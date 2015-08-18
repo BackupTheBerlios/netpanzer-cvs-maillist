@@ -1,0 +1,1027 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1227 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1227%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Network&In-Reply-To=%3C20101111163436.0C5F748058B%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000252.html">
+   <LINK REL="Next"  HREF="000254.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1227 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1227%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Network&In-Reply-To=%3C20101111163436.0C5F748058B%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1227 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 11 17:34:35 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000252.html">[Netpanzer-cvs] r1226 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+        <LI>Next message: <A HREF="000254.html">[Netpanzer-cvs] r1228 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Core Interfaces Resources Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#253">[ date ]</a>
+              <a href="thread.html#253">[ thread ]</a>
+              <a href="subject.html#253">[ subject ]</a>
+              <a href="author.html#253">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-11-11 17:34:35 +0100 (Thu, 11 Nov 2010)
+New Revision: 1227
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+Log:
+-synchronize flags between server and clients (aka flag sharing)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -22,6 +22,7 @@
+ #include &quot;NetMessage.hpp&quot;
+ 
+ enum { _net_message_id_player_connect_id,
++       _net_message_id_player_sync_flag,
+        _net_message_id_player_sync_state,
+        _net_message_id_player_score_update
+      };
+@@ -65,6 +66,20 @@
+ }
+ __attribute__((packed));
+ 
++class PlayerFlagSync : public NetMessage
++{
++public:
++    PlayerID player_id;
++    Uint8 player_flag[FLAG_WIDTH*FLAG_HEIGHT];
++
++    PlayerFlagSync()
++    {
++        message_class = _net_message_class_player;
++        message_id = _net_message_id_player_sync_flag;
++    }
++}
++__attribute__((packed));
++
+ class PlayerScoreUpdate : public NetMessage
+ {
+ private:
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -1,6 +1,3 @@
+-
+-#include &quot;NetMessage.hpp&quot;
+-
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+  
+@@ -20,38 +17,52 @@
+ */
+ 
+ #include &lt;algorithm&gt;
+-#include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
++#include &quot;ServerConnectDaemon.hpp&quot;
++#include &quot;NetworkServer.hpp&quot;
++#include &quot;NetMessage.hpp&quot;
++#include &quot;NetMessageEncoder.hpp&quot;
++#include &quot;PlayerNetMessage.hpp&quot;
++#include &quot;ConnectNetMessage.hpp&quot;
++#include &quot;SystemNetMessage.hpp&quot;
++
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
++#include &quot;PowerUps/PowerUpInterface.hpp&quot;
++#include &quot;Units/UnitInterface.hpp&quot;
++#include &quot;Core/NetworkGlobals.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+-#include &quot;Core/NetworkGlobals.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+-#include &quot;PowerUps/PowerUpInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+-#include &quot;Resources/ResourceManager.hpp&quot;
++enum ConnectionState
++{
++    connect_state_idle,
++    connect_state_wait_for_connect_request,
++    connect_state_wait_for_client_settings,
++    connect_state_wait_for_client_game_setup_ack,
++    connect_state_player_state_sync,
++    connect_state_sync_flags,
++    connect_state_unit_sync
++ };
+ 
+-#include &quot;PlayerNetMessage.hpp&quot;
+-#include &quot;ConnectNetMessage.hpp&quot;
+-#include &quot;SystemNetMessage.hpp&quot;
+ 
+-#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-
+-ServerConnectDaemon::ConnectionState 
+-        ServerConnectDaemon::connection_state = ServerConnectDaemon::connect_state_idle;
+-
+ ServerConnectDaemon::ConnectQueue ServerConnectDaemon::connect_queue;
+ 
++int                 ServerConnectDaemon::connection_state = connect_state_idle;
+ bool                ServerConnectDaemon::connection_lock_state = false;
+ ClientSocket      * ServerConnectDaemon::connect_client;
+ Timer		    ServerConnectDaemon::time_out_timer;
+ int	            ServerConnectDaemon::time_out_counter;
+ Timer               ServerConnectDaemon::sendunitpercent_timer;
+-UnitSync*           ServerConnectDaemon::connect_unit_sync = 0;
++int                 ServerConnectDaemon::sync_count = 0;
++int                 ServerConnectDaemon::sync_end = 0;
++int                 ServerConnectDaemon::sync_total = 0;
++int                 ServerConnectDaemon::sync_done = 0;
+ 
+ #define _SERVER_CONNECT_TIME_OUT_TIME (20.0)
+ #define _SERVER_CONNECT_RETRY_LIMIT   (5)
+@@ -63,7 +74,6 @@
+     (void) max_players;
+     time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
+     sendunitpercent_timer.changePeriod( _SENDUNITPERCENT_TIME );
+-    connect_unit_sync = 0;
+ }
+ 
+ void ServerConnectDaemon::startConnectDaemon( unsigned long max_players )
+@@ -75,8 +85,6 @@
+ 
+ void ServerConnectDaemon::shutdownConnectDaemon()
+ {
+-    delete connect_unit_sync;
+-    connect_unit_sync = 0;
+     ConnectMesgNetPanzerServerDisconnect server_disconnect;
+ 
+     SERVER-&gt;broadcastMessage( &amp;server_disconnect,
+@@ -207,7 +215,7 @@
+ }
+ 
+ 
+-bool ServerConnectDaemon::connectStateIdle()
++void ServerConnectDaemon::connectStateIdle()
+ {
+     if (!connect_queue.empty() &amp;&amp; (connection_lock_state == false))
+     {
+@@ -226,12 +234,10 @@
+ 
+         updateQueuedClients();
+     }
+-
+-    return true;
+ }
+ 
+ 
+-bool ServerConnectDaemon::connectStateWaitForConnectRequest(
++void ServerConnectDaemon::connectStateWaitForConnectRequest(
+         const NetMessage* message)
+ {
+     if (message &amp;&amp; message-&gt;message_id == _net_message_id_client_connect_request )
+@@ -263,11 +269,9 @@
+     {
+         resetConnectFsm();
+     }
+-    
+-    return true;
+ }
+ 
+-bool ServerConnectDaemon::connectStateWaitForClientSettings(
++void ServerConnectDaemon::connectStateWaitForClientSettings(
+         const NetMessage* message )
+ {
+     PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+@@ -294,19 +298,15 @@
+             {
+                 connection_state = connect_state_wait_for_client_game_setup_ack;
+             }
+-            return true;
+     }
+-
+-    if ( time_out_timer.count() )
++    else if ( time_out_timer.count() )
+     {
+         player-&gt;setStatus( _player_state_free );
+         resetConnectFsm();
+     }
+-
+-    return true;
+ }
+ 
+-bool ServerConnectDaemon::connectStateWaitForClientGameSetupAck(
++void ServerConnectDaemon::connectStateWaitForClientGameSetupAck(
+         const NetMessage* message )
+ {
+     PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+@@ -318,7 +318,8 @@
+             connect_client-&gt;sendMessage( &amp;player_connect_mesg,
+                                          sizeof(PlayerConnectID));
+             
+-            PlayerInterface::startPlayerStateSync( connect_client-&gt;getPlayerIndex() );
++            sync_count = 0;
++            sync_end = PlayerInterface::getMaxPlayers();
+ 
+             ConnectProcessStateMessage state_mesg;
+             state_mesg.setMessageEnum(_connect_state_message_sync_player_info);
+@@ -330,107 +331,169 @@
+             {
+                 connection_state = connect_state_player_state_sync;
+             }
+-            
+-            return true;
+         }
+         else if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
+         {
+             time_out_timer.reset();
+-            return true;
+         }
+     }
+-
+-    if ( time_out_timer.count() )
++    else if ( time_out_timer.count() )
+     {
+         player-&gt;setStatus( _player_state_free );
+         resetConnectFsm();
+     }
+-
+-    return true;
+ }
+ 
+-bool ServerConnectDaemon::connectStatePlayerStateSync()
++void ServerConnectDaemon::connectStatePlayerStateSync()
+ {
+     ConnectProcessStateMessage state_mesg;
+-    int percent_complete;
+-    
+-    unsigned char buffer[_MAX_NET_PACKET_SIZE];
+-    unsigned int buffer_pos = 0;
+-    PlayerStateSync msg;
+-    while ( buffer_pos+sizeof(PlayerStateSync) &lt; _MAX_NET_PACKET_SIZE
+-            &amp;&amp; percent_complete != 100)
++
++    NetMessageEncoder encoder;
++    PlayerStateSync pss;
++
++    do
+     {
+-        if ( PlayerInterface::syncNextPlayerState( msg.player_state, &amp;percent_complete) )
++        PlayerInterface::getPlayer(sync_count)-&gt;getNetworkPlayerState(pss.player_state);
++        if ( ! encoder.encodeMessage(&amp;pss, sizeof(pss)) )
+         {
+-            memcpy(buffer+buffer_pos, &amp;msg, sizeof(PlayerStateSync));
+-            buffer_pos += sizeof(PlayerStateSync);
++            break;
+         }
+-    }
++    } while ( ++sync_count &lt; sync_end );
+ 
+-    if ( buffer_pos )
+-    {
+-        connect_client-&gt;sendMessage(buffer, buffer_pos);
+-    }
++    // here encoder *always* has something
++    connect_client-&gt;sendMessage(encoder.getEncodedMessage(),
++                                encoder.getEncodedLen());
+     
+     state_mesg.setMessageEnum(_connect_state_message_sync_player_info_percent);
+-    state_mesg.setPercentComplete(percent_complete);
+-    connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(ConnectProcessStateMessage));
++    state_mesg.setPercentComplete((sync_count*100)/sync_end);
++
++    connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
+     connect_client-&gt;sendRemaining();
+ 
+-    if ( percent_complete == 100 )
++    if ( sync_count == sync_end )
+     {
+-        delete connect_unit_sync;
+-        connect_unit_sync = new UnitSync(connect_client);
++        sync_count = 0;
++        sync_done = 0;
++        sync_total = PlayerInterface::countPlayers();
++        // sync_end = current value = max players;
++        
++        connection_state = connect_state_sync_flags;
++    }
++}
++
++void ServerConnectDaemon::connectStateSyncFlags()
++{
++    ConnectProcessStateMessage state_mesg;
++
++    NetMessageEncoder encoder;
++
++    while ( sync_count &lt; sync_end &amp;&amp; ! PlayerInterface::isPlayerActive(sync_count) )
++    {
++        sync_count += 1;
++    }
++
++    if ( sync_count &lt; sync_end &amp;&amp; PlayerInterface::isPlayerActive(sync_count) )
++    {
++        PlayerFlagSync pfs;
++        pfs.player_id = sync_count;
++        ResourceManager::getFlag(sync_count)-&gt;frameToBuffer(pfs.player_flag, sizeof(pfs.player_flag));
++        connect_client-&gt;sendMessage(&amp;pfs, sizeof(pfs));
++        sync_done += 1;
++        sync_count += 1;
++    }
++
++    if ( sync_done == sync_total )
++    {
++        sync_count = 0;
++        sync_done = 0;
++        sync_end = 0;
++        sync_total = UnitInterface::getTotalUnitCount();
++
++        if ( sync_total )
++        {
++            sync_end = UnitInterface::getUnits().rbegin()-&gt;first;
++        }
++
++        sync_end += 1;
++
+         sendunitpercent_timer.reset();
+ 
+         state_mesg.setMessageEnum(_connect_state_message_sync_units);
+-        
++
+         // size of message already set
+         connect_client-&gt;sendMessage( &amp;state_mesg,
+                                      sizeof(ConnectProcessStateMessage));
+-        
++
+         SERVER-&gt;addClientToSendList( connect_client );
+ 
+         PlayerState *p = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+         PlayerStateSync player_state_update( p-&gt;getNetworkPlayerState() );
+         SERVER-&gt;broadcastMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+-        
++
+         if(connection_state != connect_state_idle)
+         {
+             connection_state = connect_state_unit_sync;
+         }
+     }
+-
+-    return true;
+ }
+ 
+-bool ServerConnectDaemon::connectStateUnitSync()
++void ServerConnectDaemon::connectStateUnitSync()
+ {
+     ConnectProcessStateMessage state_mesg;
+     
+-    int percent_complete = connect_unit_sync-&gt;getPercentComplete();
++    NetMessageEncoder encoder;
++    UnitInterface::Units::const_iterator i;
++    iXY unit_map_loc;
++    UnitBase* unit;
+ 
+-    // send a unit
+-    if(connect_unit_sync-&gt;sendNextUnit())
++    do
+     {
++        i = UnitInterface::getUnits().lower_bound(sync_count);
++        if ( i == UnitInterface::getUnits().end() || i-&gt;first &gt;= sync_end )
++        {
++            sync_count = sync_end;
++            sync_done = sync_total;
++            break;
++        }
++
++        unit = i-&gt;second;
++        MapInterface::pointXYtoMapXY(unit-&gt;unit_state.location, &amp;unit_map_loc);
++        UnitRemoteCreate urc(unit-&gt;player-&gt;getID(),
++                             unit-&gt;id,
++                             unit_map_loc.x,
++                             unit_map_loc.y,
++                             unit-&gt;unit_state.unit_type);
++
++        if ( ! encoder.encodeMessage(&amp;urc, sizeof(urc)) )
++        {
++            break;
++        }
++
++        sync_done += 1;
++        sync_count = i-&gt;first + 1;
++
++    } while ( sync_count &lt; sync_end );
++
++    // here encoder *always* has something
++    connect_client-&gt;sendMessage(encoder.getEncodedMessage(),
++                                encoder.getEncodedLen());
++
++    if ( sync_count &lt; sync_end )
++    {
+         if ( sendunitpercent_timer.count() )
+         {
+             state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
+-            state_mesg.setPercentComplete(percent_complete);
+-            // size already set
+-            connect_client-&gt;sendMessage( &amp;state_mesg,
+-                                         sizeof(ConnectProcessStateMessage));
++            state_mesg.setPercentComplete((sync_done*100)/sync_total);
++            connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
+             sendunitpercent_timer.reset();
+         }
+-        return true;
++        return;
+     }
+ 
+     // Sending finished
+     state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
+     state_mesg.setPercentComplete(100);
+-    // size already set
+-    connect_client-&gt;sendMessage( &amp;state_mesg,
+-                                 sizeof(ConnectProcessStateMessage));
++    connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
+ 
+     UnitSyncIntegrityCheck unit_integrity_check_mesg;
+     connect_client-&gt;sendMessage( &amp;unit_integrity_check_mesg,
+@@ -446,6 +509,11 @@
+ 
+     player-&gt;setStatus( _player_state_active );
+ 
++    PlayerFlagSync pfs;
++    pfs.player_id = connect_client-&gt;player_id;
++    ResourceManager::getFlag(connect_client-&gt;player_id)-&gt;frameToBuffer(pfs.player_flag, sizeof(pfs.player_flag));
++    SERVER-&gt;broadcastMessage(&amp;pfs, sizeof(pfs));
++
+     PlayerStateSync player_state_update
+         (player-&gt;getNetworkPlayerState());
+ 
+@@ -458,44 +526,43 @@
+     sendConnectionAlert( connect_client );
+ 
+     connection_state = connect_state_idle;
+-    return true;
+ }
+ 
+ void ServerConnectDaemon::connectFsm(const NetMessage* message)
+ {
+-    bool end_cycle = false;
++    switch ( connection_state )
++    {
++        case connect_state_idle:
++            connectStateIdle();
++            break;
+ 
+-    do {
+-        switch ( connection_state ) {
+-            case connect_state_idle:
+-                end_cycle = connectStateIdle();
+-                break;
++        case connect_state_wait_for_connect_request:
++            connectStateWaitForConnectRequest( message );
++            break;
+ 
+-            case connect_state_wait_for_connect_request:
+-                end_cycle = connectStateWaitForConnectRequest( message );
+-                break;
++        case  connect_state_wait_for_client_settings:
++            connectStateWaitForClientSettings( message );
++            break;
+ 
+-            case  connect_state_wait_for_client_settings:
+-                end_cycle = connectStateWaitForClientSettings( message );
+-                break;
++        case connect_state_wait_for_client_game_setup_ack:
++            connectStateWaitForClientGameSetupAck( message );
++            break;
+ 
+-            case connect_state_wait_for_client_game_setup_ack:
+-                end_cycle = connectStateWaitForClientGameSetupAck( message );
+-                break;
++        case connect_state_player_state_sync:
++            connectStatePlayerStateSync();
++            break;
+ 
+-            case connect_state_player_state_sync:
+-                end_cycle = connectStatePlayerStateSync();
+-                break;
++        case connect_state_sync_flags:
++            connectStateSyncFlags();
++            break;
+ 
+-            case connect_state_unit_sync:
+-                end_cycle = connectStateUnitSync();
+-                break;
++        case connect_state_unit_sync:
++            connectStateUnitSync();
++            break;
+ 
+-            default:
+-                assert(&quot;Bad connection state&quot; == 0);
+-
+-        } // ** switch
+-    } while( end_cycle == false );
++        default:
++            assert(&quot;Bad connection state&quot; == 0);
++    } // ** switch
+ }
+ 
+ void ServerConnectDaemon::connectProcess(const NetMessage* message)
+@@ -536,9 +603,5 @@
+ 
+ bool ServerConnectDaemon::isConnecting()
+ {
+-    if( connection_state == connect_state_idle ) {
+-        return false;
+-    }
+-
+-    return true;
++    return connection_state != connect_state_idle;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -25,27 +25,20 @@
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
+ #include &quot;Network/ClientSocket.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
+-#include &quot;UnitSync.hpp&quot;
+ 
+ class ServerConnectDaemon
+ {
+ protected:
+-	enum ConnectionState {
+-		connect_state_idle,
+-	 	connect_state_wait_for_connect_request,
+-	   	connect_state_wait_for_client_settings,
+-		connect_state_wait_for_client_game_setup_ack,
+-		connect_state_player_state_sync,
+-		connect_state_unit_sync
+-     };
+-
+-    static ConnectionState      connection_state;
+-    static bool                 connection_lock_state;
+-    static ClientSocket         *connect_client;
+-    static UnitSync             *connect_unit_sync;
+-    static Timer		time_out_timer;
+-    static int	                time_out_counter;
+-    static Timer                sendunitpercent_timer;
++    static int          connection_state;
++    static bool         connection_lock_state;
++    static ClientSocket *connect_client;
++    static Timer	time_out_timer;
++    static int	        time_out_counter;
++    static Timer        sendunitpercent_timer;
++    static int          sync_count;
++    static int          sync_end;
++    static int          sync_total;
++    static int          sync_done;
+     
+     typedef std::list&lt;ClientSocket *&gt; ConnectQueue;
+     typedef ConnectQueue::iterator ConnectQueueIterator;
+@@ -64,12 +57,13 @@
+     static void resetConnectFsm();
+ 
+     // ** FSM States
+-    static bool connectStateIdle();
+-    static bool connectStateWaitForConnectRequest(const NetMessage* message);
+-    static bool connectStateWaitForClientSettings(const NetMessage* message);
+-    static bool connectStateWaitForClientGameSetupAck(const NetMessage* message);
+-    static bool connectStatePlayerStateSync();
+-    static bool connectStateUnitSync();
++    static void connectStateIdle();
++    static void connectStateWaitForConnectRequest(const NetMessage* message);
++    static void connectStateWaitForClientSettings(const NetMessage* message);
++    static void connectStateWaitForClientGameSetupAck(const NetMessage* message);
++    static void connectStatePlayerStateSync();
++    static void connectStateSyncFlags();
++    static void connectStateUnitSync();
+ 
+ public:
+     static void initialize( unsigned long max_players );
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -1,80 +0,0 @@
+-/*
+-Copyright (C) 2003 by Matthias Braun&lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &quot;UnitSync.hpp&quot;
+-#include &quot;Classes/Network/NetworkServer.hpp&quot;
+-#include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Units/UnitBase.hpp&quot;
+-#include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Classes/Network/UnitNetMessage.hpp&quot;
+-
+-
+-
+-
+-UnitSync::UnitSync(ClientSocket * c)
+-    : client(c), count(0), unitid(0), unitstosync(0), lastunit(0)
+-{
+-    unitstosync = UnitInterface::getTotalUnitCount();
+-    if ( unitstosync ) {
+-        lastunit = UnitInterface::getUnits().rbegin()-&gt;first;
+-    }
+-}
+-
+-UnitSync::~UnitSync()
+-{}
+-
+-int UnitSync::getPercentComplete() const
+-{
+-    if ( unitstosync )
+-        return  (100 * count ) / unitstosync;
+-    else
+-        return 100;
+-}
+-
+-bool UnitSync::sendNextUnit()
+-{
+-    const UnitInterface::Units&amp; units = UnitInterface::getUnits();
+-    UnitInterface::Units::const_iterator i = units.lower_bound(unitid);
+-    if(i == units.end() || i-&gt;first &gt; lastunit ) {
+-        return false;
+-    }
+-    
+-    UnitBase* unit = i-&gt;second;
+-    unitid = unit-&gt;id;
+-
+-    iXY unit_map_loc;
+-    MapInterface::pointXYtoMapXY(unit-&gt;unit_state.location, &amp;unit_map_loc);
+-
+-    UnitRemoteCreate create_message(unit-&gt;player-&gt;getID(),
+-                                    unit-&gt;id,
+-                                    unit_map_loc.x,
+-                                    unit_map_loc.y,
+-                                    unit-&gt;unit_state.unit_type);
+-
+-    client-&gt;sendMessage( &amp;create_message, sizeof(UnitRemoteCreate));
+-    
+-    // XXX when send units to new players it also send sync command to all players
+-    // This will change in future
+-    //unit-&gt;syncUnit();
+-    unitid++;
+-    count++;
+-
+-    return true;
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -1,44 +0,0 @@
+-/*
+-Copyright (C) 2003 by Matthias Braun&lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __UNITSYNC_HPP__
+-#define __UNITSYNC_HPP__
+-
+-#include &quot;Units/UnitBase.hpp&quot;
+-
+-class ClientSocket;
+-
+-class UnitSync
+-{
+-public:
+-    UnitSync(ClientSocket * c);
+-    ~UnitSync();
+-
+-    int getPercentComplete() const;
+-    
+-    bool sendNextUnit();
+-
+-private:
+-    ClientSocket * client;
+-    size_t count;
+-    UnitID unitid;
+-    size_t unitstosync;
+-    UnitID lastunit;
+-};
+-
+-#endif
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -319,6 +319,21 @@
+     return state;
+ }
+ 
++void PlayerState::getNetworkPlayerState(NetworkPlayerState&amp; state) const
++{
++    state.id = id;
++    memset(state.name, 0, sizeof(state.name));
++    strncpy(state.name, name.c_str(), sizeof(state.name)-1);
++    state.status = status;
++    state.kills = htol16(kills);
++    state.kill_points = htol16(kill_points);
++    state.losses = htol16(losses);
++    state.loss_points = htol16(loss_points);
++    state.total = htol16(total);
++    state.objectives_held = htol16(objectives_held);
++    state.colorIndex = htol32(colorIndex);
++}
++
+ void PlayerState::setFromNetworkPlayerState(const NetworkPlayerState* state)
+ {
+     char tmp[64];
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -108,6 +108,7 @@
+     FlagID getFlag() const;
+     short getTotal() const;
+     NetworkPlayerState getNetworkPlayerState() const;
++    void getNetworkPlayerState(NetworkPlayerState&amp; state) const;
+     void setFromNetworkPlayerState(const NetworkPlayerState* state);
+     Uint8 getColor() const;
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -24,7 +24,6 @@
+ #include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
+ #include &quot;Classes/Network/ClientConnectDaemon.hpp&quot;
+-#include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+ #include &quot;Types/iXY.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -47,7 +47,6 @@
+ #include &quot;Classes/SpriteSorter.hpp&quot;
+ #include &quot;Classes/Network/ClientMessageRouter.hpp&quot;
+ #include &quot;Classes/Network/ClientConnectDaemon.hpp&quot;
+-#include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+ #include &quot;Classes/Network/ServerMessageRouter.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -22,7 +22,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+-
++#include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Objectives/Objective.hpp&quot;
+ 
+@@ -39,10 +39,6 @@
+ //static bool   * alliance_matrix = 0; // XXX ALLY
+ PlayerID  PlayerInterface::local_player_index = INVALID_PLAYER_ID;
+ 
+-PlayerID PlayerInterface::player_sync_index;
+-PlayerID PlayerInterface::player_sync_connect_player_index;
+-Timer PlayerInterface::player_sync_timer;
+-
+ PlayerID PlayerInterface::respawn_rule_player_index = INVALID_PLAYER_ID;
+ 
+ SDL_mutex* PlayerInterface::mutex = 0;
+@@ -158,7 +154,7 @@
+ int PlayerInterface::getActivePlayerCount()
+ {
+     PlayerID player_id;
+-    int count = 0;;
++    int count = 0;
+ 
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+@@ -209,6 +205,7 @@
+             player_lists[ player_id ].setStatus( _player_state_allocated );
+             player_lists[ player_id ].resetStats();
+             res = &amp;player_lists[ player_id ];
++            break;
+         }
+     }
+     SDL_mutexV(mutex);
+@@ -334,48 +331,6 @@
+     return( false );
+ }
+ 
+-void PlayerInterface::startPlayerStateSync(PlayerID player_id)
+-{
+-    player_sync_index = 0;
+-    player_sync_connect_player_index = player_id;
+-    player_sync_timer.changeRate( 4 );
+-}
+-
+-bool
+-PlayerInterface::syncNextPlayerState( NetworkPlayerState &amp;dest, int *percent_complete)
+-{
+-    bool hasUpdatedData = false;
+-
+-    *percent_complete = -1;
+-
+-    if ( player_sync_index == player_sync_connect_player_index )
+-    {
+-        ++player_sync_index;
+-    }
+-    
+-    if ( player_sync_index &lt; max_players )
+-    {
+-        dest = player_lists[player_sync_index].getNetworkPlayerState();
+-        ++player_sync_index;
+-        hasUpdatedData = true;
+-    }
+-    
+-    if ( player_sync_index &gt;= max_players )
+-    {
+-        *percent_complete = 100;
+-    }
+-    else
+-    {
+-        float percent;
+-        percent = ( ( (float) player_sync_index) / ( (float) max_players ) ) * 100;
+-
+-        *percent_complete = (int) percent;
+-    }
+-    
+-    return hasUpdatedData;
+-}
+-
+-
+ void PlayerInterface::netMessageConnectID(const NetMessage* message)
+ {
+     const PlayerConnectID *connect_mesg
+@@ -439,6 +394,13 @@
+             netMessageConnectID(message);
+             break;
+ 
++        case _net_message_id_player_sync_flag:
++            {
++                const PlayerFlagSync* pfs = (const PlayerFlagSync*)message;
++                ResourceManager::getFlag(pfs-&gt;player_id)-&gt;bufferToFrame(pfs-&gt;player_flag, sizeof(pfs-&gt;player_flag));
++            }
++            break;
++
+         case _net_message_id_player_sync_state :
+             netMessageSyncState(message);
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -49,6 +49,11 @@
+     static bool isAllied(PlayerID player, PlayerID with_player);
+     //static bool isSingleAllied(unsigned short player, unsigned short with_player);
+ 
++    static bool isPlayerActive(PlayerID player)
++    {
++        return player_lists[player].getStatus() == _player_state_active;
++    }
++
+     static void lockPlayerStats();
+     static void unlockPlayerStats();
+ 
+@@ -91,16 +96,10 @@
+ 
+     static bool testRuleObjectiveRatio( float precentage, PlayerState ** player_state );
+ 
+-protected:
+-    static PlayerID respawn_rule_player_index;
+-public:
+     static bool testRulePlayerRespawn( bool *completed, PlayerState **player_state );
+ 
+ protected:
+-    static PlayerID player_sync_index;
+-    static PlayerID player_sync_connect_player_index;
+-    static Timer player_sync_timer;
+-
++    static PlayerID respawn_rule_player_index;
+     static void netMessageConnectID(const NetMessage *message );
+     static void netMessageSyncState(const NetMessage *message );
+     static void netMessageScoreUpdate(const NetMessage *message );
+@@ -108,8 +107,6 @@
+     //static void netMessageAllianceUpdate(const NetMessage *message );
+ 
+ public:
+-    static void startPlayerStateSync(PlayerID player_id);
+-    static bool syncNextPlayerState( NetworkPlayerState &amp;dest, int *percent_complete);
+     static void processNetMessage(const NetMessage *message );
+     static void disconnectPlayerCleanup( PlayerID player_id );
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-11-11 10:51:46 UTC (rev 1226)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-11-11 16:34:35 UTC (rev 1227)
+@@ -145,7 +145,6 @@
+         if ( tempoffset &lt; sizeof(Uint16) )
+         {
+             // copy the needed until netMessage
+-            LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more for head&quot;, id);
+             unsigned int needsize = sizeof(Uint16)-tempoffset;
+             unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
+             memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+@@ -175,7 +174,6 @@
+ 
+         if ( (tempoffset-2 &lt; packetsize) &amp;&amp; remaining )
+         {
+-            LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more data&quot;, id);
+             unsigned int needsize = packetsize-(tempoffset-2);
+             unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
+             memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000252.html">[Netpanzer-cvs] r1226 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+	<LI>Next message: <A HREF="000254.html">[Netpanzer-cvs] r1228 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Core Interfaces Resources Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#253">[ date ]</a>
+              <a href="thread.html#253">[ thread ]</a>
+              <a href="subject.html#253">[ subject ]</a>
+              <a href="author.html#253">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

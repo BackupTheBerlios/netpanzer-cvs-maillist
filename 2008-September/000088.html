@@ -1,0 +1,724 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1049 - in trunk/netpanzer: nbproject	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1049%20-%20in%20trunk/netpanzer%3A%20nbproject%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/Game&In-Reply-To=%3C200809091554.m89Fs5bu028985%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000087.html">
+   <LINK REL="Next"  HREF="000089.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1049 - in trunk/netpanzer: nbproject	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1049%20-%20in%20trunk/netpanzer%3A%20nbproject%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/Game&In-Reply-To=%3C200809091554.m89Fs5bu028985%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1049 - in trunk/netpanzer: nbproject	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep  9 17:54:05 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000087.html">[Netpanzer-cvs] r1048 - in trunk/netpanzer/src/NetPanzer:	Interfaces Objectives
+</A></li>
+        <LI>Next message: <A HREF="000089.html">[Netpanzer-cvs] r1050 - in trunk/netpanzer: nbproject src/NetPanzer	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/AI src/NetPanzer/Classes/Network	src/NetPanzer/Classes/Weapons src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Particles	src/NetPanzer/PowerUps src/NetPanzer/Structs	src/NetPanzer/Units src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#88">[ date ]</a>
+              <a href="thread.html#88">[ thread ]</a>
+              <a href="subject.html#88">[ subject ]</a>
+              <a href="author.html#88">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-09 17:53:32 +0200 (Tue, 09 Sep 2008)
+New Revision: 1049
+
+Modified:
+   trunk/netpanzer/nbproject/Makefile-mac-debug.mk
+   trunk/netpanzer/nbproject/configurations.xml
+   trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameInfoView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+Log:
+- Fixed #includes and NetBeans project
+
+Modified: trunk/netpanzer/nbproject/Makefile-mac-debug.mk
+===================================================================
+--- trunk/netpanzer/nbproject/Makefile-mac-debug.mk	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/nbproject/Makefile-mac-debug.mk	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -62,6 +62,7 @@
+ 	${OBJECTDIR}/src/NetPanzer/Classes/ScreenSurface.o \
+ 	${OBJECTDIR}/src/Lib/2D/Palette.o \
+ 	${OBJECTDIR}/src/Lib/2D/Color.o \
++	${OBJECTDIR}/src/NetPanzer/Objectives/Outpost.o \
+ 	${OBJECTDIR}/src/NetPanzer/Particles/FlashParticle2D.o \
+ 	${OBJECTDIR}/src/Lib/lua/lvm.o \
+ 	${OBJECTDIR}/src/NetPanzer/Classes/Network/NetworkClient.o \
+@@ -102,7 +103,6 @@
+ 	${OBJECTDIR}/src/NetPanzer/Classes/OpcodeDebugger.o \
+ 	${OBJECTDIR}/src/NetPanzer/System/DummySound.o \
+ 	${OBJECTDIR}/src/Lib/lua/lfunc.o \
+-	${OBJECTDIR}/src/NetPanzer/Classes/Outpost.o \
+ 	${OBJECTDIR}/src/NetPanzer/Classes/Weapons/BulletWeapon.o \
+ 	${OBJECTDIR}/src/NetPanzer/Interfaces/UnitInterface.o \
+ 	${OBJECTDIR}/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.o \
+@@ -126,7 +126,6 @@
+ 	${OBJECTDIR}/src/Lib/lua/lstrlib.o \
+ 	${OBJECTDIR}/src/Lib/2D/ColorTable.o \
+ 	${OBJECTDIR}/src/Lib/physfs/zlib123/inftrees.o \
+-	${OBJECTDIR}/src/NetPanzer/Interfaces/ObjectiveInterface.o \
+ 	${OBJECTDIR}/src/NetPanzer/Views/Game/DisconectedView.o \
+ 	${OBJECTDIR}/src/Lib/Types/Angle.o \
+ 	${OBJECTDIR}/src/Lib/physfs/platform/posix.o \
+@@ -154,6 +153,7 @@
+ 	${OBJECTDIR}/src/Lib/lua/lapi.o \
+ 	${OBJECTDIR}/src/Lib/physfs/physfs.o \
+ 	${OBJECTDIR}/src/NetPanzer/Views/MainMenu/HelpView.o \
++	${OBJECTDIR}/src/NetPanzer/Objectives/ObjectiveInterface.o \
+ 	${OBJECTDIR}/src/NetPanzer/Views/MainMenu/Multi/JoinView.o \
+ 	${OBJECTDIR}/src/NetPanzer/Network/ProxyServer.o \
+ 	${OBJECTDIR}/src/NetPanzer/Classes/Network/ServerMessageRouter.o \
+@@ -270,7 +270,6 @@
+ 	${OBJECTDIR}/src/Lib/Network/UDPSocket.o \
+ 	${OBJECTDIR}/src/NetPanzer/Interfaces/PathScheduler.o \
+ 	${OBJECTDIR}/src/NetPanzer/Classes/TipOfDay.o \
+-	${OBJECTDIR}/src/NetPanzer/Classes/Objective.o \
+ 	${OBJECTDIR}/src/NetPanzer/Particles/TemplateExplosionSystem.o \
+ 	${OBJECTDIR}/src/Lib/physfs/platform/unix.o \
+ 	${OBJECTDIR}/src/NetPanzer/Classes/SpawnList.o \
+@@ -281,6 +280,7 @@
+ 	${OBJECTDIR}/src/Lib/INIParser/Section.o \
+ 	${OBJECTDIR}/src/NetPanzer/Views/Components/View.o \
+ 	${OBJECTDIR}/src/NetPanzer/Classes/Weapons/Weapon.o \
++	${OBJECTDIR}/src/NetPanzer/Objectives/Objective.o \
+ 	${OBJECTDIR}/src/Lib/lua/loslib.o \
+ 	${OBJECTDIR}/src/Lib/2D/RGBColor.o \
+ 	${OBJECTDIR}/src/NetPanzer/Classes/Network/ServerConnectDaemon.o \
+@@ -460,6 +460,10 @@
+ 	${MKDIR} -p ${OBJECTDIR}/src/Lib/2D
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/Lib/2D/Color.o src/Lib/2D/Color.cpp
+ 
++${OBJECTDIR}/src/NetPanzer/Objectives/Outpost.o: src/NetPanzer/Objectives/Outpost.cpp 
++	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Objectives
++	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Objectives/Outpost.o src/NetPanzer/Objectives/Outpost.cpp
++
+ ${OBJECTDIR}/src/NetPanzer/Particles/FlashParticle2D.o: src/NetPanzer/Particles/FlashParticle2D.cpp 
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Particles
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Particles/FlashParticle2D.o src/NetPanzer/Particles/FlashParticle2D.cpp
+@@ -620,10 +624,6 @@
+ 	${MKDIR} -p ${OBJECTDIR}/src/Lib/lua
+ 	$(COMPILE.c) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/Lib/lua/lfunc.o src/Lib/lua/lfunc.c
+ 
+-${OBJECTDIR}/src/NetPanzer/Classes/Outpost.o: src/NetPanzer/Classes/Outpost.cpp 
+-	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Classes
+-	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Classes/Outpost.o src/NetPanzer/Classes/Outpost.cpp
+-
+ ${OBJECTDIR}/src/NetPanzer/Classes/Weapons/BulletWeapon.o: src/NetPanzer/Classes/Weapons/BulletWeapon.cpp 
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Classes/Weapons
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Classes/Weapons/BulletWeapon.o src/NetPanzer/Classes/Weapons/BulletWeapon.cpp
+@@ -716,10 +716,6 @@
+ 	${MKDIR} -p ${OBJECTDIR}/src/Lib/physfs/zlib123
+ 	$(COMPILE.c) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/Lib/physfs/zlib123/inftrees.o src/Lib/physfs/zlib123/inftrees.c
+ 
+-${OBJECTDIR}/src/NetPanzer/Interfaces/ObjectiveInterface.o: src/NetPanzer/Interfaces/ObjectiveInterface.cpp 
+-	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Interfaces
+-	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Interfaces/ObjectiveInterface.o src/NetPanzer/Interfaces/ObjectiveInterface.cpp
+-
+ ${OBJECTDIR}/src/NetPanzer/Views/Game/DisconectedView.o: src/NetPanzer/Views/Game/DisconectedView.cpp 
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Views/Game
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Views/Game/DisconectedView.o src/NetPanzer/Views/Game/DisconectedView.cpp
+@@ -828,6 +824,10 @@
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Views/MainMenu
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Views/MainMenu/HelpView.o src/NetPanzer/Views/MainMenu/HelpView.cpp
+ 
++${OBJECTDIR}/src/NetPanzer/Objectives/ObjectiveInterface.o: src/NetPanzer/Objectives/ObjectiveInterface.cpp 
++	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Objectives
++	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Objectives/ObjectiveInterface.o src/NetPanzer/Objectives/ObjectiveInterface.cpp
++
+ ${OBJECTDIR}/src/NetPanzer/Views/MainMenu/Multi/JoinView.o: src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp 
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Views/MainMenu/Multi
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Views/MainMenu/Multi/JoinView.o src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp
+@@ -1292,10 +1292,6 @@
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Classes
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Classes/TipOfDay.o src/NetPanzer/Classes/TipOfDay.cpp
+ 
+-${OBJECTDIR}/src/NetPanzer/Classes/Objective.o: src/NetPanzer/Classes/Objective.cpp 
+-	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Classes
+-	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Classes/Objective.o src/NetPanzer/Classes/Objective.cpp
+-
+ ${OBJECTDIR}/src/NetPanzer/Particles/TemplateExplosionSystem.o: src/NetPanzer/Particles/TemplateExplosionSystem.cpp 
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Particles
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Particles/TemplateExplosionSystem.o src/NetPanzer/Particles/TemplateExplosionSystem.cpp
+@@ -1336,6 +1332,10 @@
+ 	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Classes/Weapons
+ 	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Classes/Weapons/Weapon.o src/NetPanzer/Classes/Weapons/Weapon.cpp
+ 
++${OBJECTDIR}/src/NetPanzer/Objectives/Objective.o: src/NetPanzer/Objectives/Objective.cpp 
++	${MKDIR} -p ${OBJECTDIR}/src/NetPanzer/Objectives
++	$(COMPILE.cc) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/NetPanzer/Objectives/Objective.o src/NetPanzer/Objectives/Objective.cpp
++
+ ${OBJECTDIR}/src/Lib/lua/loslib.o: src/Lib/lua/loslib.c 
+ 	${MKDIR} -p ${OBJECTDIR}/src/Lib/lua
+ 	$(COMPILE.c) -g -Wall -DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -I. -Isrc/Lib -Isrc/NetPanzer -Isrc/Lib/physfs -Isrc/Lib/physfs/zlib123 -I/Library/Frameworks/SDL.framework/Versions/A/Headers -I/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers -o ${OBJECTDIR}/src/Lib/lua/loslib.o src/Lib/lua/loslib.c
+
+Modified: trunk/netpanzer/nbproject/configurations.xml
+===================================================================
+--- trunk/netpanzer/nbproject/configurations.xml	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/nbproject/configurations.xml	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -293,13 +293,9 @@
+           &lt;/logicalFolder&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/MapFile.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/MapFile.hpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Classes/Objective.cpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Classes/Objective.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/ObjectiveMessageTypes.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/OpcodeDebugger.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/OpcodeDebugger.hpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Classes/Outpost.cpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Classes/Outpost.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/PlacementMatrix.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/PlacementMatrix.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Classes/PlayerState.cpp&lt;/itemPath&gt;
+@@ -392,8 +388,6 @@
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MiniMapInterface.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MouseInterface.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MouseInterface.hpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Interfaces/ObjectiveInterface.cpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Interfaces/ObjectiveInterface.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/PathScheduler.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/PathScheduler.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/PlayerGameManager.cpp&lt;/itemPath&gt;
+@@ -420,6 +414,14 @@
+           &lt;itemPath&gt;src/NetPanzer/Network/ProxyServer.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Network/ProxyServer.hpp&lt;/itemPath&gt;
+         &lt;/logicalFolder&gt;
++        &lt;logicalFolder name=&quot;Objectives&quot; displayName=&quot;Objectives&quot; projectFiles=&quot;true&quot;&gt;
++          &lt;itemPath&gt;src/NetPanzer/Objectives/Objective.cpp&lt;/itemPath&gt;
++          &lt;itemPath&gt;src/NetPanzer/Objectives/Objective.hpp&lt;/itemPath&gt;
++          &lt;itemPath&gt;src/NetPanzer/Objectives/ObjectiveInterface.cpp&lt;/itemPath&gt;
++          &lt;itemPath&gt;src/NetPanzer/Objectives/ObjectiveInterface.hpp&lt;/itemPath&gt;
++          &lt;itemPath&gt;src/NetPanzer/Objectives/Outpost.cpp&lt;/itemPath&gt;
++          &lt;itemPath&gt;src/NetPanzer/Objectives/Outpost.hpp&lt;/itemPath&gt;
++        &lt;/logicalFolder&gt;
+         &lt;logicalFolder name=&quot;Particles&quot; displayName=&quot;Particles&quot; projectFiles=&quot;true&quot;&gt;
+           &lt;itemPath&gt;src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp&lt;/itemPath&gt;
+@@ -1399,12 +1401,6 @@
+       &lt;item path=&quot;src/NetPanzer/Classes/Network/UnitSync.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Objective.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Objective.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Classes/ObjectiveMessageTypes.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -1414,12 +1410,6 @@
+       &lt;item path=&quot;src/NetPanzer/Classes/OpcodeDebugger.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Outpost.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Outpost.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Classes/PlacementMatrix.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -1726,12 +1716,6 @@
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MouseInterface.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/ObjectiveInterface.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/ObjectiveInterface.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Interfaces/PathScheduler.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -1801,6 +1785,24 @@
+       &lt;item path=&quot;src/NetPanzer/Network/ProxyServer.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Objective.cpp&quot;&gt;
++        &lt;itemTool&gt;1&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Objective.hpp&quot;&gt;
++        &lt;itemTool&gt;3&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/ObjectiveInterface.cpp&quot;&gt;
++        &lt;itemTool&gt;1&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/ObjectiveInterface.hpp&quot;&gt;
++        &lt;itemTool&gt;3&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Outpost.cpp&quot;&gt;
++        &lt;itemTool&gt;1&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Outpost.hpp&quot;&gt;
++        &lt;itemTool&gt;3&lt;/itemTool&gt;
++      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -3131,12 +3133,6 @@
+       &lt;item path=&quot;src/NetPanzer/Classes/Network/UnitSync.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Objective.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Objective.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Classes/ObjectiveMessageTypes.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -3146,12 +3142,6 @@
+       &lt;item path=&quot;src/NetPanzer/Classes/OpcodeDebugger.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Outpost.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Classes/Outpost.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Classes/PlacementMatrix.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -3458,12 +3448,6 @@
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MouseInterface.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/ObjectiveInterface.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/ObjectiveInterface.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Interfaces/PathScheduler.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -3533,6 +3517,24 @@
+       &lt;item path=&quot;src/NetPanzer/Network/ProxyServer.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Objective.cpp&quot;&gt;
++        &lt;itemTool&gt;1&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Objective.hpp&quot;&gt;
++        &lt;itemTool&gt;3&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/ObjectiveInterface.cpp&quot;&gt;
++        &lt;itemTool&gt;1&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/ObjectiveInterface.hpp&quot;&gt;
++        &lt;itemTool&gt;3&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Outpost.cpp&quot;&gt;
++        &lt;itemTool&gt;1&lt;/itemTool&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;src/NetPanzer/Objectives/Outpost.hpp&quot;&gt;
++        &lt;itemTool&gt;3&lt;/itemTool&gt;
++      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -23,11 +23,11 @@
+ 
+ #include &quot;Classes/PlacementMatrix.hpp&quot;
+ #include &quot;Classes/UnitBase.hpp&quot;
+-#include &quot;Classes/Objective.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
+ #include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ Bot *Bot::s_bot = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -30,8 +30,8 @@
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Classes/UnitBase.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
+-#include &quot;Classes/Objective.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
+ #include &quot;Classes/Units/Vehicle.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -29,7 +29,7 @@
+ #include &quot;ConnectNetMessage.hpp&quot;
+ #include &quot;ObjectiveNetMessage.hpp&quot;
+ 
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -25,7 +25,7 @@
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -22,7 +22,7 @@
+ #include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -25,7 +25,7 @@
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -41,7 +41,7 @@
+ #include &quot;PathScheduler.hpp&quot;
+ #include &quot;Interfaces/ProjectileInterface.hpp&quot;
+ #include &quot;Interfaces/UnitProfileInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;MapsManager.hpp&quot;
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -34,7 +34,7 @@
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+ #include &quot;Interfaces/Heartbeat.hpp&quot;
+ #include &quot;Interfaces/InfoSocket.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ 
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -21,7 +21,7 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -36,7 +36,7 @@
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+ #include &quot;Interfaces/MiniMapInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PathScheduler.hpp&quot;
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -24,7 +24,7 @@
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ 
+ #include &quot;Util/Log.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -25,7 +25,7 @@
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;PathScheduler.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ fXY MiniMapInterface::scale_factor;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -31,7 +31,7 @@
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+ #include &quot;Interfaces/MiniMapInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PathScheduler.hpp&quot;
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -20,7 +20,7 @@
+ 
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ 
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ #include &lt;config.h&gt;
+-#include &quot;Classes/Objective.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
+ #include &quot;Outpost.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -20,7 +20,7 @@
+ 
+ #include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;ArrayUtil/BoundBox.hpp&quot;
+-#include &quot;SpriteSorter.hpp&quot;
++#include &quot;Classes/SpriteSorter.hpp&quot;
+ #include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;Classes/ObjectiveMessageTypes.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ #include &lt;config.h&gt;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ 
+ #include &lt;stdio.h&gt;
+ #include &lt;memory&gt;
+@@ -31,7 +31,7 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileStream.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+-#include &quot;Classes/Outpost.hpp&quot;
++#include &quot;Objectives/Outpost.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ #include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -20,7 +20,7 @@
+ 
+ #include &quot;SDL.h&quot;
+ 
+-#include &quot;Classes/Objective.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
+ #include &quot;ArrayUtil/ArrayTemplate.hpp&quot;
+ 
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -18,7 +18,7 @@
+ #ifndef _OUTPOST_HPP
+ #define _OUTPOST_HPP
+ 
+-#include &quot;Classes/Objective.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
+ #include &quot;Classes/SelectionBoxSprite.hpp&quot;
+ #include &quot;Classes/UnitBase.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameInfoView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameInfoView.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameInfoView.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -27,7 +27,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ 
+ static int getPlayerFrags()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -23,7 +23,7 @@
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/ProjectileInterface.hpp&quot;
+ #include &quot;Interfaces/MouseInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -26,7 +26,7 @@
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ 
+ #include &quot;Views/Components/Label.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2008-09-09 15:42:00 UTC (rev 1048)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2008-09-09 15:53:32 UTC (rev 1049)
+@@ -29,9 +29,8 @@
+ #include &quot;Util/Math.hpp&quot;
+ #include &quot;Structs/UnitTypes.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/UnitProfileInterface.hpp&quot;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000087.html">[Netpanzer-cvs] r1048 - in trunk/netpanzer/src/NetPanzer:	Interfaces Objectives
+</A></li>
+	<LI>Next message: <A HREF="000089.html">[Netpanzer-cvs] r1050 - in trunk/netpanzer: nbproject src/NetPanzer	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/AI src/NetPanzer/Classes/Network	src/NetPanzer/Classes/Weapons src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Particles	src/NetPanzer/PowerUps src/NetPanzer/Structs	src/NetPanzer/Units src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#88">[ date ]</a>
+              <a href="thread.html#88">[ thread ]</a>
+              <a href="subject.html#88">[ subject ]</a>
+              <a href="author.html#88">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

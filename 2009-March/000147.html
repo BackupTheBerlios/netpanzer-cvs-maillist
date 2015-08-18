@@ -1,0 +1,304 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1118 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1118%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/menu%20src/Lib/2D%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200903301454.n2UEswSh029646%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000146.html">
+   <LINK REL="Next"  HREF="000148.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1118 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1118%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/menu%20src/Lib/2D%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200903301454.n2UEswSh029646%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1118 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Mar 30 16:54:58 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000146.html">[Netpanzer-cvs] r1117 - in trunk/netpanzer: . src/NetPanzer/Bot	src/NetPanzer/Classes
+</A></li>
+        <LI>Next message: <A HREF="000148.html">[Netpanzer-cvs] r1119 - in trunk/netpanzer/src/NetPanzer: Particles	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-03-30 16:54:04 +0200 (Mon, 30 Mar 2009)
+New Revision: 1118
+
+Modified:
+   trunk/netpanzer/pics/backgrounds/menus/menu/connectionMB.bmp
+   trunk/netpanzer/pics/backgrounds/menus/menu/defaultMB.bmp
+   trunk/netpanzer/pics/backgrounds/menus/menu/hostjoinMB.bmp
+   trunk/netpanzer/pics/backgrounds/menus/menu/loadingMB.bmp
+   trunk/netpanzer/pics/backgrounds/menus/menu/optionsMB.bmp
+   trunk/netpanzer/pics/backgrounds/menus/menu/sessionMB.bmp
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+Log:
+- use only one palette for the game.
+- use graphics converted by wile64
+- removed unused function mapFromPalette from Surface.
+
+
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/menu/connectionMB.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/menu/defaultMB.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/menu/hostjoinMB.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/menu/loadingMB.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/menu/optionsMB.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/menu/sessionMB.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -1626,38 +1626,6 @@
+ 
+ } // end Surface::bltStringInBox
+ 
+-// mapFromPalette
+-//--------------------------------------------------------------------------
+-// Purpose: Maps this image from the specified palette to the current palette.
+-//--------------------------------------------------------------------------
+-void Surface::mapFromPalette(const std::string&amp; oldPalette)
+-{
+-    // Load the source palette.
+-    Uint8     bestFitArray[256];
+-    SDL_Color sourceColor[256];
+-
+-    try {
+-        std::string filename = &quot;wads/&quot; + oldPalette + &quot;.act&quot;;
+-	std::auto_ptr&lt;filesystem::ReadFile&gt; file(
+-                filesystem::openRead(filename));
+-
+-	for (int i = 0; i &lt; 256; i++) {
+-	    file-&gt;read(&amp;sourceColor[i], 3, 1);
+-	}
+-
+-	for (int i = 0; i &lt; 256; i++) {
+-	    bestFitArray[i] = Palette::findNearestColor(sourceColor[i].r,sourceColor[i].g,sourceColor[i].b);
+-	}
+-
+-	for (size_t x = 0; x &lt; (size_t) (getWidth() * getHeight() * getNumFrames()); x++) {
+-	    frame0[x] = bestFitArray[frame0[x]];
+-	}
+-    } catch(std::exception&amp; e) {
+-	throw Exception(&quot;Error while reading palette '%s': %s&quot;,
+-		oldPalette.c_str(), e.what());
+-    }
+-} // end Surface::mapFromPalette
+-
+ // drawBoxCorners
+ //--------------------------------------------------------------------------
+ // Purpose: Draws lines in the corners of the surface of the specified length
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -211,8 +211,6 @@
+ 
+     void loadBMP(const char *fileName, bool needAlloc = true);
+ 
+-    void mapFromPalette(const std::string&amp; oldPalette);
+-
+     void drawBoxCorners(const iRect &amp;rect, int cornerLength, PIX color);
+     void drawBoxCorners(const iXY &amp;min, const iXY &amp;max,
+             int cornerLength, PIX color)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -177,8 +177,6 @@
+ 
+     Desktop::add(new LoadingView());
+ 
+-    GameManager::loadPalette(&quot;netpmenu&quot;);
+-
+     Desktop::add(new MapSelectionView());
+     Desktop::add(new MainMenuView());
+     Desktop::add(new JoinView());
+@@ -379,9 +377,6 @@
+ 
+     LoadingView::hide();
+ 
+-    // Set the palette to the game palette.
+-    GameManager::loadPalette( &quot;netp&quot;);
+-
+     GameManager::setNetPanzerGameOptions();
+ 
+     // Need to open at beginning of game until we are saving status of things.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -113,9 +113,6 @@
+             //----------------------
+             GameManager::quitNetPanzerGame();
+             //----------------------
+-
+-            GameManager::loadPalette(&quot;netpmenu&quot;);
+-
+             // Must remove the gameView first so that the initButtons detects that
+             // and loads the correct buttons.
+             Desktop::setVisibilityAllWindows(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -100,8 +100,6 @@
+ 
+         GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+ 
+-        GameManager::loadPalette(&quot;netpmenu&quot;);
+-
+         // Must remove the gameView first so that the initButtons detects that
+         // and loads the correct buttons.
+         Desktop::setVisibilityAllWindows(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -47,12 +47,7 @@
+ 
+ void
+ LoadingView::doDraw()
+-{
+-    if ( Palette::getName() != &quot;netpmenu&quot; )
+-    {
+-        GameManager::loadPalette(&quot;netpmenu&quot;);
+-    }
+-    
++{    
+     if (dirty)
+         render();
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -62,7 +62,6 @@
+     static void loadFinish()
+     {
+         Desktop::setVisibilityAllWindows(false);
+-        GameManager::loadPalette(&quot;netp&quot;);
+         GameManager::setNetPanzerGameOptions();
+         Desktop::setVisibility(&quot;MiniMapView&quot;, true);
+         Desktop::setVisibility(&quot;GameView&quot;, true);
+@@ -70,7 +69,6 @@
+ 
+     static void loadError()
+     {
+-        GameManager::loadPalette(&quot;netpmenu&quot;);
+         Desktop::setVisibilityAllWindows(false);
+         Desktop::setVisibility(&quot;MainView&quot;, true);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -101,7 +101,6 @@
+             string fullname(DEFAULT_FLAGS_PATH);
+             fullname += filenames[i];
+             buttonimg.loadBMP(fullname.c_str());
+-            buttonimg.mapFromPalette(&quot;netp&quot;);
+ 
+             Button * newButton = new Button(filenames[i]);
+             newButton-&gt;setCustomCode(FLAGBUTTONCODE);
+@@ -161,10 +160,7 @@
+     fullfile += fname;
+     try
+     {
+-        Surface t;
+-        t.loadBMP(fullfile.c_str());
+-        t.mapFromPalette(&quot;netp&quot;);
+-        playerFlag.copy(t);
++        playerFlag.loadBMP(fullfile.c_str());
+         playerFlagSelected = fname;
+     }
+     catch (Exception &amp;e)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2009-03-26 00:12:16 UTC (rev 1117)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
+@@ -251,10 +251,6 @@
+ 	}	
+     }
+ 
+-    for (size_t i = 0; i &lt; mapList.size(); i++) {
+-        mapList[i]-&gt;thumbnail.mapFromPalette(&quot;netp&quot;);
+-    }
+-
+     if (mapList.size() == 0) {
+         throw Exception(&quot;ERROR: No maps in map directory&quot;);
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000146.html">[Netpanzer-cvs] r1117 - in trunk/netpanzer: . src/NetPanzer/Bot	src/NetPanzer/Classes
+</A></li>
+	<LI>Next message: <A HREF="000148.html">[Netpanzer-cvs] r1119 - in trunk/netpanzer/src/NetPanzer: Particles	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

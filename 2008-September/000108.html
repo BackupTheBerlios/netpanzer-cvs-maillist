@@ -1,0 +1,327 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1072 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Units Views/Components
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1072%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Units%20Views/Components&In-Reply-To=%3C200809231431.m8NEVp71019681%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000107.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1072 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Units Views/Components</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1072%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Units%20Views/Components&In-Reply-To=%3C200809231431.m8NEVp71019681%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1072 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Units Views/Components">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep 23 16:31:51 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000107.html">[Netpanzer-cvs] r1071 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-23 16:31:29 +0200 (Tue, 23 Sep 2008)
+New Revision: 1072
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+Log:
+- Fixes crash in some of the latest svn when a player's send buffer gets full.
+- Fixed drawing the output location of the outposts in minimap (bug in recent svn version)
+- When players exit the game clicking the (X) button of the operating system, sends the disconnect command to server (gracefull exit).
+- Fixed bug on right click deselect, if after right click scroll the end position was the same as the starting position, the units would be deselected, now is ok.
+- The right click deselect function has a longer timer, you have to click a little bit longer than before to deselect the units
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -62,6 +62,21 @@
+     client_list.clear();
+ }
+ 
++void NetworkServer::cleanUpClientList()
++{
++    ClientList::iterator i = client_list.begin();
++    while ( i != client_list.end() )
++    {
++        if( (*i)-&gt;wannadie )
++        {
++            delete (*i)-&gt;client_socket;
++            delete (*i);
++            i = client_list.erase(i);
++        }
++        i++;
++    }
++}
++
+ bool NetworkServer::addClientToSendList( ClientSocket * client )
+ {
+     ServerClientListData *client_data = new ServerClientListData;
+@@ -164,15 +179,8 @@
+                 LOGGER.warning (&quot;Network broadcast error when sending to player %d: %s&quot;,
+                        (*i)-&gt;client_socket-&gt;getPlayerIndex(), e.what() );
+             }
+-            ++i;
+         }
+-        else
+-        {
+-            // cleanup dieing client.
+-            delete (*i)-&gt;client_socket;
+-            delete (*i);
+-            i = client_list.erase(i);
+-        }
++        ++i;
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -64,6 +64,7 @@
+     virtual ~NetworkServer();
+ 
+     bool addClientToSendList( ClientSocket * client );
++    void cleanUpClientList();
+ 
+     void openSession();
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -80,6 +80,7 @@
+     manual_fire_state = false;
+ 
+     right_mouse_scroll = false;
++    right_mouse_scroll_moved = false;
+ }
+ 
+ void
+@@ -118,16 +119,19 @@
+ 
+     scroll_increment = (long) (scroll_rate * time_slice);
+ 
+-    if(right_mouse_scroll) {
++    if(right_mouse_scroll)
++    {
+         int x,y;
+         int buttons=SDL_GetMouseState(&amp;x,&amp;y);
+-        if(!(buttons&amp;SDL_BUTTON(SDL_BUTTON_RIGHT))) {
++        if(!(buttons&amp;SDL_BUTTON(SDL_BUTTON_RIGHT)))
++        {
+             // sometimes the winning page or something comes up
+             //  as you're holding down the right mouse button
+             //  and the UP message doesn't come through
+             right_mouse_scroll=false;
+         }
+-        else if(mouse_pos.x!=right_mouse_scroll_pos.x || mouse_pos.y!=right_mouse_scroll_pos.y) {
++        else if(mouse_pos.x!=right_mouse_scroll_pos.x || mouse_pos.y!=right_mouse_scroll_pos.y)
++        {
+             // we're holding down the right mouse button, and mouse has moved
+             int x_move=mouse_pos.x-right_mouse_scroll_pos.x;
+             int y_move=mouse_pos.y-right_mouse_scroll_pos.y;
+@@ -137,6 +141,7 @@
+             WorldViewInterface::scroll_down(y_move*4);
+             right_mouse_scrolled_pos.x+=x_move;
+             right_mouse_scrolled_pos.y+=y_move;
++            right_mouse_scroll_moved = true;
+         }
+         return;
+     }
+@@ -721,19 +726,22 @@
+ void
+ WorldInputCmdProcessor::evalRightMButtonEvents(const MouseEvent&amp; event)
+ {
+-    static NTimer mtimer(100);
+-    if (event.event == MouseEvent::EVENT_DOWN ) {
++    static NTimer mtimer(150);
++    if (event.event == MouseEvent::EVENT_DOWN )
++    {
+         right_mouse_scroll=true;
++        right_mouse_scroll_moved = false;
+         right_mouse_scroll_pos=event.pos;
+         right_mouse_scrolled_pos.x=right_mouse_scrolled_pos.y=0;
+         mtimer.reset();
+     }
+-    if (right_mouse_scroll &amp;&amp; event.event == MouseEvent::EVENT_UP ) {
++    
++    if (right_mouse_scroll &amp;&amp; event.event == MouseEvent::EVENT_UP )
++    {
+         right_mouse_scroll=false;
+-        if ( right_mouse_scrolled_pos.x==0 
+-                            &amp;&amp; right_mouse_scrolled_pos.y==0
+-                            &amp;&amp; mtimer.isTimeOut() ) {
+-            // simple right click on the same position
++        if ( ! right_mouse_scroll_moved &amp;&amp; mtimer.isTimeOut() )
++        {
++            // simple right click on the same position after timeout
+             working_list.unGroup();
+         }
+         return;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -38,6 +38,7 @@
+     iXY right_mouse_scroll_pos;
+     iXY right_mouse_scrolled_pos;
+     bool right_mouse_scroll;
++    bool right_mouse_scroll_moved;
+     bool selectBoundBoxUnits();
+ 
+     bool manual_control_state;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -241,6 +241,8 @@
+ //-----------------------------------------------------------------
+ void BaseGameManager::simLoop()
+ {
++    if ( SERVER )
++        SERVER-&gt;cleanUpClientList();
+     network::SocketManager::handleEvents();
+     
+     if ( NetworkState::status == _network_state_server ) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -442,7 +442,11 @@
+ 
+     // handle SDL Events
+     if(handleSDLEvents())
++    {
++        // We got SDL_Quit, lets disconnect nicely.
++        GameManager::exitNetPanzer();
+         return false;
++    }
+ 
+     return BaseGameManager::mainLoop();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -40,6 +40,8 @@
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ 
++#define MOVEWAIT_TIME 0.8f
++
+ enum{ _rotate_and_move, _rotate_stop_move };
+ 
+ Vehicle::Vehicle(PlayerState* player, unsigned char utype, UnitID id, iXY initial_loc)
+@@ -110,7 +112,7 @@
+     body_anim_shadow.attachSprite( &amp;turret_anim, zero );
+     body_anim_shadow.attachSprite( &amp;select_info_box, zero );
+     
+-    aiFsmMoveToLoc_wait_timer.changePeriod( 0.8f );
++    aiFsmMoveToLoc_wait_timer.changePeriod( MOVEWAIT_TIME );
+ }
+ 
+ void Vehicle::setUnitProperties( unsigned char utype )
+@@ -926,7 +928,7 @@
+                     MapInterface::pointXYtoMapXY( aiFsmMoveToLoc_prev_loc, &amp;aiFsmMoveToLoc_prev_loc );
+                     UnitBlackBoard::markUnitLoc( aiFsmMoveToLoc_prev_loc );
+ 
+-                    //aiFsmMoveToLoc_wait_timer.changePeriod( 0.8f );
++                    //aiFsmMoveToLoc_wait_timer.changePeriod( MOVEWAIT_TIME );
+                     aiFsmMoveToLoc_wait_timer.reset();
+                     aiFsmMoveToLoc_state = _aiFsmMoveToLoc_wait_clear_loc;
+                 }
+@@ -974,7 +976,7 @@
+                             PathRequest path_request;
+                             path_request.set(id, aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_goal, 0, &amp;path, _path_request_full );
+                             PathScheduler::requestPath( path_request );
+-                            aiFsmMoveToLoc_wait_timer.changePeriod( 0.8f );
++                            aiFsmMoveToLoc_wait_timer.changePeriod( MOVEWAIT_TIME );
+                         }
+                         else
+                         {
+@@ -1760,7 +1762,7 @@
+     ai_command_state = _ai_command_move_to_loc;
+     aiFsmMoveToLoc_state = _aiFsmMoveToLoc_path_generate;
+     aiFsmMoveToLoc_path_not_finished = true;
+-    aiFsmMoveToLoc_wait_timer.changePeriod( 0.8f );
++    aiFsmMoveToLoc_wait_timer.changePeriod( MOVEWAIT_TIME );
+ 
+     opcode_move_timer.changePeriod( 0.10f );
+     move_opcode_sent = false;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2008-09-22 15:46:25 UTC (rev 1071)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2008-09-23 14:31:29 UTC (rev 1072)
+@@ -205,11 +205,11 @@
+             //Only draw our unit collection location
+             iXY objdest, src;
+             MapInterface::mapXYtoPointXY(status.unit_collection_loc, &amp;objdest);
+-            objdest.x = int(float(objdest.x) / xratio)+position.x;
+-            objdest.y = int(float(objdest.y) / yratio)+position.y;
+-
+-            src.x  = int(float(obj_state-&gt;location.x) / xratio)+position.x;
+-            src.y  = int(float(obj_state-&gt;location.y) / yratio)+position.y;
++            objdest.x = int(float(objdest.x/32) / xratio)+position.x;
++            objdest.y = int(float(objdest.y/32) / yratio)+position.y;
++            
++            src.x  = int(float(obj_state-&gt;location.x/32) / xratio)+position.x;
++            src.y  = int(float(obj_state-&gt;location.y/32) / yratio)+position.y;
+             dest.drawLine(src.x, src.y, objdest.x, objdest.y, color);
+         }
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000107.html">[Netpanzer-cvs] r1071 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

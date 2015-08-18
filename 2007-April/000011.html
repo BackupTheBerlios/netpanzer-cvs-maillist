@@ -1,0 +1,4782 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r964 - in trunk/netpanzer/src: Lib/Network Lib/Util	NetPanzer/Classes NetPanzer/Classes/AI NetPanzer/Core	NetPanzer/Interfaces NetPanzer/Interfaces/unix	NetPanzer/Network NetPanzer/System NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r964%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%20Lib/Util%0A%09NetPanzer/Classes%20NetPanzer/Classes/AI%20NetPanzer/Core%0A%09NetPanzer/Interfaces%20NetPanzer/Interfaces/unix%0A%09NetPanzer/Network%20NetPanzer/System%20NetPanzer/Views/Game%0A%09NetPanzer/Views/MainMenu/Multi%0A%09NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200704021155.l32BthXq002311%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000012.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r964 - in trunk/netpanzer/src: Lib/Network Lib/Util	NetPanzer/Classes NetPanzer/Classes/AI NetPanzer/Core	NetPanzer/Interfaces NetPanzer/Interfaces/unix	NetPanzer/Network NetPanzer/System NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r964%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%20Lib/Util%0A%09NetPanzer/Classes%20NetPanzer/Classes/AI%20NetPanzer/Core%0A%09NetPanzer/Interfaces%20NetPanzer/Interfaces/unix%0A%09NetPanzer/Network%20NetPanzer/System%20NetPanzer/Views/Game%0A%09NetPanzer/Views/MainMenu/Multi%0A%09NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200704021155.l32BthXq002311%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r964 - in trunk/netpanzer/src: Lib/Network Lib/Util	NetPanzer/Classes NetPanzer/Classes/AI NetPanzer/Core	NetPanzer/Interfaces NetPanzer/Interfaces/unix	NetPanzer/Network NetPanzer/System NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Apr  2 13:55:43 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000012.html">[Netpanzer-cvs] r965 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-04-02 13:55:35 +0200 (Mon, 02 Apr 2007)
+New Revision: 964
+
+Added:
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp
+Removed:
+   trunk/netpanzer/src/Lib/Network/SocketStream.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientList.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientList.hpp
+   trunk/netpanzer/src/NetPanzer/Network/SocketClient.cpp
+   trunk/netpanzer/src/NetPanzer/Network/SocketClient.hpp
+Modified:
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/SocketSet.cpp
+   trunk/netpanzer/src/Lib/Network/SocketSet.hpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+   trunk/netpanzer/src/Lib/Util/Log.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerID.hpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp
+Log:
+Changes:
+ - Changed all networking to be event based, all networking is done in the same thread.
+ - Proxy functions still has not been updated to use the new networking functions(so dont use them).
+ - Removed SocketStream.hpp as is no longer used
+ - Removed InfoThread and HeartbeatThread and added InfoSocket and Heartbeat classes which uses the new networking functions and they dont run in a separate thread.
+ - Heartbeat doesn't signals the masterserver when the gameserver is stoped. Masterserver will timeout and remove it automatically
+ - Removed ClientList and SocketClient classes as they are no longer used.
+ - All the receiving and sending of networked clients is done in the same class now (ClientSocket).
+ - ServerQueryThread is not a thread, it checks all the masterservers for gameservers, does several retrys when querying the gameservers, doesn't query/update the masterserver list.
+ - When connecting to a gameserver, stops the querying of servers.
+ - When a client is disconected from a server, there is a new window to inform the game has been disconected with an 'ok' button to go back to main screen (DisconectedView.hpp).
+ - Added timestamps too all the logs
+ - (Thanks to Cellar Door for this report) When netpanzer is in fullscreen and switching back to it (with alt-tab for example), the graphics become bad. Reload the palette in this case and problem is fixed.
+ - Pathing values changed back to original, in the future will update the pathing functions.
+
+notes:
+ - I'm thinking to change the masterserver protocol, anyway the masterserver will be changed to use new networking functions after verifying they work correctly in the main game.
+ - As there is no check for the famous 'endless loop' should check if it still happens and where.
+ - Pathing is still bad, it seems to be the next step.
+
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -17,11 +17,16 @@
+ */
+ #include &lt;config.h&gt;
+ 
++#include &lt;iostream&gt;
++using namespace std;
++
+ #include &lt;sstream&gt;
+ #include &lt;stdexcept&gt;
+ 
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;SocketBase.hpp&quot;
++#include &quot;SocketManager.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ 
+ namespace network
+ {
+@@ -52,9 +57,14 @@
+ 
+ SocketBase::~SocketBase()
+ {
+-    close();
++    //doClose();
+ }
+ 
++SocketBase::SocketBase(SOCKET fd, const Address &amp;a) : sockfd(fd), addr(a)
++{
++    SocketManager::addSocket(this);
++}
++
+ void
+ SocketBase::printError(std::ostream&amp; out, int e)
+ {
+@@ -68,11 +78,14 @@
+ void
+ SocketBase::create(bool tcp)
+ {
+-    if(tcp)
++    if(tcp) {
+         sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+-    else
++    } else {
+         sockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
++    }
+ 
++    LOGGER.debug(&quot;SocketBase:: Create [%s:%d] socket&quot;, (tcp)?&quot;tcp&quot;:&quot;udp&quot;,sockfd);
++    
+     if(sockfd == INVALID_SOCKET) {
+         int error = GET_NET_ERROR();
+ 	std::stringstream msg;
+@@ -80,6 +93,8 @@
+         printError(msg,error);
+ 	throw std::runtime_error(msg.str());
+     }
++    _isConnecting = false;
++    SocketManager::addSocket(this);
+ }
+ 
+ void
+@@ -149,6 +164,10 @@
+     int res = connect(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
++        if (IS_CONNECT_INPROGRESS(error)) {
++            _isConnecting = true;
++            return;
++        }
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't connect to '&quot; &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot;
+             &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot;;
+@@ -160,9 +179,17 @@
+ int
+ SocketBase::doSend(const void* data, size_t len)
+ {
+-    int res = send(sockfd, (const char*) data, len, 0);
++    int res = send(sockfd, (const char*) data, len, SEND_FLAGS);
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
++        if ( IS_DISCONECTED(error) ) {
++            onDisconected();
++            return 0;
++        }
++        
++        if ( IS_IGNORABLE_ERROR(error) )
++            return 0; // xxx WARNING should do something if can't send now
++        
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: &quot;;
+         printError(msg,error);
+@@ -174,23 +201,35 @@
+ int
+ SocketBase::doReceive(void* buffer, size_t len)
+ {
+-    int res = recv(sockfd, (char*) buffer, len, 0);
++    int res = recv(sockfd, (char*) buffer, len, RECV_FLAGS);
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
+-        if ( error == NETERROR_WOULDBLOCK)
++        if ( IS_DISCONECTED(error) ) {
++            onDisconected();
+             return 0;
++        }
++        
++        if ( IS_IGNORABLE_ERROR(error) )
++            return 0;
++
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Read error: &quot;;
+         printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
++    
++    if (!res) {
++        LOGGER.debug(&quot;SocketBase::doReceive Disconected from server&quot;);
++        onDisconected();
++    }
++    
+     return res;
+ }
+ 
+ int
+ SocketBase::doSendTo(const Address&amp; toaddr, const void* data, size_t len)
+ {
+-    int res = sendto(sockfd, (const char*) data, len, 0,
++    int res = sendto(sockfd, (const char*) data, len, SEND_FLAGS,
+                 toaddr.getSockaddr(), toaddr.getSockaddrLen());
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
+@@ -205,12 +244,13 @@
+ size_t
+ SocketBase::doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len)
+ {
+-    int res = recvfrom(sockfd, (char*) buffer, len, 0,
++    int res = recvfrom(sockfd, (char*) buffer, len, RECV_FLAGS,
+             fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
+-        if ( error == NETERROR_WOULDBLOCK)
++        if ( IS_IGNORABLE_ERROR(error) )
+             return 0;
++
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Receive error: &quot; &lt;&lt; strerror(errno);
+         printError(msg,error);
+@@ -226,7 +266,7 @@
+     newsock= accept(sockfd, fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
+     if (newsock == INVALID_SOCKET) {
+         int error = GET_NET_ERROR();
+-        if ( error == NETERROR_WOULDBLOCK )
++        if ( IS_ACCEPT_IGNORABLE(error) )
+             return INVALID_SOCKET; // XXX this could be better
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Accept error: &quot;;
+@@ -237,8 +277,10 @@
+ }
+ 
+ void
+-SocketBase::close()
++SocketBase::doClose()
+ {
++    LOGGER.debug(&quot;SocketBase:: Closing [%d] socket&quot;, sockfd);
++    SocketManager::removeSocket(this);
+     closesocket(sockfd);
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -34,19 +34,26 @@
+     {
+         return addr;
+     }
++
++    bool isConnecting() { return _isConnecting; };
+ protected:
+     SocketBase();
+-    SocketBase(SOCKET fd) : sockfd(fd) {};
+     SocketBase(const Address &amp;a) : addr(a) {};
+-    SocketBase(SOCKET fd, const Address &amp;a) : sockfd(fd), addr(a) {};
++    SocketBase(SOCKET fd, const Address &amp;a);
+     
+-    ~SocketBase();
++    virtual ~SocketBase();
++    
++    virtual void onDataReady() = 0;
++    virtual void onDisconected() {};
++    virtual void onConnected() {};
++    virtual void destroy() = 0;
+ 
+ protected:
+     friend class SocketSet;
++    friend class SocketManager;
+     void create(bool tcp);
+     void setNonBlocking();
+-    void close();
++    void doClose();
+     void printError(std::ostream&amp; out, int e);
+     
+     void bindSocketTo(const Address&amp; toaddr);
+@@ -59,11 +66,18 @@
+     int  doSendTo(const Address&amp; toaddr, const void* data, size_t len);
+     size_t  doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len);
+     SOCKET doAccept(Address&amp; fromaddr);
+-
+-private:    
++    
++private:
++    
++    void connectionFinished() 
++    {
++        _isConnecting = false;
++        onConnected();
++    };
++    
++    bool _isConnecting;
+     SOCKET sockfd;
+     Address addr;
+-
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -18,13 +18,22 @@
+ #ifndef __SOCKETHEADERS_HPP__
+ #define __SOCKETHEADERS_HPP__
+ 
++#include &quot;config.h&quot;
++
+ #ifdef USE_WINSOCK
+ #include &lt;winsock2.h&gt;
+ 
+ #define GET_NET_ERROR() WSAGetLastError()
++#define IS_CONNECT_INPROGRESS(code) (code==WSAEWOULDBLOCK)
++#define IS_ACCEPT_IGNORABLE(code) ((code==WSAEWOULDBLOCK)||(code==WSAECONNRESET)||(code==WSAEINTR)||(code==WSAEINPROGRESS))
++#define IS_DISCONECTED(code) ((code==WSAENETRESET)||(code==WSAECONNABORTED)||(code==WSAETIMEDOUT)||(code==WSAECONNRESET))
++#define IS_IGNORABLE_ERROR(code) (code==WSAEWOULDBLOCK)
+ #define NETERROR_WOULDBLOCK WSAEWOULDBLOCK
+ #define SETSOCKOPT_PARAMTYPE char
++#define SEND_FLAGS 0
++#define RECV_FLAGS 0
+ 
++
+ #else
+ #include &lt;unistd.h&gt;
+ #include &lt;errno.h&gt;
+@@ -40,9 +49,16 @@
+ #define INVALID_SOCKET -1
+ #define closesocket(s) ::close(s)
+ #define GET_NET_ERROR() errno
++#define IS_CONNECT_INPROGRESS(code) (code==EINPROGRESS)
++#define IS_ACCEPT_IGNORABLE(code) ((code==EAGAIN)||(code==ECONNABORTED)||(code==EINTR))
++#define IS_DISCONECTED(code) ((code==ECONNREFUSED)||(code==ECONNRESET)||(code==EPIPE)||(code==ENOTCONN))
++#define IS_IGNORABLE_ERROR(code) ((code==EAGAIN)||(code==EINTR))
+ #define NETERROR_WOULDBLOCK EWOULDBLOCK
+ #define SETSOCKOPT_PARAMTYPE int
++#define SEND_FLAGS MSG_NOSIGNAL
++#define RECV_FLAGS MSG_NOSIGNAL
+ 
++
+ #endif
+ 
+ #endif
+
+Added: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,93 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &lt;list&gt;
++#include &quot;SocketManager.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++namespace network {
++
++list&lt;SocketBase *&gt; SocketManager::socketList;
++list&lt;SocketBase *&gt; SocketManager::newSockets;
++list&lt;SocketBase *&gt; SocketManager::deletedSockets;
++SocketSet SocketManager::sset;
++
++void
++SocketManager::handleEvents()
++{
++    list&lt;SocketBase *&gt;::iterator i;
++
++    if (!newSockets.empty() || !deletedSockets.empty()) {
++        if (!newSockets.empty()) {
++            for (i = newSockets.begin(); i!=newSockets.end(); i++) {
++                LOGGER.debug(&quot;SocketManager:: Adding socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++                socketList.push_front(*i);
++            }
++            newSockets.clear();
++        }
++
++        if (!deletedSockets.empty()) {
++            for (i = deletedSockets.begin(); i!=deletedSockets.end(); i++) {
++                LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++                socketList.remove(*i);
++                delete *i;
++            }
++            deletedSockets.clear();
++        }
++
++
++        sset.clear();
++        for (i = socketList.begin(); i!=socketList.end(); i++) {
++            if ((*i)-&gt;isConnecting()) {
++                LOGGER.debug(&quot;SocketManager:: Setting socket [%d,%08lx] to write&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++                sset.addWrite(*i);
++            } else {
++                LOGGER.debug(&quot;SocketManager:: Setting socket [%d,%08lx] to read&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++                sset.add(*i);
++            }
++        }
++    }
++    
++    //std::cout &lt;&lt; &quot;NUM SOCKETS &quot; &lt;&lt; socketList.size() &lt;&lt; endl;
++ 
++    if (!sset.select(0))
++        return;
++
++    for (i = socketList.begin(); i!=socketList.end(); i++) {
++        if ((*i)-&gt;isConnecting()) {
++            if (sset.isWriteable(*i)) {
++                sset.removeWrite(*i);
++                sset.add(*i);
++                (*i)-&gt;connectionFinished();
++            }
++        } else {
++            if (sset.dataAvailable(*i)) {
++                (*i)-&gt;onDataReady();
++            }
++        }
++    }
++
++
++
++
++}
++
++
++
++
++}
+
+Added: trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,64 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef _SOCKETMANAGER_HPP
++#define _SOCKETMANAGER_HPP
++
++#include &lt;list&gt;
++#include &quot;SocketBase.hpp&quot;
++#include &quot;TCPSocket.hpp&quot;
++#include &quot;SocketSet.hpp&quot;
++
++using namespace std;
++
++namespace network {
++    
++class SocketManager
++{
++public:
++    SocketManager() {};
++    ~SocketManager() {};
++    
++    static void handleEvents();
++    
++protected:
++    friend class SocketBase; // the only allowed to add/remove
++    static void addSocket(SocketBase *s)
++    {
++        newSockets.push_front(s);
++    }
++    
++    static void removeSocket(SocketBase *s)
++    {
++        deletedSockets.push_front(s);
++    }
++
++    
++    
++private:
++    
++    static SocketSet sset;
++    static list&lt;SocketBase *&gt; socketList;
++    static list&lt;SocketBase *&gt; newSockets;
++    static list&lt;SocketBase *&gt; deletedSockets;
++    
++};
++
++} // namespace
++
++#endif
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketSet.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketSet.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketSet.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -27,9 +27,10 @@
+ namespace network
+ {
+ 
+-SocketSet::SocketSet()
++SocketSet::SocketSet() : maxfd(0)
+ {
+-    FD_ZERO(&amp;set);
++    FD_ZERO(&amp;readset);
++    FD_ZERO(&amp;writeset);
+ }
+ 
+ SocketSet::~SocketSet()
+@@ -37,17 +38,55 @@
+ }
+ 
+ void
++SocketSet::clear()
++{
++    maxfd=0;
++    FD_ZERO(&amp;readset);
++    FD_ZERO(&amp;writeset);
++}
++
++void
+ SocketSet::add(const SocketBase&amp; socket)
+ {
+-    FD_SET(socket.sockfd, &amp;set);
++    FD_SET(socket.sockfd, &amp;readset);
++#ifndef USE_WINSOCK
++    if (socket.sockfd &gt; maxfd)
++        maxfd=socket.sockfd;
++#endif
+ }
+ 
+ void
++SocketSet::add(const SocketBase* socket)
++{
++    FD_SET(socket-&gt;sockfd, &amp;readset);
++#ifndef USE_WINSOCK
++    if (socket-&gt;sockfd &gt; maxfd)
++        maxfd=socket-&gt;sockfd;
++#endif
++}
++
++void
++SocketSet::addWrite(const SocketBase* socket)
++{
++    FD_SET(socket-&gt;sockfd, &amp;writeset);
++#ifndef USE_WINSOCK
++    if (socket-&gt;sockfd &gt; maxfd)
++        maxfd=socket-&gt;sockfd;
++#endif
++}
++
++void
+ SocketSet::remove(const SocketBase&amp; socket)
+ {
+-    FD_CLR(socket.sockfd, &amp;set);
++    FD_CLR(socket.sockfd, &amp;readset);
+ }
+ 
++void
++SocketSet::removeWrite(const SocketBase* socket)
++{
++    FD_CLR(socket-&gt;sockfd, &amp;writeset);
++}
++
+ bool
+ SocketSet::select(unsigned int usec)
+ {
+@@ -56,12 +95,13 @@
+     timeout.tv_usec = usec%1000000;
+ 
+ #ifdef USE_WINSOCK
+-    if(set.fd_count == 0)
++    if( (readset.fd_count==0) &amp;&amp; (writeset.fd_count==0) )
+ 	return false;
+ #endif
+     
+-    testset = set;
+-    int res = ::select(FD_SETSIZE, &amp;testset, 0, 0, &amp;timeout);
++    testreadset = readset;
++    testwriteset = writeset;
++    int res = ::select(maxfd+1, &amp;testreadset, &amp;testwriteset, 0, &amp;timeout);
+ #ifdef USE_WINSOCK
+     if(res &lt; 0) {
+         std::stringstream msg;
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketSet.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketSet.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketSet.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -31,10 +31,16 @@
+     SocketSet();
+     ~SocketSet();
+ 
++    void clear();
++    
+     /** add a socket to the set that should be watched */
+     void add(const SocketBase&amp; socket);
++    void add(const SocketBase* socket);
++    void addWrite(const SocketBase* socket);
++    
+     /** removes a socket from the set */
+     void remove(const SocketBase&amp; socket);
++    void removeWrite(const SocketBase* socket);
+     /** Waits for input on the sockets in the set until a socket has input or a
+      * timeout occurs. Returns false in case of timeout.
+      */
+@@ -44,12 +50,26 @@
+      */
+     bool dataPending(const SocketBase&amp; socketbase) const
+     {
+-        return FD_ISSET(socketbase.sockfd, &amp;testset);
++        return FD_ISSET(socketbase.sockfd, &amp;testreadset);
+     }
+     
++    bool dataAvailable(const SocketBase* socketbase) const
++    {
++        return FD_ISSET(socketbase-&gt;sockfd, &amp;testreadset);
++    }
++    
++    bool isWriteable(const SocketBase* socketbase) const
++    {
++        return FD_ISSET(socketbase-&gt;sockfd,&amp;testwriteset);
++    }
++    
++    
+ private:
+-    fd_set set;
+-    fd_set testset;
++    SOCKET maxfd;
++    fd_set readset;
++    fd_set writeset;
++    fd_set testreadset;
++    fd_set testwriteset;
+ };
+ 
+ }
+
+Deleted: trunk/netpanzer/src/Lib/Network/SocketStream.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketStream.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/SocketStream.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,131 +0,0 @@
+-/*
+-Copyright (C) 2004 by Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __SOCKETSTREAM_HPP__
+-#define __SOCKETSTREAM_HPP__
+-
+-#include &lt;streambuf&gt;
+-#include &lt;iostream&gt;
+-#include &lt;SDL.h&gt;
+-#include &quot;SocketHeaders.hpp&quot;
+-#include &quot;TCPSocket.hpp&quot;
+-
+-namespace network
+-{
+-
+-/** streambuf implementation for tcp network sockets. This makes them usable as
+- * C++ istreams
+- */
+-class SocketStreamBuf : public std::streambuf
+-{
+-public:
+-    SocketStreamBuf(TCPSocket&amp; newsocket)
+-        : socket(newsocket), cancel(false)
+-    { 
+-        setp(writebuffer, writebuffer + sizeof(writebuffer)-1);
+-        setg(readbuffer, readbuffer, readbuffer);
+-    }
+-
+-    ~SocketStreamBuf()
+-    {
+-        // write remaining buffer to socket
+-        sync();
+-    }
+-
+-    void setCancel()
+-    {
+-        cancel = true;
+-    }
+-
+-protected:
+-    virtual int sync()
+-    {
+-        overflow(traits_type::eof());
+-        return 0;
+-    }
+-    
+-    virtual int underflow()
+-    {
+-        size_t len;
+-        do {
+-            if(cancel)
+-                return traits_type::eof();
+-            try {
+-                len = socket.recv(readbuffer, sizeof(readbuffer));
+-            } catch(...) {
+-                return traits_type::eof();
+-            }
+-            if(len &gt; 0)
+-                break;
+-            SDL_Delay(300);
+-        } while(1);
+-
+-        setg(readbuffer, readbuffer, readbuffer+len);
+-        return readbuffer[0];
+-    }
+-
+-    virtual int overflow(int c)
+-    {
+-        size_t len = size_t(pptr() - pbase());
+-        if(c != traits_type::eof()) {
+-            *pptr() = c;
+-            ++len;
+-        }
+-        // anything to send out
+-        if(len &gt; 0) {
+-            const void* data = pbase();
+-            try {
+-                socket.send(data, len);
+-            } catch(...) {
+-                return traits_type::eof();
+-            }
+-            setp(writebuffer, writebuffer+sizeof(writebuffer)-1);
+-        }
+-
+-        return 0;
+-    }
+-
+-private:
+-    char readbuffer[1024];
+-    char writebuffer[1024];
+-    TCPSocket&amp; socket;
+-    volatile bool cancel;
+-};
+-
+-class SocketStream : public std::iostream
+-{
+-public:
+-    SocketStream(TCPSocket&amp; socket)
+-        : std::iostream(new SocketStreamBuf(socket))
+-    { }
+-
+-    ~SocketStream()
+-    {
+-        delete rdbuf();
+-    }
+-
+-    void cancel()
+-    {
+-        SocketStreamBuf* buf = (SocketStreamBuf*) rdbuf();
+-        buf-&gt;setCancel();
+-    }
+-};
+-
+-}
+-
+-#endif
+-
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -27,54 +27,45 @@
+ namespace network
+ {
+     
+-TCPListenSocket::TCPListenSocket(const Address&amp; newaddr, bool blocking)
++TCPListenSocket::TCPListenSocket(const Address&amp; newaddr, TCPListenSocketObserver *o)
+     : SocketBase(newaddr)
+ {
++    observer = o;
+     try {
+         create(true);
+         setReuseAddr();
+         bindSocket();
+         doListen();
+-    
+-        if(!blocking)
+-            setNonBlocking();
+-
++        setNonBlocking();
+     } catch(...) {
+-        close();
++        doClose();
+         throw;
+     }
+-#ifdef USE_WINSOCK
+-    this-&gt;blocking = blocking;
+-#endif
+ }
+ 
+-TCPSocket*
+-TCPListenSocket::accept()
++void
++TCPListenSocket::destroy()
+ {
++    
++    
++    
++}
++
++void
++TCPListenSocket::onDataReady()
++{
+     Address newaddr;
+     SOCKET newsock;
+-    newsock = doAccept(newaddr);
+-    if (newsock == INVALID_SOCKET)
+-        return 0; 
+-    TCPSocket* result;
+-    try {
+-        result = new TCPSocket(newsock, newaddr);
+-    } catch(...) {
+-        close();
+-        throw;
++    TCPSocketObserver * newobserver;
++    while ( (newsock=doAccept(newaddr)) != INVALID_SOCKET) {
++        
++        newobserver = observer-&gt;onNewConnection(this, newaddr);
++        TCPSocket * newcon = new TCPSocket(newsock,newaddr,newobserver);
++        newcon-&gt;setNonBlocking();
++        newcon-&gt;onConnected();
++        
+     }
++}
+ 
+-#ifdef USE_WINSOCK
+-    try {
+-        if(!blocking)
+-            result-&gt;setNonBlocking();
+-    } catch(...) {
+-        delete result;
+-        throw;
+-    }
+-#endif
+ 
+-    return result;
+ }
+-
+-}
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -20,31 +20,37 @@
+ 
+ #include &lt;assert.h&gt;
+ #include &quot;SocketBase.hpp&quot;
++#include &quot;TCPSocket.hpp&quot;
+ 
+ namespace network
+ {
++    
++class TCPListenSocket;    
++    
++class TCPListenSocketObserver {
++public:    
++    TCPListenSocketObserver() {};
++    virtual ~TCPListenSocketObserver() {};
++protected:
++    friend class TCPListenSocket;
++    virtual TCPSocketObserver * onNewConnection(TCPListenSocket *so, const Address &amp;fromaddr) = 0;
++};
++    
+ 
+ class TCPListenSocket : public SocketBase
+ {
+ public:
+-    /** creates a new listen socket and binds it to the specified address */
+-    TCPListenSocket(const Address&amp; bindaddr, bool blocking = true);
++    TCPListenSocket(const Address&amp; bindaddr, TCPListenSocketObserver *o);
++    void destroy();
++    
++protected:
++    ~TCPListenSocket() {};
++    
++    void onDataReady();
+ 
+-    /** accepts a new client and returns it's socket or 0 when no client
+-     * is connecting and we're in nonblocking mode 
+-     */
+-    TCPSocket* accept();
+-
+ private:
+-    // forbidden on listening socket
+-    void send(const void* , size_t )
+-    { assert(false); }
+-    size_t recv(void* , size_t )
+-    { assert(false); }
+-
+-#ifdef USE_WINSOCK
+-    bool blocking;
+-#endif
++    TCPListenSocketObserver * observer;
++    
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -27,20 +27,6 @@
+ namespace network
+ {
+ 
+-TCPSocket::TCPSocket(const Address&amp; newaddr, bool blocking) :SocketBase(newaddr)
+-{
+-    create(true);
+-    init(blocking);
+-}
+-
+-TCPSocket::TCPSocket(const Address&amp; bindaddr, const Address&amp; newaddr,
+-        bool blocking) : SocketBase(newaddr)
+-{
+-    create(true);
+-    bindSocketTo(bindaddr);
+-    init(blocking);
+-}
+-
+ void
+ TCPSocket::init(bool blocking)
+ {
+@@ -49,19 +35,27 @@
+         if(!blocking)
+             setNonBlocking();
+     } catch(...) {
+-        close();
++        doClose();
+         throw;
+     }
+ }
+ 
+ TCPSocket::~TCPSocket()
++{ }
++
++void
++TCPSocket::destroy()
+ {
++    doClose();
++    observer=0;
+ }
+ 
+ void
+ TCPSocket::send(const void* data, size_t size)
+ {
+     int res = doSend(data,size);
++    if (!res &amp;&amp; !observer) // disconnected
++        return;
+     if(res != (int) size) {
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: Couldn't send all data.&quot;;
+@@ -69,19 +63,55 @@
+     }
+ }
+ 
+-size_t
++/*size_t
+ TCPSocket::recv(void* buffer, size_t size)
+ {
+     return doReceive(buffer,size);
+-}
++}*/
+ 
+ TCPSocket::TCPSocket()
+ {
+ }
+ 
+-TCPSocket::TCPSocket(SOCKET fd, const Address&amp; newaddr) : SocketBase(fd,newaddr)
++TCPSocket::TCPSocket(SOCKET fd, const Address&amp; newaddr, TCPSocketObserver *o) 
++    : SocketBase(fd,newaddr)
+ {
++    observer=o;
+ }
+ 
++TCPSocket::TCPSocket(const Address&amp; address, TCPSocketObserver *o) : SocketBase(address)
++{
++    observer=o;
++    create(true);
++    setNonBlocking();
++    doConnect();
++ }
++
++void
++TCPSocket::onConnected()
++{
++    if (observer)
++        observer-&gt;onConnected(this);
+ }
+ 
++void
++TCPSocket::onDisconected()
++{
++    if (observer)
++        observer-&gt;onDisconected(this);
++    destroy();
++}
++
++void
++TCPSocket::onDataReady()
++{
++    char buffer[4096];
++    int len;
++    len = doReceive(buffer,sizeof(buffer));
++    if (len) {
++        if (observer)
++            observer-&gt;onDataReceived(this, buffer,len);
++    }
++}
++
++}
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -24,29 +24,46 @@
+ namespace network
+ {
+ 
++class TCPSocket;    
++    
++class TCPSocketObserver {
++public:    
++    TCPSocketObserver() {};
++    virtual ~TCPSocketObserver() {};
++protected:
++    friend class TCPSocket;
++    virtual void onDataReceived(TCPSocket *so, const char *data, const int len) = 0;
++    virtual void onConnected(TCPSocket *so) = 0;
++    virtual void onDisconected(TCPSocket *so) = 0;
++};
++
+ class TCPSocket : public SocketBase
+ {
+ public:
+-    /** connects to a remote host */
+-    TCPSocket(const Address&amp; address, bool blocking = true);
+-    TCPSocket(const Address&amp; bindaddr, const Address&amp; address,
+-            bool blocking = true);
+-    ~TCPSocket();
++//    TCPSocket(const Address&amp; bindaddr, const Address&amp; address, bool blocking = true);
+ 
+-    /** send data to the socket */
++
++    TCPSocket(const Address&amp; address, TCPSocketObserver *o);
++
++    void destroy();
++
+     void send(const void* data, size_t datasize);
+-    /** receives data from the socket and copies it into the buffer.
+-     * returns number of read bytes
+-     */
+-    size_t recv(void* buffer, size_t bufsize);
+-
++    
++protected:
++    ~TCPSocket();
++    void onDataReady();
++    void onConnected();
++    void onDisconected();
++    
+ private:
+     friend class TCPListenSocket;
+ 
+     TCPSocket();
+-    TCPSocket(SOCKET fd, const Address&amp; addr);
++    TCPSocket(SOCKET fd, const Address&amp; addr, TCPSocketObserver *o);
+ 
+     void init(bool blocking);
++    
++    TCPSocketObserver *observer;
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -27,18 +27,35 @@
+ namespace network
+ {
+ 
+-UDPSocket::UDPSocket(bool blocking) : SocketBase(Address::ANY)
++//UDPSocket::UDPSocket(bool blocking) : SocketBase(Address::ANY) { init(blocking); }
++
++//UDPSocket::UDPSocket(const Address&amp; bindaddr, bool blocking) : SocketBase(bindaddr) { init(blocking); }
++
++UDPSocket::UDPSocket(UDPSocketObserver *o) : SocketBase(Address::ANY)
+ {
+-    init(blocking);
++    observer=o;
++    init(false);
+ }
+ 
+-UDPSocket::UDPSocket(const Address&amp; bindaddr, bool blocking)
++UDPSocket::UDPSocket(const Address&amp; bindaddr, UDPSocketObserver *o)
+     : SocketBase(bindaddr)
+ {
+-    init(blocking);
++    observer=o;
++    init(false);
+ }
+ 
++UDPSocket::~UDPSocket()
++{
++}
++
+ void
++UDPSocket::destroy()
++{
++    observer=0;
++    doClose();
++}
++
++void
+ UDPSocket::init(bool blocking)
+ {
+     create(false);
+@@ -48,15 +65,11 @@
+         if(!blocking)
+             setNonBlocking();
+     } catch(...) {
+-        close();
++        doClose();
+         throw;
+     }
+ }
+ 
+-UDPSocket::~UDPSocket()
+-{
+-}
+-
+ void
+ UDPSocket::send(const Address&amp; toaddr, const void* data, size_t datasize)
+ {
+@@ -74,4 +87,17 @@
+     return doReceiveFrom(fromaddr,buffer,bufsize);
+ }
+ 
++void
++UDPSocket::onDataReady()
++{
++    Address a;
++    char buffer[4096];
++    int len;
++    do {
++        len=doReceiveFrom(a,buffer,sizeof(buffer));
++        if (len &amp;&amp; observer)
++            observer-&gt;onDataReceived(this,a,buffer,len);
++    } while (len);
+ }
++
++}
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -25,26 +25,45 @@
+ 
+ namespace network
+ {
++    
++class UDPSocket;    
++    
++class UDPSocketObserver {
++public:    
++    UDPSocketObserver() {};
++    virtual ~UDPSocketObserver() {};
++protected:
++    friend class UDPSocket;
++    virtual void onDataReceived(UDPSocket *so, const Address &amp;from, const char *data, const int len) = 0;
++};
+ 
++
+ class UDPSocket : public SocketBase
+ {
+ public:
+     /** creates a new socket and binds it to the specified address and port or a
+      * random port if port == 0
+      */
+-    UDPSocket(bool blocking = true);
+-    UDPSocket(const Address&amp; bindaddr, bool blocking = true);
+-    ~UDPSocket();
++//    UDPSocket(bool blocking = true);
++//    UDPSocket(const Address&amp; bindaddr, bool blocking = true);
++    UDPSocket(UDPSocketObserver *o);
++    UDPSocket(const Address&amp; bindaddr, UDPSocketObserver *o);
+ 
++    void destroy();
++
+     /** send data to the specified address */
+     void send(const Address&amp; toaddr, const void* data, size_t datasize);
+     /** receives data from socket. Returns the number of bytes read and stores
+      * the address of the client who sent the data in addr.
+      */
+     size_t recv(Address&amp; fromaddr, void* buffer, size_t bufsize);
++protected:
++    ~UDPSocket();
++    void onDataReady();
+ 
+ private:
+     void init(bool blocking);
++    UDPSocketObserver *observer;
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Util/Log.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/Log.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/Lib/Util/Log.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -70,8 +70,12 @@
+ void
+ Logger::log(int priority, const char *fmt, va_list ap)
+ {
+-    char buf[512];
+-    vsnprintf(buf, sizeof(buf)-1, fmt, ap);
++    char buf[2048];
++    time_t curtime = time(0);
++    struct tm* loctime = localtime(&amp;curtime);
++    int timelen = strftime(buf, sizeof(buf), &quot;%Y-%m-%d %H:%M:%S &quot;, loctime);
++    
++    vsnprintf(buf+timelen, sizeof(buf)-timelen-1, fmt, ap);
+     strcat(buf, &quot;\n&quot;);
+     
+     if (m_logLevel &gt;= priority) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -194,28 +194,28 @@
+ 
+     switch(direction) {
+         case 0:
+-            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  0; succ-&gt;g = 7;
++            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  0; succ-&gt;g = 0;
+             break;
+         case 1:
+-            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y = -1; succ-&gt;g = 8;
++            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y = -1; succ-&gt;g = 1;
+             break;
+         case 2:
+-            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y = -1; succ-&gt;g = 7;
++            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y = -1; succ-&gt;g = 0;
+             break;
+         case 3:
+-            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y = -1; succ-&gt;g = 8;
++            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y = -1; succ-&gt;g = 1;
+             break;
+         case 4:
+-            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  0; succ-&gt;g = 7;
++            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  0; succ-&gt;g = 0;
+             break;
+         case 5:
+-            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  1; succ-&gt;g = 8;
++            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  1; succ-&gt;g = 1;
+             break;
+         case 6:
+-            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y =  1; succ-&gt;g = 7;
++            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y =  1; succ-&gt;g = 0;
+             break;
+         case 7:
+-            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  1; succ-&gt;g = 8;
++            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  1; succ-&gt;g = 1;
+             break;
+     }
+ 
+@@ -227,7 +227,7 @@
+         if ( ( (UnitBlackBoard::unitOccupiesLoc( succ-&gt;map_loc ) == true ) &amp;&amp;
+                 (succ-&gt;map_loc != goal_node.map_loc) )
+            ) {
+-            movement_val += 10;
++            movement_val = 200;
+         }
+ 
+     succ-&gt;g += node-&gt;g + movement_val;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerID.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerID.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerID.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -19,7 +19,7 @@
+ #define _PLAYERID_HPP
+ 
+ #include &lt;stdint.h&gt;
+-#include &quot;Network/SocketClient.hpp&quot;
++#include &quot;NetPacket.hpp&quot;
+ 
+ class PlayerID
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -20,5 +20,6 @@
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+ #define NETPANZER_PROTOCOL_VERSION     1019
++#define MASTERSERVER_PORT             28900
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -64,6 +64,8 @@
+ #include &quot;Physics.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ 
++#include &quot;Network/SocketManager.hpp&quot;
++
+ BaseGameManager* gamemanager = 0;
+ 
+ //------------------------------------------------------------------
+@@ -242,8 +244,10 @@
+ //-----------------------------------------------------------------
+ void BaseGameManager::simLoop()
+ {
+-    CLIENT-&gt;checkIncoming();
+-    SERVER-&gt;checkIncoming();
++    //CLIENT-&gt;checkIncoming();
++    network::SocketManager::handleEvents();
++    
++    //SERVER-&gt;checkIncoming();
+     if ( NetworkState::status == _network_state_server ) {
+         ServerMessageRouter::routeMessages();
+     } else {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -44,13 +44,13 @@
+ #include &quot;ProgressView.hpp&quot;
+ #include &quot;ConsoleLoadingView.hpp&quot;
+ #include &quot;Console.hpp&quot;
+-#include &quot;HeartbeatThread.hpp&quot;
+-#include &quot;InfoThread.hpp&quot;
++#include &quot;Heartbeat.hpp&quot;
++#include &quot;InfoSocket.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;unix/NetworkServerUnix.hpp&quot;
+ 
+ DedicatedGameManager::DedicatedGameManager()
+-    : commandqueue_mutex(0), console(0), heartbeatthread(0), infothread(0)
++    : commandqueue_mutex(0), console(0), heartbeat(0), infosocket(0)
+ {
+     commandqueue_mutex = SDL_CreateMutex();
+     Console::initialize();
+@@ -59,8 +59,10 @@
+ DedicatedGameManager::~DedicatedGameManager()
+ {
+     delete console;
+-    delete heartbeatthread;
+-    delete infothread;
++    if ( heartbeat )
++        delete heartbeat;
++    if ( infosocket )
++        delete infosocket;
+     Console::shutdown();
+ 
+     SDL_DestroyMutex(commandqueue_mutex);
+@@ -99,10 +101,6 @@
+ //-----------------------------------------------------------------
+ void DedicatedGameManager::inputLoop()
+ {
+-    if(infothread) {
+-        infothread-&gt;lastFrame = SDL_GetTicks();
+-    }
+-    
+     // handle server commands
+     SDL_mutexP(commandqueue_mutex);
+     while(!commandqueue.empty()) {
+@@ -184,6 +182,15 @@
+     SDL_mutexV(commandqueue_mutex);
+ }
+ 
++bool
++DedicatedGameManager::mainLoop()
++{
++    if ( heartbeat )
++        heartbeat-&gt;checkHeartbeat();
++    return BaseGameManager::mainLoop();
++}
++
++
+ //-----------------------------------------------------------------
+ void DedicatedGameManager::pushCommand(const ServerCommand&amp; command)
+ {
+@@ -220,12 +227,26 @@
+     if((bool) gameconfig-&gt;publicServer &amp;&amp;
+         (const std::string&amp;) gameconfig-&gt;masterservers != &quot;&quot;) {
+         try {
+-            infothread = new InfoThread(gameconfig-&gt;serverport);
+-            heartbeatthread = new HeartbeatThread();
++            if ( infosocket ) {
++                delete infosocket;
++                infosocket = 0;
++            }
++            infosocket = new InfoSocket(gameconfig-&gt;serverport);
++            if ( heartbeat ) {
++                delete heartbeat;
++                heartbeat = 0;
++            }
++            heartbeat = new Heartbeat();
+         } catch(std::exception&amp; e) {
+             LOGGER.warning(&quot;heartbeats disabled: %s&quot;, e.what());
+-            delete infothread; infothread = 0;
+-            delete heartbeatthread; heartbeatthread = 0;
++            if ( infosocket ) {
++                delete infosocket;
++                infosocket = 0;
++            }
++            if ( heartbeat ) {
++                delete heartbeat;
++                heartbeat = 0;
++            }
+         }
+     }
+ 
+@@ -248,9 +269,14 @@
+ void
+ DedicatedGameManager::shutdownNetworkSubSystem()
+ {
+-    delete infothread;
+-    infothread = 0;
+-    delete heartbeatthread;
+-    heartbeatthread = 0;
++    if ( infosocket ) {
++        delete infosocket;
++        infosocket = 0;
++    }
++
++    if ( heartbeat ) {
++        delete heartbeat;
++        heartbeat=0;
++    }
+     BaseGameManager::shutdownNetworkSubSystem();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -24,9 +24,10 @@
+ #include &quot;ServerConsole.hpp&quot;
+ #include &quot;ServerCommand.hpp&quot;
+ 
++#include &quot;InfoSocket.hpp&quot;
++#include &quot;Heartbeat.hpp&quot;
++
+ class ServerConsole;
+-class HeartbeatThread;
+-class InfoThread;
+ 
+ class DedicatedGameManager : public BaseGameManager
+ {
+@@ -41,6 +42,7 @@
+     virtual void shutdownNetworkSubSystem();
+ 
+     virtual void inputLoop();
++    virtual bool mainLoop();
+ 
+ public:
+     DedicatedGameManager();
+@@ -56,8 +58,8 @@
+     SDL_mutex* commandqueue_mutex;
+ 
+     ServerConsole* console;
+-    HeartbeatThread* heartbeatthread;
+-    InfoThread* infothread;
++    Heartbeat * heartbeat;
++    InfoSocket * infosocket;
+ };
+ 
+ #endif
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,185 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &lt;string&gt;
++#include &lt;sstream&gt;
++#include &lt;stdexcept&gt;
++#include &quot;SDL.h&quot;
++#include &quot;Heartbeat.hpp&quot;
++#include &quot;NetworkGlobals.hpp&quot;
++#include &quot;GameConfig.hpp&quot;
++#include &quot;Util/StringTokenizer.hpp&quot;
++#include &quot;Util/StringUtil.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++using namespace std;
++using namespace network;
++
++#define MSQUERY_TIMEOUT 5 * 1000
++#define HEARTBEAT_INTERVAL 5 * 60 * 1000
++
++class MasterserverInfo {
++public:
++    MasterserverInfo(){ touch(); };
++    ~MasterserverInfo(){};
++    void touch() { lastTicks = SDL_GetTicks(); };
++    string recdata;
++    Uint32 lastTicks;
++    
++};
++
++Heartbeat::Heartbeat()
++{
++    StringTokenizer mstokenizer(gameconfig-&gt;masterservers, ',');
++    string servname;
++    while( (servname = mstokenizer.getNextToken()) != &quot;&quot;) {
++        servname = removeSurroundingSpaces(servname);
++        try {
++            Address addr = Address::resolve(servname, MASTERSERVER_PORT);
++            mslist.push_back(addr);
++        } catch (runtime_error e) {
++            LOGGER.warning(&quot;Bad masterserver address: %s&quot;, e.what());
++        }
++    }
++    
++    stringstream msg;
++    msg &lt;&lt; &quot;\\heartbeat\\gamename\\netpanzer\\port\\&quot; &lt;&lt; gameconfig-&gt;serverport                     
++        &lt;&lt; &quot;\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION
++        &lt;&lt; &quot;\\final\\&quot;;
++    
++    hb_message=msg.str();
++    nextHeartbeatTicks = SDL_GetTicks() + HEARTBEAT_INTERVAL;
++    startHeartbeat();
++    
++}
++
++Heartbeat::~Heartbeat()
++{
++    if ( !masterservers.empty() ) {
++        map&lt;TCPSocket *, MasterserverInfo *&gt;::iterator msiter;
++        for (msiter=masterservers.begin(); msiter!=masterservers.end(); msiter++) {
++            delete msiter-&gt;second;
++            msiter-&gt;first-&gt;destroy();
++        }
++        masterservers.clear();
++    }
++    mslist.clear();
++}
++
++void
++Heartbeat::checkHeartbeat()
++{
++    Uint32 now = SDL_GetTicks();
++
++    if ( !masterservers.empty() ) {
++        map&lt;TCPSocket *, MasterserverInfo *&gt;::iterator msiter;
++        for (msiter=masterservers.begin(); msiter!=masterservers.end(); msiter++) {
++            if ( now - msiter-&gt;second-&gt;lastTicks &gt; MSQUERY_TIMEOUT ) {
++                LOGGER.warning(&quot;Masterserver timeout [%s]&quot;, msiter-&gt;first-&gt;getAddress().getIP().c_str());
++                delete msiter-&gt;second;
++                msiter-&gt;first-&gt;destroy();
++                masterservers.erase(msiter);
++            }
++        }
++    }
++    
++    if ( now &gt; nextHeartbeatTicks ) {
++        nextHeartbeatTicks += HEARTBEAT_INTERVAL;
++        startHeartbeat();
++    }
++
++}
++
++void
++Heartbeat::startHeartbeat()
++{
++    vector&lt;Address&gt;::iterator iter = mslist.begin();
++    while ( iter != mslist.end() ) {
++        TCPSocket *s = new TCPSocket(*iter, this);
++        MasterserverInfo * msi = new MasterserverInfo();
++        masterservers[s]=msi;
++        iter++;
++    }
++}
++
++void
++Heartbeat::onConnected(TCPSocket *so)
++{
++    LOGGER.debug(&quot;Masterserver connected [%s]&quot;, so-&gt;getAddress().getIP().c_str());
++    masterservers[so]-&gt;touch();
++    so-&gt;send(hb_message.c_str(), hb_message.size());
++}
++
++void
++Heartbeat::onDisconected(TCPSocket *so)
++{
++    LOGGER.debug(&quot;Masterserver disconected [%s]&quot;, so-&gt;getAddress().getIP().c_str());
++    delete masterservers[so];
++    masterservers.erase(so);
++}
++
++void
++Heartbeat::onDataReceived(TCPSocket *so, const char *data, const int len)
++{
++    string str;
++    
++    MasterserverInfo * msi = masterservers[so];
++    msi-&gt;touch();
++    str = msi-&gt;recdata;
++    str.append(data,len);
++    
++    if (str[0] != '\\') {
++        LOGGER.warning(&quot;Bad answer from masterserver, missing initial separator [%s]&quot;, so-&gt;getAddress().getIP().c_str());
++        delete msi;
++        masterservers.erase(so);
++        so-&gt;destroy();
++        return; // invalid answer;
++    }
++    
++    string lastpart;
++    if (str[str.length()-1] != '\\') {
++        // received incomplete
++        string::size_type p = str.rfind('\\');
++        msi-&gt;recdata = str.substr(p);
++        str.erase(p);
++    } else {
++        msi-&gt;recdata = &quot;\\&quot;;
++    }
++    
++    StringTokenizer tknizer(str,'\\');
++    
++    string token = tknizer.getNextToken();
++    while ( !token.empty()) {
++        if ( token == &quot;error&quot; ) {
++            LOGGER.warning(&quot;Masterserver returns error: '%s'&quot;, tknizer.getNextToken().c_str());
++        } else if ( token == &quot;final&quot;) {
++            LOGGER.debug(&quot;Masterserver answer ok, disconecting [%s]&quot;, so-&gt;getAddress().getIP().c_str());
++            delete msi;
++            masterservers.erase(so);
++            so-&gt;destroy();
++            break;
++        } else {
++            LOGGER.warning(&quot;Masterservend sent unknown answer: '%s'&quot;, tknizer.getNextToken().c_str());
++        }
++    }
++}
++
++
++
++
++
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,52 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef _HEARTBEAT_HPP
++#define _HEARTBEAT_HPP
++
++#include &quot;Network/TCPSocket.hpp&quot;
++#include &quot;SDL.h&quot;
++#include &lt;vector&gt;
++#include &lt;map&gt;
++
++using namespace std;
++using namespace network;
++
++class MasterserverInfo;
++
++class Heartbeat : public TCPSocketObserver
++{
++public:
++    Heartbeat();
++    ~Heartbeat();
++    void checkHeartbeat();
++    
++protected:
++    void onConnected(TCPSocket *so);
++    void onDisconected(TCPSocket *so);
++    void onDataReceived(TCPSocket *so, const char *data, const int len);
++    void startHeartbeat();
++    
++private:
++    Uint32 nextHeartbeatTicks;
++    string hb_message;
++    vector&lt;Address&gt; mslist;
++    map&lt;TCPSocket *, MasterserverInfo *&gt; masterservers;
++};
++
++#endif
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,251 +0,0 @@
+-/*
+-Copyright (C) 2004 Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-
+-#include &quot;GameConfig.hpp&quot;
+-#include &quot;HeartbeatThread.hpp&quot;
+-#include &quot;NetworkGlobals.hpp&quot;
+-
+-#include &lt;iostream&gt;
+-#include &lt;stdexcept&gt;
+-#include &lt;sstream&gt;
+-#include &lt;algorithm&gt;
+-
+-#include &lt;time.h&gt;
+-#include &lt;errno.h&gt;
+-#include &lt;stdlib.h&gt;
+-#include &lt;string.h&gt;
+-
+-#include &lt;SDL.h&gt;
+-
+-#include &quot;Network/Address.hpp&quot;
+-#include &quot;Network/TCPSocket.hpp&quot;
+-#include &quot;Network/SocketStream.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;Util/StringTokenizer.hpp&quot;
+-#include &quot;Util/StreamTokenizer.hpp&quot;
+-#include &quot;Util/StringUtil.hpp&quot;
+-
+-// send a heartbeat packet every 5 minutes
+-static const int UPDATEINTERVAL = 5*60;
+-// after how many heartbeats query for updated masterserverlist
+-static const int MASTERQUERYCOUNT = 24;
+-
+-HeartbeatThread::HeartbeatThread()
+-    : running(false), masterquery(0)
+-{
+-    static const int masterport = 28900;
+-    std::string masterhost = gameconfig-&gt;masterservers;
+-    
+-    // lookup server addresses
+-    StringTokenizer tokenizer(gameconfig-&gt;masterservers, ',');
+-    std::string host;
+-    while( (host = tokenizer.getNextToken()) != &quot;&quot;) {
+-        try {
+-            host = removeSurroundingSpaces(host);
+-            network::Address addr = network::Address::resolve(host, masterport);
+-            serveraddrs.push_back(addr);
+-        } catch(std::exception&amp; e) {
+-            LOGGER.warning(&quot;Bad Masterserver: %s\n&quot;, e.what());
+-        }
+-    }
+-
+-    // distribute load
+-    std::random_shuffle(serveraddrs.begin(), serveraddrs.end());
+-    
+-    // send initial heartbeat
+-    if(!sendHeartbeat()) {
+-        throw std::runtime_error(&quot;Sending initial heartbeat failed.&quot;);
+-    }
+-
+-    // start thread
+-    running = true;
+-    thread = SDL_CreateThread(threadMain, this);
+-    if(thread == NULL) {
+-      throw std::runtime_error(&quot;Couldn't create heartbeat thread.&quot;);
+-    }
+-}
+-
+-HeartbeatThread::~HeartbeatThread()
+-{
+-    // signal thread to stop
+-    running = false;
+-    SDL_WaitThread(thread, 0);
+-
+-    std::stringstream packet;
+-    packet &lt;&lt; &quot;\\quit\\port\\&quot; &lt;&lt; gameconfig-&gt;serverport &lt;&lt; &quot;\\final\\&quot;;
+-    masterquery = 1; // do not query for masterserverlist now
+-    sendPacket(packet.str());
+-
+-    // write back masterserverlist
+-    std::string gameservers;
+-    for(Addresses::iterator i = serveraddrs.begin();
+-            i != serveraddrs.end(); ++i) {
+-        if(i != serveraddrs.begin())
+-            gameservers += &quot;,&quot;;
+-        gameservers += i-&gt;getIP();
+-    }
+-    //gameconfig-&gt;masterservers = gameservers;
+-}
+-
+-int
+-HeartbeatThread::threadMain(void* data)
+-{
+-    HeartbeatThread* _this = reinterpret_cast&lt;HeartbeatThread*&gt; (data);
+-    
+-    while(_this-&gt;running) {
+-        time_t t = time(0);
+-
+-        while(time(0) - t &lt; UPDATEINTERVAL) {
+-            SDL_Delay(300);
+-            if(!_this-&gt;running)
+-                return 1;
+-        }
+-        
+-        try {
+-            if(!_this-&gt;sendHeartbeat()) {
+-                LOGGER.warning(&quot;all hearbteats failed. retrying in %d seconds.&quot;,
+-                        UPDATEINTERVAL);
+-            }
+-        } catch(...) {
+-            LOGGER.warning(&quot;Unexpected exception while sending heartbeat.&quot;);
+-            _this-&gt;running = false;
+-            break;
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-bool
+-HeartbeatThread::sendHeartbeat()
+-{
+-    std::stringstream packet;
+-    packet &lt;&lt; &quot;\\heartbeat\\gamename\\netpanzer&quot;
+-           &lt;&lt; &quot;\\port\\&quot; &lt;&lt; gameconfig-&gt;serverport                     
+-           &lt;&lt; &quot;\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION
+-           &lt;&lt; &quot;\\final\\&quot; &lt;&lt; std::flush;
+-    return sendPacket(packet.str());
+-}
+-
+-bool
+-HeartbeatThread::sendPacket(const std::string&amp; str)
+-{
+-    int failures = 0;
+-
+-    std::vector&lt;network::Address&gt; addresses = serveraddrs;
+-    
+-    for(std::vector&lt;network::Address&gt;::iterator i = addresses.begin();
+-            i != addresses.end(); ++i) {
+-        try {
+-            const network::Address&amp; address = *i;
+-        
+-            // we use blocking mode here and hope that no masterserver quietly
+-            // leaves our connection open without sending data
+-            network::Address bindaddr = 
+-                network::Address::resolve(gameconfig-&gt;bindaddress, 0);
+-            network::TCPSocket socket(bindaddr, address);
+-            network::SocketStream stream(socket);
+-            
+-            bool doMasterQuery = false;
+-            if(masterquery &lt;= 0) {
+-                doMasterQuery = true;
+-                stream &lt;&lt; &quot;\\list\\gamename\\master\\final&quot;;
+-                masterquery = MASTERQUERYCOUNT;
+-            }
+-            
+-            // send heartbeat packet
+-            stream &lt;&lt; str &lt;&lt; std::flush;
+-
+-            parseResult(stream, doMasterQuery);
+-        } catch(std::exception&amp; e) {
+-            LOGGER.warning(&quot;failed contacting masterserver: %s&quot;, e.what());
+-            failures++;
+-        }
+-    }
+-
+-    if(failures == (int) addresses.size())
+-        return false;
+-    
+-    masterquery--;
+-    return true;
+-}
+-
+-void
+-HeartbeatThread::parseResult(std::iostream&amp; stream, bool doMasterQuery)
+-{
+-    StreamTokenizer tokenizer(stream, '\\');
+-
+-    // deal with response to master query
+-    if(doMasterQuery) {
+-        std::string token;
+-        std::string ip;
+-        bool firstip = true;
+-        while( (token = tokenizer.getNextToken()) != &quot;&quot;) {
+-            if(token == &quot;error&quot;) {
+-                std::stringstream msg;
+-                msg &lt;&lt; &quot;Masterserver sent back error: &quot;
+-                    &lt;&lt; tokenizer.getNextToken();
+-                throw std::runtime_error(msg.str());
+-            } else if(token == &quot;ip&quot;) {
+-                ip = tokenizer.getNextToken();
+-            } else if(token == &quot;port&quot;) {
+-                int port;
+-                std::stringstream portstr(tokenizer.getNextToken());
+-                portstr &gt;&gt; port;
+-
+-                try {
+-                    network::Address addr = network::Address::resolve(ip, port);
+-                                    
+-                    if(firstip) {
+-                        serveraddrs.clear();
+-                        firstip = false;
+-                    }
+-                    serveraddrs.push_back(addr);
+-                } catch(std::exception&amp; e) {
+-                    LOGGER.warning(
+-                            &quot;Couldn't resolve additional masterserver: %s&quot;,
+-                            e.what());
+-                }
+-            } else if(token == &quot;final&quot;) {
+-                break;
+-            } else {
+-                std::stringstream msg;
+-                msg &lt;&lt; &quot;Unknown token in masterserver response: &quot; &lt;&lt; token;
+-                throw std::runtime_error(msg.str());
+-            }
+-        }
+-    }
+-
+-    // deal with response to heartbeat packet
+-    std::string token;
+-    while( (token = tokenizer.getNextToken()) != &quot;&quot;) {
+-        if(token == &quot;error&quot;) {
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Masterserver sent back error: &quot; &lt;&lt; tokenizer.getNextToken();
+-            throw std::runtime_error(msg.str());
+-        } else if(token == &quot;final&quot;) {
+-            break;
+-        } else {
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Unknown token in masterserver response: &quot; &lt;&lt; token;
+-            throw std::runtime_error(msg.str());
+-        }
+-    }
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,60 +0,0 @@
+-/*
+-Copyright (C) 2004 Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __HEARTBEATTHREAD_HPP__
+-#define __HEARTBEATTHREAD_HPP__
+-
+-#include &lt;iostream&gt;
+-#include &lt;string&gt;
+-
+-#include &quot;Network/Address.hpp&quot;
+-#include &lt;SDL_thread.h&gt;
+-
+-/** This class is responsible for notifying the masterserver from time to time
+- * that we're still alive.
+- */
+-class HeartbeatThread
+-{
+-public:
+-    /** Starts a thread and sends a heartbeat packet to the masterserver every 5
+-     * minutes. Throws std::exception's when something goes wrong while
+-     * intializing.
+-     */
+-    HeartbeatThread();
+-    /** Sends a statechanged message to the masterserver indicating that the
+-     * server gets shutdown. Remember that the masterserver will query us to
+-     * make sure the packet wasn't faked. So the infothread should return the
+-     * same.
+-     */
+-    ~HeartbeatThread();
+-
+-private:
+-    static int threadMain(void* data);
+-    bool sendHeartbeat();
+-    bool sendPacket(const std::string&amp; data);
+-    void parseResult(std::iostream&amp; stream, bool doMasterQuery);
+-    
+-    volatile bool running;
+-    int masterquery;        // number of updates until we query for list of
+-                            // masterservers again
+-    typedef std::vector&lt;network::Address&gt; Addresses;
+-    Addresses serveraddrs;
+-    SDL_Thread* thread;
+-};
+-
+-#endif
+-
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,120 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;InfoSocket.hpp&quot;
++#include &quot;Util/StringTokenizer.hpp&quot;
++
++#include &quot;NetworkGlobals.hpp&quot;
++#include &quot;GameConfig.hpp&quot;
++#include &quot;PlayerInterface.hpp&quot;
++#include &quot;ObjectiveInterface.hpp&quot;
++#include &quot;GameManager.hpp&quot;
++
++#include &quot;Util/Log.hpp&quot;
++
++#include &lt;string&gt;
++#include &lt;sstream&gt;
++
++using namespace std;
++
++InfoSocket::InfoSocket(int p) : socket(0)
++{
++    Address addr = Address::resolve( gameconfig-&gt;bindaddress, p);
++    socket = new network::UDPSocket(addr,this);
++    
++    // This parameters are fixed always
++    // others I plan to be modificable while game is running.
++    stringstream s;
++    s &lt;&lt; &quot;gamename\\netpanzer\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION
++      &lt;&lt; &quot;\\hostname\\&quot; &lt;&lt; gameconfig-&gt;playername;
++    statusHead = s.str();
++}
++
++InfoSocket::~InfoSocket()
++{
++    if (socket)
++        socket-&gt;destroy();
++    socket=0;
++}
++
++void
++InfoSocket::onDataReceived(UDPSocket *s, const Address &amp;from, const char *data, const int len)
++{
++    string querypacket(data,len);
++    StringTokenizer qtokenizer(querypacket, '\\');
++    
++    string query;
++    while ( !(query = qtokenizer.getNextToken()).empty()) {
++        LOGGER.debug(&quot;InfoSocket:: Received query '%s'&quot;, query.c_str());
++        if ( query == &quot;status&quot; ) {
++            string answer = prepareStatusPacket();
++
++            LOGGER.debug(&quot;InfoSocket:: sending answer [%s][%d]&quot;, answer.c_str(), (int)answer.size());
++            socket-&gt;send(from, answer.c_str(), answer.size());
++
++            break;
++        } else if(query == &quot;echo&quot;) {
++            string echotoken = qtokenizer.getNextToken();
++            socket-&gt;send(from, echotoken.c_str(), echotoken.size());
++        }
++    }
++}
++
++string
++InfoSocket::prepareStatusPacket()
++{
++    stringstream s;
++    int playingPlayers = PlayerInterface::countPlayers();
++    int maxPlayers = PlayerInterface::getMaxPlayers();
++    
++    s &lt;&lt; statusHead
++      &lt;&lt; &quot;\\mapname\\&quot;    &lt;&lt; gameconfig-&gt;map
++      &lt;&lt; &quot;\\mapcycle\\&quot;   &lt;&lt; gameconfig-&gt;mapcycle
++      &lt;&lt; &quot;\\numplayers\\&quot; &lt;&lt; playingPlayers
++      &lt;&lt; &quot;\\maxplayers\\&quot; &lt;&lt; maxPlayers;
++    
++    if ( !playingPlayers )
++        s &lt;&lt; &quot;\\empty\\1&quot;;
++    else if ( playingPlayers==maxPlayers )
++        s &lt;&lt; &quot;\\full\\1&quot;;
++
++    s &lt;&lt; &quot;\\gamestyle\\&quot; &lt;&lt; gameconfig-&gt;getGameTypeString()
++      &lt;&lt; &quot;\\units_per_player\\&quot; &lt;&lt; gameconfig-&gt;GetUnitsPerPlayer()
++      &lt;&lt; &quot;\\time\\&quot; &lt;&lt; GameManager::getGameTime()/60
++      &lt;&lt; &quot;\\timelimit\\&quot; &lt;&lt; gameconfig-&gt;timelimit
++      &lt;&lt; &quot;\\fraglimit\\&quot; &lt;&lt; gameconfig-&gt;fraglimit
++      &lt;&lt; &quot;\\objectivelimit\\&quot; &lt;&lt; ObjectiveInterface::getObjectiveLimit();
++
++    ObjectiveInterface::updatePlayerObjectiveCounts();
++    int n = 0;
++    for(int i = 0; i &lt; maxPlayers; ++i) {
++        PlayerState* playerState = PlayerInterface::getPlayerState(i);
++        if(playerState-&gt;getStatus() != _player_state_active)
++            continue;
++        s &lt;&lt; &quot;\\player_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getName()
++          &lt;&lt; &quot;\\kills_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getKills()
++          &lt;&lt; &quot;\\deaths_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getLosses()
++          &lt;&lt; &quot;\\score_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getObjectivesHeld()
++          &lt;&lt; &quot;\\flag_&quot;   &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; (int) playerState-&gt;getFlag();
++        n++;
++    }
++    
++    s &lt;&lt; &quot;\\final\\&quot;;
++
++    return s.str();
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,44 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef _INFOSOCKET_HPP
++#define _INFOSOCKET_HPP
++
++#include &quot;Network/UDPSocket.hpp&quot;
++#include &lt;string&gt;
++
++using namespace std;
++using namespace network;
++
++class InfoSocket : public UDPSocketObserver
++{
++public:
++    InfoSocket(int p);
++    ~InfoSocket();
++
++protected:
++    void onDataReceived(UDPSocket *so, const Address &amp;from, const char *data, const int len);
++    
++private:
++    string prepareStatusPacket();
++    string statusHead;
++    UDPSocket * socket;
++    
++};
++
++#endif
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,196 +0,0 @@
+-/*
+-Copyright (C) 2004 Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-
+-#include &quot;InfoThread.hpp&quot;
+-
+-#include &lt;sstream&gt;
+-#include &lt;stdexcept&gt;
+-#include &lt;stdlib.h&gt;
+-
+-#include &lt;string.h&gt;
+-
+-#include &quot;Util/StringTokenizer.hpp&quot;
+-#include &quot;GameConfig.hpp&quot;
+-#include &quot;NetworkGlobals.hpp&quot;
+-#include &quot;PlayerInterface.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;Network/Address.hpp&quot;
+-#include &quot;GameManager.hpp&quot;
+-#include &quot;ObjectiveInterface.hpp&quot;
+-#include &quot;ConsoleInterface.hpp&quot;
+-
+-static const float SERVER_HANG_TIME = 5*60;
+-
+-InfoThread::InfoThread(int port)
+-    : socket(0)
+-{
+-    network::Address addr = network::Address::resolve(
+-            gameconfig-&gt;bindaddress, port);
+-    socket = new network::UDPSocket(addr, false);
+-
+-    lastFrame = SDL_GetTicks();
+-    
+-    // start the thread
+-    running=true;
+-    thread = SDL_CreateThread(threadMain, this);
+-    if(thread == NULL)
+-      throw new std::runtime_error(&quot;Couldn't create info thread&quot;);
+-}
+-
+-InfoThread::~InfoThread()
+-{
+-    running = false;
+-    SDL_WaitThread(thread, 0);
+-
+-    delete socket;
+-}
+-
+-int
+-InfoThread::threadMain(void* data)
+-{
+-    InfoThread* _this = reinterpret_cast&lt;InfoThread*&gt; (data);
+-
+-    while(_this-&gt;running) {
+-        try {
+-            _this-&gt;handleStatusRequests();
+-        } catch(std::exception&amp; e) {
+-            LOGGER.warning(&quot;Error while handling status request: %s&quot;,
+-                    e.what());
+-        } catch(...) {
+-            LOGGER.warning(&quot;Unexpected exception in InfoThread.\n&quot;);
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-void
+-InfoThread::handleStatusRequests()
+-{
+-    network::Address addr;
+-    char buffer[4096];
+-   
+-    size_t size = 0;
+-    while(size == 0) {
+-        if(!running)
+-            return;         
+-        size = socket-&gt;recv(addr, buffer, sizeof(buffer));
+-        SDL_Delay(15);
+-        checkServerHang();
+-    }
+-
+-    std::string packetstr(buffer, size);
+-    StringTokenizer tokenizer(packetstr, '\\');
+-
+-    std::string query;
+-    do {
+-        query = tokenizer.getNextToken();
+-
+-        LOGGER.debug(&quot;Received server status query: '%s'&quot;, query.c_str());
+-        if(query == &quot;status&quot;) {
+-            std::stringstream response; 
+-            // you should make sure the response packet doesn't get &gt; 1500bytes
+-            PlayerInterface::lock();
+-            sendInfo(response);
+-            sendRules(response);
+-            sendPlayers(response);
+-            PlayerInterface::unLock();
+-            response &lt;&lt; &quot;final\\&quot;;
+-
+-            std::string responsestr = response.str();
+-            LOGGER.debug(&quot;Send back query response, size %d&quot;,
+-                    (int)responsestr.size());
+-
+-            socket-&gt;send(addr, responsestr.c_str(), responsestr.size());
+-            break; // enough, next client
+-        } else if(query == &quot;echo&quot;) {
+-            std::string word = tokenizer.getNextToken();
+-
+-            socket-&gt;send(addr, word.c_str(), word.size());
+-        } else {
+-            // unknown query skip it
+-        }
+-    } while(query != &quot;&quot;);
+-}
+-
+-// from main.cpp somewhat hacky...
+-void shutdown();
+-
+-void
+-InfoThread::checkServerHang()
+-{
+-    if(SDL_GetTicks() - lastFrame &gt; SERVER_HANG_TIME * 1000) {
+-        ConsoleInterface::postMessage(&quot;Detected endless loop. Shutting down.&quot;);
+-
+-        // hard shutdown, can't correctly abort the mainloop if it hangs :-/
+-        shutdown();
+-        exit(1);
+-    }
+-}
+-
+-void
+-InfoThread::sendInfo(std::stringstream&amp; out)
+-{
+-    // This should be some game-specific logic...
+-    out &lt;&lt; &quot;gamename\\netpanzer\\&quot;
+-        &lt;&lt; &quot;protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;hostname\\&quot; &lt;&lt; gameconfig-&gt;playername &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;mapname\\&quot; &lt;&lt; gameconfig-&gt;map &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;mapcycle\\&quot; &lt;&lt; gameconfig-&gt;mapcycle &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;numplayers\\&quot; &lt;&lt; PlayerInterface::countPlayers() &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;maxplayers\\&quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\\&quot;;
+-    if(PlayerInterface::countPlayers() == 0)
+-        out &lt;&lt; &quot;empty\\1\\&quot;;
+-    else if(PlayerInterface::countPlayers() &gt;= gameconfig-&gt;maxplayers)
+-        out &lt;&lt; &quot;full\\1\\&quot;;
+-}
+-
+-void
+-InfoThread::sendRules(std::stringstream&amp; out)
+-{
+-    out &lt;&lt; &quot;gamestyle\\&quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;units_per_player\\&quot; &lt;&lt; gameconfig-&gt;GetUnitsPerPlayer() &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;time\\&quot; &lt;&lt; GameManager::getGameTime()/60 &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;timelimit\\&quot; &lt;&lt; gameconfig-&gt;timelimit &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;fraglimit\\&quot; &lt;&lt; gameconfig-&gt;fraglimit &lt;&lt; &quot;\\&quot;
+-        &lt;&lt; &quot;objectivelimit\\&quot; &lt;&lt; ObjectiveInterface::getObjectiveLimit() &lt;&lt;&quot;\\&quot;;
+-}
+-
+-void
+-InfoThread::sendPlayers(std::stringstream&amp; out)
+-{
+-    ObjectiveInterface::updatePlayerObjectiveCounts();
+-    int n = 0;
+-    for(int i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i) {
+-        PlayerState* playerState = PlayerInterface::getPlayerState(i);
+-        if(playerState-&gt;getStatus() != _player_state_active)
+-            continue;
+-        
+-        out &lt;&lt; &quot;player_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getName() &lt;&lt; &quot;\\&quot;
+-            &lt;&lt; &quot;kills_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getKills() &lt;&lt; &quot;\\&quot;
+-            &lt;&lt; &quot;deaths_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getLosses() &lt;&lt; &quot;\\&quot;
+-            &lt;&lt; &quot;score_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; 
+-                &lt;&lt; playerState-&gt;getObjectivesHeld() &lt;&lt; &quot;\\&quot;
+-            &lt;&lt; &quot;flag_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot;
+-                &lt;&lt; (int) playerState-&gt;getFlag() &lt;&lt; &quot;\\&quot;;
+-        n++;
+-    }
+-    // TODO add team/alliance info
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,55 +0,0 @@
+-/*
+-Copyright (C) 2004 Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __INFOTHREAD_HPP__
+-#define __INFOTHREAD_HPP__
+-
+-#include &lt;sstream&gt;
+-#include &lt;SDL_thread.h&gt;
+-#include &quot;Network/UDPSocket.hpp&quot;
+-#include &quot;Util/TimeStamp.hpp&quot;
+-
+-/** This class is responsible for answering queries about the server status.
+- * Also contains code to detect if the server has hung and shuts it down in
+- * this case.
+- */
+-class InfoThread
+-{
+-public:
+-    InfoThread(int port);
+-    ~InfoThread();
+-
+-    /** time when the server completed it's last frame. This is used to detect
+-     * servers that are in an endless loop (happens sometimes :-(  )
+-     */
+-    volatile Uint32 lastFrame;
+-
+-private:
+-    static int threadMain(void* data);
+-    void handleStatusRequests();
+-
+-    void sendInfo(std::stringstream&amp; out);
+-    void sendRules(std::stringstream&amp; out);
+-    void sendPlayers(std::stringstream&amp; out);
+-    void checkServerHang();
+-
+-    network::UDPSocket* socket;
+-    volatile bool running;
+-    SDL_Thread* thread;
+-};
+-
+-#endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -90,6 +90,7 @@
+ #include &quot;ResignView.hpp&quot;
+ #include &quot;AreYouSureResignView.hpp&quot;
+ #include &quot;AreYouSureExitView.hpp&quot;
++#include &quot;DisconectedView.hpp&quot;
+ #include &quot;UnitSelectionView.hpp&quot;
+ #include &quot;FlagSelectionView.hpp&quot;
+ #include &quot;UnitColorView.hpp&quot;
+@@ -117,15 +118,15 @@
+ #include &quot;GameManager.hpp&quot;
+ #include &quot;GameControlRulesDaemon.hpp&quot;
+ 
+-#include &quot;InfoThread.hpp&quot;
+-#include &quot;HeartbeatThread.hpp&quot;
++#include &quot;InfoSocket.hpp&quot;
++#include &quot;Heartbeat.hpp&quot;
+ 
+ //** User interface
+ //#include &quot;UI/Painter.hpp&quot;
+ 
+ 
+ PlayerGameManager::PlayerGameManager()
+-    : sdlVideo(0), heartbeatthread(0), infothread(0)
++    : sdlVideo(0), heartbeat(0), infosocket(0)
+ {
+     //fontManager.loadFont(&quot;fixed10&quot;, &quot;fonts/fixed10.pcf&quot;, 10);
+ 
+@@ -224,6 +225,7 @@
+     Desktop::add(new ResignView());
+     Desktop::add(new AreYouSureResignView());
+     Desktop::add(new AreYouSureExitView());
++    Desktop::add(new DisconectedView());
+ 
+     Desktop::add(new IPAddressView());
+     Desktop::add(new ServerListView());
+@@ -241,9 +243,6 @@
+ //-----------------------------------------------------------------
+ void PlayerGameManager::inputLoop()
+ {
+-    if(infothread)
+-        infothread-&gt;lastFrame = SDL_GetTicks();
+-
+     processSystemKeys();
+ 
+ #if 0
+@@ -305,10 +304,14 @@
+ //-----------------------------------------------------------------
+ void PlayerGameManager::shutdownNetworkSubSystem()
+ {
+-    delete infothread;
+-    infothread = 0;
+-    delete heartbeatthread;
+-    heartbeatthread = 0;
++    if ( infosocket ) {
++        delete infosocket;
++        infosocket = 0;
++    }
++    if ( heartbeat ) {
++        delete heartbeat;
++        heartbeat = 0;
++    }
+     BaseGameManager::shutdownNetworkSubSystem();
+ }
+ 
+@@ -327,16 +330,26 @@
+         if((bool) gameconfig-&gt;publicServer &amp;&amp;
+                 (const std::string&amp;) gameconfig-&gt;masterservers != &quot;&quot;) {
+             try {
+-                delete infothread;
+-                delete heartbeatthread;
+-                infothread = new InfoThread(gameconfig-&gt;serverport);
+-                heartbeatthread = new HeartbeatThread();
++                if ( infosocket ) {
++                    delete infosocket;
++                    infosocket = 0;
++                }
++                infosocket = new InfoSocket(gameconfig-&gt;serverport);
++                if ( heartbeat ) {
++                    delete heartbeat;
++                    heartbeat = 0;
++                }
++                heartbeat = new Heartbeat();
+             } catch(std::exception&amp; e) {
+                 LOGGER.warning(&quot;heartbeats disabled: %s&quot;, e.what());
+-                delete infothread;
+-                infothread = 0;
+-                delete heartbeatthread;
+-                heartbeatthread = 0;
++                if ( infosocket ) {
++                    delete infosocket;
++                    infosocket = 0;
++                }
++                if ( heartbeat ) {
++                    delete heartbeat;
++                    heartbeat = 0;
++                }
+             }
+         }
+     } catch(std::exception&amp; e) {
+@@ -418,10 +431,14 @@
+ 
+ void PlayerGameManager::quitGame()
+ {
+-    delete infothread;
+-    infothread = 0;
+-    delete heartbeatthread;    
+-    heartbeatthread = 0;
++    if ( infosocket ) {
++        delete infosocket;
++        infosocket = 0;
++    }
++    if ( heartbeat ) {
++        delete heartbeat;
++        heartbeat = 0;
++    }
+ }
+ 
+ //-----------------------------------------------------------------
+@@ -450,6 +467,9 @@
+         }
+     }
+ 
++    if ( heartbeat )
++        heartbeat-&gt;checkHeartbeat();
++
+     // handle SDL Events
+     if(handleSDLEvents())
+         return false;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -21,12 +21,13 @@
+ #include &quot;BaseGameManager.hpp&quot;
+ #include &quot;ScreenSurface.hpp&quot;
+ 
++#include &quot;InfoSocket.hpp&quot;
++#include &quot;Heartbeat.hpp&quot;
++
+ //#include &quot;UI/FontManager.hpp&quot;
+ //#include &quot;Panels/TestPanel.hpp&quot;
+ 
+ class SDLVideo;
+-class HeartbeatThread;
+-class InfoThread;
+ 
+ class PlayerGameManager : public BaseGameManager
+ {
+@@ -59,8 +60,8 @@
+     SDLVideo* sdlVideo;
+     bool showNewPanel;
+ 
+-    HeartbeatThread* heartbeatthread;
+-    InfoThread* infothread;
++    Heartbeat * heartbeat;
++    InfoSocket * infosocket;
+ 
+     void initializeWindowSubSystem();
+     void processSystemKeys();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -25,6 +25,10 @@
+ #include &quot;NetworkClientUnix.hpp&quot;
+ #include &quot;LobbyView.hpp&quot;
+ 
++#include &quot;Desktop.hpp&quot;
++
++#include &quot;Network/SocketManager.hpp&quot;
++
+ //#define NETWORKDEBUG
+ 
+ #ifdef NETWORKDEBUG
+@@ -40,14 +44,29 @@
+     delete clientsocket;
+ }
+ 
++void
++NetworkClientUnix::onClientConnected(ClientSocket *s)
++{
++
++}
++
++void
++NetworkClientUnix::onClientDisconected(ClientSocket *s)
++{
++    Desktop::setVisibility(&quot;DisconectedView&quot;, true);
++    delete clientsocket;
++    clientsocket=0;
++}
++
+ bool NetworkClientUnix::joinServer(const std::string&amp; server_name)
+ {
+-    delete clientsocket;
++    if ( clientsocket )
++        delete clientsocket;
+     clientsocket = 0;
+     
+     LOG( (&quot;Trying to join server '%s'.\n&quot;, server_name.c_str()) );
+     try {
+-        clientsocket = new ClientSocket(server_name);
++        clientsocket = new ClientSocket(this, server_name);
+     } catch(std::exception&amp; e) {
+         LOG( ( &quot;Couldn't connect to server:\n%s.&quot;, e.what()) );
+         char text[128];
+@@ -63,7 +82,8 @@
+ 
+ void NetworkClientUnix::partServer()
+ {
+-    delete clientsocket;
++    if ( clientsocket )
++        delete clientsocket;
+     clientsocket = 0;
+ }
+ 
+@@ -119,8 +139,6 @@
+ 
+ void NetworkClientUnix::checkIncoming()
+ {
+-    if(!clientsocket)
+-        return;
++   
+     
+-    clientsocket-&gt;read();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -21,7 +21,7 @@
+ #include &quot;NetworkClient.hpp&quot;
+ #include &quot;Network/ClientSocket.hpp&quot;
+ 
+-class NetworkClientUnix : public NetworkClient
++class NetworkClientUnix : public NetworkClient, public ClientSocketObserver
+ {
+ public:
+     NetworkClientUnix();
+@@ -34,6 +34,10 @@
+     virtual bool getMessage(NetMessage *message);
+ 
+     virtual void checkIncoming();
++protected:
++    void onClientConnected(ClientSocket *s);
++    void onClientDisconected(ClientSocket *s);    
++    
+ private:
+     ClientSocket* clientsocket;
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -47,8 +47,8 @@
+ void
+ NetworkServerUnix::shutdownClientTransport(NetClientID client_id)
+ {
+-    assert(serversocket != 0);
+-    serversocket-&gt;removeClient(client_id);
++    if (serversocket)
++        serversocket-&gt;disconectClient(client_id);
+ }
+ 
+ void
+@@ -147,7 +147,7 @@
+ NetworkServerUnix::checkIncoming()
+ {
+     cleanupClients();
+-    if(serversocket)
+-        serversocket-&gt;read();
++    //if(serversocket)
++        //serversocket-&gt;read();
+ }
+ 
+
+Deleted: trunk/netpanzer/src/NetPanzer/Network/ClientList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientList.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientList.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,55 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-#include &quot;ClientList.hpp&quot;
+-
+-ClientList::ClientList()
+-        : nextid(0)
+-{}
+-
+-ClientList::~ClientList()
+-{
+-    for(ClientIterator i = begin(); i != end(); i++) {
+-        SocketClient* client = *i;
+-        client-&gt;wantstodie = true;
+-        delete client;
+-    }
+-    clients.clear();
+-}
+-
+-SocketClient* ClientList::add(ServerSocket* server, network::TCPSocket* socket)
+-{
+-    SocketClient* client = new SocketClient(server);
+-    client-&gt;socket = socket;
+-    client-&gt;id = nextid++;
+-    clients.push_back(client);
+-
+-    return client;
+-}
+-
+-SocketClient* ClientList::getClientFromID(NetClientID id)
+-{
+-    for(ClientIterator i = begin(); i != end(); i++) {
+-        SocketClient* client = *i;
+-        if(client-&gt;id == id)
+-            return client;
+-    }
+-
+-    return 0;
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Network/ClientList.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientList.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientList.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,58 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _CLIENTLIST_H
+-#define _CLIENTLIST_H
+-
+-#include &lt;vector&gt;
+-#include &quot;SocketClient.hpp&quot;
+-#include &quot;Network/TCPSocket.hpp&quot;
+-
+-class ServerSocket;
+-
+-class ClientList
+-{
+-public:
+-    ClientList();
+-    ~ClientList();
+-
+-    SocketClient* add(ServerSocket* server, network::TCPSocket* socket);
+-
+-    SocketClient* getClientFromID(NetClientID id);
+-
+-    typedef std::vector&lt;SocketClient*&gt;::iterator ClientIterator;
+-    ClientIterator begin()
+-    {
+-        return clients.begin();
+-    }
+-    ClientIterator end()
+-    {
+-        return clients.end();
+-    }
+-
+-    ClientIterator remove(ClientIterator i)
+-    {
+-        delete *i;
+-        return clients.erase(i);
+-    }
+-
+-private:
+-    std::vector&lt;SocketClient*&gt; clients;
+-    NetClientID nextid;
+-};
+-
+-#endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -30,8 +30,8 @@
+ #include &quot;Util/Endian.hpp&quot;
+ #include &quot;Network/Address.hpp&quot;
+ 
+-ClientSocket::ClientSocket(const std::string&amp; whole_servername)
+-    : socket(0), tempoffset(0)
++ClientSocket::ClientSocket(ClientSocketObserver *o, const std::string&amp; whole_servername)
++    : observer(0), socket(0), tempoffset(0)
+ {
+     try {
+         proxy.setProxy(gameconfig-&gt;proxyserver,
+@@ -48,7 +48,7 @@
+         network::Address serveraddr 
+             = network::Address::resolve(servername, port);
+         
+-        socket = new network::TCPSocket(serveraddr, false);
++        socket = new network::TCPSocket(serveraddr, this);
+ 
+         if(proxy.proxyserver != &quot;&quot;) {
+             proxy.sendProxyConnect(*socket, whole_servername);
+@@ -56,86 +56,143 @@
+                     whole_servername.c_str(),
+                     proxy.proxyserver.c_str());
+         }
++
++        initId();
++        observer = o;
+     } catch(...) {
+-        delete socket;
++        if (socket)
++            socket-&gt;destroy();
+         throw;
+     }
+ }
++ClientSocket::ClientSocket(ClientSocketObserver *o)
++    : observer(0), socket(0), tempoffset(0)
++{
++    initId();
++    observer = o;
++}
+ 
++void
++ClientSocket::initId()
++{
++    static NetClientID curid=0;
++    id=curid++;
++}
++
+ ClientSocket::~ClientSocket()
+ {
+-    delete socket;
++    if (socket)
++        socket-&gt;destroy();
+ }
+ 
+-void ClientSocket::read()
++void ClientSocket::sendMessage(const void* data, size_t size)
+ {
+-    static char RecvBuffer[4096];
++    if (socket)
++        socket-&gt;send(data, size);
++}
+ 
+-    int bytesleft;
+-    try {
+-        bytesleft = socket-&gt;recv(RecvBuffer, sizeof(RecvBuffer));
+-        if(bytesleft == 0)
+-            return;
+-    } catch(std::exception&amp; e) {
+-        LOG( (&quot;Connection lost to server: %s&quot;, e.what()) );
+-        return;
+-    }
+-
+-    const char* bufptr = RecvBuffer;    
+-    while (bytesleft &gt; 0) {
+-        if(bytesleft == 1 &amp;&amp; tempoffset == 0) {
+-            memcpy(tempbuffer, bufptr, 1);
+-            tempoffset = 1;
+-            return;
+-        }
+-
+-        uint16_t size;
+-        if(tempoffset &gt; 0) {
+-            if(tempoffset == 1) {
+-                memcpy(tempbuffer + tempoffset, bufptr, 1);
++void
++ClientSocket::onDataReceived(network::TCPSocket * so, const char *data, const int len)
++{
++    int dataptr = 0;
++    unsigned int remaining = len;
++    uint16_t packetsize=0;
++//    LOGGER.warning(&quot;Len is [%d]&quot;,len);
++    while (remaining) {
++        //LOGGER.warning(&quot;-tempoffset[%d], remaining[%d], dataptr[%d]&quot;, tempoffset,remaining,dataptr);
++        if ( !tempoffset ) {
++            if ( remaining &gt;= sizeof(NetMessage) &amp;&amp; remaining &gt;= (packetsize=htol16(*((uint16_t*)(data+dataptr))) ) ){
++                //LOGGER.warning(&quot;--Packet size is [%d]&quot;,packetsize);
++                if ( packetsize &lt; sizeof(NetMessage) )
++                    packetsize = sizeof(NetMessage);
++                if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
++                    LOGGER.warning(&quot;Received wrong packetsize [%d]&quot;, packetsize);
++                    break; // received a wrong packet size
++                }
++                
++                //LOGGER.warning(&quot;---Sending packet [%d]&quot;,packetsize);
++                EnqueueIncomingPacket(data+dataptr, packetsize, 0, id);
++                remaining-=packetsize;
++                dataptr+=packetsize;
++            } else { // XXX check someone funny doesn't send a big msg
++                //LOGGER.warning(&quot;--half packet start, remaining[%d]&quot;,remaining);
++                if ( remaining &gt; _MAX_NET_PACKET_SIZE ) {
++                    // The only possibility of getting in here is...
++                    LOGGER.warning(&quot;Received wrong packetsize (remaining) [%d]&quot;,remaining);
++                    break;
++                }
++                
++                memcpy(tempbuffer,data+dataptr,remaining);
++                tempoffset = remaining;
++                remaining=0;
+             }
+-            size = htol16( *((uint16_t*) tempbuffer) );
+         } else {
+-            assert(bytesleft &gt;= 2);
+-            size = htol16( *((uint16_t*) bufptr) );
+-        }
++            if ( tempoffset &lt; sizeof(NetMessage) ) {
++                // copy the needed until netMessage
++                LOGGER.warning(&quot;--Reading more for head&quot;);
++                unsigned int needsize = sizeof(NetMessage)-tempoffset;
++                unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
++                memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
++                remaining-=tocopy;
++                tempoffset+=tocopy;
++                dataptr+=tocopy;
++            }
++            
++            if ( tempoffset &gt;= sizeof(NetMessage) ) {
++                packetsize=htol16(*((uint16_t*)tempbuffer));
++                LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Head ok, size[%d]&quot;, id, packetsize);
++                if ( packetsize &lt; sizeof(NetMessage) )
++                    break;
+ 
+-        if(size &lt; sizeof(NetMessage) || size &gt; _MAX_NET_PACKET_SIZE) {
+-            LOGGER.warning(&quot;Read: Invalid packet size (%u) from server&quot;, size);
+-            return;
+-        }
+-
+-        if(tempoffset &gt; 0) {
+-            int tempmissing = size - tempoffset;
+-            assert(tempmissing &gt; 0);
+-            if(bytesleft &gt;= tempmissing) {
+-                memcpy(tempbuffer + tempoffset, bufptr, tempmissing);
+-                EnqueueIncomingPacket(tempbuffer, size, 0, 0);
+-                tempoffset = 0;
+-                bytesleft -= tempmissing;
+-                bufptr += tempmissing;
+-                continue;
+-            } else {
+-                memcpy(tempbuffer + tempoffset, bufptr, bytesleft);
+-                tempoffset += bytesleft;
+-                return;
++                if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
++                    LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Received wrong packetsize (half) [%d]&quot;, id, packetsize);
++                    tempoffset=0;
++                    break; // received a wrong packet size
++                }
++                
++                if ( (tempoffset &lt; packetsize) &amp;&amp; remaining ) {
++                    LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) need more packet and has remaining&quot;, id);
++                    unsigned int needsize = packetsize-tempoffset;
++                    unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
++                    memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
++                    remaining-=tocopy;
++                    tempoffset+=tocopy;
++                    dataptr+=tocopy;
++                }
++                
++                if ( tempoffset == packetsize ) {
++                    LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Sending half packet [%d]&quot;, id, packetsize);
++                    EnqueueIncomingPacket(tempbuffer, packetsize, 0, id);
++                    tempoffset = 0;
++                }
+             }
+-        } else {
+-            if(bytesleft &gt;= size) {
+-                EnqueueIncomingPacket(bufptr, size, 0, 0);
+-                bytesleft -= size;
+-                bufptr += size;
+-                continue;
+-            } else {
+-                memcpy(tempbuffer, bufptr, bytesleft);
+-                tempoffset = bytesleft;
+-                return;
+-            }
+         }
+-    }
++    } // while
++//    LOGGER.warning(&quot;Len was [%d], remainin&quot;,len);
+ }
+ 
+-void ClientSocket::sendMessage(const void* data, size_t size)
++void
++ClientSocket::onConnected(network::TCPSocket *so)
+ {
+-    socket-&gt;send(data, size);
++    LOGGER.warning(&quot;ClientSocket:: Connected to socket&quot;);
++    socket = so;
++    observer-&gt;onClientConnected(this);
+ }
++
++void
++ClientSocket::onDisconected(network::TCPSocket *so)
++{
++    LOGGER.warning(&quot;ClientSocket:: Disconected NetId[%d]!&quot;, id);
++    socket=0;
++    observer-&gt;onClientDisconected(this);
++}
++
++std::string
++ClientSocket::getIPAddress()
++{
++    std::stringstream ip;
++    ip &lt;&lt; socket-&gt;getAddress().getIP();
++    ip &lt;&lt; ':' &lt;&lt; socket-&gt;getAddress().getPort();
++    return ip.str();
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -24,23 +24,46 @@
+ #include &quot;ProxyServer.hpp&quot;
+ #include &quot;Network/TCPSocket.hpp&quot;
+ 
+-class ClientSocket
++class ClientSocket;
++
++class ClientSocketObserver
+ {
+ public:
+-    ClientSocket(const std::string&amp; serveraddress);
++    ClientSocketObserver(){};
++    virtual ~ClientSocketObserver(){};
++protected:
++    friend class ClientSocket;
++    virtual void onClientConnected(ClientSocket *cso) = 0;
++    virtual void onClientDisconected(ClientSocket *cso) = 0;
++};
++
++class ClientSocket : public network::TCPSocketObserver
++{
++public:
++    ClientSocket(ClientSocketObserver *o, const std::string&amp; serveraddress);
++    ClientSocket(ClientSocketObserver *o);
+     ~ClientSocket();
+ 
+-    void read();
++    //void read();
+     void sendMessage(const void* data, size_t datasize);
+     ProxyServer proxy;
+ 
++    NetClientID getId() { return id; };
++    std::string getIPAddress();
++    
++protected:
++    void onDataReceived(network::TCPSocket *so, const char *data, const int len);
++    void onConnected(network::TCPSocket *so);
++    void onDisconected(network::TCPSocket *so);
++
+ private:
+-    void readTCP();
+-
++    void initId();
++    ClientSocketObserver * observer;
+     network::TCPSocket* socket;
+ 
+     char tempbuffer[_MAX_NET_PACKET_SIZE];
+     uint16_t tempoffset;
++    NetClientID id;
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -76,8 +76,9 @@
+     int line=0;
+     while(1) {
+         char ch;
+-        if(socket.recv(&amp;ch, 1)!=1)
+-            break;
++        //XXX
++        //if(socket.recv(&amp;ch, 1)!=1)
++            //break;
+         *b++=ch;
+         if(ch=='\r') 
+             continue;
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -34,237 +34,102 @@
+ #include &quot;ConsoleInterface.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ 
++#include &quot;ClientSocket.hpp&quot;
++
++
+ ServerSocket::ServerSocket(const std::string&amp; bindaddress, uint16_t port)
+-        : socket(0), clientlist(0)
++        : socket(0)
+ {
++  
+     try {
+         network::Address addr
+             = network::Address::resolve(bindaddress, port);        
+-        socket = new network::TCPListenSocket(addr, false);
++        socket = new network::TCPListenSocket(addr, this);
+ 
+-        clientlist = new ClientList();
+     } catch(...) {
+-        delete socket;
+-        delete clientlist;
++        if (socket)
++            socket-&gt;destroy();
+         throw;
+     }
+ }
+ 
+ ServerSocket::~ServerSocket()
+ {
+-    delete clientlist;
+-    delete socket;
++    if (socket)
++        socket-&gt;destroy();
++    
++    std::map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.begin();
++    while ( ci != clients.end() ) {
++        delete ci-&gt;second;
++        ci++;
++    }
++    clients.clear();
+ }
+ 
+-std::string
+-ServerSocket::getClientIP(NetClientID clientid) const
++network::TCPSocketObserver *
++ServerSocket::onNewConnection(network::TCPListenSocket *so, const network::Address &amp;fromaddr)
+ {
+-    SocketClient* client = clientlist-&gt;getClientFromID(clientid);
+-    if(!client)
+-        return &quot;&quot;;
+-    
+-    std::stringstream result;
+-    result &lt;&lt; client-&gt;socket-&gt;getAddress().getIP() 
+-        &lt;&lt; ':' &lt;&lt; client-&gt;socket-&gt;getAddress().getPort();
+-    return result.str();
++    return new ClientSocket(this);
+ }
+ 
+ void
+-ServerSocket::read()
++ServerSocket::onClientConnected(ClientSocket *s)
+ {
+-    acceptNewClients();
+-    readTCP();
++    LOGGER.warning(&quot;Client Connected [%d]&quot;, s-&gt;getId());
++    clients[s-&gt;getId()] = s;
++    TransportClientAccept clientacceptmessage;
++    clientacceptmessage.setSize(sizeof(TransportClientAccept));
++    EnqueueIncomingPacket(&amp;clientacceptmessage,
++            sizeof(TransportClientAccept), 0, s-&gt;getId());
+ }
+ 
+-//this function handles accepting a client application that
+-//wants to connect. if successful it puts the client in a
+-//linked list of currently connected clients. if the number
+-//clients already connected == the max number of players allowed
+-//for this game, send a message back telling the player
+-//why he was refused and return without putting the client
+-//in the linked list--
+ void
+-ServerSocket::acceptNewClients()
++ServerSocket::onClientDisconected(ClientSocket *s)
+ {
+-    network::TCPSocket* clientsocket = 0;
+-    while( (clientsocket = socket-&gt;accept())) {
+-        try {
+-            sockets.add(*clientsocket);
+-            SocketClient* client = clientlist-&gt;add(this, clientsocket);
++    LOGGER.warning(&quot;Client Disconnected [%d]&quot;, s-&gt;getId());
++    clients.erase(s-&gt;getId());
++    delete s;
++}
+ 
+-            // Put message about connecting client into message queue
+-            TransportClientAccept clientacceptmessage;
+-            clientacceptmessage.setSize(sizeof(TransportClientAccept));
+-            EnqueueIncomingPacket(&amp;clientacceptmessage,
+-                    sizeof(TransportClientAccept), 0, client-&gt;id);
+-        } catch(...) {
+-            delete clientsocket;
+-            throw;
+-        }
+-    }
++std::string
++ServerSocket::getClientIP(NetClientID clientid)
++{
++    ClientSocket *s = clients[clientid];
++    if ( !s )
++        return &quot;Not a client&quot;;
++    
++    return s-&gt;getIPAddress();
+ }
+ 
+ NetClientID
+ ServerSocket::addLoopbackClient()
+ {
+-    SocketClient* client = clientlist-&gt;add(this, 0);
+-    return client-&gt;id;
++    //SocketClient* client = clientlist-&gt;add(this, 0);
++    //return client-&gt;id;
++    return 0;
+ }
+ 
+ void
+-ServerSocket::readTCP()
++ServerSocket::sendMessage(NetClientID toclient, const void* data, size_t datasize)
+ {
+-    if(sockets.select(0)) {
+-    	// Iterate through client list and check whether data arrived
+-	ClientList::ClientIterator i;
+-	for(i = clientlist-&gt;begin(); i != clientlist-&gt;end(); i++) {
+-	    SocketClient* client = *i;
+-            if(client-&gt;socket == 0)
+-                continue;
+-
+-	    if (sockets.dataPending(*client-&gt;socket))
+-		readClientTCP(client);
+-	}
++    ClientSocket *cs = clients[toclient];
++    if ( !cs ) {
++        throw Exception(&quot;message sent to unknown client.&quot;);
+     }
+ 
+-    // Search for clients that wants to be removed from the list
+-    for(ClientList::ClientIterator i = clientlist-&gt;begin();
+-	    i != clientlist-&gt;end(); /* empty */) {
+-        SocketClient* client = *i;
+-        if(client-&gt;wantstodie) {
+-            i = clientlist-&gt;remove(i);
+-            continue;
+-        }
+-        
+-        i++;
+-    }
++    cs-&gt;sendMessage(data, datasize);
+ }
+ 
+-/** this function recieves data after winsock has sent an
+- * FD_READ to the winproc indicating that data is in the
+- * receive buffer waiting to be read. this function ensures
+- * that the data received is a COMPLETE netPanzer 
+- * message and that no partial messages are sent to the
+- * AI system. it expects the first four bytes of any
+- * message to contain the length of the data in the message
+- * plus 4 bytes. therefore whenever iReturn == the number
+- * represented in the first 4 bytes of the data received
+- * then we have a complete netPanzer message. other cases
+- * are handled separately.
+- */
+ void
+-ServerSocket::readClientTCP(SocketClient* client)
++ServerSocket::disconectClient(NetClientID c)
+ {
+-    static char recvbuffer[4096];
+-
+-    int bytesleft;
+-    try {
+-        bytesleft = client-&gt;socket-&gt;recv(recvbuffer, sizeof(recvbuffer));
+-    } catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;Connection lost for Client %u(%s): %s.&quot;,
+-                client-&gt;id, getClientIP(client-&gt;id).c_str(), e.what());
+-        client-&gt;wantstodie = true;
+-        return;
++    LOGGER.warning(&quot;Disconecting client [%d]&quot;, c);
++    ClientSocket *s = clients[c];
++    if ( s ) {
++        delete s;
++        clients.erase(c);
++    } else {
++        LOGGER.warning(&quot;Disconecting unknown client [%d]&quot;, c);
+     }
+-
+-    const char* bufptr = recvbuffer;
+-    while(bytesleft &gt; 0) {
+-        if(bytesleft == 1 &amp;&amp; client-&gt;tempoffset == 0) {
+-            memcpy(client-&gt;tempbuffer, bufptr, 1);
+-            client-&gt;tempoffset = 1;
+-            return;
+-        }
+-        uint16_t size;
+-        if(client-&gt;tempoffset &gt; 0) {
+-            if(client-&gt;tempoffset == 1) {
+-                memcpy(client-&gt;tempbuffer + client-&gt;tempoffset, bufptr, 1);
+-            }
+-            size = htol16( *((uint16_t*) client-&gt;tempbuffer) );
+-        } else {
+-            assert(bytesleft &gt;= 2);
+-            size = htol16( *((uint16_t*) bufptr) );
+-        }
+-
+-        if(size &lt; sizeof(NetMessage) || size &gt; _MAX_NET_PACKET_SIZE) {
+-            LOGGER.warning(
+-                &quot;OnReadStreamServer: Invalid Packet Size %d from client %u&quot;
+-                &quot;(%s) Dropping client.&quot;, size, client-&gt;id,
+-                getClientIP(client-&gt;id).c_str());
+-            client-&gt;wantstodie = true;
+-            return;
+-        }
+-
+-        if(client-&gt;tempoffset &gt; 0) {
+-            int tempmissing = size - client-&gt;tempoffset;
+-            assert(tempmissing &gt; 0);
+-            if(bytesleft &gt;= tempmissing) {
+-                memcpy(client-&gt;tempbuffer + client-&gt;tempoffset,
+-                       bufptr, tempmissing);
+-
+-                EnqueueIncomingPacket(client-&gt;tempbuffer, size, 0, client-&gt;id);
+-
+-                client-&gt;tempoffset = 0;
+-                bytesleft -= tempmissing;
+-                bufptr += tempmissing;
+-                continue;
+-            } else {
+-                memcpy(client-&gt;tempbuffer + client-&gt;tempoffset,
+-                       bufptr, bytesleft);
+-                client-&gt;tempoffset += bytesleft;
+-                return;
+-            }
+-        } else {
+-            if(bytesleft &gt;= size) {
+-                EnqueueIncomingPacket(bufptr, size, 0, client-&gt;id);
+-                bytesleft -= size;
+-                bufptr += size;
+-                continue;
+-            } else {
+-                memcpy(client-&gt;tempbuffer, bufptr, bytesleft);
+-                client-&gt;tempoffset = bytesleft;
+-                return;
+-            }
+-        }
+-    }
+ }
+ 
+-/** this function interfaces the network AI code to winsock
+- * for sending server messages to the client. this
+- * implementation simply blocks until the entire message
+- * is sent. later i will change this so that it returns
+- * immediately UNLESS severe data backlog threatens to overflow
+- * the winsock async send buffers i'm doing -- in which case
+- * the game loop needs to be temporarily halted anyway.
+- * it handles both TCP and UDP sends--
+- */
+-void
+-ServerSocket::sendMessage(NetClientID toclient, const void* data,
+-        size_t datasize)
+-{
+-    SocketClient* client = clientlist-&gt;getClientFromID(toclient);
+-    if(!client || client-&gt;wantstodie)
+-        throw Exception(&quot;message sent to unknown client.&quot;);
+-    if(client-&gt;socket == 0)
+-        throw Exception(&quot;tried to send message to loopback client.&quot;);
+-
+-    client-&gt;socket-&gt;send(data, datasize);
+-}
+-
+-void
+-ServerSocket::closeConnection(SocketClient* client)
+-{
+-    if(client-&gt;socket)
+-        sockets.remove(*client-&gt;socket);
+-    delete(client-&gt;socket);
+-    client-&gt;socket = 0;
+-}
+-
+-void
+-ServerSocket::removeClient(NetClientID clientid)
+-{
+-    // TODO notify client about disconnect...
+-    SocketClient* client = clientlist-&gt;getClientFromID(clientid);
+-    if(client)
+-        client-&gt;wantstodie = true;
+-}
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -18,12 +18,13 @@
+ #ifndef _UNIXSERVER_H
+ #define _UNIXSERVER_H
+ 
++#include &lt;map&gt;
+ #include &lt;stdint.h&gt;
+-#include &quot;ClientList.hpp&quot;
+ #include &quot;Network/TCPListenSocket.hpp&quot;
+-#include &quot;Network/SocketSet.hpp&quot;
++#include &quot;ClientSocket.hpp&quot;
+ 
+-class ServerSocket
++
++class ServerSocket : public network::TCPListenSocketObserver, public ClientSocketObserver
+ {
+ public:
+     ServerSocket(const std::string&amp; bindaddress, uint16_t port);
+@@ -35,20 +36,24 @@
+     void removeClient(NetClientID clientid);
+     NetClientID addLoopbackClient();
+ 
+-    std::string getClientIP(NetClientID) const;
++    std::string getClientIP(NetClientID);
++    void disconectClient(NetClientID c);
+ 
+ protected:
++    network::TCPSocketObserver * onNewConnection(network::TCPListenSocket *so,const network::Address &amp;fromaddr);
++    void onClientConnected(ClientSocket *s);
++    void onClientDisconected(ClientSocket *s);
+     friend class SocketClient;
+-    void closeConnection(SocketClient* client);
++    //void closeConnection(SocketClient* client);
+ 
+ private:
+-    void acceptNewClients();
+-    void readTCP();
+-    void readClientTCP(SocketClient* client);
++    //void acceptNewClients();
++    //void readTCP();
++    //void readClientTCP(SocketClient* client);
+ 
+-    network::TCPListenSocket* socket;
+-    network::SocketSet sockets;
+-    ClientList* clientlist;
++    network::TCPListenSocket * socket;
++    std::map&lt;NetClientID, ClientSocket *&gt; clients;
++    //ClientList * clientlist;
+ };
+ 
+ #endif
+
+Deleted: trunk/netpanzer/src/NetPanzer/Network/SocketClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/SocketClient.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/SocketClient.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,36 +0,0 @@
+-/*
+-Copyright (C) 2004 by Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-
+-#include &lt;string.h&gt;
+-#include &lt;assert.h&gt;
+-#include &quot;ServerSocket.hpp&quot;
+-#include &quot;SocketClient.hpp&quot;
+-
+-SocketClient::SocketClient(ServerSocket* newserver)
+-        : socket(0), tempoffset(0), wantstodie(false), id(0), server(newserver)
+-{
+-}
+-
+-SocketClient::~SocketClient()
+-{
+-    assert(wantstodie == true);
+-
+-    server-&gt;closeConnection(this);
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Network/SocketClient.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/SocketClient.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Network/SocketClient.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -1,53 +0,0 @@
+-/*
+-Copyright (C) 2004 by Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __SOCKETCLIENT_HPP__
+-#define __SOCKETCLIENT_HPP__
+-
+-#include &lt;stdint.h&gt;
+-#include &quot;NetPacket.hpp&quot;
+-
+-class ServerSocket;
+-
+-namespace network {
+-class TCPSocket;
+-}
+-
+-/** This class keep data from a single client that is connected to the server
+- */
+-class SocketClient
+-{
+-public:
+-    SocketClient(ServerSocket* server);
+-    ~SocketClient();
+-
+-    network::TCPSocket* socket;
+-    
+-    char tempbuffer[_MAX_NET_PACKET_SIZE];
+-    uint16_t tempoffset;
+-
+-    /// this variable is set to true, when the Client should be removed from
+-    /// client list in the next iteratrion
+-    bool wantstodie;
+-
+-    NetClientID id;
+-
+-    ServerSocket* server;
+-};
+-
+-#endif
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -22,6 +22,9 @@
+ #include &quot;KeyboardInterface.hpp&quot;
+ #include &quot;MouseInterface.hpp&quot;
+ #include &quot;cMouse.hpp&quot;
++#include &quot;SDLVideo.hpp&quot;
++#include &quot;2D/Palette.hpp&quot;
++#include &quot;GameConfig.hpp&quot;
+ 
+ bool handleSDLEvents()
+ {
+@@ -81,6 +84,13 @@
+         case SDL_KEYUP:
+             KeyboardInterface::keyReleased(event.key.keysym.sym);
+             break;
++       
++        case SDL_ACTIVEEVENT:
++            if ( (event.active.state&amp;SDL_APPACTIVE)
++                 &amp;&amp; (event.active.gain==1)
++                 &amp;&amp; gameconfig-&gt;fullscreen )
++                Screen-&gt;setPalette(Palette::color);
++             break;
+         }
+     }
+ 
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,148 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;DisconectedView.hpp&quot;
++
++#include &quot;GameManager.hpp&quot;
++#include &quot;GameConfig.hpp&quot;
++#include &quot;Desktop.hpp&quot;
++#include &quot;MenuTemplateView.hpp&quot;
++#include &quot;OptionsTemplateView.hpp&quot;
++#include &quot;SoundView.hpp&quot;
++#include &quot;ControlsView.hpp&quot;
++#include &quot;VisualsView.hpp&quot;
++#include &quot;InterfaceView.hpp&quot;
++#include &quot;ScreenSurface.hpp&quot;
++
++#include &quot;Util/Log.hpp&quot;
++
++
++void
++DisconectedView::buttonOk()
++{
++    if(gameconfig-&gt;quickConnect == true) {
++        GameManager::exitNetPanzer();
++        return;
++    }
++    
++    GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
++    sprintf(MenuTemplateView::currentMultiView, &quot;GetSessionView&quot;);
++
++    // Vlad put all code in here for shutdown.
++    //----------------------
++    GameManager::quitNetPanzerGame();
++    //----------------------
++
++    // Swap to the menu resolution.
++    //GameManager::setVideoMode(iXY(640, 480), false);
++
++    GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
++
++    GameManager::loadPalette(&quot;netpmenu&quot;);
++
++    // Must remove the gameView first so that the initButtons detects that
++    // and loads the correct buttons.
++    Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MainView&quot;, true);
++
++    View *v = Desktop::getView(&quot;OptionsView&quot;);
++
++    if (v != 0) {
++        ((OptionsTemplateView *)v)-&gt;initButtons();
++        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++    } else {
++        assert(false);
++    }
++
++    v = Desktop::getView(&quot;SoundView&quot;);
++    if (v != 0) {
++        ((SoundView *)v)-&gt;initButtons();
++        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++    } else {
++        assert(false);
++    }
++
++    v = Desktop::getView(&quot;ControlsView&quot;);
++    if (v != 0) {
++        ((ControlsView *)v)-&gt;initButtons();
++        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++    } else {
++        assert(false);
++    }
++
++    v = Desktop::getView(&quot;VisualsView&quot;);
++    if (v != 0) {
++        ((VisualsView *)v)-&gt;initButtons();
++        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++    } else {
++        assert(false);
++    }
++
++    v = Desktop::getView(&quot;InterfaceView&quot;);
++    if (v != 0) {
++        ((InterfaceView *)v)-&gt;initButtons();
++        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++    } else {
++        assert(false);
++    }
++    LOGGER.warning(&quot;DisconectedView:: finished disconection&quot;);
++}
++
++
++DisconectedView::DisconectedView() : SpecialButtonView()
++{
++    setSearchName(&quot;DisconectedView&quot;);
++    setTitle(&quot;Disconected from server&quot;);
++    setSubTitle(&quot;&quot;);
++}
++
++void
++DisconectedView::init()
++{
++    removeAllButtons();
++
++    setBordered(false);
++    setAllowResize(false);
++    setDisplayStatusBar(false);
++
++    resize(screen-&gt;getPix());
++    moveTo(0,0);
++
++    int bsize = Surface::getTextLength(&quot; &quot;) * 8;
++    addButtonCenterText(iXY((getClientRect().getSizeX()/2)-(bsize/2),
++                (getClientRect().getSizeY()/2)+(Surface::getFontHeight() * 2)),
++                bsize, &quot;Ok&quot;, &quot;&quot;, buttonOk);
++}
++
++void
++DisconectedView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++{
++    iRect r(min, max);
++
++    viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
++    viewArea.bltStringCenter(&quot;You have been disconected from server&quot;, Color::white);
++
++    View::doDraw(viewArea, clientArea);
++}
++
++void
++DisconectedView::doActivate()
++{
++    init();
++    Desktop::setActiveView(this);
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -0,0 +1,39 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef _DISCONECTEDVIEW_HPP
++#define _DISCONECTEDVIEW_HPP
++
++#include &quot;SpecialButtonView.hpp&quot;
++#include &quot;2D/Surface.hpp&quot;
++
++//---------------------------------------------------------------------------
++class DisconectedView : public SpecialButtonView
++{
++private:
++    void init();
++    static void buttonOk();
++
++public:
++    DisconectedView();
++
++    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doActivate();
++};
++
++#endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -32,7 +32,9 @@
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;GameViewGlobals.hpp&quot;
+ #include &quot;IPAddressView.hpp&quot;
++#include &quot;ServerListView.hpp&quot;
+ 
++
+ #include &quot;Client.hpp&quot;
+ #include &quot;Server.hpp&quot;
+ #include &quot;NetworkClient.hpp&quot;
+@@ -90,6 +92,8 @@
+     if(gameconfig-&gt;hostorjoin == _game_session_join) {
+         gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
+     }
++    
++    serverlistview-&gt;endQuery();
+ 
+     MenuTemplateView::backgroundSurface.free();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -24,7 +24,7 @@
+ 
+ ServerInfo::ServerInfo()
+     : port(0), status(QUERYING), players(0), maxplayers(0), ping(0),
+-      querystartticks(0)
++      querystartticks(0), tryNum(0)
+ {
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -54,6 +54,8 @@
+ 
+     network::Address ipaddress;
+     Uint32 querystartticks;
++    
++    int tryNum;
+ };
+ 
+ } // masterserver
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -24,12 +24,10 @@
+ 
+ ServerList::ServerList()
+ {
+-    mutex = SDL_CreateMutex();
+ }
+ 
+ ServerList::~ServerList()
+ {
+-    SDL_DestroyMutex(mutex);
+ }
+ 
+ } // end of namespace masterserver
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -30,8 +30,6 @@
+ public:
+     ServerList();
+     ~ServerList();
+-    
+-    SDL_mutex* mutex;
+ };
+ 
+ } // end of namespace masterserver
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -30,7 +30,6 @@
+ #include &quot;Util/StreamTokenizer.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/StringUtil.hpp&quot;
+-#include &quot;Network/SocketStream.hpp&quot;
+ 
+ static const size_t MAX_QUERIES = 3;
+ static const Uint32 QUERY_TIMEOUT = 5 * 1000;
+@@ -38,8 +37,17 @@
+ namespace masterserver
+ {
+ 
++class MSInfo {
++public:
++    MSInfo() { touch(); };
++    void touch() { lastTicks = SDL_GetTicks(); };
++    string recdata;
++    Uint32 lastTicks;
++};
++
++
+ ServerQueryThread::ServerQueryThread(ServerList* newserverlist)
+-    : running(false), stream(0), shutdown_mutex(0), thread(0),
++    : running(true),
+       serverlist(newserverlist), state(STATE_QUERYMASTERSERVER), udpsocket(0),
+       queries(0)
+ {
+@@ -53,76 +61,42 @@
+ 
+     if(masterservers.size() == 0) {
+         state = STATE_NOSERVERS;
++        running = false;
+         return;
+     }
+-
+-    udpsocket = new network::UDPSocket(false);
+-   
+-    shutdown_mutex = SDL_CreateMutex();
+-    thread = SDL_CreateThread(threadMain, this);
++    try {
++        udpsocket = new network::UDPSocket(this);
++        queryMasterServer();
++    } catch (...) {
++        running = false;
++        if (udpsocket)
++            udpsocket-&gt;destroy();
++    }
+ }
+ 
+ ServerQueryThread::~ServerQueryThread()
+ {
+-    SDL_mutexP(shutdown_mutex);
+-    if(stream) {
+-        stream-&gt;cancel();
+-    }
+-    SDL_mutexV(shutdown_mutex);
+-    SDL_WaitThread(thread, 0);
+-
+-    delete udpsocket;
+-    SDL_DestroyMutex(shutdown_mutex);
+-}
+-
+-int
+-ServerQueryThread::threadMain(void* data)
+-{
+-    ServerQueryThread* _this = reinterpret_cast&lt;ServerQueryThread*&gt; (data);
+-
+-    _this-&gt;run();
+-    return 0;
+-}
+-
+-void
+-ServerQueryThread::run()
+-{
+-    try {
+-        running = true;
+-        while(running) {
+-            switch(state) {
+-                case STATE_QUERYMASTERSERVER:
+-                    queryMasterServer();
+-                    break;
+-                case STATE_QUERYSERVERS:
+-                    queryServers();
+-                    break;
+-                case STATE_NOSERVERS:
+-                case STATE_ERROR:
+-                case STATE_DONE:
+-                    running = false;
+-                    break;
+-            }
+-            // sleep a little bit
+-            SDL_Delay(10); // this destroys ping times :-(
++    if (udpsocket)
++        udpsocket-&gt;destroy();
++    
++    if ( ! querying_msdata.empty() ) {
++        map&lt;network::TCPSocket *,MSInfo *&gt;::iterator msiter;
++        for (msiter = querying_msdata.begin(); msiter != querying_msdata.end(); msiter++) {
++            delete msiter-&gt;second;
++            msiter-&gt;first-&gt;destroy();
+         }
+-    } catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;Unexpected exception in query thread: %s&quot;, e.what());
+-    } catch(...) {
+-        LOGGER.warning(&quot;Unexpected exception in query thread&quot;);
++        querying_msdata.clear();
+     }
++    
++    if ( ! querying_server.empty() ) {
++        querying_server.clear();
++    }
++    
+ }
+ 
+ void
+ ServerQueryThread::queryMasterServer()
+ {
+-    if(masterservers.empty()) {
+-        LOGGER.warning(&quot;masterservers list is empty.&quot;);
+-        state = STATE_ERROR;
+-        return;
+-    }
+-
+-
+     while (!masterservers.empty()) {
+         try {
+             std::string masterserverip = masterservers.back();
+@@ -131,164 +105,193 @@
+             network::Address ip
+                 = network::Address::resolve(masterserverip, 28900);
+ 
+-            network::TCPSocket* tcpsocket = new network::TCPSocket(ip, false);
+-            stream = new network::SocketStream(*tcpsocket);
+-            StreamTokenizer tokenizer(*stream, '\\');
++            network::TCPSocket *s = new network::TCPSocket(ip, this);
++            MSInfo * msi = new MSInfo();
++            querying_msdata[s]=msi;
++            running = true;
++        } catch(std::exception&amp; e) {
++            LOGGER.warning(&quot;Problem querying masterserver: %s.&quot;, e.what());
++        }
++    }
++}
+ 
+-            if(!running)
+-                throw std::runtime_error(&quot;query aborted&quot;);
++void
++ServerQueryThread::onConnected(network::TCPSocket *s)
++{
++    LOGGER.warning(&quot;MASTERSERVER Connected [%s]&quot;, s-&gt;getAddress().getIP().c_str());
++//    char query[] = &quot;\\list\\gamename\\master\\final\\list\\gamename\\netpanzer\\final\\&quot;;
++    char query[] = &quot;\\list\\gamename\\netpanzer\\final\\&quot;;
+ 
+-            // send query
+-            *stream &lt;&lt; &quot;\\list\\gamename\\master\\final&quot;
+-                    &lt;&lt; &quot;\\list\\gamename\\netpanzer&quot;
+-                    // &lt;&lt; &quot;\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION 
+-                    &lt;&lt; &quot;\\final\\&quot; &lt;&lt; std::flush;
++    querying_msdata[s]-&gt;touch();
++    s-&gt;send(query,sizeof(query)-1);
+ 
+-            ServerInfo* lastserver = 0;
+-            std::string newMasterServers;
++}
+ 
+-            // parse master server list
+-            while(!stream-&gt;eof() &amp;&amp; running) {
+-                std::string token = tokenizer.getNextToken();
+-                if(token == &quot;ip&quot;) {
+-                    if(newMasterServers != &quot;&quot;)
+-                        newMasterServers += &quot;,&quot;;
+-                    newMasterServers += tokenizer.getNextToken();
+-                } else if(token == &quot;port&quot;) {
+-                    tokenizer.getNextToken();
+-                    // ignored
+-                } else if(token == &quot;final&quot;) {
++void
++ServerQueryThread::onDisconected(network::TCPSocket *s)
++{
++    LOGGER.warning(&quot;MASTERSERVER Disconected [%s]&quot;, s-&gt;getAddress().getIP().c_str());
++    delete querying_msdata[s];
++    querying_msdata.erase(s);
++}
++
++void
++ServerQueryThread::onDataReceived(network::TCPSocket *s, const char *data, const int len)
++{
++    string str;
++    
++    MSInfo * msi = querying_msdata[s];
++    msi-&gt;touch();
++    str = msi-&gt;recdata;
++    str.append(data,len);
++    
++    if (str[0] != '\\') {
++        delete msi;
++        querying_msdata.erase(s);
++        s-&gt;destroy();
++        return; // invalid answer;
++    }
++    
++    string lastpart;
++    if (str[str.length()-1] != '\\') {
++        // received incomplete
++        string::size_type p = str.rfind('\\');
++        msi-&gt;recdata = str.substr(p);
++        str.erase(p);
++    } else {
++        msi-&gt;recdata = &quot;\\&quot;;
++    }
++    
++    StringTokenizer tknizer(str,'\\');
++    
++    string token = tknizer.getNextToken();
++    while ( !token.empty()) {
++        if ( token == &quot;ip&quot; ) {
++            string dirip = tknizer.getNextToken();
++            string port;
++            if ( dirip.empty() ) { 
++                msi-&gt;recdata.insert(0,&quot;\\ip\\&quot;);
++                break;
++            }
++            
++            token = tknizer.getNextToken();
++            if ( token.empty() ) {
++                msi-&gt;recdata.insert(0,dirip.insert(0,&quot;\\ip\\&quot;)+&quot;\\&quot;);
++                break;
++            }
++
++            if ( token == &quot;port&quot; ) {
++                token = tknizer.getNextToken();
++                if (token.empty()) {
++                    msi-&gt;recdata.insert(0,dirip.insert(0,&quot;\\ip\\&quot;)+&quot;\\port\\&quot;);
+                     break;
+-                } else {
+-                    std::stringstream msg;
+-                    msg &lt;&lt; &quot;Unknown token '&quot; 
+-                        &lt;&lt; token &lt;&lt; &quot;' when querying masterserver (master list)&quot;;
+-                    throw std::runtime_error(msg.str());
+                 }
++                port=token;
++                token = tknizer.getNextToken();
+             }
++            
++            LOGGER.warning(&quot;Server IP received: [%s:%s]&quot;,dirip.c_str(),port.c_str());
+ 
+-            // parse server list
+-            while(!stream-&gt;eof() &amp;&amp; running) {
+-                std::string token = tokenizer.getNextToken();
+-                if(token == &quot;ip&quot;) {
+-                    ServerInfo* info = new ServerInfo();
+-                    info-&gt;status = ServerInfo::QUERYING;
+-                    info-&gt;address = tokenizer.getNextToken();
+-                    if(info-&gt;address == &quot;&quot;)
+-                        break;
+-
+-                    // add server into list
+-                    SDL_mutexP(serverlist-&gt;mutex);
+-                    serverlist-&gt;push_back(info);
+-                    not_queried.push_back(info);
+-                    lastserver = info;
+-                    SDL_mutexV(serverlist-&gt;mutex);
+-                } else if(token == &quot;port&quot;) {
+-                    std::stringstream portstr(tokenizer.getNextToken());
+-                    portstr &gt;&gt; lastserver-&gt;port;
+-                } else if(token == &quot;final&quot;) {
++            int iport;
++            std::stringstream portstr(port);
++            portstr &gt;&gt; iport;
++            
++            bool found=false;
++            // check if it is already in list
++            std::vector&lt;masterserver::ServerInfo*&gt;::iterator si;
++            for ( si = serverlist-&gt;begin(); si != serverlist-&gt;end(); si++) {
++                if ( ((*si)-&gt;address == dirip) &amp;&amp; ((*si)-&gt;port == iport) ) {
++                    found=true;
+                     break;
+-                } else {
+-                    std::stringstream msg;
+-                    msg &lt;&lt; &quot;Unknown token '&quot; 
+-                        &lt;&lt; token &lt;&lt; &quot;' when querying masterserver (game list)&quot;;
+-                    throw std::runtime_error(msg.str());
+                 }
+             }
+-            delete stream;
+-            stream=0;
+-            delete tcpsocket;
+-            
+-            //if(newMasterServers != &quot;&quot;)
+-            //    gameconfig-&gt;masterservers = newMasterServers;
+-        } catch(std::exception&amp; e) {
+-            LOGGER.warning(&quot;Problem querying masterserver: %s.&quot;, e.what());
+-            //masterservers.pop_back();
++            if (found)
++                continue;
++            ServerInfo * info = new ServerInfo();
++            info-&gt;address = dirip;
++            info-&gt;port = iport;
++            info-&gt;status = ServerInfo::QUERYING;
++            serverlist-&gt;push_back(info);
++            not_queried.push_back(info);
++            sendNextQuery(); // XXX first check it is not already in
++        } else if ( token == &quot;final&quot;) {
++            delete msi;
++            querying_msdata.erase(s);
++            s-&gt;destroy();
++            break;
++        } else {
++            delete msi;
++            querying_msdata.erase(s);
++            s-&gt;destroy();
++            break; // extra tokens
+         }
+-    } // while
+-
+-    state = STATE_QUERYSERVERS;
+-
+-//    SDL_mutexP(shutdown_mutex);
+-//    delete stream;
+-//    stream = 0;
+-//    delete tcpsocket;
+-//    SDL_mutexV(shutdown_mutex);
++    }    
++    
+ }
+ 
+ void
+-ServerQueryThread::queryServers()
+-{    
+-    Uint32 now = SDL_GetTicks();
+-    
+-    // check for timed out servers
+-    for(std::vector&lt;ServerInfo*&gt;::iterator i = querying.begin();
+-            i != querying.end(); ) {
+-        ServerInfo* server = *i;
+-        if(now - server-&gt;querystartticks &gt; QUERY_TIMEOUT) {
+-            server-&gt;status = ServerInfo::TIMEOUT;
+-            i = querying.erase(i);
+-            continue;
+-        }
+-
+-        ++i;
+-    }
+-       
+-    if(querying.size() &lt; MAX_QUERIES &amp;&amp; !not_queried.empty()) {
+-        // send a query to a server
+-        ServerInfo* server = not_queried.back();
++ServerQueryThread::sendNextQuery()
++{
++    if ( querying_server.size() &gt;= 5 ) // max 5 query at time
++        return;
++    if ( ! not_queried.empty() ) {
++        ServerInfo *info = not_queried.back();
+         not_queried.pop_back();
+-
+-        // resolve address
+-        try {
+-            server-&gt;ipaddress = network::Address::resolve(server-&gt;address,
+-                    server-&gt;port);
+-        } catch(std::exception&amp; e) {
+-            LOGGER.warning(e.what());
+-            return;
+-        }
+-         
+-        // send query
+-        std::string query = &quot;\\status\\final\\&quot;;
+-
+-        udpsocket-&gt;send(server-&gt;ipaddress, query.c_str(), query.size());
+-
+-        server-&gt;querystartticks = now;
+-        querying.push_back(server);
++        sendQuery(info);
+     }
++}
+ 
+-    if(not_queried.empty() &amp;&amp; querying.empty()) {
+-        state = STATE_DONE;
++void 
++ServerQueryThread::sendQuery(ServerInfo *server)
++{
++    if (server-&gt;tryNum++ &gt;= 3) { // 3 retrys fixed for now
++        server-&gt;status = ServerInfo::TIMEOUT;
++        sendNextQuery();
+         return;
+     }
++    
++    if (server-&gt;ipaddress == network::Address::ANY) {
++        server-&gt;ipaddress = network::Address::resolve(server-&gt;address, server-&gt;port);
++    }
+ 
+-    // part2 receive data
++    stringstream serveraddr;
++    serveraddr &lt;&lt; server-&gt;address &lt;&lt; &quot;:&quot; &lt;&lt; server-&gt;port;
++    querying_server[serveraddr.str()]=server;
++    LOGGER.warning(&quot;Querying server [%s]&quot;, serveraddr.str().c_str());
++    
++    char q[] = &quot;\\status\\final\\&quot;;
++    server-&gt;querystartticks = SDL_GetTicks();
++    udpsocket-&gt;send(server-&gt;ipaddress,q,sizeof(q)-1);
++    
++}
+ 
+-    char buffer[4096];
+-    network::Address addr;
+-    size_t size = udpsocket-&gt;recv(addr, buffer, sizeof(buffer));
+-    if(size == 0)
+-        return;
+-
+-    // find server with this address
+-    ServerInfo* server = 0;
+-    SDL_mutexP(serverlist-&gt;mutex);
+-    for(ServerList::iterator i = serverlist-&gt;begin();
+-            i != serverlist-&gt;end(); ++i) {
+-        if((*i)-&gt;ipaddress == addr) {
+-            server = *i;
+-            break;
+-        }       
++void
++ServerQueryThread::onDataReceived(network::UDPSocket *s, const network::Address&amp; from, const char *data, const int len)
++{
++    stringstream fromaddress;
++    fromaddress &lt;&lt; from.getIP() &lt;&lt; &quot;:&quot; &lt;&lt; from.getPort();
++    
++    string str;
++    str.append(data,len);
++    
++    ServerInfo * server = querying_server[fromaddress.str()];
++    if (server) {
++        parseServerData(server,str);
++        querying_server.erase(fromaddress.str());
++    } else {
++        LOGGER.warning(&quot;Received answer from [%s]&quot;, fromaddress.str().c_str());
+     }
+-    SDL_mutexV(serverlist-&gt;mutex);
+-    if(server == 0) { // random data from elsewhere
+-        return;
+-    }
++    
++    sendNextQuery();
++    
++}
+ 
+-    server-&gt;ping = now - server-&gt;querystartticks;
++void
++ServerQueryThread::parseServerData(ServerInfo *server, string &amp;data)
++{
++    server-&gt;ping = SDL_GetTicks() - server-&gt;querystartticks;
+     
+-    std::string packetstr(buffer, size);
+-    StringTokenizer tokenizer(packetstr, '\\');
++    StringTokenizer tokenizer(data, '\\');
+ 
+     std::string token;
+     while( (token = tokenizer.getNextToken()) != &quot;&quot;) {
+@@ -310,15 +313,68 @@
+         }
+     }
+     server-&gt;status = ServerInfo::RUNNING;
+-    for(std::vector&lt;ServerInfo*&gt;::iterator i = querying.begin();
+-            i != querying.end(); ) {
+-        if((*i) == server)                                          
+-            i = querying.erase(i);
+-        else
+-            ++i;
++    
++}
++
++void
++ServerQueryThread::checkTimeOuts()
++{
++    Uint32 now = SDL_GetTicks();
++    
++    if ( querying_msdata.empty() &amp;&amp; querying_server.empty() &amp;&amp; not_queried.empty()) {
++        LOGGER.warning(&quot;Stopping querys to servers, no more servers&quot;);
++        running = false;
++        state = STATE_DONE;
++        if (udpsocket) {
++            udpsocket-&gt;destroy();
++            udpsocket = 0;
++        }
++        return;
+     }
++    
++    map&lt;network::TCPSocket *,MSInfo *&gt;::iterator msiter;
++    for (msiter=querying_msdata.begin(); msiter!=querying_msdata.end(); msiter++) {
++        if ( now - msiter-&gt;second-&gt;lastTicks &gt; QUERY_TIMEOUT ) {
++            LOGGER.warning(&quot;Masterserver [%s] timeout&quot;, msiter-&gt;first-&gt;getAddress().getIP().c_str());
++            delete msiter-&gt;second;
++            msiter-&gt;first-&gt;destroy();
++            querying_msdata.erase(msiter);
++            sendNextQuery();
++        }
++    }
++    
++    
++    map&lt;string, ServerInfo *&gt;::iterator i;
++    for (i=querying_server.begin(); i!=querying_server.end(); i++) {
++        if ( i-&gt;second-&gt;status == ServerInfo::TIMEOUT ) {
++            LOGGER.warning(&quot;Server [%s] timeout, removing&quot;, i-&gt;first.c_str());
++            querying_server.erase(i);
++        } else if ( now - i-&gt;second-&gt;querystartticks &gt; QUERY_TIMEOUT ) {
++            LOGGER.warning(&quot;Server [%s] timeout, retrying&quot;, i-&gt;first.c_str());
++            sendQuery(i-&gt;second);
++        }
++    }
++    
++    
+ }
+ 
++
++
++
++//    if(not_queried.empty() &amp;&amp; querying.empty()) {
++//        state = STATE_DONE;
++//        return;
++//    }
++
++//    for(std::vector&lt;ServerInfo*&gt;::iterator i = querying.begin();
++//            i != querying.end(); ) {
++//        if((*i) == server)                                          
++//            i = querying.erase(i);
++//        else
++//            ++i;
++//    }
++
++
+ const char*
+ ServerQueryThread::getStateMessage() const
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -20,17 +20,22 @@
+ 
+ #include &lt;vector&gt;
+ #include &lt;string&gt;
++#include &lt;map&gt;
+ #include &lt;SDL_thread.h&gt;
+ #include &quot;Network/TCPSocket.hpp&quot;
+ #include &quot;Network/UDPSocket.hpp&quot;
+-#include &quot;Network/SocketStream.hpp&quot;
++#include &quot;Network/Address.hpp&quot;
+ 
+ #include &quot;ServerList.hpp&quot;
+ 
++using namespace std;
++
+ namespace masterserver
+ {
++    
++class MSInfo;
+ 
+-class ServerQueryThread
++class ServerQueryThread : public network::TCPSocketObserver, public network::UDPSocketObserver
+ {
+ public:
+     ServerQueryThread(ServerList* serverlist);
+@@ -41,18 +46,24 @@
+     {
+         return running;
+     }
+-
++    void checkTimeOuts();
++    
++protected:
++    void onDataReceived(network::TCPSocket *s, const char *data, const int len);
++    void onConnected(network::TCPSocket *s);
++    void onDisconected(network::TCPSocket *s);    
++    void onDataReceived(network::UDPSocket *s, const network::Address &amp;from, const char *data, const int len);
++    
+ private:
+-    static int threadMain(void* data);
+-    void run();
++    
++    void parseServerData(ServerInfo *server, string &amp;data);
++    void sendNextQuery();
++    void sendQuery(ServerInfo *server);
+ 
+     void queryMasterServer();
+     void queryServers();
+ 
+-    volatile bool running;
+-    network::SocketStream* stream;
+-    SDL_mutex* shutdown_mutex;
+-    SDL_Thread* thread;
++    bool running;
+     
+     ServerList* serverlist;
+ 
+@@ -70,8 +81,10 @@
+     network::UDPSocket* udpsocket;
+ 
+     std::vector&lt;ServerInfo*&gt; not_queried;
+-    std::vector&lt;ServerInfo*&gt; querying;
+     int queries; // number of currently running queries
++    
++    map&lt;network::TCPSocket *,MSInfo *&gt; querying_msdata;
++    map&lt;string, ServerInfo *&gt; querying_server;
+ };
+ 
+ } // masterserver
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -59,24 +59,33 @@
+ void
+ ServerListView::refresh()
+ {
+-    if(queryThread &amp;&amp; queryThread-&gt;isRunning())
+-        return;
+-    
+-    delete queryThread;
++    if ( queryThread ) { 
++        if (queryThread-&gt;isRunning())
++            return;
++        else
++            delete queryThread;
++    }
+    
+     // don't clear before the delete or after the new, as the thread contains
+     // pointers to the serverlist
+-    SDL_mutexP(serverlist.mutex);
+     for(std::vector&lt;masterserver::ServerInfo*&gt;::iterator i = serverlist.begin();
+             i != serverlist.end(); ++i)
+         delete *i;
+     serverlist.clear();
+-    SDL_mutexV(serverlist.mutex);
+ 
+     queryThread = new masterserver::ServerQueryThread(&amp;serverlist);   
+ }
+ 
+ void
++ServerListView::endQuery()
++{
++    if (queryThread) {
++        delete queryThread;
++        queryThread=0;
++    }
++}
++
++void
+ ServerListView::buttonRefresh()
+ {
+     serverlistview-&gt;refresh();
+@@ -86,7 +95,11 @@
+ ServerListView::doDraw(Surface&amp; windowArea, Surface&amp; clientArea)
+ {
+     clientArea.fill(Color::black);
+-
++    
++    if(queryThread &amp;&amp; queryThread-&gt;isRunning()) {
++        queryThread-&gt;checkTimeOuts();
++    }
++    
+     if(serverlist.empty()) {
+         const char* msg = queryThread-&gt;getStateMessage();
+         clientArea.bltString(iXY(0, 0), msg, Color::white);
+@@ -94,7 +107,6 @@
+         return;
+     }
+ 
+-    SDL_mutexP(serverlist.mutex);
+     int y = 0;
+     for(std::vector&lt;masterserver::ServerInfo*&gt;::iterator i = serverlist.begin();
+             i != serverlist.end(); ++i) {
+@@ -138,7 +150,6 @@
+         if(y &gt;= clientArea.getPixY())
+             break;                             
+     }
+-    SDL_mutexV(serverlist.mutex);
+ 
+     View::doDraw(windowArea, clientArea);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp	2007-03-21 18:17:58 UTC (rev 963)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp	2007-04-02 11:55:35 UTC (rev 964)
+@@ -30,6 +30,7 @@
+     virtual ~ServerListView();
+ 
+     void refresh();
++    void endQuery();
+         
+     virtual void doDraw(Surface&amp; windowArea, Surface&amp; clientArea);
+     virtual int lMouseUp(const iXY&amp; up_pos, const iXY&amp; down_pos);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000012.html">[Netpanzer-cvs] r965 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

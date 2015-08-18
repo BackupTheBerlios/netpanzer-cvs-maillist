@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1200 - in trunk/netpanzer: src/Lib/Network	support/macosx support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1200%20-%20in%20trunk/netpanzer%3A%20src/Lib/Network%0A%09support/macosx%20support/scripts&In-Reply-To=%3C201001231759.o0NHx92s000136%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000225.html">
+   <LINK REL="Next"  HREF="000227.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1200 - in trunk/netpanzer: src/Lib/Network	support/macosx support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1200%20-%20in%20trunk/netpanzer%3A%20src/Lib/Network%0A%09support/macosx%20support/scripts&In-Reply-To=%3C201001231759.o0NHx92s000136%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1200 - in trunk/netpanzer: src/Lib/Network	support/macosx support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan 23 18:59:09 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000225.html">[Netpanzer-cvs] r1199 - in trunk/netpanzer: .	src/NetPanzer/Classes/Network support/macosx support/scripts
+</A></li>
+        <LI>Next message: <A HREF="000227.html">[Netpanzer-cvs] r1201 - in trunk/netpanzer/src/NetPanzer:	Interfaces PowerUps Views/Components Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#226">[ date ]</a>
+              <a href="thread.html#226">[ thread ]</a>
+              <a href="subject.html#226">[ subject ]</a>
+              <a href="author.html#226">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-23 18:58:56 +0100 (Sat, 23 Jan 2010)
+New Revision: 1200
+
+Modified:
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/support/macosx/make_appbundle.sh
+   trunk/netpanzer/support/scripts/make-all-binary.sh
+Log:
+- quick fix for windows tcp_nodelay
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2010-01-23 17:17:14 UTC (rev 1199)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2010-01-23 17:58:56 UTC (rev 1200)
+@@ -151,10 +151,11 @@
+     int res = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &amp;val, sizeof(val));
+     if(res == SOCKET_ERROR) {
+         lastError = GET_NET_ERROR();
+-        doClose();
++//        doClose();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't set TCP_NODELAY: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        throw NetworkException(msg.str());
++//        throw NetworkException(msg.str());
++        LOGGER.warning(&quot;NetError: %s&quot;, msg.str().c_str());
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/support/macosx/make_appbundle.sh
+===================================================================
+--- trunk/netpanzer/support/macosx/make_appbundle.sh	2010-01-23 17:17:14 UTC (rev 1199)
++++ trunk/netpanzer/support/macosx/make_appbundle.sh	2010-01-23 17:58:56 UTC (rev 1200)
+@@ -10,7 +10,7 @@
+ APPNAME=&quot;NetPanzer&quot;
+ BASEDMG=&quot;support/macosx/basedmg.dmg&quot;
+ TEMPDMG=&quot;${RELEASEDIR}/tempdmg.dmg&quot;
+-FINALDMG=&quot;${RELEASEDIR}/NetPanzer-${VERSION}.dmg&quot;
++FINALDMG=&quot;${RELEASEDIR}/NetPanzer-Mac-Universal-${VERSION}.dmg&quot;
+ DMGROOT=&quot;${RELEASEDIR}/MacOS_DMGROOT&quot;
+ DMGDOC=&quot;${DMGROOT}/Documentation&quot;
+ APPDIR=&quot;${DMGROOT}/${APPNAME}.app&quot;
+
+Modified: trunk/netpanzer/support/scripts/make-all-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-all-binary.sh	2010-01-23 17:17:14 UTC (rev 1199)
++++ trunk/netpanzer/support/scripts/make-all-binary.sh	2010-01-23 17:58:56 UTC (rev 1200)
+@@ -59,3 +59,6 @@
+ 
+ mv &quot;${NPDEST}/../${ZIPNAME}&quot; &quot;${RELEASEDIR}&quot;
+ rm -rf &quot;${NPDEST}&quot;
++
++support/macosx/make_appbundle.sh
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000225.html">[Netpanzer-cvs] r1199 - in trunk/netpanzer: .	src/NetPanzer/Classes/Network support/macosx support/scripts
+</A></li>
+	<LI>Next message: <A HREF="000227.html">[Netpanzer-cvs] r1201 - in trunk/netpanzer/src/NetPanzer:	Interfaces PowerUps Views/Components Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#226">[ date ]</a>
+              <a href="thread.html#226">[ thread ]</a>
+              <a href="subject.html#226">[ subject ]</a>
+              <a href="author.html#226">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

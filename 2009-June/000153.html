@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1124 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1124%20-%20trunk/netpanzer&In-Reply-To=%3C200906201641.n5KGfQX8012936%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000152.html">
+   <LINK REL="Next"  HREF="000154.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1124 - trunk/netpanzer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1124%20-%20trunk/netpanzer&In-Reply-To=%3C200906201641.n5KGfQX8012936%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1124 - trunk/netpanzer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun 20 18:41:26 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000152.html">[Netpanzer-cvs] r1123 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000154.html">[Netpanzer-cvs] r1125 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#153">[ date ]</a>
+              <a href="thread.html#153">[ thread ]</a>
+              <a href="subject.html#153">[ subject ]</a>
+              <a href="author.html#153">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-20 18:41:17 +0200 (Sat, 20 Jun 2009)
+New Revision: 1124
+
+Modified:
+   trunk/netpanzer/SConstruct
+Log:
+- Added automatic handling of netpanzer version. If the file RELEASE_VERSION exists, it will use the first line of the file as the netpanzer version, if not, it will try to get the svn version automatically and will be svn-&lt;version&gt;. If the svn version cannot be get, and there is no RELEASE_VERSION file, the version will be &quot;svn-&quot;
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-06-20 14:49:54 UTC (rev 1123)
++++ trunk/netpanzer/SConstruct	2009-06-20 16:41:17 UTC (rev 1124)
+@@ -162,15 +162,26 @@
+ # Set NetPanzer Version
+ ################################################################
+ 
+-NPVERSION = 'svn'
++NPVERSION = ''
+ SVERSION = ''
++
+ try:
++    FILE = open('RELEASE_VERSION', 'r')
++    NPVERSION = FILE.readline().strip(' \n\r')
++    FILE.close()
++except:
++    pass
++
++try:
+     SVERSION = os.popen('svnversion').read()[:-1]
+     SVERSION = SVERSION.split(':')[-1]
+-except e:
++except:
+     pass
+ 
++print &quot;NPVERSION = &quot; + NPVERSION
+ print &quot;SVERSION = &quot; + SVERSION
++if NPVERSION == '' and SVERSION != '':
++    NPVERSION = 'svn-' + SVERSION;
+ 
+ env.Append( CCFLAGS = [ '-DPACKAGE_VERSION=\\&quot;' + NPVERSION + '\\&quot;' ] )
+ crossmingwenv.Append( CCFLAGS = [ '-DPACKAGE_VERSION=\\&quot;' + NPVERSION + '\\&quot;' ] )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000152.html">[Netpanzer-cvs] r1123 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000154.html">[Netpanzer-cvs] r1125 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#153">[ date ]</a>
+              <a href="thread.html#153">[ thread ]</a>
+              <a href="subject.html#153">[ subject ]</a>
+              <a href="author.html#153">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

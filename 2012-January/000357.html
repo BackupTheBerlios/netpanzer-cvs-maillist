@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1331 - in trunk/netpanzer/src: Lib/Util	NetPanzer/System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1331%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/System&In-Reply-To=%3C20120109144707.DF5F14815AB%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000356.html">
+   <LINK REL="Next"  HREF="000358.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1331 - in trunk/netpanzer/src: Lib/Util	NetPanzer/System</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1331%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/System&In-Reply-To=%3C20120109144707.DF5F14815AB%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1331 - in trunk/netpanzer/src: Lib/Util	NetPanzer/System">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Jan  9 15:47:07 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000356.html">[Netpanzer-cvs] r1330 - trunk/netpanzer/src/Lib/Network
+</A></li>
+        <LI>Next message: <A HREF="000358.html">[Netpanzer-cvs] r1332 - in trunk/netpanzer: . src/NetPanzer/Units	support support/tools
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-09 15:47:01 +0100 (Mon, 09 Jan 2012)
+New Revision: 1331
+
+Modified:
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+Log:
+- zip files are 'mounted' on the vfs, the search path in order is: 1 '.netpanzer', 2 'zip files', 3 'netpanzer.exe base folder'
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2012-01-08 17:46:40 UTC (rev 1330)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2012-01-09 14:47:01 UTC (rev 1331)
+@@ -61,8 +61,8 @@
+     PHYSFS_addToSearchPath(writedir, 0);
+     PHYSFS_addToSearchPath(basedir, 1);
+ 
+-    delete[] writedir;
+ 
++
+     /* Root out archives, and add them to search path... */
+     const char* archiveExt = &quot;zip&quot;;
+     if (archiveExt != NULL) {
+@@ -76,10 +76,11 @@
+             if ((l &gt; extlen) &amp;&amp; ((*i)[l - extlen - 1] == '.')) {
+                 ext = (*i) + (l - extlen);
+                 if (strcasecmp(ext, archiveExt) == 0) {
++                    LOGGER.warning(&quot;==== Adding zip: '%s'&quot;, *i);
+                     const char *d = PHYSFS_getRealDir(*i);
+                     char* str = new char[strlen(d) + strlen(dirsep) + l + 1];
+                     sprintf(str, &quot;%s%s%s&quot;, d, dirsep, *i);
+-                    PHYSFS_addToSearchPath(str, 1);
++                    PHYSFS_addToSearchPath(str, 0);
+                     delete[] str;
+                 } /* if */
+             } /* if */
+@@ -87,6 +88,11 @@
+ 
+         PHYSFS_freeList(rc);
+     } /* if */
++
++
++    PHYSFS_removeFromSearchPath(writedir);
++    PHYSFS_addToSearchPath(writedir, 0);
++    delete[] writedir;
+ }
+ 
+ void shutdown()
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2012-01-08 17:46:40 UTC (rev 1330)
++++ trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2012-01-09 14:47:01 UTC (rev 1331)
+@@ -287,7 +287,7 @@
+     do {
+         const char* toplay = currentsong-&gt;c_str();
+         currentsong++;
+-#ifdef HAS_LOADMUS_RW
++//#ifdef HAS_LOADMUS_RW
+         /*
+          * use LoadMUS_RW from newer SDL_mixers
+          */
+@@ -310,7 +310,7 @@
+             LOG ((&quot;Failed to load song '%s': %s&quot;,
+                   toplay, e.what()));
+         }
+-#else
++#if 0
+         music = Mix_LoadMUS(filesystem::getRealName(toplay).c_str());
+         if (music) {
+             if (Mix_PlayMusic(music, 1) == 0) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000356.html">[Netpanzer-cvs] r1330 - trunk/netpanzer/src/Lib/Network
+</A></li>
+	<LI>Next message: <A HREF="000358.html">[Netpanzer-cvs] r1332 - in trunk/netpanzer: . src/NetPanzer/Units	support support/tools
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

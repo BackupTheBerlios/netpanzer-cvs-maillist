@@ -1,0 +1,977 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1326 - in trunk/netpanzer: . src/Lib/ArrayUtil	src/Lib/Network src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1326%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/ArrayUtil%0A%09src/Lib/Network%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Network%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/Game&In-Reply-To=%3C20120104165846.303FE4811DF%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000353.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1326 - in trunk/netpanzer: . src/Lib/ArrayUtil	src/Lib/Network src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1326%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/ArrayUtil%0A%09src/Lib/Network%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Network%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/Game&In-Reply-To=%3C20120104165846.303FE4811DF%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1326 - in trunk/netpanzer: . src/Lib/ArrayUtil	src/Lib/Network src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jan  4 17:58:45 CET 2012</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000353.html">[Netpanzer-cvs] r1327 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Components Views/Game	Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#352">[ date ]</a>
+              <a href="thread.html#352">[ thread ]</a>
+              <a href="subject.html#352">[ subject ]</a>
+              <a href="author.html#352">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-04 17:58:45 +0100 (Wed, 04 Jan 2012)
+New Revision: 1326
+
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/Lib/ArrayUtil/ArrayTemplate.hpp
+   trunk/netpanzer/src/Lib/ArrayUtil/QueueTemplate.hpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+Log:
+- Fix: correctly disconnects players in several cases and show correct messages on disconnections. This also fixes the fake &quot;server full&quot; problem.
+- Merge little changes from newpath
+- Fix: if using quick connect but connection failed, it didn't exit the game automatically.
+- Fix: in base capture mode = full base, the capture area was too big and was possible to capture from out of the base, now is exactly the base size.
+
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/SConstruct	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -239,6 +239,7 @@
+     env['WINICON'] = env.RES( 'support/icon/npicon.rc' )
+     SetupSpawn(env)
+ else:
++    networkenv.ParseConfig(env['sdlconfig'] + ' --cflags --libs')
+     env.ParseConfig(env['sdlconfig'] + ' --cflags --libs')
+     env.Append( NPLIBS = [ 'SDL_mixer' ] )
+ 
+
+Modified: trunk/netpanzer/src/Lib/ArrayUtil/ArrayTemplate.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/ArrayUtil/ArrayTemplate.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/Lib/ArrayUtil/ArrayTemplate.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -19,13 +19,15 @@
+ #define _ARRAYTEMPLATE_HPP
+ 
+ #include &lt;assert.h&gt;
+-#include &lt;string.h&gt;
++#include &lt;cstddef&gt;
+ 
+-#include &quot;Util/NoCopy.hpp&quot;
+-
+ template&lt; class TYPE &gt;
+-class ArrayTemplate : public NoCopy
++class ArrayTemplate
+ {
++private:
++    ArrayTemplate(const ArrayTemplate&amp; );
++    void operator=(const ArrayTemplate&amp; );
++
+ protected:
+     size_t size;
+     TYPE *array;
+@@ -36,11 +38,13 @@
+         size = 0;
+         array = 0;
+     }
++
+     ArrayTemplate(size_t newsize)
+         : size(newsize)
+     {
+         array = new TYPE[size];
+     }
++
+     ~ArrayTemplate()
+     {
+         delete[] array;
+
+Modified: trunk/netpanzer/src/Lib/ArrayUtil/QueueTemplate.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/ArrayUtil/QueueTemplate.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/Lib/ArrayUtil/QueueTemplate.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -24,15 +24,15 @@
+ class QueueTemplate : public ArrayTemplate&lt; TYPE &gt;
+ {
+ public:
+-    unsigned long front;
+-    unsigned long rear;
++    size_t front;
++    size_t rear;
+ 
+     QueueTemplate( )
+     { }
+ 
+-    QueueTemplate( unsigned long size );
++    QueueTemplate( size_t size );
+ 
+-    void initialize( unsigned long size );
++    void initialize( size_t size );
+ 
+     void reset()
+     {
+@@ -107,7 +107,7 @@
+ 
+ 
+ template&lt; class TYPE &gt;
+-QueueTemplate&lt; TYPE &gt;::QueueTemplate( unsigned long size )
++QueueTemplate&lt; TYPE &gt;::QueueTemplate( size_t size )
+         : ArrayTemplate&lt;TYPE&gt;( size )
+ {
+     front = 0;
+@@ -115,7 +115,7 @@
+ }
+ 
+ template&lt; class TYPE &gt;
+-void QueueTemplate&lt; TYPE &gt;::initialize( unsigned long size )
++void QueueTemplate&lt; TYPE &gt;::initialize( size_t size )
+ {
+     ArrayTemplate&lt; TYPE &gt;::initialize( size );
+     front = 0;
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -55,7 +55,11 @@
+ 
+ SocketBase::~SocketBase()
+ {
+-
++    // XXX this might be needed if sockets doesn't close nicely
++//    int tmp;
++//    while ( recv(sockfd, (char*)&amp;tmp, sizeof(tmp), RECV_FLAGS) &gt; 0 ) ; // read until there is no more.
++    shutdown(sockfd, SHUTDOWN_BOTH);
++    closesocket(sockfd);
+ }
+ 
+ SocketBase::SocketBase(const Address &amp;a, bool isTcp)
+@@ -66,6 +70,7 @@
+     SocketManager::addSocket(this);
+     setNonBlocking();
+     _isConnecting=false;
++    disconnectTimer.setTimeOut(500);
+ }
+ 
+ SocketBase::SocketBase(SOCKET fd, const Address &amp;a)
+@@ -75,6 +80,7 @@
+     SocketManager::addSocket(this);
+     setNonBlocking();
+     _isConnecting=false;
++    disconnectTimer.setTimeOut(500);
+ }
+ 
+ void
+@@ -299,7 +305,6 @@
+ {
+     LOGGER.debug(&quot;SocketBase:: Closing [%d] socket&quot;, sockfd);
+     SocketManager::removeSocket(this);
+-    closesocket(sockfd);
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -24,6 +24,7 @@
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;Address.hpp&quot;
+ #include &quot;Util/NoCopy.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ namespace network
+ {
+@@ -82,6 +83,8 @@
+     SOCKET sockfd;
+     Address addr;
+     int lastError;
++
++    NTimer disconnectTimer;
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -21,6 +21,7 @@
+ #ifdef _WIN32
+ #include &lt;winsock2.h&gt;
+ 
++#define SHUTDOWN_BOTH SD_BOTH
+ #define GET_NET_ERROR() WSAGetLastError()
+ #define NETSTRERROR(x) &quot;Winsock error: &quot; &lt;&lt; x
+ 
+@@ -53,6 +54,7 @@
+ #define SOCKET_ERROR -1
+ #define INVALID_SOCKET -1
+ #define closesocket(s) ::close(s)
++#define SHUTDOWN_BOTH SHUT_RDWR
+ #define GET_NET_ERROR() errno
+ #define NETSTRERROR(x) strerror(x)
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -36,13 +36,20 @@
+ {
+     SocketsIterator i;
+ 
+-    if (!deletedSockets.empty()) {
+-        for (i = deletedSockets.begin(); i!=deletedSockets.end(); i++) {
+-            LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
+-            socketList.erase(*i);
+-            delete *i;
++    if (!deletedSockets.empty())
++    {
++        for (i = deletedSockets.begin(); i!=deletedSockets.end(); )
++        {
++            SocketsIterator current = i++;
++            socketList.erase(*current);
++            if ( (*current)-&gt;disconnectTimer.isTimeOut() )
++            {
++                LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*current)-&gt;sockfd, (unsigned long)(*current));
++                delete *current;
++                deletedSockets.erase(current);
++            }
+         }
+-        deletedSockets.clear();
++
+     }
+ 
+     if (!newSockets.empty()) {
+@@ -52,17 +59,17 @@
+         }
+         newSockets.clear();
+     }
+-
+-    // Make the socketset every time, not all OS works the same way
+-    sset.clear();
+-    for (i = socketList.begin(); i!=socketList.end(); i++) {
+-        if ((*i)-&gt;isConnecting()) {
+-            sset.addWrite(*i);
+-        } else {
+-            sset.add(*i);
+-        }
+-    }
+ 
++    // Make the socketset every time, not all OS works the same way
++    sset.clear();
++    for (i = socketList.begin(); i!=socketList.end(); i++) {
++        if ((*i)-&gt;isConnecting()) {
++            sset.addWrite(*i);
++        } else {
++            sset.add(*i);
++        }
++    }
++
+     int r = sset.select(0);
+     if ( !r ) // most common first
+         return;
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -18,7 +18,7 @@
+ 
+ #ifndef _SOCKETMANAGER_HPP
+ #define _SOCKETMANAGER_HPP
+-
++
+ #include &lt;set&gt;
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;TCPSocket.hpp&quot;
+@@ -39,34 +39,35 @@
+ protected:
+     friend class SocketBase; // the only allowed to add/remove
+     static void addSocket(SocketBase *s)
+-    {
+-        SocketsIterator i = deletedSockets.find(s);
+-        if ( i != deletedSockets.end() ) {
+-            deletedSockets.erase(i);
++    {
++        SocketsIterator i = deletedSockets.find(s);
++        if ( i != deletedSockets.end() ) {
++            deletedSockets.erase(i);
+         } else {
+-            newSockets.insert(s);
++            newSockets.insert(s);
+         }
+     }
+     
+     static void removeSocket(SocketBase *s)
+     {
+-        SocketsIterator i = newSockets.find(s);
+-        if ( i != newSockets.end() ) {
+-            newSockets.erase(i);
+-        } else {
+-            deletedSockets.insert(s);
++        SocketsIterator i = newSockets.find(s);
++        if ( i != newSockets.end() ) {
++            newSockets.erase(i);
++        } else {
++            deletedSockets.insert(s);
++            s-&gt;disconnectTimer.reset();
+         }
+     }
+     
+     static void removeInvalidSockets();
+ 
+ private:
+-    typedef set&lt;SocketBase *&gt; Sockets;
+-    typedef set&lt;SocketBase *&gt;::iterator SocketsIterator;
+-    
+-    static SocketSet sset;
+-    static Sockets socketList;
+-    static Sockets newSockets;
++    typedef set&lt;SocketBase *&gt; Sockets;
++    typedef set&lt;SocketBase *&gt;::iterator SocketsIterator;
++    
++    static SocketSet sset;
++    static Sockets socketList;
++    static Sockets newSockets;
+     static Sockets deletedSockets;
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -68,6 +68,8 @@
+ 
+     CLIENT-&gt;sendMessage(&amp;client_disconnect,
+             sizeof(ConnectMesgNetPanzerClientDisconnect));
++
++    CLIENT-&gt;sendRemaining();
+ }
+ 
+ void ClientConnectDaemon::startConnectionProcess( )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -67,11 +67,14 @@
+ NetworkClient::onClientDisconected(ClientSocket *s, const char *msg)
+ {
+     (void)s;
+-    DisconectedView *dv = (DisconectedView *)Desktop::getView(&quot;DisconectedView&quot;);
+-    dv-&gt;setMsg(msg);
++    if ( ! Desktop::getVisible(&quot;LoadingView&quot;) )
++    {
++        DisconectedView *dv = (DisconectedView *)Desktop::getView(&quot;DisconectedView&quot;);
++        dv-&gt;setMsg(msg);
++
++        Desktop::setVisibility(&quot;DisconectedView&quot;, true);
++    }
+     
+-    Desktop::setVisibility(&quot;DisconectedView&quot;, true);
+-    
+     delete clientsocket;
+     clientsocket=0;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -21,6 +21,8 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;NetworkInterface.hpp&quot;
+ 
++NetPacketQueue NetworkInterface::receive_queue;
++
+ void EnqueueIncomingPacket( const void *data, Uint16 size,
+                             PlayerID fromPlayer, ClientSocket *fromClient)
+ {
+@@ -35,7 +37,6 @@
+     NetworkInterface::receive_queue.enqueue( TEMP_PACKET );
+ }
+ 
+-NetPacketQueue NetworkInterface::receive_queue;
+ 
+ NetworkInterface::NetworkInterface()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -219,6 +219,22 @@
+ }
+ 
+ void
++NetworkServer::niceDisconnect(ClientSocket * client)
++{
++    ClientList::iterator i = client_list.begin();
++    while( i != client_list.end() &amp;&amp; (*i)-&gt;client_socket != client )
++    {
++        ++i;
++    }
++
++    if ( i != client_list.end() )
++    {
++        // XXX hack
++        onClientDisconected(client, 0);
++    }
++}
++
++void
+ NetworkServer::kickClient(ClientSocket * client)
+ {
+     ClientList::iterator i = client_list.begin();
+@@ -317,7 +333,7 @@
+ void
+ NetworkServer::onClientDisconected(ClientSocket *s, const char * msg)
+ {
+-    LOGGER.debug(&quot;NetworkServer::onClientDisconected( %d, '%s')&quot;, s-&gt;getId(), msg);
++    LOGGER.debug(&quot;NetworkServer::onClientDisconected( %d, '%s')&quot;, s-&gt;getId(), msg ? msg : &quot;nice&quot;);
+     
+     bool cleandisconnect = false;
+     bool sendalert = true;
+@@ -390,21 +406,21 @@
+ 
+         if ( sendalert )
+         {
+-            SystemConnectAlert msg;
+-            if ( cleandisconnect )
++            SystemConnectAlert scmsg;
++            if ( cleandisconnect || ! msg )
+             {
+-                msg.set( player_index, _connect_alert_mesg_disconnect);
++                scmsg.set( player_index, _connect_alert_mesg_disconnect);
+             }
+             else if ( kicked )
+             {
+-                msg.set( player_index, _connect_alert_mesg_client_kicked);
++                scmsg.set( player_index, _connect_alert_mesg_client_kicked);
+             }
+             else
+             {
+-                msg.set( player_index, _connect_alert_mesg_client_drop );
++                scmsg.set( player_index, _connect_alert_mesg_client_drop );
+             }
+ 
+-            SERVER-&gt;broadcastMessage(&amp;msg, sizeof(msg));
++            SERVER-&gt;broadcastMessage(&amp;scmsg, sizeof(scmsg));
+         }
+     }
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -79,6 +79,7 @@
+     bool getPacket(NetPacket* packet);
+ 
+     void dropClient(ClientSocket * client);
++    void niceDisconnect(ClientSocket * client);
+     void kickClient(ClientSocket * client);
+ 
+     ClientSocket * getClientSocketByPlayerIndex ( const PlayerID index );
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -52,7 +52,9 @@
+     connect_state_player_state_sync,
+     connect_state_sync_flags,
+     connect_state_unit_sync,
+-    connect_state_finish_connect
++    connect_state_finish_connect,
++    connect_state_drop_bad_connecting_client,
++    connect_state_drop_bad_client
+ };
+ 
+ bool                connection_lock_state = false;
+@@ -221,31 +223,35 @@
+ 
+     virtual T process()
+     {
+-        return time_out_timer.count() ? connect_state_idle : State&lt;T&gt;::state;
++        return time_out_timer.count() ? connect_state_drop_bad_client : State&lt;T&gt;::state;
+     }
+ 
+     virtual T message(const NetMessage* msg)
+     {
+-        T new_state = connect_state_idle;
++        T new_state = connect_state_drop_bad_connecting_client;
+         if ( msg-&gt;message_id == _net_message_id_client_connect_request )
+         {
+             ClientConnectResult connect_result;
+ 
+-            PlayerState * player = PlayerInterface::allocateNewPlayer();
+             if ((GameConfig::game_allowmultiip == false) &amp;&amp; 
+                (SERVER-&gt;isAlreadyConnected(connect_client) == true))
+             {
+                 connect_result.result_code = _connect_result_server_already_connected;
++                LOGGER.warning(&quot;Client already connected!!!!, die&quot;);
+             }
+-            else if ( player == 0 )
+-            {
+-                connect_result.result_code = _connect_result_server_full;
+-            }
+             else
+             {
+-                connect_result.result_code = _connect_result_success;
+-                connect_client-&gt;player_id = player-&gt;getID();
+-                new_state = connect_state_wait_for_client_settings;
++                PlayerState * player = PlayerInterface::allocateNewPlayer();
++                if ( player == 0 )
++                {
++                    connect_result.result_code = _connect_result_server_full;
++                }
++                else
++                {
++                    connect_result.result_code = _connect_result_success;
++                    connect_client-&gt;player_id = player-&gt;getID();
++                    new_state = connect_state_wait_for_client_settings;
++                }
+             }
+ 
+             connect_client-&gt;sendMessage( &amp;connect_result,
+@@ -274,7 +280,7 @@
+         if ( time_out_timer.count() )
+         {
+             player-&gt;setStateFree();
+-            return connect_state_idle;
++            return connect_state_drop_bad_connecting_client;
+         }
+         return State&lt;T&gt;::state;
+     }
+@@ -327,7 +333,7 @@
+         if ( time_out_timer.count() )
+         {
+             player-&gt;setStateFree();
+-            return connect_state_idle;
++            return connect_state_drop_bad_connecting_client;
+         }
+         return State&lt;T&gt;::state;
+     }
+@@ -396,7 +402,7 @@
+         else if ( time_out_timer.count() )
+         {
+             player-&gt;setStateFree();
+-            return connect_state_idle;
++            return connect_state_drop_bad_connecting_client;
+         }
+         return State&lt;T&gt;::state;
+     }
+@@ -487,7 +493,7 @@
+         else if ( time_out_timer.count() )
+         {
+             player-&gt;setStateFree();
+-            return connect_state_idle;
++            return connect_state_drop_bad_connecting_client;
+         }
+         return State&lt;T&gt;::state;
+     }
+@@ -552,7 +558,7 @@
+         else if ( time_out_timer.count() )
+         {
+             player-&gt;setStateFree();
+-            return connect_state_idle;
++            return connect_state_drop_bad_connecting_client;
+         }
+         return State&lt;T&gt;::state;
+     }
+@@ -728,6 +734,28 @@
+     }
+ };
+ 
++template&lt;typename T&gt;
++class StateDropBadConnectingClient : public State&lt;T&gt;
++{
++public:
++    virtual T process()
++    {
++        connect_client-&gt;hardClose();
++        return connect_state_idle;
++    }
++};
++
++template&lt;typename T&gt;
++class StateDropBadClient : public State&lt;T&gt;
++{
++public:
++    virtual T process()
++    {
++        SERVER-&gt;dropClient(connect_client);
++        return connect_state_idle;
++    }
++};
++
+ static StateMachine&lt;ConnectionState&gt;* fsm = 0;
+ 
+ void ServerConnectDaemon::initialize(unsigned long max_players)
+@@ -746,6 +774,8 @@
+     fsm-&gt;addState(new StateFlagSync&lt;ConnectionState&gt;());
+     fsm-&gt;addState(new StateUnitSync&lt;ConnectionState&gt;());
+     fsm-&gt;addState(new StateFinishConnect&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateDropBadConnectingClient&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateDropBadClient&lt;ConnectionState&gt;());
+ 
+     fsm-&gt;enterState(connect_state_idle);
+ 
+@@ -782,7 +812,7 @@
+ 
+ static void netPacketClientDisconnect(const NetPacket *packet)
+ {
+-    // nothing, useless, remove
++    SERVER-&gt;niceDisconnect(packet-&gt;fromClient);
+ }
+ 
+ static void netPacketClientJoinRequest(const NetPacket* packet)
+@@ -834,7 +864,7 @@
+ 
+     if ( isbad )
+     {
+-        SERVER-&gt;dropClient(packet-&gt;fromClient);
++        packet-&gt;fromClient-&gt;hardClose();
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -25,6 +25,9 @@
+ 
+ class Sprite
+ {
++protected:
++    Sprite *next;
++
+ public:
+     iXY world_pos;
+     iXY attach_offset;
+@@ -102,19 +105,16 @@
+ 
+     inline void blitAll( Surface *surface, const iRect &amp;world_win )
+     {
+-        Sprite *iterator;
++        blit( surface, world_win );
+ 
+-        iterator = this;
++        Sprite *iterator = next;
+ 
+-        while(iterator != 0) {
++        while( iterator )
++        {
+             iterator-&gt;blit( surface, world_win );
+             iterator = iterator-&gt;next;
+         }
+     }
+-
+-protected:
+-    Sprite *next;
+-
+ };
+ 
+ class SpritePacked : public PackedSurface, public Sprite
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -58,6 +58,14 @@
+     {
+         return player_id;
+     }
++
++    void hardClose()
++    {
++        if ( socket )
++        {
++            socket-&gt;destroy();
++        }
++    }
+     
+ protected:
+     void onDataReceived(network::TCPSocket *so, const char *data, const int len);
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -46,7 +46,7 @@
+     selection_box.max = location + iXY( 64, 32 );
+     selection_box.min = location + iXY( -224, -128 );
+     this-&gt;area.min = iXY( -400, -144 );
+-    this-&gt;area.max = iXY(  400,  240 );
++    this-&gt;area.max = iXY(  304,  240 );
+     outpost_type = 0;
+ 
+     unit_generation_type = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -36,24 +36,6 @@
+ int gPacketSize = 0;
+ int display_mode;
+ 
+-
+-/*
+-static void bPlusPacketSize( void )
+- {
+-  gPacketSize++ 
+- }
+- 
+-static void bMinusPacketSize( void )
+- {
+-  gPacketSize--;
+- }
+- 
+-static void bSend( void )
+- {
+- 
+- }
+-*/
+-
+ static void buttonNetwork( void )
+ {
+     display_mode = _display_mode_network_stats;
+@@ -70,27 +52,6 @@
+     display_mode = _display_mode_pathing_stats;
+ }
+ 
+-static void buttonDebug( void )
+-{
+-    static bool previous_flag = false;
+-
+-    if ( previous_flag == false ) {
+-        PathScheduler::setLongPatherDebug( true );
+-        // XXX if needed change for new MiniMap.hpp
+-        //MiniMapInterface::setPathingDebugMode( true );
+-        previous_flag = true;
+-    } else {
+-        PathScheduler::setLongPatherDebug( false );
+-        //MiniMapInterface::setPathingDebugMode( false );
+-        previous_flag = false;
+-    }
+-}
+-
+-static void buttonSample( void )
+-{
+-    PathScheduler::sampleLongPather( );
+-}
+-
+ static void buttonUnit( void )
+ {
+     display_mode = _display_mode_unit_stats;
+@@ -132,23 +93,10 @@
+ 
+     INFO_AREA_Y_OFFSET += 18;
+     bXOffset = area_size.x / 3;
+-    addButtonCenterText(iXY(0, INFO_AREA_Y_OFFSET), bXOffset,  &quot;Debug&quot;, &quot;&quot;, buttonDebug);
+-    addButtonCenterText(iXY(bXOffset, INFO_AREA_Y_OFFSET), bXOffset, &quot;Sample&quot;, &quot;&quot;, buttonSample);
+     addButtonCenterText(iXY(bXOffset*2, INFO_AREA_Y_OFFSET), bXOffset, &quot;NetLog&quot;, &quot;&quot;, bNetLog );
+ 
+     INFO_AREA_Y_OFFSET += 18;
+-    /*
+-       addButtonCenterText(iXY(0, INFO_AREA_Y_OFFSET), 20, &quot;+&quot;, &quot;&quot;, bPlusPacketSize );
+-    addButtonCenterText(iXY(25, INFO_AREA_Y_OFFSET), 20, &quot;-&quot;, &quot;&quot;, bMinusPacketSize );
+-    addButtonCenterText(iXY(50, INFO_AREA_Y_OFFSET), 20, &quot;0&quot;, &quot;&quot;, bMinusPacketSize );
+-    addButtonCenterText(iXY(65, INFO_AREA_Y_OFFSET), 20, &quot;1&quot;, &quot;&quot;, bMinusPacketSize );
+ 
+-    addButtonCenterText(iXY(45, INFO_AREA_Y_OFFSET), 40, &quot;Send&quot;, &quot;&quot;, bSend );
+-
+-       INFO_AREA_Y_OFFSET += 18;
+-       INFO_AREA_Y_OFFSET += 18;
+-       */
+-
+     display_mode = _display_mode_network_stats;
+ 
+ } // end CodeStatsView::CodeStatsView
+@@ -177,15 +125,7 @@
+         break;
+     }
+ 
+-    /*
+-    char strBuf[256];
+-
+-    sprintf(strBuf, &quot;Packet Size : %d&quot;, gPacketSize );
+-
+-    clientArea.bltString(2, INFO_AREA_Y_OFFSET - 18, strBuf, Color::white);
+-    */
+     View::doDraw(viewArea, clientArea);
+-
+ } // end CodeStatsView::doDraw
+ 
+ //---------------------------------------------------------------------------
+@@ -202,36 +142,40 @@
+ 
+     str_loc.y += 12;
+ 
+-    sprintf(strBuf, &quot;Sent %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::packets_sent,
+-            NetworkState::packets_sent_per_sec,
+-            ((float) NetworkState::packets_sent) / ((float) NetworkState::packets_sent_time) );
++    sprintf(strBuf, &quot;Sent %ld, %.4f 1/s, %.4f Avg&quot;,
++                    NetworkState::packets_sent,
++                    NetworkState::packets_sent_per_sec,
++                    ((float)NetworkState::packets_sent) / ((float)NetworkState::packets_sent_time) );
++
+     clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+-    sprintf(strBuf, &quot;Recv %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::packets_received,
+-            NetworkState::packets_received_per_sec,
+-            ((float) NetworkState::packets_received) / ((float) NetworkState::packets_received_time) );
++    sprintf(strBuf, &quot;Recv %ld, %.4f 1/s, %.4f Avg&quot;,
++                    NetworkState::packets_received,
++                    NetworkState::packets_received_per_sec,
++                    ((float)NetworkState::packets_received) / ((float)NetworkState::packets_received_time) );
+     clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Bytes&quot; );
+-
+     clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+-    sprintf(strBuf, &quot;Sent %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::bytes_sent,
+-            NetworkState::bytes_sent_per_sec,
+-            ((float) NetworkState::bytes_sent) / ((float) NetworkState::packets_sent_time) );
++    sprintf(strBuf, &quot;Sent %ld, %.4f 1/s, %.4f Avg&quot;,
++                    NetworkState::bytes_sent,
++                    NetworkState::bytes_sent_per_sec,
++                    ((float) NetworkState::bytes_sent) / ((float) NetworkState::packets_sent_time) );
+     clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+-    sprintf(strBuf, &quot;Recv %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::bytes_received,
+-            NetworkState::bytes_received_per_sec,
+-            ((float) NetworkState::bytes_received) / ((float) NetworkState::packets_received_time) );
++    sprintf(strBuf, &quot;Recv %ld, %.4f 1/s, %.4f Avg&quot;,
++                    NetworkState::bytes_received,
++                    NetworkState::bytes_received_per_sec,
++                    ((float) NetworkState::bytes_received) / ((float) NetworkState::packets_received_time) );
+     clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+@@ -241,14 +185,16 @@
+ 
+     str_loc.y += 12;
+ 
+-    sprintf(strBuf, &quot;Sent : %ld, %.4f 1/s &quot;, NetworkState::opcodes_sent,
+-            NetworkState::opcodes_sent_per_sec );
++    sprintf(strBuf, &quot;Sent : %ld, %.4f 1/s &quot;,
++                    NetworkState::opcodes_sent,
++                    NetworkState::opcodes_sent_per_sec );
+     clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+-    sprintf(strBuf, &quot;Recv : %ld, %.4f 1/s&quot;, NetworkState::opcodes_received,
+-            NetworkState::opcodes_received_per_sec );
++    sprintf(strBuf, &quot;Recv : %ld, %.4f 1/s&quot;,
++                    NetworkState::opcodes_received,
++                    NetworkState::opcodes_received_per_sec );
+     clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2011-12-28 12:47:47 UTC (rev 1325)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-01-04 16:58:45 UTC (rev 1326)
+@@ -27,6 +27,8 @@
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ 
++#include &quot;Interfaces/GameConfig.hpp&quot;
++
+ #include &lt;list&gt;
+ #include &lt;string&gt;
+ 
+@@ -86,9 +88,15 @@
+ 
+     static void loadError()
+     {
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;MainView&quot;, true);
+-
++        if ( gameconfig-&gt;quickConnect )
++        {
++            GameManager::exitNetPanzer();
++        }
++        else
++        {
++            Desktop::setVisibilityAllWindows(false);
++            Desktop::setVisibility(&quot;MainView&quot;, true);
++        }
+     }
+ 
+     static void show()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000353.html">[Netpanzer-cvs] r1327 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Components Views/Game	Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#352">[ date ]</a>
+              <a href="thread.html#352">[ thread ]</a>
+              <a href="subject.html#352">[ subject ]</a>
+              <a href="author.html#352">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

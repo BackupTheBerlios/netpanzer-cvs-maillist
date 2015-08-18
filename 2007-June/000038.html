@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r993 - in branches/netpanzer-0.8/src/NetPanzer:	Network Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r993%20-%20in%20branches/netpanzer-0.8/src/NetPanzer%3A%0A%09Network%20Views/MainMenu/Multi&In-Reply-To=%3C200706161908.l5GJ8Bs5029253%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000037.html">
+   <LINK REL="Next"  HREF="000039.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r993 - in branches/netpanzer-0.8/src/NetPanzer:	Network Views/MainMenu/Multi</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r993%20-%20in%20branches/netpanzer-0.8/src/NetPanzer%3A%0A%09Network%20Views/MainMenu/Multi&In-Reply-To=%3C200706161908.l5GJ8Bs5029253%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r993 - in branches/netpanzer-0.8/src/NetPanzer:	Network Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun 16 21:08:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000037.html">[Netpanzer-cvs] r992 - in branches/netpanzer-0.8/src/NetPanzer:	Interfaces/unix Network Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000039.html">[Netpanzer-cvs] r994 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#38">[ date ]</a>
+              <a href="thread.html#38">[ thread ]</a>
+              <a href="subject.html#38">[ subject ]</a>
+              <a href="author.html#38">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-16 21:08:11 +0200 (Sat, 16 Jun 2007)
+New Revision: 993
+
+Modified:
+   branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+Modified the network code (receiving packets) to be clearer and report errors
+In the server list window, limit the length of the server name so doesn't
+overwrite the server stats.
+
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp	2007-06-16 16:21:43 UTC (rev 992)
++++ branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp	2007-06-16 19:08:11 UTC (rev 993)
+@@ -142,26 +142,31 @@
+     Uint16 packetsize=0;
+     while (remaining) {
+         if ( !tempoffset ) {
+-            if ( remaining &gt;= sizeof(NetMessage) &amp;&amp; remaining &gt;= (packetsize=htol16(*((Uint16*)(data+dataptr))) ) ){
+-                if ( packetsize &lt; sizeof(NetMessage) )
+-                    packetsize = sizeof(NetMessage);
+-                if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+-                    LOGGER.warning(&quot;Received wrong packetsize [%d]&quot;, packetsize);
+-                    observer-&gt;onClientDisconected(this, &quot;Received wrong packet size&quot;);
+-                    break; // received a wrong packet size
+-                }
+-                
++            if ( remaining &lt; sizeof(NetMessage) ) {
++                memcpy(tempbuffer,data+dataptr,remaining);
++                tempoffset = remaining;
++                break; // no more data
++            }
++            
++            packetsize=htol16(*((Uint16*)(data+dataptr)));;
++            
++            if ( packetsize &lt; sizeof(NetMessage) ) {
++                LOGGER.debug(&quot;Received wrong packetsize: less than required [%d]&quot;, packetsize);
++                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (less than required)&quot;);
++                break; // we are deleted
++            }
++            
++            if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
++                LOGGER.debug(&quot;Received wrong packetsize: more than limit [%d]&quot;, packetsize);
++                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (more than limit)&quot;);
++                break; // we are deleted
++            }
++            
++            if ( remaining &gt;= packetsize ) {
+                 EnqueueIncomingPacket(data+dataptr, packetsize, 0, id);
+                 remaining-=packetsize;
+                 dataptr+=packetsize;
+             } else {
+-                if ( remaining &gt; _MAX_NET_PACKET_SIZE ) {
+-                    // The only possibility of getting in here is...
+-                    LOGGER.warning(&quot;Received wrong packetsize (remaining) [%d]&quot;,remaining);
+-                    observer-&gt;onClientDisconected(this, &quot;Received wrong packet size&quot;);
+-                    break;
+-                }
+-                
+                 memcpy(tempbuffer,data+dataptr,remaining);
+                 tempoffset = remaining;
+                 remaining=0;
+@@ -169,7 +174,7 @@
+         } else {
+             if ( tempoffset &lt; sizeof(NetMessage) ) {
+                 // copy the needed until netMessage
+-                LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Reading more for head&quot;, id);
++                LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more for head&quot;, id);
+                 unsigned int needsize = sizeof(NetMessage)-tempoffset;
+                 unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
+                 memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+@@ -178,32 +183,37 @@
+                 dataptr+=tocopy;
+             }
+             
+-            if ( tempoffset &gt;= sizeof(NetMessage) ) {
+-                packetsize=htol16(*((Uint16*)tempbuffer));
+-                LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Head ok, size[%d]&quot;, id, packetsize);
+-                if ( packetsize &lt; sizeof(NetMessage) )
+-                    packetsize = sizeof(NetMessage);
+-
+-                if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+-                    LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Received wrong packetsize (half) [%d]&quot;, id, packetsize);
+-                    observer-&gt;onClientDisconected(this, &quot;Received wrong packet size&quot;);
+-                    break; // received a wrong packet size
+-                }
++            if ( tempoffset &lt; sizeof(NetMessage) )
++                break; // no more data
+                 
+-                if ( (tempoffset &lt; packetsize) &amp;&amp; remaining ) {
+-                    unsigned int needsize = packetsize-tempoffset;
+-                    unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
+-                    memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+-                    remaining-=tocopy;
+-                    tempoffset+=tocopy;
+-                    dataptr+=tocopy;
+-                }
++            packetsize=htol16(*((Uint16*)tempbuffer));;
++            
++            if ( packetsize &lt; sizeof(NetMessage) ) {
++                LOGGER.debug(&quot;Received wrong packetsize(half): less than required [%d]&quot;, packetsize);
++                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (less than required(half))&quot;);
++                break; // we are deleted
++            }
++            
++            if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
++                LOGGER.debug(&quot;Received wrong packetsize(half): more than limit [%d]&quot;, packetsize);
++                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (more than limit(half))&quot;);
++                break; // we are deleted
++            }
+                 
+-                if ( tempoffset == packetsize ) {
+-                    EnqueueIncomingPacket(tempbuffer, packetsize, 0, id);
+-                    tempoffset = 0;
+-                }
++            if ( (tempoffset &lt; packetsize) &amp;&amp; remaining ) {
++                LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more data&quot;, id);
++                unsigned int needsize = packetsize-tempoffset;
++                unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
++                memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
++                remaining-=tocopy;
++                tempoffset+=tocopy;
++                dataptr+=tocopy;
+             }
++            
++            if ( tempoffset == packetsize ) {
++                EnqueueIncomingPacket(tempbuffer, packetsize, 0, id);
++                tempoffset = 0;
++            }
+         }
+     } // while
+ }
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-16 16:21:43 UTC (rev 992)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-16 19:08:11 UTC (rev 993)
+@@ -163,7 +163,9 @@
+                     Color::blue);
+             }
+ 
+-            clientArea.bltString(0,   y, server.name.c_str(), textcolor);
++            char ssn[44];
++            SDL_strlcpy(ssn, server.name.c_str(), sizeof(ssn));
++            clientArea.bltString(0,   y, ssn, textcolor);
+             clientArea.bltString(350, y, playerstr.str().c_str(), textcolor);
+             clientArea.bltString(400, y, server.map.c_str(), textcolor);
+             clientArea.bltString(550, y, pingstr.str().c_str(), textcolor);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000037.html">[Netpanzer-cvs] r992 - in branches/netpanzer-0.8/src/NetPanzer:	Interfaces/unix Network Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000039.html">[Netpanzer-cvs] r994 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#38">[ date ]</a>
+              <a href="thread.html#38">[ thread ]</a>
+              <a href="subject.html#38">[ subject ]</a>
+              <a href="author.html#38">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

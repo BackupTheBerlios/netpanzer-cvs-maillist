@@ -1,0 +1,1217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1158 - in trunk/netpanzer/src/NetPanzer:	Interfaces Scripts Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1158%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Scripts%20Units&In-Reply-To=%3C201001041737.o04HbXvK019597%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000185.html">
+   <LINK REL="Next"  HREF="000187.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1158 - in trunk/netpanzer/src/NetPanzer:	Interfaces Scripts Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1158%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Scripts%20Units&In-Reply-To=%3C201001041737.o04HbXvK019597%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1158 - in trunk/netpanzer/src/NetPanzer:	Interfaces Scripts Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Jan  4 18:37:33 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000185.html">[Netpanzer-cvs] r1157 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Particles
+</A></li>
+        <LI>Next message: <A HREF="000187.html">[Netpanzer-cvs] r1159 - trunk/netpanzer/src/NetPanzer/Particles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-04 18:37:19 +0100 (Mon, 04 Jan 2010)
+New Revision: 1158
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+Log:
+- Unified state machine for client and server, there must be some bugs introduced with these changes.
+- Fix bug when switching map in server, it would give less units each map switch.
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-04 11:14:32 UTC (rev 1157)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-04 17:37:19 UTC (rev 1158)
+@@ -57,37 +57,48 @@
+ 
+ #include &quot;Util/Log.hpp&quot;
+ 
+-enum { _map_cycle_server_state_idle,
+-       _map_cycle_server_state_display_endgame_views,
+-       _map_cycle_server_state_cycle_next_map,
+-       _map_cycle_server_state_load_map,
+-       _map_cycle_server_state_wait_for_client_map_load,
+-       _map_cycle_server_state_respawn_players,
+-       _map_cycle_server_state_in_progress
+-     };
++#include &quot;Interfaces/Console.hpp&quot;
++#include &quot;Particles/ParticleInterface.hpp&quot;
+ 
+-enum { _map_cycle_client_idle,
+-       _map_cycle_client_connecting_to_server,
+-       _map_cycle_client_connecting_to_server_work,
+-       _map_cycle_client_wait_connection,
+-       _map_cycle_client_wait_link_ack,
+-       _map_cycle_client_wait_connect_start,
+-       _map_cycle_client_wait_connect_result,
+-       _map_cycle_client_wait_game_setup,
+-       _map_cycle_client_start_map_load,
+-       _map_cycle_client_load_map,
+-       _map_cycle_client_load_tile_set,
+-       _map_cycle_client_send_ack,
+-       _map_cycle_client_wait_for_resetgamelogic_or_connectid,
+-       _map_cycle_client_wait_complete_connect,
+-       _map_cycle_client_wait_for_respawn_ack,
+-       _map_cycle_client_state_in_progress
+-   };
++enum
++{
++    _fsm_state_idle,
+ 
+-enum { _execution_mode_loop_back_server,
+-       _execution_mode_dedicated_server
+-     };
++    _fsm_state_server_display_endgame_views,
++    _fsm_state_server_waiting_to_switch_map,
+ 
++    _fsm_state_prepare_map_load,
++    _fsm_state_load_map,
++    _fsm_state_load_tileset,
++    _fsm_state_init_particles,
++
++    _fsm_state_server_waiting_clients_load_map,
++    _fsm_state_server_respawn_players,
++
++    _fsm_state_connecting_to_server,
++    _fsm_state_connecting_to_server_work,
++    _fsm_state_waiting_connection,
++    _fsm_state_waiting_link_ack,
++    _fsm_state_waiting_connect_start,
++    _fsm_state_waiting_connect_result,
++    _fsm_state_waiting_game_setup,
++    _fsm_state_send_gamesetup_ack,
++    _fsm_state_waiting_resetgamelogic_or_connectid,
++    _fsm_state_waiting_complete_connect,
++    _fsm_state_waiting_respawn_ack,
++
++    _fsm_state_game_in_progress
++
++};
++
++enum
++{
++    _execution_mode_loop_back_server,
++    _execution_mode_dedicated_server
++};
++
++static int fsm_state = _fsm_state_idle;
++
+ int GameControlRulesDaemon::execution_mode = _execution_mode_loop_back_server;
+ std::string GameControlRulesDaemon::nextmap = &quot;&quot;;
+ NTimer GameControlRulesDaemon::respawntimer;
+@@ -95,288 +106,405 @@
+ #define _MAP_CYCLE_ENDGAME_WAIT_PERIOD  (20) // seconds
+ #define _MAP_CYCLE_MAP_LOAD_WAIT_PERIOD (7) // seconds
+ 
+-int GameControlRulesDaemon::map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+ Timer GameControlRulesDaemon::map_cycle_fsm_server_endgame_timer;
+ Timer GameControlRulesDaemon::map_cycle_fsm_server_map_load_timer;
+ 
+-int GameControlRulesDaemon::map_cycle_fsm_client_state = _map_cycle_client_idle;
+ bool GameControlRulesDaemon::map_cycle_fsm_client_respawn_ack_flag = false;
+ 
+ static std::string connecting_server_name;
+ 
+ //-----------------------------------------------------------------
+-void GameControlRulesDaemon::setStateServerLoadingMap()
++void GameControlRulesDaemon::setStateIdle()
+ {
+-    map_cycle_fsm_server_endgame_timer.changePeriod( 0.0f );
+-    GameControlRulesDaemon::map_cycle_fsm_server_state = _map_cycle_server_state_cycle_next_map;
++    fsm_state = _fsm_state_idle;
+ }
+ //-----------------------------------------------------------------
+-void GameControlRulesDaemon::setStateClientLoadingMap()
++void GameControlRulesDaemon::setStateServerLoadingMap()
+ {
+-    GameControlRulesDaemon::map_cycle_fsm_client_state = _map_cycle_client_start_map_load;
++    map_cycle_fsm_server_endgame_timer.changePeriod( 0.0f );
++    fsm_state = _fsm_state_server_waiting_to_switch_map;
+ }
++//-----------------------------------------------------------------
+ void GameControlRulesDaemon::setStateClientConnectToServer(const std::string&amp; server_name)
+ {
+     connecting_server_name = server_name;
+-    GameControlRulesDaemon::map_cycle_fsm_client_state = _map_cycle_client_connecting_to_server;
++    fsm_state = _fsm_state_connecting_to_server;
+ }
+ //-----------------------------------------------------------------
+-void GameControlRulesDaemon::setStateServerIdle()
+-{
+-    GameControlRulesDaemon::map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+-}
+-//-----------------------------------------------------------------
+ void GameControlRulesDaemon::setDedicatedServer()
+ {
+     GameControlRulesDaemon::execution_mode = _execution_mode_dedicated_server;
+ }
++unsigned char GameControlRulesDaemon::getGameState()
++{
++    return fsm_state;
++}
+ 
+ //-----------------------------------------------------------------
+-void GameControlRulesDaemon::mapCycleFsmClient()
++void GameControlRulesDaemon::updateGameControlFlow()
+ {
+-    bool loop_finished = true;
+-    do
++    switch( fsm_state )
+     {
+-    switch( map_cycle_fsm_client_state )
+-    {
+-        case _map_cycle_client_idle :
++        case _fsm_state_idle:
+             return;
+ 
+-        case _map_cycle_client_connecting_to_server:
++        case _fsm_state_connecting_to_server:
+             LoadingView::show();
+             LoadingView::append(&quot;Starting network connection...&quot;);
+-            map_cycle_fsm_client_state = _map_cycle_client_connecting_to_server_work;
++            fsm_state = _fsm_state_connecting_to_server_work;
+             break;
+ 
+-        case _map_cycle_client_connecting_to_server_work:
++        case _fsm_state_connecting_to_server_work:
+             NetworkState::setNetworkStatus( _network_state_client );
+             MessageRouter::initialize(false);
+             NetworkClient::joinServer(connecting_server_name);
+-            map_cycle_fsm_client_state = _map_cycle_client_wait_connection;
++            fsm_state = _fsm_state_waiting_connection;
+             break;
+ 
+-        case _map_cycle_client_wait_connection:
++        case _fsm_state_waiting_connection:
++        {
++            NetPacket np;
++            if ( MessageRouter::getNextPacket(np) )
+             {
+-                NetPacket np;
+-                if ( MessageRouter::getNextPacket(np) )
++                const NetMessage * msg = np.getNetMessage();
++                if (  msg-&gt;message_class == _net_message_class_client_server
++                    &amp;&amp; msg-&gt;message_id == _net_message_id_client_connect_ack
++                   )
+                 {
+-                    const NetMessage * msg = np.getNetMessage();
+-                    if (  msg-&gt;message_class == _net_message_class_client_server
+-                        &amp;&amp; msg-&gt;message_id == _net_message_id_client_connect_ack
+-                       )
+-                    {
+-                        LoadingView::append(&quot;Sending join request...&quot;);
+-                        ClientConnectJoinRequest join_request;
+-                        join_request.setProtocolVersion(NETPANZER_PROTOCOL_VERSION);
+-                        NetworkClient::sendMessage(&amp;join_request, sizeof(join_request));
+-                        map_cycle_fsm_client_state = _map_cycle_client_wait_link_ack;
+-                    }
+-                    else
+-                    {
+-                        LoadingView::append(&quot;Error in wait_connection&quot;);
+-                        // TODO fail here if message is not expected
+-                    }
++                    LoadingView::append(&quot;Sending join request...&quot;);
++                    ClientConnectJoinRequest join_request;
++                    join_request.setProtocolVersion(NETPANZER_PROTOCOL_VERSION);
++                    NetworkClient::sendMessage(&amp;join_request, sizeof(join_request));
++                    fsm_state = _fsm_state_waiting_link_ack;
+                 }
++                else
++                {
++                    LoadingView::append(&quot;Error in wait_connection&quot;);
++                    // TODO fail here if message is not expected
++                }
+             }
++        }
+             break;
+ 
+-        case _map_cycle_client_wait_link_ack:
++        case _fsm_state_waiting_link_ack:
++        {
++            NetPacket np;
++            if ( MessageRouter::getNextPacket(np) )
+             {
+-                NetPacket np;
+-                if ( MessageRouter::getNextPacket(np) )
++                const ClientConnectJoinRequestAck * msg = (ClientConnectJoinRequestAck*)np.getNetMessage();
++                if (  msg-&gt;message_class == _net_message_class_connect
++                    &amp;&amp; msg-&gt;message_id == _net_message_id_connect_join_game_request_ack
++                   )
+                 {
+-                    const ClientConnectJoinRequestAck * msg = (ClientConnectJoinRequestAck*)np.getNetMessage();
+-                    if (  msg-&gt;message_class == _net_message_class_connect
+-                        &amp;&amp; msg-&gt;message_id == _net_message_id_connect_join_game_request_ack
+-                       )
++                    switch ( msg-&gt;getResultCode() )
+                     {
+-                        switch ( msg-&gt;getResultCode() )
+-                        {
+-                            case _join_request_result_success:
+-                                LoadingView::append(&quot;Join successfull&quot;);
+-                                map_cycle_fsm_client_state = _map_cycle_client_wait_connect_start;
+-                                break;
++                        case _join_request_result_success:
++                            LoadingView::append(&quot;Join successfull&quot;);
++                            fsm_state = _fsm_state_waiting_connect_start;
++                            break;
+ 
+-                            case _join_request_result_invalid_protocol:
+-                                // TODO fail here
+-                                break;
++                        case _join_request_result_invalid_protocol:
++                            // TODO fail here
++                            break;
+ 
+-                            case _join_request_result_server_busy:
+-                                // TODO fail here
+-                                break;
++                        case _join_request_result_server_busy:
++                            // TODO fail here
++                            break;
+ 
+-                            default:
+-                                // TODO fail here if message is not expected
+-                                ;
+-                        }
++                        default:
++                            // TODO fail here if message is not expected
++                            ;
+                     }
+-                    else
+-                    {
+-                        LoadingView::append(&quot;Error in wait_link_ack&quot;);
+-                        // TODO fail here if message is not expected
+-                    }
+                 }
++                else
++                {
++                    LoadingView::append(&quot;Error in wait_link_ack&quot;);
++                    // TODO fail here if message is not expected
++                }
+             }
++        }
+             break;
+ 
+-        case _map_cycle_client_wait_connect_start:
++        case _fsm_state_waiting_connect_start:
++        {
++            NetPacket np;
++            if ( MessageRouter::getNextPacket(np) )
+             {
+-                NetPacket np;
+-                if ( MessageRouter::getNextPacket(np) )
++                const NetMessage * msg = np.getNetMessage();
++                if (  msg-&gt;message_class == _net_message_class_connect
++                    &amp;&amp; msg-&gt;message_id == _net_message_id_client_start_connect
++                   )
+                 {
+-                    const NetMessage * msg = np.getNetMessage();
+-                    if (  msg-&gt;message_class == _net_message_class_connect
+-                        &amp;&amp; msg-&gt;message_id == _net_message_id_client_start_connect
+-                       )
+-                    {
+-                        LoadingView::append(&quot;Starting connection ...&quot;);
+-                        ClientConnectRequest connect_request;
+-                        NetworkClient::sendMessage(&amp;connect_request, sizeof(connect_request));
+-                        map_cycle_fsm_client_state = _map_cycle_client_wait_connect_result;
+-                    }
+-                    else
+-                    {
+-                        LoadingView::append(&quot;Wrong connection packet received when waiting for start&quot;);
+-                        // TODO fail here if message is not expected
+-                    }
++                    LoadingView::append(&quot;Starting connection ...&quot;);
++                    ClientConnectRequest connect_request;
++                    NetworkClient::sendMessage(&amp;connect_request, sizeof(connect_request));
++                    fsm_state = _fsm_state_waiting_connect_result;
+                 }
++                else
++                {
++                    LoadingView::append(&quot;Wrong connection packet received when waiting for start&quot;);
++                    // TODO fail here if message is not expected
++                }
+             }
++        }
+             break;
+ 
+-        case _map_cycle_client_wait_connect_result:
++        case _fsm_state_waiting_connect_result:
++        {
++            NetPacket np;
++            if ( MessageRouter::getNextPacket(np) )
+             {
+-                NetPacket np;
+-                if ( MessageRouter::getNextPacket(np) )
++                const ClientConnectResult * msg = (ClientConnectResult*)np.getNetMessage();
++                if (  msg-&gt;message_class == _net_message_class_connect
++                    &amp;&amp; msg-&gt;message_id == _net_message_id_client_connect_result
++                   )
+                 {
+-                    const ClientConnectResult * msg = (ClientConnectResult*)np.getNetMessage();
+-                    if (  msg-&gt;message_class == _net_message_class_connect
+-                        &amp;&amp; msg-&gt;message_id == _net_message_id_client_connect_result
+-                       )
++                     if ( msg-&gt;result_code == _connect_result_success )
+                     {
+-                         if ( msg-&gt;result_code == _connect_result_success )
+-                        {
+-                            LoadingView::append(&quot;Sending client settings...&quot;);
+-                            ConnectClientSettings client_setting;
++                        LoadingView::append(&quot;Sending client settings...&quot;);
++                        ConnectClientSettings client_setting;
+ 
+-                            client_setting.set(gameconfig-&gt;playername.c_str(),
+-                                               gameconfig-&gt;getUnitColor(),
+-                                               gameconfig-&gt;playerflag.c_str());
++                        client_setting.set(gameconfig-&gt;playername.c_str(),
++                                           gameconfig-&gt;getUnitColor(),
++                                           gameconfig-&gt;playerflag.c_str());
+ 
+-                            NetworkClient::sendMessage(&amp;client_setting, sizeof(client_setting));
+-                            map_cycle_fsm_client_state = _map_cycle_client_wait_game_setup;
+-                        }
+-                        else
+-                        {
+-                             LoadingView::append(&quot;Connection result failed&quot;);
+-                            // TODO fail here
+-                        }
++                        NetworkClient::sendMessage(&amp;client_setting, sizeof(client_setting));
++                        fsm_state = _fsm_state_waiting_game_setup;
+                     }
+                     else
+                     {
+-                        LoadingView::append(&quot;Wrong connection packet when waiting for connection result&quot;);
+-                        // TODO fail here if message is not expected
++                         LoadingView::append(&quot;Connection result failed&quot;);
++                        // TODO fail here
+                     }
+                 }
++                else
++                {
++                    LoadingView::append(&quot;Wrong connection packet when waiting for connection result&quot;);
++                    // TODO fail here if message is not expected
++                }
+             }
++        }
+             break;
+ 
+-        case _map_cycle_client_wait_game_setup:
++        case _fsm_state_waiting_game_setup:
++        {
++            NetPacket np;
++            if ( MessageRouter::getNextPacket(np) )
+             {
+-                NetPacket np;
+-                if ( MessageRouter::getNextPacket(np) )
++                const ConnectMesgServerGameSettings * msg = (ConnectMesgServerGameSettings*)np.getNetMessage();
++                if (  msg-&gt;message_class == _net_message_class_connect
++                    &amp;&amp; msg-&gt;message_id == _net_message_id_connect_server_game_setup
++                   )
+                 {
+-                    const ConnectMesgServerGameSettings * msg = (ConnectMesgServerGameSettings*)np.getNetMessage();
+-                    if (  msg-&gt;message_class == _net_message_class_connect
+-                        &amp;&amp; msg-&gt;message_id == _net_message_id_connect_server_game_setup
+-                       )
+-                    {
+-                         LoadingView::append(&quot;Received server settings...&quot;);
+-                        gameconfig-&gt;maxplayers = msg-&gt;getMaxPlayers();
+-                        gameconfig-&gt;maxunits = msg-&gt;getMaxUnits();
+-                        gameconfig-&gt;cloudcoverage = msg-&gt;getCloudCoverage();
+-                        gameconfig-&gt;windspeed = (int)msg-&gt;getWindSpeed();
+-                        gameconfig-&gt;powerups = msg-&gt;powerup_state;
+-                        gameconfig-&gt;gametype = msg-&gt;getGameType();
+-                        gameconfig-&gt;fraglimit = msg-&gt;getFragLimit();
+-                        gameconfig-&gt;timelimit = msg-&gt;getTimeLimit();
++                    LoadingView::append(&quot;Received server settings...&quot;);
++                    gameconfig-&gt;maxplayers = msg-&gt;getMaxPlayers();
++                    gameconfig-&gt;maxunits = msg-&gt;getMaxUnits();
++                    gameconfig-&gt;cloudcoverage = msg-&gt;getCloudCoverage();
++                    gameconfig-&gt;windspeed = (int)msg-&gt;getWindSpeed();
++                    gameconfig-&gt;powerups = msg-&gt;powerup_state;
++                    gameconfig-&gt;gametype = msg-&gt;getGameType();
++                    gameconfig-&gt;fraglimit = msg-&gt;getFragLimit();
++                    gameconfig-&gt;timelimit = msg-&gt;getTimeLimit();
+ 
+-                        global_engine_state-&gt;game_manager-&gt;setElapsetTimeOffset(msg-&gt;getElapsedTime());
+-                        gameconfig-&gt;map = msg-&gt;map_name;
++                    global_engine_state-&gt;game_manager-&gt;setElapsetTimeOffset(msg-&gt;getElapsedTime());
++                    gameconfig-&gt;map = msg-&gt;map_name;
+ 
+-                        ConnectMesgClientGameSetupPing ping;
+-                        NetworkClient::sendMessage(&amp;ping, sizeof(ping));
+-                        map_cycle_fsm_client_state = _map_cycle_client_start_map_load;
+-                    }
+-                    else
+-                    {
+-                        LoadingView::append(&quot;Wrong connection packet when waiting server settings&quot;);
+-                        // TODO fail here if message is not expected
+-                    }
++                    ConnectMesgClientGameSetupPing ping;
++                    NetworkClient::sendMessage(&amp;ping, sizeof(ping));
++                    fsm_state = _fsm_state_prepare_map_load;
+                 }
++                else
++                {
++                    LoadingView::append(&quot;Wrong connection packet when waiting server settings&quot;);
++                    // TODO fail here if message is not expected
++                }
+             }
++        }
+             break;
+ 
+-        case _map_cycle_client_start_map_load : {
+-                LoadingView::show();
++        case _fsm_state_server_display_endgame_views:
++            {
++                ChatInterface::serversay(&quot;Round is over&quot;);
+ 
+-                GameManager::shutdownParticleSystems();
+-                ObjectiveInterface::resetLogic();
++                SystemViewControl view_control;
+ 
++                ServerConnectDaemon::lockConnectProcess();
++
++                view_control.set(&quot;RankView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
++
++                if ( execution_mode == _execution_mode_loop_back_server ) {
++                    Desktop::setVisibility(&quot;GameView&quot;, true);
++                    Desktop::setVisibility(&quot;RankView&quot;, true );
++                }
++
++                NetworkServer::broadcastMessage(&amp;view_control, sizeof(SystemViewControl));
++
++                map_cycle_fsm_server_endgame_timer.changePeriod( _MAP_CYCLE_ENDGAME_WAIT_PERIOD );
++
++                fsm_state = _fsm_state_server_waiting_to_switch_map;
++            }
++            break;
++
++        case _fsm_state_server_waiting_to_switch_map:
++            MessageRouter::routePackets();
++            Physics::sim();
++
++            if ( execution_mode != _execution_mode_dedicated_server )
++            {
++                ParticleSystem2D::simAll();
++                Particle2D::simAll();
++            }
++
++            if (   map_cycle_fsm_server_endgame_timer.count()
++                &amp;&amp; ServerConnectDaemon::isConnecting() == false )
++            {
++                if ( nextmap != &quot;&quot; )
++                {
++                    gameconfig-&gt;map = nextmap;
++                    nextmap = &quot;&quot;;
++                }
++                else
++                {
++                    gameconfig-&gt;map = MapsManager::getNextMap(gameconfig-&gt;map);
++                }
++
++                fsm_state = _fsm_state_prepare_map_load;
++            }
++            break;
++
++        case _fsm_state_prepare_map_load:
++            GameManager::shutdownParticleSystems();
++            ObjectiveInterface::resetLogic();
++
++            if ( execution_mode == _execution_mode_dedicated_server )
++            {
++                ConsoleInterface::postMessage(Color::white, false, 0,
++                        &quot;loading map '%s'.&quot;, gameconfig-&gt;map.c_str());
++            }
++            else
++            {
++                LoadingView::show();
++
+                 char buf[256];
+                 snprintf(buf, sizeof(buf), &quot;Next Map '%s'.&quot;,
+-                        gameconfig-&gt;map.c_str());
++                                           gameconfig-&gt;map.c_str());
+                 LoadingView::append( buf);
+                 LoadingView::append( &quot;Loading Game Map ...&quot; );
++            }
+ 
+-                map_cycle_fsm_client_state = _map_cycle_client_load_map;
++            if ( NetworkState::getNetworkStatus() == _network_state_server )
++            {
++                GameControlCycleMap cycle_map_mesg;
++                cycle_map_mesg.set( gameconfig-&gt;map.c_str() );
++
++                NetworkServer::broadcastMessage(&amp;cycle_map_mesg,
++                                                sizeof(cycle_map_mesg));
++
+             }
++            
++            fsm_state = _fsm_state_load_map;
+             break;
+ 
+-        case _map_cycle_client_load_map:
+-        {
++        case _fsm_state_load_map:
+             try
+             {
+                 GameManager::loadGameMap(gameconfig-&gt;map.c_str());
+             }
+             catch(std::exception&amp; e)
+-            {
++            { // XXX Handle correctly for both client and server.
+                 LoadingView::append(&quot;Error while loading map:&quot;);
+                 LoadingView::append(e.what());
+-                map_cycle_fsm_client_state = _map_cycle_client_idle;
++                fsm_state = _fsm_state_idle;
+                 return;
+             }
++            
++            if ( execution_mode == _execution_mode_dedicated_server )
++            {
++                map_cycle_fsm_server_map_load_timer.changePeriod(_MAP_CYCLE_MAP_LOAD_WAIT_PERIOD);
++                map_cycle_fsm_server_map_load_timer.reset();
+ 
+-            global_engine_state-&gt;game_manager-&gt;resetGameLogic();
++                ParticleInterface::initParticleSystems();
++                Particle2D::setCreateParticles(false);
+ 
+-            if ( ! TileSet::tileImagesLoaded() )
++                Console::mapSwitch(gameconfig-&gt;map);
++                *Console::server &lt;&lt; &quot;Server Settings:\n&quot;
++                    &lt;&lt; &quot;Map: &quot; &lt;&lt; gameconfig-&gt;map &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;MaxPlayers: &quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;MaxUnits: &quot; &lt;&lt; gameconfig-&gt;maxunits &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;Gametype: &quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;ObjectivePercentage: &quot; &lt;&lt;
++                        gameconfig-&gt;objectiveoccupationpercentage &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;TimeLimit: &quot; &lt;&lt; gameconfig-&gt;timelimit &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;FragLimit: &quot; &lt;&lt; gameconfig-&gt;fraglimit &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;RespawnType: &quot; &lt;&lt; gameconfig-&gt;getRespawnTypeString() &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;Mapcycle: &quot; &lt;&lt; gameconfig-&gt;mapcycle &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;Powerups: &quot; &lt;&lt; (gameconfig-&gt;powerups ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;AllowAllies: &quot; &lt;&lt; (gameconfig-&gt;allowallies ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;CloudCoverage: &quot; &lt;&lt; gameconfig-&gt;cloudcoverage &lt;&lt; &quot; (Windspeed &quot;
++                                         &lt;&lt; gameconfig-&gt;windspeed &lt;&lt; &quot;)&quot; &lt;&lt; std::endl;
++
++                fsm_state = _fsm_state_server_waiting_clients_load_map;
++            }
++            else
+             {
+-                LoadingView::append(&quot;Loading TileSet...&quot;);
+-                map_cycle_fsm_client_state = _map_cycle_client_load_tile_set;
++
++                if ( ! TileSet::tileImagesLoaded() )
++                {
++                    LoadingView::append(&quot;Loading TileSet...&quot;);
++                    fsm_state = _fsm_state_load_tileset;
++                }
++                else
++                {
++                    LoadingView::append(&quot;Initializing particles...&quot;);
++                    fsm_state = _fsm_state_init_particles;
++                }
+             }
++            break;
++
++        case _fsm_state_load_tileset:
++            TileSet::loadImages();
++            LoadingView::append(&quot;Initializing particles...&quot;);
++            fsm_state = _fsm_state_init_particles;
++
++        case _fsm_state_init_particles:
++            ParticleInterface::initParticleSystems();
++            ParticleInterface::addCloudParticle(gameconfig-&gt;cloudcoverage);
++            Physics::wind.setVelocity(gameconfig-&gt;windspeed, 107);
++
++            if ( NetworkState::getNetworkStatus() == _network_state_server )
++            {
++                LoadingView::append(&quot;Data loaded, respawning players...&quot;);
++                fsm_state = _fsm_state_server_respawn_players;
++            }
+             else
+             {
+                 LoadingView::append(&quot;Data loaded, sending ack...&quot;);
+-                map_cycle_fsm_client_state = _map_cycle_client_send_ack;
++//                global_engine_state-&gt;game_manager-&gt;resetGameLogic();
++                fsm_state = _fsm_state_send_gamesetup_ack;
+             }
+             break;
+-        }
+ 
+-        case _map_cycle_client_load_tile_set:
+-            TileSet::loadImages();
+-            LoadingView::append(&quot;Data loaded, sending ack...&quot;);
+-            map_cycle_fsm_client_state = _map_cycle_client_send_ack;
++        case _fsm_state_server_waiting_clients_load_map :
++        {
++            MessageRouter::routePackets();
++            if ( map_cycle_fsm_server_map_load_timer.count() )
++            {
++                ConsoleInterface::postMessage(Color::white, false, 0, &quot;Game started.&quot;);
++                fsm_state = _fsm_state_server_respawn_players;
++            }
++        }
+             break;
+ 
+-        case _map_cycle_client_send_ack:
++        case _fsm_state_send_gamesetup_ack:
+         {
+             ConnectMesgClientGameSetupAck ack;
+             NetworkClient::sendMessage( &amp;ack, sizeof(ack));
+-            map_cycle_fsm_client_state = _map_cycle_client_wait_for_resetgamelogic_or_connectid;
++            fsm_state = _fsm_state_waiting_resetgamelogic_or_connectid;
+         }
+             break;
+ 
+ 
+-        case _map_cycle_client_wait_for_resetgamelogic_or_connectid:
++        case _fsm_state_waiting_resetgamelogic_or_connectid:
+         {
+             NetPacket np;
+             if ( MessageRouter::getNextPacket(np) )
+@@ -389,7 +517,7 @@
+                             global_engine_state-&gt;game_manager-&gt;reinitializeGameLogic();
+                             LoadingView::append(&quot;Received my id...&quot;);
+                             MessageRouter::routePacket(np);
+-                            map_cycle_fsm_client_state = _map_cycle_client_wait_complete_connect;
++                            fsm_state = _fsm_state_waiting_complete_connect;
+                         }
+                         else
+                         {
+@@ -402,7 +530,7 @@
+                         {
+                             LoadingView::append(&quot;Resetting game logic...&quot;);
+                             global_engine_state-&gt;game_manager-&gt;resetGameLogic();
+-                            map_cycle_fsm_client_state = _map_cycle_client_wait_for_respawn_ack;
++                            fsm_state = _fsm_state_waiting_respawn_ack;
+                         }
+                         else
+                         {
+@@ -423,17 +551,17 @@
+         }
+             break;
+ 
+-        case _map_cycle_client_wait_for_respawn_ack:
++        case _fsm_state_waiting_respawn_ack:
+             MessageRouter::routePackets();
+             if( map_cycle_fsm_client_respawn_ack_flag == true )
+             {
+                 LoadingView::loadFinish();
+                 map_cycle_fsm_client_respawn_ack_flag = false;
+-                map_cycle_fsm_client_state = _map_cycle_client_state_in_progress;
++                fsm_state = _fsm_state_game_in_progress;
+             }
+             break;
+ 
+-        case _map_cycle_client_wait_complete_connect:
++        case _fsm_state_waiting_complete_connect:
+             {
+                 NetPacket np;
+                 bool in_loop = true;
+@@ -444,182 +572,58 @@
+                         &amp;&amp; ((ConnectProcessStateMessage*)np.getNetMessage())-&gt;getMessageEnum() == _connect_state_sync_complete
+                        )
+                     {
+-                        map_cycle_fsm_client_state = _map_cycle_client_state_in_progress;
++                        fsm_state = _fsm_state_game_in_progress;
+                     }
+ 
+                     MessageRouter::routePacket(np);
+                 }
+             }
+             break;
+-        case _map_cycle_client_state_in_progress:
+-            MessageRouter::routePackets();
+-            UnitInterface::updateUnitStatus();
+ 
+-            ProjectileInterface::updateStatus();
+-            ObjectiveInterface::updateObjectiveStatus();
+-            PowerUpInterface::updateState();
+-            PathScheduler::run();
+-
+-            Physics::sim();
+-
+-            ParticleSystem2D::simAll();
+-            Particle2D::simAll();
+-            break;
+-    } // ** switch
+-
+-    } while ( ! loop_finished );
+-
+-}
+-
+-
+-void GameControlRulesDaemon::mapCycleFsmServer()
+-{
+-    MessageRouter::routePackets();
+-
+-    switch ( map_cycle_fsm_server_state )
+-    {
+-        case _map_cycle_server_state_idle:
+-            break;
+-
+-        case _map_cycle_server_state_display_endgame_views:
+-            {
+-                ChatInterface::serversay(&quot;Round is over&quot;);
+-                                                                
+-                SystemViewControl view_control;
+-
+-                ServerConnectDaemon::lockConnectProcess();
+-
+-                view_control.set(&quot;RankView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
+-
+-                if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server ) {
+-                    Desktop::setVisibility(&quot;GameView&quot;, true);
+-                    Desktop::setVisibility(&quot;RankView&quot;, true );
+-                }
+-
+-                NetworkServer::broadcastMessage(&amp;view_control, sizeof(SystemViewControl));
+-
+-                map_cycle_fsm_server_endgame_timer.changePeriod( _MAP_CYCLE_ENDGAME_WAIT_PERIOD );
+-
+-                map_cycle_fsm_server_state = _map_cycle_server_state_cycle_next_map;
+-            }
+-            break;
+-
+-        case _map_cycle_server_state_cycle_next_map:
+-            {
+-                if ( map_cycle_fsm_server_endgame_timer.count() &amp;&amp;
+-                        (ServerConnectDaemon::isConnecting() == false)
+-                   )
+-                {
+-                    GameManager::shutdownParticleSystems();
+-
+-                    if(nextmap != &quot;&quot;) {
+-                        gameconfig-&gt;map = nextmap;
+-                        nextmap = &quot;&quot;;
+-                    } else {
+-                        gameconfig-&gt;map 
+-                            = MapsManager::getNextMap(gameconfig-&gt;map);
+-                    }
+-                    
+-                    ConsoleInterface::postMessage(Color::white, false, 0, &quot;loading map '%s'.&quot;,
+-                            gameconfig-&gt;map.c_str());
+-
+-                    GameControlCycleMap cycle_map_mesg;
+-                    cycle_map_mesg.set( gameconfig-&gt;map.c_str() );
+-
+-                    NetworkServer::broadcastMessage( &amp;cycle_map_mesg, sizeof( GameControlCycleMap ));
+-
+-                    ObjectiveInterface::resetLogic();
+-
+-                    if ( GameControlRulesDaemon::execution_mode == _execution_mode_dedicated_server )
+-                    {
+-                        GameManager::dedicatedLoadGameMap(gameconfig-&gt;map.c_str());
+-
+-                        map_cycle_fsm_server_map_load_timer.changePeriod(_MAP_CYCLE_MAP_LOAD_WAIT_PERIOD);
+-                        map_cycle_fsm_server_map_load_timer.reset();
+-                        map_cycle_fsm_server_state = _map_cycle_server_state_wait_for_client_map_load;
+-                    } else {
+-                        LoadingView::show();
+-
+-                        LoadingView::append( &quot;Loading Game Map ...&quot; );                        
+-                        map_cycle_fsm_server_state = _map_cycle_server_state_load_map;
+-                    }
+-                }
+-            }
+-            break;
+-
+-        case _map_cycle_server_state_load_map :
++        case _fsm_state_server_respawn_players :
+         {
+-            try
++            MessageRouter::routePackets();
++            if ( ! UnitInterface::getUnits() )
+             {
+-                GameManager::loadGameMap(gameconfig-&gt;map.c_str());
+-                if ( ! TileSet::tileImagesLoaded() )
++                ConsoleInterface::postMessage(Color::white, false, 0, &quot;Reinitializing game logic.&quot;);
++                global_engine_state-&gt;game_manager-&gt;reinitializeGameLogic();
++                if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server )
+                 {
+-                    TileSet::loadImages();
++                    PlayerState * player_state = PlayerInterface::allocateLoopBackPlayer();
++                    player_state-&gt;setName(gameconfig-&gt;playername.c_str());
++                    ResourceManager::loadDefaultFlags();
++                    Uint8 flagdata[20*14]; // XXX shouldn't use fixed values
++                    ResourceManager::getFlagData(gameconfig-&gt;playerflag.c_str(), (Uint8 *)&amp;flagdata);
++                    player_state-&gt;setFlag(ResourceManager::registerFlagFromData(flagdata));
+                 }
+             }
+-            catch(std::exception&amp; e)
++            else
+             {
+-                LoadingView::append(
+-                        &quot;Error while loading map:&quot;);
+-                LoadingView::append(e.what());
+-                map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+-                return;
++                ConsoleInterface::postMessage(Color::white, false, 0, &quot;Resetting game logic.&quot;);
++                SystemResetGameLogic reset_game_logic_mesg;
++                NetworkServer::broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
++                global_engine_state-&gt;game_manager-&gt;resetGameLogic();
+             }
+ 
+-            map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
+-        }
+-            break;
++            GameManager::respawnAllPlayers();
+ 
+-        case _map_cycle_server_state_wait_for_client_map_load :
+-            {
+-                if ( map_cycle_fsm_server_map_load_timer.count() )
+-                {
+-                    ConsoleInterface::postMessage(Color::white, false, 0, &quot;Game started.&quot;);
+-                    map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
+-                }
+-            }
+-            break;
++            PlayerInterface::unlockPlayerStats();
+ 
+-        case _map_cycle_server_state_respawn_players :
++            if ( execution_mode == _execution_mode_loop_back_server )
+             {
+-                if ( ! UnitInterface::getUnits() )
+-                {
+-                    ConsoleInterface::postMessage(Color::white, false, 0, &quot;Reinitializing game logic.&quot;);
+-                    global_engine_state-&gt;game_manager-&gt;reinitializeGameLogic();
+-                    if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server )
+-                    {
+-                        PlayerState * player_state = PlayerInterface::allocateLoopBackPlayer();
+-                        player_state-&gt;setName(gameconfig-&gt;playername.c_str());
+-                        ResourceManager::loadDefaultFlags();
+-                        Uint8 flagdata[20*14]; // XXX shouldn't use fixed values
+-                        ResourceManager::getFlagData(gameconfig-&gt;playerflag.c_str(), (Uint8 *)&amp;flagdata);
+-                        player_state-&gt;setFlag(ResourceManager::registerFlagFromData(flagdata));
+-                    }
+-                }
+-                else
+-                {
+-                    ConsoleInterface::postMessage(Color::white, false, 0, &quot;Resetting game logic.&quot;);
+-                    SystemResetGameLogic reset_game_logic_mesg;
+-                    NetworkServer::broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
+-                    global_engine_state-&gt;game_manager-&gt;resetGameLogic();
+-                }
+-
+-                GameManager::respawnAllPlayers();
+-
+-                PlayerInterface::unlockPlayerStats();
+-
+                 LoadingView::loadFinish();
++            }
+ 
+-                GameControlCycleRespawnAck respawn_ack_mesg;
+-                NetworkServer::broadcastMessage( &amp;respawn_ack_mesg, sizeof(GameControlCycleRespawnAck));
++            GameControlCycleRespawnAck respawn_ack_mesg;
++            NetworkServer::broadcastMessage( &amp;respawn_ack_mesg, sizeof(GameControlCycleRespawnAck));
+ 
+-                map_cycle_fsm_server_state = _map_cycle_server_state_in_progress;
+-
+-                ServerConnectDaemon::unlockConnectProcess();
+-            }
++            ServerConnectDaemon::unlockConnectProcess();
++            fsm_state = _fsm_state_game_in_progress;
++        }
+             break;
+ 
+-        case _map_cycle_server_state_in_progress:            
++        case _fsm_state_game_in_progress:
++            MessageRouter::routePackets();
+             UnitInterface::updateUnitStatus();
+ 
+             ProjectileInterface::updateStatus();
+@@ -629,12 +633,17 @@
+ 
+             Physics::sim();
+ 
+-            ParticleSystem2D::simAll();
+-            Particle2D::simAll();
++            if ( execution_mode != _execution_mode_dedicated_server )
++            {
++                ParticleSystem2D::simAll();
++                Particle2D::simAll();
++            }
+ 
+-            BotManager::simBots();
+-
+-            checkGameRules();
++            if ( NetworkState::getNetworkStatus() == _network_state_server )
++            {
++                BotManager::simBots();
++                checkGameRules();
++            }
+             break;
+ 
+     } // ** switch
+@@ -644,21 +653,21 @@
+ {
+     PlayerInterface::lockPlayerStats();
+ 
+-    map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
++    fsm_state = _fsm_state_server_display_endgame_views;
+ }
+ 
+ void GameControlRulesDaemon::onFraglimitGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+ 
+-    map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
++    fsm_state = _fsm_state_server_display_endgame_views;
+ }
+ 
+ void GameControlRulesDaemon::onObjectiveGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+ 
+-    map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
++    fsm_state = _fsm_state_server_display_endgame_views;
+ }
+ 
+ void GameControlRulesDaemon::forceMapChange(std::string _nextmap)
+@@ -667,7 +676,7 @@
+ 
+     PlayerInterface::lockPlayerStats();
+ 
+-    map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
++    fsm_state = _fsm_state_server_display_endgame_views;
+ }
+ 
+ void GameControlRulesDaemon::checkGameRules()
+@@ -771,7 +780,7 @@
+     cycle_map_mesg = (GameControlCycleMap *) message;
+     gameconfig-&gt;map = cycle_map_mesg-&gt;map_name;
+ 
+-    map_cycle_fsm_client_state = _map_cycle_client_start_map_load;
++    fsm_state = _fsm_state_prepare_map_load;
+ }
+ 
+ void GameControlRulesDaemon::netMessageCycleRespawnAck(const NetMessage* )
+@@ -797,24 +806,3 @@
+             break;
+     }
+ }
+-
+-void GameControlRulesDaemon::updateGameControlFlow()
+-{
+-    if ( NetworkState::status == _network_state_server ) {
+-        mapCycleFsmServer();
+-    } else {
+-        mapCycleFsmClient();
+-    }
+-}
+-
+-void GameControlRulesDaemon::mapLoadFailureResponse(int result_code, const char *map_name)
+-{
+-    char str_buf[128];
+-
+-    if( result_code == _mapload_result_no_map_file ) {
+-        sprintf( str_buf, &quot;MAP %s NOT FOUND!&quot;, map_name );
+-        LoadingView::append( str_buf);
+-    } else if( result_code == _mapload_result_no_wad_file ) {
+-            LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
+-    }
+-}
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp	2010-01-04 11:14:32 UTC (rev 1157)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp	2010-01-04 17:37:19 UTC (rev 1158)
+@@ -31,14 +31,10 @@
+     static NTimer respawntimer;
+ 
+ protected:
+-    static int map_cycle_fsm_server_state;
+     static Timer map_cycle_fsm_server_endgame_timer;
+     static Timer map_cycle_fsm_server_map_load_timer;
+-    static void mapCycleFsmServer();
+ 
+-    static int map_cycle_fsm_client_state;
+     static bool map_cycle_fsm_client_respawn_ack_flag;
+-    static void mapCycleFsmClient();
+ 
+     static void onTimelimitGameCompleted();
+     static void onFraglimitGameCompleted();
+@@ -47,23 +43,21 @@
+     static void checkGameRules();
+     static void checkRespawn();
+ 
+-    static void mapLoadFailureResponse(int result_code, const char *map_name);
+-
+     static void netMessageCycleMap(const NetMessage* message);
+     static void netMessageCycleRespawnAck(const NetMessage* message);
+ 
+ public:
++    static void setStateIdle();
+     static void setStateServerLoadingMap();
+-    static void setStateClientLoadingMap();
+     static void setStateClientConnectToServer(const std::string&amp;  server_name);
+-    static void setStateServerIdle();
++
+     static void setDedicatedServer();
+ 
+     static void forceMapChange(std::string map);
+ 
+     static void processNetMessage(const NetMessage* message);
+     static void updateGameControlFlow();
+-    static unsigned char getGameState() { return map_cycle_fsm_server_state; }
++    static unsigned char getGameState();
+ };
+ 
+ #endif // ** _GAME_CONTROL_RULES_DAEMON_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-04 11:14:32 UTC (rev 1157)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-04 17:37:19 UTC (rev 1158)
+@@ -191,46 +191,9 @@
+     map_path.append(&quot;.opt&quot;);
+     ObjectiveInterface::loadObjectiveList( map_path.c_str() );
+ 
+-    ParticleInterface::initParticleSystems();
+-
+-    ParticleInterface::addCloudParticle(gameconfig-&gt;cloudcoverage);
+-    Physics::wind.setVelocity(gameconfig-&gt;windspeed, 107);
+ }
+ 
+ // ******************************************************************
+-
+-void GameManager::dedicatedLoadGameMap(const char *map_name )
+-{
+-    Console::mapSwitch(map_name);
+-    *Console::server &lt;&lt; &quot;Server Settings:\n&quot;
+-        &lt;&lt; &quot;Map: &quot; &lt;&lt; gameconfig-&gt;map &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;MaxPlayers: &quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;MaxUnits: &quot; &lt;&lt; gameconfig-&gt;maxunits &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;Gametype: &quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;ObjectivePercentage: &quot; &lt;&lt;
+-            gameconfig-&gt;objectiveoccupationpercentage &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;TimeLimit: &quot; &lt;&lt; gameconfig-&gt;timelimit &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;FragLimit: &quot; &lt;&lt; gameconfig-&gt;fraglimit &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;RespawnType: &quot; &lt;&lt; gameconfig-&gt;getRespawnTypeString() &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;Mapcycle: &quot; &lt;&lt; gameconfig-&gt;mapcycle &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;Powerups: &quot; &lt;&lt; (gameconfig-&gt;powerups ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;AllowAllies: &quot; &lt;&lt; (gameconfig-&gt;allowallies ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;CloudCoverage: &quot; &lt;&lt; gameconfig-&gt;cloudcoverage &lt;&lt; &quot; (Windspeed &quot;
+-                             &lt;&lt; gameconfig-&gt;windspeed &lt;&lt; &quot;)&quot; &lt;&lt; std::endl;
+-    
+-    std::string map_path(&quot;maps/&quot;);
+-    map_path.append(map_name);
+-
+-    MapInterface::load( map_path.c_str() );
+-
+-    map_path.append(&quot;.opt&quot;);
+-    ObjectiveInterface::loadObjectiveList( map_path.c_str() );
+-
+-    ParticleInterface::initParticleSystems();
+-    Particle2D::setCreateParticles(false);
+-}
+-
+-// ******************************************************************
+ void GameManager::spawnPlayer( const Uint16 player )
+ {
+     global_engine_state-&gt;sound_manager-&gt;stopTankIdle();
+@@ -599,5 +562,5 @@
+ //    UnitInterface::reset();
+     PlayerInterface::reset();
+     ObjectiveInterface::resetLogic();
+-    GameControlRulesDaemon::setStateServerIdle();
++    GameControlRulesDaemon::setStateIdle();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2010-01-04 11:14:32 UTC (rev 1157)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2010-01-04 17:37:19 UTC (rev 1158)
+@@ -57,7 +57,6 @@
+ 
+     static void disconnectPlayerCleanUp( const Uint16 player );
+ 
+-    static void dedicatedLoadGameMap(const char *map_file_path );
+     static void loadGameMap(const char *map_file_path);
+ 
+     static void shutdownParticleSystems();
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-04 11:14:32 UTC (rev 1157)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-04 17:37:19 UTC (rev 1158)
+@@ -68,7 +68,7 @@
+     int error=lua_pcall(luavm,0,0,0);
+     if (error)
+     {
+-        printf(&quot;error is: %s\n&quot;,lua_tostring(luavm,-1));
++        printf(&quot;Error is: %s\n&quot;,lua_tostring(luavm,-1));
+         lua_pop(luavm,1);
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-01-04 11:14:32 UTC (rev 1157)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-01-04 17:37:19 UTC (rev 1158)
+@@ -175,7 +175,7 @@
+ UnitInterface::reset()
+ {
+     cleanUp();
+-    initialize(units_per_player);
++    initialize(gameconfig-&gt;maxunits);
+ }
+ 
+ // ******************************************************************
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000185.html">[Netpanzer-cvs] r1157 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Particles
+</A></li>
+	<LI>Next message: <A HREF="000187.html">[Netpanzer-cvs] r1159 - trunk/netpanzer/src/NetPanzer/Particles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

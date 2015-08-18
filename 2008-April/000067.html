@@ -1,0 +1,1678 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1025 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1025%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Interfaces/unix%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200804271158.m3RBw7rw013647%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000068.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1025 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1025%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Interfaces/unix%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200804271158.m3RBw7rw013647%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1025 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Apr 27 13:58:07 CEST 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000068.html">[Netpanzer-cvs] r1026 - in trunk/netpanzer: .	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-04-27 13:56:53 +0200 (Sun, 27 Apr 2008)
+New Revision: 1025
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.hpp
+Modified:
+   trunk/netpanzer/BUGS
+   trunk/netpanzer/ChangeLog
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+Log:
+- removed unused line in MenuTemplateView
+- removed classes LobbyView, ProgressView and ConsoleLoadingView functionality
+  is done by LoadingView
+
+
+Modified: trunk/netpanzer/BUGS
+===================================================================
+--- trunk/netpanzer/BUGS	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/BUGS	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -11,6 +11,7 @@
+ - The no allies flag in the server config has no effect
+ - Clients pressing the Abort button when connecting leave a ghost on the server
+ which displays no IP. (i think matze fixed this in 0.8.1)
++- The Abort button when connecting doesn't really aborts the operation, just hide the window
+ -netpanzer fails on win98se
+ -setting allowallies=no in config has no effect
+ 
+@@ -34,8 +35,3 @@
+ &lt;BenUrban&gt; that one is far more common
+ &lt;BenUrban&gt; and has been known to block off bases completely
+ &lt;MatzeB&gt; oh
+-
+-- setting maxunits so low that no player can spawn with 9 units makes netpanzer
+-  trigger an assertion, should be an error message
+-
+-
+
+Modified: trunk/netpanzer/ChangeLog
+===================================================================
+--- trunk/netpanzer/ChangeLog	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/ChangeLog	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -1,4 +1,9 @@
+-16-Sep-2006 by Aaron Perez
++27-Apr-2008 by Aaron Perez
++- removed unused line in MenuTemplateView
++- removed classes LobbyView, ProgressView and ConsoleLoadingView functionality
++  is done by LoadingView
++
++16-Sep-2007 by Aaron Perez
+ - added a timer to the right click function to unselect units only if some
+   time passed. (100 miliseconds)
+ - units are selected while moving the mouse on real time
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -294,7 +294,6 @@
+         filesystem::mkdir(tablePath);
+     }
+     char strBuf[512];
+-    //progressView-&gt;scrollAndUpdate(&quot;&quot;);
+ 
+     // Best color match.
+     sprintf(strBuf, &quot;%s/2080.tbl&quot;, tablePath);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -30,9 +30,8 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;ConnectNetMessage.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
++#include &quot;Views/Game/LoadingView.hpp&quot;
+ 
+-#include &quot;Views/Game/LobbyView.hpp&quot;
+-
+ enum { _connect_state_idle,
+        _connect_state_wait_for_connect_start,
+        _connect_state_send_connect_request,
+@@ -85,27 +84,27 @@
+ 
+     switch( join_request_ack_mesg-&gt;getResultCode() ) {
+     case _join_request_result_success :
+-        lobbyView-&gt;scrollAndUpdate( &quot;Link to Server Established&quot; );
++        LoadingView::append( &quot;Link to Server Established&quot; );
+         sprintf( buf, &quot;Protocol Version: %u&quot;,
+                 join_request_ack_mesg-&gt;getServerProtocolVersion());
+-        lobbyView-&gt;scrollAndUpdate( buf );
++        LoadingView::append( buf );
+         break;
+ 
+     case _join_request_result_invalid_protocol :
+-        lobbyView-&gt;scrollAndUpdate( &quot;Link to Server FAILED!&quot; );
+-        lobbyView-&gt;scrollAndUpdate( &quot;Incorrect Network Protocol Revision&quot; );
+-        lobbyView-&gt;scrollAndUpdate( &quot;Please get a newer netPanzer version.&quot; );
++        LoadingView::append( &quot;Link to Server FAILED!&quot; );
++        LoadingView::append( &quot;Incorrect Network Protocol Revision&quot; );
++        LoadingView::append( &quot;Please get a newer netPanzer version.&quot; );
+         sprintf( buf, &quot;Server Protocol Version: %u&quot;,
+                 join_request_ack_mesg-&gt;getServerProtocolVersion());
+-        lobbyView-&gt;scrollAndUpdate( buf );
++        LoadingView::append( buf );
+         connection_state = _connect_state_connect_failure;
+         failure_display_timer.reset();
+         break;
+ 
+     case _join_request_result_server_busy :
+-        lobbyView-&gt;scrollAndUpdate( &quot;Link to Server FAILED!&quot; );
+-        lobbyView-&gt;scrollAndUpdate( &quot;Server is VERY busy&quot; );
+-        lobbyView-&gt;scrollAndUpdate( &quot;Please try in a few minutes&quot; );
++        LoadingView::append( &quot;Link to Server FAILED!&quot; );
++        LoadingView::append( &quot;Server is VERY busy&quot; );
++        LoadingView::append( &quot;Please try in a few minutes&quot; );
+         connection_state = _connect_state_connect_failure;
+         failure_display_timer.reset();
+         break;
+@@ -127,7 +126,7 @@
+     snprintf(buf, sizeof(buf), &quot;Your Position In Queue is %d &quot;,
+             process_update-&gt;getQueuePosition());
+ 
+-    lobbyView-&gt;scrollAndUpdate( buf );
++    LoadingView::append( buf );
+ }
+ 
+ void ClientConnectDaemon::netMessageConnectProcessMessage(const NetMessage* message)
+@@ -140,12 +139,12 @@
+ 
+     switch ( state_mesg-&gt;getMessageEnum() ) {
+     case _connect_state_message_load_game_data : {
+-            lobbyView-&gt;scrollAndUpdate( &quot;Loading Game Data ...&quot; );
++            LoadingView::append( &quot;Loading Game Data ...&quot; );
+         }
+         break;
+ 
+     case  _connect_state_message_sync_player_info : {
+-            lobbyView-&gt;scrollAndUpdate( &quot;Synchronizing Player Info ...&quot; );
++            LoadingView::append( &quot;Synchronizing Player Info ...&quot; );
+         }
+         break;
+ 
+@@ -153,12 +152,12 @@
+             snprintf(str_buf, sizeof(str_buf),
+                     &quot;Synchronizing Player Info ... (%d%%)&quot;,
+                     state_mesg-&gt;getPercentComplete());
+-            lobbyView-&gt;update( str_buf );
++            LoadingView::update( str_buf );
+         }
+         break;
+ 
+     case  _connect_state_message_sync_units : {
+-            lobbyView-&gt;scrollAndUpdate( &quot;Synchronizing Game Elements ...&quot; );
++            LoadingView::append( &quot;Synchronizing Game Elements ...&quot; );
+         }
+         break;
+ 
+@@ -166,13 +165,13 @@
+             snprintf(str_buf, sizeof(str_buf),
+                     &quot;Synchronizing Game Elements ... (%d%%)&quot;,
+                     state_mesg-&gt;getPercentComplete());
+-            lobbyView-&gt;update( str_buf );
++            LoadingView::update( str_buf );
+         }
+         break;
+ 
+     case  _connect_state_sync_complete : {
+-            lobbyView-&gt;scrollAndUpdate( &quot;Game Synchronized&quot; );
+-            lobbyView-&gt;toggleGameView();
++            LoadingView::append( &quot;Game Synchronized&quot; );
++            LoadingView::loadFinish();
+         }
+         break;
+     }
+@@ -222,12 +221,12 @@
+ {
+     switch( result_code ) {
+     case _connect_result_server_busy : {
+-            lobbyView-&gt;scrollAndUpdate( &quot;Connect Failure: Server Too Busy&quot; );
++            LoadingView::append( &quot;Connect Failure: Server Too Busy&quot; );
+         }
+         break;
+ 
+     case _connect_result_server_full : {
+-            lobbyView-&gt;scrollAndUpdate( &quot;Connect Failure: Server Full&quot; );
++            LoadingView::append( &quot;Connect Failure: Server Full&quot; );
+         }
+         break;
+     } // ** switch
+@@ -246,7 +245,7 @@
+         case _connect_state_wait_for_connect_start : {
+                 if ( message != 0 ) {
+                     if ( message-&gt;message_id == _net_message_id_client_start_connect ) {
+-                        lobbyView-&gt;scrollAndUpdate( &quot;Connecting ...&quot; );
++                        LoadingView::append( &quot;Connecting ...&quot; );
+                         connection_state = _connect_state_send_connect_request;
+                     } else {
+                         end_cycle = true;
+@@ -302,7 +301,7 @@
+                                 CLIENT-&gt;sendMessage( &amp;connect_request, sizeof(ClientConnectRequest));
+                                 time_out_counter++;
+                             } else {
+-                                lobbyView-&gt;scrollAndUpdate( &quot;Connection To Server Failed&quot; );
++                                LoadingView::append( &quot;Connection To Server Failed&quot; );
+                                 connection_state = _connect_state_connect_failure;
+                                 failure_display_timer.reset();
+                             }
+@@ -318,7 +317,7 @@
+                             CLIENT-&gt;sendMessage( &amp;connect_request, sizeof(ClientConnectRequest));
+                             time_out_counter++;
+                         } else {
+-                            lobbyView-&gt;scrollAndUpdate( &quot;Connection To Server Failed&quot; );
++                            LoadingView::append( &quot;Connection To Server Failed&quot; );
+                             connection_state = _connect_state_connect_failure;
+                         }
+                     }
+@@ -343,18 +342,18 @@
+ 
+                         if( result_code == _mapload_result_no_map_file ) {
+                             sprintf( str_buf, &quot;MAP %s NOT FOUND!&quot;, game_setup-&gt;map_name );
+-                            lobbyView-&gt;scrollAndUpdate( str_buf);
++                            LoadingView::append( str_buf);
+                             connection_state = _connect_state_connect_failure;
+                             failure_display_timer.reset();
+                         } else
+                             if( result_code == _mapload_result_no_wad_file ) {
+-                                lobbyView-&gt;scrollAndUpdate( &quot;MAP TILE SET NOT FOUND!&quot; );
+-                                lobbyView-&gt;scrollAndUpdate( &quot;please download the appropriate tileset&quot; );
+-                                lobbyView-&gt;scrollAndUpdate( &quot;from www.pyrosoftgames.com&quot; );
++                                LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
++                                LoadingView::append( &quot;please download the appropriate tileset&quot; );
++                                LoadingView::append( &quot;from www.pyrosoftgames.com&quot; );
+                                 connection_state = _connect_state_connect_failure;
+                                 failure_display_timer.reset();
+                             } else {
+-                                lobbyView-&gt;scrollAndUpdate( &quot;Loading Game Data ...&quot; );
++                                LoadingView::append( &quot;Loading Game Data ...&quot; );
+ 
+                                 CLIENT-&gt;sendMessage( &amp;client_game_setup_ping, sizeof(ConnectMesgClientGameSetupPing));
+ 
+@@ -375,7 +374,7 @@
+                     ConnectMesgClientGameSetupAck client_game_setup_ack;
+ 
+                     sprintf( str_buf, &quot;Loading Game Data ... (%d%%)&quot;, percent_complete);
+-                    lobbyView-&gt;update( str_buf );
++                    LoadingView::update( str_buf );
+ 
+                     CLIENT-&gt;sendMessage( &amp;client_game_setup_ack, sizeof(ConnectMesgClientGameSetupAck));
+                     connection_state = _connect_state_idle;
+@@ -383,7 +382,7 @@
+                     ConnectMesgClientGameSetupPing client_game_setup_ping;
+ 
+                     sprintf( str_buf, &quot;Loading Game Data ... (%d%%)&quot;, percent_complete);
+-                    lobbyView-&gt;update( str_buf );
++                    LoadingView::update( str_buf );
+                     CLIENT-&gt;sendMessage( &amp;client_game_setup_ping, sizeof(ConnectMesgClientGameSetupPing));
+                 }
+ 
+@@ -394,7 +393,7 @@
+ 
+         case _connect_state_connect_failure : {
+                 if ( failure_display_timer.count() == true ) {
+-                    lobbyView-&gt;toggleMainMenu();
++                    LoadingView::loadError();
+                     connection_state = _connect_state_idle;
+                 }
+                 end_cycle = true;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -50,9 +50,6 @@
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+-#include &quot;Views/Game/LobbyView.hpp&quot;
+-#include &quot;Views/Game/ProgressView.hpp&quot;
+-#include &quot;Views/Game/ConsoleLoadingView.hpp&quot;
+ #include &quot;Classes/SelectionBoxSprite.hpp&quot;
+ 
+ #include &quot;Classes/Units/UnitGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -30,9 +30,8 @@
+ #include &quot;Classes/Network/ClientConnectDaemon.hpp&quot;
+ 
+ #include &quot;Util/Exception.hpp&quot;
+-#include &quot;Views/Game/LobbyView.hpp&quot;
+-#include &quot;Views/Game/ProgressView.hpp&quot;
+-#include &quot;Views/Game/ConsoleLoadingView.hpp&quot;
++//#include &quot;Views/Game/LoadingView.hpp&quot;
++//#include &quot;Views/Game/ConsoleLoadingView.hpp&quot;
+ 
+ //-----------------------------------------------------------------
+ BotGameManager::BotGameManager(const std::string &amp;serverHost)
+@@ -43,14 +42,12 @@
+ 
+ void BotGameManager::initializeVideoSubSystem()
+ {
+-    lobbyView = new ConsoleLoadingView();
+-    progressView = new ConsoleLoadingView();
++    //LoadingView::setLoadingView(new ConsoleLoadingView());
+ }
+ 
+ void BotGameManager::shutdownVideoSubSystem()
+ {
+-    delete lobbyView;
+-    delete progressView;
++    //LoadingView::deleteLoadingView();
+ }
+ 
+ //-----------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -45,9 +45,6 @@
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Particles/Physics.hpp&quot;
+ 
+-#include &quot;Views/Game/LobbyView.hpp&quot;
+-#include &quot;Views/Game/ProgressView.hpp&quot;
+-#include &quot;Views/Game/ConsoleLoadingView.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ DedicatedGameManager::DedicatedGameManager()
+@@ -72,16 +69,12 @@
+ 
+ void DedicatedGameManager::initializeVideoSubSystem()
+ {
+-    lobbyView = new ConsoleLoadingView();
+-    progressView = new ConsoleLoadingView();
++    //LoadingView::setLoadingView(new ConsoleLoadingView());
+ }
+ 
+ void DedicatedGameManager::shutdownVideoSubSystem()
+ {
+-    delete lobbyView;
+-    lobbyView = 0;
+-    delete progressView;
+-    progressView = 0;
++    //LoadingView::deleteLoadingView();
+     delete console;
+     console = 0;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -35,7 +35,7 @@
+ #include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+ 
+ #include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Views/Game/ProgressView.hpp&quot;
++#include &quot;Views/Game/LoadingView.hpp&quot;
+ 
+ #include &quot;Util/Log.hpp&quot;
+ 
+@@ -100,7 +100,7 @@
+             return;
+ 
+         case _map_cycle_client_start_map_load : {
+-                progressView-&gt;open();
++                LoadingView::show();
+ 
+                 GameManager::shutdownParticleSystems();
+                 ObjectiveInterface::resetLogic();
+@@ -110,14 +110,14 @@
+                 char buf[256];
+                 snprintf(buf, sizeof(buf), &quot;Next Map '%s'.&quot;,
+                         gameconfig-&gt;map.c_str());
+-                progressView-&gt;scrollAndUpdate( buf);
+-                progressView-&gt;scrollAndUpdate( &quot;Loading Game Map ...&quot; );
++                LoadingView::append( buf);
++                LoadingView::append( &quot;Loading Game Map ...&quot; );
+ 
+                 try {
+                     GameManager::startGameMapLoad(gameconfig-&gt;map.c_str(), 16);
+                 } catch(std::exception&amp; e) {
+-                    progressView-&gt;scrollAndUpdate(&quot;Error while loading map:&quot;);
+-                    progressView-&gt;scrollAndUpdate(e.what());
++                    LoadingView::append(&quot;Error while loading map:&quot;);
++                    LoadingView::append(e.what());
+                     map_cycle_fsm_client_state = _map_cycle_client_idle;
+                     return;
+                 }
+@@ -136,12 +136,12 @@
+                     map_cycle_fsm_client_state = _map_cycle_client_wait_for_respawn_ack;
+ 
+                     sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-                    progressView-&gt;update( str_buf );
++                    LoadingView::update( str_buf );
+ 
+-                    progressView-&gt;scrollAndUpdate( &quot;Waiting to respawn ...&quot; );
++                    LoadingView::append( &quot;Waiting to respawn ...&quot; );
+                 } else {
+                     sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-                    progressView-&gt;update( str_buf );
++                    LoadingView::update( str_buf );
+                 }
+ 
+                 return;
+@@ -149,7 +149,7 @@
+ 
+         case _map_cycle_client_wait_for_respawn_ack : {
+                 if( map_cycle_fsm_client_respawn_ack_flag == true ) {
+-                    progressView-&gt;toggleGameView();
++                    LoadingView::loadFinish();
+                     map_cycle_fsm_client_respawn_ack_flag = false;
+                     map_cycle_fsm_client_state = _map_cycle_client_idle;
+                 }
+@@ -179,7 +179,6 @@
+                 view_control.set(&quot;RankView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
+ 
+                 if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server ) {
+-                    Desktop::setVisibilityAllWindows(false);
+                     Desktop::setVisibility(&quot;GameView&quot;, true);
+                     Desktop::setVisibility(&quot;RankView&quot;, true );
+                 }
+@@ -227,18 +226,18 @@
+                         map_cycle_fsm_server_map_load_timer.reset();
+                         map_cycle_fsm_server_state = _map_cycle_server_state_wait_for_client_map_load;
+                     } else {
+-                        progressView-&gt;open();
++                        LoadingView::show();
+ 
+-                        progressView-&gt;scrollAndUpdate( &quot;Loading Game Map ...&quot; );
++                        LoadingView::append( &quot;Loading Game Map ...&quot; );
+                         ObjectiveInterface::resetLogic();
+ 
+                         try {
+                             GameManager::startGameMapLoad
+                                 (gameconfig-&gt;map.c_str(), 16);
+                         } catch(std::exception&amp; e) {
+-                            progressView-&gt;scrollAndUpdate(
++                            LoadingView::append(
+                                     &quot;Error while loading map:&quot;);
+-                            progressView-&gt;scrollAndUpdate(e.what());
++                            LoadingView::append(e.what());
+                             map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+                             return;
+                         }
+@@ -261,7 +260,7 @@
+                 }
+ 
+                 sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-                progressView-&gt;update( str_buf );
++                LoadingView::update( str_buf );
+             }
+             break;
+ 
+@@ -284,7 +283,7 @@
+                 PlayerInterface::unlockPlayerStats();
+                 GameControlRulesDaemon::game_state = _game_state_in_progress;
+ 
+-                progressView-&gt;toggleGameView();
++                LoadingView::loadFinish();
+ 
+                 GameControlCycleRespawnAck respawn_ack_mesg;
+                 SERVER-&gt;sendMessage( &amp;respawn_ack_mesg, sizeof(GameControlCycleRespawnAck));
+@@ -430,8 +429,8 @@
+ 
+     if( result_code == _mapload_result_no_map_file ) {
+         sprintf( str_buf, &quot;MAP %s NOT FOUND!&quot;, map_name );
+-        progressView-&gt;scrollAndUpdate( str_buf);
++        LoadingView::append( str_buf);
+     } else if( result_code == _mapload_result_no_wad_file ) {
+-            progressView-&gt;scrollAndUpdate( &quot;MAP TILE SET NOT FOUND!&quot; );
++            LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -92,8 +92,6 @@
+ #include &quot;Views/MainMenu/Options/VisualsView.hpp&quot;
+ #include &quot;Views/Game/RankView.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+-#include &quot;Views/Game/LobbyView.hpp&quot;
+-#include &quot;Views/Game/ProgressView.hpp&quot;
+ #include &quot;Views/Game/CodeStatsView.hpp&quot;
+ #include &quot;Views/Game/LibView.hpp&quot;
+ #include &quot;Views/Game/HelpScrollView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -86,10 +86,9 @@
+ #include &quot;Views/MainMenu/Options/ControlsView.hpp&quot;
+ #include &quot;Views/MainMenu/Options/InterfaceView.hpp&quot;
+ #include &quot;Views/MainMenu/Options/VisualsView.hpp&quot;
++
+ #include &quot;Views/Game/RankView.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+-#include &quot;Views/Game/LobbyView.hpp&quot;
+-#include &quot;Views/Game/ProgressView.hpp&quot;
+ #include &quot;Views/Game/CodeStatsView.hpp&quot;
+ #include &quot;Views/Game/LibView.hpp&quot;
+ #include &quot;Views/Game/HelpScrollView.hpp&quot;
+@@ -100,6 +99,7 @@
+ #include &quot;Views/Game/GameInfoView.hpp&quot;
+ #include &quot;Views/Game/MiniMapView.hpp&quot;
+ #include &quot;Views/Game/DisconectedView.hpp&quot;
++#include &quot;Views/Game/LoadingView.hpp&quot;
+ 
+ #include &quot;Particles/Particle2D.hpp&quot;
+ #include &quot;Particles/ParticleSystem2D.hpp&quot;
+@@ -190,14 +190,8 @@
+     Desktop::add(new HelpScrollView());
+     Desktop::add(new GameInfoView());
+ 
+-    lobbyView = new LobbyView();
+-    lobbyView-&gt;init();
+-    Desktop::add(lobbyView);
++    Desktop::add(new LoadingView());
+ 
+-    progressView = new ProgressView();    
+-    progressView-&gt;init();
+-    Desktop::add(progressView);
+-
+     GameManager::loadPalette(&quot;netpmenu&quot;);
+ 
+     Desktop::add(new MapSelectionView());
+@@ -297,8 +291,9 @@
+     PlayerState *player_state;
+     Timer wait;
+ 
+-    progressView-&gt;open();
+-    progressView-&gt;scrollAndUpdateDirect( &quot;Launching Server ...&quot; );
++    LoadingView::show();
++    // refresh the view in each append
++    LoadingView::append( &quot;Launching Server ...&quot; );
+     try {
+     	if (CLIENT) {
+ 		delete CLIENT;
+@@ -333,22 +328,25 @@
+             }
+         }
+     } catch(std::exception&amp; e) {
+-        progressView-&gt;scrollAndUpdateDirect( &quot;SERVER LAUNCH FAILED&quot; );
+-        progressView-&gt;scrollAndUpdateDirect(e.what());
++        LoadingView::append( &quot;SERVER LAUNCH FAILED&quot; );
++        LoadingView::append(e.what());
+         wait.changePeriod( 4 );
+         while( !wait.count() );
+ 
+-        progressView-&gt;toggleMainMenu();
++        LoadingView::loadError();
+         return;
+     }
++    
++    // refresh views
++    LoadingView::update( &quot;Launching Server ... (100%) &quot; );
++    graphicsLoop();
+ 
+-    progressView-&gt;updateDirect( &quot;Launching Server ... (100%) &quot; );
+-
+     GameControlRulesDaemon::setStateServerInProgress();
+     NetworkState::setNetworkStatus( _network_state_server );
+ 
+-    progressView-&gt;scrollAndUpdateDirect( &quot;Loading Game Data ...&quot; );
+-
++    LoadingView::append( &quot;Loading Game Data ...&quot; );
++    graphicsLoop();
++    
+     gameconfig-&gt;map = MapsManager::getNextMap(&quot;&quot;);
+     const char* mapname = gameconfig-&gt;map.c_str();
+ 
+@@ -357,7 +355,7 @@
+     } catch(std::exception&amp; e) {
+         LOGGER.warning(&quot;Error while loading map '%s':&quot;, mapname);
+         LOGGER.warning(e.what());
+-        progressView-&gt;toggleMainMenu();
++        LoadingView::loadError();
+         return;
+     }
+ 
+@@ -368,18 +366,24 @@
+ 
+     while( GameManager::gameMapLoad( &amp;percent_complete ) == true ) {
+         sprintf( strbuf, &quot;Loading Game Data ... (%d%%)&quot;, percent_complete);
+-        progressView-&gt;updateDirect( strbuf );
++        LoadingView::update( strbuf );
++        graphicsLoop();
+     }
+ 
+     sprintf( strbuf, &quot;Loading Game Data ... (%d%%)&quot;, percent_complete);
+-    progressView-&gt;updateDirect( strbuf );
++    LoadingView::update( strbuf );
++    graphicsLoop();
+ 
+ 
+-    progressView-&gt;scrollAndUpdateDirect( &quot;Initializing Game Logic ...&quot; );
++    LoadingView::append( &quot;Initializing Game Logic ...&quot; );
++    graphicsLoop();
+     GameManager::reinitializeGameLogic();
+-    progressView-&gt;updateDirect( &quot;Initializing Game Logic ... (100%) &quot; );
+-
+-    progressView-&gt;scrollAndUpdateDirect( &quot;Spawning Player ...&quot; );
++    LoadingView::update( &quot;Initializing Game Logic ... (100%) &quot; );
++    graphicsLoop();
++    
++    LoadingView::append( &quot;Spawning Player ...&quot; );
++    graphicsLoop();
++    
+     player_state = PlayerInterface::allocateLoopBackPlayer();
+     player_state-&gt;setNetworkID(0);
+     const char* playername = gameconfig-&gt;playername.c_str();
+@@ -387,14 +391,15 @@
+     player_state-&gt;setFlag((unsigned char) gameconfig-&gt;playerflag);
+     player = PlayerInterface::getLocalPlayerID();
+     GameManager::spawnPlayer( player );
+-    progressView-&gt;updateDirect( &quot;Spawning Player ... (100%)&quot; );
++    LoadingView::update( &quot;Spawning Player ... (100%)&quot; );
++    graphicsLoop();
+ 
+     wait.changePeriod( 3 );
+     //while( !wait.count() );
+ 
+     GameManager::startGameTimer();
+ 
+-    progressView-&gt;close();
++    LoadingView::hide();
+ 
+     // Set the palette to the game palette.
+     GameManager::loadPalette( &quot;netp&quot;);
+@@ -429,6 +434,7 @@
+     NetworkState::setNetworkStatus( _network_state_client );
+ 
+     CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect);
++    LoadingView::show();
+ 
+     ClientConnectDaemon::startConnectionProcess();
+     sound-&gt;playTankIdle();
+@@ -441,8 +447,7 @@
+     if(firstrun) {
+         firstrun = false;
+         if(gameconfig-&gt;quickConnect == true) {
+-            Desktop::setVisibilityAllWindows(false);
+-            Desktop::setVisibility(&quot;LobbyView&quot;, true);
++            LoadingView::show();
+             launchMultiPlayerGame();
+         }
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -24,7 +24,7 @@
+ #include &quot;Interfaces/unix/NetworkClientUnix.hpp&quot;
+ 
+ #include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Views/Game/LobbyView.hpp&quot;
++#include &quot;Views/Game/LoadingView.hpp&quot;
+ #include &quot;Views/Game/DisconectedView.hpp&quot;
+ 
+ #include &quot;Network/SocketManager.hpp&quot;
+@@ -74,7 +74,7 @@
+         LOG( ( &quot;Couldn't connect to server:\n%s.&quot;, e.what()) );
+         char text[128];
+         snprintf(text, 128, &quot;connection error: %s&quot;, e.what());
+-        lobbyView-&gt;scrollAndUpdate(text);
++        LoadingView::append(text);
+         return false;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -312,6 +312,17 @@
+         activate(view);
+ } // end add
+ 
++// remove
++//--------------------------------------------------------------------------
++// Purpose: Removes a window from the list.
++//--------------------------------------------------------------------------
++void Desktop::remove(View *view)
++{
++    if ( view )
++        std::remove(views.begin(), views.end(), view);
++} // end add
++
++
+ // activate
+ //--------------------------------------------------------------------------
+ // Purpose:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -83,6 +83,7 @@
+     static void toggleVisibilityNoDoAnything(const char *viewName);
+     static void setVisibilityNoDoAnything(const char *viewName, int isVisible);
+     static void add(View *view, bool autoActivate = true);
++    static void remove(View *view);
+     static void draw(Surface&amp; surface);
+ 
+     static iXY      getMouseActionOffset  ()
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -1,46 +0,0 @@
+-/*
+-Copyright (C) 2003 Ivo Danihelka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">ivo at danihelka.net</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-#include &quot;ConsoleLoadingView.hpp&quot;
+-
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;Interfaces/GameManager.hpp&quot;
+-
+-// update
+-//---------------------------------------------------------------------------
+-// Purpose: Adds the specified text to the current surface, erasing
+-//          whatever is on the current line.
+-//---------------------------------------------------------------------------
+-void ConsoleLoadingView::update(const char *text)
+-{
+-    LOGGER.info(&quot;Loading: %s&quot;, text);
+-}
+-
+-// toggleGameView
+-//---------------------------------------------------------------------------
+-void ConsoleLoadingView::toggleGameView()
+-{
+-    GameManager::setNetPanzerGameOptions();
+-}
+-
+-// toggleMainMenu
+-//---------------------------------------------------------------------------
+-void ConsoleLoadingView::toggleMainMenu()
+-{
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.hpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ConsoleLoadingView.hpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -1,43 +0,0 @@
+-/*
+-Copyright (C) 2003 Ivo Danihelka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">ivo at danihelka.net</A>&gt;
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __CONSOLELOADINGVIEW_HPP__
+-#define __CONSOLELOADINGVIEW_HPP__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;LoadingView.hpp&quot;
+-
+-//---------------------------------------------------------------------------
+-class ConsoleLoadingView : public LoadingView
+-{
+-public:
+-    virtual void init() {};
+-    virtual void update(const char *text);
+-    virtual void scroll() {};
+-
+-    virtual void reset() {};
+-
+-    virtual void open() {};
+-    virtual void close() {};
+-    virtual void toggleGameView();
+-    virtual void toggleMainMenu();
+-private:
+-    virtual void blitToScreen() { }
+-};
+-
+-#endif
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -0,0 +1,95 @@
++/*
++ *  LoadingView.cpp
++ *  netpanzer-osx
++ *
++ *  Created by krom on 4/27/08.
++ *  Copyright 2008 __MyCompanyName__. All rights reserved.
++ *
++ */
++
++#include &quot;LoadingView.hpp&quot;
++
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;System/Sound.hpp&quot;
++
++list&lt;string&gt; LoadingView::lines;
++bool LoadingView::dirty = true;
++
++static void bAbort()
++{
++    if(gameconfig-&gt;quickConnect) {
++        GameManager::exitNetPanzer();
++        return;
++    }
++    sound-&gt;stopTankIdle();
++    Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MainView&quot;, true);
++}
++
++
++void
++LoadingView::init()
++{
++    setSearchName(&quot;LoadingView&quot;);
++    setTitle(&quot;Loading Progress&quot;);
++    setSubTitle(&quot;&quot;);
++    
++    setAllowResize(false);
++    setAllowMove(false);
++    setDisplayStatusBar(false);
++    setVisible(false);
++    setBordered(false);
++
++    resize(640, 480);
++    
++    addButtonCenterText(iXY(628 - 60, 302 - 15), 60, &quot;Abort&quot;, &quot;Cancel the joining of this game.&quot;, bAbort);
++    
++}
++
++
++void
++LoadingView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++{
++    if (dirty)
++        render();
++    
++    //screen-&gt;fill(Color::black);
++    backgroundSurface.blt(clientArea, 0, 0);
++    surface.blt(clientArea, 179, 153);
++    
++    View::doDraw(viewArea, clientArea);    
++}
++
++void
++LoadingView::render()
++{
++    dirty=false;
++    
++    surface.fill(Color::black);
++    
++    int ypos = surface.getHeight() - Surface::getFontHeight();
++    int fontHeight = Surface::getFontHeight();
++    
++    list&lt;string&gt;::reverse_iterator i = lines.rbegin();
++    while ( i != lines.rend() &amp;&amp; ypos &gt; -fontHeight )
++    {
++        surface.bltString( 0, ypos, (*i).c_str(), Color::white);
++        i++;
++        ypos -= fontHeight;
++    }
++}
++
++void
++LoadingView::doActivate()
++{
++    backgroundSurface.loadBMP(&quot;pics/backgrounds/menus/menu/loadingMB.bmp&quot;);
++    surface.create(628 - 179, 302 - 153, 1);
++    dirty=true;
++}
++
++void
++LoadingView::doDeactivate()
++{
++    backgroundSurface.free();
++    surface.free();
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -19,47 +19,89 @@
+ #define __LOADINGVIEW_HPP__
+ 
+ #include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++#include &lt;list&gt;
++#include &lt;string&gt;
+ 
++#include &quot;Interfaces/GameManager.hpp&quot;
++
++using namespace std;
++
++#define LINELIMIT 100
++
+ //---------------------------------------------------------------------------
+ class LoadingView : public View
+ {
+ public:
+-    virtual ~LoadingView() {}
+-
+-    virtual void init() = 0;
+-    virtual void update(const char *text) = 0;
+-    virtual void scroll() = 0;
+-    void scrollAndUpdate(const char *text)
++    static void update(const string text)
+     {
+-        scroll();
+-        update(text);
++        LOGGER.info(&quot;Loading: %s&quot;, text.c_str());
++        lines.pop_back();
++        lines.push_back(text);
++        dirty=true;
+     }
+-    void scrollDirect()
++    
++    static void append(const string text)
+     {
+-        scroll();
+-        blitToScreen();
++        LOGGER.info(&quot;Loading: %s&quot;, text.c_str());
++        if ( lines.size() &gt;= LINELIMIT )
++        {
++            lines.pop_front();
++        }
++        lines.push_back(text);
++        dirty=true;
+     }
+-    void scrollAndUpdateDirect(const char *text)
++    
++    LoadingView()
+     {
+-        scroll();
+-        update(text);
+-        blitToScreen();
++        init();
+     }
+-    void updateDirect(const char *text)
++    
++    static void loadFinish()
+     {
+-        update(text);
+-        blitToScreen();
++        GameManager::setNetPanzerGameOptions();
++        Desktop::setVisibilityAllWindows(false);
++        GameManager::loadPalette(&quot;netp&quot;);
++        Desktop::setVisibility(&quot;GameInfoView&quot;, true);
++        Desktop::setVisibility(&quot;MiniMapView&quot;, true);
++        Desktop::setVisibility(&quot;GameView&quot;, true);
+     }
+ 
+-    virtual void reset() = 0;
++    static void loadError()
++    {
++        GameManager::loadPalette(&quot;netpmenu&quot;);
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MainView&quot;, true);
+ 
+-    virtual void open() = 0;
+-    virtual void close() = 0;
+-    virtual void toggleGameView() = 0;
+-    virtual void toggleMainMenu() = 0;
++    }
++    
++    static void show()
++    {
++        Desktop::setVisibility(&quot;LoadingView&quot;, true);
++    }
++    
++    static void hide()
++    {
++        Desktop::setVisibility(&quot;LoadingView&quot;, false);
++    }
++
++    virtual ~LoadingView() {}
++    
++    virtual void init();
++    virtual void doActivate();
++    virtual void doDeactivate();
++    
++    void doDraw(Surface &amp;viewArea, Surface &amp;clientArea);
++    void render();
++    
+ private:
+-    virtual void blitToScreen() {};
++    static list&lt;string&gt; lines;
++    static bool dirty;
++    
++    Surface backgroundSurface;
++    Surface surface;
+ };
+ 
+ #endif // end __LOADINGVIEW_HPP__
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -1,196 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-
+-#include &quot;Util/Exception.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;Views/Game/LobbyView.hpp&quot;
+-#include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Interfaces/GameManager.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Classes/ScreenSurface.hpp&quot;
+-#include &quot;System/Sound.hpp&quot;
+-
+-LoadingView *lobbyView = 0;
+-
+-static void bAbort()
+-{
+-    if(gameconfig-&gt;quickConnect) {
+-        GameManager::exitNetPanzer();
+-        return;
+-    }
+-    sound-&gt;stopTankIdle();
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MainView&quot;, true);
+-}
+-
+-
+-// LobbyView
+-//---------------------------------------------------------------------------
+-LobbyView::LobbyView() : LoadingView(), currentline(0)
+-{} // end LobbyView::LobbyView
+-
+-// init
+-//---------------------------------------------------------------------------
+-void LobbyView::init()
+-{
+-    setSearchName(&quot;LobbyView&quot;);
+-    setTitle(&quot;Join Lobby&quot;);
+-    setSubTitle(&quot;&quot;);
+-
+-    setAllowResize(false);
+-    setAllowMove(false);
+-    setDisplayStatusBar(false);
+-    setVisible(false);
+-    setBordered(false);
+-
+-    background.create(628 - 179, 302 - 153, 1);
+-    background.fill(0);
+-
+-    moveTo(0, 0);
+-    resize(640, 480);
+-
+-    addButtonCenterText(iXY(628 - 60, 302 - 15), 60, &quot;Abort&quot;, &quot;Cancel the joining of this game.&quot;, bAbort);
+-
+-    currentline = 0;
+-} // end LobbyView::init
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void LobbyView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    if (!backgroundSurface.getDoesExist()) {
+-        loadBackgroundSurface();
+-    }
+-
+-    screen-&gt;fill(Color::black);
+-    backgroundSurface.blt(clientArea, 0, 0);
+-    background.blt(clientArea, 179, 153);
+-
+-    View::doDraw(viewArea, clientArea);
+-} // end LobbyView::doDraw
+-
+-// update
+-//---------------------------------------------------------------------------
+-// Purpose: Adds the specified text to the current surface, erasing
+-//          whatever is on the current line.
+-//---------------------------------------------------------------------------
+-void LobbyView::update(const char *text)
+-{
+-    //int yOffset = background.getPix().y-CHAR_YPIX - 1;
+-    int yOffset = Surface::getFontHeight() * currentline;
+-
+-    LOGGER.info(&quot;%s %s&quot;, &quot;Lobby:&quot;, text);
+-
+-    // Clear the area for the text and draw the new text.
+-    background.fillRect(iRect( 0, yOffset, background.getWidth(), yOffset + Surface::getFontHeight()), Color::black);
+-    background.bltString(0, yOffset, text, Color::white);
+-
+-} // end LobbyView::update
+-
+-// scroll
+-//---------------------------------------------------------------------------
+-// Purpose: Moves all the current text up one line and creates a new
+-//          clean line for text.
+-//---------------------------------------------------------------------------
+-void LobbyView::scroll()
+-{
+-    if(currentline * Surface::getFontHeight() &gt; background.getHeight() - Surface::getFontHeight()) {
+-        Surface tempSurface;
+-        tempSurface.copy(background);
+-
+-        // Move the current text up by the height of the app font.
+-        tempSurface.blt(background, Surface::getFontHeight(), 0);
+-    } else {
+-        currentline++;
+-    }
+-} // end LobbyView::scroll
+-
+-// close
+-
+-void LobbyView::reset()
+-{
+-    background.fill(0);
+-}
+-
+-void LobbyView::open()
+-{
+-    if ( Desktop::getView(&quot;LobbyView&quot;)-&gt;getVisible() == false ) {
+-        GameManager::drawTextCenteredOnScreen(&quot;Sec...&quot;, Color::white);
+-
+-        GameManager::loadPalette(&quot;netpmenu&quot;);
+-
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;LobbyView&quot;, true);
+-    }
+-}
+-
+-
+-//---------------------------------------------------------------------------
+-void LobbyView::close()
+-{
+-    backgroundSurface.free();
+-    Desktop::setVisibility(&quot;LobbyView&quot;, false);
+-} // end LobbyView::close
+-
+-// toggleGameView
+-//---------------------------------------------------------------------------
+-void LobbyView::toggleGameView()
+-{
+-    reset();
+-    backgroundSurface.free();
+-    GameManager::drawTextCenteredOnScreen(&quot;Sec...&quot;, Color::white);
+-
+-    // Set the palette to the game palette.
+-    GameManager::loadPalette(&quot;netp&quot;);
+-
+-    GameManager::setNetPanzerGameOptions();
+-
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;GameInfoView&quot;, true);
+-    Desktop::setVisibility(&quot;MiniMapView&quot;, true);
+-    Desktop::setVisibility(&quot;GameView&quot;, true);
+-
+-} // end LobbyView::toggleGameView
+-
+-// toggleMainMenu
+-//---------------------------------------------------------------------------
+-void LobbyView::toggleMainMenu()
+-{
+-    reset();
+-    backgroundSurface.free();
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MainView&quot;, true);
+-
+-} // end LobbyView::toggleMainMenu
+-
+-// doActivate
+-//---------------------------------------------------------------------------
+-void LobbyView::doActivate()
+-{
+-    Desktop::setActiveView(this);
+-
+-} // end VehicleSelectionView::doActivate
+-
+-// loadBackgroundSurface
+-//---------------------------------------------------------------------------
+-void LobbyView::loadBackgroundSurface()
+-{
+-    backgroundSurface.loadBMP(&quot;pics/backgrounds/menus/menu/loadingMB.bmp&quot;);
+-} // end MenuTemplateView::loadBackgroundSurface
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.hpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LobbyView.hpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -1,65 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __LobbyView_hpp__
+-#define __LobbyView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;LoadingView.hpp&quot;
+-
+-//---------------------------------------------------------------------------
+-class LobbyView : public LoadingView
+-{
+-private:
+-    int currentline;
+-
+-    Surface background;
+-    Surface backgroundSurface;
+-protected:
+-    virtual void loadBackgroundSurface();
+-
+-public:
+-    LobbyView();
+-
+-    // Standard window related functions.
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    //virtual void lMouseDown(const iXY &amp;p);
+-    virtual void doActivate();
+-
+-    virtual void init();
+-    virtual void update(const char *text);
+-    virtual void scroll();
+-    void scrollAndUpdate(const char *text)
+-    {
+-        scroll();
+-        update(text);
+-    }
+-
+-    virtual void reset();
+-
+-    virtual void open();
+-    virtual void close();
+-    virtual void toggleGameView();
+-    virtual void toggleMainMenu();
+-
+-}
+-; // end LobbyView
+-
+-extern LoadingView *lobbyView;
+-
+-#endif // end __LobbyView_hpp__
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -1,186 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-
+-#include &quot;ProgressView.hpp&quot;
+-#include &quot;Util/Exception.hpp&quot;
+-#include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Classes/ScreenSurface.hpp&quot;
+-#include &quot;Interfaces/GameManager.hpp&quot;
+-
+-LoadingView *progressView = 0;
+-
+-// ProgressView
+-//---------------------------------------------------------------------------
+-ProgressView::ProgressView() : LoadingView()
+-{} // end ProgressView::ProgressView
+-
+-// init
+-//---------------------------------------------------------------------------
+-void ProgressView::init()
+-{
+-    setSearchName(&quot;ProgressView&quot;);
+-    setTitle(&quot;Progress Update&quot;);
+-    setSubTitle(&quot;&quot;);
+-
+-    setAllowResize(false);
+-    setAllowMove(false);
+-    setDisplayStatusBar(false);
+-    setVisible(false);
+-    setBordered(false);
+-
+-    background.create(628 - 179, 302 - 153, 1);
+-    background.fill(0);
+-
+-    resize(640, 480);
+-} // end ProgressView::init
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void ProgressView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    if (!backgroundSurface.getDoesExist()) {
+-        loadBackgroundSurface();
+-    }
+-
+-    screen-&gt;fill(Color::black);
+-    backgroundSurface.blt(clientArea, 0, 0);
+-    background.blt(clientArea, 179, 153);
+-
+-    View::doDraw(viewArea, clientArea);
+-} // end ProgressView::doDraw
+-
+-// update
+-//---------------------------------------------------------------------------
+-// Purpose: Adds the specified text to the current surface, erasing
+-//          whatever is on the current line.
+-//---------------------------------------------------------------------------
+-void ProgressView::update(const char *text)
+-{
+-    int CHAR_YPIX = Surface::getFontHeight();
+-    int yOffset = background.getHeight()-CHAR_YPIX - 1;
+-
+-    // Clear the area for the text and draw the new text.
+-    background.fillRect(iRect(0, yOffset, background.getWidth(), yOffset + CHAR_YPIX), Color::black);
+-    background.bltString(0, background.getHeight() - CHAR_YPIX - 1, text, Color::white);
+-} // end ProgressView::update
+-
+-// scroll
+-//---------------------------------------------------------------------------
+-// Purpose: Moves all the current text up one line and creates a new
+-//          clean line for text.
+-//---------------------------------------------------------------------------
+-void ProgressView::scroll()
+-{
+-    Surface tempSurface;
+-    tempSurface.copy(background);
+-
+-    // Move the current text up by the height of the app font.
+-    tempSurface.blt(background, 0, - Surface::getFontHeight() - 1);
+-} // end ProgressView::scroll
+-
+-void ProgressView::blitToScreen()
+-{
+-    screen-&gt;lock();
+-                                                  
+-    if (!backgroundSurface.getDoesExist()) {
+-        loadBackgroundSurface();
+-    }
+-    
+-    screen-&gt;fill(Color::black);
+-    backgroundSurface.blt(*screen, min.x, min.y);
+-    background.blt(*screen, min.x+179, min.y+153);
+-                                                  
+-    screen-&gt;unlock();
+-    screen-&gt;copyToVideoFlip();
+-}
+-
+-void ProgressView::reset()
+-{
+-    background.fill(0);
+-}
+-
+-void ProgressView::open()
+-{
+-    if ( Desktop::getView(&quot;ProgressView&quot;)-&gt;getVisible() == false ) {
+-        GameManager::drawTextCenteredOnScreen(&quot;Sec...&quot;, Color::white);
+-
+-        GameManager::loadPalette(&quot;netpmenu&quot;);
+-
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;ProgressView&quot;, true);
+-    }
+-}
+-
+-//---------------------------------------------------------------------------
+-void ProgressView::close()
+-{
+-    if ( Desktop::getView(&quot;ProgressView&quot;)-&gt;getVisible() &gt; 0 ) {
+-        reset();
+-        GameManager::drawTextCenteredOnScreen(&quot;Sec...&quot;, Color::white);
+-
+-        GameManager::loadPalette(&quot;netp&quot;);
+-
+-        backgroundSurface.free();
+-        Desktop::setVisibility(&quot;ProgressView&quot;, false);
+-    }
+-} // end ProgressView::close
+-
+-// toggleGameView
+-//---------------------------------------------------------------------------
+-void ProgressView::toggleGameView()
+-{
+-    reset();
+-    backgroundSurface.free();
+-    GameManager::drawTextCenteredOnScreen(&quot;Sec...&quot;, Color::white);
+-
+-    // Set the palette to the game palette.
+-    GameManager::loadPalette(&quot;netp&quot;);
+-
+-    GameManager::setNetPanzerGameOptions();
+-
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;GameInfoView&quot;, true);
+-    Desktop::setVisibility(&quot;MiniMapView&quot;, true);
+-    Desktop::setVisibility(&quot;GameView&quot;, true);
+-} // end ProgressView::toggleGameView
+-
+-// toggleMainMenu
+-//---------------------------------------------------------------------------
+-void ProgressView::toggleMainMenu()
+-{
+-    reset();
+-    backgroundSurface.free();
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MainView&quot;, true);
+-} // end ProgressView::toggleMainMenu
+-
+-// doActivate
+-//---------------------------------------------------------------------------
+-void ProgressView::doActivate()
+-{
+-    Desktop::setActiveView(this);
+-} // end VehicleSelectionView::doActivate
+-
+-// loadBackgroundSurface
+-//---------------------------------------------------------------------------
+-void ProgressView::loadBackgroundSurface()
+-{
+-    backgroundSurface.loadBMP(&quot;pics/backgrounds/menus/menu/loadingMB.bmp&quot;);
+-} // end MenuTemplateView::loadBackgroundSurface
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.hpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ProgressView.hpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -1,67 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __ProgressView_hpp__
+-#define __ProgressView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;LoadingView.hpp&quot;
+-
+-//---------------------------------------------------------------------------
+-class ProgressView : public LoadingView
+-{
+-protected:
+-    virtual void loadBackgroundSurface();
+-
+-public:
+-    ProgressView();
+-
+-    // Standard window related functions.
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    //virtual void lMouseDown(const iXY &amp;p);
+-    virtual void doActivate();
+-
+-    Surface background;
+-    Surface backgroundSurface;
+-
+-    virtual void init();
+-    virtual void update(const char *text);
+-
+-    virtual void scroll();
+-
+-    void scrollAndUpdate(const char *text)
+-    {
+-        scroll();
+-        update(text);
+-    }
+-
+-
+-    virtual void reset();
+-
+-    virtual void open();
+-    virtual void close();
+-    virtual void toggleGameView();
+-    virtual void toggleMainMenu();
+-
+-private:
+-    virtual void blitToScreen();
+-}; // end ProgressView
+-
+-extern LoadingView *progressView;
+-
+-#endif // end __ProgressView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -66,7 +66,6 @@
+         Desktop::setVisibility(&quot;FlagSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+         Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+-        Desktop::setVisibility(&quot;IRCLobbyView&quot;, true);
+         Desktop::setVisibility(&quot;ServerListView&quot;, true);
+     } else {
+         assert(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2008-01-13 07:59:44 UTC (rev 1024)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
+@@ -87,7 +87,6 @@
+ 
+     // Close all menu views.
+     Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;LobbyView&quot;, true);
+ 
+     if(gameconfig-&gt;hostorjoin == _game_session_join) {
+         gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000068.html">[Netpanzer-cvs] r1026 - in trunk/netpanzer: .	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

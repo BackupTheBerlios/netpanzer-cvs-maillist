@@ -1,0 +1,1462 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1382 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1382%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C20120901160908.529EE55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000405.html">
+   <LINK REL="Next"  HREF="000407.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1382 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1382%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C20120901160908.529EE55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1382 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sat Sep  1 18:09:08 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000405.html">[Netpanzer-cvs] r1381 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000407.html">[Netpanzer-cvs] r1383 - in trunk/netpanzer/src/NetPanzer: . Actions	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-01 18:09:07 +0200 (Sat, 01 Sep 2012)
+New Revision: 1382
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+Log:
+Delete several worthless views.
+Modified the main menu view system, now the buttons are created only once and reused.
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -67,10 +67,6 @@
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Views/MainMenu/MainMenuView.hpp&quot;
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+-#include &quot;Views/MainMenu/HelpView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/JoinView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/HostView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/GetSessionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitSelectionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitColorView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/HostOptionsView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -58,12 +58,9 @@
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
++#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ #include &quot;Views/MainMenu/MainMenuView.hpp&quot;
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+-#include &quot;Views/MainMenu/HelpView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/JoinView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/HostView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/GetSessionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitSelectionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitColorView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/HostOptionsView.hpp&quot;
+@@ -191,11 +188,7 @@
+ 
+     Desktop::add(new MapSelectionView());
+     Desktop::add(new MainMenuView());
+-    Desktop::add(new JoinView());
+-    Desktop::add(new HostView());
+-    Desktop::add(new GetSessionView());
+     Desktop::add(new OptionsTemplateView());
+-    Desktop::add(new HelpView());
+     Desktop::add(new HostOptionsView());
+     Desktop::add(new PlayerNameView());
+     Desktop::add(new ResignView());
+@@ -206,8 +199,10 @@
+     Desktop::add(new IPAddressView());
+     Desktop::add(new ServerListView());
+ 
++    Desktop::add(new MenuTemplateView());
++    
+     Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MainView&quot;, true);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+ 
+     Desktop::checkResolution(iXY(800,600), iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+     Desktop::checkViewPositions(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -23,12 +23,12 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Particles/ParticleSystem2D.hpp&quot;
+ #include &quot;Particles/Particle2D.hpp&quot;
+-#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
++#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ 
+ //---------------------------------------------------------------------------
+ static void bYES()
+@@ -39,7 +39,6 @@
+     }
+ 
+     GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+-    sprintf(MenuTemplateView::currentMultiView, &quot;GetSessionView&quot;);
+ 
+     // Vlad put all code in here for shutdown.
+     //----------------------
+@@ -54,7 +53,9 @@
+     // Must remove the gameView first so that the initButtons detects that
+     // and loads the correct buttons.
+     Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+     Desktop::setVisibility(&quot;MainView&quot;, true);
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+ 
+     View *v = Desktop::getView(&quot;OptionsView&quot;);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -21,8 +21,8 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+-#include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ 
+ #include &quot;Util/Log.hpp&quot;
+@@ -37,7 +37,6 @@
+     }
+ 
+     GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+-    sprintf(MenuTemplateView::currentMultiView, &quot;GetSessionView&quot;);
+ 
+     // Vlad put all code in here for shutdown.
+     //----------------------
+@@ -53,7 +52,9 @@
+     // Must remove the gameView first so that the initButtons detects that
+     // and loads the correct buttons.
+     Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+     Desktop::setVisibility(&quot;MainView&quot;, true);
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+ 
+     View *v = Desktop::getView(&quot;OptionsView&quot;);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -20,6 +20,7 @@
+ #include &quot;Views/Components/Label.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ #include &quot;Views/Game/ChatView.hpp&quot;
++#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ 
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ 
+@@ -35,7 +36,9 @@
+     }
+     GameManager::quitNetPanzerGame();
+     Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+     Desktop::setVisibility(&quot;MainView&quot;, true);
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+ }
+ 
+ void
+@@ -216,7 +219,9 @@
+     else if ( Desktop::getVisible(&quot;LoadingView&quot;) )
+     {
+         Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+         Desktop::setVisibility(&quot;MainView&quot;, true);
++        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+         GameManager::quitNetPanzerGame();
+     }
+ }
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,60 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#include &quot;HelpView.hpp&quot;
+-#include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Views/Game/GameView.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-
+-// HelpView
+-//---------------------------------------------------------------------------
+-HelpView::HelpView() : MenuTemplateView()
+-{
+-    setSearchName(&quot;HelpView&quot;);
+-    setTitle(&quot;Help Information&quot;);
+-    setSubTitle(&quot;&quot;);
+-} // end HelpView::HelpView
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void HelpView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    MenuTemplateView::doDraw(viewArea, clientArea);
+-} // end HelpView::doDraw
+-
+-// doActivate
+-//---------------------------------------------------------------------------
+-void HelpView::doActivate()
+-{
+-    MenuTemplateView::doActivate();
+-
+-    Desktop::setVisibilityNoDoAnything(&quot;HelpScrollView&quot;, true);
+-} // end HelpView::doActivate
+-
+-// doDeactivate
+-//---------------------------------------------------------------------------
+-void HelpView::doDeactivate()
+-{
+-} // end HelpView::doDeactivate
+-
+-// loadTitleSurface
+-//---------------------------------------------------------------------------
+-void HelpView::loadTitleSurface()
+-{
+-    doLoadTitleSurface(&quot;helpTitle&quot;);
+-} // end HelpView::loadTitleSurface
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,39 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __HelpView_hpp__
+-#define __HelpView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+-
+-//--------------------------------------------------------------------------
+-class HelpView : public MenuTemplateView
+-{
+-protected:
+-    virtual void loadTitleSurface();
+-
+-public:
+-    HelpView();
+-
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void doActivate();
+-    virtual void doDeactivate();
+-}; // end HelpView
+-
+-#endif // end __HelpView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -22,14 +22,16 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ 
+-#include &quot;Views/MainMenu/Multi/HostJoinTemplateView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/GetSessionView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+ #endif
+ 
++// size is: 620x450 located @ 90,90
++static iRect mainTextRect(0, 0, 620, 370);
++static iRect mainNewsRect(0, 380, 620, 450);
++
+ static const char loading_message[] = &quot;Loading news...&quot;;
+ 
+ const char * MainMenuView::news_message = loading_message;
+@@ -46,13 +48,23 @@
+ 
+ // MainMenuView
+ //---------------------------------------------------------------------------
+-MainMenuView::MainMenuView() : MenuTemplateView()
++MainMenuView::MainMenuView() : RMouseHackView()
+ {
+     setSearchName(&quot;MainView&quot;);
+     setTitle(&quot;Main&quot;);
+     setSubTitle(&quot;&quot;);
++    
++    setAllowResize(false);
++    setVisible(false);
++    setAllowMove(false);
++    setDisplayStatusBar(false);
++    setBordered(false);
++    setAlwaysOnBottom(true);
+ 
+-    setVisible(true);
++    moveTo(iXY(90, 90));
++    resize(iXY(620, 450));
++
++//    setVisible(true);
+ } // end MainMenuView::MainMenuView
+ 
+ MainMenuView::~MainMenuView()
+@@ -68,7 +80,7 @@
+ //---------------------------------------------------------------------------
+ void MainMenuView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    RMouseHackView::doDraw(viewArea, clientArea);
+ 
+     static char text[] =
+         &quot;This is NetPanzer version &quot; PACKAGE_VERSION
+@@ -94,6 +106,6 @@
+         &quot;   Tobias Blerch, Ingo Ruhnke\n\n&quot;
+         &quot;NetPanzer News:&quot;;
+ 
+-    viewArea.bltStringInBox(bodyTextRect, text, windowTextColor, 12, false);
+-    viewArea.bltStringInBox(newsRect, news_message, windowTextColor, 12, false);
++    viewArea.bltStringInBox(mainTextRect, text, windowTextColor, 12, false);
++    viewArea.bltStringInBox(mainNewsRect, news_message, windowTextColor, 12, false);
+ } // end MainMenuView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -24,7 +24,7 @@
+ #include &quot;Network/NewsGetter.hpp&quot;
+ 
+ //--------------------------------------------------------------------------
+-class MainMenuView : public MenuTemplateView
++class MainMenuView : public RMouseHackView
+ {
+ private:
+     NewsGetter news_getter;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -35,6 +35,11 @@
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Multi/ServerListView.hpp&quot;
+ 
++#include &quot;Multi/MapSelectionView.hpp&quot;
++#include &quot;Multi/IPAddressView.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
++#include &quot;Interfaces/PlayerGameManager.hpp&quot;
++
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+ #endif
+@@ -42,49 +47,53 @@
+ Surface       MenuTemplateView::backgroundSurface;
+ PackedSurface MenuTemplateView::titlePackedSurface;
+ 
+-//PackedSurface MenuTemplateView::netPanzerLogo;
+-
+-
+-char MenuTemplateView::currentMultiView[] = &quot;GetSessionView&quot;;
+-char MenuTemplateView::currentView[]      = &quot;&quot;;
+-
+ static void bMain()
+ {
+     Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+     Desktop::setVisibility(&quot;MainView&quot;, true);
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+ }
+ 
+ static void bHost()
+ {
+-        gameconfig-&gt;hostorjoin = _game_session_host;
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;HostView&quot;, true);
+-        Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
+-        Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
+-        Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
+-        Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
++    gameconfig-&gt;hostorjoin = _game_session_host;
++    Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++    Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
++    Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
++    Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
++    Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;showPlayButton();
++    // TODO: do doLoadTitleSurface(&quot;hostTitle&quot;);
+ }
+ static void bJoin()
+ {
+-        gameconfig-&gt;hostorjoin = _game_session_join;
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;JoinView&quot;, true);
+-        Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+-        Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+-        Desktop::setVisibility(&quot;ServerListView&quot;, true);
+-        serverlistview-&gt;refresh();
++    gameconfig-&gt;hostorjoin = _game_session_join;
++    Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++    Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
++    Desktop::setVisibility(&quot;IPAddressView&quot;, true);
++    Desktop::setVisibility(&quot;ServerListView&quot;, true);
++    serverlistview-&gt;refresh();
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;showPlayButton();
++    // TODO: do doLoadTitleSurface(&quot;joinTitle&quot;);
+ }
+ 
+ static void bOptions()
+ {
+     Desktop::setVisibilityAllWindows(false);
+     Desktop::setVisibility(&quot;OptionsView&quot;, true);
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+ }
+ 
+ static void bHelp()
+ {
+     Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;HelpView&quot;, true);
++    // TODO: should doLoadTitleSurface(&quot;helpTitle&quot;);
++    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++    Desktop::setVisibilityNoDoAnything(&quot;HelpScrollView&quot;, true);
++    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+ }
+ 
+ static void bExit()
+@@ -115,6 +124,46 @@
+     Desktop::setVisibility(&quot;AreYouSureExitView&quot;, true);
+ }
+ 
++static void bPlay()
++{
++    if ( GameConfig::player_name-&gt;length() == 0 )
++        return;
++
++    // Check a few things which should be ok.
++
++    if (MapSelectionView::curMap == -1)
++    {
++        return;
++    }
++    
++    if (  gameconfig-&gt;hostorjoin == _game_session_join
++       &amp;&amp; strcmp(IPAddressView::szServer.getString(), &quot;&quot;) == 0 )
++    {
++        return;
++    }
++
++    // Close all menu views.
++    Desktop::setVisibilityAllWindows(false);
++
++    if ( gameconfig-&gt;hostorjoin == _game_session_join )
++    {
++        gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
++        IPAddressView::szServer.setString(&quot;&quot;);
++    }
++    
++    serverlistview-&gt;endQuery();
++
++    // TODO: do it?
++//    MenuTemplateView::backgroundSurface.free();
++
++    ResourceManager::updateFlagData( 0,
++                                     GameConfig::player_flag_data,
++                                     sizeof(GameConfig::player_flag_data) );
++
++    PlayerGameManager* manager = (PlayerGameManager*) gamemanager;
++    manager-&gt;launchMultiPlayerGame();
++}
++
+ // MenuTemplateView
+ //---------------------------------------------------------------------------
+ MenuTemplateView::MenuTemplateView() : RMouseHackView()
+@@ -134,7 +183,7 @@
+     resize(iXY(800, 600));
+ 
+     initButtons();
+-
++    
+     curTitleFlashTime  = 0.0f;
+     titleFlashTimeHalf = 0.5;
+ } // end MenuTemplateView constructor
+@@ -149,6 +198,9 @@
+     add( Button::createMenuButton( &quot;OPTIONS&quot;, &quot;Options&quot;, optionsPos, false) );
+     add( Button::createMenuButton( &quot;HELP&quot;, &quot;Help&quot;, helpPos, false) );
+     add( Button::createMenuButton( &quot;EXITNP&quot;, &quot;Exit netPanzer&quot;, exitPos, false) );
++    
++    playButton = Button::createMenuButton(&quot;PLAY&quot;, &quot;Play&quot;, iXY(-100,-100), true);
++    add( playButton );
+ } // end MenuTemplateView::initPreGameOptionButtons
+ 
+ // initInGameOptionButtons
+@@ -181,13 +233,16 @@
+ void MenuTemplateView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+     //setWorldRect();
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
++    if (Desktop::getVisible(&quot;GameView&quot;))
++    {
+ 	// When ingame, tint the game into gray
+         clientArea.BltRoundRect(getClientRect(), 10, Palette::darkGray256.getColorArray());
+         clientArea.RoundRect(MenuRect, 10, Color::gray);
+         clientArea.drawWindowsBorder();
+ 
+-    } else {        
++    }
++    else
++    {        
+         screen-&gt;fill(0);
+ 		// Set the following to get does exist.
+         if (backgroundSurface.getNumFrames() &gt; 0) {
+@@ -214,7 +269,6 @@
+ void MenuTemplateView::doActivate()
+ {
+     // Make the activating view active, redo this please!
+-    sprintf(currentView, &quot;%s&quot;, searchName);
+     Desktop::setActiveView(searchName);
+ 
+     loadBackgroundSurface();
+@@ -312,4 +366,20 @@
+     {
+         bCloseOptions();
+     }
++    else if ( !cname.compare(&quot;Button.PLAY&quot;) )
++    {
++        bPlay();
++    }
+ }
++
++void
++MenuTemplateView::showPlayButton()
++{
++    playButton-&gt;setLocation(playPos);
++}
++
++void
++MenuTemplateView::hidePlayButton()
++{
++    playButton-&gt;setLocation(-100,-100);
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -24,9 +24,14 @@
+ #include &quot;Types/iRect.hpp&quot;
+ #include &quot;Types/iXY.hpp&quot;
+ 
++class Button;
++
+ //--------------------------------------------------------------------------
+ class MenuTemplateView : public RMouseHackView
+ {
++private:
++    Button * playButton;
++    
+ protected:
+     static  void loadNetPanzerLogo();
+ 
+@@ -39,7 +44,6 @@
+     float curTitleFlashTime;  // Where am I at in the flash?
+     float titleFlashTimeHalf; // Time it takes for a half flash.
+ 
+-    typedef void (*ITEM_FUNC)(void);
+     void onComponentClicked(Component *c);
+ 
+ public:
+@@ -54,10 +58,10 @@
+     void initPreGameOptionButtons();
+ 
+     virtual void initButtons();
++    
++    void showPlayButton();
++    void hidePlayButton();
+ 
+-    static char currentMultiView[256];  // Used to keep track of where you are in the multiplayer menus.
+-    static char currentView[256];       // Used to keep track of which menu you are currently in.
+-
+     //static PackedSurface netPanzerLogo;
+     static bool          firstTimeInMenu;
+     //static PackedSurface globeSurface;
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,209 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &quot;GetSessionView.hpp&quot;
+-#include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Views/Components/Button.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Interfaces/GameManager.hpp&quot;
+-#include &quot;Interfaces/MouseInterface.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-
+-#include &quot;IPAddressView.hpp&quot;
+-#include &quot;ServerListView.hpp&quot;
+-
+-#include &quot;Classes/Network/NetworkServer.hpp&quot;
+-
+-static int previousSessionType = _game_session_join;
+-
+-
+-/////////////////////////////////////////////////////////////////////////////
+-// Button functions.
+-/////////////////////////////////////////////////////////////////////////////
+-
+-static void bBack()
+-{
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MainView&quot;, true);
+-}
+-
+-void bNext()
+-{
+-    if (gameconfig-&gt;hostorjoin == _game_session_host) {
+-        Desktop::setVisibilityAllWindows(false);
+-
+-        Desktop::setVisibility(&quot;HostView&quot;, true);
+-        Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
+-        Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
+-        Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
+-        Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+-
+-        SERVER-&gt;openSession();
+-    } else if (gameconfig-&gt;hostorjoin == _game_session_join) {
+-        Desktop::setVisibility(&quot;JoinView&quot;, true);
+-        Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+-
+-        Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+-        Desktop::setVisibility(&quot;ServerListView&quot;, true);
+-        serverlistview-&gt;refresh();
+-    }
+-}
+-
+-static void bHost()
+-{
+-    previousSessionType = gameconfig-&gt;hostorjoin;
+-
+-    gameconfig-&gt;hostorjoin = _game_session_host;
+-}
+-
+-static void bJoin()
+-{
+-    previousSessionType = gameconfig-&gt;hostorjoin;
+-
+-    gameconfig-&gt;hostorjoin = _game_session_join;
+-}
+-
+-
+-// GetSessionView
+-//---------------------------------------------------------------------------
+-GetSessionView::GetSessionView() : MenuTemplateView()
+-{
+-    setSearchName(&quot;GetSessionView&quot;);
+-    setTitle(&quot;Select Session&quot;);
+-    setSubTitle(&quot;&quot;);
+-
+-    add( Button::createSpecialButton( &quot;JOIN&quot;, &quot;Join&quot;, joinPos) );
+-    add( Button::createSpecialButton( &quot;HOST&quot;, &quot;Host&quot;, hostPos) );
+-} // end GetSessionView::GetSessionView
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void GetSessionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    if (previousSessionType != gameconfig-&gt;hostorjoin) {
+-        loadTitleSurface();
+-    }
+-
+-    MenuTemplateView::doDraw(viewArea, clientArea);
+-
+-    drawInfo(clientArea);
+-
+-} // end GetSessionView::doDraw
+-
+-//---------------------------------------------------------------------------
+-void GetSessionView::drawInfo(Surface &amp;dest)
+-{
+-    int connectionType = gameconfig-&gt;hostorjoin;
+-
+-    if (connectionType == _game_session_host) {
+-        drawHostInfo(dest, bodyTextRect);
+-    } else if (connectionType == _game_session_join) {
+-        drawJoinInfo(dest, bodyTextRect);
+-    }
+-}
+-
+-//---------------------------------------------------------------------------
+-void GetSessionView::drawHostInfo(Surface &amp;dest, const iRect &amp;rect)
+-{
+-    static char	tcpipInfo[] =
+-        &quot;HOSTING INTERNET GAMES\n&quot;
+-        &quot;\n&quot;
+-        &quot;Over the Internet varying numbers of players can be &quot;
+-        &quot;supported depending on connection speed and quality. &quot;
+-        &quot;\n&quot;
+-        &quot;Maximum Internet Player Recommendations:\n&quot;
+-        &quot;\n&quot;
+-        &quot;  28.8 modem:      4\n&quot;
+-        &quot;  33.6 modem:      6\n&quot;
+-        &quot;  56.6 modem:      8\n&quot;
+-        &quot;  ISDN or faster: 25\n&quot;
+-        &quot;\n&quot;
+-        &quot;Click the Next button to proceed&quot;;
+-
+-    dest.bltStringInBox(rect, tcpipInfo, Color::white, 12);
+-}
+-
+-//---------------------------------------------------------------------------
+-void GetSessionView::drawJoinInfo(Surface &amp;dest, const iRect &amp;rect)
+-{
+-    static char	tcpipInfo[] =
+-        &quot;JOINING LAN OR INTERNET GAMES\n&quot;
+-        &quot;\n&quot;
+-        &quot;There are three ways to join a game:\n&quot;
+-        &quot;- you can pick a server from the in-game Lobby.\n&quot;
+-        &quot;- you can manually specify the IP address of the server, which is &quot;
+-        &quot;useful for LAN games.\n&quot;
+-        &quot;- use external browsers such as qstat to get a list of &quot;
+-        &quot;available Internet servers, and then run 'netpanzer -c &lt;server&gt;' to &quot;
+-        &quot;connect directly.\n&quot;
+-        &quot;\n&quot;
+-        &quot;Click the Next button to proceed.&quot;;
+-
+-
+-    dest.bltStringInBox(rect, tcpipInfo, Color::white, 12);
+-}
+-
+-// doActivate
+-//---------------------------------------------------------------------------
+-void GetSessionView::doActivate()
+-{
+-    MenuTemplateView::doActivate();
+-
+-    sprintf(currentMultiView, &quot;%s&quot;, searchName);
+-
+-} // end GetSessionView::doActivate
+-
+-// loadBackgroundSurface
+-//---------------------------------------------------------------------------
+-void GetSessionView::loadBackgroundSurface()
+-{
+-} // end GetSessionView::loadBackgroundSurface
+-
+-// loadTitleSurface
+-//---------------------------------------------------------------------------
+-void GetSessionView::loadTitleSurface()
+-{
+-    if (gameconfig-&gt;hostorjoin == _game_session_host) {
+-        doLoadTitleSurface(&quot;hostTitle&quot;);
+-    } else if (gameconfig-&gt;hostorjoin == _game_session_join) {
+-        doLoadTitleSurface(&quot;joinTitle&quot;);
+-    }
+-
+-} // end GetSessionView::loadTitleSurface
+-
+-void GetSessionView::onComponentClicked(Component* c)
+-{
+-    string cname = c-&gt;getName();
+-    if ( !cname.compare(&quot;Button.JOIN&quot;) )
+-    {
+-        bJoin();
+-    }
+-    else if ( !cname.compare(&quot;Button.HOST&quot;) )
+-    {
+-        bHost();
+-    }
+-    else if ( !cname.compare(&quot;Button.NEXT&quot;) )
+-    {
+-        bNext();
+-    }
+-    else if ( !cname.compare(&quot;Button.BACK&quot;) )
+-    {
+-        bBack();
+-    }
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,47 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __GetSessionView_hpp__
+-#define __GetSessionView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+-
+-void bNext();
+-
+-
+-//---------------------------------------------------------------------------
+-class GetSessionView : public MenuTemplateView
+-{
+-protected:
+-    void drawHostInfo(Surface &amp;dest, const iRect &amp;rect);
+-    void drawJoinInfo(Surface &amp;dest, const iRect &amp;rect);
+-    void drawInfo(Surface &amp;dest);
+-
+-    virtual void loadBackgroundSurface();
+-    virtual void loadTitleSurface();
+-
+-public:
+-    GetSessionView();
+-
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void doActivate();
+-    void onComponentClicked(Component* c);
+-}; // end GetSessionView
+-
+-#endif // end __GetSessionView_hpp__
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,136 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &lt;ctype.h&gt;
+-#include &lt;sstream&gt;
+-#include &quot;HostJoinTemplateView.hpp&quot;
+-#include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Views/Components/Button.hpp&quot;
+-#include &quot;HostJoinTemplateView.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Interfaces/PlayerGameManager.hpp&quot;
+-#include &quot;HostView.hpp&quot;
+-#include &quot;Util/Exception.hpp&quot;
+-#include &quot;MapSelectionView.hpp&quot;
+-#include &quot;PlayerNameView.hpp&quot;
+-#include &quot;2D/Palette.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-#include &quot;IPAddressView.hpp&quot;
+-#include &quot;ServerListView.hpp&quot;
+-
+-#include &quot;Classes/Network/NetworkClient.hpp&quot;
+-#include &quot;Classes/Network/NetworkServer.hpp&quot;
+-#include &quot;Resources/ResourceManager.hpp&quot;
+-
+-char HostJoinTemplateView::gameTypeBuf[256];
+-
+-Surface playerColor;
+-
+-int cDarkBlue;
+-int cLightBlue;
+-int cLightGreen;
+-int cOrange;
+-
+-/////////////////////////////////////////////////////////////////////////////
+-// Button functions.
+-/////////////////////////////////////////////////////////////////////////////
+-
+-static void bPlay()
+-{
+-    if ( GameConfig::player_name-&gt;length() == 0 )
+-        return;
+-
+-    // Check a few things which should be ok.
+-    if (strlen(HostJoinTemplateView::gameTypeBuf) == 0) {
+-        return;
+-    }
+-    if (MapSelectionView::curMap == -1) {
+-        return;
+-    }
+-    if (gameconfig-&gt;hostorjoin == _game_session_join &amp;&amp;
+-        strcmp(IPAddressView::szServer.getString(), &quot;&quot;) == 0)
+-        return;
+-
+-    // Close all menu views.
+-    Desktop::setVisibilityAllWindows(false);
+-
+-    if(gameconfig-&gt;hostorjoin == _game_session_join) {
+-        gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
+-        IPAddressView::szServer.setString(&quot;&quot;);
+-    }
+-    
+-    serverlistview-&gt;endQuery();
+-
+-    MenuTemplateView::backgroundSurface.free();
+-
+-    ResourceManager::updateFlagData( 0,
+-                                     GameConfig::player_flag_data,
+-                                     sizeof(GameConfig::player_flag_data) );
+-
+-    PlayerGameManager* manager = (PlayerGameManager*) gamemanager;
+-    manager-&gt;launchMultiPlayerGame();
+-}
+-
+-// HostJoinTemplateView
+-//---------------------------------------------------------------------------
+-HostJoinTemplateView::HostJoinTemplateView() : MenuTemplateView()
+-{
+-    setSearchName(&quot;HostJoinTemplateView&quot;);
+-    setTitle(&quot;&quot;);
+-    setSubTitle(&quot;&quot;);
+-    add( Button::createMenuButton( &quot;PLAY&quot;, &quot;Play&quot;, playPos, true) );
+-} // end HostJoinTemplateView constructor
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void HostJoinTemplateView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    MenuTemplateView::doDraw(viewArea, clientArea);
+-
+-    //View::doDraw(viewArea, clientArea);
+-} // end doDraw
+-
+-// doActivate
+-//---------------------------------------------------------------------------
+-void HostJoinTemplateView::doActivate()
+-{
+-    MenuTemplateView::doActivate();
+-
+-    sprintf(currentMultiView, &quot;%s&quot;, searchName);
+-} // end doActivate
+-
+-// loadBackgroundSurface
+-//---------------------------------------------------------------------------
+-void HostJoinTemplateView::loadBackgroundSurface()
+-{
+-} // end HostJoinTemplateView::loadBackgroundSurface
+-
+-void HostJoinTemplateView::onComponentClicked(Component* c)
+-{
+-    string cname = c-&gt;getName();
+-    if ( !cname.compare(&quot;Button.PLAY&quot;) )
+-    {
+-        bPlay();
+-    }
+-    else
+-    {
+-        MenuTemplateView::onComponentClicked(c);
+-    }
+-
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,49 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __HostJoinTemplateView_hpp__
+-#define __HostJoinTemplateView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+-
+-
+-extern Surface           playerColor;
+-
+-void bReady();
+-
+-
+-//---------------------------------------------------------------------------
+-class HostJoinTemplateView : public MenuTemplateView
+-{
+-private:
+-    void addVehicleButtons(const iXY &amp;pos);
+-    
+-    virtual void loadBackgroundSurface();
+-
+-public:
+-    static char gameTypeBuf[256];
+-
+-    HostJoinTemplateView();
+-
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void doActivate();
+-    void onComponentClicked(Component* c);
+-}; // end HostJoinTemplateView
+-
+-#endif // end __HostJoinTemplateView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -18,7 +18,6 @@
+ 
+ #include &quot;HostOptionsView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;HostView.hpp&quot;
+ #include &quot;Particles/ParticleSystemGlobals.hpp&quot;
+ #include &quot;MapSelectionView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,131 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &quot;HostView.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-#include &quot;HostOptionsView.hpp&quot;
+-
+-/////////////////////////////////////////////////////////////////////////////
+-// Buttons functions.
+-/////////////////////////////////////////////////////////////////////////////
+-
+-//---------------------------------------------------------------------------
+-HostView::HostView() : HostJoinTemplateView()
+-{
+-    setSearchName(&quot;HostView&quot;);
+-    setTitle(&quot;Host Options&quot;);
+-    setSubTitle(&quot;&quot;);
+-
+-    sprintf(HostView::gameTypeBuf, &quot;Objective&quot;);
+-
+-    //addButtonCenterText(iXY(x, y), buttonXSize, &quot;Objective&quot;, &quot;&quot;, setGameTypeObjective);
+-
+-    //x += buttonXSize;
+-    //addButtonCenterText(iXY(x, y), buttonXSize, &quot;Frag Limit&quot;, &quot;&quot;, setGameTypeFragLimit);
+-    //addButton(iXY(x + buttonXSize + 1, y), &quot;+&quot;, &quot;&quot;, increaseFragLimit);
+-    //addButton(iXY(x + buttonXSize + 15, y), &quot;-&quot;, &quot;&quot;, decreaseFragLimit);
+-
+-    //x += buttonXSize;
+-    //addButtonCenterText(iXY(x, y), buttonXSize, &quot;Time Limit&quot;, &quot;&quot;, setGameTypeTimeLimit);
+-    //addButton(iXY(x + buttonXSize + 1, y), &quot;+&quot;, &quot;&quot;, increaseTimeLimit);
+-    //addButton(iXY(x + buttonXSize + 15, y), &quot;-&quot;, &quot;&quot;, decreaseTimeLimit);
+-
+-    //iXY pos(200, 380);
+-    //int yOffset = 20;
+-    //choiceAllowAllies.add(&quot;Yes&quot;);
+-    //choiceAllowAllies.add(&quot;No&quot;);
+-    //choiceAllowAllies.setLocation(pos);
+-    //pos.y += yOffset;
+-    //add(&amp;choiceAllowAllies);
+-    //
+-    //choiceSpawnPlacement.add(&quot;Round Robin&quot;);
+-    //choiceSpawnPlacement.add(&quot;Random&quot;);
+-    //choiceSpawnPlacement.setLocation(pos);
+-    //pos.y += yOffset;
+-    //add(&amp;choiceSpawnPlacement);
+-    //
+-    //choiceCloudCoverage.add(&quot;Clear&quot;);
+-    //choiceCloudCoverage.add(&quot;Broken&quot;);
+-    //choiceCloudCoverage.add(&quot;Partly Cloudy&quot;);
+-    //choiceCloudCoverage.add(&quot;Overcast&quot;);
+-    //choiceCloudCoverage.add(&quot;Extremely Cloudy&quot;);
+-    //choiceCloudCoverage.setLocation(pos);
+-    //pos.y += yOffset;
+-    //add(&amp;choiceCloudCoverage);
+-    //
+-    //choiceWindSpeed.add(&quot;Calm&quot;);
+-    //choiceWindSpeed.add(&quot;Breezy&quot;);
+-    //choiceWindSpeed.add(&quot;Brisk Winds&quot;);
+-    //choiceWindSpeed.add(&quot;Heavy Winds&quot;);
+-    //choiceWindSpeed.add(&quot;Typhoon&quot;);
+-    //choiceWindSpeed.setLocation(pos);
+-    //pos.y += yOffset;
+-    //add(&amp;choiceWindSpeed);
+-
+-} // end HostView::HostView
+-
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void HostView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    HostJoinTemplateView::doDraw(viewArea, clientArea);
+-
+-    /*
+-    	char strBuf[256];
+-     
+-    	sprintf(strBuf, &quot;Game Type: %s&quot;, gameTypeBuf);
+-    	clientArea.bltString( x + 2, y, strBuf, Color::white);
+-    	y += yOffset;
+-    	y += yOffset;
+-     
+-    	sprintf(strBuf, &quot;%d frags&quot;, gameconfig-&gt;GetFragLimit());
+-    	clientArea.bltString( x + 220, y, strBuf, Color::white);
+-    	y += yOffset;
+-     
+-    	if ((gameconfig-&gt;GetTimeLimit() / 60) &gt; 0)
+-    	{
+-    		sprintf(strBuf, &quot;%d hours  %2d minutes&quot;, gameconfig-&gt;GetTimeLimit() / 60, gameconfig-&gt;GetTimeLimit() % 60);
+-    		clientArea.bltString( x + 220, y, strBuf, Color::white);
+-    		y += yOffset;
+-    	} else
+-    	{
+-    		sprintf(strBuf, &quot;%d minutes&quot;, gameconfig-&gt;GetTimeLimit());
+-    		clientArea.bltString( x + 220, y, strBuf, Color::white);
+-    		y += yOffset;
+-    	}
+-     
+-    	sprintf(strBuf, &quot;Player #:&quot;);
+-    	clientArea.bltString(x + 2, y, strBuf, Color::white);
+-     
+-    	sprintf(strBuf, &quot;%3d&quot;, gameconfig-&gt;GetNumberPlayers());
+-    	clientArea.bltString(x + 125, y, strBuf, Color::white);
+-    */
+-//    View::doDraw(viewArea, clientArea);
+-
+-} // end HostView::doDraw
+-
+-// loadTitleSurface
+-//---------------------------------------------------------------------------
+-void HostView::loadTitleSurface()
+-{
+-    doLoadTitleSurface(&quot;hostTitle&quot;);
+-
+-} // end HostView::loadTitleSurface
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,48 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __HostView_hpp__
+-#define __HostView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;HostJoinTemplateView.hpp&quot;
+-#include &quot;Views/Components/Choice.hpp&quot;
+-
+-
+-
+-//---------------------------------------------------------------------------
+-class HostView : public HostJoinTemplateView
+-{
+-public:
+-
+-protected:
+-    void drawCurMapInfo(Surface &amp;dest, const iXY &amp;pos);
+-    virtual void loadTitleSurface();
+-
+-    //Choice choiceAllowAllies;
+-    //Choice choiceSpawnPlacement;
+-    //Choice choiceCloudCoverage;
+-    //Choice choiceWindSpeed;
+-
+-public:
+-    HostView();
+-
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-}; // end HostView
+-
+-#endif // end __HostView_hpp__
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,49 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &quot;JoinView.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-
+-// JoinView
+-//---------------------------------------------------------------------------
+-JoinView::JoinView() : HostJoinTemplateView()
+-{
+-    setSearchName(&quot;JoinView&quot;);
+-    setTitle(&quot;Join Options&quot;);
+-    setSubTitle(&quot;&quot;);
+-} // end JoinView constructor
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void JoinView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    HostJoinTemplateView::doDraw(viewArea, clientArea);
+-} // end JoinView::doDraw
+-
+-// doDeactivate
+-//---------------------------------------------------------------------------
+-
+-// loadTitleSurface
+-//---------------------------------------------------------------------------
+-void JoinView::loadTitleSurface()
+-{
+-    doLoadTitleSurface(&quot;joinTitle&quot;);
+-} // end JoinView::loadTitleSurface
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp	2012-09-01 13:17:11 UTC (rev 1381)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
+@@ -1,38 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __JoinView_hpp__
+-#define __JoinView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;HostJoinTemplateView.hpp&quot;
+-
+-
+-//---------------------------------------------------------------------------
+-class JoinView : public HostJoinTemplateView
+-{
+-protected:
+-    virtual void loadTitleSurface();
+-
+-public:
+-    JoinView();
+-
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-}; // end JoinView
+-
+-#endif // end __JoinView_hpp__
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000405.html">[Netpanzer-cvs] r1381 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000407.html">[Netpanzer-cvs] r1383 - in trunk/netpanzer/src/NetPanzer: . Actions	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

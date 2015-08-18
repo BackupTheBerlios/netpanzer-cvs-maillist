@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1335 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1335%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Components%20Views/Game&In-Reply-To=%3C20120112002511.840BA481148%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000360.html">
+   <LINK REL="Next"  HREF="000362.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1335 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1335%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Components%20Views/Game&In-Reply-To=%3C20120112002511.840BA481148%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1335 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Jan 12 01:25:11 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000360.html">[Netpanzer-cvs] r1334 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000362.html">[Netpanzer-cvs] r1336 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-12 01:25:10 +0100 (Thu, 12 Jan 2012)
+New Revision: 1335
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+Log:
+Fix some string operations was not properly ending the strings. The observer result was some names contained strange characters, and possibly could crash the game
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2012-01-11 15:52:45 UTC (rev 1334)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2012-01-12 00:25:10 UTC (rev 1335)
+@@ -140,6 +140,7 @@
+             else
+                 line_index = (line_index - 1) % console_size;
+ 
++            memset(line_list[ line_index ].string, 0, sizeof(ConsoleLine::string));
+             strncpy( line_list[ line_index ].string, temp_str_ptr, max_char_per_line);
+             line_list[ line_index ].string[ max_char_per_line ] = 0;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2012-01-11 15:52:45 UTC (rev 1334)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2012-01-12 00:25:10 UTC (rev 1335)
+@@ -41,6 +41,7 @@
+     assert(maxWidth &gt; 0);
+ 
+     cInputFieldString::string = new char [maxCharCount + 1];
++    memset(cInputFieldString::string, 0, maxCharCount+1);
+ 
+     if (strlen(string) &gt; 0 &amp;&amp; strlen(string) &lt; (size_t) maxCharCount) {
+         strcpy(cInputFieldString::string, string);
+@@ -54,6 +55,7 @@
+ void cInputFieldString::setString(const std::string&amp; string)
+ {
+     // XXX notify cinputfield to resetString positions
++    memset(cInputFieldString::string, 0, maxCharCount+1);
+     strncpy(this-&gt;string, string.c_str(), maxCharCount);
+ } // end setString
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2012-01-11 15:52:45 UTC (rev 1334)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2012-01-12 00:25:10 UTC (rev 1335)
+@@ -512,14 +512,12 @@
+ //---------------------------------------------------------------------------
+ void VehicleSelectionView::drawMiniProductionStatus(Surface &amp;dest)
+ {
+-
+     char strBuf[256];
+     char outpostNameBuf[256];
+     char outpostUserNameBuf[256];
+     char productionUnitBuf[256];
+     char timeLeftBuf[256];
+ 
+-    iRect         objectiveBounds;
+     iRect         gameViewRect;
+ 
+     WorldViewInterface::getViewWindow(&amp;gameViewRect);
+@@ -550,6 +548,7 @@
+             if (length &gt; 13)
+             {
+                 strncpy(strBuf, obj-&gt;occupying_player-&gt;getName().c_str() , 10);
++                strBuf[10] = 0; // fix runners
+                 sprintf(outpostUserNameBuf, &quot;Owner:  %s...&quot;, strBuf);
+             }
+             else
+@@ -566,6 +565,7 @@
+         if (length &gt; 10)
+         {
+             strncpy(strBuf, (const char *) obj-&gt;name , 7);
++            strBuf[7] = 0; // fix runners
+             sprintf(outpostNameBuf, &quot;Outpost:  %s...&quot;,  strBuf);
+         }
+         else
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000360.html">[Netpanzer-cvs] r1334 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000362.html">[Netpanzer-cvs] r1336 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

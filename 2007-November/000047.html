@@ -1,0 +1,761 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1003 - in trunk/netpanzer: . src/Lib/Network	src/Lib/Util src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1003%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/Lib/Util%20src/NetPanzer/Interfaces%20src/NetPanzer/Network%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200711151238.lAFCcriS018571%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000048.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1003 - in trunk/netpanzer: . src/Lib/Network	src/Lib/Util src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1003%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/Lib/Util%20src/NetPanzer/Interfaces%20src/NetPanzer/Network%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200711151238.lAFCcriS018571%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1003 - in trunk/netpanzer: . src/Lib/Network	src/Lib/Util src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 15 13:38:53 CET 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000048.html">[Netpanzer-cvs] r1005 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Particles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#47">[ date ]</a>
+              <a href="thread.html#47">[ thread ]</a>
+              <a href="subject.html#47">[ subject ]</a>
+              <a href="author.html#47">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-11-15 13:38:51 +0100 (Thu, 15 Nov 2007)
+New Revision: 1003
+
+Modified:
+   trunk/netpanzer/TODO
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+   trunk/netpanzer/src/Lib/Util/NTimer.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp
+Log:
+- Heartbeat class now uses NTimer
+- added more checks to networking related lists
+- added initial onSocketError events to networking 
+
+
+Modified: trunk/netpanzer/TODO
+===================================================================
+--- trunk/netpanzer/TODO	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/TODO	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -1,4 +1,20 @@
+-Next release:
++TODO Now:
++- In SocketManager, replace list with vector, use direct access to list, and
++  change the way the sockets are added/removed.
++- In heartbeat, change the way the received information is parsed, the same method
++  should be used for other communications that use a similar protocol, like server
++  query.
++- Recreate the fd_sets in each iteration in SocketSet, and/or remove SocketSet
++  class and handle it in SocketManager.
++- Remove exception code from networking.
++- Create a task manager for the game main loop. These tasks will run each loop,
++  with a defined priority to select the running order,
++  should have a &quot;runable&quot; like interface.
++- Move all units related classes to src/NetPanzer/Units
++- Import physfs code into netpanzer trunk
++- Import lua code into netpanzer trunk 
++
++*** Old todo
+ -after having a full nodelist in A* the server is getting slow
+     - no idea how to solve this, have to leave it open I guess...
+ -create a new netpanzer-music package which adds pronobozos music to the game
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -50,7 +50,9 @@
+     virtual void onDataReady() = 0;
+     virtual void onDisconected() {};
+     virtual void onConnected() {};
++    virtual void onSocketError() = 0;
+     virtual void destroy() = 0;
++    
+ 
+     void setReuseAddr() throw(NetworkException);
+     void doClose();
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -78,13 +78,6 @@
+             }
+         }
+     }
+-
+-
+-
+-
+ }
+ 
+-
+-
+-
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -38,6 +38,13 @@
+ }
+ 
+ void
++TCPListenSocket::onSocketError()
++{
++    if ( observer )
++        observer-&gt;onSocketError(this);
++}
++
++void
+ TCPListenSocket::onDataReady()
+ {
+     Address newaddr;
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -34,6 +34,7 @@
+ protected:
+     friend class TCPListenSocket;
+     virtual TCPSocketObserver * onNewConnection(TCPListenSocket *so, const Address &amp;fromaddr) = 0;
++    virtual void onSocketError(TCPListenSocket *so) = 0;
+ };
+     
+ 
+@@ -47,6 +48,7 @@
+     ~TCPListenSocket() {};
+     
+     void onDataReady();
++    void onSocketError();
+ 
+ private:
+     TCPListenSocketObserver * observer;
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -89,4 +89,12 @@
+     } while (len &amp;&amp; observer);
+ }
+ 
++void
++TCPSocket::onSocketError()
++{
++    if (observer)
++        observer-&gt;onSocketError(this);
++    destroy();
+ }
++
++}
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -35,6 +35,7 @@
+     virtual void onDataReceived(TCPSocket *so, const char *data, const int len) = 0;
+     virtual void onConnected(TCPSocket *so) = 0;
+     virtual void onDisconected(TCPSocket *so) = 0;
++    virtual void onSocketError(TCPSocket *so) = 0;
+ };
+ 
+ class TCPSocket : public SocketBase
+@@ -54,6 +55,7 @@
+     void onDataReady();
+     void onConnected();
+     void onDisconected();
++    void onSocketError();
+     
+ private:
+     friend class TCPListenSocket;
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -51,6 +51,13 @@
+ }
+ 
+ void
++UDPSocket::onSocketError()
++{
++    if ( observer )
++        observer-&gt;onSocketError(this);
++}
++
++void
+ UDPSocket::send(const Address&amp; toaddr, const void* data, size_t datasize)
+     throw(NetworkException)
+ {
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -34,6 +34,7 @@
+ protected:
+     friend class UDPSocket;
+     virtual void onDataReceived(UDPSocket *so, const Address &amp;from, const char *data, const int len) = 0;
++    virtual void onSocketError(UDPSocket *so) = 0;
+ };
+ 
+ 
+@@ -56,6 +57,7 @@
+ protected:
+     ~UDPSocket();
+     void onDataReady();
++    void onSocketError();
+ 
+ private:
+     UDPSocketObserver *observer;
+
+Modified: trunk/netpanzer/src/Lib/Util/NTimer.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/NTimer.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/Lib/Util/NTimer.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -28,7 +28,8 @@
+     NTimer(Uint32 t) : starttime(0), timeout(t) {};
+     
+     inline void reset()              { starttime = SDL_GetTicks(); }
+-
++    inline void reset(Uint32 t)      { starttime = t; }
++    
+     inline Uint32 getStartTime()     { return starttime; }
+ 
+     inline void setTimeOut(Uint32 t) { timeout = t; }
+@@ -36,6 +37,7 @@
+     inline Uint32 getTimeOut()       { return timeout; }
+     
+     inline bool isTimeOut() { return (SDL_GetTicks()-starttime)&gt;timeout; }
++    inline bool isTimeOut(Uint32 t) { return (t-starttime)&gt;timeout; }
+     
+ private:
+     Uint32 starttime;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -35,20 +35,19 @@
+ 
+ class MasterserverInfo {
+ public:
+-    MasterserverInfo(){ touch(); };
++    MasterserverInfo() : timer(MSQUERY_TIMEOUT){ };
+     ~MasterserverInfo(){};
+-    void touch() { lastTicks = SDL_GetTicks(); };
++    inline void touch() { timer.reset(); };
+     string recdata;
+-    Uint32 lastTicks;
++    NTimer timer;
+     
+ };
+ 
+-Heartbeat::Heartbeat()
++Heartbeat::Heartbeat() : nextHeartbeat(HEARTBEAT_INTERVAL)
+ {
+     StringTokenizer mstokenizer(gameconfig-&gt;masterservers, ',');
+     string servname;
+-    while( (servname = mstokenizer.getNextToken()) != &quot;&quot;) {
+-        servname = removeSurroundingSpaces(servname);
++    while( (servname = removeSurroundingSpaces(mstokenizer.getNextToken())) != &quot;&quot;) {
+         try {
+             Address addr = Address::resolve(servname, MASTERSERVER_PORT);
+             mslist.push_back(addr);
+@@ -63,7 +62,6 @@
+         &lt;&lt; &quot;\\final\\&quot;;
+     
+     hb_message=msg.str();
+-    nextHeartbeatTicks = SDL_GetTicks() + HEARTBEAT_INTERVAL;
+     startHeartbeat();
+     
+ }
+@@ -89,17 +87,14 @@
+     if ( !masterservers.empty() ) {
+         map&lt;TCPSocket *, MasterserverInfo *&gt;::iterator msiter;
+         for (msiter=masterservers.begin(); msiter!=masterservers.end(); msiter++) {
+-            if ( now - msiter-&gt;second-&gt;lastTicks &gt; MSQUERY_TIMEOUT ) {
++            if ( msiter-&gt;second-&gt;timer.isTimeOut(now) ) {
+                 LOGGER.warning(&quot;Masterserver timeout [%s]&quot;, msiter-&gt;first-&gt;getAddress().getIP().c_str());
+                 delete msiter-&gt;second;
+                 msiter-&gt;first-&gt;destroy();
+                 masterservers.erase(msiter);
+             }
+         }
+-    }
+-    
+-    if ( now &gt; nextHeartbeatTicks ) {
+-        nextHeartbeatTicks += HEARTBEAT_INTERVAL;
++    } else if ( nextHeartbeat.isTimeOut(now) ) {
+         startHeartbeat();
+     }
+ 
+@@ -109,12 +104,14 @@
+ Heartbeat::startHeartbeat()
+ {
+     vector&lt;Address&gt;::iterator iter = mslist.begin();
++    Uint32 now = SDL_GetTicks();
+     while ( iter != mslist.end() ) {
+         TCPSocket *s = 0;
+         MasterserverInfo *msi = 0;
+         try {
+             s = new TCPSocket(*iter, this);
+             msi = new MasterserverInfo();
++            msi-&gt;timer.reset(now);
+             masterservers[s]=msi;
+         } catch (NetworkException e) {
+             LOGGER.warning(&quot;Error '%s' connecting to masterserver '%s'&quot;, e.what(), (*iter).getIP().c_str());
+@@ -123,6 +120,7 @@
+         }
+         iter++;
+     }
++    nextHeartbeat.reset();
+ }
+ 
+ void
+@@ -142,11 +140,26 @@
+ }
+ 
+ void
++Heartbeat::onSocketError(TCPSocket *so)
++{
++    LOGGER.debug(&quot;Masterserver socket error [%s]&quot;, so-&gt;getAddress().getIP().c_str());
++    delete masterservers[so];
++    masterservers.erase(so);
++}
++
++void
+ Heartbeat::onDataReceived(TCPSocket *so, const char *data, const int len)
+ {
+     string str;
+     
+-    MasterserverInfo * msi = masterservers[so];
++    MSMapIterator i = masterservers.find(so);
++    if ( i == masterservers.end() ) {
++        LOGGER.warning(&quot;Received data from Unknown masterserver [%s]&quot;, so-&gt;getAddress().getIP().c_str());
++        so-&gt;destroy();
++        return;
++    }
++    
++    MasterserverInfo * msi = i-&gt;second;
+     msi-&gt;touch();
+     str = msi-&gt;recdata;
+     str.append(data,len);
+@@ -156,35 +169,40 @@
+         delete msi;
+         masterservers.erase(so);
+         so-&gt;destroy();
+-        return; // invalid answer;
++        return; // invalid answer, needs '\\' at beggining;
+     }
+     
+-    string lastpart;
+-    if (str[str.length()-1] != '\\') {
+-        // received incomplete
+-        string::size_type p = str.rfind('\\');
+-        msi-&gt;recdata = str.substr(p);
+-        str.erase(p);
+-    } else {
+-        msi-&gt;recdata = &quot;\\&quot;;
++    string::size_type strpos = str.find('\\',1);
++    if ( strpos == string::npos ) {
++        msi-&gt;recdata=str;
++        return; // unfinished token, needs '\\' at end
+     }
+     
+-    StringTokenizer tknizer(str,'\\');
+-    
+-    string token = tknizer.getNextToken();
+-    while ( !token.empty()) {
++    string token = str.substr(1,strpos-1);
++    if ( !token.empty() ) {
+         if ( token == &quot;error&quot; ) {
+-            LOGGER.warning(&quot;Masterserver returns error: '%s'&quot;, tknizer.getNextToken().c_str());
++            string::size_type msgend = str.find('\\',strpos+1);
++            if ( msgend == string::npos ) {
++                return; // need '\\' at end, continue with the socket
++            } else if ( msgend == strpos+1 ) {
++                LOGGER.warning(&quot;Masterserver returns empty error&quot;);
++            } else {
++                LOGGER.warning(&quot;Masterserver returns error: '%s'&quot;, str.substr(strpos+1,msgend-strpos-1).c_str());
++            }
++            return;
+         } else if ( token == &quot;final&quot;) {
+             LOGGER.debug(&quot;Masterserver answer ok, disconecting [%s]&quot;, so-&gt;getAddress().getIP().c_str());
+-            delete msi;
+-            masterservers.erase(so);
+-            so-&gt;destroy();
+-            break;
+         } else {
+-            LOGGER.warning(&quot;Masterservend sent unknown answer: '%s'&quot;, tknizer.getNextToken().c_str());
++            LOGGER.warning(&quot;Masterservend sent unknown answer: '%s'&quot;, token.c_str());
++            msi-&gt;recdata=str.substr(strpos); // includes the initial '\\'
++            return; // continues with the socket;
+         }
++        
++        delete msi;
++        masterservers.erase(so);
++        so-&gt;destroy();
+     }
++
+ }
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -20,6 +20,7 @@
+ #define _HEARTBEAT_HPP
+ 
+ #include &quot;Network/TCPSocket.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ #include &quot;SDL.h&quot;
+ #include &lt;vector&gt;
+ #include &lt;map&gt;
+@@ -40,13 +41,16 @@
+     void onConnected(TCPSocket *so);
+     void onDisconected(TCPSocket *so);
+     void onDataReceived(TCPSocket *so, const char *data, const int len);
++    void onSocketError(TCPSocket *so);
+     void startHeartbeat();
+     
+ private:
+-    Uint32 nextHeartbeatTicks;
++    NTimer nextHeartbeat;
+     string hb_message;
+     vector&lt;Address&gt; mslist;
+-    map&lt;TCPSocket *, MasterserverInfo *&gt; masterservers;
++    typedef map&lt;TCPSocket *, MasterserverInfo *&gt; MSMap;
++    typedef MSMap::iterator MSMapIterator;
++    MSMap masterservers;
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -56,6 +56,12 @@
+ }
+ 
+ void
++InfoSocket::onSocketError(UDPSocket *so)
++{
++    LOGGER.debug(&quot;InfoSocket: socket error&quot;);
++}
++
++void
+ InfoSocket::onDataReceived(UDPSocket *s, const Address &amp;from, const char *data, const int len)
+ {
+     (void)s;
+@@ -74,7 +80,8 @@
+             break;
+         } else if(query == &quot;echo&quot;) {
+             string echotoken = qtokenizer.getNextToken();
+-            socket-&gt;send(from, echotoken.c_str(), echotoken.size());
++            if ( echotoken.size() )
++                socket-&gt;send(from, echotoken.c_str(), echotoken.size());
+         }
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -33,6 +33,7 @@
+ 
+ protected:
+     void onDataReceived(UDPSocket *so, const Address &amp;from, const char *data, const int len);
++    void onSocketError(UDPSocket *so);
+     
+ private:
+     string prepareStatusPacket();
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -220,7 +220,7 @@
+ void
+ ClientSocket::onConnected(network::TCPSocket *so)
+ {
+-    LOGGER.warning(&quot;ClientSocket:: Connected to socket&quot;);
++    LOGGER.warning(&quot;ClientSocket: connected, id=%d&quot;, id);
+     socket = so;
+     observer-&gt;onClientConnected(this);
+ }
+@@ -229,11 +229,20 @@
+ ClientSocket::onDisconected(network::TCPSocket *so)
+ {
+     (void)so;
+-    LOGGER.warning(&quot;ClientSocket:: Disconected NetId[%d]!&quot;, id);
++    LOGGER.warning(&quot;ClientSocket: Disconected id=%d&quot;, id);
+     socket=0;
+     observer-&gt;onClientDisconected(this, &quot;Network connection closed&quot;);
+ }
+ 
++void
++ClientSocket::onSocketError(network::TCPSocket *so)
++{
++    (void)so;
++    LOGGER.warning(&quot;ClientSocket: Network connection error id=%d&quot;, id);
++    socket=0;
++    observer-&gt;onClientDisconected(this, &quot;Network connection error&quot;);
++}
++
+ std::string
+ ClientSocket::getIPAddress()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -57,6 +57,7 @@
+     void onDataReceived(network::TCPSocket *so, const char *data, const int len);
+     void onConnected(network::TCPSocket *so);
+     void onDisconected(network::TCPSocket *so);
++    void onSocketError(network::TCPSocket *so);
+ 
+ private:
+     void initId();
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -44,7 +44,7 @@
+     if (socket)
+         socket-&gt;destroy();
+     
+-    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.begin();
++    ClientsMapIterator ci = clients.begin();
+     while ( ci != clients.end() ) {
+         delete ci-&gt;second;
+         ci++;
+@@ -52,6 +52,13 @@
+     clients.clear();
+ }
+ 
++void
++ServerSocket::onSocketError(TCPListenSocket *so)
++{
++    LOGGER.debug(&quot;ServerSocket: Listen Socket error&quot;);
++
++}
++
+ TCPSocketObserver *
+ ServerSocket::onNewConnection(TCPListenSocket *so, const Address &amp;fromaddr)
+ {
+@@ -63,8 +70,13 @@
+ void
+ ServerSocket::onClientConnected(ClientSocket *s)
+ {
+-    LOGGER.debug(&quot;ServerSocket::onClientConnected() [%d]&quot;, s-&gt;getId());
+-    clients[s-&gt;getId()] = s;
++    NetClientID id = s-&gt;getId();
++    if ( clients.find(id) != clients.end() ) {
++        LOGGER.warning(&quot;ServerSocket: client connected already in list [%d]&quot;, id);
++        return;
++    }
++    LOGGER.debug(&quot;ServerSocket: client connected [%d]&quot;, id);
++    clients[id] = s;
+     TransportClientAccept clientacceptmessage;
+     clientacceptmessage.setSize(sizeof(TransportClientAccept));
+     EnqueueIncomingPacket(&amp;clientacceptmessage,
+@@ -74,26 +86,32 @@
+ void
+ ServerSocket::onClientDisconected(ClientSocket *s, const char * msg)
+ {
+-    LOGGER.warning(&quot;ServerSocket::onClientDisconnected() [%d] %s&quot;, s-&gt;getId(), msg);
+-    clients.erase(s-&gt;getId());
+-    delete s;
++    NetClientID id = s-&gt;getId();
++    ClientsMapIterator i = clients.find(id);
++    if ( i == clients.end() ) {
++        LOGGER.warning(&quot;ServerSocket: disconnected client not in map %d, msg=%s&quot;, id, msg);
++    } else {
++        LOGGER.warning(&quot;ServerSocket: disconnected client %d msg=%s&quot;, id, msg);
++        clients.erase(i);
++        delete s;
++    }
+ }
+ 
+ std::string
+ ServerSocket::getClientIP(NetClientID clientid)
+ {
+-    ClientSocket *s = clients[clientid];
+-    if ( !s )
++    ClientsMapIterator i = clients.find(clientid);
++    if ( i == clients.end() )
+         return &quot;Not a client&quot;;
+     
+-    return s-&gt;getIPAddress();
++    return i-&gt;second-&gt;getIPAddress();
+ }
+ 
+ void
+ ServerSocket::sendMessage(NetClientID toclient, const void* data, size_t datasize)
+ {
+-    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.find(toclient);
+-    if ( ci == clients.end() ) {
++    ClientsMapIterator ci = clients.find(toclient);
++    if ( ci == clients.end() ) { // XXX remove the throw
+         throw Exception(&quot;message sent to unknown client.&quot;);
+     }
+ 
+@@ -103,20 +121,20 @@
+ void
+ ServerSocket::disconectClient(NetClientID c)
+ {
+-    LOGGER.debug(&quot;ServerSocket::disconectClient() [%d]&quot;, c);
+-    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.find(c);
++    ClientsMapIterator ci = clients.find(c);
+     if ( ci != clients.end() ) {
++        LOGGER.warning(&quot;ServerSocket: disconnect client [%d]&quot;, ci-&gt;second-&gt;getId());
+         delete ci-&gt;second;
+         clients.erase(ci);
+     } else {
+-        LOGGER.warning(&quot;ServerSocket::disconectClient() Disconecting unknown client [%d]&quot;, c);
++        LOGGER.warning(&quot;ServerSocket: disconnect client not in list [%d]&quot;, c);
+     }
+ }
+ 
+ void
+ ServerSocket::sendRemaining()
+ {
+-    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.begin();
++    ClientsMapIterator ci = clients.begin();
+     while ( ci != clients.end() ) {
+         ci-&gt;second-&gt;sendRemaining();
+         ci++;
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -40,14 +40,17 @@
+     void sendRemaining();
+ 
+ protected:
+-    network::TCPSocketObserver * onNewConnection(TCPListenSocket *so,const Address &amp;fromaddr);
++    TCPSocketObserver * onNewConnection(TCPListenSocket *so,const Address &amp;fromaddr);
++    void onSocketError(TCPListenSocket *so);
+     void onClientConnected(ClientSocket *s);
+     void onClientDisconected(ClientSocket *s, const char * msg);
+     friend class SocketClient;
+ 
+ private:
+     TCPListenSocket * socket;
+-    map&lt;NetClientID, ClientSocket *&gt; clients;
++    typedef map&lt;NetClientID, ClientSocket *&gt; ClientsMap;
++    typedef ClientsMap::iterator ClientsMapIterator;
++    ClientsMap clients;
+ 
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -136,6 +136,21 @@
+ }
+ 
+ void
++ServerQueryThread::onSocketError(network::TCPSocket *s)
++{
++    LOGGER.warning(&quot;MASTERSERVER Socket error [%s]&quot;, s-&gt;getAddress().getIP().c_str());
++    delete querying_msdata[s];
++    querying_msdata.erase(s);    
++}
++
++void
++ServerQueryThread::onSocketError(network::UDPSocket *s)
++{
++    LOGGER.warning(&quot;SERVER query socket error [%s]&quot;, s-&gt;getAddress().getIP().c_str());
++    udpsocket = 0;
++}
++
++void
+ ServerQueryThread::onDataReceived(network::TCPSocket *s, const char *data, const int len)
+ {
+     string str;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp	2007-10-30 13:49:25 UTC (rev 1002)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.hpp	2007-11-15 12:38:51 UTC (rev 1003)
+@@ -53,6 +53,8 @@
+     void onConnected(network::TCPSocket *s);
+     void onDisconected(network::TCPSocket *s);    
+     void onDataReceived(network::UDPSocket *s, const network::Address &amp;from, const char *data, const int len);
++    void onSocketError(network::TCPSocket *s);
++    void onSocketError(network::UDPSocket *s);
+     
+ private:
+     
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000048.html">[Netpanzer-cvs] r1005 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Particles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#47">[ date ]</a>
+              <a href="thread.html#47">[ thread ]</a>
+              <a href="subject.html#47">[ subject ]</a>
+              <a href="author.html#47">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

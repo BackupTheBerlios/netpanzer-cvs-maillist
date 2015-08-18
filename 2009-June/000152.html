@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1123 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1123%20-%20trunk/netpanzer&In-Reply-To=%3C200906201450.n5KEo0Oq028950%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000151.html">
+   <LINK REL="Next"  HREF="000153.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1123 - trunk/netpanzer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1123%20-%20trunk/netpanzer&In-Reply-To=%3C200906201450.n5KEo0Oq028950%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1123 - trunk/netpanzer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun 20 16:50:00 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000151.html">[Netpanzer-cvs] r1122 - in trunk/netpanzer: . cache docs fonts maps	pics powerups scripts sound src src/Lib src/Lib/2D	src/Lib/ArrayUtil src/Lib/INIParser src/Lib/Network	src/Lib/Types src/Lib/Util src/Lib/lua src/Lib/optionmm	src/Lib/physfs src/NetPanzer src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Views units wads
+</A></li>
+        <LI>Next message: <A HREF="000153.html">[Netpanzer-cvs] r1124 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#152">[ date ]</a>
+              <a href="thread.html#152">[ thread ]</a>
+              <a href="subject.html#152">[ subject ]</a>
+              <a href="author.html#152">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-20 16:49:54 +0200 (Sat, 20 Jun 2009)
+New Revision: 1123
+
+Modified:
+   trunk/netpanzer/SConstruct
+Log:
+- Added the icon to the windows executable when compiling
+- Correct linking of the libstdc++ statically for cross linux compilation
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-06-20 13:10:22 UTC (rev 1122)
++++ trunk/netpanzer/SConstruct	2009-06-20 14:49:54 UTC (rev 1123)
+@@ -74,6 +74,10 @@
+ # Create Environments
+ ################################################################
+ 
++if not (env['mode'] in ['debug', 'release']):
++    print &quot;Error: mode can only be 'debug' or 'release', found: &quot; + env['mode']
++    Exit(1)
++
+ crossmingwenv = env.Clone();
+ crosslinuxenv = env.Clone();
+ 
+@@ -86,16 +90,16 @@
+         print 'You need to set the full path of sdl-config for mingw cross compilation'
+         Exit(1)
+ 
+-    #finalplatform = 'mingw'
+-    crossmingwenv = Environment(ENV = {'PATH' : os.environ['PATH']}, tools = ['mingw'], options=opts )
+-    print crossmingwenv
+-    crossmingwenv.Replace( CXX = env['crossmingwcompilerprefix'] + env['CXX'] )
+-    crossmingwenv.Replace( CC = env['crossmingwcompilerprefix'] + env['CC'] )
+-    crossmingwenv.Replace( AR = env['crossmingwcompilerprefix'] + env['AR'] )
+-    crossmingwenv.Replace( RANLIB = env['crossmingwcompilerprefix'] + env['RANLIB'] )
++    crossmingwenv = Environment( ENV = {'PATH' : os.environ['PATH']}, tools = ['mingw'], options=opts )
++    crossmingwenv.Replace( CXX = env['crossmingwcompilerprefix'] + crossmingwenv['CXX'] )
++    crossmingwenv.Replace( CC = env['crossmingwcompilerprefix'] + crossmingwenv['CC'] )
++    crossmingwenv.Replace( AR = env['crossmingwcompilerprefix'] + crossmingwenv['AR'] )
++    crossmingwenv.Replace( RANLIB = env['crossmingwcompilerprefix'] + crossmingwenv['RANLIB'] )
++    crossmingwenv.Replace( RC = env['crossmingwcompilerprefix'] + crossmingwenv['RC'] )
+     crossmingwenv.Append( CCFLAGS = [ '-Dsocklen_t=int' ] )
+     crossmingwenv.Append( LDFLAGS = [ '-mwindows' ] )
+     crossmingwenv.Append( LIBS = [ 'ws2_32', 'mingw32' ] )
++    crossmingwenv['WINICON'] = crossmingwenv.RES( 'support/icon/npicon.rc' )
+     crossmingwenv['PROGSUFFIX'] = '.exe'
+ 
+ if 'crosslinux' in COMMAND_LINE_TARGETS:
+@@ -107,20 +111,13 @@
+         print 'You need to set the full path of sdl-config for linux cross compilation'
+         Exit(1)
+ 
+-    #finalplatform = 'linux'
+     crosslinuxenv= Environment(ENV = {'PATH' : os.environ['PATH']},tools = ['gcc','g++','ar','gnulink'], options=opts )
+     crosslinuxenv.Replace( CXX = env['crosslinuxcompilerprefix'] + env['CXX'] )
+     crosslinuxenv.Replace( CC = env['crosslinuxcompilerprefix'] + env['CC'] )
+     crosslinuxenv.Replace( AR = env['crosslinuxcompilerprefix'] + env['AR'] )
+     crosslinuxenv.Replace( RANLIB = env['crosslinuxcompilerprefix'] + env['RANLIB'] )
+-    crosslinuxenv.Command('libstdc++.a', None, Action('ln -sf `%s -print-file-name=libstdc++.a` build/linux/' % crosslinuxenv['CXX'] ) )
+-    crosslinuxenv.Append( LIBS = [ 'libstdc++.a' ] )
++    crosslinuxenv.Append( _LIBFLAGS = [ '`' + crosslinuxenv['CXX'] + ' -print-file-name=libstdc++.a`' ] )
+ 
+-
+-if not (env['mode'] in ['debug', 'release']):
+-    print &quot;Error: mode can only be 'debug' or 'release', found: &quot; + env['mode']
+-    Exit(1)
+-
+ env['FINALBUILDDIR'] = 'build/' + env['mode'] + '/'
+ env['FINALLIBSDIR'] = env['FINALBUILDDIR'] + 'libs/'
+ crossmingwenv['FINALBUILDDIR'] = 'build/crossmingw/' + env['mode'] + '/'
+@@ -203,6 +200,7 @@
+     networkenv.Append( CCFLAGS = [ '-Dsocklen_t=int' ] )
+     env.Append( _LIBFLAGS = [ '-mwindows' ] )
+     env.Prepend( _LIBFLAGS = [ 'c:/mingw/lib/SDL_mixer.lib' ] )
++    env['WINICON'] = env.RES( 'support/icon/npicon.rc' )
+     SetupSpawn(env)
+ else:
+     env.ParseConfig(env['sdlconfig'] + ' --cflags --libs')
+@@ -283,7 +281,13 @@
+ &quot;&quot;&quot;
+ 
+ env.Append( NPSOURCES = globSources(env, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;) )
++if env.has_key('WINICON'):
++    env.Append( NPSOURCES = env['WINICON'] )
++
+ crossmingwenv.Append( NPSOURCES = globSources(crossmingwenv, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;) )
++if crossmingwenv.has_key('WINICON'):
++    crossmingwenv.Append( NPSOURCES = crossmingwenv['WINICON'] )
++    
+ crosslinuxenv.Append( NPSOURCES = globSources(crosslinuxenv, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;) )
+ 
+ env.Append( NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
+@@ -303,6 +307,8 @@
+ crossmingwenv.Append( NPLIBPATH = crossmingwenv['FINALLIBSDIR'] )
+ crosslinuxenv.Append( NPLIBPATH = crosslinuxenv['FINALLIBSDIR'] )
+ 
++
++
+ netpanzer = env.Program( env['FINALEXENAME'], env['NPSOURCES'],
+              LIBS=env['NPLIBS'], LIBPATH=env['NPLIBPATH'] )
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000151.html">[Netpanzer-cvs] r1122 - in trunk/netpanzer: . cache docs fonts maps	pics powerups scripts sound src src/Lib src/Lib/2D	src/Lib/ArrayUtil src/Lib/INIParser src/Lib/Network	src/Lib/Types src/Lib/Util src/Lib/lua src/Lib/optionmm	src/Lib/physfs src/NetPanzer src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Views units wads
+</A></li>
+	<LI>Next message: <A HREF="000153.html">[Netpanzer-cvs] r1124 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#152">[ date ]</a>
+              <a href="thread.html#152">[ thread ]</a>
+              <a href="subject.html#152">[ subject ]</a>
+              <a href="author.html#152">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

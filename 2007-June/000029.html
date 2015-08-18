@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r984 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r984%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game%20Views/MainMenu/Multi&In-Reply-To=%3C200706011545.l51Fjn8p006917%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000028.html">
+   <LINK REL="Next"  HREF="000030.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r984 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game Views/MainMenu/Multi</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r984%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game%20Views/MainMenu/Multi&In-Reply-To=%3C200706011545.l51Fjn8p006917%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r984 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun  1 17:45:49 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000028.html">[Netpanzer-cvs] r983 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000030.html">[Netpanzer-cvs] r985 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#29">[ date ]</a>
+              <a href="thread.html#29">[ thread ]</a>
+              <a href="subject.html#29">[ subject ]</a>
+              <a href="author.html#29">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-01 17:45:47 +0200 (Fri, 01 Jun 2007)
+New Revision: 984
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+Note: This is in the main trunk, some of the changes are the same as the 0.8 trunk
+- Set default masterservers to the new names (masterserver{,2}.netpanzer.{org,info})
+- Remove a couple of commented functions in TileSet class
+- Hack to show something in the server list view when resolving the masterservers
+- Add a pointer to array of pointer in TileSet (note: i was starting to convert the tile engine to use surfaces, when abitos gave the idea of releasing 0.8.2 with fixed (and older) code, i'll back to this as soon as that is done).
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2007-06-01 15:34:37 UTC (rev 983)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2007-06-01 15:45:47 UTC (rev 984)
+@@ -52,131 +52,6 @@
+     tile_size = tile_set_info.x_pix * tile_set_info.y_pix;
+ }
+ 
+-/*
+-void TileSet::loadTileSet( const char *file_path )
+-{
+-    unsigned long  tile_buffer_size;
+-
+-    try {
+-	std::auto_ptr&lt;filesystem::ReadFile&gt; file(
+-                filesystem::openRead(file_path));
+-
+-        delete[] tile_data;
+-        tile_data = 0;
+-        delete[] tile_info;
+-        tile_info = 0;
+-        tile_set_loaded = false;
+-
+-	readTileDbHeader(*file, &amp;tile_set_info);
+-
+-	tile_buffer_size = (tile_set_info.x_pix * tile_set_info.y_pix) * tile_set_info.tile_count;
+-
+-	tile_info =  new TILE_HEADER [ tile_set_info.tile_count ];
+-	assert( tile_info != 0 );
+-
+-	tile_data =  new unsigned char[tile_buffer_size];
+-	assert( tile_data != 0 );
+-
+-	file-&gt;read(tile_info, tile_set_info.tile_count, sizeof(TILE_HEADER));
+-	file-&gt;read( tile_data, tile_buffer_size, 1);
+-
+-    	tile_set_loaded = true;
+-	
+-	computeTileConsts();
+-    } catch(std::exception&amp; e) {
+-	throw Exception(&quot;Couldn't load tileset '%s': %s&quot;,
+-		file_path, e.what());
+-    }
+-}
+-
+-
+-void TileSet::loadTileSet( const char *file_path, WadMapTable &amp;mapping_table )
+-{
+-    try {
+-	unsigned long  tile_buffer_size;
+-	unsigned long  tile_size;
+-
+-	std::auto_ptr&lt;filesystem::ReadFile&gt; file(
+-                filesystem::openRead(file_path));
+-
+-	delete[] tile_data;
+-	tile_data = 0;
+-	delete[] tile_info;
+-	tile_info = 0;
+-	tile_set_loaded = false;
+-
+-	// ** Read Header Info **
+-    	readTileDbHeader(*file, &amp;tile_set_info);
+-
+-	// ** Read in Tile Info **
+-	tile_info = new TILE_HEADER [ mapping_table.used_tile_count ];
+-
+-	unsigned short tile_count   = 0;
+-	unsigned long  tile_index   = 0;
+-	unsigned long  mapped_index = 0;
+-	unsigned long  unused_tile_count;
+-	unsigned long  used_tile_count;
+-
+-    	tile_count = getTileCount();
+-
+-	for ( tile_index = 0; tile_index &lt; tile_count; tile_index++ ) {
+-	    if ( mapping_table[ tile_index ].is_used == true ) {
+-		file-&gt;read( (tile_info + mapped_index), sizeof(TILE_HEADER), 1);
+-		mapped_index++;
+-	    } else {
+-		file-&gt;seek(file-&gt;tell() + sizeof( TILE_HEADER ));
+-	    }
+-	}
+-
+-	// ** Read in tile data **
+-	tile_buffer_size = (tile_set_info.x_pix * tile_set_info.y_pix) * mapping_table.used_tile_count;
+-	tile_size = (tile_set_info.x_pix * tile_set_info.y_pix);
+-
+-	tile_data =  new unsigned char [tile_buffer_size];
+-
+-	mapped_index = 0;
+-	tile_index = 0;
+-
+-	while ( tile_index &lt; tile_count ) {
+-	    used_tile_count = 0;
+-	    unused_tile_count = 0;
+-
+-	    // ** find the next used tile
+-	    while( (tile_index &lt; tile_count) &amp;&amp; (mapping_table[ tile_index ].is_used == false) ) {
+-		unused_tile_count++;
+-		tile_index++;
+-	    }
+-
+-	    if ( tile_index &lt; tile_count) {
+-		if (unused_tile_count != 0) {
+-		    file-&gt;seek(file-&gt;tell()+ tile_size * unused_tile_count);
+-		}
+-
+-		while( (tile_index &lt; tile_count) &amp;&amp; (mapping_table[ tile_index ].is_used == true) ) {
+-		    used_tile_count++;
+-		    tile_index++;
+-		}
+-		
+-		if (used_tile_count != 0) {
+-		    file-&gt;read( (tile_data + (mapped_index*tile_size)),
+-			    tile_size , used_tile_count);
+-		    mapped_index += used_tile_count;
+-		}
+-
+-    	    }	// ** if ( tile_index &lt; tile_count)
+-	}
+-
+-	tile_set_loaded = true;
+-
+-	TileSet::tile_count = mapping_table.used_tile_count;
+-	computeTileConsts();
+-    } catch(std::exception&amp; e) {
+-	throw Exception(&quot;Error while reading tileset '%s': %s&quot;,
+-		file_path, e.what());
+-    }
+-}
+-*/
+-
+ void TileSet::loadTileSetInfo( const char *file_path )
+ {
+     std::auto_ptr&lt;filesystem::ReadFile&gt; file (filesystem::openRead(file_path));
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp	2007-06-01 15:34:37 UTC (rev 983)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp	2007-06-01 15:45:47 UTC (rev 984)
+@@ -20,6 +20,7 @@
+ 
+ #include &quot;TileSetStruct.hpp&quot;
+ #include &quot;WadMapTable.hpp&quot;
++#include &quot;2D/Surface.hpp&quot;
+ 
+ namespace filesystem {
+ class ReadFile;
+@@ -27,6 +28,9 @@
+ 
+ class TileSet
+ {
++private:
++    Surface **tiles;
++    
+ protected:
+     bool tile_set_loaded;
+     TILE_DBASE_HEADER tile_set_info;
+@@ -49,8 +53,6 @@
+     void readTileDbHeader(filesystem::ReadFile&amp; file, TILE_DBASE_HEADER *header);
+     void loadTileSetInfo( const char *file_path );
+     void loadTileSetInfo( const char *file_path, WadMapTable &amp;mapping_table );
+-//    void loadTileSet( const char *file_path, WadMapTable &amp;mapping_table );
+-//    void loadTileSet( const char *file_path );
+ 
+     bool startPartitionTileSetLoad( const char *file_path, WadMapTable &amp;mapping_table, unsigned long partitions );
+     bool partitionTileSetLoad( WadMapTable &amp;mapping_table, int *percent_complete );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-06-01 15:34:37 UTC (rev 983)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-06-01 15:45:47 UTC (rev 984)
+@@ -37,7 +37,7 @@
+       serverConnect(&quot;serverconnect&quot;, &quot;&quot;),
+     
+       playername(&quot;name&quot;, &quot;Player&quot;),
+-      masterservers(&quot;masterservers&quot;, &quot;netpanzer.dyndns.org&quot;),
++      masterservers(&quot;masterservers&quot;, &quot;masterserver.netpanzer.org, masterserver2.netpanzer.org, masterserver.netpanzer.info&quot;),
+       
+       serverport(&quot;serverport&quot;, NETPANZER_DEFAULT_PORT_TCP,0,65535),
+       proxyserver(&quot;proxyserver&quot;,&quot;&quot;),
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2007-06-01 15:34:37 UTC (rev 983)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2007-06-01 15:45:47 UTC (rev 984)
+@@ -144,7 +144,7 @@
+     unsigned int CHAR_YPIX = Surface::getFontHeight();
+     unsigned int entryHeight = std::max(CHAR_YPIX, UNIT_FLAGS_SURFACE.getHeight()) + 2;
+     iXY offset(2, 40);
+-    iXY flagOffset(162, 40 + (CHAR_YPIX - UNIT_FLAGS_SURFACE.getHeight())/2);
++    iXY flagOffset(162, 40 + (int(CHAR_YPIX - UNIT_FLAGS_SURFACE.getHeight()))/2);
+ 
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2007-06-01 15:34:37 UTC (rev 983)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2007-06-01 15:45:47 UTC (rev 984)
+@@ -31,6 +31,8 @@
+ #include &quot;NetworkServer.hpp&quot;
+ #include &quot;Server.hpp&quot;
+ #include &quot;Client.hpp&quot;
++// XXX ultrahack
++#include &quot;ScreenSurface.hpp&quot;
+ 
+ static int previousSessionType = _game_session_join;
+ 
+@@ -64,6 +66,8 @@
+ 
+         Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+         Desktop::setVisibility(&quot;ServerListView&quot;, true);
++        Desktop::draw(*screen); // XXX ultrahack
++        screen-&gt;copyToVideoFlip(); // XXX uberhack
+         serverlistview-&gt;refresh();
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-01 15:34:37 UTC (rev 983)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-01 15:45:47 UTC (rev 984)
+@@ -101,7 +101,12 @@
+     }
+     
+     if(serverlist.empty()) {
+-        const char* msg = queryThread-&gt;getStateMessage();
++        const char* msg;
++        if ( queryThread ) {
++            msg = queryThread-&gt;getStateMessage();
++        } else {
++            msg = &quot;Resolving masterserver address&quot;;
++        }
+         clientArea.bltString(0, 0, msg, Color::white);
+         View::doDraw(windowArea, clientArea);
+         return;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000028.html">[Netpanzer-cvs] r983 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000030.html">[Netpanzer-cvs] r985 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#29">[ date ]</a>
+              <a href="thread.html#29">[ thread ]</a>
+              <a href="subject.html#29">[ subject ]</a>
+              <a href="author.html#29">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,933 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1290 - in trunk/netpanzer: src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1290%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20units/profiles&In-Reply-To=%3C20111120135711.3F136481531%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000315.html">
+   <LINK REL="Next"  HREF="000317.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1290 - in trunk/netpanzer: src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1290%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20units/profiles&In-Reply-To=%3C20111120135711.3F136481531%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1290 - in trunk/netpanzer: src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 20 14:57:10 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000315.html">[Netpanzer-cvs] r1289 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts src/NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000317.html">[Netpanzer-cvs] r1291 - in trunk/netpanzer: src/NetPanzer/Resources	units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#316">[ date ]</a>
+              <a href="thread.html#316">[ thread ]</a>
+              <a href="subject.html#316">[ subject ]</a>
+              <a href="author.html#316">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-11-20 14:57:10 +0100 (Sun, 20 Nov 2011)
+New Revision: 1290
+
+Added:
+   trunk/netpanzer/units/profiles/Archer.upf
+   trunk/netpanzer/units/profiles/Bear.upf
+   trunk/netpanzer/units/profiles/Bobcat.upf
+   trunk/netpanzer/units/profiles/Drake.upf
+   trunk/netpanzer/units/profiles/Manta.upf
+   trunk/netpanzer/units/profiles/Panther1.upf
+   trunk/netpanzer/units/profiles/SPanzer.upf
+   trunk/netpanzer/units/profiles/Scout.upf
+   trunk/netpanzer/units/profiles/Stinger.upf
+   trunk/netpanzer/units/profiles/Titan.upf
+   trunk/netpanzer/units/profiles/Wolf.upf
+Removed:
+   trunk/netpanzer/units/profiles/Archer.pfl
+   trunk/netpanzer/units/profiles/Bear.pfl
+   trunk/netpanzer/units/profiles/Bobcat.pfl
+   trunk/netpanzer/units/profiles/Drake.pfl
+   trunk/netpanzer/units/profiles/Manta.pfl
+   trunk/netpanzer/units/profiles/Panther1.pfl
+   trunk/netpanzer/units/profiles/SPanzer.pfl
+   trunk/netpanzer/units/profiles/Scout.pfl
+   trunk/netpanzer/units/profiles/Stinger.pfl
+   trunk/netpanzer/units/profiles/Titan.pfl
+   trunk/netpanzer/units/profiles/Wolf.pfl
+Modified:
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+Log:
+Fix: new version with old profiles has errors, the profiles now are loaded using lua, the file names are changed from &quot;*.pfl&quot; to &quot;*.upf&quot;
+
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -194,8 +194,8 @@
+ {
+     const char profilesPath[] = &quot;units/profiles/&quot;;
+ 
+-    // scan directory for .pfl files
+-    std::string suffix = &quot;.pfl&quot;;
++    // scan directory for .upf files
++    std::string suffix = &quot;.upf&quot;;
+     char **list = filesystem::enumerateFiles(profilesPath);
+ 
+     int tindex = 0; // will push ++tindex
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -410,6 +410,38 @@
+     }
+ }
+ 
++bool
++ScriptManager::loadSimpleConfig(const NPString&amp; filename)
++{
++    lua_newtable(luavm);
++
++    int r = luaL_loadfile(luavm, filesystem::getRealName(filename.c_str()).c_str());
++    if ( r )
++    {
++        LOGGER.warning(&quot;Error in loadSimpleConfig: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,2);
++        return false;
++    }
++
++    lua_pushvalue(luavm, -2);
++    if ( ! lua_setfenv(luavm, -2) )
++    {
++        LOGGER.warning(&quot;Error in loadSimpleConfig: can't set environment.&quot;);
++        lua_pop(luavm,2);
++        return false;
++    }
++
++    if ( lua_pcall(luavm, 0, 0, 0) )
++    {
++        LOGGER.warning(&quot;Error in loadConfigFile: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,2);
++        return false;
++    }
++
++    // the new table is in the stack, do something!!!
++    return true;
++}
++
+ void
+ ScriptManager::PrepareMetaTable(const NPString&amp; metaName,
+                             ScriptVarBindRecord * getters,
+@@ -505,3 +537,45 @@
+ 
+     lua_pop(luavm,1);
+ }
++
++void
++ScriptManager::popElements(int n)
++{
++    lua_pop(luavm, n);
++}
++
++int
++ScriptManager::getIntField(const char* name, const int default_value)
++{
++    int res;
++    lua_getfield(luavm, -1, name);
++    int n = lua_tonumber(luavm, -1);
++    if ( !n &amp;&amp; ! lua_isnumber(luavm, -1) )
++    {
++        res = default_value;
++    }
++    else
++    {
++        res = n;
++    }
++    lua_pop(luavm, 1);
++    return res;
++}
++
++NPString
++ScriptManager::getStringField(const char* name, const NPString&amp; default_value)
++{
++    NPString res;
++    lua_getfield(luavm, -1, name);
++    const char *s = lua_tostring(luavm, -1);
++    if ( !s )
++    {
++        res = default_value;
++    }
++    else
++    {
++        res.assign(s);
++    }
++    lua_pop(luavm, 1);
++    return res;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -45,6 +45,7 @@
+ 
+     static void runFileInTable(const NPString&amp; filename, const NPString&amp; table);
+     static void loadConfigFile(const NPString&amp; filename, const NPString&amp; table);
++    static bool loadSimpleConfig(const NPString&amp; filename);
+ 
+     static lua_State* getLuavm() { return luavm; }
+ 
+@@ -61,6 +62,12 @@
+ 
+     static void setIntValue(const NPString&amp; variable, int n);
+     static void setDoubleValue(const NPString&amp; variable, double n);
++
++    static void popElements(int n);
++    static int getIntField(const char* name, const int default_value);
++    static NPString getStringField(const char* name, const NPString&amp; default_value);
++
++
+ private:        
+     static lua_State *luavm;
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -21,8 +21,8 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+-#include &quot;Util/FileStream.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;Scripts/ScriptManager.hpp&quot;
+ #include &lt;ctype.h&gt;
+ #include &lt;memory&gt;
+ #include &lt;string.h&gt;
+@@ -190,129 +190,68 @@
+ bool read_vehicle_profile(const NPString&amp; unitName, UnitProfile *profile)
+ {
+     int temp_int;
+-    bool not_done = true;
+ 
+     NPString file_path = &quot;units/profiles/&quot;;
+     file_path += unitName;
+-    file_path += &quot;.pfl&quot;;
++    file_path += &quot;.upf&quot;;
+ 
+     profile-&gt;unitname = unitName;
+-    
+-    try
++
++    bool isok = ScriptManager::loadSimpleConfig(file_path);
++    if ( isok )
+     {
+-        IFileStream in(file_path);
+-        NPString line;
+-        std::vector&lt;NPString&gt; parameters;
++        // loaded file in top
++        profile-&gt;hit_points       = ScriptManager::getIntField(&quot;hitpoints&quot;,    100);
++        profile-&gt;attack_factor    = ScriptManager::getIntField(&quot;attack&quot;,       100);
++        profile-&gt;reload_time      = ScriptManager::getIntField(&quot;reload&quot;,       100);
++        profile-&gt;cfg_attack_range = ScriptManager::getIntField(&quot;range&quot;,         10);
++        profile-&gt;cfg_defend_range = ScriptManager::getIntField(&quot;defend_range&quot;,  10);
++        profile-&gt;regen_time       = ScriptManager::getIntField(&quot;regen&quot;,         60);
++        profile-&gt;speed_rate       = ScriptManager::getIntField(&quot;speed_rate&quot;,    16);
++        profile-&gt;speed_factor     = ScriptManager::getIntField(&quot;speed_factor&quot;,   2);
++        profile-&gt;boundBox         = ScriptManager::getIntField(&quot;boundbox&quot;,      40);
+ 
+-        while( not_done &amp;&amp; !in.eof() )
++        profile-&gt;imagefile         = ScriptManager::getStringField(&quot;image&quot;,        &quot;&quot;);
++        profile-&gt;bodySprite_name   = ScriptManager::getStringField(&quot;bodysprite&quot;,   &quot;&quot;);
++        profile-&gt;bodyShadow_name   = ScriptManager::getStringField(&quot;bodyshadow&quot;,   &quot;&quot;);
++        profile-&gt;turretSprite_name = ScriptManager::getStringField(&quot;turretsprite&quot;, &quot;&quot;);
++        profile-&gt;turretShadow_name = ScriptManager::getStringField(&quot;turretshadow&quot;, &quot;&quot;);
++        profile-&gt;soundSelected     = ScriptManager::getStringField(&quot;soundselected&quot;,&quot;&quot;);
++        profile-&gt;fireSound         = ScriptManager::getStringField(&quot;soundfire&quot;,    &quot;&quot;);
++        profile-&gt;weaponType        = ScriptManager::getStringField(&quot;weapon&quot;,       &quot;&quot;);
++
++        ScriptManager::popElements(1);
++
++        temp_int = profile-&gt;cfg_attack_range &lt;&lt; 5;
++        profile-&gt;attack_range = temp_int * temp_int;
++
++        temp_int = profile-&gt;cfg_defend_range &lt;&lt; 5;
++        profile-&gt;defend_range = temp_int * temp_int;
++
++        try
+         {
+-            std::getline(in,line);
+-            string_to_params( line, parameters );
++            profile-&gt;bodySprite.load(profile-&gt;bodySprite_name);
++            profile-&gt;bodyShadow.load(profile-&gt;bodyShadow_name);
++            profile-&gt;turretSprite.load(profile-&gt;turretSprite_name);
++            profile-&gt;turretShadow.load(profile-&gt;turretShadow_name);
+ 
+-            if ( parameters.size() == 0 )
+-            {
+-                continue;
+-            }
++        }
++        catch (std::exception&amp; e)
++        {
++            LOGGER.warning(&quot;Error loading unitprofile sprites '%s': %s&quot;,
++                           file_path.c_str(), e.what() );
+ 
+-            if ( parameters[0] == &quot;HITPOINTS&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;hit_points = (short) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;ATTACK_FACTOR&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;attack_factor = (short) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;RELOAD_TIME&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;reload_time = (char) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;RANGE_MAX&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;cfg_attack_range = temp_int;
+-                temp_int *= 32;         // adjust new values
+-                temp_int *= temp_int;
+-                profile-&gt;attack_range = (long) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;REGEN_TIME&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;regen_time = (short) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;DEFEND_RANGE&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;cfg_defend_range = temp_int;
+-                temp_int *= 32;         // adjust new values
+-                temp_int *= temp_int;
+-                profile-&gt;defend_range = (long) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;SPEED_RATE&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;speed_rate = (char) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;SPEED_FACTOR&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;speed_factor = (char) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;IMAGE&quot; )
+-            {
+-                profile-&gt;imagefile = parameters[1];
+-            }
+-            else if ( parameters[0] == &quot;BODYSPRITE&quot; )
+-            {
+-                profile-&gt;bodySprite_name = parameters[1];
+-                profile-&gt;bodySprite.load(parameters[1]);
+-            }
+-            else if ( parameters[0] == &quot;BODYSHADOW&quot; )
+-            {
+-                profile-&gt;bodyShadow_name = parameters[1];
+-                profile-&gt;bodyShadow.load(parameters[1]);
+-            }
+-            else if ( parameters[0] == &quot;TURRETSPRITE&quot; )
+-            {
+-                profile-&gt;turretSprite_name = parameters[1];
+-                profile-&gt;turretSprite.load(parameters[1]);
+-            }
+-            else if ( parameters[0] == &quot;TURRETSHADOW&quot; )
+-            {
+-                profile-&gt;turretShadow_name = parameters[1];
+-                profile-&gt;turretShadow.load(parameters[1]);
+-            }
+-            else if ( parameters[0] == &quot;SOUNDSELECTED&quot; )
+-            {
+-                profile-&gt;soundSelected = parameters[1];
+-            }
+-            else if ( parameters[0] == &quot;FIRESOUND&quot; )
+-            {
+-                profile-&gt;fireSound = parameters[1];
+-            }
+-            else if ( parameters[0] == &quot;WEAPON&quot; )
+-            {
+-                profile-&gt;weaponType = parameters[1];
+-            }
+-            else if ( parameters[0] == &quot;BOUNDBOX&quot; )
+-            {
+-                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
+-                profile-&gt;boundBox = (short) temp_int;
+-            }
+-            else if ( parameters[0] == &quot;END&quot; || parameters[0] == &quot;END;&quot; )
+-            {
+-                not_done = false;
+-            }
+-	} // ** while ( !feof )
+-    } catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;Error while reading unitprofile '%s': %s&quot;,
+-                       file_path.c_str(), e.what() );
+-        return false;
++            isok = false;
++        }
++
+     }
+ 
+-    return true;
++    if ( ! isok )
++    {
++        LOGGER.warning(&quot;Can't load unit profile '%s'&quot;, unitName.c_str());
++    }
++
++    return isok;
+ } // function
+ 
+ vector&lt;UnitProfile *&gt; UnitProfileInterface::profiles;
+
+Deleted: trunk/netpanzer/units/profiles/Archer.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Archer.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Archer.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS       120;
+-ATTACK_FACTOR   350;
+-RELOAD_TIME     110;
+-RANGE_MAX        48;
+-REGEN_TIME       90;
+-DEFEND_RANGE    119;
+-SPEED_RATE       16;
+-SPEED_FACTOR      2;
+-IMAGE &quot;pics/menus/vehicleSelectionView/archer.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/ArchHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/ArchHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/ArchTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/ArchTSSD.pak&quot;
+-SOUNDSELECTED &quot;mu-selected&quot;
+-FIRESOUND &quot;mu-fire&quot;
+-WEAPON &quot;DOUBLEMISSILE&quot;
+-BOUNDBOX 40
+-END;
+
+Added: trunk/netpanzer/units/profiles/Archer.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Archer.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Archer.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  120;
++attack =  350;
++reload =  110;
++range =  48;
++regen =  90;
++defend_range =  119;
++speed_rate =  16;
++speed_factor =  2;
++image =  &quot;pics/menus/vehicleSelectionView/archer.bmp&quot;
++bodysprite =  &quot;units/pics/pak/ArchHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/ArchHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/ArchTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/ArchTSSD.pak&quot;
++soundselected =  &quot;mu-selected&quot;
++soundfire =  &quot;mu-fire&quot;
++weapon =  &quot;DOUBLEMISSILE&quot;
++boundbox =  40
+
+Deleted: trunk/netpanzer/units/profiles/Bear.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Bear.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Bear.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS      450;
+-ATTACK_FACTOR   80;
+-RELOAD_TIME     40;
+-RANGE_MAX       20;
+-REGEN_TIME      35;
+-DEFEND_RANGE    15;
+-SPEED_RATE      14;
+-SPEED_FACTOR     2;
+-IMAGE &quot;pics/menus/vehicleSelectionView/bear.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/BearHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/BearHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/BearTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/BearTSSD.pak&quot;
+-SOUNDSELECTED &quot;mt-selected&quot;
+-FIRESOUND &quot;mt-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 60
+-END;
+
+Added: trunk/netpanzer/units/profiles/Bear.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Bear.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Bear.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  450;
++attack =  80;
++reload =  40;
++range =  20;
++regen =  35;
++defend_range =  15;
++speed_rate =  14;
++speed_factor =  2;
++image =  &quot;pics/menus/vehicleSelectionView/bear.bmp&quot;
++bodysprite =  &quot;units/pics/pak/BearHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/BearHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/BearTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/BearTSSD.pak&quot;
++soundselected =  &quot;mt-selected&quot;
++soundfire =  &quot;mt-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  60
+
+Deleted: trunk/netpanzer/units/profiles/Bobcat.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Bobcat.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Bobcat.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS      200;
+-ATTACK_FACTOR   30;
+-RELOAD_TIME     20;
+-RANGE_MAX       11;
+-REGEN_TIME      20;
+-DEFEND_RANGE     8;
+-SPEED_RATE      20;
+-SPEED_FACTOR     4;
+-IMAGE &quot;pics/menus/vehicleSelectionView/bobcat.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/BobcHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/BobcHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/BobcTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/BobcTSSD.pak&quot;
+-SOUNDSELECTED &quot;lt-selected&quot;
+-FIRESOUND &quot;lt-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 60
+-END;
+
+Added: trunk/netpanzer/units/profiles/Bobcat.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Bobcat.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Bobcat.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  200;
++attack =  30;
++reload =  20;
++range =  11;
++regen =  20;
++defend_range =  8;
++speed_rate =  20;
++speed_factor =  4;
++image =  &quot;pics/menus/vehicleSelectionView/bobcat.bmp&quot;
++bodysprite =  &quot;units/pics/pak/BobcHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/BobcHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/BobcTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/BobcTSSD.pak&quot;
++soundselected =  &quot;lt-selected&quot;
++soundfire =  &quot;lt-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  60
+
+Deleted: trunk/netpanzer/units/profiles/Drake.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Drake.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Drake.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS       300;
+-ATTACK_FACTOR   180;
+-RELOAD_TIME      50;
+-RANGE_MAX        31;
+-REGEN_TIME       55;
+-DEFEND_RANGE     24;
+-SPEED_RATE       16;
+-SPEED_FACTOR      2;
+-IMAGE &quot;pics/menus/vehicleSelectionView/drake.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/DrakHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/DrakHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/DrakTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/DrakTSSD.pak&quot;
+-SOUNDSELECTED &quot;ht-selected&quot;
+-FIRESOUND &quot;ht-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 60
+-END;
+
+Added: trunk/netpanzer/units/profiles/Drake.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Drake.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Drake.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  300;
++attack =  180;
++reload =  50;
++range =  31;
++regen =  55;
++defend_range =  24;
++speed_rate =  16;
++speed_factor =  2;
++image =  &quot;pics/menus/vehicleSelectionView/drake.bmp&quot;
++bodysprite =  &quot;units/pics/pak/DrakHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/DrakHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/DrakTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/DrakTSSD.pak&quot;
++soundselected =  &quot;ht-selected&quot;
++soundfire =  &quot;ht-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  60
+
+Deleted: trunk/netpanzer/units/profiles/Manta.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Manta.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Manta.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS       350;
+-ATTACK_FACTOR    50;
+-RELOAD_TIME      35;
+-RANGE_MAX        15;
+-REGEN_TIME       30;
+-DEFEND_RANGE     12;
+-SPEED_RATE       20;
+-SPEED_FACTOR      4;
+-IMAGE &quot;pics/menus/vehicleSelectionView/manta.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/MantHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/MantHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/MantTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/MantTSSD.pak&quot;
+-SOUNDSELECTED &quot;lt-selected&quot;
+-FIRESOUND &quot;lt-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 40
+-END;
+
+Added: trunk/netpanzer/units/profiles/Manta.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Manta.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Manta.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  350;
++attack =  50;
++reload =  35;
++range =  15;
++regen =  30;
++defend_range =  12;
++speed_rate =  20;
++speed_factor =  4;
++image =  &quot;pics/menus/vehicleSelectionView/manta.bmp&quot;
++bodysprite =  &quot;units/pics/pak/MantHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/MantHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/MantTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/MantTSSD.pak&quot;
++soundselected =  &quot;lt-selected&quot;
++soundfire =  &quot;lt-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  40
+
+Deleted: trunk/netpanzer/units/profiles/Panther1.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Panther1.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Panther1.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS       525;
+-ATTACK_FACTOR    80;
+-RELOAD_TIME      50;
+-RANGE_MAX        20;
+-REGEN_TIME       45;
+-DEFEND_RANGE     15;
+-SPEED_RATE       18;
+-SPEED_FACTOR      2;
+-IMAGE &quot;pics/menus/vehicleSelectionView/panther1.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/PantHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/PantHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/PantTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/PantTSSD.pak&quot;
+-SOUNDSELECTED &quot;mt-selected&quot;
+-FIRESOUND &quot;mt-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 50
+-END;
+
+Added: trunk/netpanzer/units/profiles/Panther1.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Panther1.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Panther1.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  525;
++attack =  80;
++reload =  50;
++range =  20;
++regen =  45;
++defend_range =  15;
++speed_rate =  18;
++speed_factor =  2;
++image =  &quot;pics/menus/vehicleSelectionView/panther1.bmp&quot;
++bodysprite =  &quot;units/pics/pak/PantHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/PantHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/PantTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/PantTSSD.pak&quot;
++soundselected =  &quot;mt-selected&quot;
++soundfire =  &quot;mt-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  50
+
+Deleted: trunk/netpanzer/units/profiles/SPanzer.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/SPanzer.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/SPanzer.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,20 +0,0 @@
+-HITPOINTS         60;
+-ATTACK_FACTOR     15;
+-RELOAD_TIME       20;
+-RANGE_MAX         10;
+-REGEN_TIME        20;
+-DEFEND_RANGE       8;
+-SPEED_RATE        22;
+-SPEED_FACTOR       4;
+-IMAGE &quot;pics/menus/vehicleSelectionView/scout.bmp&quot;;
+-BODYSPRITE &quot;units/pics/pak/SpahHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/SpahHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/SpahTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/SpahTSSD.pak&quot;
+-SOUNDSELECTED &quot;yessir&quot;
+-FIRESOUND &quot;lt-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 40
+-END; 
+-
+-
+
+Added: trunk/netpanzer/units/profiles/SPanzer.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/SPanzer.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/SPanzer.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  60;
++attack =  15;
++reload =  20;
++range =  10;
++regen =  20;
++defend_range =  8;
++speed_rate =  22;
++speed_factor =  4;
++image =  &quot;pics/menus/vehicleSelectionView/scout.bmp&quot;;
++bodysprite =  &quot;units/pics/pak/SpahHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/SpahHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/SpahTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/SpahTSSD.pak&quot;
++soundselected =  &quot;yessir&quot;
++soundfire =  &quot;lt-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  40
+
+Deleted: trunk/netpanzer/units/profiles/Scout.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Scout.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Scout.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,15 +0,0 @@
+-HITPOINTS         25;
+-DAMAGE_FACTOR      0;
+-ATTACK_FACTOR      5;
+-RELOAD_TIME       20;
+-REACTION_TIME      8;
+-RANGE_MAX      90000;
+-REGEN_TIME      25;
+-DEFEND_RANGE   54000;
+-SPEED_RATE        18;
+-SPEED_FACTOR       4;
+-REPATH_TIME       20;
+-FUEL_CAPACITY  10000;
+-END; 
+-
+-
+
+Added: trunk/netpanzer/units/profiles/Scout.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Scout.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Scout.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,8 @@
++hitpoints =  25;
++attack =  5;
++reload =  20;
++range =  90000;
++regen =  25;
++defend_range =  54000;
++speed_rate =  18;
++speed_factor =  4;
+
+Deleted: trunk/netpanzer/units/profiles/Stinger.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Stinger.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Stinger.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS       100;
+-ATTACK_FACTOR   200;
+-RELOAD_TIME     100;
+-RANGE_MAX        40;
+-REGEN_TIME       80;
+-DEFEND_RANGE     97;
+-SPEED_RATE       18;
+-SPEED_FACTOR      2;
+-IMAGE &quot;pics/menus/vehicleSelectionView/stinger.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/StinHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/StinHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/StinTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/StinTSSD.pak&quot;
+-SOUNDSELECTED &quot;mu-selected&quot;
+-FIRESOUND &quot;mu-fire&quot;
+-WEAPON &quot;QUADMISSILE&quot;
+-BOUNDBOX 40
+-END;
+
+Added: trunk/netpanzer/units/profiles/Stinger.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Stinger.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Stinger.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  100;
++attack =  200;
++reload =  100;
++range =  40;
++regen =  80;
++defend_range =  97;
++speed_rate =  18;
++speed_factor =  2;
++image =  &quot;pics/menus/vehicleSelectionView/stinger.bmp&quot;
++bodysprite =  &quot;units/pics/pak/StinHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/StinHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/StinTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/StinTSSD.pak&quot;
++soundselected =  &quot;mu-selected&quot;
++soundfire =  &quot;mu-fire&quot;
++weapon =  &quot;QUADMISSILE&quot;
++boundbox =  40
+
+Deleted: trunk/netpanzer/units/profiles/Titan.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Titan.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Titan.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS      1300;
+-ATTACK_FACTOR   140;
+-RELOAD_TIME      60;
+-RANGE_MAX        31;
+-REGEN_TIME       60;
+-DEFEND_RANGE     28;
+-SPEED_RATE       16;
+-SPEED_FACTOR      2;
+-IMAGE &quot;pics/menus/vehicleSelectionView/titan.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/TitaHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/TitaHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/TitaTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/TitaTSSD.pak&quot;
+-SOUNDSELECTED &quot;ht-selected&quot;
+-FIRESOUND &quot;ht-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 60
+-END;
+
+Added: trunk/netpanzer/units/profiles/Titan.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Titan.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Titan.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  1300;
++attack =  140;
++reload =  60;
++range =  31;
++regen =  60;
++defend_range =  28;
++speed_rate =  16;
++speed_factor =  2;
++image =  &quot;pics/menus/vehicleSelectionView/titan.bmp&quot;
++bodysprite =  &quot;units/pics/pak/TitaHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/TitaHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/TitaTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/TitaTSSD.pak&quot;
++soundselected =  &quot;ht-selected&quot;
++soundfire =  &quot;ht-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  60
+
+Deleted: trunk/netpanzer/units/profiles/Wolf.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Wolf.pfl	2011-11-20 10:15:11 UTC (rev 1289)
++++ trunk/netpanzer/units/profiles/Wolf.pfl	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -1,18 +0,0 @@
+-HITPOINTS      175;
+-ATTACK_FACTOR   60;
+-RELOAD_TIME     40;
+-RANGE_MAX       31;
+-REGEN_TIME      50;
+-DEFEND_RANGE    24;
+-SPEED_RATE      20;
+-SPEED_FACTOR     4;
+-IMAGE &quot;pics/menus/vehicleSelectionView/wolf.bmp&quot;
+-BODYSPRITE &quot;units/pics/pak/WolfHNSD.pak&quot;
+-BODYSHADOW &quot;units/pics/pak/WolfHSSD.pak&quot;
+-TURRETSPRITE &quot;units/pics/pak/WolfTNSD.pak&quot;
+-TURRETSHADOW &quot;units/pics/pak/WolfTSSD.pak&quot;
+-SOUNDSELECTED &quot;lt-selected&quot;
+-FIRESOUND &quot;lt-fire&quot;
+-WEAPON &quot;SHELL&quot;
+-BOUNDBOX 60
+-END;
+
+Added: trunk/netpanzer/units/profiles/Wolf.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/Wolf.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Wolf.upf	2011-11-20 13:57:10 UTC (rev 1290)
+@@ -0,0 +1,17 @@
++hitpoints =  175;
++attack =  60;
++reload =  40;
++range =  31;
++regen =  50;
++defend_range =  24;
++speed_rate =  20;
++speed_factor =  4;
++image =  &quot;pics/menus/vehicleSelectionView/wolf.bmp&quot;
++bodysprite =  &quot;units/pics/pak/WolfHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/WolfHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/WolfTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/WolfTSSD.pak&quot;
++soundselected =  &quot;lt-selected&quot;
++soundfire =  &quot;lt-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  60
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000315.html">[Netpanzer-cvs] r1289 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts src/NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000317.html">[Netpanzer-cvs] r1291 - in trunk/netpanzer: src/NetPanzer/Resources	units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#316">[ date ]</a>
+              <a href="thread.html#316">[ thread ]</a>
+              <a href="subject.html#316">[ subject ]</a>
+              <a href="author.html#316">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

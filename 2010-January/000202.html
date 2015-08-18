@@ -1,0 +1,484 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1174 - in trunk/netpanzer: pics/particles/lights	scripts src/Lib/2D src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1174%20-%20in%20trunk/netpanzer%3A%20pics/particles/lights%0A%09scripts%20src/Lib/2D%20src/NetPanzer/Views/Game&In-Reply-To=%3C201001131724.o0DHOvTl030023%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000201.html">
+   <LINK REL="Next"  HREF="000203.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1174 - in trunk/netpanzer: pics/particles/lights	scripts src/Lib/2D src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1174%20-%20in%20trunk/netpanzer%3A%20pics/particles/lights%0A%09scripts%20src/Lib/2D%20src/NetPanzer/Views/Game&In-Reply-To=%3C201001131724.o0DHOvTl030023%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1174 - in trunk/netpanzer: pics/particles/lights	scripts src/Lib/2D src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jan 13 18:24:57 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000201.html">[Netpanzer-cvs] r1173 - in trunk/netpanzer: . pics pics/default	pics/particles/clouds pics/particles/craters	pics/particles/explosion pics/particles/lights	pics/particles/missles pics/particles/puff	pics/particles/shells powerups scripts src/Lib/2D	src/NetPanzer/PowerUps src/NetPanzer/Units	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Weapons units/pics
+</A></li>
+        <LI>Next message: <A HREF="000203.html">[Netpanzer-cvs] r1175 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#202">[ date ]</a>
+              <a href="thread.html#202">[ thread ]</a>
+              <a href="subject.html#202">[ subject ]</a>
+              <a href="author.html#202">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-13 18:24:44 +0100 (Wed, 13 Jan 2010)
+New Revision: 1174
+
+Modified:
+   trunk/netpanzer/pics/particles/lights/flash2.png
+   trunk/netpanzer/scripts/particles.lcfg
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+- The sprite images are converted to video format on loading.
+- In particles.lcfg can add a alpha=value to force that alpha transparency on the image
+- Removed extra space on Rank view
+
+
+Modified: trunk/netpanzer/pics/particles/lights/flash2.png
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/scripts/particles.lcfg
+===================================================================
+--- trunk/netpanzer/scripts/particles.lcfg	2010-01-12 17:44:40 UTC (rev 1173)
++++ trunk/netpanzer/scripts/particles.lcfg	2010-01-13 17:24:44 UTC (rev 1174)
+@@ -1,80 +1,82 @@
+ -- clouds: required, single file
+ 
+-clouds = { &quot;pics/particles/clouds/clouds.png&quot;, 300, 300, 10, colorkey=0 }
++clouds = { &quot;pics/particles/clouds/clouds.png&quot;, 300, 300, 10, alpha=128 }
+ flash  = { &quot;pics/particles/lights/flash2.png&quot;, 240, 194, 20 }
+-chunks = { &quot;pics/particles/chunks/groundChunks.png&quot;, 2, 2, 256, colorkey=true }
+-craters= { &quot;pics/particles/craters/craters.png&quot;, 32, 32, 3, colorkey=true }
++--flash  = { &quot;pics/particles/lights/flash3.png&quot;, 256, 256, 17 }
++--flash  = { &quot;pics/particles/lights/flash5.png&quot;, 240, 194, 20 }
++chunks = { &quot;pics/particles/chunks/groundChunks.png&quot;, 2, 2, 256, alpha=128 }
++craters= { &quot;pics/particles/craters/craters.png&quot;, 32, 32, 3, alpha=255 }
+ 
+ -- puffs is required, must have: light, dark and dirt
+ -- format is file_name, width, height, num_frames
+ 
+ lightpuffs = 
+ {
+-    { &quot;pics/particles/puff/smokeLightPuff0004.png&quot;,  4,  4, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0008.png&quot;,  8,  8, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0012.png&quot;, 12, 12, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0016.png&quot;, 16, 16, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0020.png&quot;, 20, 20, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0024.png&quot;, 24, 24, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0028.png&quot;, 28, 28, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0032.png&quot;, 32, 32, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0036.png&quot;, 36, 36, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0040.png&quot;, 40, 40, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0044.png&quot;, 44, 44, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeLightPuff0048.png&quot;, 48, 48, 26, colorkey=true },
++    { &quot;pics/particles/puff/smokeLightPuff0004.png&quot;,  4,  4, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0008.png&quot;,  8,  8, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0012.png&quot;, 12, 12, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0016.png&quot;, 16, 16, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0020.png&quot;, 20, 20, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0024.png&quot;, 24, 24, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0028.png&quot;, 28, 28, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0032.png&quot;, 32, 32, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0036.png&quot;, 36, 36, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0040.png&quot;, 40, 40, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0044.png&quot;, 44, 44, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeLightPuff0048.png&quot;, 48, 48, 26, alpha=128 },
+ }
+     
+ darkpuffs =
+ {
+-    { &quot;pics/particles/puff/smokeDarkPuff0004.png&quot;,  4,  4, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0008.png&quot;,  8,  8, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0012.png&quot;, 12, 12, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0016.png&quot;, 16, 16, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0020.png&quot;, 20, 20, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0024.png&quot;, 24, 24, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0028.png&quot;, 28, 28, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0032.png&quot;, 32, 32, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0036.png&quot;, 36, 36, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0040.png&quot;, 40, 40, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0044.png&quot;, 44, 44, 26, colorkey=true },
+-    { &quot;pics/particles/puff/smokeDarkPuff0048.png&quot;, 48, 48, 26, colorkey=true }
++    { &quot;pics/particles/puff/smokeDarkPuff0004.png&quot;,  4,  4, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0008.png&quot;,  8,  8, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0012.png&quot;, 12, 12, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0016.png&quot;, 16, 16, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0020.png&quot;, 20, 20, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0024.png&quot;, 24, 24, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0028.png&quot;, 28, 28, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0032.png&quot;, 32, 32, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0036.png&quot;, 36, 36, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0040.png&quot;, 40, 40, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0044.png&quot;, 44, 44, 26, alpha=128 },
++    { &quot;pics/particles/puff/smokeDarkPuff0048.png&quot;, 48, 48, 26, alpha=128 }
+ }
+     
+ dirtpuffs =
+ {
+-    { &quot;pics/particles/puff/dirtPuff0004.png&quot;,  4,  4, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0008.png&quot;,  8,  8, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0012.png&quot;, 12, 12, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0016.png&quot;, 16, 16, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0020.png&quot;, 20, 20, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0024.png&quot;, 24, 24, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0028.png&quot;, 28, 28, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0032.png&quot;, 32, 32, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0036.png&quot;, 36, 36, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0040.png&quot;, 40, 40, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0044.png&quot;, 44, 44, 26, colorkey=true },
+-    { &quot;pics/particles/puff/dirtPuff0048.png&quot;, 48, 48, 26, colorkey=true }
++    { &quot;pics/particles/puff/dirtPuff0004.png&quot;,  4,  4, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0008.png&quot;,  8,  8, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0012.png&quot;, 12, 12, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0016.png&quot;, 16, 16, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0020.png&quot;, 20, 20, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0024.png&quot;, 24, 24, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0028.png&quot;, 28, 28, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0032.png&quot;, 32, 32, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0036.png&quot;, 36, 36, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0040.png&quot;, 40, 40, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0044.png&quot;, 44, 44, 26, alpha=128 },
++    { &quot;pics/particles/puff/dirtPuff0048.png&quot;, 48, 48, 26, alpha=128 }
+ }
+ 
+ explosions =
+ {
+     {
+-        { &quot;pics/particles/explosion/explosion0_0001.png&quot;, 13, 18, 16, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion0_0002.png&quot;, 27, 36, 16, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion0_0003.png&quot;, 41, 54, 16, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion0_0004.png&quot;, 54, 73, 16, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion0_0005.png&quot;, 68, 91, 16, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion0_0006.png&quot;, 82, 109, 16, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion0_0007.png&quot;, 96, 128, 16, colorkey=true }
++        { &quot;pics/particles/explosion/explosion0_0001.png&quot;, 13, 18, 16 },
++        { &quot;pics/particles/explosion/explosion0_0002.png&quot;, 27, 36, 16 },
++        { &quot;pics/particles/explosion/explosion0_0003.png&quot;, 41, 54, 16 },
++        { &quot;pics/particles/explosion/explosion0_0004.png&quot;, 54, 73, 16 },
++        { &quot;pics/particles/explosion/explosion0_0005.png&quot;, 68, 91, 16 },
++        { &quot;pics/particles/explosion/explosion0_0006.png&quot;, 82, 109, 16 },
++        { &quot;pics/particles/explosion/explosion0_0007.png&quot;, 96, 128, 16 }
+     },
+     
+     {
+-        { &quot;pics/particles/explosion/explosion1_0001.png&quot;, 18, 13, 15, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion1_0002.png&quot;, 36, 27, 15, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion1_0003.png&quot;, 54, 41, 15, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion1_0004.png&quot;, 73, 54, 15, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion1_0005.png&quot;, 91, 68, 15, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion1_0006.png&quot;, 109, 82, 15, colorkey=true },
+-        { &quot;pics/particles/explosion/explosion1_0007.png&quot;, 128, 96, 15, colorkey=true }
++        { &quot;pics/particles/explosion/explosion1_0001.png&quot;, 18, 13, 15 },
++        { &quot;pics/particles/explosion/explosion1_0002.png&quot;, 36, 27, 15 },
++        { &quot;pics/particles/explosion/explosion1_0003.png&quot;, 54, 41, 15 },
++        { &quot;pics/particles/explosion/explosion1_0004.png&quot;, 73, 54, 15 },
++        { &quot;pics/particles/explosion/explosion1_0005.png&quot;, 91, 68, 15 },
++        { &quot;pics/particles/explosion/explosion1_0006.png&quot;, 109, 82, 15 },
++        { &quot;pics/particles/explosion/explosion1_0007.png&quot;, 128, 96, 15 }
+     }
+ }
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-12 17:44:40 UTC (rev 1173)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-13 17:24:44 UTC (rev 1174)
+@@ -177,34 +177,16 @@
+ //          otherwise false is returned.
+ //---------------------------------------------------------------------------
+ void
+-Surface::alloc(unsigned int w, unsigned int h, int nframes, int bpp, bool alpha)
++Surface::alloc(unsigned int w, unsigned int h, int nframes, int bpp)
+ {
+     assert(this != 0);
+ 
+     freeFrames();
+-    Uint32 Rmask = 0;
+-    Uint32 Gmask = 0;
+-    Uint32 Bmask = 0;
+-    Uint32 Amask = 0;
+-    if ( alpha )
+-    {
+-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+-        Rmask = 0x000000FF;
+-        Gmask = 0x0000FF00;
+-        Bmask = 0x00FF0000;
+-        Amask = 0xFF000000;
+-#else
+-        Rmask = 0xFF000000;
+-        Gmask = 0x00FF0000;
+-        Bmask = 0x0000FF00;
+-        Amask = 0x000000FF;
+-#endif
+-    }
+     
+     frames.resize(nframes);
+     for ( int n = 0; n &lt; nframes; ++n )
+     {
+-        frames[n] = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, bpp, Rmask, Gmask, Bmask, Amask);
++        frames[n] = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, bpp, 0, 0, 0, 0);
+         if ( bpp == 8 )
+         {
+             SDL_SetColors(frames[n], Palette::color, 0, 256);
+@@ -917,61 +899,102 @@
+ }
+ 
+ void
+-Surface::loadPNGSheet(const char * fileName, int width, int height, int count)
++Surface::loadPNGSheet(const char * fileName, int width, int height, int count,
++                      bool has_alpha, int alpha)
+ {
+     Surface t;
+     t.loadPNG(fileName);
+ 
+-    Uint32 orig_flags = t.frames[0]-&gt;flags;
+-
+-    SDL_Color colorkey;
+-    Uint32 orig_colorkey;
+-    bool has_colorkey = orig_flags &amp; SDL_SRCCOLORKEY;
+-
+-    if ( has_colorkey )
++    SDL_Surface * orig = t.frames[0];
++    if ( SDL_MUSTLOCK(orig) )
+     {
+-        orig_colorkey = t.frames[0]-&gt;format-&gt;colorkey;
+-        SDL_GetRGB(orig_colorkey, t.frames[0]-&gt;format,
+-                                        &amp;colorkey.r, &amp;colorkey.g, &amp;colorkey.b);
+-
+-        SDL_SetColorKey(t.frames[0],0,0);
++        SDL_LockSurface(orig);
+     }
+ 
+-    Uint8 orig_alpha;
+-    bool has_alpha = orig_flags &amp; SDL_SRCALPHA;
+-    if ( has_alpha )
+-    {
+-        orig_alpha = t.frames[0]-&gt;format-&gt;alpha;
+-        t.frames[0]-&gt;flags &amp;= ~SDL_SRCALPHA;
+-    }
+ 
+-    alloc(width, height, count, 32, has_alpha);
++    freeFrames();
++    frames.resize(count);
+ 
+-    SDL_Rect r = {0, 0, width, height};
++    SDL_Surface *temp = 0;
++    int cur_x = 0;
++    int cur_y = 0;
+ 
+     for ( int n = 0; n &lt; count; ++n )
+     {
+-        SDL_BlitSurface(t.frames[0], &amp;r, frames[n], 0);
+-        if ( has_colorkey )
++        temp = SDL_CreateRGBSurfaceFrom((Uint8*)orig-&gt;pixels
++                                         + (cur_x * orig-&gt;format-&gt;BytesPerPixel)
++                                         + (cur_y * orig-&gt;pitch),
++                                        width, height,
++                                        orig-&gt;format-&gt;BitsPerPixel,
++                                        orig-&gt;pitch,
++                                        orig-&gt;format-&gt;Rmask,
++                                        orig-&gt;format-&gt;Gmask,
++                                        orig-&gt;format-&gt;Bmask,
++                                        orig-&gt;format-&gt;Amask);
++
++        if ( orig-&gt;flags &amp; SDL_SRCCOLORKEY )
+         {
+-            SDL_SetColorKey(frames[n], SDL_SRCCOLORKEY|SDL_RLEACCELOK,
+-                    SDL_MapRGB(frames[n]-&gt;format, colorkey.r, colorkey.g, colorkey.b));
++            SDL_SetColorKey(temp,
++                            orig-&gt;flags&amp;(SDL_SRCCOLORKEY|SDL_RLEACCELOK),
++                            orig-&gt;format-&gt;colorkey);
+         }
+ 
+-        if ( has_alpha )
++        if ( orig-&gt;flags &amp; SDL_SRCALPHA )
+         {
+-            SDL_SetAlpha(frames[n], SDL_SRCALPHA|SDL_RLEACCELOK, orig_alpha);
++            SDL_SetAlpha(temp,
++                         orig-&gt;flags&amp;(SDL_SRCALPHA|SDL_RLEACCELOK),
++                         orig-&gt;format-&gt;alpha);
+         }
+ 
+-        r.x += width;
+-        if ( r.x &gt;= t.frames[0]-&gt;w )
++//        temp-&gt;format-&gt;colorkey = orig-&gt;format-&gt;colorkey;
++//        temp-&gt;format-&gt;alpha = orig-&gt;format-&gt;alpha;
++        temp-&gt;format-&gt;palette = orig-&gt;format-&gt;palette;
++
++
++
++//        temp-&gt;flags |= (orig-&gt;flags &amp; ( SDL_SRCCOLORKEY | SDL_RLEACCEL
++//                                      | SDL_RLEACCELOK  | SDL_SRCALPHA) );
++
++        // XXX not checking for null
++        if ( ! (temp-&gt;flags &amp; SDL_SRCALPHA) )
+         {
+-            r.x = 0;
+-            r.y += height;
++            if ( has_alpha )
++            {
++                SDL_SetAlpha(temp, SDL_SRCALPHA|SDL_RLEACCELOK, alpha);
++            }
++            frames[n] = SDL_DisplayFormat(temp);
+         }
++        else
++        {
++            if ( has_alpha )
++            {
++                SDL_SetAlpha(temp, SDL_SRCALPHA|SDL_RLEACCELOK, alpha);
++            }
++            frames[n] = SDL_DisplayFormatAlpha(temp);
++        }
++
++        temp-&gt;format-&gt;palette = NULL;
++
++        SDL_FreeSurface(temp);
++
++        cur_x += width;
++        if ( cur_x &gt;= orig-&gt;w )
++        {
++            cur_x = 0;
++            cur_y += height;
++        }
+     }
+ 
+-    // we don't recover the old image as it is deleted now.
++    cur_frame = frames[0];
++    twidth = width;
++    theight= height;
++    tpitch = frames[0]-&gt;pitch;
++    Surface::mem        = (Uint8*)cur_frame-&gt;pixels;
++
++    if ( SDL_MUSTLOCK(orig) )
++    {
++        SDL_UnlockSurface(orig);
++    }
+ }
+ // drawButtonBorder
+ //---------------------------------------------------------------------------
+@@ -1224,6 +1247,16 @@
+     lua_rawgeti(L, -3, 3); // height
+     lua_rawgeti(L, -4, 4); // nframes
+ 
++    bool has_alpha = false;
++    int alpha = 255;
++    lua_getfield(L, -5, &quot;alpha&quot;);
++    if ( ! lua_isnil(L, -1) )
++    {
++        has_alpha = true;
++        alpha = lua_tointeger(L, -1);
++    }
++    lua_pop(L, 1);
++
+     if ( ! *dest )
+     {
+         *dest = new Surface();
+@@ -1232,7 +1265,9 @@
+     (*dest)-&gt;loadPNGSheet( lua_tostring(L, -4),
+                           lua_tointeger(L, -3),
+                           lua_tointeger(L, -2),
+-                          lua_tointeger(L, -1));
++                          lua_tointeger(L, -1),
++                          has_alpha,
++                          alpha);
+ 
+     lua_pop(L, 4);
+ 
+@@ -1241,7 +1276,7 @@
+ //    {
+ //        (*dest)-&gt;setColorkey();
+ //    }
+-//    lua_pop(L,-1);
++//    lua_pop(L, 1);
+ 
+     (*dest)-&gt;setOffsetCenter();
+     return 0;
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-12 17:44:40 UTC (rev 1173)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-13 17:24:44 UTC (rev 1174)
+@@ -173,7 +173,8 @@
+ 
+     void loadBMP(const char *fileName);
+     void loadPNG(const char *fileName);
+-    void loadPNGSheet(const char * fileName, int width, int height, int count);
++    void loadPNGSheet(const char * fileName, int width, int height, int count,
++                      bool has_alpha=false, int alpha=255);
+ 
+     void drawBoxCorners(const iRect &amp;rect, int cornerLength, IntColor color);
+     void drawBoxCorners(const iXY &amp;min, const iXY &amp;max,
+@@ -211,7 +212,7 @@
+     SDL_Surface * cur_frame;
+     Uint8   *mem;       // Pointer to upperleft most pixel
+ 
+-    void alloc(unsigned int w, unsigned int h, int nframes, int bpp, bool alpha=false);
++    void alloc(unsigned int w, unsigned int h, int nframes, int bpp);
+ 
+     inline Uint32 *pixPtr(const unsigned int x, const unsigned int y) const
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-12 17:44:40 UTC (rev 1173)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-13 17:24:44 UTC (rev 1174)
+@@ -91,7 +91,7 @@
+     unsigned int CHAR_YPIX = Surface::getFontHeight();
+     unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
+     unsigned int entryheight = std::max(CHAR_YPIX, flagHeight) + 2;
+-    unsigned int newheight = 60 + entryheight * PlayerInterface::countPlayers();
++    unsigned int newheight = 60 + (entryheight * (PlayerInterface::countPlayers()-1));
+     
+     if ( newheight != (unsigned int)clientRect.getSizeY() ) {
+         resize(iXY(450+20, newheight));
+@@ -176,7 +176,7 @@
+                 &quot;%-20s%5i%7i%7i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+-        drawStringShadowed(offset.x, offset.y, statBuf, state-&gt;getColor(), Color::gray64);
++        drawStringShadowed(offset.x, offset.y, statBuf, Color::white, Color::gray64);
+         
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         drawImage( *flag, flagOffset.x, flagOffset.y );
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000201.html">[Netpanzer-cvs] r1173 - in trunk/netpanzer: . pics pics/default	pics/particles/clouds pics/particles/craters	pics/particles/explosion pics/particles/lights	pics/particles/missles pics/particles/puff	pics/particles/shells powerups scripts src/Lib/2D	src/NetPanzer/PowerUps src/NetPanzer/Units	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Weapons units/pics
+</A></li>
+	<LI>Next message: <A HREF="000203.html">[Netpanzer-cvs] r1175 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#202">[ date ]</a>
+              <a href="thread.html#202">[ thread ]</a>
+              <a href="subject.html#202">[ subject ]</a>
+              <a href="author.html#202">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

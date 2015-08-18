@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r973 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Particles
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r973%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Particles&In-Reply-To=%3C200705260620.l4Q6KoF1030983%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000019.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r973 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Particles</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r973%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Particles&In-Reply-To=%3C200705260620.l4Q6KoF1030983%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r973 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Particles">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat May 26 08:20:50 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000019.html">[Netpanzer-cvs] r974 - branches
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-05-26 08:20:49 +0200 (Sat, 26 May 2007)
+New Revision: 973
+
+Modified:
+   trunk/netpanzer/configure.ac
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+Log:
+Added locking of surfaces
+
+Modified: trunk/netpanzer/configure.ac
+===================================================================
+--- trunk/netpanzer/configure.ac	2007-05-23 14:24:24 UTC (rev 972)
++++ trunk/netpanzer/configure.ac	2007-05-26 06:20:49 UTC (rev 973)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [svn-r972], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [svn], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2007-05-23 14:24:24 UTC (rev 972)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2007-05-26 06:20:49 UTC (rev 973)
+@@ -62,6 +62,9 @@
+     void setOffsetY(int oy)     { offset.y = oy; }
+     void setFPS(int f)          { fps = f; }
+     void setOffsetCenter();
++    
++    void lockFrame() { if ( SDL_MUSTLOCK(thisFrame) ) SDL_LockSurface(thisFrame); }
++    void unlockFrame() { if ( SDL_MUSTLOCK(thisFrame) ) SDL_UnlockSurface(thisFrame); }
+ 
+     // Accessor functions.
+     unsigned int getWidth()  const { return thisFrame-&gt;w; }
+@@ -86,7 +89,7 @@
+     Uint8 * getMem() const
+     { 
+         if ( ! thisFrame-&gt;pixels )
+-            throw Exception(&quot;Surface::getMem() Error, surface must be locked&quot;);
++            assert(&quot;Surface::getMem() Error, surface must be locked&quot;==0);
+         return (PIX *)thisFrame-&gt;pixels;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2007-05-23 14:24:24 UTC (rev 972)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2007-05-26 06:20:49 UTC (rev 973)
+@@ -598,11 +598,12 @@
+ 
+     memset(muzzleTips, 0, sizeof(iXY) * 36);
+     float saveframe=source.getCurFrame();
+-
++    int i;
+     // Frame 0 - 8
+-    {for (int  i = 0; i &lt; 9; i++)
++    for (int  i = 0; i &lt; 9; i++)
+         {
+             source.setFrame(i);
++            source.lockFrame();
+ 
+             for (unsigned int offset = 0; offset &lt; source.getCenterX(); offset++) {
+                 int yy = offset;
+@@ -614,6 +615,7 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+ 
+@@ -626,19 +628,22 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+             }
+ 
+             done = false;
+-        }}
++            source.unlockFrame();
++        }
+ 
+     done = false;
+ 
+     // Frame 9 - 17
+-    {for (int i = 9; i &lt; 18; i++)
++    for (i = 9; i &lt; 18; i++)
+         {
+             source.setFrame(i);
++            source.lockFrame();
+ 
+             for (unsigned int offset = 0; offset &lt; source.getCenterX(); offset++) {
+                 int yy = offset;
+@@ -650,6 +655,7 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+ 
+@@ -662,19 +668,22 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+             }
+ 
+             done = false;
+-        }}
++            source.unlockFrame();
++        }
+ 
+     done = false;
+ 
+     // Frame 18 - 26
+-    {for (int i = 18; i &lt; 27; i++)
++    for (i = 18; i &lt; 27; i++)
+         {
+             source.setFrame(i);
++            source.lockFrame();
+ 
+             for (unsigned int offset = 0; offset &lt; source.getCenterX(); offset++) {
+                 int yy = source.getHeight() - 1 - offset;
+@@ -686,6 +695,7 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+ 
+@@ -698,19 +708,22 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+             }
+ 
+             done = false;
+-        }}
++            source.unlockFrame();
++        }
+ 
+     done = false;
+ 
+     // Frame 27 - 35
+-    {for (int i = 27; i &lt; 36; i++)
++    for (i = 27; i &lt; 36; i++)
+         {
+             source.setFrame(i);
++            source.lockFrame();
+ 
+             for (unsigned int offset = 0; offset &lt; source.getCenterX(); offset++) {
+                 int yy = source.getHeight() - 1 - offset;
+@@ -722,6 +735,7 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+ 
+@@ -734,12 +748,14 @@
+                 }
+ 
+                 if (done) {
++                    source.unlockFrame();
+                     break;
+                 }
+             }
+ 
+             done = false;
+-        }}
++            source.unlockFrame();
++        }
+         
+     
+     source.setFrame(saveframe);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000019.html">[Netpanzer-cvs] r974 - branches
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

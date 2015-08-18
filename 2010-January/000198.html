@@ -1,0 +1,358 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1170 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1170%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts&In-Reply-To=%3C201001100547.o0A5lArY017844%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000197.html">
+   <LINK REL="Next"  HREF="000199.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1170 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1170%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts&In-Reply-To=%3C201001100547.o0A5lArY017844%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1170 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 10 06:47:10 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000197.html">[Netpanzer-cvs] r1169 - in trunk/netpanzer: . scripts	src/NetPanzer/Scripts
+</A></li>
+        <LI>Next message: <A HREF="000199.html">[Netpanzer-cvs] r1171 - in trunk/netpanzer: scripts	src/NetPanzer/Particles src/NetPanzer/Units src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#198">[ date ]</a>
+              <a href="thread.html#198">[ thread ]</a>
+              <a href="subject.html#198">[ subject ]</a>
+              <a href="author.html#198">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-10 06:46:53 +0100 (Sun, 10 Jan 2010)
+New Revision: 1170
+
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+Log:
+- configuration is saved using a lua function, it saves also custom values (not only the netpanzer defined values), usefull for script only values. The file format is consistent, example:
+
+video.width = 800
+mymod.something.secret.ultra = &quot;myultrasecret&quot;
+
+The needed tables are created if doesn't exists.
+
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2010-01-10 03:10:05 UTC (rev 1169)
++++ trunk/netpanzer/scripts/initialize.lua	2010-01-10 05:46:53 UTC (rev 1170)
+@@ -3,10 +3,6 @@
+ LOGGER:log(&quot;Video Config: &quot; .. config.video.width .. &quot; x &quot; .. config.video.height)
+ LOGGER:log(&quot;Fullscreen: &quot; .. tostring(config.video.fullscreen))
+ 
+-config.morethings = 4
+-
+-config.master = { master1=&quot;one&quot;, master2=&quot;two&quot;}
+-
+ function pairs(t)
+     local mt = getmetatable(t)
+     local iter = mt and mt.__next or next
+@@ -15,8 +11,9 @@
+ 
+ function dump_table(result, t, extra)
+     local lin = extra or &quot;&quot;
++
+     if type(t) ~= 'table' then
+-        print('You fucker, give ma table')
++        LOGGER:log(&quot;ERROR dumping table: it is not a table&quot;)
+         return
+     end
+ 	for key,value in pairs(t) do
+@@ -26,22 +23,19 @@
+ 	    elseif type(value) == 'string' then
+ 	        value = string.gsub(value,'&quot;','\\&quot;')
+ 	        table.insert(result, lin .. key .. &quot; = \&quot;&quot; .. value .. &quot;\&quot;&quot;);
+-		    --print(lin .. key .. &quot; = \&quot;&quot; .. value .. &quot;\&quot;&quot;)
+-	    else
+-	        table.insert(result, lin .. key .. &quot; = &quot; .. tostring(value))
+-		    --print(lin .. key .. &quot; = &quot; .. tostring(value))
++	    elseif type(value) ~= 'function' then
++	        table.insert(result, lin .. key .. &quot; = &quot; .. tostring(value));
+ 		end
+ 	end
+ end
+ 
+---for k,v in pairs(config.video) do
+---    print(k .. &quot; = &quot; .. tostring(v))
+---end
++gconcat = table.concat;
+ 
+-result={}
+-dump_table(result, config)
++config.dump = function(table)
++    result = {}
++    dump_table(result, table)
++    return gconcat(result,&quot;\n&quot;);
++end
+ 
+---table.sort(result)
++LOGGER:log(&quot;Dumping conf:\n&quot; .. config.dump(config))
+ 
+-print(table.concat(result,&quot;\n&quot;))
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-10 03:10:05 UTC (rev 1169)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-10 05:46:53 UTC (rev 1170)
+@@ -283,7 +283,7 @@
+ 
+ void GameConfig::loadConfig()
+ {
+-    ScriptManager::runFileInTable(&quot;config/config.cfg&quot;, &quot;config&quot;);
++    ScriptManager::loadConfigFile(&quot;config/config.cfg&quot;, &quot;config&quot;);
+ 
+     INI::Store inifile;
+     if(usePhysFS) {
+@@ -385,22 +385,6 @@
+ 
+ void GameConfig::saveConfig()
+ {
+-    {
+-        OFileStream out(&quot;config/config.cfg&quot;);
+-        out &lt;&lt; &quot;-- Beware this file is overwritten each time netpanzer exits&quot; &lt;&lt; std::endl;
+-        out &lt;&lt; &quot;video.width = &quot; &lt;&lt; video_width &lt;&lt; std::endl;
+-        out &lt;&lt; &quot;video.height = &quot; &lt;&lt; video_height &lt;&lt; std::endl;
+-        out &lt;&lt; &quot;video.fullscreen = &quot; &lt;&lt; WRITE_BOOL(video_fullscreen) &lt;&lt; std::endl;
+-        out &lt;&lt; &quot;video.hardwaresurface = &quot; &lt;&lt; WRITE_BOOL(video_hardwaresurface) &lt;&lt; std::endl;
+-        out &lt;&lt; &quot;video.doublebuffer = &quot; &lt;&lt; WRITE_BOOL(video_doublebuffer) &lt;&lt; std::endl;
+-        out &lt;&lt; &quot;video.shadows = &quot; &lt;&lt; WRITE_BOOL(video_shadows) &lt;&lt; std::endl;
+-        out &lt;&lt; &quot;video.blendsmoke = &quot; &lt;&lt; WRITE_BOOL(video_blendsmoke) &lt;&lt; std::endl;
+-#ifdef _WIN32
+-        out &lt;&lt; &quot;video.usedirectx = &quot; &lt;&lt; WRITE_BOOL(video_usedirectx) &lt;&lt; std::endl;
+-#endif
+-
+-//        out &lt;&lt; &quot;video. = &quot; &lt;&lt; WRITE_BOOL(video_) &lt;&lt; std::endl;
+-    }
+     INI::Store inifile;
+ 
+     saveSettings(inifile.getSection(&quot;game&quot;), gamesettings);
+@@ -419,6 +403,45 @@
+         std::ofstream out(configfile.c_str());
+         inifile.save(out);
+     }
++
++    lua_State *L = ScriptManager::getLuavm();
++        
++    lua_getglobal(L,&quot;config&quot;);
++    if ( ! lua_istable(L, -1) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, config doesn't exits.&quot;);
++        return;
++    }
++    
++    lua_pushliteral(L, &quot;dump&quot;);
++    lua_rawget(L, -2);
++    if ( ! lua_isfunction(L, -1) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, config.dump function doesn't exits.&quot;);
++        lua_pop(L, 2);
++        return;
++    }
++
++    lua_pushvalue(L, -2);
++    lua_remove(L, -3);
++    
++    if ( lua_pcall(L, 1, 1, 0) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, Lua error: '%s'&quot;, lua_tostring(L, -1));
++        lua_pop(L, 1);
++        return;
++    }
++    
++    if ( ! lua_isstring(L, -1) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, dump result is not a string.&quot;);
++        lua_pop(L, 1);
++        return;
++    }
++    
++    OFileStream out(&quot;config/config.cfg&quot;);
++    out &lt;&lt; lua_tostring(L, -1) &lt;&lt; std::endl;
++    lua_pop(L, 1);
+ }
+ 
+ void GameConfig::saveSettings(INI::Section&amp; section,
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-10 03:10:05 UTC (rev 1169)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-10 05:46:53 UTC (rev 1170)
+@@ -213,3 +213,35 @@
+     lua_pushnil(L);
+     return 1;
+ }
++
++int
++ScriptHelper::autotable_indexhandler(lua_State* L)
++{
++    // stack has mtable, index
++    lua_pushvalue(L, 2);
++    // stack has mtable, index, index
++    lua_rawget(L, 1);
++    // stack has mtable, index, result
++    if ( lua_isnil(L, -1) )
++    {
++        lua_pop(L, 1);
++        // stack has mtable, index
++        lua_createtable(L,0,0);
++        // stack has mtable, index, ntable
++        lua_pushvalue(L, -1);
++        // stack has mtable, index, ntable, ntable
++        lua_insert(L, 2);
++        // stack has mtable, ntable, index, ntable
++        lua_rawset(L, 1);
++        // stack has mtable, ntable
++        lua_createtable(L, 0, 1);
++        // stack has mtable, ntable, meta
++        lua_pushliteral(L, &quot;__index&quot;);
++        lua_pushcfunction(L, autotable_indexhandler);
++        lua_rawset(L, -3);
++        // stack has mtable, ntable, meta
++        lua_setmetatable(L, -2);
++        // stack has mtable, ntable
++    }
++    return 1;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2010-01-10 03:10:05 UTC (rev 1169)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2010-01-10 05:46:53 UTC (rev 1170)
+@@ -68,6 +68,7 @@
+     static int index_handler (lua_State *L);
+     static int newindex_handler (lua_State *L);
+     static int next_handler(lua_State *L);
++    static int autotable_indexhandler(lua_State *L);
+ };
+ 
+ #endif	/* _SCRIPTHELPER_HPP */
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-10 03:10:05 UTC (rev 1169)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-10 05:46:53 UTC (rev 1170)
+@@ -255,7 +255,61 @@
+     }
+ }
+ 
++void
++ScriptManager::loadConfigFile(const char * filename, const char * table)
++{
++    int r = luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
++    if ( r )
++    {
++        LOGGER.warning(&quot;Error in loadConfigFile: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,1);
++        return;
++    }
+ 
++    lua_getglobal(luavm, table);
++    if ( ! lua_istable(luavm, -1) )
++    {
++        lua_pop(luavm,1);
++        lua_createtable(luavm, 6, 0);
++        lua_pushvalue(luavm, -1);
++        lua_setglobal(luavm, table);
++    }
++
++    // stack: file, table
++
++    if ( ! lua_getmetatable(luavm, -1) )
++    {
++        lua_createtable(luavm, 0, 1);
++    }
++
++    // stack: file, table, metatable
++
++    lua_pushliteral(luavm, &quot;__index&quot;);
++    lua_pushcfunction(luavm, ScriptHelper::autotable_indexhandler);
++    lua_rawset(luavm, -3);
++
++    // stack: file, table, metatable(with __index)
++
++    lua_setmetatable(luavm, -2);
++
++    // stack: file, table
++
++    if ( ! lua_setfenv(luavm, -2) )
++    {
++        LOGGER.warning(&quot;Error in loadConfigFile: can't set environment.&quot;);
++        lua_pop(luavm,2);
++        return;
++    }
++
++    // stack: file
++
++    if ( lua_pcall(luavm, 0, 0, 0) )
++    {
++        LOGGER.warning(&quot;Error in loadConfigFile: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,1);
++    }
++}
++
+ void
+ ScriptManager::bindStaticVariables(const char * objectName,
+                                    const char * fieldName,
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-01-10 03:10:05 UTC (rev 1169)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-01-10 05:46:53 UTC (rev 1170)
+@@ -43,6 +43,7 @@
+     static void runFile(const char * runname, const char * filename);
+ 
+     static void runFileInTable(const char * filename, const char * table);
++    static void loadConfigFile(const char * filename, const char * table);
+ 
+     static lua_State* getLuavm() { return luavm; }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000197.html">[Netpanzer-cvs] r1169 - in trunk/netpanzer: . scripts	src/NetPanzer/Scripts
+</A></li>
+	<LI>Next message: <A HREF="000199.html">[Netpanzer-cvs] r1171 - in trunk/netpanzer: scripts	src/NetPanzer/Particles src/NetPanzer/Units src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#198">[ date ]</a>
+              <a href="thread.html#198">[ thread ]</a>
+              <a href="subject.html#198">[ subject ]</a>
+              <a href="author.html#198">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

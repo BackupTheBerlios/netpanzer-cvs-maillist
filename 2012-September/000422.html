@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1398 - in trunk/netpanzer/src/NetPanzer: Actions	Classes Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1398%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Actions%0A%09Classes%20Views/Components%20Views/Game&In-Reply-To=%3C20120905163229.58E6255B10%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000421.html">
+   <LINK REL="Next"  HREF="000423.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1398 - in trunk/netpanzer/src/NetPanzer: Actions	Classes Views/Components Views/Game</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1398%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Actions%0A%09Classes%20Views/Components%20Views/Game&In-Reply-To=%3C20120905163229.58E6255B10%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1398 - in trunk/netpanzer/src/NetPanzer: Actions	Classes Views/Components Views/Game">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Wed Sep  5 18:32:29 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000421.html">[Netpanzer-cvs] r1397 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+        <LI>Next message: <A HREF="000423.html">[Netpanzer-cvs] r1399 -	trunk/netpanzer/src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#422">[ date ]</a>
+              <a href="thread.html#422">[ thread ]</a>
+              <a href="subject.html#422">[ subject ]</a>
+              <a href="author.html#422">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-05 18:32:28 +0200 (Wed, 05 Sep 2012)
+New Revision: 1398
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Actions/ChatPageDownAction.hpp
+   trunk/netpanzer/src/NetPanzer/Actions/ChatPageUpAction.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+Log:
+Q&amp;D page up and down for the chat view.
+
+Modified: trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp	2012-09-05 13:58:21 UTC (rev 1397)
++++ trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -22,6 +22,8 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;HideViewAction.hpp&quot;
+ #include &quot;DisconnectAction.hpp&quot;
++#include &quot;ChatPageUpAction.hpp&quot;
++#include &quot;ChatPageDownAction.hpp&quot;
+ 
+ void ActionManager::addGUIActions()
+ {
+@@ -39,4 +41,7 @@
+     addAction(&quot;hide_confirmexit&quot;, new HideViewAction(&quot;AreYouSureExitView&quot;));
+     addAction(&quot;hide_confirmdisconnect&quot;, new HideViewAction(&quot;AreYouSureResignView&quot;));
+     
++    addAction(&quot;chat_pgup&quot;, new ChatPageUpAction());
++    addAction(&quot;chat_pgdown&quot;, new ChatPageDownAction());
++    
+ }
+\ No newline at end of file
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/ChatPageDownAction.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ChatPageDownAction.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/ChatPageDownAction.hpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -0,0 +1,60 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * Created on September 5, 2012, 11:58 PM
++ */
++
++#ifndef CHATPAGEDOWNACTION_HPP
++#define	CHATPAGEDOWNACTION_HPP
++
++#include &quot;Action.hpp&quot;
++#include &quot;Views/Game/ChatView.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Components/tChatBox.hpp&quot;
++#include &quot;Views/Components/tVScrollBar.hpp&quot;
++
++#include &lt;algorithm&gt;
++
++class ChatPageDownAction : public Action
++{
++public:
++    ChatPageDownAction() : Action(true) {}
++    void execute()
++    {
++        ChatView *v = (ChatView*)Desktop::getView(&quot;ChatView&quot;);
++        if ( v )
++        {
++            tChatBox * cbox = v-&gt;getChatBox();
++            if ( ! cbox )
++            {
++                return;
++            }
++            
++            tVScrollBar * sbar = cbox-&gt;getVscrollBar();
++            if ( ! sbar )
++            {
++                return;
++            }
++
++            int new_pos = std::min(sbar-&gt;getMax(), sbar-&gt;getPosition() + cbox-&gt;getNumVisibleLines());
++            sbar-&gt;setPosition(new_pos);
++        }
++    }
++};
++
++#endif	/* CHATPAGEDOWNACTION_HPP */
++
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/ChatPageUpAction.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ChatPageUpAction.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/ChatPageUpAction.hpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -0,0 +1,60 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * Created on September 5, 2012, 11:53 PM
++ */
++
++#ifndef CHATPAGEUPACTION_HPP
++#define	CHATPAGEUPACTION_HPP
++
++#include &quot;Action.hpp&quot;
++#include &quot;Views/Game/ChatView.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Components/tChatBox.hpp&quot;
++#include &quot;Views/Components/tVScrollBar.hpp&quot;
++
++#include &lt;algorithm&gt;
++
++class ChatPageUpAction : public Action
++{
++public:
++    ChatPageUpAction() : Action(true) {}
++    void execute()
++    {
++        ChatView *v = (ChatView*)Desktop::getView(&quot;ChatView&quot;);
++        if ( v )
++        {
++            tChatBox * cbox = v-&gt;getChatBox();
++            if ( ! cbox )
++            {
++                return;
++            }
++            
++            tVScrollBar * sbar = cbox-&gt;getVscrollBar();
++            if ( ! sbar )
++            {
++                return;
++            }
++            
++            int new_pos = std::max(sbar-&gt;getMin(), sbar-&gt;getPosition() - cbox-&gt;getNumVisibleLines());
++            sbar-&gt;setPosition(new_pos);
++        }
++    }
++};
++
++#endif	/* CHATPAGEUPACTION_HPP */
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-05 13:58:21 UTC (rev 1397)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -60,6 +60,7 @@
+ 
+ #include &quot;Scripts/ScriptManager.hpp&quot;
+ #include &quot;Views/Game/ChatView.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ WorldInputCmdProcessor COMMAND_PROCESSOR;
+ 
+@@ -435,6 +436,18 @@
+     {
+     	WorldViewInterface::scroll_left( 15 );
+     }
++    
++    if ( KeyboardInterface::getKeyPressed( SDLK_PAGEUP ) )
++    {
++        ActionManager::runAction(&quot;chat_pgup&quot;);
++    }
++    
++    if ( KeyboardInterface::getKeyPressed( SDLK_PAGEDOWN ) )
++    {
++        ActionManager::runAction(&quot;chat_pgdown&quot;);
++    }
++    
++    
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	2012-09-05 13:58:21 UTC (rev 1397)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -23,6 +23,7 @@
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+ #include &quot;SDL.h&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ #ifdef WIN32
+     #include &lt;windows.h&gt;
+@@ -225,6 +226,14 @@
+             cursor_pos = text.length();
+             fixCursorPos();
+             break;
++            
++        case SDLK_PAGEUP:
++            ActionManager::runAction(&quot;chat_pgup&quot;);
++            break;
++            
++        case SDLK_PAGEDOWN:
++            ActionManager::runAction(&quot;chat_pgdown&quot;);
++            break;
+ 
+         default:
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-05 13:58:21 UTC (rev 1397)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -76,6 +76,8 @@
+         callback = newcallback;
+     }
+     virtual void setVscrollBar(tVScrollBar *newVScrollBar);
++    tVScrollBar * getVscrollBar() { return VScrollBar; }
++    
+     virtual void setHscrollBar(tHScrollBar *newHScrollBar);
+     virtual void stateChanged(Component* source);
+     virtual int getMaxItemWidth(int Index);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp	2012-09-05 13:58:21 UTC (rev 1397)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -244,6 +244,8 @@
+         RisePos = ((Position-Min) * (size.y-(bSize*3))) / R+1; // XXX / R+1 or (R+1) it is different...
+     }
+     dirty = true;
++    
++    if(callback) callback-&gt;stateChanged(this);
+ }
+ 
+ void tVScrollBar::setMax(int newMax)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-05 13:58:21 UTC (rev 1397)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-05 16:32:28 UTC (rev 1398)
+@@ -65,6 +65,8 @@
+     
+     void switchChatMode();
+     
++    tChatBox * getChatBox() { return ChatList; }
++    
+ };
+ 
+ #endif
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000421.html">[Netpanzer-cvs] r1397 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+	<LI>Next message: <A HREF="000423.html">[Netpanzer-cvs] r1399 -	trunk/netpanzer/src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#422">[ date ]</a>
+              <a href="thread.html#422">[ thread ]</a>
+              <a href="subject.html#422">[ subject ]</a>
+              <a href="author.html#422">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

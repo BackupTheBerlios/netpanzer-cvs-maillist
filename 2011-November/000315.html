@@ -1,0 +1,708 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1289 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts src/NetPanzer/Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1289%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%20src/NetPanzer/Units&In-Reply-To=%3C20111120101511.C07CD481531%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000314.html">
+   <LINK REL="Next"  HREF="000316.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1289 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts src/NetPanzer/Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1289%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%20src/NetPanzer/Units&In-Reply-To=%3C20111120101511.C07CD481531%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1289 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts src/NetPanzer/Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 20 11:15:11 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000314.html">[Netpanzer-cvs] r1288 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000316.html">[Netpanzer-cvs] r1290 - in trunk/netpanzer: src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#315">[ date ]</a>
+              <a href="thread.html#315">[ thread ]</a>
+              <a href="subject.html#315">[ subject ]</a>
+              <a href="author.html#315">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-11-20 11:15:11 +0100 (Sun, 20 Nov 2011)
+New Revision: 1289
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp
+Log:
+New: Unit profiles are sync at every map change, previously you could set the parameter but you had to restart the server to activate it.
+
+New: command &quot;listprofiles&quot; will list the unit profiles available in the server, similar to &quot;listmaps&quot;
+
+fix: listing several things now show all data, for example: listcommands, listmaps, listplayers(this one improved), listprofiles
+
+fix: If the user input a wrong unit profile list, the server would crash because no profiles were loaded. Now in case of failure we put the unit profiles to the default list and try again, if it fails again, then it is the end of the world as we know it. With this fix we can reset the profile list by writing something invalid, like &quot;/server unitprofiles .&quot; and it will reset to default at the next map change.
+
+fix: now when the players respawn, it will update its unitspawnlist, previously only new players could get the changes after issuing &quot;/server unitspawnlist 1 2 3&quot;
+
+fix: when swiching map the &quot;admin&quot; players losed their powers.
+
+
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -1,3 +1,23 @@
++local splitsay = function(player, prefix, tbl)
++    local s = &quot;&quot;;
++    local i = 0;
++    while ( i &lt; #tbl )
++    do
++        i = i + 1;
++        if ( #s + #tbl[i] &gt; 80 ) then
++            netpanzer.serversayto(player, prefix .. s);
++            s = tbl[i];
++        else
++            if ( #s &gt; 0 ) then s = s .. ',' end
++            s = s .. tbl[i];
++        end
++    end
++
++    if ( #s &gt; 0 ) then
++        netpanzer.serversayto(player, prefix .. s);
++    end
++end;
++
+ ServerCommands =
+ {
+     say_help = &quot;Says something to all players as server.&quot;,
+@@ -9,8 +29,14 @@
+ 
+     listplayers_help = &quot;List the players with their Id&quot;,
+     listplayers = function(param, player)
+-        if param then
+-            netpanzer.serversayto(player, &quot;List of players:&quot; .. netpanzer.listplayers());
++        netpanzer.serversayto(player, 'Listing players:');
++        local players = netpanzer.listplayers();
++        local i = 0;
++        while ( i &lt; #players )
++        do
++            i = i + 1;
++            local p = players[i];
++            netpanzer.serversayto(player, p.id .. &quot; - &quot; .. p.name .. &quot; ip: &quot; .. p.ip);
+         end
+     end,
+ 
+@@ -28,22 +54,26 @@
+ 
+     listmaps_help = &quot;List the available maps in server&quot;,
+     listmaps = function(param, player)
+-        netpanzer.serversayto(player, netpanzer.listmaps());
++        netpanzer.serversayto(player, 'Listing maps:');
++        splitsay(player, '', netpanzer.listmaps());
+     end,
+ 
++    listprofiles_help = &quot;List the available unit profiles in server&quot;,
++    listprofiles = function(param, player)
++        netpanzer.serversayto(player, 'Listing profiles:');
++        splitsay(player, '', netpanzer.listprofiles());
++    end,
++
+     listcommands_help = &quot;List the server commands&quot;,
+     listcommands = function(param, player)
+-        local out;
++        netpanzer.serversayto(player, 'Listing commands:');
++        local out = {};
+         for k,v in pairs(ServerCommands) do
+             if type(v) == &quot;function&quot; then
+-                if out then
+-                    out = out .. &quot;, &quot; .. k;
+-                else
+-                    out = k;
+-                end
++                table.insert(out,k);
+             end
+         end
+-        netpanzer.serversayto(player, out);
++        splitsay(player, '', out);
+     end,
+ 
+     _help = &quot;Type /server help &lt;wanted_command&gt; or /server listcommands&quot;,
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -34,12 +34,13 @@
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Views/Game/LoadingView.hpp&quot;
+ 
+-enum { _connect_state_idle,
++enum { _connect_state_idle = 0,
+        _connect_state_waiting_link,
+        _connect_state_waiting_connect_start,
+        _connect_state_waiting_connect_result,
+        _connect_state_wait_for_server_game_setup,
+        _connect_state_setup_client_game,
++       _connect_state_sync_profiles,
+        _connect_state_connect_failure
+      };
+ 
+@@ -182,6 +183,7 @@
+     case  _connect_state_sync_complete : {
+             LoadingView::append( &quot;Game Synchronized&quot; );
+             LoadingView::loadFinish();
++            connection_state = _connect_state_idle;
+         }
+         break;
+     }
+@@ -376,7 +378,7 @@
+                     LoadingView::update( str_buf );
+ 
+                     CLIENT-&gt;sendMessage( &amp;client_game_setup_ack, sizeof(ConnectMesgClientGameSetupAck));
+-                    connection_state = _connect_state_idle;
++                    connection_state = _connect_state_sync_profiles;
+                 } else {
+                     ConnectMesgClientGameSetupPing client_game_setup_ping;
+ 
+@@ -388,6 +390,10 @@
+             break;
+ 
+ 
++        case _connect_state_sync_profiles : {
++                // nothing, will change when sync complete
++            }
++            break;
+         case _connect_state_connect_failure : {
+                 if ( failure_display_timer.count() == true ) {
+                     LoadingView::loadError();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.hpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.hpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -53,6 +53,8 @@
+ 
+     static void serverConnectionBroken();
+ 
++    static bool isIdle() { return ! connection_state; }
++
+ };
+ 
+ #endif // ** _CLIENTCONNECTDAEMON_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -73,8 +73,9 @@
+             break;
+ 
+         case _net_message_class_unit_profile:
++            UnitProfileInterface::processNetMessage(message, packet-&gt;size);
++            if ( ! ClientConnectDaemon::isIdle() )
+             {
+-                UnitProfileInterface::processNetMessage(message, packet-&gt;size);
+                 ConnectMesgClientSendNextUnit msg;
+                 CLIENT-&gt;sendMessage(&amp;msg, sizeof(msg));
+ //                CLIENT-&gt;sendRemaining();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -182,7 +182,7 @@
+     } while (recheck);
+ }
+ 
+-void PlayerState::resetStats()
++void PlayerState::resetStats(bool keepAdmin)
+ {
+     kills  = 0;
+     kill_points = 0;
+@@ -191,7 +191,7 @@
+     total = 0;
+     objectives_held = 0;
+     stats_locked = false;
+-    admin_flag = false;
++    if ( ! keepAdmin ) admin_flag = false;
+ }
+ 
+ void PlayerState::resetAutokick()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -94,7 +94,7 @@
+ 
+     void resetAutokick();
+     bool checkAutokick();
+-    void resetStats();
++    void resetStats(bool keepAdmin);
+     void lockStats();
+     void unlockStats();
+     short getKills() const;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -138,7 +138,7 @@
+ {
+     if ( ! game_unit_profiles )
+     {
+-        game_unit_profiles = new NPString(&quot;Manta, Panther1, Titan, Stinger, Bobcat, Bear, Archer, Wolf, Drake, Spanzer&quot;);
++        game_unit_profiles = new NPString(DEFAULT_UNIT_PROFILES);
+     }
+ 
+     if ( ! game_unit_spawnlist )
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -31,6 +31,8 @@
+ #include &quot;ConfigVariable.hpp&quot;
+ #include &quot;Classes/PlayerUnitConfig.hpp&quot;
+ 
++#define DEFAULT_UNIT_PROFILES &quot;Manta, Panther1, Titan, Stinger, Bobcat, Bear, Archer, Wolf, Drake, Spanzer&quot;
++
+ enum { _mini_map_objective_draw_mode_solid_rect,
+        _mini_map_objective_draw_mode_outline_rect,
+        _mini_map_objective_draw_mode_last
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -42,6 +42,8 @@
+        _map_cycle_server_state_cycle_next_map,
+        _map_cycle_server_state_load_map,
+        _map_cycle_server_state_wait_for_client_map_load,
++       _map_cycle_server_state_load_unit_profiles,
++       _map_cycle_server_state_sync_profiles,
+        _map_cycle_server_state_respawn_players
+      };
+ 
+@@ -74,6 +76,8 @@
+ bool GameControlRulesDaemon::map_cycle_fsm_client_respawn_ack_flag = false;
+ char GameControlRulesDaemon::map_cycle_fsm_client_map_name[256];
+ 
++static unsigned int sync_profile_index = 0;
++
+ //-----------------------------------------------------------------
+ void GameControlRulesDaemon::setStateServerInProgress()
+ {
+@@ -253,7 +257,7 @@
+                 char str_buf[128];
+ 
+                 if ( GameManager::gameMapLoad( &amp;percent_complete ) == false ) {
+-                    map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
++                    map_cycle_fsm_server_state = _map_cycle_server_state_load_unit_profiles;
+                 }
+ 
+                 sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+@@ -264,11 +268,39 @@
+         case _map_cycle_server_state_wait_for_client_map_load : {
+                 if ( map_cycle_fsm_server_map_load_timer.count() ) {
+                     ConsoleInterface::postMessage(Color::white, false, 0, &quot;game started.&quot;);
++                    map_cycle_fsm_server_state = _map_cycle_server_state_load_unit_profiles;
++                }
++            }
++            break;
++
++        case _map_cycle_server_state_load_unit_profiles: {
++                UnitProfileInterface::loadUnitProfiles();
++                Uint8 data[ _MAX_NET_PACKET_SIZE ];
++                NetMessage *pmsg = (NetMessage*)&data;
++                int len = UnitProfileInterface::fillProfileResetMessage(pmsg);
++                SERVER-&gt;broadcastMessage(pmsg, len);
++                sync_profile_index = 0;
++                map_cycle_fsm_server_state = _map_cycle_server_state_sync_profiles;
++            }
++            break;
++
++        case _map_cycle_server_state_sync_profiles : {
++                if ( sync_profile_index &lt;= UnitProfileInterface::getNumUnitTypes() )
++                {
++                    Uint8 data[ _MAX_NET_PACKET_SIZE ];
++                    NetMessage *pmsg = (NetMessage*)&data;
++                    int len = UnitProfileInterface::fillProfileSyncMessage(pmsg, sync_profile_index);
++                    SERVER-&gt;broadcastMessage(pmsg, len);
++                    sync_profile_index++;
++                }
++                if ( sync_profile_index &gt;= UnitProfileInterface::getNumUnitTypes() )
++                {
+                     map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
+                 }
+             }
+             break;
+ 
++
+         case _map_cycle_server_state_respawn_players : {
+                 SystemResetGameLogic reset_game_logic_mesg;
+ 
+@@ -375,6 +407,7 @@
+         {
+             if ( PlayerInterface::testRulePlayerRespawn( &amp;respawn_rule_complete, &amp;player_state ) )
+             {
++                PlayerInterface::resetPlayerUnitConfig( player_state-&gt;getID() );
+                 GameManager::spawnPlayer( player_state-&gt;getID() );
+             }
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -191,7 +191,7 @@
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+         player_lists[ player_id ].setID( player_id );
+-        player_lists[ player_id ].resetStats();
++        player_lists[ player_id ].resetStats(false);
+         player_lists[ player_id ].setStateFree();
+         sprintf( temp_str, &quot;Player %u&quot;, player_id );
+         player_lists[ player_id ].setName( temp_str );
+@@ -210,7 +210,7 @@
+ 
+ void PlayerInterface::reset()
+ {
+-    resetPlayerStats();
++    resetPlayerStats(countPlayers() &gt; 0);
+     resetAllianceMatrix(); // XXX ALLY
+ }
+ 
+@@ -269,14 +269,14 @@
+     SDL_mutexV(mutex);
+ }
+ 
+-void PlayerInterface::resetPlayerStats()
++void PlayerInterface::resetPlayerStats(bool keepAdmin)
+ {
+     PlayerID player_id;
+ 
+     SDL_mutexP(mutex);
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+-        player_lists[ player_id ].resetStats();
++        player_lists[ player_id ].resetStats(keepAdmin);
+     } // ** for
+     SDL_mutexV(mutex);
+ }
+@@ -328,7 +328,7 @@
+         if ( player_lists[ player_id ].isFree() )
+         {
+             player_lists[ player_id ].setStateAllocated();
+-            player_lists[ player_id ].resetStats();
++            player_lists[ player_id ].resetStats(false);
+             player_lists[ player_id ].unit_config.initialize();
+             res = &amp;player_lists[ player_id ];
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -105,7 +105,7 @@
+         return local_player_index;
+     }
+ 
+-    static void resetPlayerStats();
++    static void resetPlayerStats(bool keepAdmin = false);
+ 
+     static int getActivePlayerCount();
+ 
+@@ -116,6 +116,14 @@
+ 
+     static void spawnPlayer( PlayerID player_id, const iXY &amp;location );
+ 
++    static void resetPlayerUnitConfig( PlayerID player_id )
++    {
++        if ( player_id &lt; getMaxPlayers() )
++        {
++            player_lists[player_id].unit_config.initialize();
++        }
++    }
++
+     static bool testRuleScoreLimit( long score_limit, PlayerState ** player_state );
+ 
+     static bool testRuleObjectiveRatio( float precentage, PlayerState ** player_state );
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -96,20 +96,28 @@
+ 
+ static int npmodule_listPlayers (lua_State *L)
+ {
+-    std::stringstream ss(&quot;&quot;);
++    int tindex = 0; // will push ++tindex
++    lua_newtable(L);
+ 
+     for ( int n = 0; n &lt; PlayerInterface::getMaxPlayers(); n++)
+     {
+         PlayerState *p = PlayerInterface::getPlayer(n);
+         if ( ! p-&gt;isFree() )
+         {
+-            ss &lt;&lt; ' ' &lt;&lt; n &lt;&lt; &quot; - &quot;
+-               &lt;&lt; (p-&gt;isAllocated() ? &quot;&lt;preconnect&gt;&quot; : p-&gt;getName())
+-               &lt;&lt; &quot; |&quot;;
++            lua_newtable(L);
++            lua_pushinteger(L, n);
++            lua_setfield(L, -2, &quot;id&quot;);
++
++            lua_pushstring(L, p-&gt;isAllocated() ? &quot;&lt;preconnect&gt;&quot; : p-&gt;getName().c_str());
++            lua_setfield(L, -2, &quot;name&quot;);
++
++            lua_pushstring(L, PlayerInterface::isLocalPlayer(n) ? &quot;local&quot; : SERVER-&gt;getIP(n).c_str());
++            lua_setfield(L, -2, &quot;ip&quot;);
++
++            lua_rawseti(L, -2, ++tindex);
+         }
+     }
+ 
+-    lua_pushstring( L, ss.str().c_str() );
+     return 1;
+ }
+ 
+@@ -143,14 +151,15 @@
+ 
+ static int npmodule_listMaps (lua_State *L)
+ {
+-    std::stringstream ss(&quot;&quot;);
+-
+     const char mapsPath[] = &quot;maps/&quot;;
+ 
+     // scan directory for .npm files
+     std::string suffix = &quot;.npm&quot;;
+     char **list = filesystem::enumerateFiles(mapsPath);
+ 
++    int tindex = 0; // will push ++tindex
++    lua_newtable(L);
++
+     for (char **i = list; *i != NULL; i++)
+     {
+         std::string filename = mapsPath;
+@@ -171,16 +180,57 @@
+                     mapname += c;
+                 }
+ 
+-                ss &lt;&lt; mapname &lt;&lt; ',';
++                lua_pushstring( L, mapname.c_str() );
++                lua_rawseti(L, -2, ++tindex);
+             }
+         }
+     }
+     filesystem::freeList(list);
+ 
+-    lua_pushstring( L, ss.str().c_str() );
+     return 1;
+ }
+ 
++static int npmodule_listProfiles (lua_State *L)
++{
++    const char profilesPath[] = &quot;units/profiles/&quot;;
++
++    // scan directory for .pfl files
++    std::string suffix = &quot;.pfl&quot;;
++    char **list = filesystem::enumerateFiles(profilesPath);
++
++    int tindex = 0; // will push ++tindex
++    lua_newtable(L);
++
++    for (char **i = list; *i != NULL; i++)
++    {
++        std::string filename = profilesPath;
++        filename.append(*i);
++
++        if ( !filesystem::isDirectory(filename.c_str()) )
++        {
++            if ( filename.size() &gt;= suffix.size()
++                &amp;&amp; (filename.compare( filename.size() - suffix.size(),
++                                      suffix.size(), suffix) == 0) )
++            {
++                std::string profilename;
++                size_t p = 0;
++                char c;
++                while( (c = (*i)[p++]) != 0) {
++                    if(c == '.')
++                        break;
++                    profilename += c;
++                }
++
++                lua_pushstring( L, profilename.c_str() );
++                lua_rawseti(L, -2, ++tindex);
++            }
++        }
++    }
++    filesystem::freeList(list);
++
++    return 1;
++}
++
+ static const luaL_Reg npmodule[] =
+ {
+     {&quot;say&quot;,           npmodule_say},
+@@ -193,6 +243,7 @@
+     {&quot;listplayers&quot;,   npmodule_listPlayers},
+     {&quot;map&quot;,           npmodule_map},
+     {&quot;listmaps&quot;,      npmodule_listMaps},
++    {&quot;listprofiles&quot;,  npmodule_listProfiles},
+     {NULL, NULL}
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -36,7 +36,8 @@
+ 
+ enum
+ {
+-    _profile_msg_profile_desc = 0
++    _profile_msg_profile_desc = 0,
++    _profile_msg_reset
+ };
+ 
+ class ByteBufferWriter
+@@ -328,10 +329,8 @@
+     profiles.clear();
+ }
+ 
+-void UnitProfileInterface::loadUnitProfiles( void )
++void UnitProfileInterface::doLoadUnitProfiles()
+ {
+-    clearProfiles();
+-
+     std::vector&lt;NPString&gt; plist;
+     NPString pl = *GameConfig::game_unit_profiles;
+ 
+@@ -341,10 +340,25 @@
+     {
+         addLocalProfile(plist[n]);
+     }
++}
+ 
++void UnitProfileInterface::loadUnitProfiles( void )
++{
++    clearProfiles();
++
++    doLoadUnitProfiles();
++
+     if ( profiles.size() == 0 )
+     {
+-        LOGGER.warning(&quot;Didn't load ANY PROFILE!!! I should die.&quot;);
++        LOGGER.warning(&quot;Error loading profiles provided by user, trying defaults&quot;);
++
++        GameConfig::game_unit_profiles-&gt;assign(DEFAULT_UNIT_PROFILES);
++        doLoadUnitProfiles();
++
++        if ( profiles.size() == 0 )
++        {
++            LOGGER.warning(&quot;Didn't load ANY PROFILE!!! I should die.&quot;);
++        }
+     }
+ //    addLocalProfile(&quot;Manta&quot;);
+ //    addLocalProfile(&quot;Panther1&quot;);
+@@ -437,6 +451,18 @@
+     return bb.writedBytesCount();
+ }
+ 
++int
++UnitProfileInterface::fillProfileResetMessage(NetMessage* message)
++{
++    ByteBufferWriter bb((unsigned char *)message, _MAX_NET_PACKET_SIZE);
++
++    bb.writeInt8( _net_message_class_unit_profile );
++    bb.writeInt8( _profile_msg_reset );
++
++    return bb.writedBytesCount();
++}
++
++
+ UnitProfile *
+ UnitProfileInterface::loadProfileFromMessage(const NetMessage *message, size_t size)
+ {
+@@ -489,6 +515,10 @@
+             handleProfileDescMessage(net_message, size);
+             break;
+ 
++        case _profile_msg_reset:
++            clearProfiles();
++            break;
++
+         default:
+             LOGGER.warning(&quot;Unknown message id in UnitProfileMessage (%d)&quot;,
+                            net_message-&gt;message_id);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp	2011-11-19 20:06:57 UTC (rev 1288)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp	2011-11-20 10:15:11 UTC (rev 1289)
+@@ -66,6 +66,8 @@
+ {
+ protected:
+     static vector&lt;UnitProfile *&gt; profiles;
++
++    static void doLoadUnitProfiles();
+     
+ public:
+     static void clearProfiles();
+@@ -79,6 +81,7 @@
+     }
+ 
+     static int fillProfileSyncMessage(NetMessage* message, int profile_id);
++    static int fillProfileResetMessage(NetMessage* message);
+     static UnitProfile* loadProfileFromMessage(const NetMessage* message, size_t size);
+     static void processNetMessage(const NetMessage* net_message, size_t size);
+     static void handleProfileDescMessage(const NetMessage* net_message, size_t size);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000314.html">[Netpanzer-cvs] r1288 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000316.html">[Netpanzer-cvs] r1290 - in trunk/netpanzer: src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#315">[ date ]</a>
+              <a href="thread.html#315">[ thread ]</a>
+              <a href="subject.html#315">[ subject ]</a>
+              <a href="author.html#315">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

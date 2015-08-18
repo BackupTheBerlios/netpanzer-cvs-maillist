@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1125 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1125%20-%20trunk/netpanzer&In-Reply-To=%3C200906220109.n5M197kx027778%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000153.html">
+   <LINK REL="Next"  HREF="000155.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1125 - trunk/netpanzer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1125%20-%20trunk/netpanzer&In-Reply-To=%3C200906220109.n5M197kx027778%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1125 - trunk/netpanzer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 22 03:09:07 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000153.html">[Netpanzer-cvs] r1124 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000155.html">[Netpanzer-cvs] r1126 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#154">[ date ]</a>
+              <a href="thread.html#154">[ thread ]</a>
+              <a href="subject.html#154">[ subject ]</a>
+              <a href="author.html#154">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-22 03:09:02 +0200 (Mon, 22 Jun 2009)
+New Revision: 1125
+
+Modified:
+   trunk/netpanzer/SConstruct
+Log:
+- fixed compiling on windows
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-06-20 16:41:17 UTC (rev 1124)
++++ trunk/netpanzer/SConstruct	2009-06-22 01:09:02 UTC (rev 1125)
+@@ -218,12 +218,14 @@
+     env.Append( NPLIBS = [ 'SDL_mixer' ] )
+ 
+ # for crossmingw platform
+-crossmingwenv.ParseConfig(env['crossmingwsdlconfig'] + ' --cflags --libs')
+-crossmingwenv.Append( NPLIBS = [ 'SDL_mixer' ] )
++if 'crossmingw' in COMMAND_LINE_TARGETS:
++    crossmingwenv.ParseConfig(env['crossmingwsdlconfig'] + ' --cflags --libs')
++    crossmingwenv.Append( NPLIBS = [ 'SDL_mixer' ] )
+ 
+ # for crosslinux platform
+-crosslinuxenv.ParseConfig(env['crosslinuxsdlconfig'] + ' --cflags --libs')
+-crosslinuxenv.Append( NPLIBS = [ 'SDL_mixer' ] )
++if 'crosslinux' in COMMAND_LINE_TARGETS:
++    crosslinuxenv.ParseConfig(env['crosslinuxsdlconfig'] + ' --cflags --libs')
++    crosslinuxenv.Append( NPLIBS = [ 'SDL_mixer' ] )
+ 
+ ################################################################
+ # Makes libs
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000153.html">[Netpanzer-cvs] r1124 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000155.html">[Netpanzer-cvs] r1126 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#154">[ date ]</a>
+              <a href="thread.html#154">[ thread ]</a>
+              <a href="subject.html#154">[ subject ]</a>
+              <a href="author.html#154">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

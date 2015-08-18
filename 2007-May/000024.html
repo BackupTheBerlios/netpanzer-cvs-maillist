@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r979 - in trunk/netpanzer/src/NetPanzer: Interfaces	System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r979%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Interfaces%0A%09System&In-Reply-To=%3C200705280701.l4S71WhN003496%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000023.html">
+   <LINK REL="Next"  HREF="000025.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r979 - in trunk/netpanzer/src/NetPanzer: Interfaces	System</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r979%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Interfaces%0A%09System&In-Reply-To=%3C200705280701.l4S71WhN003496%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r979 - in trunk/netpanzer/src/NetPanzer: Interfaces	System">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon May 28 09:01:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000023.html">[Netpanzer-cvs] r978 - in branches/netpanzer-0.8/src/NetPanzer:	Interfaces System
+</A></li>
+        <LI>Next message: <A HREF="000025.html">[Netpanzer-cvs] r980 - branches/netpanzer-0.8
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-05-28 09:01:31 +0200 (Mon, 28 May 2007)
+New Revision: 979
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+Log:
+Added config variable usedirectx in windows and enable directx by default (solves slow game with newer SDL)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-05-28 07:00:54 UTC (rev 978)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-05-28 07:01:31 UTC (rev 979)
+@@ -69,6 +69,9 @@
+       displayshadows(&quot;displayshadows&quot;, true),
+       blendsmoke(&quot;blendsmoke&quot;, true),
+       screengamma(&quot;gamma&quot;, 50, 0, 100),
++#ifdef _WIN32
++      usedirectx(&quot;usedirectx&quot;, true),
++#endif
+ 
+       enablesound(&quot;enable&quot;, true),
+       enablemusic(&quot;music&quot;, true),
+@@ -154,6 +157,9 @@
+     visualssettings.push_back(&amp;displayshadows);
+     visualssettings.push_back(&amp;blendsmoke);
+     visualssettings.push_back(&amp;screengamma);
++#ifdef _WIN32
++    visualssettings.push_back(&amp;usedirectx);
++#endif
+ 
+     soundsettings.push_back(&amp;enablesound);
+     soundsettings.push_back(&amp;enablemusic);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2007-05-28 07:00:54 UTC (rev 978)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2007-05-28 07:01:31 UTC (rev 979)
+@@ -146,6 +146,9 @@
+     ConfigBool  displayshadows;
+     ConfigBool  blendsmoke;
+     ConfigInt   screengamma;
++#ifdef _WIN32
++    ConfigBool  usedirectx;
++#endif
+ 
+     // sound settings
+     ConfigBool  enablesound;
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2007-05-28 07:00:54 UTC (rev 978)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2007-05-28 07:01:31 UTC (rev 979)
+@@ -22,12 +22,21 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;SDLVideo.hpp&quot;
++#include &lt;stdlib.h&gt;
++#ifdef _WIN32
++  #include &quot;GameConfig.hpp&quot;
++#endif
+ 
+ SDLVideo* Screen; // get rid of this later...
+ 
+ SDLVideo::SDLVideo()
+         : frontBuffer(0), backBuffer(0)
+ {
++#ifdef _WIN32
++    if ( gameconfig-&gt;usedirectx ) {
++        putenv(&quot;SDL_VIDEODRIVER=directx&quot;);
++    }
++#endif
+     if(SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+         throw Exception(&quot;Couldn't initialize SDL_video subsystem: %s&quot;,
+                 SDL_GetError());
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000023.html">[Netpanzer-cvs] r978 - in branches/netpanzer-0.8/src/NetPanzer:	Interfaces System
+</A></li>
+	<LI>Next message: <A HREF="000025.html">[Netpanzer-cvs] r980 - branches/netpanzer-0.8
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

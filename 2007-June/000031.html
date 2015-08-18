@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r986 -	branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r986%20-%0A%09branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200706051608.l55G8Wsc019710%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000030.html">
+   <LINK REL="Next"  HREF="000032.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r986 -	branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r986%20-%0A%09branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200706051608.l55G8Wsc019710%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r986 -	branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jun  5 18:08:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000030.html">[Netpanzer-cvs] r985 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000032.html">[Netpanzer-cvs] r987 -	branches/netpanzer-0.8/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#31">[ date ]</a>
+              <a href="thread.html#31">[ thread ]</a>
+              <a href="subject.html#31">[ subject ]</a>
+              <a href="author.html#31">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-05 18:08:30 +0200 (Tue, 05 Jun 2007)
+New Revision: 986
+
+Modified:
+   branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+Moved the message &quot;Resolving masterserver address&quot; to ServerListView so it works in all situations and locks the screen surface if needed(was generating errors)
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2007-06-05 16:03:29 UTC (rev 985)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2007-06-05 16:08:30 UTC (rev 986)
+@@ -31,8 +31,6 @@
+ #include &quot;NetworkServer.hpp&quot;
+ #include &quot;Server.hpp&quot;
+ #include &quot;Client.hpp&quot;
+-// XXX ultrahack
+-#include &quot;ScreenSurface.hpp&quot;
+ 
+ static int previousSessionType = _game_session_join;
+ 
+@@ -67,8 +65,6 @@
+ 
+         Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+         Desktop::setVisibility(&quot;ServerListView&quot;, true);
+-        Desktop::draw(*screen); // XXX ultrahack
+-        screen-&gt;copyToVideoFlip(); // XXX uberhack
+         serverlistview-&gt;refresh();
+     }
+ }
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-05 16:03:29 UTC (rev 985)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-05 16:08:30 UTC (rev 986)
+@@ -25,7 +25,11 @@
+ #include &quot;GameViewGlobals.hpp&quot;
+ #include &quot;MasterServer/ServerInfo.hpp&quot;
+ #include &quot;Core/NetworkGlobals.hpp&quot;
++// XXX ultrahack
++#include &quot;ScreenSurface.hpp&quot;
++#include &quot;Desktop.hpp&quot;
+ 
++
+ ServerListView* serverlistview = 0;
+ 
+ ServerListView::ServerListView()
+@@ -65,7 +69,8 @@
+         else
+             delete queryThread;
+     }
+-   
++    queryThread = 0;
++    
+     // don't clear before the delete or after the new, as the thread contains
+     // pointers to the serverlist
+     for(std::vector&lt;masterserver::ServerInfo*&gt;::iterator i = serverlist.begin();
+@@ -73,6 +78,16 @@
+         delete *i;
+     serverlist.clear();
+ 
++    bool mylock = false;
++    if ( ! screen-&gt;getDoesExist() ) {
++        screen-&gt;lock();
++        mylock = true;
++    }
++    Desktop::draw(*screen); // XXX ultrahack
++    if ( mylock )
++        screen-&gt;unlock();
++    screen-&gt;copyToVideoFlip(); // XXX uberhack
++
+     queryThread = new masterserver::ServerQueryThread(&amp;serverlist);   
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000030.html">[Netpanzer-cvs] r985 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000032.html">[Netpanzer-cvs] r987 -	branches/netpanzer-0.8/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#31">[ date ]</a>
+              <a href="thread.html#31">[ thread ]</a>
+              <a href="subject.html#31">[ subject ]</a>
+              <a href="author.html#31">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

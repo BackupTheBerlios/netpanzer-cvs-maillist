@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1302 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Game NetPanzer/Views/MainMenu
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1302%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Views%20NetPanzer/Views/Game%20NetPanzer/Views/MainMenu&In-Reply-To=%3C20111204160541.32BFA48256E%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000327.html">
+   <LINK REL="Next"  HREF="000329.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1302 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Game NetPanzer/Views/MainMenu</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1302%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Views%20NetPanzer/Views/Game%20NetPanzer/Views/MainMenu&In-Reply-To=%3C20111204160541.32BFA48256E%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1302 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Game NetPanzer/Views/MainMenu">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec  4 17:05:40 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000327.html">[Netpanzer-cvs] r1301 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000329.html">[Netpanzer-cvs] r1303 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#328">[ date ]</a>
+              <a href="thread.html#328">[ thread ]</a>
+              <a href="subject.html#328">[ subject ]</a>
+              <a href="author.html#328">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-04 17:05:40 +0100 (Sun, 04 Dec 2011)
+New Revision: 1302
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+Log:
+Modified the transparency of winner window. Modified all the windows to have rounded borders. some little fix on the rounded transparency.
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2011-12-03 21:28:11 UTC (rev 1301)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2011-12-04 16:05:40 UTC (rev 1302)
+@@ -148,12 +148,16 @@
+     
+     blue256.init(256);
+     for (num = 0; num &lt; 256; num++) {
+-        blue256.setColor(num, int(findNearestColor(0,0,color[num].b))); 
++        blue256.setColor(num, int(findNearestColor(0,0,color[num].b)));
+     }
+ 
+     green256.init(256);
+     for (num = 0; num &lt; 256; num++) {
+-        green256.setColor(num, int(findNearestColor(0, color[num].g/1.2, 0))); 
++        // the magic values are for palete color 41
++        int r = abs(color[num].r - 0x1b)/3;
++        int g = abs(color[num].g - 0x3e)/3;
++        int b = abs(color[num].b - 0x21)/3;
++        green256.setColor(num, int(findNearestColor(0x1b + r,0x3e + g,0x21 + b)));
+     }
+     
+     lightorange256.init(256);
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-12-03 21:28:11 UTC (rev 1301)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-12-04 16:05:40 UTC (rev 1302)
+@@ -1830,12 +1830,6 @@
+ 
+ void Surface::BltRoundRect(iRect rect, int radius, const PIX table[])
+ {
+-    int d, y, x;
+-
+-    d = 3 - (2 * radius);
+-    x = 0;
+-    y = radius;
+-
+     if ( !getWidth() || !getHeight() ) return;
+ 
+     orderCoords(rect);
+@@ -1852,25 +1846,31 @@
+     if (rect.max.x &gt;= (int)getWidth())  rect.max.x = getWidth() - 1;
+     if (rect.max.y &gt;= (int)getHeight()) rect.max.y = getHeight() - 1;
+ 
+-    bltLookup(iRect(rect.min.x,rect.min.y+radius+1,
+-                   rect.max.x,rect.max.y-radius), table);
++    bltLookup(iRect(rect.min.x,rect.min.y+radius,
++                   rect.max.x,rect.max.y-radius+1), table);
+ 
+-  while (y &gt;= x)
+-  {
+-    bltHLine((rect.min.x+radius) - y, (rect.min.y+radius) - x,(rect.max.x-radius)+ y, table);//up
+-    bltHLine((rect.min.x+radius) - y, (rect.max.y-radius) + x,(rect.max.x-radius)+ y, table);//down
++    int d = 3 - (2 * radius);
++    int x = 0;
++    int y = radius;
+ 
+-    if (d &lt; 0)
+-      d = d + (4 * x) + 6;
+-    else
++    while (x &lt; y)
+     {
+-      bltHLine((rect.min.x+radius) - x, (rect.min.y+radius) - (y+1),(rect.max.x-radius)+ x, table);//up
+-      bltHLine((rect.min.x+radius) - x, (rect.max.y-radius) +(y+1),(rect.max.x-radius)+ x, table);//down
+-      d = d + 4 * (x - y) + 10;
+-      y--;
++        if (d &lt; 0)
++        {
++            d = d + (4 * x) + 6;
++        }
++        else
++        {
++            bltHLine((rect.min.x+radius) - x, (rect.max.y-radius) + y,(rect.max.x-radius)+ x, table);//down
++            bltHLine((rect.min.x+radius) - x, (rect.min.y+radius) - y,(rect.max.x-radius)+ x, table);//up
++            d = d + 4 * (x - y) + 10;
++            y--;
++        }
++
++        x++;
++        bltHLine((rect.min.x+radius) - y, (rect.min.y+radius) - x,(rect.max.x-radius)+ y, table);//up
++        bltHLine((rect.min.x+radius) - y, (rect.max.y-radius) + x,(rect.max.x-radius)+ y, table);//down
+     }
+-    x++;
+-  }
+ }
+ 
+ void Surface::bltHLine(int x1, int y, int x2, const PIX table[])
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-12-03 21:28:11 UTC (rev 1301)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-12-04 16:05:40 UTC (rev 1302)
+@@ -95,7 +95,7 @@
+     clientArea.BltRoundRect(RectWinner, 14, Palette::green256.getColorArray());
+     clientArea.RoundRect(RectWinner,14, Color::gray);
+     
+-    clientArea.BltRoundRect(RectStates, 14, Palette::brightness256.getColorArray());
++    clientArea.BltRoundRect(RectStates, 14, Palette::darkGray256.getColorArray());
+     clientArea.RoundRect(RectStates, 14, Color::gray);
+     
+     drawPlayerStats(clientArea, flagHeight);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2011-12-03 21:28:11 UTC (rev 1301)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2011-12-04 16:05:40 UTC (rev 1302)
+@@ -69,9 +69,9 @@
+ void bltBlendRect(Surface &amp;dest, const iRect &amp;r)
+ {
+     if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_DARK_GRAY_BLEND) {
+-        dest.bltLookup(r, Palette::darkGray256.getColorArray());
++        dest.BltRoundRect(r, 10, Palette::darkGray256.getColorArray());
+     } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_LIGHT_GRAY_BLEND) {
+-        dest.bltLookup(r, Palette::gray256.getColorArray());
++        dest.BltRoundRect(r, 10, Palette::gray256.getColorArray());
+     } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_SOLID_BLACK) {
+         dest.fillRect(r, Color::black);
+     } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_TRANSPARENT) {}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-12-03 21:28:11 UTC (rev 1301)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-12-04 16:05:40 UTC (rev 1302)
+@@ -183,7 +183,7 @@
+     //setWorldRect();
+     if (Desktop::getVisible(&quot;GameView&quot;)) {
+ 	// When ingame, tint the game into gray
+-        clientArea.bltLookup(getClientRect(), Palette::darkGray256.getColorArray());
++        clientArea.BltRoundRect(getClientRect(), 10, Palette::darkGray256.getColorArray());
+         clientArea.RoundRect(MenuRect, 10, Color::gray);
+         clientArea.drawWindowsBorder();
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000327.html">[Netpanzer-cvs] r1301 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000329.html">[Netpanzer-cvs] r1303 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#328">[ date ]</a>
+              <a href="thread.html#328">[ thread ]</a>
+              <a href="subject.html#328">[ subject ]</a>
+              <a href="author.html#328">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

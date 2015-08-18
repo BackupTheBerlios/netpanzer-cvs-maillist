@@ -1,0 +1,515 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1226 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1226%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units&In-Reply-To=%3C20101111105146.AA6EC480587%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000251.html">
+   <LINK REL="Next"  HREF="000253.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1226 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1226%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units&In-Reply-To=%3C20101111105146.AA6EC480587%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1226 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 11 11:51:46 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000251.html">[Netpanzer-cvs] r1225 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Network Objectives Units
+</A></li>
+        <LI>Next message: <A HREF="000253.html">[Netpanzer-cvs] r1227 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-11-11 11:51:46 +0100 (Thu, 11 Nov 2010)
+New Revision: 1226
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+Log:
+-simplified encoded message handling
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -24,21 +24,11 @@
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;NetworkClient.hpp&quot;
+ 
+-NetMessageEncoder::NetMessageEncoder(bool sendAsClient)
++NetMessageEncoder::NetMessageEncoder()
+ {
+-    this-&gt;sendAsClient = sendAsClient;
+-    usePlayerID = false;
+     resetEncoder();
+ }
+ 
+-NetMessageEncoder::NetMessageEncoder(PlayerID player_index)
+-{
+-    usePlayerID = true;
+-    sendAsClient = false;
+-    player = player_index;
+-    resetEncoder();
+-}
+-
+ NetMessageEncoder::~NetMessageEncoder()
+ {
+ }
+@@ -51,13 +41,11 @@
+     offset = 0;
+ }
+ 
+-void NetMessageEncoder::encodeMessage(NetMessage *message, size_t size)
++bool NetMessageEncoder::encodeMessage(NetMessage *message, size_t size)
+ {
+-    if (offset &gt;= _MULTI_PACKET_LIMIT )
++    if (offset+size &gt; _MULTI_PACKET_LIMIT )
+     {
+-        sendEncodedMessage();
+-
+-        resetEncoder();
++        return false;
+     }
+ 
+     Uint16* mlen = (Uint16*)(encode_message.data + offset);
+@@ -66,31 +54,5 @@
+     memcpy(mlen+1, message, size);
+ 
+     offset += size + 2;
++    return true;
+ }
+-
+-void NetMessageEncoder::sendEncodedMessage()
+-{
+-    if ( offset )
+-    {
+-        size_t size = offset + sizeof(NetMessage);
+-        if(usePlayerID)
+-        {
+-            SERVER-&gt;sendMessage(player, &amp;encode_message, size);
+-        }
+-        else if(sendAsClient)
+-        {
+-            CLIENT-&gt;sendMessage(&amp;encode_message, size);
+-        }
+-        else if(NetworkState::status == _network_state_server)
+-        {
+-            SERVER-&gt;broadcastMessage(&amp;encode_message, size);
+-        }
+-        else
+-        {
+-            CLIENT-&gt;sendMessage(&amp;encode_message, size);
+-        }
+-
+-        resetEncoder();
+-    }
+-}
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -23,20 +23,18 @@
+ class NetMessageEncoder
+ {
+ private:
+-    bool sendAsClient;
+-    bool usePlayerID;
+-    PlayerID player;
+     MultiMessage encode_message;
+     size_t offset;
+ 
+ public:
+-    NetMessageEncoder(bool sendAsClient = false);
+-    NetMessageEncoder(PlayerID player_index);
++    NetMessageEncoder();
+     ~NetMessageEncoder();
+     
+     void resetEncoder();
+-    void encodeMessage(NetMessage *message, size_t size);
+-    void sendEncodedMessage();
++    bool encodeMessage(NetMessage *message, size_t size);
++    const NetMessage* getEncodedMessage() const { return &amp;encode_message; }
++    size_t getEncodedLen() const { return offset + sizeof(NetMessage); }
++    bool isEmpty() const { return offset == 0; }
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -105,7 +105,7 @@
+     clientsocket = 0;
+ }
+ 
+-void NetworkClient::sendMessage(NetMessage* message, size_t size)
++void NetworkClient::sendMessage(const NetMessage* message, size_t size)
+ {
+     if ( !clientsocket )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -50,7 +50,7 @@
+     bool joinServer(const std::string&amp; server_name);
+     void partServer();
+ 
+-    void sendMessage(NetMessage* message, size_t size);
++    void sendMessage(const NetMessage* message, size_t size);
+     void sendRemaining();
+ 
+     bool getPacket(NetPacket *packet);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -130,7 +130,7 @@
+ }
+ 
+ void
+-NetworkServer::broadcastMessage(NetMessage *message, size_t size)
++NetworkServer::broadcastMessage(const NetMessage *message, size_t size)
+ {
+     ClientList::iterator i = client_list.begin();
+     while ( i != client_list.end() )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -68,7 +68,7 @@
+     
+     void closeSession();
+ 
+-    void broadcastMessage(NetMessage *message, size_t size);
++    void broadcastMessage(const NetMessage *message, size_t size);
+     
+     void sendMessage(const PlayerID player_index, NetMessage* message,
+             size_t size);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -771,7 +771,7 @@
+     size_t id_list_size;
+     UnitBase *unit_ptr;
+ 
+-    TerminalUnitCmdRequest comm_mesg;
++    TerminalUnitCmdRequest msg;
+ 
+     id_list_size = working_list.unit_list.size();
+ 
+@@ -781,24 +781,38 @@
+     MapInterface::pointXYtoMapXY( world_pos, &amp;map_pos );
+     matrix.reset( map_pos );
+ 
+-    NetMessageEncoder encoder(true);
++    NetMessageEncoder encoder;
+ 
+-    for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ ) {
++    for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ )
++    {
+         unit_ptr = UnitInterface::getUnit(working_list.unit_list[ id_list_index ]);
+-        if ( unit_ptr != 0 ) {
+-            if ( unit_ptr-&gt;unit_state.select == true ) {
++
++        if ( unit_ptr != 0 )
++        {
++            if ( unit_ptr-&gt;unit_state.select == true )
++            {
+                 matrix.getNextEmptyLoc( &amp;map_pos );
+-                comm_mesg.comm_request.setHeader(unit_ptr-&gt;id,
+-                        _umesg_flag_unique );
++                msg.comm_request.setHeader( unit_ptr-&gt;id,
++                                            _umesg_flag_unique );
+ 
+-                comm_mesg.comm_request.setMoveToLoc( map_pos );
+-                encoder.encodeMessage(&amp;comm_mesg,
+-                        sizeof(TerminalUnitCmdRequest));
++                msg.comm_request.setMoveToLoc( map_pos );
++
++                if ( !encoder.encodeMessage(&amp;msg, sizeof(msg)) )
++                {
++                    CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                                        encoder.getEncodedLen());
++                    encoder.resetEncoder();
++                    encoder.encodeMessage(&amp;msg, sizeof(msg));
++                }
+             }
+         }
+     }
+ 
+-    encoder.sendEncodedMessage();
++    if ( ! encoder.isEmpty() )
++    {
++        CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                            encoder.getEncodedLen());
++    }
+ 
+     //sfx
+     sound-&gt;playUnitSound(working_list.getHeadUnitType() );
+@@ -808,7 +822,7 @@
+ void
+ WorldInputCmdProcessor::sendAttackCommand(const iXY &amp;world_pos)
+ {
+-    TerminalUnitCmdRequest comm_mesg;
++    TerminalUnitCmdRequest msg;
+ 
+     UnitBase *target_ptr;
+ 
+@@ -826,23 +840,35 @@
+         if ( id_list_size == 0 )
+             return;
+ 
+-        NetMessageEncoder encoder(true);
++        NetMessageEncoder encoder;
+ 
+-        for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ ) {
++        for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ )
++        {
+             unit_ptr = UnitInterface::getUnit( working_list.unit_list[ id_list_index ] );
+-            if ( unit_ptr != 0 ) {
+-                if ( unit_ptr-&gt;unit_state.select == true ) {
+-                    comm_mesg.comm_request.setHeader(unit_ptr-&gt;id,
++            if ( unit_ptr != 0 )
++            {
++                if ( unit_ptr-&gt;unit_state.select == true )
++                {
++                    msg.comm_request.setHeader(unit_ptr-&gt;id,
+                             _umesg_flag_unique);
+-                    comm_mesg.comm_request.setTargetUnit(target_ptr-&gt;id);
++                    msg.comm_request.setTargetUnit(target_ptr-&gt;id);
+ 
+-                    encoder.encodeMessage(&amp;comm_mesg,
+-                            sizeof(TerminalUnitCmdRequest));
++                    if ( !encoder.encodeMessage(&amp;msg, sizeof(msg)) )
++                    {
++                        CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                                            encoder.getEncodedLen());
++                        encoder.resetEncoder();
++                        encoder.encodeMessage(&amp;msg, sizeof(msg));
++                    }
+                 }
+             }
+         }
+ 
+-        encoder.sendEncodedMessage();
++        if ( ! encoder.isEmpty() )
++        {
++            CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                                encoder.getEncodedLen());
++        }
+ 
+         //sfx
+         sound-&gt;playSound(&quot;target&quot;);
+@@ -853,7 +879,7 @@
+ WorldInputCmdProcessor::sendManualMoveCommand(unsigned char orientation,
+         bool start_stop)
+ {
+-    TerminalUnitCmdRequest comm_mesg;
++    TerminalUnitCmdRequest msg;
+     size_t id_list_index;
+     size_t id_list_size;
+     UnitBase *unit_ptr;
+@@ -861,33 +887,48 @@
+     if ( working_list.unit_list.size() &gt; 0 ) {
+         id_list_size = working_list.unit_list.size();
+ 
+-        NetMessageEncoder encoder(true);
++        NetMessageEncoder encoder;
+ 
+-        for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ ) {
++        for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ )
++        {
+             unit_ptr = UnitInterface::getUnit( working_list.unit_list[ id_list_index ] );
+             if ( unit_ptr != 0 ) {
+-                if ( unit_ptr-&gt;unit_state.select == true ) {
+-                    comm_mesg.comm_request.setHeader(unit_ptr-&gt;id,
++                if ( unit_ptr-&gt;unit_state.select == true )
++                {
++                    msg.comm_request.setHeader(unit_ptr-&gt;id,
+                             _umesg_flag_unique);
+-                    if ( start_stop == true ) {
+-                        comm_mesg.comm_request.setStartManualMove( orientation );
+-                    } else {
+-                        comm_mesg.comm_request.setStopManualMove();
++                    if ( start_stop == true )
++                    {
++                        msg.comm_request.setStartManualMove( orientation );
+                     }
++                    else
++                    {
++                        msg.comm_request.setStopManualMove();
++                    }
+ 
+-                    encoder.encodeMessage(&amp;comm_mesg,
+-                            sizeof(TerminalUnitCmdRequest) );
++                    if ( !encoder.encodeMessage(&amp;msg, sizeof(msg)) )
++                    {
++                        CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                                            encoder.getEncodedLen());
++                        encoder.resetEncoder();
++                        encoder.encodeMessage(&amp;msg, sizeof(msg));
++                    }
+                 }
+             }
+         }
+-        encoder.sendEncodedMessage();
++
++        if ( ! encoder.isEmpty() )
++        {
++            CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                                encoder.getEncodedLen());
++        }
+     }
+ }
+ 
+ void
+ WorldInputCmdProcessor::sendManualFireCommand(const iXY &amp;world_pos)
+ {
+-    TerminalUnitCmdRequest comm_mesg;
++    TerminalUnitCmdRequest msg;
+ 
+     size_t id_list_index;
+     size_t id_list_size;
+@@ -896,24 +937,33 @@
+     if ( working_list.unit_list.size() &gt; 0 ) {
+         id_list_size = working_list.unit_list.size();
+ 
+-        NetMessageEncoder encoder(true);
++        NetMessageEncoder encoder;
+ 
+         for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ ) {
+             unit_ptr = UnitInterface::getUnit( working_list.unit_list[ id_list_index ] );
+ 
+             if ( unit_ptr != 0 ) {
+                 if ( unit_ptr-&gt;unit_state.select == true ) {
+-                    comm_mesg.comm_request.setHeader(unit_ptr-&gt;id,
++                    msg.comm_request.setHeader(unit_ptr-&gt;id,
+                             _umesg_flag_unique);
+-                    comm_mesg.comm_request.setManualFire(world_pos);
++                    msg.comm_request.setManualFire(world_pos);
+ 
+-                    encoder.encodeMessage(&amp;comm_mesg,
+-                            sizeof(TerminalUnitCmdRequest));
++                    if ( !encoder.encodeMessage(&amp;msg, sizeof(msg)) )
++                    {
++                        CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                                            encoder.getEncodedLen());
++                        encoder.resetEncoder();
++                        encoder.encodeMessage(&amp;msg, sizeof(msg));
++                    }
+                 }
+             }
+         }
+ 
+-        encoder.sendEncodedMessage();
++        if ( ! encoder.isEmpty() )
++        {
++            CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
++                                encoder.getEncodedLen());
++        }
+         
+         // SFX
+         sound-&gt;playSound(&quot;target&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-11-11 10:07:04 UTC (rev 1225)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-11-11 10:51:46 UTC (rev 1226)
+@@ -398,21 +398,34 @@
+ 
+     unit_placement_matrix.reset( location );
+ 
+-    for ( unit_type_index = 0; unit_type_index &lt; UnitProfileInterface::getNumUnitTypes(); unit_type_index++ ) {
++    for ( unit_type_index = 0; unit_type_index &lt; UnitProfileInterface::getNumUnitTypes(); unit_type_index++ )
++    {
+ 
+         unit_spawn_count = unit_config.getSpawnUnitCount( unit_type_index );
+-        for ( unit_spawn_index = 0; unit_spawn_index &lt; unit_spawn_count; unit_spawn_index++ ) {
++        for ( unit_spawn_index = 0; unit_spawn_index &lt; unit_spawn_count; unit_spawn_index++ )
++        {
+             unit_placement_matrix.getNextEmptyLoc( &amp;next_loc );
+             unit = createUnit(unit_type_index, next_loc, player_id);
+-
+-            assert(unit != 0);
+             UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(), unit-&gt;id,
+                     next_loc.x, next_loc.y, unit-&gt;unit_state.unit_type);
+-            encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg));
++
++            if ( !encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg)) )
++            {
++                LOGGER.info(&quot;UnitInterface encoder full, sending and resetting&quot;);
++                SERVER-&gt;broadcastMessage(encoder.getEncodedMessage(),
++                                         encoder.getEncodedLen());
++                encoder.resetEncoder();
++                encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg));
++            }
+         } // ** for unit_spawn_index
+     } // ** for unit_type_index
+ 
+-    encoder.sendEncodedMessage();
++    if ( ! encoder.isEmpty() )
++    {
++        LOGGER.info(&quot;UnitInterface sending remaining&quot;);
++        SERVER-&gt;broadcastMessage(encoder.getEncodedMessage(),
++                                 encoder.getEncodedLen());
++    }
+ }
+ 
+ // ******************************************************************
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000251.html">[Netpanzer-cvs] r1225 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Network Objectives Units
+</A></li>
+	<LI>Next message: <A HREF="000253.html">[Netpanzer-cvs] r1227 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

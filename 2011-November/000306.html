@@ -1,0 +1,323 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1280 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Components	NetPanzer/Views/Game NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1280%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Views%20NetPanzer/Views/Components%0A%09NetPanzer/Views/Game%20NetPanzer/Views/MainMenu%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111112204338.8F551481582%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000305.html">
+   <LINK REL="Next"  HREF="000307.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1280 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Components	NetPanzer/Views/Game NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1280%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Views%20NetPanzer/Views/Components%0A%09NetPanzer/Views/Game%20NetPanzer/Views/MainMenu%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111112204338.8F551481582%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1280 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Components	NetPanzer/Views/Game NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Sat Nov 12 21:43:38 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000305.html">[Netpanzer-cvs] r1279 - in trunk/netpanzer/src/NetPanzer/Views: .	Components MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000307.html">[Netpanzer-cvs] r1281 - trunk/netpanzer/pics/flags
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#306">[ date ]</a>
+              <a href="thread.html#306">[ thread ]</a>
+              <a href="subject.html#306">[ subject ]</a>
+              <a href="author.html#306">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-12 21:43:38 +0100 (Sat, 12 Nov 2011)
+New Revision: 1280
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+Log:
+Add group line
+Change buttons design
+add Separator component
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -1546,10 +1546,11 @@
+     assert(this != 0);
+ 
+     orderCoords(bounds);
+-    drawHLine(bounds.min.x,bounds.min.y,bounds.max.x-1,topLeftColor);
+-    drawVLine(bounds.min.x,bounds.min.y,bounds.max.y-1,topLeftColor);
+-    drawHLine(bounds.min.x,bounds.max.y-1,bounds.max.x-1,bottomRightColor);
+-    drawVLine(bounds.max.x-1,bounds.min.y,bounds.max.y-1,bottomRightColor);
++//    drawHLine(bounds.min.x,bounds.min.y,bounds.max.x-1,topLeftColor);
++//    drawVLine(bounds.min.x,bounds.min.y,bounds.max.y-1,topLeftColor);
++//    drawHLine(bounds.min.x,bounds.max.y-1,bounds.max.x-1,bottomRightColor);
++//    drawVLine(bounds.max.x-1,bounds.min.y,bounds.max.y-1,bottomRightColor);
++    RoundRect(bounds,3, topLeftColor);
+ 
+ } // end Surface::drawButtonBorder
+ 
+@@ -1557,7 +1558,8 @@
+ //--------------------------------------------------------------------------
+ void Surface::drawWindowsBorder()
+ {
+-    drawRect(iRect(0,0,getWidth(),getHeight()), Color::darkGray);
++    //drawRect(iRect(0,0,getWidth(),getHeight()), Color::darkGray);
++    RoundRect(iRect(0,0,getWidth(),getHeight()),8, Color::lightGray);
+ } // end Surface::drawWindowsBorder
+ 
+ // bltStringInBox
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -20,7 +20,7 @@
+ 
+ #include &quot;SDL.h&quot;
+ 
+-#define topLeftBorderColor           (Color::white)
++#define topLeftBorderColor           (Color::lightGray)
+ #define bottomRightBorderColor       (Color::black)
+ 
+ #define componentBodyColor           (Color::terreVerte)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -37,8 +37,6 @@
+     int  maxYOffset;
+     void drawHelpText(Surface &amp;dest, const int &amp;x, const int &amp;y);
+ 
+-    void drawBorder(Surface &amp;windowArea)
+-    {}
+     ScrollBar *scrollBar;
+     std::vector&lt;std::string&gt; text;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -27,13 +27,13 @@
+ #define windowTextColorShadow       (Color::black)
+ #define meterColor                  (Color::terreVerte)
+ #define meterTextColor              (Color::black)
+-#define meterTopLeftBorderColor     (Color::white)
++#define meterTopLeftBorderColor     (Color::lightGray)
+ #define meterBottomRightBorderColor (Color::black)
+ #define viewHeadingColor            (Color::tan)
+ #define meterWidth                  (280)
+ 
+ #define optionsMeterWidth           (148)
+-#define optionsMeterStartX          (120)
++#define optionsMeterStartX          (140)
+ #define optionsColorMeterStartX     (342)
+ 
+ #define ButonWidth                  (155)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -53,8 +53,6 @@
+     {}
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void drawBorder(Surface&amp; )
+-    {}
+     virtual void actionPerformed(mMouseEvent me);
+ 
+     static void updateGameConfigCloudCoverage();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -133,7 +133,6 @@
+         mapList[curMap]-&gt;thumbnail.blt(clientArea, BORDER_SPACE, BORDER_SPACE);
+         drawCurMapInfo(clientArea, iXY(MAP_SIZE + BORDER_SPACE * 2, BORDER_SPACE));
+     }
+-
+     View::doDraw(viewArea, clientArea);
+ 
+ } // end MapSelectionView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -53,8 +53,6 @@
+     ~MapSelectionView();
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void drawBorder(Surface&amp; )
+-    {}
+ 
+     static std::vector&lt;MapInfo*&gt; mapList;
+     static int curMap;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-11 20:44:06 UTC (rev 1279)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-12 20:43:38 UTC (rev 1280)
+@@ -26,6 +26,45 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
+ 
++class Separator:public Component
++{
++public:
++    Separator(int x, int y, int endx, string t, PIX color)
++    {
++        text = t;
++        foreground = color;
++        position.x = x;
++        position.y = y;
++        xend = endx;
++    }
++    
++    void draw(Surface &amp;dest);
++    
++    virtual void render()
++    {
++        // nothing
++    }
++    
++    void actionPerformed(const mMouseEvent &amp;me)
++    {
++        // nothing
++    }
++    
++private:
++    string text;
++    int xend;
++};
++
++void Separator::draw(Surface &amp;dest)
++{    
++    dest.drawLine(position.x, position.y+3, position.x+20, position.y+3, Color::white);
++    dest.drawLine(position.x, position.y+2, position.x+20, position.y+2, Color::black);
++    dest.bltStringShadowed(position.x+25,position.y, text.c_str(),  Color::white, Color::black);
++    int lentxt = 30+dest.getTextLength(text);
++    dest.drawLine(position.x+lentxt, position.y+3, xend, position.y+3, Color::white);
++    dest.drawLine(position.x+lentxt, position.y+2, xend, position.y+2, Color::black);
++}
++
+ static void bIncreaseScrollRate()
+ {
+     if(gameconfig-&gt;scrollrate + 100 &lt;= gameconfig-&gt;scrollrate.getMax())
+@@ -126,6 +165,7 @@
+     //----------------------------------------------------------------------
+     int minWidth = 19 * 8;
+ 
++    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;VISUAL&quot;, Color::white) );
+     y += yOffset;
+     x = xTextStart;
+     checkBoxFullscreen = new CheckBox();
+@@ -198,20 +238,25 @@
+     choiceMiniMapUnitSize-&gt;setMinWidth(minWidth);
+     choiceMiniMapUnitSize-&gt;setStateChangedCallback(this);
+     add(choiceMiniMapUnitSize);
+-    y += yOffset*4;
++    y += yOffset*2;
+    
+ // VISUAL OPTIONS
++    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;INTERFACE&quot;, Color::white) );
+ 
++    y += yOffset;
+     x = xTextStart;
+     add( new Label( x, y+3, &quot;Scroll Rate:&quot;, Color::white) );
+     x += optionsMeterStartX;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseScrollRate);
+     x += optionsMeterWidth + arrowButtonWidth;
+     addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseScrollRate);
+-    y += yOffset*4;
++    y += yOffset*3;
+ 
+ // SOUND OPTIONS
+ 
++    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;SOUND&quot;, Color::white) );
++
++    y += yOffset;
+     x = xTextStart;
+     add( new Label( x, y, &quot;Sound Status:&quot;, Color::white) );
+     checkBoxSoundEnabled = new CheckBox();
+@@ -252,15 +297,6 @@
+     y += yOffset;
+ } // end OptionsTemplateView::initButtons
+ 
+-void Separator(int x, int y, std::string title, Surface &amp;clientArea)
+-{
+-    clientArea.drawLine(bodyTextRect.min.x, y+3, bodyTextRect.min.x+20, y+3, Color::white);
+-    clientArea.drawLine(bodyTextRect.min.x, y+2, bodyTextRect.min.x+20, y+2, Color::black);
+-    clientArea.bltStringShadowed(bodyTextRect.min.x+25,y, title.c_str(),  Color::white, Color::black);
+-    clientArea.drawLine(bodyTextRect.min.x+30+clientArea.getTextLength(title), y+3, bodyTextRect.max.x, y+3, Color::white);
+-    clientArea.drawLine(bodyTextRect.min.x+30+clientArea.getTextLength(title), y+2, bodyTextRect.max.x, y+2, Color::black);
+-}
+-
+ // doDraw
+ //---------------------------------------------------------------------------
+ void OptionsTemplateView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+@@ -283,18 +319,13 @@
+     int   y               = bodyTextRect.min.y ;
+     int yOffset          =  17;
+ 
+-    Separator(bodyTextRect.min.x, y, &quot;VISUAL&quot;, clientArea);
+-    y += yOffset*6;
+-    Separator(bodyTextRect.min.x, y, &quot;INTERFACE&quot;, clientArea);
+-    y += yOffset*2;
++    y += yOffset*7;
+ 
+     sprintf(strBuf, &quot;%d %%&quot;, int((float(getScrollRate()) / 
+                     float(gameconfig-&gt;scrollrate.getMax())) * 100.0f));
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+     tempSurface.blt(clientArea, x, y);
+     y += yOffset*2;
+-
+-    Separator(bodyTextRect.min.x, y, &quot;SOUND&quot;, clientArea);
+     
+     // Sound Volume
+     y += yOffset*3;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000305.html">[Netpanzer-cvs] r1279 - in trunk/netpanzer/src/NetPanzer/Views: .	Components MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000307.html">[Netpanzer-cvs] r1281 - trunk/netpanzer/pics/flags
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#306">[ date ]</a>
+              <a href="thread.html#306">[ thread ]</a>
+              <a href="subject.html#306">[ subject ]</a>
+              <a href="author.html#306">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,707 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1233 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1233%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/Util%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts&In-Reply-To=%3C20110913173142.196E948125B%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000258.html">
+   <LINK REL="Next"  HREF="000260.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1233 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1233%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/Util%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts&In-Reply-To=%3C20110913173142.196E948125B%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1233 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep 13 19:31:41 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000258.html">[Netpanzer-cvs] r1232 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000260.html">[Netpanzer-cvs] r1234 - in trunk/netpanzer:	pics/backgrounds/menus/menu pics/cursors pics/flags scripts	src/Lib/Network src/NetPanzer/Classes/AI	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Views src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#259">[ date ]</a>
+              <a href="thread.html#259">[ thread ]</a>
+              <a href="subject.html#259">[ subject ]</a>
+              <a href="author.html#259">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-09-13 19:31:41 +0200 (Tue, 13 Sep 2011)
+New Revision: 1233
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/scripts/usercommands.lua
+   trunk/netpanzer/src/Lib/Util/NTimer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+Log:
+- Adds wile64 autokick function with some changes:
+  * the configuration is done in config.cfg not in the ini file
+  * the function also works when the player creates a non dedicated server
+  * the kicking has a special message (SystemNetMessage) before had connect, disconnect and drop, now it also has kicked.
+  * the timeout is configurable at run time: /server autokick &lt;new_time&gt;, without parameters it tell you what is the current configured time.
+
+- Fix showing different colors for players.
+- Adds more scripting support: can display messages locally, can exit the game, user and server commands can access the configuration (the one that is done in lua currently).
+
+
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -75,6 +75,16 @@
+ 
+     testrules = function(param)
+         test_game_rules();
++    end,
++
++    autokick_help = &quot;sets the idle time for kicking a player automatically&quot;,
++    autokick = function(param, player)
++        if ( param == &quot;&quot; ) then
++            netpanzer.serversayto( player, &quot;autokick time is &quot; .. netpanzer.config.game.autokicktime);
++        else
++            netpanzer.config.game.autokicktime = param;
++            netpanzer.serversayto( player, &quot;autokick time was set to &quot; .. netpanzer.config.game.autokicktime);
++        end
+     end
+ };
+ 
+
+Modified: trunk/netpanzer/scripts/usercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/usercommands.lua	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/scripts/usercommands.lua	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -33,7 +33,7 @@
+                 end
+             end
+         end
+-        ConsoleInterface:post( Color.cyan, false, 0, out);
++        netpanzer.scriptmessage(out);
+     end,
+ 
+     _help = &quot;Type /help &lt;wanted_command&gt; or /listcommands&quot;,
+@@ -41,15 +41,15 @@
+     help = function(param)
+         local ht = UserCommands[param .. &quot;_help&quot;];
+         if ht then
+-            ConsoleInterface:post( Color.cyan, false, 0, param .. &quot;: &quot; .. ht);
++            netpanzer.scriptmessage(param .. &quot;: &quot; .. ht);
+         else
+-            ConsoleInterface:post( Color.cyan, false, 0, &quot;Help not found for &quot; .. param .. &quot;. Use /listcommands&quot;);
++            netpanzer.scriptmessage(&quot;Help not found for &quot; .. param .. &quot;. Use /listcommands&quot;);
+         end
+     end,
+ 
+     quit_help = &quot;Quits NetPanzer.&quot;,
+     quit = function(param)
+-        GameManager:exitNetPanzer();
++       netpanzer.quit();
+     end,
+ 
+ 	-- doesn't work as expected, needs checking.
+
+Modified: trunk/netpanzer/src/Lib/Util/NTimer.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/NTimer.hpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/Lib/Util/NTimer.hpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -16,9 +16,9 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#ifndef _NTIMER_HPP_
+-#define _NTIMER_HPP_
+-
++#ifndef _NTIMER_HPP_
++#define _NTIMER_HPP_
++
+ #include &quot;SDL.h&quot;
+ 
+ class NTimer
+@@ -38,10 +38,11 @@
+     
+     inline bool isTimeOut() { return (SDL_GetTicks()-starttime)&gt;timeout; }
+     inline bool isTimeOut(Uint32 t) { return (t-starttime)&gt;timeout; }
++    inline bool checkWithTimeOut(Uint32 tout) { return (SDL_GetTicks()-starttime)&gt;tout; }
+     
+ private:
+     Uint32 starttime;
+     Uint32 timeout;
+-};
+-
+-#endif // _NTIMER_HPP_
++};
++
++#endif // _NTIMER_HPP_
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -219,6 +219,27 @@
+ }
+ 
+ void
++NetworkServer::kickClient(ClientSocket * client)
++{
++    ClientList::iterator i = client_list.begin();
++    while( i != client_list.end() &amp;&amp; (*i)-&gt;client_socket != client )
++    {
++        ++i;
++    }
++
++    if ( i != client_list.end() )
++    {
++        // XXX hack
++        PlayerState *p = PlayerInterface::getPlayer(client-&gt;getPlayerIndex());
++        if ( p )
++        {
++            p-&gt;setStatus( _player_state_kicked );
++        }
++        onClientDisconected(client, &quot;kicked&quot;);
++    }
++}
++
++void
+ NetworkServer::sendRemaining()
+ {
+     ClientList::iterator i = client_list.begin();
+@@ -330,13 +351,16 @@
+     if ( player_index != INVALID_PLAYER_ID )
+     {
+         PlayerState * player = PlayerInterface::getPlayer(player_index);
+-        if ( player &amp;&amp; sendalert )
++        bool kicked = player ? player-&gt;isKicked() : false;
++
++        if ( player &amp;&amp; sendalert &amp;&amp; ! kicked)
+         {
+             ConsoleInterface::postMessage(Color::cyan, true, player-&gt;getFlag(),
+                                       &quot;'%s' has left.&quot;,
+                                       player-&gt;getName().c_str());
+         }
+-        
++
++
+         ObjectiveInterface::disownPlayerObjectives( player_index );
+ 
+         UnitInterface::destroyPlayerUnits( player_index );
+@@ -350,6 +374,10 @@
+             {
+                 msg.set( player_index, _connect_alert_mesg_disconnect);
+             }
++            else if ( kicked )
++            {
++                msg.set( player_index, _connect_alert_mesg_client_kicked);
++            }
+             else
+             {
+                 msg.set( player_index, _connect_alert_mesg_client_drop );
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -78,7 +78,8 @@
+     bool getPacket(NetPacket* packet);
+ 
+     void dropClient(ClientSocket * client);
+-    
++    void kickClient(ClientSocket * client);
++
+     ClientSocket * getClientSocketByPlayerIndex ( const PlayerID index );
+ 
+     std::string getIP(const PlayerID player_index);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -199,6 +199,8 @@
+                                   player_state-&gt;getName().c_str(),
+                                   client-&gt;getIPAddress().c_str() );
+ 
++    player_state-&gt;resetAutokick();
++
+     if ( ((std::string)gameconfig-&gt;motd).length() &gt; 0 )
+     {
+     	ChatInterface::serversayTo(client-&gt;getPlayerIndex(), gameconfig-&gt;motd.c_str());
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -61,8 +61,14 @@
+ void ServerMessageRouter::routePacket(const NetPacket* packet)
+ {
+     const NetMessage* message = packet-&gt;getNetMessage();
++    PlayerState * player = PlayerInterface::getPlayer(packet-&gt;fromPlayer);
++
+     switch (message-&gt;message_class) {
+         case _net_message_class_terminal:
++            if ( player )
++            {
++                player-&gt;resetAutokick();
++            }
+             processTerminalPacket(packet);
+             break;
+ 
+@@ -71,10 +77,18 @@
+             break;
+ 
+         case _net_message_class_system:
++            if ( player )
++            {
++                player-&gt;resetAutokick();
++            }
+             GameManager::processSystemMessage(message);
+             break;
+             
+         case _net_message_class_chat:
++            if ( player )
++            {
++                player-&gt;resetAutokick();
++            }
+             ChatInterface::processChatMessages(packet);
+             break;
+ 
+@@ -83,6 +97,10 @@
+             break;
+ 
+         case _net_message_class_player:
++            if ( player )
++            {
++                player-&gt;resetAutokick();
++            }
+             PlayerInterface::processNetMessage(message);
+             break;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -133,7 +133,8 @@
+ 
+ enum { _connect_alert_mesg_connect,
+        _connect_alert_mesg_disconnect,
+-       _connect_alert_mesg_client_drop
++       _connect_alert_mesg_client_drop,
++       _connect_alert_mesg_client_kicked
+      };
+ 
+ class SystemConnectAlert : public NetMessage
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -21,6 +21,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &lt;sstream&gt;
+ 
+@@ -97,8 +98,8 @@
+ Uint8
+ PlayerState::getColor() const
+ {
+-    assert(colorIndex &lt; playerColorCount);
+-    return ( *playerColorArray[ colorIndex ] );
++    assert(id &lt; playerColorCount);
++    return ( *playerColorArray[ id ] );
+ }
+ 
+ PlayerState::PlayerState()
+@@ -106,7 +107,7 @@
+       loss_points(0), total(0), objectives_held(0), stats_locked(false),
+       colorIndex(0)
+ {
+-    // nothing
++    autokick.reset();
+ }
+ 
+ PlayerState::PlayerState(const PlayerState&amp; other)
+@@ -132,6 +133,7 @@
+     objectives_held = other.objectives_held;
+     stats_locked = other.stats_locked;
+     unit_config = other.unit_config;
++    autokick.reset();
+ }
+ 
+ void PlayerState::setName(const std::string&amp; newname)
+@@ -191,6 +193,16 @@
+     stats_locked = false;
+ }
+ 
++void PlayerState::resetAutokick()
++{
++    autokick.reset();
++}
++
++bool PlayerState::checkAutokick()
++{
++    return autokick.checkWithTimeOut(GameConfig::game_autokicktime * 60000);
++}
++
+ const std::string&amp; PlayerState::getName() const
+ {
+     return name;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -23,11 +23,13 @@
+ #include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;Classes/PlayerUnitConfig.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ enum { _player_state_free,
+        _player_state_allocated,
+        _player_state_connecting,
+-       _player_state_active
++       _player_state_active,
++       _player_state_kicked
+      };
+ 
+ #ifdef MSVC
+@@ -75,6 +77,7 @@
+     short objectives_held;
+     bool stats_locked;
+     Uint32 colorIndex;
++    NTimer autokick;
+ 
+ public:
+     PlayerUnitConfig unit_config;
+@@ -89,6 +92,8 @@
+ 
+     PlayerID getID() const { return id; }
+ 
++	void resetAutokick();
++    bool checkAutokick();
+     void resetStats();
+     void lockStats();
+     void unlockStats();
+@@ -111,6 +116,12 @@
+     void getNetworkPlayerState(NetworkPlayerState&amp; state) const;
+     void setFromNetworkPlayerState(const NetworkPlayerState* state);
+     Uint8 getColor() const;
++
++    bool isFree() const { return status == _player_state_free; }
++    bool isAllocated() const { return status == _player_state_allocated; }
++    bool isConnecting() const { return status == _player_state_connecting; }
++    bool isActive() const { return status == _player_state_active; }
++    bool isKicked() const { return status == _player_state_kicked; }
+ };
+ 
+ #endif // ** _PLAYERSTATE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -16,8 +16,8 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &lt;sstream&gt;
++#include &lt;time.h&gt;
+ 
+ #include &quot;Console.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -183,6 +183,32 @@
+ {
+     if ( heartbeat )
+         heartbeat-&gt;checkHeartbeat();
++
++    static NTimer aktimer(10000); //all 10 sec only
++    if (aktimer.isTimeOut())
++    {
++        aktimer.reset();
++        PlayerState * player = 0;
++        unsigned long max_players;
++        max_players = PlayerInterface::getMaxPlayers();
++        for (unsigned long i = 0; i &lt; max_players; i++)
++        {
++            player = PlayerInterface::getPlayer((unsigned short) i);
++            if (player-&gt;getStatus() == _player_state_active)
++            {
++                if ( player-&gt;checkAutokick() )
++                {
++                    char chat_string[256];
++                    sprintf(chat_string, &quot;Server kicked '%s' due to inactivity&quot;,player-&gt;getName().c_str());
++                    LOGGER.info(&quot;DED: %s&quot;, chat_string);
++                    ChatInterface::serversay(chat_string);
++                    SERVER-&gt;kickClient(SERVER-&gt;getClientSocketByPlayerIndex((unsigned short) i));
++
++                }
++            }
++
++        }
++    }
+     return BaseGameManager::mainLoop();
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -50,6 +50,8 @@
+ 
+ bool GameConfig::game_enable_bases = true;
+ int  GameConfig::game_base_capture_mode = 1; // normal capture;
++int  GameConfig::game_autokicktime = 20; // minutes;
++bool GameConfig::game_allowmultiip = true;
+ 
+ Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
+ 
+@@ -106,6 +108,8 @@
+ {
+     { &quot;enable_bases&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
+     { &quot;base_capture_mode&quot;, GETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
++    { &quot;autokicktime&quot;,      GETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
++    { &quot;allowmultiip&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+     {0,0}
+ };
+ 
+@@ -113,6 +117,8 @@
+ {
+     { &quot;enable_bases&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
+     { &quot;base_capture_mode&quot;, SETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
++    { &quot;autokicktime&quot;,      SETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
++    { &quot;allowmultiip&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+     {0,0}
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -127,6 +127,8 @@
+ 
+     static bool game_enable_bases;
+     static int  game_base_capture_mode; // 0=no capture, 1=normal, 2=...
++	static int  game_autokicktime; // in minutes
++	static bool game_allowmultiip; // allow multi connect from same ip
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -297,6 +297,7 @@
+         &lt;&lt; &quot;Map: &quot; &lt;&lt; gameconfig-&gt;map &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;MaxPlayers: &quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;MaxUnits: &quot; &lt;&lt; gameconfig-&gt;maxunits &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;AutoKick: &quot; &lt;&lt; GameConfig::game_autokicktime &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;Gametype: &quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;ObjectivePercentage: &quot; &lt;&lt;
+             gameconfig-&gt;objectiveoccupationpercentage &lt;&lt; &quot;\n&quot;
+@@ -430,6 +431,12 @@
+                     player_state-&gt;getName().c_str());
+             break;
+ 
++        case _connect_alert_mesg_client_kicked:
++            ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
++                &quot;Player %s was kicked.&quot;,
++                player_state-&gt;getName().c_str());
++            break;
++
+         default:
+             LOGGER.warning(&quot;invalid connection_alert enum found.&quot;);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -454,6 +454,36 @@
+         return false;
+     }
+ 
++    if ( NetworkState::getNetworkStatus() == _network_state_server )
++    {
++        static NTimer aktimer(10000); //all 10 sec only
++        if (aktimer.isTimeOut())
++        {
++            aktimer.reset();
++            PlayerState * player = 0;
++            unsigned long max_players;
++            max_players = PlayerInterface::getMaxPlayers();
++            for (unsigned long i = 0; i &lt; max_players; i++)
++            {
++                if ( i != PlayerInterface::getLocalPlayerIndex() )
++                {
++                    player = PlayerInterface::getPlayer((unsigned short) i);
++                    if (player-&gt;getStatus() == _player_state_active)
++                    {
++                        if ( player-&gt;checkAutokick() )
++                        {
++                            char chat_string[256];
++                            sprintf(chat_string, &quot;Server kicked '%s' due to inactivity&quot;,player-&gt;getName().c_str());
++                            LOGGER.info(&quot;PSE: %s&quot;, chat_string);
++                            ChatInterface::serversay(chat_string);
++                            SERVER-&gt;kickClient(SERVER-&gt;getClientSocketByPlayerIndex((unsigned short) i));
++                        }
++                    }
++                }
++            }
++        }
++    }
++
+     return BaseGameManager::mainLoop();
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -30,8 +30,6 @@
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+-// for UNIT_FLAGS_SURFACE
+-
+ // ** PlayerInterface Statics
+ PlayerState   * PlayerInterface::player_lists = 0;
+ PlayerID        PlayerInterface::max_players = MIN_PLAYER_ID;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -51,15 +51,13 @@
+ 
+     static bool isPlayerActive(PlayerID player)
+     {
+-        return (player &lt; getMaxPlayers())
+-                ? player_lists[player].getStatus() == _player_state_active
+-                : false;
++        return (player &lt; getMaxPlayers()) &amp;&amp; player_lists[player].isActive();
+     }
+ 
+     static void lockPlayerStats();
+     static void unlockPlayerStats();
+ 
+-    static PlayerID getMaxPlayers( )
++    static PlayerID getMaxPlayers()
+     {
+         return max_players;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-09-08 16:09:22 UTC (rev 1232)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-09-13 17:31:41 UTC (rev 1233)
+@@ -22,6 +22,8 @@
+ #include &quot;ScriptHelper.hpp&quot;
+ 
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ 
+ static int npmodule_say (lua_State *L)
+ {
+@@ -55,17 +57,36 @@
+     return 0;
+ }
+ 
++static int npmodule_quit (lua_State *L)
++{
++    GameManager::exitNetPanzer();
++    return 0;
++}
++
++static int npmodule_scriptmessage (lua_State *L)
++{
++    ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;* %s&quot;, lua_tolstring(L,1,0) );
++    return 0;
++}
++
+ static const luaL_Reg npmodule[] =
+ {
+     {&quot;say&quot;,         npmodule_say},
+     {&quot;teamsay&quot;,     npmodule_teamsay},
+     {&quot;serversay&quot;,   npmodule_serversay},
+     {&quot;serversayto&quot;, npmodule_serversayto},
++    {&quot;quit&quot;,        npmodule_quit},
++    {&quot;scriptmessage&quot;, npmodule_scriptmessage},
+     {NULL, NULL}
+ };
+ 
+ int npmodule_load (lua_State *L)
+ {
+   luaL_register(L, &quot;netpanzer&quot;, npmodule);
++  lua_pushliteral(L, &quot;config&quot;); // +1
++  lua_getglobal(L, &quot;config&quot;); // +1
++  lua_settable(L, -3); // -2
++
++
+   return 1;
+-}
+\ No newline at end of file
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000258.html">[Netpanzer-cvs] r1232 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000260.html">[Netpanzer-cvs] r1234 - in trunk/netpanzer:	pics/backgrounds/menus/menu pics/cursors pics/flags scripts	src/Lib/Network src/NetPanzer/Classes/AI	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Views src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#259">[ date ]</a>
+              <a href="thread.html#259">[ thread ]</a>
+              <a href="subject.html#259">[ subject ]</a>
+              <a href="author.html#259">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,572 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1388 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1388%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20MainMenu/Multi&In-Reply-To=%3C20120902105831.49BED55B10%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000411.html">
+   <LINK REL="Next"  HREF="000413.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1388 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1388%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20MainMenu/Multi&In-Reply-To=%3C20120902105831.49BED55B10%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1388 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sun Sep  2 12:58:31 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000411.html">[Netpanzer-cvs] r1387 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu
+</A></li>
+        <LI>Next message: <A HREF="000413.html">[Netpanzer-cvs] r1389 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#412">[ date ]</a>
+              <a href="thread.html#412">[ thread ]</a>
+              <a href="subject.html#412">[ subject ]</a>
+              <a href="author.html#412">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-02 12:58:30 +0200 (Sun, 02 Sep 2012)
+New Revision: 1388
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+Log:
+Commit preview of new InputField, can be tested in the player name change view, this code comes from /branches/krom around one year ago.
+
+Note that this test doesn't really change the player name
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2012-09-02 09:35:35 UTC (rev 1387)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -112,6 +112,8 @@
+     
+     virtual void render() = 0;
+     virtual void actionPerformed(const mMouseEvent &amp;me) = 0;
++    virtual void handleKeyboard() {}
++    
+ private:
+     Component(const Component&amp;);
+     void operator=(const Component&amp;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2012-09-02 09:35:35 UTC (rev 1387)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -32,6 +32,7 @@
+ float     Desktop::currentMouseDownTime = 0.0;
+ std::vector&lt;View*&gt; Desktop::views;
+ View     *Desktop::focus;
++Component *Desktop::keyboardFocusComponent = 0;
+ int       Desktop::mouseActions;
+ iXY       Desktop::lMouseDownPos;
+ iXY       Desktop::rMouseDownPos;
+@@ -283,7 +284,12 @@
+         effActions = mouseView-&gt;getMouseActions(mousePos-mouseView-&gt;min);
+     }
+ 
+-    if (focus != 0) {
++    if ( keyboardFocusComponent )
++    {
++        keyboardFocusComponent-&gt;handleKeyboard();
++        KeyboardInterface::flushCharBuffer();
++    }
++    else if (focus != 0) {
+         focus-&gt;processEvents();
+         KeyboardInterface::flushCharBuffer();
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2012-09-02 09:35:35 UTC (rev 1387)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -26,6 +26,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ 
+ class Surface;
++class Component;
+ 
+ class Desktop
+ {
+@@ -40,6 +41,7 @@
+     static float      currentMouseDownTime;
+     static std::vector&lt;View*&gt; views;
+     static View      *focus;
++    static Component *keyboardFocusComponent;
+     static int        mouseActions;
+     static iXY        lMouseDownPos;
+     static iXY        rMouseDownPos;
+@@ -162,10 +164,18 @@
+     {
+         return focus;
+     }
++    
+     static void setFocusView(View *view)
+     {
+         activate(view);
+     }
++    
++    static void setKeyboardFocusComponent(Component *c)
++    {
++        keyboardFocusComponent = c;
++    }
++
++    static Component * getKeyboardFocusComponent() { return keyboardFocusComponent; }
+ }
+ ; // end Desktop
+ 
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -0,0 +1,230 @@
++/*
++Copyright (C) 2011 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++ * Created on September 1, 2011, 05:01 PM
++ */
++
++#include &quot;InputField.hpp&quot;
++#include &quot;2D/Color.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Interfaces/KeyboardInterface.hpp&quot;
++#include &quot;SDL.h&quot;
++
++InputField::InputField()
++{
++    this-&gt;has_focus = false;
++    this-&gt;max_chars = 50;
++    this-&gt;text_display_start = 0;
++    this-&gt;cursor_pos = 0;
++    this-&gt;text.clear();
++
++    this-&gt;last_pressed_key = 0;
++    this-&gt;was_special_key = false;
++}
++
++void InputField::render()
++{
++    draw(surface);
++}
++
++void InputField::draw(Surface &amp;dest)
++{
++    iRect r;
++    getBounds(r);
++
++    dest.fillRect(r, Color::black);
++
++    bool inFocus = Desktop::getKeyboardFocusComponent() == this;
++
++    if ( inFocus )
++    {
++        checkRepeatKey();
++        dest.drawButtonBorder(r, Color::gray64, Color::white);
++    }
++    else
++    {
++        last_pressed_key = 0;
++        dest.drawButtonBorder(r, Color::white, Color::gray64);
++    }
++    
++    r.min.y += 2; // add the border;
++    r.min.x += 2;
++    r.max.y -= 2;
++    r.max.x -= 2;
++
++    Surface s;
++    s.setTo(dest, r);
++    
++    int text_y = (r.getSizeY()/2)-4;
++
++    s.bltString(0, text_y , text.substr(text_display_start).c_str(), Color::white);
++
++    if ( inFocus )
++    {
++        drawCursor(s, text_y);
++    }
++}
++
++void InputField::drawCursor(Surface&amp; dest, int text_y)
++{
++    Uint32 now = SDL_GetTicks()/100;
++
++    if ( now &amp; 2)
++    {
++        int cpos = (cursor_pos - text_display_start) * 8;
++        iRect r(cpos, text_y + 7, cpos+7, text_y + 9);
++        dest.fillRect(r, Color::white);
++    }
++}
++
++void InputField::actionPerformed(const mMouseEvent &amp;me)
++{
++    if ( me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED )
++    {
++        Desktop::setKeyboardFocusComponent(this);
++    }
++}
++
++void InputField::handleKeyboard()
++{
++    int kchar;
++    while (KeyboardInterface::getChar(kchar))
++    {
++        if (kchar == 0)
++        {
++            if (KeyboardInterface::getChar(kchar))
++            {
++                was_special_key = true;
++                handleSpecialKey(kchar);
++            }
++        }
++        else
++        {
++            was_special_key = false;
++            handleNormalKey(kchar);
++        }
++
++        last_pressed_key = kchar;
++        key_repeat_timer.setTimeOut(250);
++        key_repeat_timer.reset();
++
++    }
++}
++
++void InputField::handleNormalKey(int key)
++{
++    if ( text.length() &lt; max_chars )
++    {
++        text.insert(cursor_pos,1,key);
++        ++cursor_pos;
++        int end_pos = ((cursor_pos - text_display_start) * 8) + 8;
++        if ( end_pos &gt; size.x-2 )
++        {
++            ++text_display_start;
++        }
++    }
++
++}
++
++void InputField::handleSpecialKey(int key)
++{
++    switch ( key )
++    {
++        case SDLK_LEFT:
++            if ( cursor_pos &gt; 0 )
++            {
++                --cursor_pos;
++                if ( cursor_pos &lt; text_display_start )
++                {
++                    text_display_start = cursor_pos;
++                }
++            }
++            break;
++
++        case SDLK_RIGHT:
++            if ( cursor_pos &lt; text.length() )
++            {
++                ++cursor_pos;
++                int end_pos = ((cursor_pos - text_display_start) * 8) + 8;
++                if ( end_pos &gt; size.x-2 )
++                {
++                    ++text_display_start;
++                }
++            }
++            break;
++
++        case SDLK_BACKSPACE:
++            if (cursor_pos &gt; 0)
++            {
++                --cursor_pos;
++                text.erase(cursor_pos,1);
++                if ( cursor_pos &lt; text_display_start )
++                {
++                    text_display_start = cursor_pos;
++                }
++            }
++            break;
++
++        case SDLK_DELETE:
++            if ( cursor_pos &lt; text.length() )
++            {
++                text.erase(cursor_pos, 1);
++            }
++            break;
++
++        case SDLK_HOME:
++            cursor_pos = 0;
++            text_display_start = 0;
++            break;
++
++        case SDLK_END:
++            cursor_pos = text.length();
++            text_display_start = 0;
++            while ( (((cursor_pos - text_display_start) * 8) + 8) &gt; size.x -2 )
++            {
++                ++text_display_start;
++            }
++            break;
++
++        default:
++            break;
++    }
++}
++
++void InputField::checkRepeatKey()
++{
++    if ( last_pressed_key &amp;&amp; key_repeat_timer.isTimeOut() )
++    {
++        if ( KeyboardInterface::getKeyState(last_pressed_key) )
++        {
++            if ( was_special_key )
++            {
++                handleSpecialKey(last_pressed_key);
++            }
++            else
++            {
++                handleNormalKey(last_pressed_key);
++            }
++            key_repeat_timer.setTimeOut(50);
++            key_repeat_timer.reset();
++        }
++        else
++        {
++            last_pressed_key = 0;
++        }
++    }
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -0,0 +1,77 @@
++/*
++Copyright (C) 2011 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++ * Created on September 1, 2011, 05:01 PM
++ */
++
++#ifndef INPUTFIELD_HPP
++#define INPUTFIELD_HPP
++
++#include &quot;Component.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
++#include &lt;string&gt;
++
++class InputField : public Component
++{
++protected:
++    virtual void draw(Surface &amp;dest);
++    virtual void actionPerformed(const mMouseEvent &amp;me);
++
++    void drawCursor(Surface&amp; dest, int text_y);
++    
++    void render();
++
++public:
++    InputField();
++    virtual ~InputField() {}
++
++    void setText(const std::string&amp; text)
++    {
++        this-&gt;text = text;
++    }
++
++    const std::string&amp; getText() const { return text; }
++
++    void setSize(int x, int y)
++    {
++        (void)y;
++        Component::setSize(x+4, y);
++    }
++
++    void setMaxTextLength(int max_length) { max_chars = max_length; }
++    
++    virtual void handleKeyboard();
++
++    void handleNormalKey(int key);
++    void handleSpecialKey(int key);
++
++private:
++    bool has_focus;
++    int cursor_pos;
++    int max_chars;
++    int text_display_start;
++    std::string text;
++
++    int last_pressed_key;
++    bool was_special_key;
++    NTimer key_repeat_timer;
++
++    void checkRepeatKey();
++
++};
++
++#endif // INPUTFIELD_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2012-09-02 09:35:35 UTC (rev 1387)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -664,6 +664,7 @@
+     }
+ 
+     focusComponent = 0;
++    Desktop::setKeyboardFocusComponent(0);
+ 
+     // Check all components for a pressed event.
+     ComponentsIterator i;
+@@ -757,6 +758,7 @@
+ void View::rMouseDown(const iXY &amp;pos)
+ {
+     focusComponent = 0;
++    Desktop::setKeyboardFocusComponent(0);
+ 
+     // Check all components for a pressed event.
+     ComponentsIterator i;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2012-09-02 09:35:35 UTC (rev 1387)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -22,6 +22,7 @@
+ #include &quot;PlayerNameView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Views/Components/InputField.hpp&quot;
+ 
+ // PlayerNameView
+ //---------------------------------------------------------------------------
+@@ -53,12 +54,20 @@
+ //---------------------------------------------------------------------------
+ void PlayerNameView::init()
+ {
+-    playerName.init(GameConfig::player_name-&gt;c_str(), INPUT_FIELD_CHARACTERS, getSizeX()-16);
+-    playerName.setString(*GameConfig::player_name);
+-    cInputField* input 
+-        = addInputField(iXY(BORDER_SPACE, BORDER_SPACE+2), &amp;playerName, &quot;&quot;, true, INPUT_FIELD_CHARACTERS);
+-    input-&gt;setTextAction(textChanged);
+-    input-&gt;setExcludedCharacters(&quot;\\&quot;);
++    playerName = new InputField();
++    playerName-&gt;setLocation(iXY(BORDER_SPACE, BORDER_SPACE));
++    playerName-&gt;setSize(getSizeX()-20, 16);
++    playerName-&gt;setMaxTextLength(INPUT_FIELD_CHARACTERS * 2); // XXX *2 for testing only
++    playerName-&gt;setText(*GameConfig::player_name);
++
++    add(playerName);
++    
++//    playerName.init(GameConfig::player_name-&gt;c_str(), INPUT_FIELD_CHARACTERS, getSizeX()-16);
++//    playerName.setString(*GameConfig::player_name);
++//    cInputField* input 
++//        = addInputField(iXY(BORDER_SPACE, BORDER_SPACE+2), &amp;playerName, &quot;&quot;, true, INPUT_FIELD_CHARACTERS);
++//    input-&gt;setTextAction(textChanged);
++//    input-&gt;setExcludedCharacters(&quot;\\&quot;);
+ } // end PlayerNameView::init
+ 
+ // doDraw
+@@ -73,6 +82,6 @@
+ 
+ void PlayerNameView::textChanged(cInputField* input)
+ {
+-    GameConfig::player_name-&gt;assign( input-&gt;getDestString() );
++//    GameConfig::player_name-&gt;assign( input-&gt;getDestString() );
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2012-09-02 09:35:35 UTC (rev 1387)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2012-09-02 10:58:30 UTC (rev 1388)
+@@ -21,6 +21,8 @@
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ 
++class InputField;
++
+ //---------------------------------------------------------------------------
+ class PlayerNameView : public View
+ {
+@@ -39,7 +41,7 @@
+     // irc nick is 16 chars max, 2 = &quot;np&quot;, 1 spare for digit if nick is taken
+     enum { INPUT_FIELD_CHARACTERS = 15 };
+ 
+-    cInputFieldString playerName;
++    InputField* playerName;
+ }; // end PlayerNameView
+ 
+ #endif // end __PlayerNameView_hpp__
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000411.html">[Netpanzer-cvs] r1387 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu
+</A></li>
+	<LI>Next message: <A HREF="000413.html">[Netpanzer-cvs] r1389 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#412">[ date ]</a>
+              <a href="thread.html#412">[ thread ]</a>
+              <a href="subject.html#412">[ subject ]</a>
+              <a href="author.html#412">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

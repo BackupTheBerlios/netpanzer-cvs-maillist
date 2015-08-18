@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1261 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1261%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units&In-Reply-To=%3C20111015011143.AEDAE4814E9%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000286.html">
+   <LINK REL="Next"  HREF="000288.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1261 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1261%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units&In-Reply-To=%3C20111015011143.AEDAE4814E9%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1261 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Oct 15 03:11:43 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000286.html">[Netpanzer-cvs] r1260 - in trunk/netpanzer: scripts	src/NetPanzer/Scripts
+</A></li>
+        <LI>Next message: <A HREF="000288.html">[Netpanzer-cvs] r1262 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#287">[ date ]</a>
+              <a href="thread.html#287">[ thread ]</a>
+              <a href="subject.html#287">[ subject ]</a>
+              <a href="author.html#287">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-15 03:11:43 +0200 (Sat, 15 Oct 2011)
+New Revision: 1261
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+Log:
+Fix sending incorrect multipackets
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2011-10-14 11:00:59 UTC (rev 1260)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2011-10-15 01:11:43 UTC (rev 1261)
+@@ -43,7 +43,7 @@
+ 
+ bool NetMessageEncoder::encodeMessage(NetMessage *message, size_t size)
+ {
+-    if (offset+size &gt; _MULTI_PACKET_LIMIT )
++    if (offset+size &gt;= _MULTI_PACKET_LIMIT )
+     {
+         return false;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2011-10-14 11:00:59 UTC (rev 1260)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2011-10-15 01:11:43 UTC (rev 1261)
+@@ -40,7 +40,6 @@
+     
+     int rem_units = max_allowed_units;
+     int num_units;
+-
+     std::vector&lt;NPString&gt; str_counts;
+ 
+     string_to_params(*GameConfig::game_unit_spawnlist, str_counts);
+@@ -48,7 +47,6 @@
+     for ( int n = 0; n &lt; num_types ; n++ )
+     {
+         num_units = n &lt; (int)str_counts.size() ? atoi(str_counts[n].c_str()) : 0;
+-
+         if ( num_units &lt; 0 )
+         {
+             num_units = 0;
+@@ -57,7 +55,6 @@
+         {
+             num_units = rem_units;
+         }
+-
+         rem_units -= num_units;
+ 
+         unit_spawn_list[n] = num_units;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2011-10-14 11:00:59 UTC (rev 1260)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2011-10-15 01:11:43 UTC (rev 1261)
+@@ -408,7 +408,6 @@
+             unit = createUnit(unit_type_index, next_loc, player_id);
+             UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(), unit-&gt;id,
+                     next_loc.x, next_loc.y, unit-&gt;unit_state.unit_type);
+-
+             if ( !encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg)) )
+             {
+                 LOGGER.info(&quot;UnitInterface encoder full, sending and resetting&quot;);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000286.html">[Netpanzer-cvs] r1260 - in trunk/netpanzer: scripts	src/NetPanzer/Scripts
+</A></li>
+	<LI>Next message: <A HREF="000288.html">[Netpanzer-cvs] r1262 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#287">[ date ]</a>
+              <a href="thread.html#287">[ thread ]</a>
+              <a href="subject.html#287">[ subject ]</a>
+              <a href="author.html#287">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

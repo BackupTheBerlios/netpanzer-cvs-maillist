@@ -1,0 +1,919 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1024 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Components
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1024%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Components&In-Reply-To=%3C200801130759.m0D7xkNu027897%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000065.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1024 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Components</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1024%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Components&In-Reply-To=%3C200801130759.m0D7xkNu027897%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1024 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Components">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 13 08:59:46 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000065.html">[Netpanzer-cvs] r1023 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Core
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-01-13 08:59:44 +0100 (Sun, 13 Jan 2008)
+New Revision: 1024
+
+Added:
+   trunk/netpanzer/src/Lib/2D/BuiltinFont.cpp
+Modified:
+   trunk/netpanzer/NetPanzer-windows.cbp
+   trunk/netpanzer/NetPanzer.cbp
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+Log:
+- the game font is compiled statically in the code
+- new function Surface::renderText
+- changed Component, Button and CheckBox to use new font rendering and to redraw itself only when changed
+
+
+Modified: trunk/netpanzer/NetPanzer-windows.cbp
+===================================================================
+--- trunk/netpanzer/NetPanzer-windows.cbp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/NetPanzer-windows.cbp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -50,6 +50,7 @@
+ 			&lt;Add library=&quot;SDLmain&quot; /&gt;
+ 			&lt;Add library=&quot;SDL&quot; /&gt;
+ 		&lt;/Linker&gt;
++		&lt;Unit filename=&quot;src\Lib\2D\BuiltinFont.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\2D\Color.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\2D\Color.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\2D\ColorTable.cpp&quot; /&gt;
+
+Modified: trunk/netpanzer/NetPanzer.cbp
+===================================================================
+--- trunk/netpanzer/NetPanzer.cbp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/NetPanzer.cbp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -45,6 +45,7 @@
+ 			&lt;Add option=&quot;`sdl-config --libs`&quot; /&gt;
+ 			&lt;Add library=&quot;SDL_mixer&quot; /&gt;
+ 		&lt;/Linker&gt;
++		&lt;Unit filename=&quot;src/Lib/2D/BuiltinFont.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/2D/Color.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/2D/Color.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/2D/ColorTable.cpp&quot; /&gt;
+
+Added: trunk/netpanzer/src/Lib/2D/BuiltinFont.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/BuiltinFont.cpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/Lib/2D/BuiltinFont.cpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -0,0 +1,279 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++/* Conversion of pics/chars8x8.raw */
++
++char staticFont[8192]= {
++        0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,1,0,1,1,0,0,
++        0,0,0,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
++        1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,
++        0,0,1,1,1,1,0,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,0,0,1,
++        1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,
++        0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,1,1,0,0,0,1,1,0,1,1,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,
++        0,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,
++        0,0,0,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,0,0,
++        0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,0,0,0,
++        0,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,
++        1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,
++        1,1,0,0,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,0,1,1,0,
++        0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,0,1,1,0,0,0,1,1,1,0,0,0,
++        1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,
++        1,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,1,0,
++        1,1,0,0,0,1,1,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,
++        1,1,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,
++        1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,0,0,0,0,0,
++        0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,
++        0,0,0,1,1,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
++        0,0,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
++        1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,1,1,1,
++        0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,0,
++        1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,0,0,1,1,0,
++        1,1,0,1,1,0,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,
++        0,0,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,
++        0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,1,1,0,0,0,1,1,0,1,1,0,0,
++        0,1,1,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,
++        1,1,0,0,0,1,1,0,0,1,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
++        0,0,1,1,1,1,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,
++        1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,
++        1,1,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,
++        0,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,
++        1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,1,1,0,
++        0,1,1,0,0,0,0,0,1,1,1,0,1,1,1,0,1,1,1,0,0,1,1,0,0,1,1,0,1,1,0,0,
++        0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,1,0,
++        1,1,0,0,0,1,1,0,1,1,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,0,0,0,1,0,0,0,0,
++        0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,0,
++        0,1,1,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,1,0,0,0,
++        1,1,1,0,0,1,1,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,0,1,0,0,0,0,1,1,1,1,
++        0,1,1,0,0,1,1,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,
++        1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,1,0,0,1,1,0,
++        1,1,0,1,1,0,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,
++        0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,
++        1,1,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,
++        0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,1,1,0,0,1,1,1,1,1,1,1,0,
++        1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,1,1,1,0,0,0,1,1,0,0,0,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,
++        1,1,0,0,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,
++        0,1,1,0,1,1,0,0,1,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,
++        1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,
++        0,1,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,
++        1,1,0,1,1,1,1,0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,0,0,0,0,
++        0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,
++        1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,
++        0,1,1,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,0,0,0,1,1,0,
++        0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,1,1,1,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,1,0,
++        0,1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,0,0,0,
++        0,0,0,0,1,1,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,0,1,1,0,
++        0,1,1,0,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,1,1,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,
++        1,1,0,1,1,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1,0,0,0,1,1,1,1,1,0,0,
++        0,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,1,0,
++        1,1,0,0,0,1,1,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,
++        0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
++        1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,
++        1,1,0,0,0,0,1,1,0,1,0,0,0,0,1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,
++        0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,0,0,1,1,1,
++        1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,
++        0,1,1,1,1,0,1,1,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,
++        1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,
++        0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,
++        0,1,1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,
++        0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,
++        1,1,0,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,
++        1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,1,1,0,0,0,
++        0,1,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,
++        1,1,0,1,1,1,1,0,1,1,0,0,1,1,0,0,0,1,1,1,1,1,0,0,1,1,0,0,0,0,0,0,
++        0,1,1,0,0,1,1,0,0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,
++        1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,0,0,0,
++        0,1,1,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,0,0,1,1,0,
++        0,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,1,0,1,1,0,
++        0,0,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,
++        0,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,1,1,1,1,0,0,0,0,1,1,0,0,1,1,0,0,
++        0,1,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,
++        0,0,1,1,0,0,0,0,1,1,1,1,1,1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
++        0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,0,1,1,1,0,1,1,0,1,1,0,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,1,0,1,1,0,
++        0,1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,1,0,0,1,1,0,0,0,1,1,1,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,
++        0,0,0,0,0,0,0,0,1,0,1,1,1,1,0,1,1,1,0,0,0,0,1,1,0,1,1,1,1,1,0,0,
++        0,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,
++        1,1,0,0,0,0,1,1,0,1,0,0,0,0,1,0,1,0,1,1,1,1,0,1,1,1,0,0,1,1,0,0,
++        0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,0,0,1,1,1,
++        1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,
++        0,0,0,1,1,0,1,1,0,1,1,0,1,1,0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,
++        0,0,0,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,
++        1,1,0,0,0,0,0,0,0,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,
++        0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,
++        0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,
++        1,1,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,
++        1,1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,
++        1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,
++        1,1,0,1,1,1,1,0,1,1,1,1,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,0,0,0,0,
++        0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,1,1,1,0,
++        1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,1,1,0,0,
++        0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,0,
++        0,1,1,0,0,0,0,0,1,1,0,1,1,1,0,0,0,1,1,0,1,1,0,0,0,0,0,1,1,1,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,1,0,
++        0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,
++        0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,0,0,0,0,
++        1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,0,1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,
++        0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,0,0,0,
++        0,0,1,1,0,0,0,0,1,1,1,1,1,1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
++        0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,0,1,1,1,1,0,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,1,0,
++        0,0,1,1,1,0,0,0,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,
++        0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,1,1,1,1,0,0,1,1,1,0,0,1,1,1,0,0,0,
++        0,0,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,
++        1,1,1,0,0,1,1,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,
++        0,0,0,1,1,0,0,0,0,1,1,1,0,0,0,0,0,1,1,0,0,1,1,1,0,0,1,1,1,1,0,0,
++        1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,
++        0,0,0,1,1,0,1,1,0,0,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,
++        0,0,0,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,
++        1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,
++        1,1,1,1,1,0,0,0,0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,
++        1,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
++        0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,
++        1,1,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,
++        0,0,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,
++        1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,
++        0,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,1,0,
++        1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,
++        0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,
++        0,1,1,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,0,1,1,1,0,
++        0,1,1,0,1,1,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,
++        0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,0,1,1,0,0,1,1,0,0,
++        1,1,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,
++        0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,1,1,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
++        0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,
++        0,0,1,1,0,1,0,0,1,1,0,0,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,0,
++        0,1,1,0,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,0,0,1,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,
++        0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,
++        0,0,0,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,
++        1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,1,1,0,0,0,0,1,1,1,1,0,0,1,1,0,0,
++        0,1,1,1,1,1,1,0,1,1,1,1,0,0,0,0,1,1,1,0,0,1,1,0,0,1,0,1,1,0,1,0,
++        1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,1,1,0,0,1,1,0,
++        0,0,0,1,1,0,1,1,1,1,0,0,1,1,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,
++        0,0,1,1,0,0,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,
++        0,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,
++        0,0,0,1,1,1,1,0,0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,
++        0,1,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,
++        0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,
++        0,1,1,1,1,0,0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,
++        1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,0,
++        1,1,0,0,1,1,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,
++        0,1,1,1,1,1,1,0,1,1,0,0,0,1,1,0,1,1,0,0,0,1,1,0,0,0,1,1,1,0,0,0,
++        1,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,0,0,1,1,0,0,1,1,1,1,0,0,0,
++        0,0,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,1,1,0,
++        1,1,0,0,0,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,
++        0,0,0,0,0,0,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1,0,0,0,1,1,1,1,0,0,0,
++        0,1,1,1,0,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,
++        1,1,1,0,0,1,1,0,0,1,1,1,1,0,0,0,1,1,0,0,1,1,0,0,1,1,1,0,0,1,1,0,
++        0,1,1,1,1,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,1,1,0,0,0,1,1,1,1,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,
++        0,0,0,1,1,0,0,0,0,1,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,1,1,0,1,1,0,0,
++        1,1,0,0,0,1,1,0,0,0,0,0,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1,1,1,0,0,
++        0,0,0,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,
++        0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,
++        1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,0,0,
++        0,0,0,1,1,0,0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,1,1,0,0,1,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
++        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
++};
++
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -38,6 +38,11 @@
+ using std::min;
+ using std::max;
+ 
++extern char staticFont[8192];
++#define FONT_HEIGHT 8
++#define FONT_WIDTH 8
++#define FONT_MAXCHAR 127
++
+ // orderCoords
+ //---------------------------------------------------------------------------
+ // Purpose: Orders a pair of (x,y) coordinates
+@@ -1336,30 +1341,19 @@
+ //---------------------------------------------------------------------------
+ void initFont()
+ {
+-    try {
+-        // Make room for the 128 characters.
+-        ascii8x8.create(8, 8, 128);
++    ascii8x8.create(8, 8, 128);
+ 
+-        // NOTE: Make sure the file size is 128 characters.
+-        char charfilename[] = &quot;pics/chars8x8.raw&quot;;
+-
+-        std::auto_ptr&lt;filesystem::ReadFile&gt; file(
+-                filesystem::openRead(charfilename));
+-                
+-        for (unsigned int y = 0; y &lt; ascii8x8.getHeight(); y++) {
+-            for (unsigned int curChar = 0; curChar &lt; ascii8x8.getNumFrames();
+-		    curChar++) {
+-                ascii8x8.setFrame(curChar);
+-                int yOffset = y * ascii8x8.getWidth();
+-
+-                file-&gt;read(ascii8x8.getMem() + yOffset, ascii8x8.getWidth(), 1);
+-            }
+-        }
+-    } catch(std::exception&amp; e) {
+-	throw Exception(&quot;Error while reading 8x8 font: %s&quot;,
+-		e.what());
++    for ( int c = 0; c &lt; 128; c++) {
++        ascii8x8.setFrame(c);
++        char * fptr = (char *)&amp;staticFont + (c * FONT_WIDTH);
++        PIX * dptr = ascii8x8.getMem();
++        int n = FONT_HEIGHT;
++        do {
++            memcpy(dptr,fptr,FONT_WIDTH);
++            dptr += FONT_WIDTH;
++            fptr += FONT_WIDTH*128;
++        } while (--n);
+     }
+-
+ } // Surface::initFont
+ 
+ unsigned int
+@@ -1373,6 +1367,56 @@
+     return ascii8x8.getWidth() * strlen(text);
+ }
+ 
++// renderText
++//---------------------------------------------------------------------------
++// Purpose: Renders a string of text to the surface using color and background
++//          color. The surface is created, if it was already created and is
++//          the exact size needed, clears it and use it, if size is different
++//          will delete it and create new one
++// Parameters:
++//   str     = string to render
++//   color   = foreground color
++//   bgcolor = background color
++//---------------------------------------------------------------------------
++void
++Surface::renderText(const char *str, PIX color, PIX bgcolor)
++{
++    if ( !str )
++        return;
++    
++    int len = strlen(str);
++    if ( !len )
++        return;
++
++    unsigned int need_width = len * FONT_WIDTH;
++    unsigned int need_height = FONT_HEIGHT;
++    
++    if ( frame0 != 0 ) {
++        if ( getWidth() != need_width || getHeight() != need_height ) {
++            free();
++            create( need_width, need_height, 1);
++        }
++    } else {
++        create( need_width, need_height, 1);
++    }
++    
++    for ( int line = 0; line &lt; FONT_HEIGHT; ++line) {
++        PIX * dptr = getFrame0() + (line * getPitch());
++        const char * pstr = str;
++        for ( unsigned char c = *pstr; c; c= *(++pstr)) {
++            if ( c &gt;=128 ) c = ' ';
++            
++            char * fptr = staticFont + (c*FONT_WIDTH) + (128*FONT_WIDTH*line);
++            PIX * eptr = dptr+FONT_WIDTH;
++            do {
++                *(dptr++) = *(fptr++)?color:bgcolor;
++            } while ( dptr &lt; eptr );
++            
++        }
++        
++    }
++}
++
+ // bltChar8x8
+ //---------------------------------------------------------------------------
+ // Purpose: Blits the specied rom character to the screen at the specified
+@@ -1465,7 +1509,7 @@
+ void
+ Surface::create(unsigned int w, unsigned int h, unsigned int nframes)
+ {
+-    reset();
++    //reset();
+     alloc( w, h, nframes);
+ } // end Surface::create
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -56,17 +56,11 @@
+     void free();
+ 
+     void setOffset(const iXY &amp;o) { offset = o; }
+-    void setOffsetX(int ox)     { offset.x = ox; }
+-    void setOffsetY(int oy)     { offset.y = oy; }
+-    void setFPS(int f)          { fps = f; }
++    void setOffsetX(int ox)      { offset.x = ox; }
++    void setOffsetY(int oy)      { offset.y = oy; }
++    void setFPS(unsigned int f)  { fps = f; }
+     void setOffsetCenter();
+ 
+-    void setFrame0(PIX *f0)
+-    {
+-        assert(frame0 != 0);
+-        frame0 = f0;
+-    }
+-
+     // Accessor functions.
+     unsigned int getWidth()  const { return twidth; }
+     unsigned int getHeight() const { return theight; }
+@@ -78,7 +72,6 @@
+ 
+     unsigned int getNumFrames() const { return numFrames; }
+ 
+-
+     float  getFPS()         const { return fps; }
+     bool   getDoesExist()   const { return doesExist; }
+     int    getCurFrame ()   const { return (int) curFrame; }
+@@ -204,6 +197,9 @@
+ 
+     int  loadAllBMPInDirectory(const char *path);
+ 
++    // Text rendering functions
++    void renderText(const char *str, PIX color, PIX bgcolor);
++    
+     // Blit a single character of text.
+     void bltChar8x8(int x, int y, unsigned char character, const PIX &amp;color);
+     void bltString(int x, int y, const char * str, const PIX&amp; color);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -135,13 +135,17 @@
+ 
+ void GameManager::drawTextCenteredOnScreen(const char *string, PIX color)
+ {
+-    screen-&gt;lock();
++        Surface text;
++        text.renderText(string, color, 0);
++        screen-&gt;lock();
+     
+-    screen-&gt;fill(0);
+-    screen-&gt;bltStringCenter(string, color);
++        screen-&gt;fill(0);
++        int x = (screen-&gt;getWidth() / 2) - (text.getWidth() / 2);
++        int y = (screen-&gt;getHeight() / 2) - (text.getHeight() / 2);
++        text.blt(*screen,x,y);
+     
+-    screen-&gt;unlock();
+-    screen-&gt;copyToVideoFlip();
++        screen-&gt;unlock();
++        screen-&gt;copyToVideoFlip();
+ }
+ 
+ // ******************************************************************
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -28,35 +28,47 @@
+     iRect bounds;
+     getBounds(bounds);
+ 
+-    if (clicked) {
+-        dest.fillRect(bounds, componentBodyColor);
+-        dest.drawButtonBorder(bounds, bottomRightBorderColor, topLeftBorderColor);
+-        dest.bltStringCenteredInRect(bounds, label.c_str(), Color::yellow);
+-    } else if (highlighted) {
+-        dest.fillRect(bounds, componentBodyColor);
+-        dest.drawButtonBorder(bounds, topLeftBorderColor, bottomRightBorderColor);
+-        dest.bltStringCenteredInRect(bounds, label.c_str(), Color::red);
+-    } else {
+-        dest.fillRect(bounds, componentBodyColor);
+-        dest.drawButtonBorder(bounds, topLeftBorderColor, bottomRightBorderColor);
+-        dest.bltStringCenteredInRect(bounds, label.c_str(), Color::white);
+-    }
++    if ( dirty )
++        render();
+ 
++    surface.blt(dest, bounds.min.x, bounds.min.y);
++    
+ } // end Button::draw
+ 
++// render
++void
++Button::render()
++{
++    surface.fill(componentBodyColor);
++    surface.drawButtonBorder(borderTop, borderBottom);
++    
++    Surface text;
++    text.renderText( label.c_str(), textColor, 0);
++    // blit centered and transparent
++    text.bltTrans(surface, (surface.getWidth()/2) - (text.getWidth()/2),
++                           (surface.getHeight()/2) - (text.getHeight()/2));
++    dirty = false;
++}
++
+ // actionPerformed
+ //---------------------------------------------------------------------------
+ void Button::actionPerformed(const mMouseEvent &amp;me)
+ {
+-    if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED) {
+-        highlighted = true;
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
++                || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED) {
++        textColor = Color::red;
++        borderTop = topLeftBorderColor;
++        borderBottom = bottomRightBorderColor;
++        dirty = true; // draw text in red
+     } else if (me.getID() == mMouseEvent::MOUSE_EVENT_EXITED) {
+-        highlighted = false;
+-        clicked = false;
++        textColor = Color::white;
++        borderTop = topLeftBorderColor;
++        borderBottom = bottomRightBorderColor;
++        dirty = true; // draw defaults;
+     } else if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED) {
+-        clicked = true;
+-    } else if (me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED) {
+-        clicked = false;
++        borderTop = bottomRightBorderColor;
++        borderBottom = topLeftBorderColor;
++        textColor = Color::yellow;
++        dirty = true;
+     }
+-
+ } // end Button::actionPerformed
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -27,8 +27,12 @@
+ protected:
+     std::string label;
+     std::string actionCommand;
+-    bool   highlighted;
+-    bool   clicked;
++    
++    PIX borderTop;
++    PIX borderBottom;
++    PIX textColor;
++    
++    void render();
+ 
+ public:
+     Button() : Component()
+@@ -39,7 +43,7 @@
+     Button(const std::string&amp; s) : Component()
+     {
+         reset();
+-
++        
+         label         = s;
+         actionCommand = label;
+     }
+@@ -48,17 +52,10 @@
+ 
+     void reset()
+     {
+-        highlighted   = false;
+-        clicked       = false;
+         label         = &quot;&quot;;
+         actionCommand = &quot;&quot;;
+     }
+ 
+-    bool isHighlighted()
+-    {
+-        return highlighted;
+-    }
+-
+     void setActionCommand(const std::string&amp; l)
+     {
+         label = l;
+@@ -66,6 +63,7 @@
+     void setLabel(const std::string&amp; l)
+     {
+         label = l;
++        dirty = true;
+     }
+ 
+     const std::string&amp; getLabel() const
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -28,62 +28,31 @@
+     iRect bounds;
+ 
+     getBounds(bounds);
++    if ( dirty )
++        render();
+ 
+-    if (state) {
+-        drawCheckBox(dest);
+-        drawCheck(dest);
+-    } else {
+-        drawCheckBox(dest);
+-    }
++    surface.blt(dest, bounds.min.x, bounds.min.y);
+ 
+-    drawLabel(dest);
+-
+ } // end CheckBox::draw
+ 
+-// drawCheckBox
+-//---------------------------------------------------------------------------
+-void CheckBox::drawCheckBox(Surface &amp;dest)
++void
++CheckBox::render()
+ {
+-    iRect bounds;
++    surface.fill(Color::black);
++    Surface text;
++    text.renderText( label.c_str(), textColor, 0);
++    surface.drawRect( iRect(0,0,12,12), Color::gray96);
++    surface.drawRect( iRect(1,1,13,13), Color::white);
++    surface.drawRect( iRect(1,1,12,12), Color::black);
++    if (state) {
++        surface.drawLine( 2, 2, 11, 11, Color::white);
++        surface.drawLine( 2, 11, 11, 2, Color::white);
++    }
++    
++    text.blt( surface, 14+2, (surface.getHeight()/2) - (text.getHeight()/2) );
++    dirty = false;
++}
+ 
+-    getBounds(bounds);
+-
+-    iRect r;
+-
+-    r = iRect(bounds.min.x, bounds.min.y, bounds.max.x - 2, bounds.max.y - 2);
+-    dest.drawRect(r, Color::gray96);
+-
+-    r = iRect(bounds.min.x + 1, bounds.min.y + 1, bounds.max.x - 1, bounds.max.y - 1);
+-    dest.drawRect(r, Color::white);
+-
+-    r = iRect(bounds.min.x + 1, bounds.min.y + 1, bounds.max.x - 2, bounds.max.y - 2);
+-    dest.fillRect(r, Color::black);
+-
+-} // end CheckBox::drawCheckBox
+-
+-// drawCheck
+-//---------------------------------------------------------------------------
+-void CheckBox::drawCheck(Surface &amp;dest)
+-{
+-    iXY pos(min + iXY(2,2));
+-
+-    iXY length(size - iXY(4,4));
+-
+-    dest.drawLine(pos, pos + length, Color::white);
+-
+-    dest.drawLine(pos.x + length.x, pos.y, pos.x, pos.y + length.y, Color::white);
+-
+-} // end CheckBox::drawCheck
+-
+-// drawLabel
+-//---------------------------------------------------------------------------
+-void CheckBox::drawLabel(Surface &amp;dest)
+-{
+-    dest.bltString( min.x + size.x + 8,
+-                    min.y + (size.y - Surface::getFontHeight()) / 2,
+-                    label.c_str(), Color::white);
+-} // end CheckBox::drawLabel
+-
+ // actionPerformed
+ //---------------------------------------------------------------------------
+ void CheckBox::actionPerformed(const mMouseEvent &amp;me)
+@@ -93,6 +62,14 @@
+         state = !state;
+         if(callback)
+             callback-&gt;stateChanged(this);
++        dirty = true;
++    } else if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED) {
++        textColor = Color::yellow;
++        dirty = true; // draw text in red
++    } else if (me.getID() == mMouseEvent::MOUSE_EVENT_EXITED) {
++        textColor = Color::white;
++        dirty = true; // draw defaults;
+     }
+ 
++
+ } // end CheckBox::actionPerformed
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -32,21 +32,25 @@
+     bool   state;
+     StateChangedCallback* callback;
+ 
+-    virtual void drawCheckBox(Surface &amp;dest);
+-    virtual void drawCheck(Surface &amp;dest);
+-    virtual void drawLabel(Surface &amp;dest);
++    PIX textColor;
+ 
++    void render();
++
+ public:
+     CheckBox(StateChangedCallback* newcallback = 0)
+             : Component(), state(false), callback(newcallback)
+     {
+-        size = iXY(14, 14);
++        setSize(14, 14);
++        textColor = Color::white;
+     }
+ 
+     CheckBox(const std::string&amp; newlabel, bool newstate = false)
+             : Component(), label(newlabel), state(newstate), callback(0)
+     {
+-        size = iXY(14, 14);
++        setSize(14+label.length()*8,14);
++        textColor = Color::white;
++        dirty = true;
++        //size = iXY(14, 14);
+     }
+ 
+     virtual ~CheckBox()
+@@ -64,6 +68,8 @@
+     void setLabel(const std::string&amp; label)
+     {
+         CheckBox::label = label;
++        setSize(14+label.length()*8,14);
++        dirty = true;
+     }
+     void setState(bool state)
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -34,6 +34,7 @@
+     enabled    = true;
+     visible    = true;
+     parent     = 0;
++    surface.free();
+ 
+ } // end Component::reset
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2008-01-08 11:12:10 UTC (rev 1023)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2008-01-13 07:59:44 UTC (rev 1024)
+@@ -40,6 +40,7 @@
+     std::string name;
+     bool    enabled;
+     bool    visible;
++    bool    dirty;
+ 
+     static int borderSize;
+ 
+@@ -90,15 +91,23 @@
+     {
+         min  = r.min;
+         size = r.getSize();
++        surface.create(r.getSizeX(), r.getSizeY(), 1);
++        dirty = true;
+     }
++    void setSize(int x, int y)
++    {
++        size.x=x;
++        size.y=y;
++        surface.create(x,y,1);
++        dirty=true;
++    }
++    void setSize(const iXY &amp;d) { setSize(d.x, d.y); }
+ 
+ //    void setEnabled(bool _enabled) { enabled = _enabled; }
+ //    void setForeground(PIX _foreground) { foreground = _foreground; }
+     void setLocation(int x, int y);
+     void setLocation(const iXY &amp;p) { setLocation(p.x, p.y); }
+     void setName(const std::string&amp; name) { Component::name = name; }
+-    void setSize(int, int) {}
+-    void setSize(const iXY &amp;d) { setSize(d.x, d.y); }
+ 
+     virtual void draw(Surface &amp;dest) = 0;
+     virtual void actionPerformed(const mMouseEvent &amp;me) = 0;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000065.html">[Netpanzer-cvs] r1023 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Core
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

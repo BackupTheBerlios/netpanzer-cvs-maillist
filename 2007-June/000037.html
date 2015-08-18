@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r992 - in branches/netpanzer-0.8/src/NetPanzer:	Interfaces/unix Network Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r992%20-%20in%20branches/netpanzer-0.8/src/NetPanzer%3A%0A%09Interfaces/unix%20Network%20Views/Game&In-Reply-To=%3C200706161621.l5GGLiK1002457%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000036.html">
+   <LINK REL="Next"  HREF="000038.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r992 - in branches/netpanzer-0.8/src/NetPanzer:	Interfaces/unix Network Views/Game</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r992%20-%20in%20branches/netpanzer-0.8/src/NetPanzer%3A%0A%09Interfaces/unix%20Network%20Views/Game&In-Reply-To=%3C200706161621.l5GGLiK1002457%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r992 - in branches/netpanzer-0.8/src/NetPanzer:	Interfaces/unix Network Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun 16 18:21:44 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000036.html">[Netpanzer-cvs] r991 - in branches/netpanzer-0.8/src: Lib/Util	NetPanzer/Core
+</A></li>
+        <LI>Next message: <A HREF="000038.html">[Netpanzer-cvs] r993 - in branches/netpanzer-0.8/src/NetPanzer:	Network Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#37">[ date ]</a>
+              <a href="thread.html#37">[ thread ]</a>
+              <a href="subject.html#37">[ subject ]</a>
+              <a href="author.html#37">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-16 18:21:43 +0200 (Sat, 16 Jun 2007)
+New Revision: 992
+
+Modified:
+   branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp
+   branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.hpp
+   branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.hpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.hpp
+Log:
+Fixed problem that would cause clients (and posibly servers) to crash when receiving wrong packet sizes
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -26,6 +26,7 @@
+ #include &quot;LobbyView.hpp&quot;
+ 
+ #include &quot;Desktop.hpp&quot;
++#include &quot;DisconectedView.hpp&quot;
+ 
+ #include &quot;Network/SocketManager.hpp&quot;
+ 
+@@ -51,9 +52,11 @@
+ }
+ 
+ void
+-NetworkClientUnix::onClientDisconected(ClientSocket *s)
++NetworkClientUnix::onClientDisconected(ClientSocket *s, const char *msg)
+ {
+     (void)s;
++    DisconectedView *dv = (DisconectedView *)Desktop::getView(&quot;DisconectedView&quot;);
++    dv-&gt;setMsg(msg);
+     Desktop::setVisibility(&quot;DisconectedView&quot;, true);
+     delete clientsocket;
+     clientsocket=0;
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -37,7 +37,7 @@
+     virtual void checkIncoming();
+ protected:
+     void onClientConnected(ClientSocket *s);
+-    void onClientDisconected(ClientSocket *s);    
++    void onClientDisconected(ClientSocket *s, const char *msg);    
+     
+ private:
+     ClientSocket* clientsocket;
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -147,6 +147,7 @@
+                     packetsize = sizeof(NetMessage);
+                 if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+                     LOGGER.warning(&quot;Received wrong packetsize [%d]&quot;, packetsize);
++                    observer-&gt;onClientDisconected(this, &quot;Received wrong packet size&quot;);
+                     break; // received a wrong packet size
+                 }
+                 
+@@ -157,6 +158,7 @@
+                 if ( remaining &gt; _MAX_NET_PACKET_SIZE ) {
+                     // The only possibility of getting in here is...
+                     LOGGER.warning(&quot;Received wrong packetsize (remaining) [%d]&quot;,remaining);
++                    observer-&gt;onClientDisconected(this, &quot;Received wrong packet size&quot;);
+                     break;
+                 }
+                 
+@@ -184,7 +186,7 @@
+ 
+                 if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+                     LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Received wrong packetsize (half) [%d]&quot;, id, packetsize);
+-                    tempoffset=0;
++                    observer-&gt;onClientDisconected(this, &quot;Received wrong packet size&quot;);
+                     break; // received a wrong packet size
+                 }
+                 
+@@ -220,7 +222,7 @@
+     (void)so;
+     LOGGER.warning(&quot;ClientSocket:: Disconected NetId[%d]!&quot;, id);
+     socket=0;
+-    observer-&gt;onClientDisconected(this);
++    observer-&gt;onClientDisconected(this, &quot;Network connection closed&quot;);
+ }
+ 
+ std::string
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.hpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.hpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -35,7 +35,7 @@
+ protected:
+     friend class ClientSocket;
+     virtual void onClientConnected(ClientSocket *cso) = 0;
+-    virtual void onClientDisconected(ClientSocket *cso) = 0;
++    virtual void onClientDisconected(ClientSocket *cso, const char * msg) = 0;
+ };
+ 
+ class ClientSocket : public network::TCPSocketObserver
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.cpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.cpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -72,9 +72,9 @@
+ }
+ 
+ void
+-ServerSocket::onClientDisconected(ClientSocket *s)
++ServerSocket::onClientDisconected(ClientSocket *s, const char * msg)
+ {
+-    LOGGER.debug(&quot;ServerSocket::onClientDisconnected() [%d]&quot;, s-&gt;getId());
++    LOGGER.warning(&quot;ServerSocket::onClientDisconnected() [%d] %s&quot;, s-&gt;getId(), msg);
+     clients.erase(s-&gt;getId());
+     delete s;
+ }
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.hpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.hpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Network/ServerSocket.hpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -42,7 +42,7 @@
+ protected:
+     network::TCPSocketObserver * onNewConnection(TCPListenSocket *so,const Address &amp;fromaddr);
+     void onClientConnected(ClientSocket *s);
+-    void onClientDisconected(ClientSocket *s);
++    void onClientDisconected(ClientSocket *s, const char * msg);
+     friend class SocketClient;
+ 
+ private:
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.cpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.cpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -116,9 +116,8 @@
+ {
+     removeAllButtons();
+ 
+-    setBordered(false);
++    setBordered(true);
+     setAllowResize(false);
+-    setDisplayStatusBar(false);
+ 
+     resize(screen-&gt;getWidth(),screen-&gt;getHeight());
+     moveTo(0,0);
+@@ -135,7 +134,7 @@
+     iRect r(min, max);
+ 
+     viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+-    viewArea.bltStringCenter(&quot;You have been disconected from server&quot;, Color::white);
++    viewArea.bltStringCenter(disconectMsg.c_str(), Color::white);
+ 
+     View::doDraw(viewArea, clientArea);
+ }
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.hpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.hpp	2007-06-16 09:22:30 UTC (rev 991)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/Game/DisconectedView.hpp	2007-06-16 16:21:43 UTC (rev 992)
+@@ -21,6 +21,7 @@
+ 
+ #include &quot;SpecialButtonView.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
++#include &lt;string&gt;
+ 
+ //---------------------------------------------------------------------------
+ class DisconectedView : public SpecialButtonView
+@@ -28,12 +29,14 @@
+ private:
+     void init();
+     static void buttonOk();
++    std::string disconectMsg;
+ 
+ public:
+     DisconectedView();
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void doActivate();
++    void setMsg(const char * msg) { disconectMsg=msg; }
+ };
+ 
+ #endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000036.html">[Netpanzer-cvs] r991 - in branches/netpanzer-0.8/src: Lib/Util	NetPanzer/Core
+</A></li>
+	<LI>Next message: <A HREF="000038.html">[Netpanzer-cvs] r993 - in branches/netpanzer-0.8/src/NetPanzer:	Network Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#37">[ date ]</a>
+              <a href="thread.html#37">[ thread ]</a>
+              <a href="subject.html#37">[ subject ]</a>
+              <a href="author.html#37">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

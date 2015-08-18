@@ -1,0 +1,371 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1136 - in trunk/netpanzer: pics/default	src/NetPanzer/Classes src/NetPanzer/Objectives	src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-July/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1136%20-%20in%20trunk/netpanzer%3A%20pics/default%0A%09src/NetPanzer/Classes%20src/NetPanzer/Objectives%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C200907011147.n61BlqH4011669%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000166.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1136 - in trunk/netpanzer: pics/default	src/NetPanzer/Classes src/NetPanzer/Objectives	src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1136%20-%20in%20trunk/netpanzer%3A%20pics/default%0A%09src/NetPanzer/Classes%20src/NetPanzer/Objectives%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C200907011147.n61BlqH4011669%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1136 - in trunk/netpanzer: pics/default	src/NetPanzer/Classes src/NetPanzer/Objectives	src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul  1 13:47:52 CEST 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000166.html">[Netpanzer-cvs] r1137 - in trunk/netpanzer/src/NetPanzer: Classes	Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#165">[ date ]</a>
+              <a href="thread.html#165">[ thread ]</a>
+              <a href="subject.html#165">[ subject ]</a>
+              <a href="author.html#165">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-07-01 13:47:31 +0200 (Wed, 01 Jul 2009)
+New Revision: 1136
+
+Added:
+   trunk/netpanzer/pics/default/loadingBG.bmp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+- fix: previous commit had an error and was not possible to select a unit by normal click on it
+- NEW: loading window has changed, now it shows an outpost, the messages appears on a transparent window, on the top right corner there is a &quot;www.netpanzer.org&quot;
+- fix: when one player captures an outpost, the destination point is reset (thanks to Ilidur on forum for suggestion.
+
+
+
+Added: trunk/netpanzer/pics/default/loadingBG.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/default/loadingBG.bmp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-06-30 16:45:29 UTC (rev 1135)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-07-01 11:47:31 UTC (rev 1136)
+@@ -154,9 +154,15 @@
+         return _cursor_blocked;
+     }
+ 	
+-	Unit * unit = UnitInterface::queryNonPlayerUnitAtWorld( loc, PlayerInterface::getLocalPlayerIndex() );
++	//Unit * unit = UnitInterface::queryNonPlayerUnitAtWorld( loc, PlayerInterface::getLocalPlayerIndex() );
++    Unit * unit = UnitInterface::queryUnitAtMapLoc( map_loc );
+ 	if ( unit )
+ 	{
++        if ( unit-&gt;player-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
++        {
++            return _cursor_player_unit;
++        }
++        
+ 		if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
+ 		{
+ 			if ( KeyboardInterface::getKeyState(SDLK_a) )
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2009-06-30 16:45:29 UTC (rev 1135)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2009-07-01 11:47:31 UTC (rev 1136)
+@@ -34,43 +34,6 @@
+ }
+ 
+ void
+-Objective::objectiveMesgUpdateOccupation(const ObjectiveMessage* message)
+-{
+-    const UpdateOccupationsStatus *occupation_update
+-        = (const UpdateOccupationsStatus *) message;
+-
+-    if ( objective_state.occupation_status == _occupation_status_occupied )
+-    {
+-        objective_state.occupying_player-&gt;decObjectivesHeld();
+-    }
+-    
+-    objective_state.occupation_status = occupation_update-&gt;occupation_status;
+-    objective_state.occupying_player
+-        = PlayerInterface::getPlayer(occupation_update-&gt;getOccupyingPlayerID());
+-
+-    Outpost* outpost = dynamic_cast&lt;Outpost*&gt; (this);
+-    if(outpost)
+-    {
+-        outpost-&gt;unit_generation_on_flag = occupation_update-&gt;unit_gen_on;
+-        outpost-&gt;unit_generation_type = occupation_update-&gt;unit_type;
+-        UnitProfile* profile =
+-            UnitProfileInterface::getUnitProfile(
+-                    outpost-&gt;unit_generation_type );
+-        outpost-&gt;unit_generation_timer.changePeriod((float)profile-&gt;regen_time);
+-        outpost-&gt;unit_generation_timer.setTimeLeft(
+-                float(occupation_update-&gt;getTimeLeft()) / 128.0);
+-    }
+-
+-    if( objective_state.occupation_status != _occupation_status_unoccupied )
+-    {
+-        objective_state.occupying_player-&gt;incObjectivesHeld();
+-        
+-        ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;'%s' has been occupied by '%s'&quot;,
+-                objective_state.name, objective_state.occupying_player-&gt;getName().c_str() );
+-    }
+-}
+-
+-void
+ Objective::objectiveMesgSync(const ObjectiveMessage* message)
+ {
+     const SyncObjective *sync_mesg = (const SyncObjective*) message;
+@@ -107,10 +70,6 @@
+ void Objective::processMessage(const ObjectiveMessage* message)
+ {
+     switch(message-&gt;message_type) {
+-        case _objective_mesg_update_occupation:
+-            objectiveMesgUpdateOccupation(message);
+-            break;
+-
+         case _objective_mesg_sync_objective:
+             objectiveMesgSync(message);
+             break;
+@@ -118,6 +77,7 @@
+         case _objective_mesg_change_unit_generation:
+         case _objective_mesg_disown_player_objective:
+         case _objective_mesg_change_output_location:
++        case _objective_mesg_update_occupation:
+             break;
+ 
+         default:
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp	2009-06-30 16:45:29 UTC (rev 1135)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp	2009-07-01 11:47:31 UTC (rev 1136)
+@@ -65,7 +65,6 @@
+ class Objective
+ {
+ protected:
+-    void objectiveMesgUpdateOccupation(const ObjectiveMessage* message);
+     void objectiveMesgSync(const ObjectiveMessage* message);
+ 
+ public:
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2009-06-30 16:45:29 UTC (rev 1135)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2009-07-01 11:47:31 UTC (rev 1136)
+@@ -69,7 +69,8 @@
+             objective_state.occupying_player = player;
+             objective_state.occupying_player-&gt;incObjectivesHeld();
+             objective_state.occupation_status = _occupation_status_occupied;
+-
++            unit_collection_loc = outpost_map_loc + iXY( 13, 13 );
++            
+             update_mesg.status_update.set(objective_state.ID,
+                         objective_state.occupation_status,
+                         objective_state.occupying_player-&gt;getID(),
+@@ -91,6 +92,8 @@
+             objective_state.occupying_player = player;
+             objective_state.occupying_player-&gt;incObjectivesHeld();
+             objective_state.occupation_status = _occupation_status_occupied;
++            unit_collection_loc = outpost_map_loc + iXY( 13, 13 );
++            
+             update_mesg.status_update.set(
+                     objective_state.ID,
+                     objective_state.occupation_status,
+@@ -310,9 +313,44 @@
+ }
+ 
+ void
++Outpost::objectiveMesgUpdateOccupation(const ObjectiveMessage* message)
++{
++    const UpdateOccupationsStatus *occupation_update
++        = (const UpdateOccupationsStatus *) message;
++
++    if ( objective_state.occupation_status == _occupation_status_occupied )
++    {
++        objective_state.occupying_player-&gt;decObjectivesHeld();
++    }
++    
++    objective_state.occupation_status = occupation_update-&gt;occupation_status;
++    objective_state.occupying_player
++        = PlayerInterface::getPlayer(occupation_update-&gt;getOccupyingPlayerID());
++
++    unit_generation_on_flag = occupation_update-&gt;unit_gen_on;
++    unit_generation_type = occupation_update-&gt;unit_type;
++    
++    UnitProfile* profile = UnitProfileInterface::getUnitProfile( unit_generation_type );
++    
++    unit_generation_timer.changePeriod((float)profile-&gt;regen_time);
++    unit_generation_timer.setTimeLeft(
++                                float(occupation_update-&gt;getTimeLeft()) / 128.0);
++    unit_collection_loc = outpost_map_loc + iXY( 13, 13 );
++
++    if( objective_state.occupation_status != _occupation_status_unoccupied )
++    {
++        objective_state.occupying_player-&gt;incObjectivesHeld();
++        
++        ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;'%s' has been occupied by '%s'&quot;,
++                objective_state.name, objective_state.occupying_player-&gt;getName().c_str() );
++    }
++}
++
++void
+ Outpost::processMessage(const ObjectiveMessage* message)
+ {
+-    switch(message-&gt;message_type) {
++    switch(message-&gt;message_type)
++    {
+         case _objective_mesg_change_unit_generation:
+             objectiveMesgChangeUnitGeneration(message);
+             break;
+@@ -324,6 +362,11 @@
+         case _objective_mesg_change_output_location:
+             objectiveMesgChangeOutputLocation(message);
+             break;
++            
++        case _objective_mesg_update_occupation:
++            objectiveMesgUpdateOccupation(message);
++            break;
++            
+     }
+ 
+     Objective::processMessage(message);
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp	2009-06-30 16:45:29 UTC (rev 1135)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp	2009-07-01 11:47:31 UTC (rev 1136)
+@@ -25,10 +25,13 @@
+ {
+ private:
+     unsigned char outpost_state;
++    iXY unit_generation_loc;
++    iXY occupation_pad_offset;
++    
++protected:
+     iXY outpost_map_loc;
+-    iXY unit_generation_loc;
+     iXY unit_collection_loc;
+-    iXY occupation_pad_offset;
++
+ public:
+     unsigned short unit_generation_type;
+     bool unit_generation_on_flag;
+@@ -48,6 +51,7 @@
+     void objectiveMesgChangeUnitGeneration(const ObjectiveMessage* message);
+     void objectiveMesgDisownPlayerObjective(const ObjectiveMessage* message);
+     void objectiveMesgChangeOutputLocation(const ObjectiveMessage* message);
++    void objectiveMesgUpdateOccupation(const ObjectiveMessage* message);
+ 
+ public:
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-06-30 16:45:29 UTC (rev 1135)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-07-01 11:47:31 UTC (rev 1136)
+@@ -39,7 +39,7 @@
+ 
+     resize(640, 480);
+     
+-    add( Button::createTextButton(&quot;abort&quot;,&quot;Abort&quot;, iXY(628 - 60, 302 - 15), 60, BTN_ABORT) );
++    add( Button::createTextButton(&quot;abort&quot;,&quot;Abort&quot;, iXY(530-60-2, 250+175), 60, BTN_ABORT) );
+     
+ }
+ 
+@@ -52,7 +52,9 @@
+     
+     screen-&gt;fill(Color::black);
+     drawImage(backgroundSurface, 0, 0);
+-    drawImage(surface, 179, 153);
++    iRect r(120,250,120+410,250+175);
++    drawTransRect(r, Palette::darkGray256.getColorArray());
++    drawImageTrans(surface, 120, 250);
+     
+     View::doDraw();    
+ }
+@@ -62,7 +64,7 @@
+ {
+     dirty=false;
+     
+-    surface.fill(Color::black);
++    surface.fill(0);//Color::black);
+     
+     int ypos = surface.getHeight() - Surface::getFontHeight();
+     int fontHeight = Surface::getFontHeight();
+@@ -71,7 +73,7 @@
+     while ( i != lines.rend() &amp;&amp; ypos &gt; -fontHeight )
+     {
+         surface.bltString( 0, ypos, (*i).c_str(), Color::white);
+-        i++;
++        ++i;
+         ypos -= fontHeight;
+     }
+ }
+@@ -79,8 +81,8 @@
+ void
+ LoadingView::doActivate()
+ {
+-    backgroundSurface.loadBMP(&quot;pics/backgrounds/menus/menu/loadingMB.bmp&quot;);
+-    surface.create(628 - 179, 302 - 153, 1);
++    backgroundSurface.loadBMP(&quot;pics/default/loadingBG.bmp&quot;);
++    surface.create(410, 175, 1);
+     dirty=true;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-06-30 16:45:29 UTC (rev 1135)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-07-01 11:47:31 UTC (rev 1136)
+@@ -220,7 +220,6 @@
+ void
+ RankView::lMouseDown(const iXY &amp;pos)
+ {
+-	LOGGER.info(&quot;Mouse down, pos = %d,%d&quot;, pos.x, pos.y);
+ 	GameTemplateView::lMouseDown(pos);
+ 
+ 	if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= 40 )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000166.html">[Netpanzer-cvs] r1137 - in trunk/netpanzer/src/NetPanzer: Classes	Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#165">[ date ]</a>
+              <a href="thread.html#165">[ thread ]</a>
+              <a href="subject.html#165">[ subject ]</a>
+              <a href="author.html#165">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

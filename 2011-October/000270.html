@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1244 - trunk/netpanzer/src/NetPanzer/Scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1244%20-%20trunk/netpanzer/src/NetPanzer/Scripts&In-Reply-To=%3C20111006142035.563F548130A%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000269.html">
+   <LINK REL="Next"  HREF="000271.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1244 - trunk/netpanzer/src/NetPanzer/Scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1244%20-%20trunk/netpanzer/src/NetPanzer/Scripts&In-Reply-To=%3C20111006142035.563F548130A%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1244 - trunk/netpanzer/src/NetPanzer/Scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct  6 16:20:35 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000269.html">[Netpanzer-cvs] r1243 - trunk/netpanzer/src/NetPanzer/PowerUps
+</A></li>
+        <LI>Next message: <A HREF="000271.html">[Netpanzer-cvs] r1245 - in trunk/netpanzer: src/NetPanzer/Classes	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#270">[ date ]</a>
+              <a href="thread.html#270">[ thread ]</a>
+              <a href="subject.html#270">[ subject ]</a>
+              <a href="author.html#270">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-06 16:20:34 +0200 (Thu, 06 Oct 2011)
+New Revision: 1244
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+Log:
+fix not checking for empty parameters after commands in scripts, it was causing an early exit from game due to an exception
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-06 12:12:21 UTC (rev 1243)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-06 14:20:34 UTC (rev 1244)
+@@ -181,7 +181,10 @@
+         if ( end != NPString::npos )
+         {
+             NPString::size_type param_start = str.find_first_not_of(&quot; \t&quot;, end);
+-            params.assign(str, param_start, -1);
++            if ( param_start != NPString::npos )
++            {
++                params.assign(str, param_start, -1);
++            }
+         }
+     }
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000269.html">[Netpanzer-cvs] r1243 - trunk/netpanzer/src/NetPanzer/PowerUps
+</A></li>
+	<LI>Next message: <A HREF="000271.html">[Netpanzer-cvs] r1245 - in trunk/netpanzer: src/NetPanzer/Classes	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#270">[ date ]</a>
+              <a href="thread.html#270">[ thread ]</a>
+              <a href="subject.html#270">[ subject ]</a>
+              <a href="author.html#270">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

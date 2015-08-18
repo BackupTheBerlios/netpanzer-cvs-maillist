@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1307 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1307%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20System&In-Reply-To=%3C20111213161022.4AD45481546%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000332.html">
+   <LINK REL="Next"  HREF="000334.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1307 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces System</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1307%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20System&In-Reply-To=%3C20111213161022.4AD45481546%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1307 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces System">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 13 17:10:22 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000332.html">[Netpanzer-cvs] r1306 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000334.html">[Netpanzer-cvs] r1308 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#333">[ date ]</a>
+              <a href="thread.html#333">[ thread ]</a>
+              <a href="subject.html#333">[ subject ]</a>
+              <a href="author.html#333">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-12-13 17:10:21 +0100 (Tue, 13 Dec 2011)
+New Revision: 1307
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+Log:
+Better method for unicode support.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-12 13:42:56 UTC (rev 1306)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-13 16:10:21 UTC (rev 1307)
+@@ -236,7 +236,7 @@
+         // XXX ALLY
+         if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
+         {
+-            if ( KeyboardInterface::isCharPressed('A') )
++            if ( KeyboardInterface::getKeyState(SDLK_a) )
+             {
+                 if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
+                 {
+@@ -256,7 +256,7 @@
+         }
+         else
+         {
+-            if ( KeyboardInterface::isCharPressed('A') )
++            if ( KeyboardInterface::getKeyState(SDLK_a) )
+             {
+                 return _cursor_break_allie;
+             }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp	2011-12-12 13:42:56 UTC (rev 1306)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp	2011-12-13 16:10:21 UTC (rev 1307)
+@@ -19,6 +19,7 @@
+ 
+ #include &quot;KeyboardInterface.hpp&quot;
+ 
++int KeyboardInterface::key_table_unicode[SDLK_LAST];
+ bool KeyboardInterface::key_table[SDLK_LAST];
+ bool KeyboardInterface::previous_key_state[SDLK_LAST];
+ bool KeyboardInterface::textmode;
+@@ -32,14 +33,15 @@
+     memcpy(previous_key_state, key_table, sizeof(key_table));
+ }
+ 
+-void KeyboardInterface::keyPressed(int scancode)
++void KeyboardInterface::keyPressed(int scancode, int Unicode)
+ {
+-    key_table[scancode] = true;
++    key_table_unicode[scancode] = Unicode;
++    key_table[key_table_unicode[scancode]] = true;
+ }
+ 
+ void KeyboardInterface::keyReleased(int scancode)
+ {
+-    key_table[scancode] = false;
++    key_table[key_table_unicode[scancode]] = false;
+ }
+ 
+ bool KeyboardInterface::getKeyPressed(int scanCode)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp	2011-12-12 13:42:56 UTC (rev 1306)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp	2011-12-13 16:10:21 UTC (rev 1307)
+@@ -28,6 +28,7 @@
+ class KeyboardInterface
+ {
+ protected:
++    static int key_table_unicode[SDLK_LAST];
+     static bool key_table[SDLK_LAST];
+     static bool previous_key_state[SDLK_LAST];
+     static bool textmode;
+@@ -40,10 +41,11 @@
+     {
+         memset(key_table, 0, sizeof(key_table));
+         memset(previous_key_state, 0, sizeof(previous_key_state));
++        memset(key_table_unicode, 0, sizeof(key_table_unicode));
+     }
+ 
+     static void sampleKeyboard();
+-    static void keyPressed(int scancode);
++    static void keyPressed(int scancode, int Unicode);
+     static void keyReleased(int scancode);
+ 
+     static bool getKeyPressed(int scanCode);
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2011-12-12 13:42:56 UTC (rev 1306)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2011-12-13 16:10:21 UTC (rev 1307)
+@@ -27,6 +27,18 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
++void Translate_Sym(SDL_KeyboardEvent *key)
++{
++    if(((key-&gt;keysym.unicode) != 0) &amp;&amp; (key-&gt;keysym.unicode &lt; 256) )
++    {
++        KeyboardInterface::keyPressed(key-&gt;keysym.sym, key-&gt;keysym.unicode);
++    }
++    else
++    {
++        KeyboardInterface::keyPressed(key-&gt;keysym.sym, key-&gt;keysym.sym);
++    }     
++}
++
+ bool handleSDLEvents()
+ {
+     static SDL_Event event;
+@@ -47,7 +59,8 @@
+             MouseInterface::onMouseMoved(&amp;event.motion);
+             break;
+         case SDL_KEYDOWN: {
+-                KeyboardInterface::keyPressed(event.key.keysym.sym);
++                
++                Translate_Sym(&amp;event.key);
+                 char c = event.key.keysym.unicode &amp; 0x7F;
+                 if (isprint(c)) {
+                     KeyboardInterface::putChar(c);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000332.html">[Netpanzer-cvs] r1306 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000334.html">[Netpanzer-cvs] r1308 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#333">[ date ]</a>
+              <a href="thread.html#333">[ thread ]</a>
+              <a href="subject.html#333">[ subject ]</a>
+              <a href="author.html#333">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

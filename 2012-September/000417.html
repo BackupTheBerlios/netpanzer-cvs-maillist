@@ -1,0 +1,644 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1393 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1393%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120904131844.BACBC55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000416.html">
+   <LINK REL="Next"  HREF="000418.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1393 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1393%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120904131844.BACBC55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1393 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Tue Sep  4 15:18:44 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000416.html">[Netpanzer-cvs] r1392 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000418.html">[Netpanzer-cvs] r1394 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Actions src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#417">[ date ]</a>
+              <a href="thread.html#417">[ thread ]</a>
+              <a href="subject.html#417">[ subject ]</a>
+              <a href="author.html#417">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-09-04 15:18:44 +0200 (Tue, 04 Sep 2012)
+New Revision: 1393
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+Log:
+Teammode:
+  - delete change team view.
+ - Change team names to yellow and red.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-02 16:16:59 UTC (rev 1392)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-04 13:18:44 UTC (rev 1393)
+@@ -332,18 +332,12 @@
+             Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
+         }
+     }
+-    
+-    if ( KeyboardInterface::getKeyPressed(SDLK_t) )
+-    {
+-        if (GameConfig::game_teammode)
+-            Desktop::toggleVisibility( &quot;GTeamView&quot; );
+-    }
+ 
+     if ( KeyboardInterface::getKeyPressed(SDLK_m) )
+     {
+         Desktop::toggleVisibility( &quot;MiniMapView&quot; );
+     }
+-    
++
+     if ( KeyboardInterface::getKeyPressed(SDLK_o) )
+     {
+         toggleDisplayOutpostNames();
+@@ -378,19 +372,19 @@
+        &amp;&amp; ! Desktop::getVisible(&quot;GFlagSelectionView&quot;) ) {
+         Desktop::toggleVisibility( &quot;HelpScrollView&quot; );
+     }
+-    
++
+     if (KeyboardInterface::getKeyPressed(SDLK_TAB) ) {
+         Desktop::toggleVisibility( &quot;RankView&quot; );
+     }
+-    
++
+     if (KeyboardInterface::getKeyPressed(SDLK_F3)) {
+         Desktop::toggleVisibility( &quot;DesktopView&quot; );
+     }
+-    
++
+     if (KeyboardInterface::getKeyPressed(SDLK_F4)) {
+         Desktop::toggleVisibility( &quot;CodeStatsView&quot; );
+     }
+-    
++
+     if (KeyboardInterface::getKeyPressed( SDLK_F5 )) {
+         //  DEBUG VIEW
+         Desktop::toggleVisibility( &quot;LibView&quot; );
+@@ -518,7 +512,7 @@
+ WorldInputCmdProcessor::evaluateKeyboardEvents()
+ {
+     getManualControlStatus();
+-    
++
+     evaluateGroupingKeys();
+ 
+     evaluateKeyCommands();
+@@ -628,7 +622,7 @@
+     }
+ 
+     unsigned char click_status;
+-    
++
+     click_status = getCursorStatus(world_pos);
+     switch(click_status)
+     {
+@@ -659,7 +653,7 @@
+         &amp;&amp; abs(box_release.y - box_press.y) &gt; 3)
+         {
+             return;
+-        } 
++        }
+     }
+ 
+     if (outpost_goal_selection != OBJECTIVE_NONE )
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-09-02 16:16:59 UTC (rev 1392)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-09-04 13:18:44 UTC (rev 1393)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -349,9 +349,9 @@
+ 
+     if ( ! game_team_names )
+     {
+-        game_team_names = new NPString(&quot;One, Two&quot;);
++        game_team_names = new NPString(&quot;Yellow, Red&quot;);
+     }
+-    
++
+     if ( ! server_bindaddress )
+     {
+         server_bindaddress = new NPString(&quot;&quot;);
+@@ -376,8 +376,8 @@
+     {
+         player_name = new NPString(&quot;Player&quot;);
+     }
+-    
+ 
++
+     ScriptManager::bindStaticVariables(table_name + &quot;.video&quot;,
+                                        &quot;ConfigVideoMetaTable&quot;,
+                                        video_getters, video_setters);
+@@ -418,7 +418,7 @@
+       quickConnect(&quot;quickconnect&quot;, false),
+       needPassword(&quot;needpassword&quot;, false),
+       serverConnect(&quot;serverconnect&quot;, &quot;&quot;)
+-    
++
+ {
+     this-&gt;luaconfigfile = luaconfigfile;
+     this-&gt;usePhysFS = usePhysFS;
+@@ -431,7 +431,7 @@
+     }
+ 
+     player_name-&gt;assign(default_player.str());
+-    
++
+     try
+     {
+         loadConfig();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-02 16:16:59 UTC (rev 1392)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-04 13:18:44 UTC (rev 1393)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 2003 Ivo Danihelka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">ivo at danihelka.net</A>&gt;
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -70,7 +70,6 @@
+ #include &quot;Views/Game/RankView.hpp&quot;
+ #include &quot;Views/Game/EndRoundView.hpp&quot;
+ #include &quot;Views/Game/GFlagSelectionView.hpp&quot;
+-#include &quot;Views/Game/GTeamView.hpp&quot;
+ #include &quot;Views/Game/PrepareTeam.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ #include &quot;Views/Game/CodeStatsView.hpp&quot;
+@@ -136,7 +135,7 @@
+ {
+     delete sound;
+     sound = 0;
+-    
++
+     LOGGER.info(&quot;Initializing sound system.&quot;);
+     try {
+         if ( GameConfig::sound_enable )
+@@ -176,7 +175,6 @@
+     Desktop::add(new HelpScrollView());
+ 
+     Desktop::add(new ChatView());
+-    Desktop::add(new GTeamView());
+     Desktop::add(new PrepareTeam());
+ 
+     LoadingView *lv = new LoadingView();
+@@ -196,7 +194,7 @@
+     Desktop::add(new ServerListView());
+ 
+     Desktop::add(new MenuTemplateView());
+-    
++
+     Desktop::setVisibilityAllWindows(false);
+     Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+     Desktop::setVisibility(&quot;MainView&quot;, true);
+@@ -277,7 +275,7 @@
+     LoadingView::show();
+     // refresh the view in each append
+     LoadingView::append( &quot;Launching Server ...&quot; );
+-    
++
+     ScriptManager::runFile(&quot;server_commands_load&quot;,&quot;scripts/servercommands.lua&quot;);
+     ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
+ 
+@@ -324,7 +322,7 @@
+         LoadingView::loadError();
+         return;
+     }
+-    
++
+     // refresh views
+     LoadingView::update( &quot;Launching Server ... (100%) &quot; );
+     graphicsLoop();
+@@ -333,7 +331,7 @@
+ 
+     LoadingView::append( &quot;Loading Game Data ...&quot; );
+     graphicsLoop();
+-    
++
+     GameConfig::game_map-&gt;assign( MapsManager::getNextMap(&quot;&quot;) );
+     const char* mapname = GameConfig::game_map-&gt;c_str();
+ 
+@@ -397,16 +395,16 @@
+ 
+     LoadingView::update( &quot;Initializing Game Logic ... (100%) &quot; );
+     graphicsLoop();
+-    
++
+     LoadingView::append( &quot;Spawning Player ...&quot; );
+     graphicsLoop();
+-    
++
+     player_state = PlayerInterface::allocateLoopBackPlayer();
+     const char* playername = GameConfig::player_name-&gt;c_str();
+     player_state-&gt;setName(playername);
+-    
++
+     LoadingView::update( &quot;Spawning Player ... (100%)&quot; );
+-    
++
+     graphicsLoop();
+ 
+     wait.changePeriod( 3 );
+@@ -507,7 +505,7 @@
+ //-----------------------------------------------------------------
+ void PlayerGameManager::processSystemKeys()
+ {
+-    if (Desktop::getVisible(&quot;GameView&quot;)) 
++    if (Desktop::getVisible(&quot;GameView&quot;))
+     {
+ 
+         if (KeyboardInterface::getKeyState( SDLK_LALT ) ||
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-09-02 16:16:59 UTC (rev 1392)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-09-04 13:18:44 UTC (rev 1393)
+@@ -1,241 +0,0 @@
+-/*
+-Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+- 
+-#include &quot;GTeamView.hpp&quot;
+-#include &quot;Classes/ScreenSurface.hpp&quot;
+-#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+-#include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;2D/Palette.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/TeamManager.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
+-#include &quot;Resources/ResourceManager.hpp&quot;
+-#include &quot;Views/Components/Button.hpp&quot;
+-
+-#include &quot;Actions/Action.hpp&quot;
+-
+- 
+-static const char * stats_format = &quot;%-16s%6i%7i%6i&quot;;
+-static Uint8 newteam = 0;
+-static Timer chantetimer;
+-
+-class RequestTeamChangeAction : public Action
+-{
+-public:
+-    GTeamView * view;
+-    RequestTeamChangeAction(GTeamView * view) : Action(false), view(view) {}
+-    void execute()
+-    {
+-        view-&gt;requestTeamChange();
+-    }
+-};
+-
+-GTeamView::GTeamView() : GameTemplateView()
+-{
+-    setSearchName(&quot;GTeamView&quot;);
+-    setTitle(&quot;Team View&quot;);
+-    setSubTitle(&quot;&quot;);
+- 
+-    setAllowResize(false);
+-    setAllowMove(false);
+-    setVisible(false);
+-    setBordered(false);
+- 
+-    loaded = false; 
+-    chantetimer.changePeriod(2); //2 sec on start
+-    chantetimer.reset();
+-}
+- 
+-void GTeamView::init()
+-{
+-    removeComponents();
+-    iRect viewrect = getClientRect();
+- 
+-    firstrect.min.x = (viewrect.getSizeX()/2) - 350;
+-    firstrect.min.y = (viewrect.getSizeY()/2) - 250;
+-    firstrect.max.x = firstrect.min.x + 350;
+-    firstrect.max.y = firstrect.min.y + 400;
+- 
+-    secondrect.min.x = firstrect.max.x+30;
+-    secondrect.min.y = firstrect.min.y;
+-    secondrect.max.x = secondrect.min.x + 350;
+-    secondrect.max.y = firstrect.max.y;
+- 
+-    changebutton = Button::createNewSpecialButton(&quot; &gt;&gt; &quot;, 
+-                                                  iXY(firstrect.max.x+1, firstrect.min.y+((firstrect.getSizeY()/2)-10)), 
+-                                                  secondrect.min.x-firstrect.max.x,
+-                                                  new RequestTeamChangeAction(this));
+-
+-    add(changebutton);
+-    loaded = true;
+-    if (!chantetimer.count()) changebutton-&gt;disable();
+-}
+- 
+-void GTeamView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    if (!changebutton-&gt;isEnabled() &amp;&amp; chantetimer.count())
+-    {
+-        changebutton-&gt;enable();
+-    }
+-
+-    clientArea.BltRoundRect(firstrect, 14, Palette::darkbrown256.getColorArray());
+-    clientArea.RoundRect(firstrect,14, 15);
+- 
+-    clientArea.BltRoundRect(secondrect, 14, Palette::darkbrown256.getColorArray());
+-    clientArea.RoundRect(secondrect,14, 15);
+- 
+-    drawTeams(clientArea);
+-    View::doDraw(viewArea, clientArea);
+-}
+- 
+-class StatesSortByTeam
+-    : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+-{
+-public:
+-    bool operator() (const PlayerState* state1, const PlayerState* state2)
+-    {
+-            return state1-&gt;getTeamID() &lt; state2-&gt;getTeamID();
+-    }
+-};
+- 
+-void GTeamView::drawTeams(Surface &amp;dest)
+-{
+-    char statBuf[256];
+- 
+-    states.clear();
+-    PlayerID i;
+-    for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
+-    {
+-        PlayerState* state = PlayerInterface::getPlayer(i);
+-        if( state-&gt;isActive() )
+-        {
+-            states.push_back(state);
+-        }
+-    }
+-    std::sort(states.begin(), states.end(), StatesSortByTeam());
+- 
+-    int cur_line_pos = firstrect.min.y +20;
+-    snprintf(statBuf, sizeof(statBuf), stats_format, 
+-             TeamManager::getTeamName(0).c_str(), 
+-             TeamManager::getKills(0),
+-             TeamManager::getLosses(0),
+-             TeamManager::getObjectivesHeld(0));
+-    dest.bltString(firstrect.min.x+30, cur_line_pos, statBuf,Color::lightGreen);
+-    TeamManager::drawFlag(0, dest, firstrect.min.x+7, cur_line_pos-4);
+-    snprintf(statBuf, sizeof(statBuf), stats_format, 
+-             TeamManager::getTeamName(1).c_str(), 
+-             TeamManager::getKills(1),
+-             TeamManager::getLosses(1),
+-             TeamManager::getObjectivesHeld(1));
+-    dest.bltString(secondrect.min.x+30, cur_line_pos, statBuf,Color::lightGreen);
+-    TeamManager::drawFlag(1, dest, secondrect.min.x+7, cur_line_pos-4);
+-    cur_line_pos += 25;
+-    dest.drawLine(firstrect.min.x+10, cur_line_pos-10, firstrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+-    dest.drawLine(secondrect.min.x+10, cur_line_pos-10, secondrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+- 
+-    int Start_x = firstrect.min.x+30;
+-    int current_Team = 0;
+-    Surface * flag = 0;
+-
+-    for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+-            i != states.end(); ++i)
+-    {
+-        const PlayerState* state = *i;
+-
+-        if (current_Team != state-&gt;getTeamID())
+-        {
+-            cur_line_pos = firstrect.min.y +45;
+-            Start_x = secondrect.min.x+30;
+-            current_Team = state-&gt;getTeamID();
+-        }
+-        flag = ResourceManager::getFlag(state-&gt;getFlag());
+-        flag-&gt;blt( dest, Start_x-23, cur_line_pos-4 );
+-
+-        if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+-        {
+-            snprintf(statBuf, sizeof(statBuf),
+-                     stats_format, state-&gt;getName().substr(0,20).c_str(),
+-                     state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getObjectivesHeld());
+-            dest.bltString(Start_x, cur_line_pos, statBuf,Color::cyan);
+-            if (current_Team &gt; 0)
+-            {
+-                newteam=0;
+-                changebutton-&gt;setLabel(&quot;&lt;&lt;&quot;);
+-            }
+-            else
+-            {
+-                newteam=1;
+-                changebutton-&gt;setLabel(&quot;&gt;&gt;&quot;);
+-            }
+-        }
+-        else
+-        {
+-            snprintf(statBuf, sizeof(statBuf),
+-                     stats_format, state-&gt;getName().substr(0,20).c_str(),
+-                     state-&gt;getKills(), state-&gt;getLosses(),state-&gt;getObjectivesHeld());
+-            dest.bltString(Start_x, cur_line_pos, statBuf,Color::gray224);
+-        }
+-        cur_line_pos += 20;
+-    }
+-}
+-void GTeamView::doActivate()
+-{
+-    if ( ! loaded )
+-    {
+-        init();
+-    }
+-    Desktop::setActiveView(this);
+-}
+- 
+-void GTeamView::doDeactivate()
+-{
+-    if ( ! getVisible() )
+-    {
+-        removeComponents();
+-        loaded = false;
+-    }
+-}
+- 
+-void GTeamView::checkResolution(iXY oldResolution, iXY newResolution)
+-{
+-    resize(iXY(newResolution.x, newResolution.y));
+-    moveTo(iXY(0,0));
+-}
+- 
+-void GTeamView::processEvents()
+-{
+-    COMMAND_PROCESSOR.process(false);
+-}
+-
+-void GTeamView::requestTeamChange()
+-{
+-    if (  chantetimer.count())
+-    {
+-        TeamManager::PlayerrequestchangeTeam(PlayerInterface::getLocalPlayerIndex(), newteam);
+-        chantetimer.changePeriod(120); //2 minutes after first change
+-        chantetimer.reset();
+-        changebutton-&gt;disable();
+-    }
+-}
+-
+-void GTeamView::resize(const iXY &amp;size)
+-{
+-    View::resize(size);
+-    init();
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-09-02 16:16:59 UTC (rev 1392)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-09-04 13:18:44 UTC (rev 1393)
+@@ -1,57 +0,0 @@
+-/*
+-Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#ifndef GTEAMVIEW_HPP
+-#define GTEAMVIEW_HPP
+-
+-#include &lt;vector&gt;
+-#include &quot;GameTemplateView.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-
+-class PlayerState;
+-class Button;
+-
+-class GTeamView : public GameTemplateView
+-{
+-private:
+-    bool loaded;
+-
+-    iRect firstrect;
+-    iRect secondrect;
+-    std::vector&lt;const PlayerState*&gt; states;
+-    void drawTeams(Surface &amp;dest);
+-    Button * changebutton;
+-
+-public:
+-    GTeamView();
+-    virtual ~GTeamView()
+-    {}
+-
+-    virtual void doActivate();
+-    virtual void doDeactivate();
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void checkResolution(iXY oldResolution, iXY newResolution);
+-    virtual void processEvents();
+-    virtual void resize(const iXY &amp;size);
+-    
+-    void requestTeamChange();
+-
+-    void init();
+-};
+-
+-#endif // GTEAMVIEW_HPP
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000416.html">[Netpanzer-cvs] r1392 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000418.html">[Netpanzer-cvs] r1394 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Actions src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#417">[ date ]</a>
+              <a href="thread.html#417">[ thread ]</a>
+              <a href="subject.html#417">[ subject ]</a>
+              <a href="author.html#417">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

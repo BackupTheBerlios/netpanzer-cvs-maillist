@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1192 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Interfaces NetPanzer/System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1192%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/Interfaces%20NetPanzer/System&In-Reply-To=%3C201001221536.o0MFagHe003366%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000217.html">
+   <LINK REL="Next"  HREF="000219.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1192 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Interfaces NetPanzer/System</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1192%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/Interfaces%20NetPanzer/System&In-Reply-To=%3C201001221536.o0MFagHe003366%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1192 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Interfaces NetPanzer/System">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Jan 22 16:36:42 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000217.html">[Netpanzer-cvs] r1191 - in trunk/netpanzer/src/NetPanzer:	Interfaces System
+</A></li>
+        <LI>Next message: <A HREF="000219.html">[Netpanzer-cvs] r1193 - in trunk/netpanzer/src/NetPanzer:	Interfaces System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#218">[ date ]</a>
+              <a href="thread.html#218">[ thread ]</a>
+              <a href="subject.html#218">[ subject ]</a>
+              <a href="author.html#218">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-22 16:36:26 +0100 (Fri, 22 Jan 2010)
+New Revision: 1192
+
+Modified:
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/Lib/Util/FileSystem.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp
+Log:
+- new, press F9 to save a screenshoot in .netpanzer/screenshoots/DATE_TIME.bmp
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-22 14:56:33 UTC (rev 1191)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-22 15:36:26 UTC (rev 1192)
+@@ -125,6 +125,18 @@
+     return realname;
+ }
+ 
++std::string getRealWriteName(const char* filename)
++{
++    const char* dir = PHYSFS_getWriteDir();
++    if (dir == 0) {
++        throw Exception(&quot;no writedir defined&quot;);
++    }
++    std::string realname = dir;
++    realname += PHYSFS_getDirSeparator();
++    realname += filename;
++    return realname;
++}
++
+ char** enumerateFiles(const char* directory)
+ {
+     return PHYSFS_enumerateFiles(directory);
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.hpp	2010-01-22 14:56:33 UTC (rev 1191)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.hpp	2010-01-22 15:36:26 UTC (rev 1192)
+@@ -142,6 +142,7 @@
+ 
+ const char* getRealDir(const char* filename);
+ std::string getRealName(const char* filename);
++std::string getRealWriteName(const char* filename);
+ /// remember to call freeLisT
+ char** enumerateFiles(const char* directory);
+ static inline char** enumerateFiles(const std::string&amp; directory)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-22 14:56:33 UTC (rev 1191)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-22 15:36:26 UTC (rev 1192)
+@@ -465,6 +465,11 @@
+         }
+     }
+ 
++    if ( KeyboardInterface::getKeyState(SDLK_F9) )
++    {
++        Screen-&gt;doScreenshoot();
++    }
++
+     if (KeyboardInterface::getKeyState( SDLK_LALT ) ||
+             KeyboardInterface::getKeyState( SDLK_RALT )) {
+         if (KeyboardInterface::getKeyPressed(SDLK_RETURN)) {
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-22 14:56:33 UTC (rev 1191)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-22 15:36:26 UTC (rev 1192)
+@@ -18,9 +18,13 @@
+ 
+ 
+ #include &lt;iostream&gt;
++#include &lt;string&gt;
+ 
++#include &lt;time.h&gt;
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
++#include &quot;Util/Filesystem.hpp&quot;
+ #include &quot;SDLVideo.hpp&quot;
+ #include &lt;stdlib.h&gt;
+ #ifdef _WIN32
+@@ -189,3 +193,16 @@
+     return backBuffer;
+ }
+ 
++void SDLVideo::doScreenshoot()
++{
++    filesystem::mkdir(&quot;screenshoots&quot;);
++
++    char buf[256];
++    time_t curtime = time(0);
++    struct tm* loctime = localtime(&amp;curtime);
++    int timelen = strftime(buf, sizeof(buf), &quot;screenshoots/%Y%m%d_%H%M%S.bmp&quot;, loctime);
++
++    std::string bmpfile = filesystem::getRealWriteName(buf);
++    SDL_SaveBMP(backBuffer, bmpfile.c_str());
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp	2010-01-22 14:56:33 UTC (rev 1191)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp	2010-01-22 15:36:26 UTC (rev 1192)
+@@ -38,6 +38,7 @@
+     void unlockDoubleBuffer();
+     void copyDoubleBufferandFlip();
+     void setPalette(SDL_Color *color);
++    void doScreenshoot();
+ 
+     SDL_Surface* getSurface();
+ }; // end DirectDraw
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000217.html">[Netpanzer-cvs] r1191 - in trunk/netpanzer/src/NetPanzer:	Interfaces System
+</A></li>
+	<LI>Next message: <A HREF="000219.html">[Netpanzer-cvs] r1193 - in trunk/netpanzer/src/NetPanzer:	Interfaces System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#218">[ date ]</a>
+              <a href="thread.html#218">[ thread ]</a>
+              <a href="subject.html#218">[ subject ]</a>
+              <a href="author.html#218">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

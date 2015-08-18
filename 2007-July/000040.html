@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r995 - in branches/netpanzer-0.8: .	src/NetPanzer/Classes/Network src/NetPanzer/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r995%20-%20in%20branches/netpanzer-0.8%3A%20.%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Network&In-Reply-To=%3C200707081439.l68EdqT5009867%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000041.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r995 - in branches/netpanzer-0.8: .	src/NetPanzer/Classes/Network src/NetPanzer/Network</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r995%20-%20in%20branches/netpanzer-0.8%3A%20.%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Network&In-Reply-To=%3C200707081439.l68EdqT5009867%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r995 - in branches/netpanzer-0.8: .	src/NetPanzer/Classes/Network src/NetPanzer/Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  8 16:39:52 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000041.html">[Netpanzer-cvs] r996 - trunk/homepage
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-07-08 16:39:51 +0200 (Sun, 08 Jul 2007)
+New Revision: 995
+
+Modified:
+   branches/netpanzer-0.8/configure.ac
+   branches/netpanzer-0.8/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp
+Log:
+Release for 0.8.2
+Fix problem when sending buffered data, could send data twice and make clients
+to exit by receiving wrong packet
+
+
+Modified: branches/netpanzer-0.8/configure.ac
+===================================================================
+--- branches/netpanzer-0.8/configure.ac	2007-06-28 11:05:41 UTC (rev 994)
++++ branches/netpanzer-0.8/configure.ac	2007-07-08 14:39:51 UTC (rev 995)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [0.8.2-rc7], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [0.8.2], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-06-28 11:05:41 UTC (rev 994)
++++ branches/netpanzer-0.8/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-07-08 14:39:51 UTC (rev 995)
+@@ -218,11 +218,8 @@
+ 
+     case _connect_alert_mesg_client_drop : {
+             connect_alert.set( player_id, _connect_alert_mesg_client_drop );
+-            ConsoleInterface::postMessage(
+-                    &quot;Connection to '%s' has been unexpectedly broken.&quot;,
++            ConsoleInterface::postMessage( &quot;'%s' has left the game for some reason.&quot;,
+                     player_state-&gt;getName().c_str() );
+-            ConsoleInterface::postMessage( &quot;'%s' has left the game.&quot;,
+-                    player_state-&gt;getName().c_str() );
+         }
+         break;
+ 
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp	2007-06-28 11:05:41 UTC (rev 994)
++++ branches/netpanzer-0.8/src/NetPanzer/Network/ClientSocket.cpp	2007-07-08 14:39:51 UTC (rev 995)
+@@ -93,29 +93,28 @@
+ 
+ void ClientSocket::sendMessage(const void* data, size_t size)
+ {
+-    if (socket) {
+-        if (sendpos) {
+-            if (sendpos+size &gt; sizeof(sendbuffer)) {
+-                stringstream errmsg;
+-                errmsg &lt;&lt; &quot;send buffer full 1 [&quot; &lt;&lt; id &lt;&lt; &quot;]&quot;;
+-                throw runtime_error(errmsg.str());
++    if ( socket ) {
++        if ( sendpos ) {
++            if ( sendpos+size &gt; sizeof(sendbuffer) ) {
++                observer-&gt;onClientDisconected(this, &quot;Send buffer full, need to disconnect&quot;);
++                return;
+             }
+-            memcpy(sendbuffer+sendpos,data,size);
+-            sendpos+=size;
++            memcpy(sendbuffer+sendpos, data, size);
++            sendpos += size;
+             sendRemaining();
+         } else {
+             size_t s = socket-&gt;send(data, size);
+             if ( s != size ) {
+-                if (sendpos+size &gt; sizeof(sendbuffer)) {
+-                    stringstream errmsg;
+-                    errmsg &lt;&lt; &quot;send buffer full 2 [&quot; &lt;&lt; id &lt;&lt; &quot;]&quot;;
+-                    throw runtime_error(errmsg.str());
++                size_t remain = size-s;
++                if ( remain &gt; sizeof(sendbuffer) ) {
++                    observer-&gt;onClientDisconected(this, &quot;Send data bigger than buffer, need to disconnect&quot;);
++                    return;
+                 }
+-                memcpy(sendbuffer+sendpos,data,size);
+-                sendpos+=size;
++                memcpy(sendbuffer, (char *)data+s, remain);
++                sendpos = remain;
+             }
+         }
+-    }        
++    }
+ }
+ 
+ void
+@@ -123,11 +122,11 @@
+ {
+     if ( socket &amp;&amp; sendpos ) {
+         size_t s = socket-&gt;send(sendbuffer, sendpos);
+-        if (!s)
++        if ( !s )
+             return;
+         if ( s != sendpos ) {
+-            memmove(sendbuffer,sendbuffer+s,sendpos-s);
+-            sendpos-=s;
++            memmove(sendbuffer, sendbuffer+s, sendpos-s);
++            sendpos -= s;
+         } else
+             sendpos = 0;
+     }
+@@ -140,10 +139,10 @@
+     int dataptr = 0;
+     unsigned int remaining = len;
+     Uint16 packetsize=0;
+-    while (remaining) {
++    while ( remaining ) {
+         if ( !tempoffset ) {
+             if ( remaining &lt; sizeof(NetMessage) ) {
+-                memcpy(tempbuffer,data+dataptr,remaining);
++                memcpy(tempbuffer, data+dataptr, remaining);
+                 tempoffset = remaining;
+                 break; // no more data
+             }
+@@ -164,10 +163,10 @@
+             
+             if ( remaining &gt;= packetsize ) {
+                 EnqueueIncomingPacket(data+dataptr, packetsize, 0, id);
+-                remaining-=packetsize;
+-                dataptr+=packetsize;
++                remaining -= packetsize;
++                dataptr   += packetsize;
+             } else {
+-                memcpy(tempbuffer,data+dataptr,remaining);
++                memcpy(tempbuffer, data+dataptr, remaining);
+                 tempoffset = remaining;
+                 remaining=0;
+             }
+@@ -176,11 +175,11 @@
+                 // copy the needed until netMessage
+                 LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more for head&quot;, id);
+                 unsigned int needsize = sizeof(NetMessage)-tempoffset;
+-                unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
++                unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
+                 memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+-                remaining-=tocopy;
+-                tempoffset+=tocopy;
+-                dataptr+=tocopy;
++                remaining  -= tocopy;
++                tempoffset += tocopy;
++                dataptr    += tocopy;
+             }
+             
+             if ( tempoffset &lt; sizeof(NetMessage) )
+@@ -203,11 +202,11 @@
+             if ( (tempoffset &lt; packetsize) &amp;&amp; remaining ) {
+                 LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more data&quot;, id);
+                 unsigned int needsize = packetsize-tempoffset;
+-                unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
++                unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
+                 memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+-                remaining-=tocopy;
+-                tempoffset+=tocopy;
+-                dataptr+=tocopy;
++                remaining  -= tocopy;
++                tempoffset += tocopy;
++                dataptr    += tocopy;
+             }
+             
+             if ( tempoffset == packetsize ) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000041.html">[Netpanzer-cvs] r996 - trunk/homepage
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

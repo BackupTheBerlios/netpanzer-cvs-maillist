@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1141 - in trunk/netpanzer: src/NetPanzer/Particles	support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-July/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1141%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Particles%0A%09support/scripts&In-Reply-To=%3C200907021643.n62GhuhR003599%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000169.html">
+   <LINK REL="Next"  HREF="000171.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1141 - in trunk/netpanzer: src/NetPanzer/Particles	support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1141%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Particles%0A%09support/scripts&In-Reply-To=%3C200907021643.n62GhuhR003599%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1141 - in trunk/netpanzer: src/NetPanzer/Particles	support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul  2 18:43:56 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000169.html">[Netpanzer-cvs] r1140 - in trunk/netpanzer: .	src/NetPanzer/Interfaces support/scripts
+</A></li>
+        <LI>Next message: <A HREF="000171.html">[Netpanzer-cvs] r1142 - in trunk/netpanzer: pics/default	src/NetPanzer/Core src/NetPanzer/Interfaces src/NetPanzer/Resources
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#170">[ date ]</a>
+              <a href="thread.html#170">[ thread ]</a>
+              <a href="subject.html#170">[ subject ]</a>
+              <a href="author.html#170">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-07-02 18:43:47 +0200 (Thu, 02 Jul 2009)
+New Revision: 1141
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+   trunk/netpanzer/support/scripts/make-linux-binary.sh
+Log:
+- FIX: explosions on 64 bit now works (thanks muuseas for letting me use his computer on ssh)
+- little change on linux support script
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2009-07-01 16:58:45 UTC (rev 1140)
++++ trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2009-07-02 16:43:47 UTC (rev 1141)
+@@ -36,7 +36,7 @@
+ int   Particle2D::drawParticles       = 1;
+ 
+ // Pre-allocation variables.
+-const  size_t MAX_PARTICLE_CLASS_SIZE = 340;
++const  size_t MAX_PARTICLE_CLASS_SIZE = 512;
+ const  int    MAX_PARTICLES           = 3000;
+ //static size_t biggestParticle         = 0;
+ 
+
+Modified: trunk/netpanzer/support/scripts/make-linux-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-linux-binary.sh	2009-07-01 16:58:45 UTC (rev 1140)
++++ trunk/netpanzer/support/scripts/make-linux-binary.sh	2009-07-02 16:43:47 UTC (rev 1141)
+@@ -24,7 +24,6 @@
+       crosslinuxsdlconfig=/usr/local/gcc/i686-linux/bin/sdl-config
+ 
+ i686-linux-strip &quot;${EXENAME}&quot;
+-exit 1
+ 
+ [ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
+ 
+@@ -46,4 +45,4 @@
+ [ -f &quot;${RELEASEDIR}/${ZIPNAME}&quot; ] &amp;&amp; rm -f &quot;${RELEASEDIR}/${ZIPNAME}&quot;
+ 
+ mv &quot;${NPDEST}/../${ZIPNAME}&quot; &quot;${RELEASEDIR}&quot;
+-#rm -rf &quot;${NPDEST}&quot;
++rm -rf &quot;${NPDEST}&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000169.html">[Netpanzer-cvs] r1140 - in trunk/netpanzer: .	src/NetPanzer/Interfaces support/scripts
+</A></li>
+	<LI>Next message: <A HREF="000171.html">[Netpanzer-cvs] r1142 - in trunk/netpanzer: pics/default	src/NetPanzer/Core src/NetPanzer/Interfaces src/NetPanzer/Resources
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#170">[ date ]</a>
+              <a href="thread.html#170">[ thread ]</a>
+              <a href="subject.html#170">[ subject ]</a>
+              <a href="author.html#170">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

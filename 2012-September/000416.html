@@ -1,0 +1,982 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1392 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1392%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Components%20Views/Game&In-Reply-To=%3C20120902161659.C5B5E55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000415.html">
+   <LINK REL="Next"  HREF="000417.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1392 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components Views/Game</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1392%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Components%20Views/Game&In-Reply-To=%3C20120902161659.C5B5E55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1392 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components Views/Game">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sun Sep  2 18:16:59 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000415.html">[Netpanzer-cvs] r1391 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000417.html">[Netpanzer-cvs] r1393 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#416">[ date ]</a>
+              <a href="thread.html#416">[ thread ]</a>
+              <a href="subject.html#416">[ subject ]</a>
+              <a href="author.html#416">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-02 18:16:59 +0200 (Sun, 02 Sep 2012)
+New Revision: 1392
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+Log:
+Fix bug when there were more than 255 messages in the chat box.
+
+Removed the &quot;old&quot; chatting method.
+
+The new:
+
+There is an ugly button left of the chat box, if it is white you are chatting to all, if is yellow you chat with team mates or allies.
+
+Depending on who you chat with, the characters you type will have a different color too.
+
+Pressing &quot;ENTER&quot; any time will focus the chat window (doesn't change who you chat with), if the window was minimized it will be restored.
+
+Pressing &quot;CTRL+ENTER&quot; will focus the chat window AND set to chat with Team mates / allies (also restore the window if minimized).
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -59,6 +59,7 @@
+ #include &quot;Units/Vehicle.hpp&quot;
+ 
+ #include &quot;Scripts/ScriptManager.hpp&quot;
++#include &quot;Views/Game/ChatView.hpp&quot;
+ 
+ WorldInputCmdProcessor COMMAND_PROCESSOR;
+ 
+@@ -72,17 +73,10 @@
+        _cursor_break_allie
+      };
+ 
+-enum { _keyboard_input_mode_command,
+-       _keyboard_input_mode_chat_mesg,
+-       _keyboard_input_mode_allie_mesg
+-     };
+-
+ ObjectiveID WorldInputCmdProcessor::selected_objective_id = 0;
+ 
+ WorldInputCmdProcessor::WorldInputCmdProcessor()
+ {
+-    keyboard_input_mode = _keyboard_input_mode_command;
+-
+     selection_box_active = false;
+     outpost_goal_selection = OBJECTIVE_NONE;
+     previous_manual_control_state = false;
+@@ -406,13 +400,21 @@
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_LALT ) == false)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_RALT ) == false))
+     {
+-        setKeyboardInputModeChatMesg();
++        ChatView *v = (ChatView*)Desktop::getView(&quot;ChatView&quot;);
++        if ( v )
++        {
++            v-&gt;openChat();
++        }
+     }
+ 
+     if ( (KeyboardInterface::getKeyState(SDLK_LCTRL) || KeyboardInterface::getKeyState(SDLK_RCTRL))
+-        &amp;&amp; (KeyboardInterface::getKeyPressed(SDLK_a) ))
++        &amp;&amp; (KeyboardInterface::getKeyPressed(SDLK_RETURN) ))
+     {
+-        setKeyboardInputModeAllieChatMesg();
++        ChatView *v = (ChatView*)Desktop::getView(&quot;ChatView&quot;);
++        if ( v )
++        {
++            v-&gt;openFriendsChat();
++        }
+     }
+ 
+     //If space is pressed, jump to first currently attacked unit
+@@ -513,8 +515,10 @@
+ }
+ 
+ void
+-WorldInputCmdProcessor::keyboardInputModeCommand()
++WorldInputCmdProcessor::evaluateKeyboardEvents()
+ {
++    getManualControlStatus();
++    
+     evaluateGroupingKeys();
+ 
+     evaluateKeyCommands();
+@@ -522,77 +526,6 @@
+     previous_manual_control_state = manual_control_state;
+ }
+ 
+-void
+-WorldInputCmdProcessor::setKeyboardInputModeChatMesg()
+-{
+-    ConsoleInterface::setInputStringStatus( true );
+-    ConsoleInterface::resetInputString( &quot;&gt; &quot; );
+-    KeyboardInterface::flushCharBuffer();
+-    KeyboardInterface::setTextMode(true);
+-    enter_key_hit_count = 1;
+-    keyboard_input_mode = _keyboard_input_mode_chat_mesg;
+-}
+-
+-void
+-WorldInputCmdProcessor::keyboardInputModeChatMesg()
+-{
+-    char chat_string[256];
+-    if (getConsoleInputString(chat_string))
+-    {
+-        if(strcmp(chat_string, &quot;&quot;) != 0)
+-        {
+-            if ( chat_string[0] != '/' || ! ScriptManager::runUserCommand(&amp;chat_string[1]) )
+-            {
+-                ChatInterface::say(chat_string);
+-            }
+-        }
+-        keyboard_input_mode = _keyboard_input_mode_command;
+-        ConsoleInterface::setInputStringStatus(false);
+-    }
+-}
+-
+-void
+-WorldInputCmdProcessor::setKeyboardInputModeAllieChatMesg()
+-{
+-    ConsoleInterface::setInputStringStatus( true );
+-    ConsoleInterface::resetInputString( &quot;[Team]&gt; &quot; );
+-    KeyboardInterface::flushCharBuffer();
+-    KeyboardInterface::setTextMode(true);
+-    enter_key_hit_count = 1;
+-    keyboard_input_mode = _keyboard_input_mode_allie_mesg;
+-}
+-
+-void
+-WorldInputCmdProcessor::keyboardInputModeAllieChatMesg()
+-{
+-    char chat_string[256];
+-    if ( getConsoleInputString( chat_string ) == true ) {
+-        keyboard_input_mode = _keyboard_input_mode_command;
+-        ConsoleInterface::setInputStringStatus( false );
+-        ChatInterface::teamsay( chat_string );
+-    }
+-}
+-
+-void
+-WorldInputCmdProcessor::evaluateKeyboardEvents()
+-{
+-    getManualControlStatus();
+-    
+-    switch( keyboard_input_mode ) {
+-    case _keyboard_input_mode_command :
+-        keyboardInputModeCommand();
+-        break;
+-
+-    case _keyboard_input_mode_chat_mesg :
+-        keyboardInputModeChatMesg();
+-        break;
+-
+-    case _keyboard_input_mode_allie_mesg :
+-        keyboardInputModeAllieChatMesg();
+-        break;
+-    }
+-}
+-
+ bool
+ WorldInputCmdProcessor::selectBoundBoxUnits()
+ {
+@@ -1100,77 +1033,6 @@
+     working_list.validateList();
+ }
+ 
+-void WorldInputCmdProcessor::processChat()
+-{
+-    switch( keyboard_input_mode ) {
+-    case _keyboard_input_mode_command :
+-        if ( (KeyboardInterface::getKeyPressed( SDLK_RETURN ) == true))
+-        {
+-            setKeyboardInputModeChatMesg();
+-        }
+-        break;
+-
+-    case _keyboard_input_mode_chat_mesg :
+-        keyboardInputModeChatMesg();
+-        break;
+-    }
+-}
+-
+-bool
+-WorldInputCmdProcessor::getConsoleInputString(char *input_string)
+-{
+-    int key_char;
+-    while (KeyboardInterface::getChar(key_char))
+-    {
+-        // Check for extended code.
+-        if (key_char == 0)
+-        {
+-            if (KeyboardInterface::getChar(key_char))
+-            {
+-                ConsoleInterface::addExtendedChar(key_char);
+-                if ((key_char == SDLK_RETURN) )
+-                {
+-                    enter_key_hit_count++;
+-                    if (enter_key_hit_count == 2)
+-                    {
+-                        KeyboardInterface::setTextMode(false);
+-                        ConsoleInterface::getInputString( input_string );
+-                        return true;
+-                    }
+-                }
+-#ifdef WIN32                
+-                if ((key_char == SDLK_INSERT))
+-                {
+-                    OpenClipboard(NULL);
+-                    HANDLE clip = GetClipboardData(CF_TEXT);
+-                    CloseClipboard();
+-                    if (clip)
+-                    {
+-                        char* pntchr = (char*)clip;
+-						int count = 0;
+-                        while ((*pntchr != 0) &amp;&amp; (count &lt; 150))
+-                        {
+-                            if (isprint(*pntchr))
+-							{
+-								ConsoleInterface::addChar(*pntchr);
+-								count++;
+-							}
+-                            pntchr++;
+-                        }
+-                    }
+-                }
+-#endif
+-            }
+-        }
+-        else
+-        {
+-            ConsoleInterface::addChar(key_char);
+-        }
+-
+-    }
+-    return false;
+-}
+-
+ void
+ WorldInputCmdProcessor::inFocus()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -78,16 +78,6 @@
+ 
+     void evaluateMouseEvents();
+ 
+-    unsigned long keyboard_input_mode;
+-
+-    void keyboardInputModeCommand();
+-
+-    long enter_key_hit_count;
+-    void setKeyboardInputModeChatMesg();
+-    void keyboardInputModeChatMesg();
+-    void setKeyboardInputModeAllieChatMesg();
+-    void keyboardInputModeAllieChatMesg();
+-
+     void evaluateKeyCommands();
+     void evaluateGroupingKeys();
+ 
+@@ -99,8 +89,6 @@
+      */
+     void centerSelectedUnits();
+ 
+-    bool getConsoleInputString(char *input_string);
+-
+     static ObjectiveID selected_objective_id;
+ 
+ public:
+@@ -109,7 +97,6 @@
+     WorldInputCmdProcessor();
+ 
+     void process(bool process_mouse = true);
+-    void processChat();
+ 
+     void inFocus();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -16,7 +16,6 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ 
+ #include &quot;cstring&quot;
+@@ -27,13 +26,6 @@
+ #include &quot;Console.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+-#define CommandMax 13
+-
+-std::string CommandList[CommandMax] = {
+-    &quot;/server listcommands&quot;, &quot;/server adminlogin&quot;, &quot;/server unitspawnlist&quot;, &quot;/server unitprofiles&quot;,
+-    &quot;/server listprofiles&quot;, &quot;/server kick&quot;, &quot;/server baselimit&quot;, &quot;/server gamepass&quot;,
+-    &quot;/server map &quot;, &quot;/server autokick&quot;, &quot;/server say&quot;, &quot;/server listplayers&quot;, &quot;/server flagtimer&quot;}; 
+-
+ bool ConsoleInterface::stdout_pipe;
+ 
+ long ConsoleInterface::console_size;
+@@ -48,12 +40,6 @@
+ 
+ long ConsoleInterface::line_index;
+ 
+-bool ConsoleInterface::input_string_active;
+-
+-int  ConsoleInterface::maxCharCount;
+-char ConsoleInterface::inputString[256];
+-char ConsoleInterface::inputPrompt[256];
+-int  ConsoleInterface::cursorPos;
+ int ConsoleInterface::commandPos;
+ void ConsoleInterface::initialize( long size )
+ {
+@@ -74,8 +60,6 @@
+     line_offset.x = 0;
+     line_offset.y = (14 + vertical_spacing);
+ 
+-    input_string_active = false;
+-
+     long line_loop;
+ 
+     for ( line_loop = 0; line_loop &lt; console_size; line_loop++ )
+@@ -191,13 +175,8 @@
+ 
+     } while( index != line_index );
+ 
+-    if( input_string_active == true ) {
+-        current_line.y = bounds.min.y + (line_offset.y * visible_count ) + (line_offset.y * 2);
+-        current_line.x = bounds.min.x + line_offset.x;
+-    } else {
+-        current_line.y = bounds.min.y + (line_offset.y * visible_count );
+-        current_line.x = bounds.min.x + line_offset.x;
+-    }
++    current_line.y = bounds.min.y + (line_offset.y * visible_count );
++    current_line.x = bounds.min.x + line_offset.x;
+ 
+     int flagextrax;
+     Surface * flag = 0;
+@@ -225,155 +204,4 @@
+ 
+     } while( index != line_index );
+ 
+-
+-    if( input_string_active == true ) {
+-        iXY input_offset;
+-        unsigned long max_char_space;
+-        unsigned long input_string_length;
+-        char *string_ptr;
+-
+-        current_line.y = current_line.y - line_offset.y;
+-
+-        surface.bltStringShadowed(current_line.x, current_line.y, inputPrompt, Color::white,
+-                Color::black );
+-
+-        int CHAR_XPIX = 8; // XXX hardcoded
+-        input_offset.x = current_line.x + ( (long) strlen( inputPrompt ) ) * CHAR_XPIX;
+-        input_offset.y = current_line.y;
+-
+-        max_char_space = (bounds.max.x - input_offset.x ) / CHAR_XPIX;
+-        input_string_length = strlen(inputString);
+-
+-        if( input_string_length &gt; max_char_space ) {
+-            string_ptr = inputString + (input_string_length - (max_char_space - 1) );
+-        } else {
+-            string_ptr = inputString;
+-        }
+-
+-        surface.bltStringShadowed(input_offset.x, input_offset.y, string_ptr , Color::white,
+-                Color::black );
+-
+-        surface.bltStringShadowed(  input_offset.x + cursorPos * CHAR_XPIX,
+-                                    input_offset.y,
+-                                    &quot;_&quot;, Color::white, Color::black );
+-    }
+ }
+-
+-void ConsoleInterface::setInputStringStatus( bool on_off )
+-{
+-    input_string_active = on_off;
+-}
+-
+-void ConsoleInterface::resetInputString( const char *prompt )
+-{
+-    cursorPos = 0;
+-    inputString[0] = 0;
+-    maxCharCount = 256;
+-    strcpy( inputPrompt, prompt );
+-}
+-
+-void ConsoleInterface::getInputString( char *str )
+-{
+-    strcpy( str, inputString );
+-}
+-
+-void ConsoleInterface::addChar(int newChar)
+-{
+-    // Check if the character should be excluded.
+-    // Add the character.
+-    int length = strlen(inputString) + 1;
+-
+-    if ( cursorPos != length )
+-    {
+-        memmove(&amp;inputString[cursorPos+1], &amp;inputString[cursorPos], length-cursorPos);
+-        ++length;
+-    }
+-
+-    inputString[cursorPos] = newChar;
+-    inputString[length] = '\0';
+-
+-    if (cursorPos &lt; maxCharCount - 1) {
+-        cursorPos++;
+-    }
+-} // addChar
+-
+-void ConsoleInterface::addExtendedChar(int newExtendedChar)
+-{
+-    // Process the extendedChar accordingly.
+-    switch (newExtendedChar) {
+-    case SDLK_RETURN: {}
+-        break;
+-
+-    case SDLK_HOME: {
+-            cursorPos = 0;
+-        }
+-        break;
+-
+-    case SDLK_LEFT: {
+-            if(--cursorPos &lt; 0) {
+-                cursorPos = 0;
+-            }
+-        }
+-        break;
+-
+-    case SDLK_RIGHT: {
+-            int length = strlen(inputString);
+-            if(++cursorPos &gt; length) {
+-                if (cursorPos &gt; maxCharCount) {
+-                    cursorPos = maxCharCount - 1;
+-                } else {
+-                    cursorPos = length;
+-                }
+-            }
+-        }
+-        break;
+-
+-    case SDLK_END: {
+-            cursorPos = strlen(inputString);
+-
+-            if (cursorPos &gt; maxCharCount) {
+-                cursorPos = maxCharCount - 1;
+-            }
+-        }
+-        break;
+-
+-    case SDLK_INSERT: {}
+-        break;
+-
+-    case SDLK_DELETE: {
+-            if (cursorPos == (int) strlen(inputString + cursorPos)) {
+-                break;
+-            }
+-
+-            memcpy(inputString + cursorPos, inputString + cursorPos + 1, strlen(inputString + cursorPos + 1) + 1);
+-        }
+-        break;
+-
+-    case SDLK_BACKSPACE: {
+-            if (cursorPos &gt;= 1) {
+-                int byteCount = strlen(inputString + cursorPos);
+-
+-                // Only do this if we are not at the end of the string.
+-                if (byteCount &gt; 0) {
+-                    memcpy(inputString + cursorPos - 1, inputString + cursorPos, byteCount);
+-                }
+-
+-                cursorPos--;
+-                inputString[cursorPos + byteCount] = '\0';
+-            }
+-        }
+-        break;
+-
+-    case SDLK_TAB: {
+-            cursorPos = 0;
+-            strcpy(inputString, CommandList[commandPos].c_str());
+-            commandPos++;
+-            if (commandPos &gt;= CommandMax) commandPos = 0;
+-            cursorPos = strlen(inputString);
+-        }
+-        break;
+-
+-    default: break;
+-    }
+-
+-} // addExtendedChar
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -57,12 +57,6 @@
+ 
+     static long line_index;
+ 
+-    static bool input_string_active;
+-
+-    static int  maxCharCount;
+-    static char inputString[256];
+-    static char inputPrompt[256];
+-    static int  cursorPos;
+     static int commandPos;
+ 
+ public:
+@@ -78,12 +72,6 @@
+     static void postMessage( PIX msgColor, bool hasFlag, FlagID flag, const char *format, ... )
+         __attribute__(( format(printf, 4, 5) ));
+ 
+-    /* Input String Methods */
+-    static void setInputStringStatus( bool on_off );
+-    static void resetInputString( const char *prompt );
+-    static void addChar(int newChar);
+-    static void addExtendedChar(int newExtendedChar);
+-    static void getInputString( char *str );
+ };
+ 
+ #endif // ** _CONSOLEINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -33,6 +33,9 @@
+ 
+     this-&gt;last_pressed_key = 0;
+     this-&gt;was_special_key = false;
++    
++    this-&gt;text_color = Color::white;
++    
+ }
+ 
+ void InputField::render()
+@@ -70,7 +73,7 @@
+     
+     int text_y = (r.getSizeY()/2)-4;
+ 
+-    s.bltString(0, text_y , text.substr(text_display_start).c_str(), Color::white);
++    s.bltString(0, text_y , text.substr(text_display_start).c_str(), text_color);
+ 
+     if ( inFocus )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -53,6 +53,8 @@
+         Component::setSize(x+4, y);
+     }
+ 
++    void setTextColor(PIX color) { text_color = color; }
++    
+     void setMaxTextLength(int max_length) { max_chars = max_length; }
+     void setExcludedChars(const std::string&amp; excluded_chars) { this-&gt;excluded_chars = excluded_chars; }
+     
+@@ -72,6 +74,8 @@
+     int last_pressed_key;
+     bool was_special_key;
+     NTimer key_repeat_timer;
++    
++    PIX text_color;
+ 
+     void checkRepeatKey();
+     void fixCursorPos();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -113,7 +113,7 @@
+     int row = 5;
+     Surface RowPaint(MaxItemWidth+10, ItemHeight, 1);
+     Surface Bitmap(size.x, ItemHeight, 1);
+-    for(PlayerID i = StartItem; i &lt; MaxItem; ++i)
++    for(int i = StartItem; i &lt; MaxItem; ++i)
+     {
+         RowPaint.fill(background);
+         if (SelectedItem == i)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -34,6 +34,35 @@
+ #include &lt;windows.h&gt;
+ #endif
+ 
++#include &quot;Actions/Action.hpp&quot;
++
++//#define CommandMax 13
++//
++//std::string CommandList[CommandMax] = {
++//    &quot;/server listcommands&quot;, &quot;/server adminlogin&quot;, &quot;/server unitspawnlist&quot;, &quot;/server unitprofiles&quot;,
++//    &quot;/server listprofiles&quot;, &quot;/server kick&quot;, &quot;/server baselimit&quot;, &quot;/server gamepass&quot;,
++//    &quot;/server map &quot;, &quot;/server autokick&quot;, &quot;/server say&quot;, &quot;/server listplayers&quot;, &quot;/server flagtimer&quot;}; 
++
++//    case SDLK_TAB: {
++//            cursorPos = 0;
++//            strcpy(inputString, CommandList[commandPos].c_str());
++//            commandPos++;
++//            if (commandPos &gt;= CommandMax) commandPos = 0;
++//            cursorPos = strlen(inputString);
++//        }
++
++class SwitchChatModeAction : public Action
++{
++public:
++    ChatView * view;
++    SwitchChatModeAction(ChatView * view) : Action(false), view(view) {}
++    void execute()
++    {
++        view-&gt;switchChatMode();
++    }
++};
++
++
+ static Button* createTitlebarButton(int x, int y, const Surface&amp; button_images, Action* action)
+ {
+     Surface bimage(15,15,4);
+@@ -124,13 +153,35 @@
+     add(ChatList);
+     
+     input = new InputField();
+-    input-&gt;setLocation(2,getSizeY()-16);
++    input-&gt;setLocation(2 + 16,getSizeY()-16);
+     input-&gt;setSize(getSizeX()-5,16);
+     input-&gt;setMaxTextLength(100);
+     input-&gt;setExcludedChars(&quot;\\&#65533;`&#65533;&quot;);
+     
+     add(input);
+     
++    switchModeButton = new Button(); //Button::createTextButton(&quot;&gt;&quot;, iXY(0, getSizeY()-16), 14, 0);
++    
++    switchModeButton-&gt;setLocation(1, getSizeY()-16);
++    switchModeButton-&gt;setSize(16, 16);
++    switchModeButton-&gt;setLabel(&quot;&gt;&quot;);
++    switchModeButton-&gt;setStateOffset(Button::BPRESSED, 1, 1);
++    switchModeButton-&gt;setAction(new SwitchChatModeAction(this));
++    
++    switchModeButton-&gt;setTextColors(Color::gray, Color::yellow, Color::gray, Color::darkGray);
++    
++    allBg.create(16,16,1);
++    allBg.FillRoundRect(allBg.getRect(), 3, Color::white);
++    allBg.RoundRect(allBg.getRect(), 3, Color::white);
++    
++    friendsBg.create(16,16,1);
++    friendsBg.FillRoundRect(friendsBg.getRect(), 3, Color::yellow);
++    friendsBg.RoundRect(friendsBg.getRect(), 3, Color::yellow);
++
++    add(switchModeButton);
++    
++    isAllMode = true;
++    setChatFriends();
+ }
+ 
+ void ChatView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+@@ -142,69 +193,82 @@
+ 
+ void ChatView::processEvents()
+ {
+-    if ( (KeyboardInterface::getKeyPressed(SDLK_RETURN) || KeyboardInterface::getKeyPressed(SDLK_KP_ENTER) )
+-         &amp;&amp; Desktop::getKeyboardFocusComponent() == input )
++    if ( Desktop::getKeyboardFocusComponent() == input )
+     {
+-        if ( input-&gt;getText().length() != 0 )
++        if ( (KeyboardInterface::getKeyPressed(SDLK_RETURN) || KeyboardInterface::getKeyPressed(SDLK_KP_ENTER) ) )
+         {
+-            const NPString&amp; msg = input-&gt;getText();
++            if ( input-&gt;getText().length() != 0 )
++            {
++                const NPString&amp; msg = input-&gt;getText();
+ 
+-            if ( msg[0] != '/' || ! ScriptManager::runUserCommand( msg.substr(1) ) )
+-            {
+-                ChatInterface::teamsay(msg);
++                if ( msg[0] != '/' || ! ScriptManager::runUserCommand( msg.substr(1) ) )
++                {
++                    if ( isAllMode )
++                    {
++                        ChatInterface::say(msg);
++                    }
++                    else
++                    {
++                        ChatInterface::teamsay(msg);
++                    }
++                }
++
++                input-&gt;setText(&quot;&quot;);
+             }
+-            
+-            input-&gt;setText(&quot;&quot;);
+         }
+-    }
+-#ifdef WIN32
+-    else if ( (KeyboardInterface::getKeyState(SDLK_LCTRL)
+-               || KeyboardInterface::getKeyState(SDLK_RCTRL))
+-              &amp;&amp; (KeyboardInterface::getKeyPressed(SDLK_v) ))
+-    {
+-        OpenClipboard(NULL);
+-        HANDLE clip = GetClipboardData(CF_TEXT);
+-        CloseClipboard();
+-        if (clip)
++    #ifdef WIN32
++        else if ( (KeyboardInterface::getKeyState(SDLK_LCTRL)
++                   || KeyboardInterface::getKeyState(SDLK_RCTRL))
++                  &amp;&amp; (KeyboardInterface::getKeyPressed(SDLK_v) ))
+         {
+-            char* pntchr = (char*)clip;
+-            int count = 0;
+-            while ((*pntchr != 0) &amp;&amp; (count &lt; 150))
++            OpenClipboard(NULL);
++            HANDLE clip = GetClipboardData(CF_TEXT);
++            CloseClipboard();
++            if (clip)
+             {
+-                if (isprint(*pntchr))
++                char* pntchr = (char*)clip;
++                int count = 0;
++                while ((*pntchr != 0) &amp;&amp; (count &lt; 150))
+                 {
+-                    input-&gt;handleNormalKey(*pntchr);
+-                    count++;
++                    if (isprint(*pntchr))
++                    {
++                        input-&gt;handleNormalKey(*pntchr);
++                        count++;
++                    }
++                    pntchr++;
+                 }
+-                pntchr++;
+             }
+         }
+-    }
+-    else if ( (KeyboardInterface::getKeyState(SDLK_LCTRL)
+-               || KeyboardInterface::getKeyState(SDLK_RCTRL))
+-              &amp;&amp; (KeyboardInterface::getKeyPressed(SDLK_c) ))
+-    {
+-        std::string str = ChatList-&gt;getTextItem();
+-        if (str != &quot;&quot;)
++        else if ( (KeyboardInterface::getKeyState(SDLK_LCTRL)
++                   || KeyboardInterface::getKeyState(SDLK_RCTRL))
++                  &amp;&amp; (KeyboardInterface::getKeyPressed(SDLK_c) ))
+         {
+-            if(OpenClipboard(NULL))
++            std::string str = ChatList-&gt;getTextItem();
++            if (str != &quot;&quot;)
+             {
+-                int pos = str.find_first_of(':')+2;
+-                std::string chaine = str.substr(pos);
+-                HGLOBAL hText = GlobalAlloc(GMEM_DDESHARE, chaine.length()+1);
+-                char * pText = (char*)GlobalLock(hText);
+-                strcpy(pText, chaine.c_str());
+-                GlobalUnlock(hText);
+-                EmptyClipboard();
+-                SetClipboardData(CF_TEXT, hText);
+-                CloseClipboard();
++                if(OpenClipboard(NULL))
++                {
++                    int pos = str.find_first_of(':')+2;
++                    std::string chaine = str.substr(pos);
++                    HGLOBAL hText = GlobalAlloc(GMEM_DDESHARE, chaine.length()+1);
++                    char * pText = (char*)GlobalLock(hText);
++                    strcpy(pText, chaine.c_str());
++                    GlobalUnlock(hText);
++                    EmptyClipboard();
++                    SetClipboardData(CF_TEXT, hText);
++                    CloseClipboard();
++                }
+             }
+         }
++    #endif
++        else
++        {
++            View::processEvents();
++        }
+     }
+-#endif
+     else
+     {
+-        View::processEvents();
++        COMMAND_PROCESSOR.process(false);
+     }
+ }
+ 
+@@ -220,6 +284,7 @@
+     }
+     
+     removeComponent(input);
++    removeComponent(switchModeButton);
+ 
+     resize(500, 17);
+     moveTo(screen-&gt;getWidth()-getSizeX(), screen-&gt;getHeight()-getSizeY());
+@@ -234,6 +299,7 @@
+     resize(500, 150);
+     moveTo(screen-&gt;getWidth()-getSizeX(), screen-&gt;getHeight()-getSizeY());
+     
++    add(switchModeButton);
+     add(input);
+ }
+ 
+@@ -265,3 +331,56 @@
+     ChatList-&gt;Clear();
+ }
+ 
++void ChatView::setChatFriends()
++{
++    if ( isAllMode )
++    {
++        isAllMode = false;
++        switchModeButton-&gt;setImage(friendsBg);
++        input-&gt;setTextColor(Color::yellow);
++    }
++}
++
++void ChatView::setChatAll()
++{
++    if ( ! isAllMode )
++    {
++        isAllMode = true;
++        switchModeButton-&gt;setImage(allBg);
++        input-&gt;setTextColor(Color::white);
++    }
++}
++
++void ChatView::openChat()
++{
++    if ( HideWindow )
++    {
++        restoreChat();
++    }
++    
++    Desktop::setKeyboardFocusComponent(input);
++}
++
++void ChatView::openFriendsChat()
++{
++    if ( HideWindow )
++    {
++        restoreChat();
++    }
++    
++    setChatFriends();
++    
++    Desktop::setKeyboardFocusComponent(input);
++}
++
++void ChatView::switchChatMode()
++{
++    if ( isAllMode )
++    {
++        setChatFriends();
++    }
++    else
++    {
++        setChatAll();
++    }
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-02 14:08:04 UTC (rev 1391)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-02 16:16:59 UTC (rev 1392)
+@@ -36,9 +36,14 @@
+     tHScrollBar * hsbChat;
+     Button * bHideWindow;
+     Button * bShowWindow;
++    Button * switchModeButton;
+     InputField * input;
+     bool HideWindow;
+     
++    bool isAllMode;
++    Surface allBg;
++    Surface friendsBg;
++    
+ public:
+     ChatView();
+     virtual ~ChatView()
+@@ -53,6 +58,15 @@
+     
+     void minimizeChat();
+     void restoreChat();
++    
++    void setChatFriends();
++    void setChatAll();
++    
++    void openChat();
++    void openFriendsChat();
++    
++    void switchChatMode();
++    
+ };
+ 
+ #endif
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000415.html">[Netpanzer-cvs] r1391 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000417.html">[Netpanzer-cvs] r1393 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#416">[ date ]</a>
+              <a href="thread.html#416">[ thread ]</a>
+              <a href="subject.html#416">[ subject ]</a>
+              <a href="author.html#416">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

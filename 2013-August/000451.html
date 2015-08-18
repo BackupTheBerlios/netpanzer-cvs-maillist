@@ -1,0 +1,1846 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1429 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src/Lib/2D	src/Lib/GameInput src/NetPanzer/Interfaces	src/NetPanzer/Scenes src/NetPanzer/Scenes/Common	src/NetPanzer/Scenes/MainMenu src/NetPanzer/System	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2013-August/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1429%20-%20in%20trunk/netpanzer%3A%0A%09projects/netpanzer-svn-windows/nbproject%0A%09projects/netpanzer-svn-windows/nbproject/private%20src/Lib/2D%0A%09src/Lib/GameInput%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Scenes%20src/NetPanzer/Scenes/Common%0A%09src/NetPanzer/Scenes/MainMenu%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20130828162323.86A0855B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1429 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src/Lib/2D	src/Lib/GameInput src/NetPanzer/Interfaces	src/NetPanzer/Scenes src/NetPanzer/Scenes/Common	src/NetPanzer/Scenes/MainMenu src/NetPanzer/System	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1429%20-%20in%20trunk/netpanzer%3A%0A%09projects/netpanzer-svn-windows/nbproject%0A%09projects/netpanzer-svn-windows/nbproject/private%20src/Lib/2D%0A%09src/Lib/GameInput%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Scenes%20src/NetPanzer/Scenes/Common%0A%09src/NetPanzer/Scenes/MainMenu%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20130828162323.86A0855B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1429 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src/Lib/2D	src/Lib/GameInput src/NetPanzer/Interfaces	src/NetPanzer/Scenes src/NetPanzer/Scenes/Common	src/NetPanzer/Scenes/MainMenu src/NetPanzer/System	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu/Multi">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Wed Aug 28 18:23:23 CEST 2013</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#451">[ date ]</a>
+              <a href="thread.html#451">[ thread ]</a>
+              <a href="subject.html#451">[ subject ]</a>
+              <a href="author.html#451">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2013-08-28 18:23:22 +0200 (Wed, 28 Aug 2013)
+New Revision: 1429
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+Modified:
+   trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/configurations.xml
+   trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/configurations.xml
+   trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml
+   trunk/netpanzer/src/Lib/2D/SceneManager.cpp
+   trunk/netpanzer/src/Lib/GameInput/InputConstants.hpp
+   trunk/netpanzer/src/Lib/GameInput/InputManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scenes/Common/OptionsLayer.hpp
+   trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.cpp
+   trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.hpp
+   trunk/netpanzer/src/NetPanzer/Scenes/MainMenuScene.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+Log:
+- rewrote host game options
+- screenshot function working (F9) note &quot;when mouse not over a component&quot;
+
+Modified: trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/configurations.xml
+===================================================================
+--- trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/configurations.xml	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/configurations.xml	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -5,6 +5,22 @@
+       &lt;df name=&quot;src&quot;&gt;
+         &lt;df name=&quot;Lib&quot;&gt;
+           &lt;df name=&quot;2D&quot;&gt;
++            &lt;df name=&quot;Components&quot;&gt;
++              &lt;in&gt;AreaComponent.hpp&lt;/in&gt;
++              &lt;in&gt;Button.cpp&lt;/in&gt;
++              &lt;in&gt;Button.hpp&lt;/in&gt;
++              &lt;in&gt;CheckBox.cpp&lt;/in&gt;
++              &lt;in&gt;CheckBox.hpp&lt;/in&gt;
++              &lt;in&gt;Choice.cpp&lt;/in&gt;
++              &lt;in&gt;Choice.hpp&lt;/in&gt;
++              &lt;in&gt;InputField.cpp&lt;/in&gt;
++              &lt;in&gt;InputField.hpp&lt;/in&gt;
++              &lt;in&gt;Label.cpp&lt;/in&gt;
++              &lt;in&gt;Label.hpp&lt;/in&gt;
++              &lt;in&gt;Separator.hpp&lt;/in&gt;
++              &lt;in&gt;Slider.cpp&lt;/in&gt;
++              &lt;in&gt;Slider.hpp&lt;/in&gt;
++            &lt;/df&gt;
+             &lt;in&gt;Color.cpp&lt;/in&gt;
+             &lt;in&gt;Color.hpp&lt;/in&gt;
+             &lt;in&gt;ComponentEvents.hpp&lt;/in&gt;
+@@ -23,6 +39,8 @@
+             &lt;in&gt;Surface.hpp&lt;/in&gt;
+             &lt;in&gt;TextRenderer.cpp&lt;/in&gt;
+             &lt;in&gt;TextRenderer.hpp&lt;/in&gt;
++            &lt;in&gt;TextRenderingSystem.cpp&lt;/in&gt;
++            &lt;in&gt;TextRenderingSystem.hpp&lt;/in&gt;
+           &lt;/df&gt;
+           &lt;df name=&quot;ArrayUtil&quot;&gt;
+             &lt;in&gt;ArrayTemplate.hpp&lt;/in&gt;
+@@ -279,6 +297,7 @@
+             &lt;in&gt;Angle.cpp&lt;/in&gt;
+             &lt;in&gt;Angle.hpp&lt;/in&gt;
+             &lt;in&gt;BoundBox.hpp&lt;/in&gt;
++            &lt;in&gt;SimpleEventList.hpp&lt;/in&gt;
+             &lt;in&gt;UString.cpp&lt;/in&gt;
+             &lt;in&gt;UString.hpp&lt;/in&gt;
+             &lt;in&gt;fRect.cpp&lt;/in&gt;
+@@ -571,6 +590,8 @@
+               &lt;in&gt;OptionsLayer.hpp&lt;/in&gt;
+             &lt;/df&gt;
+             &lt;df name=&quot;MainMenu&quot;&gt;
++              &lt;in&gt;HostGameLayer.cpp&lt;/in&gt;
++              &lt;in&gt;HostGameLayer.hpp&lt;/in&gt;
+               &lt;in&gt;IntroLayer.cpp&lt;/in&gt;
+               &lt;in&gt;IntroLayer.hpp&lt;/in&gt;
+             &lt;/df&gt;
+@@ -693,10 +714,6 @@
+                   &lt;in&gt;ServerQueryThread.cpp&lt;/in&gt;
+                   &lt;in&gt;ServerQueryThread.hpp&lt;/in&gt;
+                 &lt;/df&gt;
+-                &lt;in&gt;HostOptionsView.cpp&lt;/in&gt;
+-                &lt;in&gt;HostOptionsView.hpp&lt;/in&gt;
+-                &lt;in&gt;MapSelectionView.cpp&lt;/in&gt;
+-                &lt;in&gt;MapSelectionView.hpp&lt;/in&gt;
+                 &lt;in&gt;ServerListView.cpp&lt;/in&gt;
+                 &lt;in&gt;ServerListView.hpp&lt;/in&gt;
+               &lt;/df&gt;
+@@ -834,6 +851,76 @@
+             tool=&quot;3&quot;
+             flavor2=&quot;0&quot;&gt;
+       &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/AreaComponent.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Button.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Button.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/CheckBox.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/CheckBox.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Choice.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Choice.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/InputField.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/InputField.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Label.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Label.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Separator.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Slider.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/Components/Slider.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
+       &lt;item path=&quot;../../src/Lib/2D/Layer.hpp&quot; ex=&quot;false&quot; tool=&quot;3&quot; flavor2=&quot;0&quot;&gt;
+       &lt;/item&gt;
+       &lt;item path=&quot;../../src/Lib/2D/PackedSurface.cpp&quot; ex=&quot;false&quot; tool=&quot;1&quot; flavor2=&quot;0&quot;&gt;
+@@ -961,6 +1048,16 @@
+       &lt;/item&gt;
+       &lt;item path=&quot;../../src/Lib/2D/TextRenderer.hpp&quot; ex=&quot;false&quot; tool=&quot;3&quot; flavor2=&quot;0&quot;&gt;
+       &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/TextRenderingSystem.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/2D/TextRenderingSystem.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
+       &lt;item path=&quot;../../src/Lib/ArrayUtil/ArrayTemplate.hpp&quot;
+             ex=&quot;false&quot;
+             tool=&quot;3&quot;
+@@ -1238,6 +1335,11 @@
+       &lt;/item&gt;
+       &lt;item path=&quot;../../src/Lib/Types/BoundBox.hpp&quot; ex=&quot;false&quot; tool=&quot;3&quot; flavor2=&quot;0&quot;&gt;
+       &lt;/item&gt;
++      &lt;item path=&quot;../../src/Lib/Types/SimpleEventList.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
+       &lt;item path=&quot;../../src/Lib/Types/UString.cpp&quot; ex=&quot;false&quot; tool=&quot;1&quot; flavor2=&quot;0&quot;&gt;
+       &lt;/item&gt;
+       &lt;item path=&quot;../../src/Lib/Types/UString.hpp&quot; ex=&quot;false&quot; tool=&quot;3&quot; flavor2=&quot;0&quot;&gt;
+@@ -5379,6 +5481,16 @@
+             tool=&quot;3&quot;
+             flavor2=&quot;0&quot;&gt;
+       &lt;/item&gt;
++      &lt;item path=&quot;../../src/NetPanzer/Scenes/MainMenu/HostGameLayer.cpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;1&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
++      &lt;item path=&quot;../../src/NetPanzer/Scenes/MainMenu/HostGameLayer.hpp&quot;
++            ex=&quot;false&quot;
++            tool=&quot;3&quot;
++            flavor2=&quot;0&quot;&gt;
++      &lt;/item&gt;
+       &lt;item path=&quot;../../src/NetPanzer/Scenes/MainMenu/IntroLayer.cpp&quot;
+             ex=&quot;false&quot;
+             tool=&quot;1&quot;
+@@ -6808,76 +6920,6 @@
+             tool=&quot;3&quot;
+             flavor2=&quot;0&quot;&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;../../src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp&quot;
+-            ex=&quot;false&quot;
+-            tool=&quot;1&quot;
+-            flavor2=&quot;0&quot;&gt;
+-        &lt;ccTool&gt;
+-          &lt;incDir&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/Types&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/2D&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Views/Components&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Views/MainMenu/Multi&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Actions&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Classes&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/ArrayUtil&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/bits&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/ext&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/debug&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/bits&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/i686-linux-gnu/bits&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/Util&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Core&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Interfaces&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Particles&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Views&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/SDL&lt;/pElem&gt;
+-            &lt;pElem&gt;/home/krom/program/netpanzer-svn&lt;/pElem&gt;
+-          &lt;/incDir&gt;
+-        &lt;/ccTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;../../src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp&quot;
+-            ex=&quot;false&quot;
+-            tool=&quot;3&quot;
+-            flavor2=&quot;0&quot;&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;../../src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp&quot;
+-            ex=&quot;false&quot;
+-            tool=&quot;1&quot;
+-            flavor2=&quot;0&quot;&gt;
+-        &lt;ccTool&gt;
+-          &lt;incDir&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/bits&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/Types&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/2D&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Views/Components&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Views/MainMenu/Multi&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Classes&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Actions&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/ArrayUtil&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/ext&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/debug&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/bits&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/c++/4.5/i686-linux-gnu/bits&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/Lib/Util&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Core&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../usr/include/SDL&lt;/pElem&gt;
+-            &lt;pElem&gt;../../../../home/krom/program/netpanzer-svn/src/NetPanzer/Views&lt;/pElem&gt;
+-            &lt;pElem&gt;/home/krom/program/netpanzer-svn&lt;/pElem&gt;
+-          &lt;/incDir&gt;
+-        &lt;/ccTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;../../src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp&quot;
+-            ex=&quot;false&quot;
+-            tool=&quot;3&quot;
+-            flavor2=&quot;0&quot;&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;../../src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp&quot;
+             ex=&quot;false&quot;
+             tool=&quot;1&quot;
+
+Modified: trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/configurations.xml
+===================================================================
+--- trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/configurations.xml	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/configurations.xml	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -1579,10 +1579,6 @@
+                   &lt;in&gt;ServerQueryThread.cpp&lt;/in&gt;
+                   &lt;in&gt;ServerQueryThread.hpp&lt;/in&gt;
+                 &lt;/df&gt;
+-                &lt;in&gt;HostOptionsView.cpp&lt;/in&gt;
+-                &lt;in&gt;HostOptionsView.hpp&lt;/in&gt;
+-                &lt;in&gt;MapSelectionView.cpp&lt;/in&gt;
+-                &lt;in&gt;MapSelectionView.hpp&lt;/in&gt;
+                 &lt;in&gt;ServerListView.cpp&lt;/in&gt;
+                 &lt;in&gt;ServerListView.hpp&lt;/in&gt;
+               &lt;/df&gt;
+
+Modified: trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml
+===================================================================
+--- trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -8,4 +8,9 @@
+         &lt;activeConfIndexElem&gt;0&lt;/activeConfIndexElem&gt;
+     &lt;/data&gt;
+     &lt;editor-bookmarks xmlns=&quot;<A HREF="http://www.netbeans.org/ns/editor-bookmarks/2">http://www.netbeans.org/ns/editor-bookmarks/2</A>&quot; lastBookmarkId=&quot;0&quot;/&gt;
++    &lt;preferences xmlns=&quot;<A HREF="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">http://www.netbeans.org/ns/auxiliary-configuration-preferences/1</A>&quot;&gt;
++        &lt;module name=&quot;org-netbeans-modules-cnd-discovery&quot;&gt;
++            &lt;property name=&quot;rootFolder&quot; value=&quot;C:\prog\netpanzer-svn&quot;/&gt;
++        &lt;/module&gt;
++    &lt;/preferences&gt;
+ &lt;/project-private&gt;
+
+Modified: trunk/netpanzer/src/Lib/2D/SceneManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/SceneManager.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/Lib/2D/SceneManager.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -45,6 +45,7 @@
+ #include &quot;System/SDLVideo.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;System/SDLVideo.hpp&quot;
+ 
+ static Scene * current_scene = 0;
+ static bool shall_run = false;
+@@ -73,6 +74,12 @@
+             GameConfig::video_height= GameInput::InputManager::getResizeHeight();
+             GameManager::setVideoMode();
+         }
++        
++        if ( input-&gt;hasAction(GameInput::Action_ScreenShot) )
++        {
++            Screen-&gt;doScreenshoot();
++        }
++        
+         return true;
+     }
+ };
+
+Modified: trunk/netpanzer/src/Lib/GameInput/InputConstants.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/GameInput/InputConstants.hpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/Lib/GameInput/InputConstants.hpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -38,6 +38,8 @@
+         Action_StartRight,
+         Action_StopRight,
+         
++        Action_ScreenShot,
++        
+         ActionMAX
+     };
+     
+
+Modified: trunk/netpanzer/src/Lib/GameInput/InputManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/GameInput/InputManager.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/Lib/GameInput/InputManager.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -117,6 +117,12 @@
+                 mapped_input-&gt;setAction( pressed ? Action_StartRight : Action_StopRight );
+                 break;
+                 
++            case SDLK_F9:
++                if ( pressed )
++                {
++                    mapped_input-&gt;setAction(Action_ScreenShot);
++                }
++                break;
+             default: ;
+         }
+ 
+@@ -262,6 +268,10 @@
+                             text_input_events-&gt;push(TextInput_Delete);
+                             break;
+                             
++                        case SDLK_F9: // @todo this wont work
++                            mapped_input-&gt;setAction(Action_ScreenShot);
++                            break;
++                            
+                         default:
+                             if ( event.key.keysym.unicode &gt;= 32 )
+                             {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -65,8 +65,6 @@
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Views/MainMenu/MainMenuView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/HostOptionsView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/MapSelectionView.hpp&quot;
+ #include &quot;Views/Game/RankView.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ #include &quot;Views/Game/CodeStatsView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Scenes/Common/OptionsLayer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scenes/Common/OptionsLayer.hpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Scenes/Common/OptionsLayer.hpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -15,7 +15,6 @@
+ class Choice;
+ class Slider;
+ class Label;
+-class Slider;
+ 
+ class ModalMessageLayer;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -20,3 +20,502 @@
+ 
+ #include &quot;HostGameLayer.hpp&quot;
+ 
++#include &lt;algorithm&gt;
++#include &lt;stdio.h&gt;
++
++#include &quot;Classes/MapFile.hpp&quot;
++#include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Util/Exception.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/StrManager.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
++#include &quot;Particles/ParticleSystemGlobals.hpp&quot;
++
++#include &quot;2D/Color.hpp&quot;
++#include &quot;2D/Components/AreaComponent.hpp&quot;
++#include &quot;2D/Components/Button.hpp&quot;
++#include &quot;2D/Components/Label.hpp&quot;
++#include &quot;2D/Components/Slider.hpp&quot;
++#include &quot;2D/Components/Choice.hpp&quot;
++#include &quot;2D/TextRenderingSystem.hpp&quot;
++
++
++#define MENU_WIDTH  (640)
++#define MENU_HEIGHT (480-26-26)
++
++#define SLIDER_OFFSET (275)
++#define SLIDER_SIZE (200)
++#define SLIDER_VALUE_OFFSET (SLIDER_OFFSET + SLIDER_SIZE + 25)
++
++struct Events
++{
++    enum
++    {
++        PrevMap = 1,
++        NextMap,
++        ChangeMaxPlayers,
++        ChangeMaxUnits,
++        ChangeOccupation,
++        ChangeTimeLimit,
++        ChangeFragLimit,
++        ChangeClouds,
++        ChangeWind
++    };
++};
++
++static const char* getCloudText( const int v )
++{
++    switch (v)
++    {
++        case 0: return _(&quot;Clear&quot;);
++        case 1: return _(&quot;Broken&quot;);
++        case 2: return _(&quot;Partly Cloudy&quot;);
++        case 3: return _(&quot;Overcast&quot;);
++    }
++    
++    return _(&quot;Extremely Cloudy&quot;);
++}
++
++static float calmWindSpeed    = float(baseWindSpeed) * calmWindsPercentOfBase;
++static float breezyWindSpeed  = float(baseWindSpeed) * breezyWindsPercentOfBase;
++static float briskWindSpeed   = float(baseWindSpeed) * briskWindsPercentOfBase;
++static float heavyWindSpeed   = float(baseWindSpeed) * heavyWindsPercentOfBase;
++static float typhoonWindSpeed = float(baseWindSpeed) * typhoonWindsPercentOfBase;
++
++static const char* getWindText( const int v )
++{
++    switch (v)
++    {
++        case 0: return _(&quot;Calm&quot;);
++        case 1: return _(&quot;Breezy&quot;);
++        case 2: return _(&quot;Brisk Winds&quot;);
++        case 3: return _(&quot;Heavy Winds&quot;);
++    }
++    
++    return _(&quot;Typhoon&quot;);
++}
++
++static int getWindIndex(const int v)
++{
++    float ws = GameConfig::game_windspeed;
++        
++    if ( ws &lt;= calmWindSpeed ) return 0;
++    else if ( ws &lt;= breezyWindSpeed ) return 1;
++    else if ( ws &lt;= briskWindSpeed ) return 2;
++    else if ( ws &lt;= heavyWindSpeed ) return 3;
++    
++    return 4;
++}
++
++static int windIndexToConfig(const int v)
++{
++    switch (v)
++    {
++        case 0: return int(calmWindSpeed);
++        case 1: return int(breezyWindSpeed);
++        case 2: return int(briskWindSpeed);
++        case 3: return int(heavyWindSpeed);
++    }
++    
++    return int(typhoonWindSpeed);
++}
++
++
++class MapThumbnailComponent : public Component
++{
++private:
++    Surface mapimage;
++    
++public:
++    MapThumbnailComponent(int w, int h)
++    {
++//        setLocation(x, y);
++        setSize(w, h);
++        mapimage.create(w - 2, h - 2);
++    }
++    
++    void draw(Surface &amp;dest)
++    {
++        dest.drawRect(rect, Color::lightGray);
++        mapimage.blt(dest, rect.getLocationX()+1, rect.getLocationY()+1); // full blit
++    }
++    
++    void setImage(const Surface&amp; from)
++    {
++        iRect r(0,0, rect.getWidth()-2, rect.getHeight()-2);
++        mapimage.bltScale(from, r);
++    }
++    
++    virtual void render()
++    {
++        // nothing
++    }
++    
++    void actionPerformed(const mMouseEvent &amp;me)
++    {
++        // nothing
++    }
++};
++
++class GameTypeChoice : public Choice
++{
++public:
++    GameTypeChoice(int w) : Choice()
++    {
++//        setLabel(_(&quot;Game Type&quot;));
++        addItem(_(&quot;Objective&quot;));
++        addItem(_(&quot;Frag Limit&quot;));
++        addItem(_(&quot;Time Limit&quot;));
++        setMinWidth(w);
++        setLocation(0, 0);
++        
++        switch ( GameConfig::game_gametype )
++        {
++            case _gametype_objective: select(0); break;
++            case _gametype_fraglimit: select(1); break;
++            case _gametype_timelimit: select(2); break;
++            default: select(0);
++        }
++
++    }
++    
++    void onSelectionChanged()
++    {
++        switch ( getSelectedIndex() )
++        {
++            case 0: GameConfig::game_gametype = _gametype_objective; break;
++            case 1: GameConfig::game_gametype = _gametype_fraglimit; break;
++            case 2: GameConfig::game_gametype = _gametype_timelimit; break;
++        }
++    }
++};
++
++HostGameLayer::HostGameLayer() : ComponentLayer(0)
++{
++    area = new AreaComponent( MENU_WIDTH, MENU_HEIGHT );
++    
++    mapthumbnail = new MapThumbnailComponent(102, 102);
++    button_prevmap = Button::createTextButton(&quot;&lt;&quot;, iXY(0,0), 48);
++    button_nextmap = Button::createTextButton(&quot;&gt;&quot;, iXY(0,0), 48);
++    label_mapnamelabel        = new Label( UString(_(&quot;Name&quot;)), Color::yellow);
++    label_mapsizelabel        = new Label( UString(_(&quot;Size&quot;)), Color::yellow);
++    label_mapobjectiveslabel  = new Label( UString(_(&quot;Objectives&quot;)), Color::yellow);
++    label_mapname             = new Label( UString(), Color::white);
++    label_mapsize             = new Label( UString(), Color::white);
++    label_mapobjectives       = new Label( UString(), Color::white);
++    
++    button_prevmap-&gt;setClickEvent(Events::PrevMap);
++    button_nextmap-&gt;setClickEvent(Events::NextMap);
++
++    addComponent(area);
++    addComponent(mapthumbnail);
++    addComponent(button_prevmap);
++    addComponent(button_nextmap);
++    addComponent(label_mapnamelabel);
++    addComponent(label_mapsizelabel);
++    addComponent(label_mapobjectiveslabel);
++    addComponent(label_mapname);
++    addComponent(label_mapsize);
++    addComponent(label_mapobjectives);
++    
++    label_gametype = new Label(UString(_(&quot;Game Type&quot;)), Color::yellow);
++    choice_gametype = new GameTypeChoice(150);
++    
++    addComponent(label_gametype);
++    addComponent(choice_gametype);
++    
++    char number[50];
++    
++    snprintf(number, sizeof(number), &quot;%d&quot;, GameConfig::game_maxplayers);
++    label_maxplayers = new Label( UString(_(&quot;Max Players&quot;)), Color::yellow);
++    slider_maxplayers = new Slider( 2, 16, GameConfig::game_maxplayers, SLIDER_SIZE, Events::ChangeMaxPlayers);
++    label_maxplayers_value = new Label( UString(number), Color::white);
++
++    snprintf(number, sizeof(number), &quot;%d&quot;, GameConfig::game_maxunits);
++    label_maxunits = new Label( UString(_(&quot;Game Max Unit Count&quot;)), Color::yellow);
++    slider_maxunits = new Slider( 2, 1000, GameConfig::game_maxunits, SLIDER_SIZE, Events::ChangeMaxUnits);
++    label_maxunits_value = new Label( UString(number), Color::white);
++
++    snprintf(number, sizeof(number), &quot;%d%%&quot;, GameConfig::game_occupationpercentage);
++    label_occupation = new Label( UString(_(&quot;Objective Capture Percent&quot;)), Color::yellow);
++    slider_occupation = new Slider( 5, 100, GameConfig::game_occupationpercentage, SLIDER_SIZE, Events::ChangeOccupation);
++    label_occupation_value = new Label( UString(number), Color::white);
++    
++    snprintf(number, sizeof(number), &quot;%02d:%02d&quot;, GameConfig::game_timelimit / 60, GameConfig::game_timelimit % 60 );
++    label_timelimit = new Label( UString(_(&quot;Time Limit&quot;)), Color::yellow);
++    slider_timelimit = new Slider( 5, 240, GameConfig::game_timelimit, SLIDER_SIZE, Events::ChangeTimeLimit);
++    label_timelimit_value = new Label( UString(number), Color::white);
++    
++    snprintf(number, sizeof(number), &quot;%d&quot;, GameConfig::game_fraglimit);
++    label_fraglimit = new Label( UString(_(&quot;Frag Limit&quot;)), Color::yellow);
++    slider_fraglimit = new Slider( 5, 1000, GameConfig::game_fraglimit, SLIDER_SIZE, Events::ChangeFragLimit);
++    label_fraglimit_value = new Label( UString(number), Color::white);
++    
++    label_clouds = new Label( UString(_(&quot;Cloud Coverage&quot;)), Color::yellow);
++    slider_clouds = new Slider( 0, 4, GameConfig::game_cloudcoverage, SLIDER_SIZE, Events::ChangeClouds);
++    label_clouds_value = new Label( UString(getCloudText(GameConfig::game_cloudcoverage)), Color::white);
++    
++    label_wind = new Label( UString(_(&quot;Wind&quot;)), Color::yellow);
++    const int windIndex = getWindIndex(GameConfig::game_windspeed);
++    slider_wind = new Slider( 0, 4, windIndex, SLIDER_SIZE, Events::ChangeWind);
++    label_wind_value = new Label( UString(getWindText(windIndex)), Color::white);
++    
++    addComponent(label_maxplayers);
++    addComponent(slider_maxplayers);
++    addComponent(label_maxplayers_value);
++    addComponent(label_maxunits);
++    addComponent(slider_maxunits);
++    addComponent(label_maxunits_value);
++    addComponent(label_occupation);
++    addComponent(slider_occupation);
++    addComponent(label_occupation_value);
++    addComponent(label_timelimit);
++    addComponent(slider_timelimit);
++    addComponent(label_timelimit_value);
++    addComponent(label_fraglimit);
++    addComponent(slider_fraglimit);
++    addComponent(label_fraglimit_value);
++    addComponent(label_clouds);
++    addComponent(slider_clouds);
++    addComponent(label_clouds_value);
++    addComponent(label_wind);
++    addComponent(slider_wind);
++    addComponent(label_wind_value);
++    
++    refreshMaps();
++    setSelectedMap(&quot;&quot;);
++}
++
++HostGameLayer::~HostGameLayer()
++{
++    
++}
++
++void HostGameLayer::recalculateComponentLocations()
++{
++    int sw = screen-&gt;getWidth();
++    int sh = screen-&gt;getHeight();
++
++    area-&gt;setLocation((sw/2) - (area-&gt;getWidth()/2), ((sh/2) - (area-&gt;getHeight()/2)) );
++
++    int x = area-&gt;getLocationX() + 10;
++    int y = area-&gt;getLocationY() + 10;
++    
++    // to be done
++    
++    mapthumbnail-&gt;setLocation(x, y);
++    
++    button_prevmap-&gt;setLocation(x     , y+104);
++    button_nextmap-&gt;setLocation(x + 52, y+104);
++    
++    label_mapnamelabel-&gt;setLocation(x + 114, y);
++    label_mapsizelabel-&gt;setLocation(x + 114, y + TextRenderingSystem::line_height());
++    label_mapobjectiveslabel-&gt;setLocation(x + 114, y + TextRenderingSystem::line_height() * 2 );
++    
++    label_mapname-&gt;setLocation(x + 214, y);
++    label_mapsize-&gt;setLocation(x + 214, y + TextRenderingSystem::line_height());
++    label_mapobjectives-&gt;setLocation(x + 214, y + TextRenderingSystem::line_height() * 2 );
++
++    const int choice_x = x + area-&gt;getWidth() - (choice_gametype-&gt;getWidth()+20);
++    
++    label_gametype-&gt;setLocation(choice_x, y);
++    choice_gametype-&gt;setLocation(choice_x, y + TextRenderingSystem::line_height());
++    
++    y += 104 + 30; // 30 is the button size, haha
++    
++    label_maxplayers-&gt;setLocation(x, y);
++    slider_maxplayers-&gt;setLocation(x + SLIDER_OFFSET, y);
++    label_maxplayers_value-&gt;setLocation(x + SLIDER_VALUE_OFFSET, y);
++    
++    y += 30;
++    
++    label_maxunits-&gt;setLocation(x, y);
++    slider_maxunits-&gt;setLocation(x + SLIDER_OFFSET, y);
++    label_maxunits_value-&gt;setLocation(x + SLIDER_VALUE_OFFSET, y);
++
++    y += 30;
++    
++    label_occupation-&gt;setLocation(x, y);
++    slider_occupation-&gt;setLocation(x + SLIDER_OFFSET, y);
++    label_occupation_value-&gt;setLocation(x + SLIDER_VALUE_OFFSET, y);
++    
++    y += 30;
++    
++    label_timelimit-&gt;setLocation(x, y);
++    slider_timelimit-&gt;setLocation(x + SLIDER_OFFSET, y);
++    label_timelimit_value-&gt;setLocation(x + SLIDER_VALUE_OFFSET, y);
++    
++    y += 30;
++    
++    label_fraglimit-&gt;setLocation(x, y);
++    slider_fraglimit-&gt;setLocation(x + SLIDER_OFFSET, y);
++    label_fraglimit_value-&gt;setLocation(x + SLIDER_VALUE_OFFSET, y);
++    
++    y += 30;
++    
++    label_clouds-&gt;setLocation(x, y);
++    slider_clouds-&gt;setLocation(x + SLIDER_OFFSET, y);
++    label_clouds_value-&gt;setLocation(x + SLIDER_VALUE_OFFSET, y);
++    
++    y += 30;
++    
++    label_wind-&gt;setLocation(x, y);
++    slider_wind-&gt;setLocation(x + SLIDER_OFFSET, y);
++    label_wind_value-&gt;setLocation(x + SLIDER_VALUE_OFFSET, y);
++    
++}
++
++void HostGameLayer::handleComponentEvents()
++{
++    int event;
++    while ( (event = component_events.nextEvent()) ) switch ( event )
++    {
++        case Events::PrevMap:
++            setSelectedMap(getPrevMapName(selectedMap));
++            break;
++            
++        case Events::NextMap:
++            setSelectedMap(getNextMapName(selectedMap));
++            break;
++            
++        case Events::ChangeMaxPlayers:
++        {
++            char number[50];
++            const int sr = slider_maxplayers-&gt;getValue();
++            GameConfig::game_maxplayers = sr; // @todo maybe do when pressing begin
++            snprintf(number, sizeof(number), &quot;%d&quot;, sr);
++            label_maxplayers_value-&gt;setText(number);
++        }
++            break;
++            
++        case Events::ChangeMaxUnits:
++        {
++            char number[50];
++            const int sr = slider_maxunits-&gt;getValue();
++            GameConfig::game_maxunits = sr; // @todo maybe do when pressing begin
++            snprintf(number, sizeof(number), &quot;%d&quot;, sr);
++            label_maxunits_value-&gt;setText(number);
++        }
++            break;
++            
++        case Events::ChangeOccupation:
++        {
++            char number[50];
++            const int sr = slider_occupation-&gt;getValue();
++            GameConfig::game_occupationpercentage = sr; // @todo maybe do when pressing begin
++            snprintf(number, sizeof(number), &quot;%d%%&quot;, sr);
++            label_occupation_value-&gt;setText(number);
++        }
++            break;
++            
++        case Events::ChangeTimeLimit:
++        {
++            char number[50];
++            const int sr = slider_timelimit-&gt;getValue();
++            GameConfig::game_timelimit = sr; // @todo maybe do when pressing begin
++            snprintf(number, sizeof(number), &quot;%02d:%02d&quot;, sr / 60, sr % 60 );
++            label_timelimit_value-&gt;setText(number);
++        }
++            break;
++            
++        case Events::ChangeFragLimit:
++        {
++            char number[50];
++            const int sr = slider_fraglimit-&gt;getValue();
++            GameConfig::game_fraglimit = sr; // @todo maybe do when pressing begin
++            snprintf(number, sizeof(number), &quot;%d&quot;, sr );
++            label_fraglimit_value-&gt;setText(number);
++        }
++            break;
++            
++        case Events::ChangeClouds:
++        {
++            const int sr = slider_clouds-&gt;getValue();
++            GameConfig::game_cloudcoverage = sr; // @todo maybe do when pressing begin
++            label_clouds_value-&gt;setText(getCloudText(sr));
++        }
++            break;
++            
++        case Events::ChangeWind:
++        {
++            const int sr = slider_wind-&gt;getValue();
++            GameConfig::game_windspeed = windIndexToConfig(sr); // @todo maybe do when pressing begin
++            label_wind_value-&gt;setText(getWindText(sr));
++        }
++            break;
++        
++    }
++
++}
++
++void HostGameLayer::refreshMaps()
++{
++    ResourceManager::refreshMapList();
++    mapList.clear();
++
++    if ( ResourceManager::listMaps(mapList) == 0 )
++    {
++        throw Exception(&quot;not found any map&quot;);
++    }
++}
++
++void HostGameLayer::setSelectedMap(const NPString&amp; map_name)
++{
++    const MapFile *m = 0;
++    std::vector&lt;NPString&gt;::iterator i = std::find(mapList.begin(), mapList.end(), map_name);
++    if ( i != mapList.end() )
++    {
++        m = ResourceManager::getMap(map_name, ResourceManager::MAP_THUMBNAIL);
++    }
++    else
++    {
++        m = ResourceManager::getMap(mapList[0], ResourceManager::MAP_THUMBNAIL);
++    }
++    
++    selectedMap = m-&gt;filename; // XXX actually filenames and map names may be different, this is the correct one.
++    
++    mapthumbnail-&gt;setImage(*(m-&gt;thumbnail));
++    
++    char strBuf[256];
++    label_mapname-&gt;setText(m-&gt;filename);
++        
++    int sizeX = m-&gt;width;
++    int sizeY = m-&gt;height;
++//    int sizeX = (m-&gt;width * 32) / 800;
++//    int sizeY = (m-&gt;height * 32) / 600;
++    sprintf(strBuf, &quot;%d x %d&quot;, sizeX, sizeY);
++    label_mapsize-&gt;setText(strBuf);
++    
++    sprintf(strBuf, &quot;%d&quot;, m-&gt;getOutpostCount());
++    label_mapobjectives-&gt;setText(strBuf);
++
++    // @todo when to set the game config?
++    // like this? GameConfig::game_mapcycle-&gt;assign( mapList[curMap] );
++}
++
++const NPString&amp; HostGameLayer::getPrevMapName(const NPString&amp; name) const
++{
++    std::vector&lt;NPString&gt;::const_iterator i = std::find(mapList.begin(), mapList.end(), name);
++    if ( i != mapList.begin() )
++    {
++        i--;
++        return *i;
++    }
++    
++    return mapList.back();
++}
++
++const NPString&amp; HostGameLayer::getNextMapName(const NPString&amp; name) const
++{
++    std::vector&lt;NPString&gt;::const_iterator i = std::find(mapList.begin(), mapList.end(), name);
++    if ( i != mapList.end() )
++    {
++        i++;
++        if ( i != mapList.end() )
++        {
++            return *i;
++        }
++    }
++    
++    return mapList[0];
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.hpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/HostGameLayer.hpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -21,8 +21,18 @@
+ #ifndef HOSTGAMELAYER_HPP
+ #define	HOSTGAMELAYER_HPP
+ 
++#include &lt;vector&gt;
++
++#include &quot;Core/CoreTypes.hpp&quot;
++
+ #include &quot;2D/ComponentLayer.hpp&quot;
+ 
++class MapThumbnailComponent;
++class Button;
++class Label;
++class Slider;
++class Choice;
++
+ class HostGameLayer : public ComponentLayer
+ {
+ public:
+@@ -33,6 +43,58 @@
+     void recalculateComponentLocations();
+     void handleComponentEvents();
+     
++    void refreshMaps();
++    void setSelectedMap(const NPString&amp; map_name);
++    const NPString&amp; getNextMapName(const NPString&amp; name) const;
++    const NPString&amp; getPrevMapName(const NPString&amp; name) const;
++    
++    Component * area;
++    
++    MapThumbnailComponent * mapthumbnail;
++    
++    Button * button_prevmap;
++    Button * button_nextmap;
++    Label  * label_mapnamelabel;
++    Label  * label_mapsizelabel;
++    Label  * label_mapobjectiveslabel;
++    Label  * label_mapname;
++    Label  * label_mapsize;
++    Label  * label_mapobjectives;
++    
++    Label  * label_maxplayers;
++    Slider * slider_maxplayers;
++    Label  * label_maxplayers_value;
++    
++    Label  * label_maxunits;
++    Slider * slider_maxunits;
++    Label  * label_maxunits_value;
++    
++    Label  * label_occupation;
++    Slider * slider_occupation;
++    Label  * label_occupation_value;
++    
++    Label  * label_timelimit;
++    Slider * slider_timelimit;
++    Label  * label_timelimit_value;
++    
++    Label  * label_fraglimit;
++    Slider * slider_fraglimit;
++    Label  * label_fraglimit_value;
++    
++    Label  * label_clouds;
++    Slider * slider_clouds;
++    Label  * label_clouds_value;
++            
++    Label  * label_wind;
++    Slider * slider_wind;
++    Label  * label_wind_value;
++    
++    Label  * label_gametype;
++    Choice * choice_gametype;
++    
++    NPString selectedMap;
++    std::vector&lt;NPString&gt; mapList;
++    
+ };
+ 
+ #endif	/* HOSTGAMELAYER_HPP */
+
+Modified: trunk/netpanzer/src/NetPanzer/Scenes/MainMenuScene.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scenes/MainMenuScene.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Scenes/MainMenuScene.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -24,6 +24,7 @@
+ 
+ #include &quot;Scenes/Common/OptionsLayer.hpp&quot;
+ #include &quot;Scenes/MainMenu/IntroLayer.hpp&quot;
++#include &quot;Scenes/MainMenu/HostGameLayer.hpp&quot;
+ 
+ #include &quot;2D/Components/Slider.hpp&quot;
+ 
+@@ -128,8 +129,9 @@
+     Button * button_help;
+     Button * button_exit;
+ 
+-    IntroLayer   * intro_layer;
+-    OptionsLayer * options_layer;
++    IntroLayer    * intro_layer;
++    OptionsLayer  * options_layer;
++    HostGameLayer * hostgame_layer;
+ 
+     struct Events {
+         enum
+@@ -148,6 +150,7 @@
+     MainMenuLayer() : ComponentLayer(0)
+     {
+         options_layer = 0;
++        hostgame_layer = 0;
+ 
+         panel_darkgray = new DarkGrayPanel();
+         panel_darkgray-&gt;setSize(MENU_WIDTH, MENU_HEIGHT-26-26);
+@@ -182,6 +185,11 @@
+         {
+             delete options_layer;
+         }
++        
++        if ( hostgame_layer )
++        {
++            delete hostgame_layer;
++        }
+     }
+     
+     void logic()
+@@ -204,7 +212,12 @@
+                 break;
+ 
+             case Events::ShowHost:
+-                LOGGER.warning(&quot;Clicked on Host!!!&quot;);
++                if ( hostgame_layer == 0 )
++                {
++                    hostgame_layer = new HostGameLayer();
++                }
++
++                setSubLayer( hostgame_layer );
+                 break;
+ 
+             case Events::ShowOptions:
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -211,7 +211,8 @@
+  
+     std::string bmpfile = filesystem::getRealWriteName(buf);
+     SDL_SaveBMP(frontBuffer, bmpfile.c_str());
+-    ConsoleInterface::postMessage(Color::cyan, false, 0, _(&quot;Screenshoot saved as: %s&quot;), buf);
++    LOGGER.info(&quot;Screenshoot saved as: %s&quot;, buf);
++//    ConsoleInterface::postMessage(Color::cyan, false, 0, _(&quot;Screenshoot saved as: %s&quot;), buf);
+     timer.reset();
+ }
+  
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -21,7 +21,6 @@
+ #include &quot;Particles/ParticleSystem2D.hpp&quot;
+ #include &quot;Particles/Particle2D.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/HostOptionsView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -1,335 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#include &quot;HostOptionsView.hpp&quot;
+-#include &quot;Interfaces/StrManager.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Particles/ParticleSystemGlobals.hpp&quot;
+-#include &quot;MapSelectionView.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-#include &quot;2D/Components/Label.hpp&quot;
+-#include &quot;2D/Components/Button.hpp&quot;
+-#include &quot;2D/Components/Separator.hpp&quot;
+-#include &quot;Actions/Action.hpp&quot;
+-#include &quot;Actions/ChangeIntVarAction.hpp&quot;
+-#include &quot;Views/Components/BoxedLabel.hpp&quot;
+-#include &quot;2D/Components/CheckBox.hpp&quot;
+-#include &quot;2D/Components/Choice.hpp&quot;
+-#include &quot;Classes/MapFile.hpp&quot;
+-#include &quot;Resources/ResourceManager.hpp&quot;
+-
+-enum { BORDER_SPACE = 4 };
+-
+-class MaxPlayerBoxedLabel : public BoxedLabel
+-{
+-public:
+-    MaxPlayerBoxedLabel()
+-        : BoxedLabel(0,0,10,&quot;&quot;,meterTextColor, meterColor, true)
+-    {}
+-
+-    NPString getText() const
+-    {
+-        char strBuf[256];
+-        sprintf(strBuf, &quot;%d&quot;, GameConfig::game_maxplayers);
+-        return NPString(strBuf);
+-    }
+-};
+-
+-class MaxUnitsBoxedLabel : public BoxedLabel
+-{
+-public:
+-    MaxUnitsBoxedLabel()
+-        : BoxedLabel(0,0,10,&quot;&quot;,meterTextColor, meterColor, true)
+-    {}
+-
+-    NPString getText() const
+-    {
+-        char strBuf[256];
+-        sprintf( strBuf, &quot;%d - %d %s&quot;, GameConfig::game_maxunits, 
+-                 GameConfig::game_maxunits / GameConfig::game_maxplayers, 
+-                 _(&quot;max per player&quot;));
+-        return NPString(strBuf);
+-    }
+-};
+-
+-class CapturePercentBoxedLabel : public BoxedLabel
+-{
+-public:
+-    CapturePercentBoxedLabel()
+-        : BoxedLabel(0,0,10,&quot;&quot;,meterTextColor, meterColor, true)
+-    {}
+-
+-    NPString getText() const
+-    {
+-        char strBuf[256];
+-        // XXX WARNING note efficient
+-        const MapFile * m = 0; //ResourceManager::getMap(((MapSelectionView*)Desktop::getView(&quot;MapSelectionView&quot;))-&gt;getCurrentSelectedMapName(), 0);
+-        if ( m )
+-        {
+-            int objectiveCount = m-&gt;getOutpostCount();
+-            sprintf(strBuf, &quot;%d%% - %d of %d&quot;, GameConfig::game_occupationpercentage,
+-                    int(float(objectiveCount) * (float(GameConfig::game_occupationpercentage) / 100.0f) + 0.999),
+-                    objectiveCount);
+-        }
+-        else
+-        {
+-            sprintf(strBuf,&quot;%s&quot;, _(&quot;Map Data Needed&quot;));
+-        }
+-        return NPString(strBuf);
+-    }
+-};
+-
+-class TimeLimitBoxedLabel : public BoxedLabel
+-{
+-public:
+-    TimeLimitBoxedLabel()
+-        : BoxedLabel(0,0,10,&quot;&quot;,meterTextColor, meterColor, true)
+-    {}
+-
+-    NPString getText() const
+-    {
+-        char strBuf[256];
+-        sprintf(strBuf, &quot;%d:%d&quot;, GameConfig::game_timelimit / 60, GameConfig::game_timelimit % 60 );
+-        return NPString(strBuf);
+-    }
+-};
+-
+-class FragLimitBoxedLabel : public BoxedLabel
+-{
+-public:
+-    FragLimitBoxedLabel()
+-        : BoxedLabel(0,0,10,&quot;&quot;,meterTextColor, meterColor, true)
+-    {}
+-
+-    NPString getText() const
+-    {
+-        char strBuf[256];
+-        sprintf(strBuf, &quot;%d %s&quot;, GameConfig::game_fraglimit, _(&quot;Frags&quot;) );
+-        return NPString(strBuf);
+-    }
+-};
+-
+-class GameTypeChoice : public Choice
+-{
+-public:
+-    GameTypeChoice(int x, int y, int w) : Choice()
+-    {
+-//        setLabel(_(&quot;Game Type&quot;));
+-        addItem(_(&quot;Objective&quot;));
+-        addItem(_(&quot;Frag Limit&quot;));
+-        addItem(_(&quot;Time Limit&quot;));
+-        setMinWidth(w);
+-        setLocation(x, y);
+-        
+-        switch ( GameConfig::game_gametype )
+-        {
+-            case _gametype_objective: select(0); break;
+-            case _gametype_fraglimit: select(1); break;
+-            case _gametype_timelimit: select(2); break;
+-            default: select(0);
+-        }
+-
+-    }
+-    
+-    void onSelectionChanged()
+-    {
+-        switch ( getSelectedIndex() )
+-        {
+-            case 0: GameConfig::game_gametype = _gametype_objective; break;
+-            case 1: GameConfig::game_gametype = _gametype_fraglimit; break;
+-            case 2: GameConfig::game_gametype = _gametype_timelimit; break;
+-        }
+-    }
+-};
+-
+-static float calmWindSpeed    = float(baseWindSpeed) * calmWindsPercentOfBase;
+-static float breezyWindSpeed  = float(baseWindSpeed) * breezyWindsPercentOfBase;
+-static float briskWindSpeed   = float(baseWindSpeed) * briskWindsPercentOfBase;
+-static float heavyWindSpeed   = float(baseWindSpeed) * heavyWindsPercentOfBase;
+-static float typhoonWindSpeed = float(baseWindSpeed) * typhoonWindsPercentOfBase;
+-
+-class WindSpeedChoice : public Choice
+-{
+-public:
+-    WindSpeedChoice(int x, int y, int w) : Choice()
+-    {
+-//        setLabel(_(&quot;Wind Speed&quot;));
+-        addItem(_(&quot;Calm&quot;));
+-        addItem(_(&quot;Breezy&quot;));
+-        addItem(_(&quot;Brisk Winds&quot;));
+-        addItem(_(&quot;Heavy Winds&quot;));
+-        addItem(_(&quot;Typhoon&quot;));
+-        setMinWidth(w);
+-        setLocation(x, y);
+-        
+-        float ws = GameConfig::game_windspeed;
+-        
+-        if ( ws &lt;= calmWindSpeed ) select(0);
+-        else if ( ws &lt;= breezyWindSpeed ) select(1);
+-        else if ( ws &lt;= briskWindSpeed ) select(2);
+-        else if ( ws &lt;= heavyWindSpeed ) select(3);
+-        else select(4);
+-    }
+-    
+-    void onSelectionChanged()
+-    {
+-        switch ( getSelectedIndex() )
+-        {
+-            case 0: GameConfig::game_windspeed = int(calmWindSpeed); break;
+-            case 1: GameConfig::game_windspeed = int(breezyWindSpeed); break;
+-            case 2: GameConfig::game_windspeed = int(briskWindSpeed); break;
+-            case 3: GameConfig::game_windspeed = int(heavyWindSpeed); break;
+-            case 4: GameConfig::game_windspeed = int(typhoonWindSpeed); break;
+-        }
+-    }
+-};
+-
+-class CloudCoverageChoice : public Choice
+-{
+-public:
+-    CloudCoverageChoice(int x, int y, int w) : Choice()
+-    {
+-//        setLabel(_(&quot;Cloud Coverage&quot;));
+-        addItem(_(&quot;Clear&quot;));
+-        addItem(_(&quot;Broken&quot;));
+-        addItem(_(&quot;Partly Cloudy&quot;));
+-        addItem(_(&quot;Overcast&quot;));
+-        addItem(_(&quot;Extremely Cloudy&quot;));
+-        setMinWidth(w);
+-        setLocation(x, y);
+-        
+-        if ( (GameConfig::game_cloudcoverage &lt; 0) || (GameConfig::game_cloudcoverage &gt; 4) )
+-        {
+-            select ( 0 );
+-        }
+-        else
+-        {
+-            select(GameConfig::game_cloudcoverage);
+-        }
+-    }
+-    
+-    void onSelectionChanged()
+-    {
+-        GameConfig::game_cloudcoverage = getSelectedIndex();
+-    }
+-};
+-
+-// HostOptionsView
+-//---------------------------------------------------------------------------
+-HostOptionsView::HostOptionsView() : View()
+-{
+-    setSearchName(&quot;HostOptionsView&quot;);
+-
+-    setAllowMove(false);
+-
+-    moveTo(bodyTextRect.getLocationX(), bodyTextRect.getLocationY() + 205);
+-    resizeClientArea(bodyTextRect.getWidth()-5, 168 + 16);
+-
+-    add( new Separator( 0, 0, getWidth(), _(&quot;Host Options&quot;), componentActiveTextColor) );
+-    
+-    addMeterButtons(iXY(BORDER_SPACE, BORDER_SPACE+16));
+-    
+-//    add( new Label(4, getHeight() - Surface::getFontHeight(), _(&quot;Note: Use the right mouse button to accomplish fast mouse clicking.&quot;), windowTextColor ) );
+-
+-} // end HostOptionsView::HostOptionsView
+-
+-void HostOptionsView::doDeactivate()
+-{
+-    // nothing
+-}
+-
+-#define arrowButtonWidth (16)
+-#define xControlStart (270)
+-
+-void HostOptionsView::addConfRow(   const iXY pos,
+-                                    const NPString&amp; label,
+-                                    Action* decreaseAction,
+-                                    Action* increaseAction,
+-                                    Component* meter)
+-{
+-    iXY p(pos);
+-//    add( new Label(p.x, p.y+3, label, windowTextColor) );
+-    p.x += xControlStart - 1;
+-//    add( Button::createTextButton( &quot;&lt;&quot;, p, arrowButtonWidth-2, decreaseAction));
+-    p.x += arrowButtonWidth + 3;
+-    meter-&gt;setLocation(p);
+-    meter-&gt;setSize(meterWidth, 16);
+-    add(meter);
+-    p.x += meterWidth + 3;
+-//    add( Button::createTextButton( &quot;&gt;&quot;, p, arrowButtonWidth-2, increaseAction));
+-}
+-
+-// addMeterButtons
+-//---------------------------------------------------------------------------
+-void HostOptionsView::addMeterButtons(const iXY &amp;pos)
+-{
+-    const int yOffset          = 15;
+-    
+-    iXY p(pos);
+-    
+-    addConfRow(p, _(&quot;Max Players&quot;),
+-                   new ChangeIntVarAction&lt;GameConfig::game_maxplayers, 2, 16&gt;(-1),
+-                   new ChangeIntVarAction&lt;GameConfig::game_maxplayers, 2, 16&gt;(1),
+-                   new MaxPlayerBoxedLabel() );
+-    
+-    p.y += yOffset;
+-
+-    addConfRow(p, _(&quot;Game Max Unit Count&quot;),
+-                   new ChangeIntVarAction&lt;GameConfig::game_maxunits, 2, 1000&gt;(-5),
+-                   new ChangeIntVarAction&lt;GameConfig::game_maxunits, 2, 1000&gt;(5),
+-                   new MaxUnitsBoxedLabel() );
+-    
+-    p.y += yOffset;
+-    
+-    addConfRow(p, _(&quot;Objective Capture Percent&quot;),
+-                   new ChangeIntVarAction&lt;GameConfig::game_occupationpercentage, 5, 100&gt;(-5),
+-                   new ChangeIntVarAction&lt;GameConfig::game_occupationpercentage, 5, 100&gt;(5),
+-                   new CapturePercentBoxedLabel() );
+-    
+-    p.y += yOffset;
+-
+-    addConfRow(p, _(&quot;Time Limit&quot;),
+-                   new ChangeIntVarAction&lt;GameConfig::game_timelimit, 5, 240&gt;(-5),
+-                   new ChangeIntVarAction&lt;GameConfig::game_timelimit, 5, 240&gt;(5),
+-                   new TimeLimitBoxedLabel() );
+-    
+-    p.y += yOffset;
+-    
+-    addConfRow(p, _(&quot;Frag Limit&quot;),
+-                   new ChangeIntVarAction&lt;GameConfig::game_fraglimit, 5, 1000&gt;(-5),
+-                   new ChangeIntVarAction&lt;GameConfig::game_fraglimit, 5, 1000&gt;(5),
+-                   new FragLimitBoxedLabel() );
+-    
+-    const int minWidth = 150;
+-    int xChoiceOffset = 2;
+-
+-    add( new GameTypeChoice(xChoiceOffset, 100 + 16, minWidth) );
+-    
+-    xChoiceOffset += minWidth + 123;
+-
+-    add( new CloudCoverageChoice(xChoiceOffset, 100 + 16, minWidth) );
+-
+-    xChoiceOffset += minWidth + 13;
+-
+-    add( new WindSpeedChoice(xChoiceOffset, 100 + 16, minWidth) );
+-    
+-//    add( new CheckBox(2, 125 + 16, _(&quot;Public&quot;), &amp;GameConfig::server_public) );
+-//
+-//    add( new CheckBox(120, 125 + 16, _(&quot;PowerUps&quot;), &amp;GameConfig::game_powerups) );
+-    
+-} // end HostOptionsView::addMeterButtons
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -1,43 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __HostOptionsView_hpp__
+-#define __HostOptionsView_hpp__
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Core/CoreTypes.hpp&quot;
+-
+-class Action;
+-
+-//---------------------------------------------------------------------------
+-class HostOptionsView : public View
+-{
+-private:
+-    void addMeterButtons(const iXY &amp;pos);
+-    void addConfRow( const iXY pos, const NPString&amp; label, Action* decreaseAction, Action* increaseAction, Component* meter);
+-    
+-protected:
+-    virtual void doDeactivate();
+-
+-public:
+-    HostOptionsView();
+-    virtual ~HostOptionsView()
+-    {}
+-}; // end HostOptionsView
+-
+-#endif // end __HostOptionsView_hpp__
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -1,215 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &lt;memory&gt;
+-#include &lt;vector&gt;
+-#include &lt;string&gt;
+-#include &quot;MapSelectionView.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Interfaces/StrManager.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-#include &quot;HostOptionsView.hpp&quot;
+-#include &quot;Classes/MapFile.hpp&quot;
+-#include &quot;Util/Exception.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-
+-#include &quot;Actions/Action.hpp&quot;
+-#include &quot;2D/Components/Button.hpp&quot;
+-#include &quot;2D/Components/Separator.hpp&quot;
+-#include &quot;2D/Components/Label.hpp&quot;
+-
+-#include &quot;Resources/ResourceManager.hpp&quot;
+-
+-class ChangeSelectedMapAction : public Action
+-{
+-public:
+-    MapSelectionView * view;
+-    int change;
+-    ChangeSelectedMapAction(MapSelectionView * view, int change) : Action(false), view(view), change(change) {}
+-    void execute()
+-    {
+-        int num_maps = view-&gt;getNumMaps();
+-        if ( num_maps == 0 )
+-        {
+-            return;
+-        }
+-        
+-        int new_val = view-&gt;getCurrentSelectedMapNumber() + change;
+-        if ( new_val &lt; 0 )
+-        {
+-            new_val = num_maps -1;
+-        }
+-        else if ( new_val &gt;= num_maps )
+-        {
+-            new_val = 0;
+-        }
+-        
+-        view-&gt;setSelectedMap(new_val);
+-    }
+-};
+-
+-class MapThumbnailComponent : public Component
+-{
+-private:
+-    Surface mapimage;
+-public:
+-    MapThumbnailComponent(int x, int y, int w, int h)
+-    {
+-        setLocation(x, y);
+-        setSize(w, h);
+-        mapimage.create(w - 2, h - 2);
+-    }
+-    
+-    void draw(Surface &amp;dest)
+-    {
+-        dest.drawRect(rect, Color::lightGray);
+-        mapimage.blt(dest, rect.getLocationX()+1, rect.getLocationY()+1); // full blit
+-    }
+-    
+-    void setImage(const Surface&amp; from)
+-    {
+-        iRect r(0,0, rect.getWidth()-2, rect.getHeight()-2);
+-        mapimage.bltScale(from, r);
+-    }
+-    
+-    virtual void render()
+-    {
+-        // nothing
+-    }
+-    
+-    void actionPerformed(const mMouseEvent &amp;me)
+-    {
+-        // nothing
+-    }
+-};
+-
+-// MapSelectionView
+-//---------------------------------------------------------------------------
+-MapSelectionView::MapSelectionView() : View()
+-{
+-    setSearchName(&quot;MapSelectionView&quot;);
+-
+-    setAllowMove(false);
+-
+-    moveTo(bodyTextRect.getLocationX(), bodyTextRect.getLocationY() + 50);
+-
+-    resize(350, MAP_SIZE + BORDER_SPACE * 2 + 16);
+-
+-    curMap = -1;
+-    
+-    init();
+-
+-} // end MapSelectionView::MapSelectionView
+-
+-MapSelectionView::~MapSelectionView()
+-{
+-}
+-
+-// init
+-//---------------------------------------------------------------------------
+-void MapSelectionView::init()
+-{
+-    add( new Separator( 0, 0, getWidth(), _(&quot;Map Selection&quot;), componentActiveTextColor) );
+-    
+-    const int arrowButtonWidth = (getWidth() - MAP_SIZE - BORDER_SPACE * 3) / 2;
+-
+-    iXY pos(MAP_SIZE + BORDER_SPACE * 2, getHeight() - 22 - BORDER_SPACE);
+-
+-    Button * b;// = Button::createTextButton( &quot;&lt;&quot;, pos, arrowButtonWidth - 1, new ChangeSelectedMapAction(this, -1));
+-    b-&gt;setSize(arrowButtonWidth-1, 20);
+-    add( b );
+-    
+-    pos.x += arrowButtonWidth + 2;
+-//    b = Button::createTextButton( &quot;&gt;&quot;, pos, arrowButtonWidth - 1, new ChangeSelectedMapAction(this, 1));
+-    b-&gt;setSize(arrowButtonWidth-1, 20);
+-    add( b );
+-
+-    mapthumbnail = new MapThumbnailComponent(BORDER_SPACE, 14 + BORDER_SPACE, 102, 102);
+-    add(mapthumbnail);
+-    
+-    const int lx = MAP_SIZE + BORDER_SPACE * 2;
+-    int ly = BORDER_SPACE + 16;
+-    name_label = new Label(lx, ly, &quot;&quot;, windowTextColor);
+-    ly += 15;
+-    size_label = new Label(lx, ly, &quot;&quot;, windowTextColor);
+-    ly += 15;
+-    objectives_label = new Label(lx, ly, &quot;&quot;, windowTextColor);
+-
+-    add(name_label);
+-    add(size_label);
+-    add(objectives_label);
+-    
+-    loadMaps();
+-
+-} // end MapSelectionView::init
+-
+-void
+-MapSelectionView::setSelectedMap(int map_number)
+-{
+-    curMap = map_number;
+-    
+-    const MapFile * m = ResourceManager::getMap(mapList[curMap], ResourceManager::MAP_THUMBNAIL);
+-    
+-    mapthumbnail-&gt;setImage(*(m-&gt;thumbnail));
+-    
+-    char strBuf[256];
+-    sprintf(strBuf, &quot;%-11s: %s&quot;, _(&quot;Name&quot;), m-&gt;name);
+-    name_label-&gt;setText(strBuf);
+-        
+-    int sizeX = (m-&gt;width * 32) / 800;
+-    int sizeY = (m-&gt;height * 32) / 600;
+-    sprintf(strBuf, &quot;%-11s: %d x %d&quot;, _(&quot;Size&quot;),sizeX, sizeY);
+-    size_label-&gt;setText(strBuf);
+-    
+-    sprintf(strBuf, &quot;%-11s: %d&quot;, _(&quot;Objectives&quot;), m-&gt;getOutpostCount());
+-    objectives_label-&gt;setText(strBuf);
+-    
+-    GameConfig::game_mapcycle-&gt;assign( mapList[curMap] );
+-}
+-
+-// loadMaps
+-//---------------------------------------------------------------------------
+-int MapSelectionView::loadMaps()
+-{
+-    ResourceManager::refreshMapList();
+-    mapList.clear();
+-
+-    if ( ResourceManager::listMaps(mapList) == 0 )
+-    {
+-        throw Exception(&quot;not found any map&quot;);
+-    }
+-
+-    bool selected = false;
+-    for ( unsigned n = 0; n &lt;mapList.size(); n++ )
+-    {
+-        if ( mapList[n] == *GameConfig::game_mapcycle )
+-        {
+-            selected = true;
+-            setSelectedMap(n);
+-        }
+-    }
+-
+-    if ( ! selected )
+-    {
+-        setSelectedMap(0);
+-    }
+-
+-    // Success
+-    return -1;
+-} // end MapSelectionView::loadMaps
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2013-08-27 17:36:11 UTC (rev 1428)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2013-08-28 16:23:22 UTC (rev 1429)
+@@ -1,76 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __MapSelectionView_hpp__
+-#define __MapSelectionView_hpp__
+-
+-#include &lt;vector&gt;
+-#include &lt;string.h&gt;
+-
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Core/CoreTypes.hpp&quot;
+-
+-//---------------------------------------------------------------------------
+-class MapInfo
+-{
+-public:
+-    Surface thumbnail;
+-    std::string name;
+-    std::string description;
+-    iXY     cells;
+-    int     objectiveCount;
+-
+-    MapInfo()
+-    {
+-    }
+-}; // end MapInfo
+-
+-class MapThumbnailComponent;
+-class Label;
+-
+-//---------------------------------------------------------------------------
+-class MapSelectionView : public View
+-{
+-private:
+-    enum { BORDER_SPACE =   4 };
+-    enum { MAP_SIZE     = 100 };
+-    
+-    MapThumbnailComponent * mapthumbnail;
+-    Label * name_label;
+-    Label * size_label;
+-    Label * objectives_label;
+-    
+-    int  loadMaps();
+-
+-    std::vector&lt;NPString&gt; mapList;
+-    int curMap;
+-    
+-public:
+-    MapSelectionView();
+-    ~MapSelectionView();
+-
+-    int getNumMaps() const { return mapList.size(); }
+-    int getCurrentSelectedMapNumber() const { return curMap; }
+-    
+-    void setSelectedMap(int map_number);
+-    const NPString getCurrentSelectedMapName() const { return (curMap &lt; 0) ? &quot;&quot; : mapList[curMap]; } 
+-    
+-    void init();
+-}; // end MapSelectionView
+-
+-#endif // end __MapSelectionView_hpp__
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#451">[ date ]</a>
+              <a href="thread.html#451">[ thread ]</a>
+              <a href="subject.html#451">[ subject ]</a>
+              <a href="author.html#451">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

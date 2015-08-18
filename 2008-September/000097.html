@@ -1,0 +1,1324 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1061 - in trunk/netpanzer: nbproject	src/NetPanzer/Interfaces src/NetPanzer/PowerUps	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1061%20-%20in%20trunk/netpanzer%3A%20nbproject%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/PowerUps%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game&In-Reply-To=%3C200809201506.m8KF66VC015748%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000096.html">
+   <LINK REL="Next"  HREF="000098.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1061 - in trunk/netpanzer: nbproject	src/NetPanzer/Interfaces src/NetPanzer/PowerUps	src/NetPanzer/Views/Components src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1061%20-%20in%20trunk/netpanzer%3A%20nbproject%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/PowerUps%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game&In-Reply-To=%3C200809201506.m8KF66VC015748%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1061 - in trunk/netpanzer: nbproject	src/NetPanzer/Interfaces src/NetPanzer/PowerUps	src/NetPanzer/Views/Components src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 20 17:06:06 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000096.html">[Netpanzer-cvs] r1060 - in trunk/netpanzer: nbproject	src/NetPanzer/Interfaces src/NetPanzer/PowerUps	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000098.html">[Netpanzer-cvs] r1062 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#97">[ date ]</a>
+              <a href="thread.html#97">[ thread ]</a>
+              <a href="subject.html#97">[ subject ]</a>
+              <a href="author.html#97">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-20 17:05:39 +0200 (Sat, 20 Sep 2008)
+New Revision: 1061
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.hpp
+Modified:
+   trunk/netpanzer/nbproject/configurations.xml
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+Log:
+- Removed MiniMapInterface
+- All the minimap functions are done in the new MiniMap except the right button move (done in MiniMapView)
+
+Modified: trunk/netpanzer/nbproject/configurations.xml
+===================================================================
+--- trunk/netpanzer/nbproject/configurations.xml	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/nbproject/configurations.xml	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -347,8 +347,6 @@
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MapInterface.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MapsManager.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MapsManager.hpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Interfaces/MiniMapInterface.cpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Interfaces/MiniMapInterface.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MouseInterface.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/MouseInterface.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Interfaces/PathScheduler.cpp&lt;/itemPath&gt;
+@@ -1606,12 +1604,6 @@
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MapsManager.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MouseInterface.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -3335,12 +3327,6 @@
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MapsManager.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MouseInterface.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -5064,12 +5050,6 @@
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MapsManager.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MouseInterface.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -6793,12 +6773,6 @@
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MapsManager.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.cpp&quot;&gt;
+-        &lt;itemTool&gt;1&lt;/itemTool&gt;
+-      &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Interfaces/MiniMapInterface.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Interfaces/MouseInterface.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -93,7 +93,7 @@
+       scrollrate(&quot;scrollrate&quot;, 1000, 100, 10000),
+       minimapposition(&quot;minimapposition&quot;, iXY(0,0)),
+       minimapsize(&quot;minimapsize&quot;, iXY(194,194)),
+-      minimapdrawtype(&quot;minimapdrawtype&quot;, MAP_SOLID),
++      minimapdrawtype(&quot;minimapdrawtype&quot;, 0),
+       gameinfoposition(&quot;gameinfoposition&quot;, iXY(0,0)),
+       toolbarposition(&quot;toolbarposition&quot;, iXY(0,0)),
+       rankposition(&quot;rankposition&quot;, iXY(0,0)),
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -35,7 +35,6 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+-#include &quot;Interfaces/MiniMapInterface.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PathScheduler.hpp&quot;
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+@@ -592,12 +591,7 @@
+ 
+ void GameManager::setNetPanzerGameOptions()
+ {
+-    MiniMapInterface::setProperties( gameconfig-&gt;getPlayerRadarUnitColor(),
+-                                     gameconfig-&gt;getSelectedRadarUnitColor(),
+-                                     gameconfig-&gt;getAlliedRadarUnitColor(),
+-                                     gameconfig-&gt;getPlayerOutpostRadarColor(),
+-                                     gameconfig-&gt;getAlliedOutpostRadarColor(),
+-                                     gameconfig-&gt;getEnemyOutpostRadarColor() );
++    // nothing
+ }
+ 
+ // ******************************************************************
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -27,7 +27,6 @@
+ WorldMap MapInterface::main_map;
+ SpawnList MapInterface::spawn_list;
+ WadMapTable MapInterface::wad_mapping_table;
+-Surface MapInterface::mini_map_surface;
+ char MapInterface::map_path[256];
+ MapInterface::MapListenerList MapInterface::listenerList;
+ 
+@@ -89,8 +88,6 @@
+         i++;
+     }
+     
+-    buildMiniMapSurface();
+-
+     strcpy( path, map_path );
+ 
+     strcat( path, &quot;.spn&quot; );
+@@ -119,9 +116,7 @@
+    }
+  
+   wad_mapping_table.deallocate();
+-  
+-  buildMiniMapSurface();
+- 
++   
+   strcpy( path, file_path );
+   strcat( path, &quot;.spn&quot; );
+   spawn_list.loadSpawnFile( path );  
+@@ -162,26 +157,6 @@
+ 
+ }
+ 
+-void MapInterface::buildMiniMapSurface()
+-{
+-    unsigned long map_x_size, x_index;
+-    unsigned long map_y_size, y_index;
+-    WorldMap::MapElementType map_value;
+-    unsigned char  avg_color;
+-
+-    map_x_size = main_map.getWidth();
+-    map_y_size = main_map.getHeight();
+-    mini_map_surface.create( map_x_size, map_y_size, 1 );
+-
+-    for( y_index = 0; y_index &lt; map_y_size; y_index++ ) {
+-        for ( x_index = 0; x_index &lt; map_x_size; x_index++ ) {
+-            map_value = main_map.getValue( x_index, y_index );
+-            avg_color = tile_set.getAverageTileColor( map_value );
+-            mini_map_surface.putPixel( x_index, y_index, (PIX) avg_color );
+-        } // ** for x_index
+-    } // ** for y_index
+-}
+-
+ unsigned char MapInterface::getMovementValue( iXY map_loc )
+ {
+     unsigned short tile_val;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -25,8 +25,6 @@
+ #include &quot;Classes/SpawnList.hpp&quot;
+ #include &quot;Classes/WadMapTable.hpp&quot;
+ 
+-#include &quot;2D/Surface.hpp&quot;
+-
+ class MapEventListener
+ {
+ public:
+@@ -48,14 +46,12 @@
+     static WorldMap main_map;
+     static SpawnList spawn_list;
+     static WadMapTable wad_mapping_table;
+-    static Surface mini_map_surface;
+     static char map_path[256];
+     static const int TILE_WIDTH = 32;
+     static const int TILE_HEIGHT = 32;
+ 
+ protected:
+     static void generateMappingTable();
+-    static void buildMiniMapSurface();
+ 
+ public:
+     static void addMapEventListener(MapEventListener *lis)
+@@ -223,11 +219,6 @@
+         return( main_map.isMapLoaded() );
+     }
+ 
+-    static Surface * getMiniMapSurface()
+-    {
+-        return ( &amp;mini_map_surface );
+-    }
+-
+     static unsigned char getMovementValue( iXY map_loc );
+ 
+     static unsigned char getAverageColorPointXY( iXY &amp;point_loc );
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -1,289 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-#include &quot;Interfaces/MiniMapInterface.hpp&quot;
+-
+-#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+-
+-#include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/WorldViewInterface.hpp&quot;
+-#include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;PathScheduler.hpp&quot;
+-#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-
+-fXY MiniMapInterface::scale_factor;
+-bool MiniMapInterface::pathing_debug_mode = false;
+-
+-PIX MiniMapInterface::player_unit_color;
+-PIX MiniMapInterface::selected_unit_color;
+-PIX MiniMapInterface::allie_unit_color;
+-
+-PIX MiniMapInterface::player_objective_color;
+-PIX MiniMapInterface::allie_objective_color;
+-PIX MiniMapInterface::enemy_objective_color;
+-
+-TimerFrameBase MiniMapInterface::radar_blink_timer;
+-bool        MiniMapInterface::radar_blink_flag;
+-
+-TimerFrameBase MiniMapInterface::show_enemy_radar_timer;
+-bool        MiniMapInterface::show_enemy_radar_flag;
+-
+-iRect MiniMapInterface::getWorldWindow()
+-{
+-    iRect world_win;
+-    WorldViewInterface::getViewWindow(&amp;world_win);
+-
+-    world_win.min.x = int(float(world_win.min.x) / scale_factor.x);
+-    world_win.min.y = int(float(world_win.min.y) / scale_factor.y);
+-    world_win.max.x = int(float(world_win.max.x) / scale_factor.x);
+-    world_win.max.y = int(float(world_win.max.y) / scale_factor.y);
+-
+-    return( world_win );
+-}
+-
+-void MiniMapInterface::setMapScale(const iXY &amp;mini_map_size)
+-{
+-    iXY map_size;
+-
+-    gameconfig-&gt;minimapsize=mini_map_size;
+- 
+-    MapInterface::getMapPointSize( &amp;map_size );
+-    scale_factor.x = float(map_size.x) / float(mini_map_size.x);
+-    scale_factor.y = float(map_size.y) / float(mini_map_size.y);
+-}
+-
+-void MiniMapInterface::setWorldWindowPosition( iXY world_loc )
+-{
+-    world_loc.x = int(float(world_loc.x) * scale_factor.x);
+-    world_loc.y = int(float(world_loc.y) * scale_factor.y);
+-
+-    WorldViewInterface::setCameraPosition( world_loc );
+-}
+-
+-void MiniMapInterface::annotateUnits( Surface &amp;map_surface )
+-{
+-    const UnitInterface::Units&amp; units = UnitInterface::getUnits();
+-    for(UnitInterface::Units::const_iterator i = units.begin();
+-            i != units.end(); ++i) {
+-        UnitBase* unit = i-&gt;second;
+-        bool islocal 
+-            = unit-&gt;player-&gt;getID() == PlayerInterface::getLocalPlayerIndex();
+-        bool isally = PlayerInterface::isAllied
+-	    (PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID());
+-        UnitState&amp; unit_state = unit-&gt;unit_state;
+-        iXY map_loc = iXY(
+-                int(float(unit_state.location.x) / scale_factor.x),
+-                int(float(unit_state.location.y) / scale_factor.y));
+-
+-        if (islocal) {
+-            if ( unit_state.threat_level == _threat_level_under_attack ) {
+-                if ( radar_blink_flag == true ) {
+-                    drawLargeUnitDot( map_surface, map_loc, Color::yellow );
+-                }
+-            } else {
+-                PIX unit_color=player_unit_color;
+-                if(unit_state.select) { unit_color=selected_unit_color; }
+-                if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_small) {
+-                    drawSmallUnitDot( map_surface, map_loc, unit_color );
+-                } else if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_large) {
+-                    drawLargeUnitDot( map_surface, map_loc, unit_color );
+-                } else {
+-                    assert(false);
+-                }
+-            }
+-        } else
+-            if (isally) {
+-                if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_small) {
+-                    drawSmallUnitDot( map_surface, map_loc, allie_unit_color );
+-                } else if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_large) {
+-                    drawLargeUnitDot( map_surface, map_loc, allie_unit_color );
+-                    
+-                } else {
+-                    assert(false);
+-                }
+-            } else if ( (show_enemy_radar_flag == true) ) {
+-                if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_small) {
+-                    drawSmallUnitDot(map_surface, map_loc,
+-                            unit-&gt;player-&gt;getColor() );
+-                } else if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_large) {
+-                    drawLargeUnitDot( map_surface, map_loc,
+-                            unit-&gt;player-&gt;getColor() );
+-                    
+-                } else {
+-                    assert(false);
+-                }
+-            }
+-    }
+-}
+-
+-void MiniMapInterface::annotateObjectives( Surface &amp;map_surface )
+-{
+-    iRect world_rect, map_rect;
+-    unsigned char objective_disposition;
+-    PIX color;
+-    ObjectiveID objective_id;
+-
+-    ObjectiveInterface::startObjectivePositionEnumeration();
+-
+-    while( ObjectiveInterface::objectivePositionEnumeration( &amp;world_rect, &amp;objective_disposition, &amp;objective_id ) ) {
+-        ObjectiveState * obj_state = ObjectiveInterface::getObjectiveState(objective_id);
+-
+-	switch( objective_disposition ) {
+-        case _objective_disposition_unoccupied :
+-            color = Color::white;
+-            break;
+-
+-        case _objective_disposition_player :
+-            color = player_objective_color;
+-            break;
+-
+-        case _objective_disposition_allie :
+-            color = allie_objective_color;
+-            break;
+-
+-        case _objective_disposition_enemy :
+-            color = obj_state-&gt;occupying_player-&gt;getColor();
+-            break;
+-        } // ** switch
+-
+-        map_rect.min.x = int(float(world_rect.min.x) / scale_factor.x);
+-        map_rect.min.y = int(float(world_rect.min.y) / scale_factor.y);
+-        map_rect.max.x = int(float(world_rect.max.x) / scale_factor.x);
+-        map_rect.max.y = int(float(world_rect.max.y) / scale_factor.y);
+-
+-        // Removed black borders to the text.
+-        if (gameconfig-&gt;radar_objectivedrawmode == _mini_map_objective_draw_mode_solid_rect) {
+-            map_surface.fillRect( map_rect, color);
+-        } else if (gameconfig-&gt;radar_objectivedrawmode == _mini_map_objective_draw_mode_outline_rect) {
+-            map_surface.drawRect( map_rect, color);
+-            map_surface.drawRect( iRect(map_rect.min.x + 1, map_rect.min.y + 1, map_rect.max.x - 1, map_rect.max.y - 1), color );
+-            //}
+-            //else if (gameconfig-&gt;radar_objectivedrawmode == _mini_map_objective_draw_mode_player_flag)
+-            //{
+-            //map_surface.fillRect( map_rect, color );
+-        } else {
+-            assert(false);
+-        }
+-
+-        //LOG((&quot;%d&quot;, obj_state.outpost_type));
+-        if(obj_state-&gt;outpost_type == 0){
+-            //outpost_type is never used, I assume it determine the type of objective and 0 is for outpost 
+-            // Actually, outpost is the only type of objective
+-            
+-            if(objective_disposition == _objective_disposition_player){
+-              OutpostStatus status = ObjectiveInterface::getOutpostStatus(objective_id);
+-                //Only draw our unit collection location
+-              iXY dest, src;
+-              MapInterface::mapXYtoPointXY(status.unit_collection_loc, &amp;dest);
+-              dest.x = int(float(dest.x) / scale_factor.x);
+-              dest.y = int(float(dest.y) / scale_factor.y);
+-
+-              src.x  = int(float(obj_state-&gt;location.x) / scale_factor.x);
+-              src.y  = int(float(obj_state-&gt;location.y) / scale_factor.y);
+-              map_surface.drawLine(src.x, src.y, dest.x, dest.y, color);
+-            }
+-        }
+-
+-
+-    } // ** while
+-}
+-
+-void MiniMapInterface::annotateMiniMap( Surface &amp;map_surface )
+-{
+-    if ( pathing_debug_mode == true ) {
+-        BitArray *bit_array;
+-        unsigned long map_x_size = MapInterface::getWidth();
+-        unsigned long map_y_size = MapInterface::getHeight();
+-
+-        bit_array = PathScheduler::getLongPatherSetArray( );
+-
+-        for( unsigned long map_x_index = 0; map_x_index &lt; map_x_size; map_x_index++ ) {
+-            for( unsigned long map_y_index = 0; map_y_index &lt; map_y_size; map_y_index++ ) {
+-                if( bit_array-&gt;getBit( map_x_index, map_y_index ) ) {
+-                    map_surface.putPixel( map_x_index, map_y_index, Color::lightYellow );
+-                }
+-            } // ** for
+-        } // ** for
+-
+-    } else {
+-        if ( radar_blink_timer.count() ) {
+-            radar_blink_flag = !radar_blink_flag;
+-        }
+-
+-        if( show_enemy_radar_flag == true ) {
+-            if( show_enemy_radar_timer.count() ) {
+-                show_enemy_radar_flag = false;
+-            }
+-        }
+-
+-        //annotateObjectives( map_surface );
+-        //annotateUnits( map_surface );
+-    }
+-}
+-
+-void MiniMapInterface::setPathingDebugMode( bool on_off )
+-{
+-    pathing_debug_mode = on_off;
+-}
+-
+-void MiniMapInterface::setShowEnemyRadar( float time )
+-{
+-    show_enemy_radar_timer.changePeriod( time );
+-    show_enemy_radar_timer.reset();
+-    show_enemy_radar_flag = true;
+-}
+-
+-void MiniMapInterface::setProperties( PIX player_unit_color,
+-                                      PIX selected_unit_color,
+-                                      PIX allie_unit_color,
+-                                      PIX player_objective_color,
+-                                      PIX allie_objective_color,
+-                                      PIX enemy_objective_color
+-                                    )
+-{
+-    MiniMapInterface::player_unit_color = player_unit_color;
+-    MiniMapInterface::selected_unit_color = selected_unit_color;
+-    MiniMapInterface::allie_unit_color = allie_unit_color;
+-
+-    MiniMapInterface::player_objective_color = player_objective_color;
+-    MiniMapInterface::allie_objective_color = allie_objective_color;
+-    MiniMapInterface::enemy_objective_color = enemy_objective_color;
+-
+-    radar_blink_flag = false;
+-    radar_blink_timer.changeRate( 10 );
+-
+-    show_enemy_radar_flag = false;
+-}
+-
+-void MiniMapInterface::drawLargeUnitDot(Surface &amp;dest,
+-        const iXY &amp;location, unsigned char color )
+-{
+-    // Center
+-    dest.putPixel( location.x,     location.y,     color );
+-    dest.putPixel( location.x + 1, location.y,     color );
+-    dest.putPixel( location.x,     location.y + 1, color );
+-    dest.putPixel( location.x + 1, location.y + 1, color );
+-}
+-
+-void MiniMapInterface::drawSmallUnitDot(Surface &amp;dest, const iXY &amp;location,
+-        unsigned char color )
+-{
+-    dest.putPixel( location.x, location.y, color );
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.hpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.hpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -1,87 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _MINIMAPINTERFACE_HPP
+-#define _MINIMAPINTERFACE_HPP
+-
+-#include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
+-#include &quot;ArrayUtil/BitArray.hpp&quot;
+-#include &quot;Types/fXY.hpp&quot;
+-
+-class MiniMapInterface
+-{
+-protected:
+-    static fXY            scale_factor;
+-    static iXY       mini_map_size;
+-    static bool        pathing_debug_mode;
+-
+-    static TimerFrameBase radar_blink_timer;
+-    static bool        radar_blink_flag;
+-
+-    static TimerFrameBase show_enemy_radar_timer;
+-    static bool        show_enemy_radar_flag;
+-
+-    static PIX player_unit_color;
+-    static PIX selected_unit_color;
+-    static PIX allie_unit_color;
+-
+-    static PIX player_objective_color;
+-    static PIX allie_objective_color;
+-    static PIX enemy_objective_color;
+-
+-    static void annotateUnits( Surface &amp;map_surface );
+-    static void annotateObjectives( Surface &amp;map_surface );
+-    static void drawLargeUnitDot(Surface &amp;dest, const iXY &amp;location,
+-            unsigned char color );
+-    static void drawSmallUnitDot(Surface &amp;dest, const iXY &amp;location,
+-            unsigned char color );
+-
+-public:
+-
+-    static inline Surface * getMiniMap( void )
+-    {
+-        return( MapInterface::getMiniMapSurface() );
+-    }
+-
+-    static iRect getWorldWindow( void );
+-
+-    static void setMapScale(const iXY &amp;mini_map_size);
+-    static const iXY &amp;getMapScale()
+-    {
+-        return mini_map_size;
+-    }
+-
+-    static void setWorldWindowPosition( iXY world_loc );
+-
+-    static void annotateMiniMap( Surface &amp;map_surface );
+-
+-    static void setPathingDebugMode( bool on_off );
+-
+-    static void setShowEnemyRadar( float time );
+-
+-    static void setProperties( PIX player_unit_color,
+-                               PIX selected_unit_color,
+-                               PIX allie_unit_color,
+-                               PIX player_objective_color,
+-                               PIX allie_objective_color,
+-                               PIX enemy_objective_color
+-                             );
+-
+-};
+-
+-#endif // ** _MINIMAPINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -30,7 +30,6 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+-#include &quot;Interfaces/MiniMapInterface.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PathScheduler.hpp&quot;
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -23,7 +23,6 @@
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Interfaces/MiniMapInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ 
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -36,12 +36,14 @@
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;PowerUps/EnemyRadarPowerUp.hpp&quot;
++#include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ 
+ MiniMap::MiniMap(int x, int y, int w, int h) : mousepos(0,0)
+ {
+     setLocation(x, y);
+     setSize(w,h);
+     moving=false;
++    mouseinside=false;
+     
+     blinktimer.setTimeOut(200);
+     blinkstatus=false;
+@@ -61,44 +63,56 @@
+     surface.blt(dest,position.x, position.y);
+     drawObjectives(dest);
+     drawUnits(dest);
++    drawWorldAndMouseBox(dest);
+ }
+ 
+ void
+ MiniMap::actionPerformed(const mMouseEvent &amp;me)
+ {
+-    // XXX enable after input handling reworked.
+-//    switch (me.getID())
+-//    {
+-//        case mMouseEvent::MOUSE_EVENT_ENTERED:
+-//            mousepos = me.getPoint();
+-//            break;
+-//        case mMouseEvent::MOUSE_EVENT_PRESSED:
++    switch (me.getID())
++    {
++        case mMouseEvent::MOUSE_EVENT_ENTERED:
++            mousepos = me.getPoint();
++            mouseinside = true;
++            break;
++        case mMouseEvent::MOUSE_EVENT_DRAGGED:
++        case mMouseEvent::MOUSE_EVENT_PRESSED:
++            if ( me.getModifiers() &amp; InputEvent::BUTTON1_MASK)
++            {
++                iXY pos = mousepos+position;
++                pos.x = int(float(pos.x) * xratio)*32;
++                pos.y = int(float(pos.y) * yratio)*32;
++
++                WorldViewInterface::setCameraPosition( pos );
++
++            }
+ //            if ( me.getModifiers() &amp; InputEvent::BUTTON2_MASK )
+ //            {
+ //                moving = true;
+ //            }
+-//            break;
+-//            
+-//        case mMouseEvent::MOUSE_EVENT_CLICKED:
+-//        case mMouseEvent::MOUSE_EVENT_RELEASED:
++            break;
++            
++        case mMouseEvent::MOUSE_EVENT_CLICKED:
++        case mMouseEvent::MOUSE_EVENT_RELEASED:
+ //            if ( me.getModifiers() &amp; InputEvent::BUTTON2_MASK )
+ //            {
+ //                moving = false;
+ //            }
+-//            break;
+-//        case mMouseEvent::MOUSE_EVENT_EXITED:
++            break;
++        case mMouseEvent::MOUSE_EVENT_EXITED:
++            mouseinside = false;
+ //            moving = false;
+-//            break;
+-//        case mMouseEvent::MOUSE_EVENT_MOVED:
++            break;
++        case mMouseEvent::MOUSE_EVENT_MOVED:
+ //            if ( moving )
+ //            {
+ //                iXY diff = me.getPoint() - mousepos;
+ //                setLocation(position-diff);
+ //            }
+-//            mousepos = me.getPoint();
+-//            break;
+-//    }
+-//    
++            mousepos = me.getPoint();
++            break;
++    }
++    
+ }
+ 
+ void
+@@ -116,11 +130,11 @@
+     
+     PIX *curline = ptr;
+     PIX *curptr;
+-    for ( int y=0; y&lt;surface.getHeight(); y++)
++    for ( int y=0; y&lt;(int)surface.getHeight(); y++)
+     {
+         curptr = curline;
+         mapx = 0.0f;
+-        for ( int x=0; x&lt;surface.getWidth(); x++)
++        for ( int x=0; x&lt;(int)surface.getWidth(); x++)
+         {
+             iXY pos(mapx,mapy);
+             // XXX Beware, no check for limits, could raise assert and quit the game.
+@@ -167,10 +181,10 @@
+         }
+ 
+         // magic 32 to convert from point to tile
+-        map_rect.min.x = int(float(objective_rect.min.x/32) / xratio);
+-        map_rect.min.y = int(float(objective_rect.min.y/32) / yratio);
+-        map_rect.max.x = int(float(objective_rect.max.x/32) / xratio);
+-        map_rect.max.y = int(float(objective_rect.max.y/32) / yratio);
++        map_rect.min.x = int(float(objective_rect.min.x/32) / xratio)+position.x;
++        map_rect.min.y = int(float(objective_rect.min.y/32) / yratio)+position.y;
++        map_rect.max.x = int(float(objective_rect.max.x/32) / xratio)+position.x;
++        map_rect.max.y = int(float(objective_rect.max.y/32) / yratio)+position.y;
+ 
+         // Removed black borders to the text.
+ //        if (gameconfig-&gt;radar_objectivedrawmode == _mini_map_objective_draw_mode_solid_rect) {
+@@ -191,11 +205,11 @@
+             //Only draw our unit collection location
+             iXY objdest, src;
+             MapInterface::mapXYtoPointXY(status.unit_collection_loc, &amp;objdest);
+-            objdest.x = int(float(objdest.x) / xratio);
+-            objdest.y = int(float(objdest.y) / yratio);
++            objdest.x = int(float(objdest.x) / xratio)+position.x;
++            objdest.y = int(float(objdest.y) / yratio)+position.y;
+ 
+-            src.x  = int(float(obj_state-&gt;location.x) / xratio);
+-            src.y  = int(float(obj_state-&gt;location.y) / yratio);
++            src.x  = int(float(obj_state-&gt;location.x) / xratio)+position.x;
++            src.y  = int(float(obj_state-&gt;location.y) / yratio)+position.y;
+             dest.drawLine(src.x, src.y, objdest.x, objdest.y, color);
+         }
+     }
+@@ -212,8 +226,8 @@
+         PIX color;
+         bool forceLarge = false;
+         UnitState&amp; unit_state = unit-&gt;unit_state;
+-        iXY map_loc = iXY( int(float(unit_state.location.x/32) / xratio),
+-                           int(float(unit_state.location.y/32) / yratio));
++        iXY map_loc = iXY( int(float(unit_state.location.x/32) / xratio)+position.x,
++                           int(float(unit_state.location.y/32) / yratio)+position.y);
+ 
+         if ( unit-&gt;player-&gt;getID() == PlayerInterface::getLocalPlayerIndex())
+         {
+@@ -273,3 +287,26 @@
+         dest.putPixel( loc.x+1, loc.y+1, color );
+     }
+ }
++
++void
++MiniMap::drawWorldAndMouseBox(Surface &amp;dest)
++{
++    iRect world_win;
++    WorldViewInterface::getViewWindow(&amp;world_win);
++
++    world_win.min.x = int(float(world_win.min.x/32) / xratio)+position.x;
++    world_win.min.y = int(float(world_win.min.y/32) / yratio)+position.y;
++    world_win.max.x = int(float(world_win.max.x/32) / xratio)+position.x;
++    world_win.max.y = int(float(world_win.max.y/32) / yratio)+position.y;
++
++    dest.bltLookup(world_win, Palette::darkGray256.getColorArray());
++    dest.drawBoxCorners(world_win, 5, Color::white);
++    
++    if ( mouseinside )
++    {
++        iXY size(world_win.getSize());
++        world_win.min = mousepos - (size/2);
++        world_win.max = world_win.min + size;
++        dest.drawBoxCorners(world_win, 5, Color::red);
++    }
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -23,6 +23,7 @@
+ 
+ #include &quot;Views/Components/Component.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ class MiniMap : public Component, public MapEventListener
+ {
+@@ -51,6 +52,8 @@
+     void drawObjectives(Surface &amp;dest);
+     void drawUnits(Surface &amp;dest);
+     void drawUnit(Surface &amp;dest, const iXY loc, PIX color, bool forceLarge);
++    void drawWorldAndMouseBox(Surface &amp;dest);
++    bool mouseinside;
+     bool moving;
+     iXY  mousepos;
+     float xratio;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -23,7 +23,6 @@
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/AI/PathingState.hpp&quot;
+ #include &quot;Interfaces/PathScheduler.hpp&quot;
+-#include &quot;Interfaces/MiniMapInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Classes/Network/NetworkInterface.hpp&quot;
+@@ -77,11 +76,12 @@
+ 
+     if ( previous_flag == false ) {
+         PathScheduler::setLongPatherDebug( true );
+-        MiniMapInterface::setPathingDebugMode( true );
++        // XXX if needed change for new MiniMap.hpp
++        //MiniMapInterface::setPathingDebugMode( true );
+         previous_flag = true;
+     } else {
+         PathScheduler::setLongPatherDebug( false );
+-        MiniMapInterface::setPathingDebugMode( false );
++        //MiniMapInterface::setPathingDebugMode( false );
+         previous_flag = false;
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -17,23 +17,11 @@
+ */
+ #include &lt;config.h&gt;
+ 
+-#include &lt;algorithm&gt;
+ #include &quot;MiniMapView.hpp&quot;
+-#include &quot;Interfaces/MiniMapInterface.hpp&quot;
+-#include &quot;Interfaces/KeyboardInterface.hpp&quot;
+-#include &quot;Classes/ScreenSurface.hpp&quot;
+-#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-
+ #include &quot;Views/Components/MiniMap.hpp&quot;
+ 
+ MiniMapView miniMapView;
+ 
+-
+-float MiniMapView::scaleDelta   = 400.0f;
+-int   MiniMapView::decreaseSize = 0;
+-int   MiniMapView::increaseSize = 0;
+-
+ // MiniMapView
+ //---------------------------------------------------------------------------
+ MiniMapView::MiniMapView() : GameTemplateView()
+@@ -49,10 +37,7 @@
+     setAllowMove(true);
+ 
+     setBordered(false);
+-
+-    add(CLOSE_VIEW_BUTTON);
+-    add(MINMAX_VIEW_BUTTON);
+-
++    
+     resize(160, 160);
+     add(new MiniMap(1,1,158,158));
+ } // end MiniMapView::MiniMapView
+@@ -61,271 +46,22 @@
+ //---------------------------------------------------------------------------
+ void MiniMapView::init()
+ {
+-    Surface *miniMap;
+-    miniMap = MiniMapInterface::getMiniMap();
+-
+-    MiniMapInterface::setMapScale(getSize() - iXY(2,2));
+-    //checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+-
+     minMapSize =  64;
+     maxMapSize = 480;
+-
+-    // Get the original version of the minimap.
+-    miniMapSurface.copy(*miniMap);
+-
+-    scaleGroupWait  = 0.0f;
+-    needScale       = true;
+-    selectionAnchor = false;
+-
+-    selectionAnchorDownPos.zero();
+-    selectionAnchorCurPos.zero();
+ } // end MiniMapView::init
+ 
+ void
+ MiniMapView::checkResolution(iXY oldResolution, iXY newResolution)
+ {
+-    moveTo(iXY(0,newResolution.y-300));
++    moveTo(iXY(0,newResolution.y-160));
+ }
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+ void MiniMapView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    //miniMapSurface.blt(clientArea, 0, 0);
+-    // draw the components first
+-    GameTemplateView::doDraw(viewArea, clientArea);
+-
+-    // Draw a hairline border.
+-    //viewArea.drawRect(Color::white);
++    // border
+     viewArea.drawRect(iRect(0,0,viewArea.getWidth(), viewArea.getHeight()),Color::gray);
+-
+-    // Draw the world view box.
+-    iRect boxpos = MiniMapInterface::getWorldWindow();
+-    boxpos.translate(iXY(1,1));                           
+     
+-    clientArea.bltLookup(boxpos, Palette::darkGray256.getColorArray());
+-    // Draw the units and such on the minimap.
+-    MiniMapInterface::annotateMiniMap((Surface &amp;) clientArea);
+-    // Draw the world view box corners.
+-    clientArea.drawBoxCorners(boxpos, 5, Color::white);
+-
+-    // If the mouse is over the client area, then change the cursor.
+-    if (getClientRect().contains(getScreenToClientPos(MouseInterface::getMousePosition()))) {
+-        if (selectionAnchor) {
+-            // Since we are selecting units, draw the selection box.
+-            clientArea.drawRect(iRect(selectionAnchorDownPos, selectionAnchorCurPos), Color::white);
+-        } else {
+-            // Draw a box which show where the area which you click will be located.
+-            drawMouseBox(clientArea);
+-        }
+-    }
++    GameTemplateView::doDraw(viewArea, clientArea);
+ } // end doDraw
+-
+-// setViewWindow
+-//--------------------------------------------------------------------------
+-// Purpose: Sets the viewable window on the screen to the position clicked
+-//          on the map.  pos (position) corresponds to the grid(x,y) position clicked
+-//          ont he map.  The pos is converted to world coords and the
+-//          viewable window is repositioned.
+-//--------------------------------------------------------------------------
+-void MiniMapView::setViewWindow(const iXY &amp;pos)
+-{
+-    assert(this != 0);
+-
+-    if (iRect(iXY(0,0), getSize()).contains(pos)) {
+-        MiniMapInterface::setWorldWindowPosition( pos - iXY(1,1) );
+-    }
+-} // end MiniMapView::setViewWindow
+-
+-// drawMouseBox
+-//--------------------------------------------------------------------------
+-// Purpose: Replaces the mouse cursor with a box showing where the viewable
+-//          screen area would be moved to if the mouse was pressed.
+-//--------------------------------------------------------------------------
+-void MiniMapView::drawMouseBox(Surface &amp;dest)
+-{
+-    assert(this != 0);
+-    assert(dest.getDoesExist());
+-
+-    iRect r(MiniMapInterface::getWorldWindow());
+-    iXY   size(r.getSize() / 2);
+-    iXY   pos(getScreenToClientPos(MouseInterface::getMousePosition()));
+-
+-    //dest.drawRect(pos - size - 1, pos + size - 1, Color::yellow);
+-    dest.drawBoxCorners(pos - size - iXY(1,1), iXY(pos.x + size.x - 1, pos.y + size.y), 5, Color::red);
+-
+-} // end MiniMapView::drawMouseBox
+-
+-// lMouseDown
+-//--------------------------------------------------------------------------
+-// Purpose:  Move the current viewable area of the map to the area
+-//           corresponding to the position of teh mouse on the map.
+-//--------------------------------------------------------------------------
+-void MiniMapView::lMouseDown(const iXY &amp;pos)
+-{
+-    assert(this != 0);
+-
+-    if (getClientRect().contains(getScreenToClientPos(MouseInterface::getMousePosition()))) {
+-        if (!selectionAnchor) {
+-            setViewWindow(pos);
+-        }
+-    }
+-
+-    GameTemplateView::lMouseDown(pos);
+-
+-} // end MiniMapView::lMouseDown
+-
+-// rMouseDown
+-//--------------------------------------------------------------------------
+-void MiniMapView::rMouseDown(const iXY&amp;)
+-{
+-} // end MiniMapView::rMouseDown
+-
+-void MiniMapView::setMapDrawType(MAP_DRAW_TYPES type)
+-{
+-    gameconfig-&gt;minimapdrawtype=type;
+-}
+-
+-// doIncreaseSize
+-//--------------------------------------------------------------------------
+-void MiniMapView::doIncreaseSize(int value)
+-{
+-    iXY destSize(getSize());
+-
+-    if (value == -1) {
+-        float dt = TimerInterface::getTimeSlice();
+-
+-        destSize += iXY(int(scaleDelta * dt), int(scaleDelta * dt));
+-    } else {
+-        destSize += iXY(value, value);
+-    }
+-
+-    //resize(destSize);
+-    //deltaSize += deltaAmount;
+-    if (destSize.x &gt; maxMapSize || destSize.y &gt; maxMapSize) {
+-        destSize = iXY(maxMapSize, maxMapSize);
+-    }
+-
+-    // Check the validity of the X dimension.
+-    if ((min.x + destSize.x) &gt;= (int)screen-&gt;getWidth()) {
+-        int xOffset = min.x + destSize.x - screen-&gt;getWidth();
+-
+-        int destXPos = min.x - xOffset;
+-
+-        if (destXPos &lt; 0) {
+-            moveTo(0, min.y);
+-
+-        } else {
+-            moveTo(destXPos, min.y);
+-        }
+-        checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+-    }
+-
+-    // Check the validity of the Y dimension.
+-    if ((min.y + destSize.y) &gt;= (int)screen-&gt;getHeight()) {
+-        int yOffset = min.y + destSize.y - screen-&gt;getHeight();
+-
+-        int destYPos = min.y - yOffset;
+-
+-        if (destYPos &lt; 0) {
+-            moveTo(min.x, 0);
+-
+-        } else {
+-            moveTo(min.x, destYPos);
+-        }
+-        checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+-    }
+-
+-    // Resize the x dimension.
+-    if (destSize.x &gt; getSize().x) {
+-        if (destSize.x &gt; maxMapSize) {
+-            resize(iXY(maxMapSize, getSize().y));
+-
+-        } else {
+-            resize(iXY(destSize.x, getSize().y));
+-        }
+-    }
+-
+-    // Resize the y dimension.
+-    if (destSize.y &gt; getSize().y) {
+-        if (destSize.x &gt; maxMapSize) {
+-            resize(iXY(getSize().x, maxMapSize));
+-
+-        } else {
+-            resize(iXY(getSize().x, destSize.x));
+-        }
+-    }
+-
+-    MiniMapInterface::setMapScale(getSize() - iXY(2,2));
+-
+-    needScale      = true;
+-    scaleGroupWait = 0.0f;
+-
+-} // end MiniMapView::doIncreaseSize
+-
+-// doDecreaseSize
+-//--------------------------------------------------------------------------
+-void MiniMapView::doDecreaseSize(int value)
+-{
+-    iXY destSize(getSize());
+-
+-    if (value == -1) {
+-        float dt = TimerInterface::getTimeSlice();
+-
+-        destSize -= iXY(int(scaleDelta * dt), int(scaleDelta * dt));
+-    } else {
+-        destSize -= iXY(value, value);
+-    }
+-
+-    resize(destSize);
+-
+-    if (destSize.x &lt; minMapSize || destSize.y &lt; minMapSize) {
+-        resize(iXY(minMapSize, minMapSize));
+-    }
+-
+-    MiniMapInterface::setMapScale(getSize() - iXY(2,2));
+-
+-    needScale      = true;
+-    scaleGroupWait = 0.0f;
+-
+-} // end MiniMapView::doDecreaseSize
+-
+-// lMouseUp
+-//--------------------------------------------------------------------------
+-int MiniMapView::lMouseUp(const iXY &amp;downPos, const iXY &amp;upPos)
+-{
+-    return View::lMouseUp(downPos, upPos);
+-} // end MiniMapView::lMouseUp
+-
+-// mouseMove
+-//--------------------------------------------------------------------------
+-void MiniMapView::mouseMove(const iXY &amp;prevPos, const iXY &amp;newPos)
+-{
+-    if (getClientRect().contains(getScreenToClientPos(MouseInterface::getMousePosition()))) {
+-        if (	(KeyboardInterface::getKeyState(SDLK_LCTRL) ||
+-                KeyboardInterface::getKeyState(SDLK_RCTRL))) {
+-
+-            if (!selectionAnchor) {
+-                selectionAnchorDownPos = newPos;
+-            }
+-
+-            selectionAnchorCurPos = newPos;
+-            selectionAnchor       = true;
+-
+-            // Set the selection cursor.
+-            MouseInterface::setCursor(&quot;select.bmp&quot;);
+-        } else {
+-            selectionAnchor = false;
+-        }
+-    }
+-
+-    GameTemplateView::mouseMove(prevPos, newPos);
+-} // end MiniMapView::mouseMove
+-
+-// lMouseDrag
+-//--------------------------------------------------------------------------
+-void MiniMapView::lMouseDrag(const iXY&amp;, const iXY&amp;, const iXY &amp;newPos)
+-{
+-    lMouseDown(newPos);
+-
+-} // end MiniMapView::lMouseDrag
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2008-09-20 13:16:39 UTC (rev 1060)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2008-09-20 15:05:39 UTC (rev 1061)
+@@ -19,66 +19,26 @@
+ #define __MiniMapView_hpp__
+ 
+ #include &quot;Views/Components/View.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+ #include &quot;GameTemplateView.hpp&quot;
+ 
+-
+-enum MAP_DRAW_TYPES
+-{
+-    MAP_SOLID,
+-    MAP_2080,
+-    MAP_4060,
+-    MAP_BLEND_GRAY,
+-    MAP_BLEND_DARK_GRAY,
+-    MAP_BLEND_GREEN,
+-    MAP_BLACK,
+-    MAP_TRANSPARENT
+-};
+-
+ //---------------------------------------------------------------------------
+ class MiniMapView : public GameTemplateView
+ {
+ private:
+-    int     deltaSize;
+     int     minMapSize;
+     int     maxMapSize;
+-    Surface miniMapSurface;
+-    bool    needScale;
+-    float   scaleGroupWait;
+-    bool    selectionAnchor;
+-    iXY     selectionAnchorDownPos;
+-    iXY     selectionAnchorCurPos;
+ 
+-    void doDecreaseSize(int value);
+-    void doIncreaseSize(int value);
+-
+ public:
+     MiniMapView();
+ 
+     void init();
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void lMouseDown(const iXY &amp;pos);
+-    virtual int  lMouseUp(const iXY &amp;downPos, const iXY &amp;upPos);
+-    virtual void lMouseDrag(const iXY &amp;downPos, const iXY &amp;prevPos, const iXY &amp;newPos);
+-    virtual void rMouseDown(const iXY &amp;pos);
+-    virtual void mouseMove(const iXY &amp;prevPos, const iXY &amp;newPos);
+ 
+-    void drawMouseBox(Surface &amp;dest);
+-    void setViewWindow(const iXY &amp;pos);
+-    void setMapDrawType(MAP_DRAW_TYPES type);
+-
+-    static float          scaleDelta;
+-
+-    static int decreaseSize;
+-    static int increaseSize;
+-
+ protected:
+     void checkResolution(iXY oldResolution, iXY newResolution);
+     
+ private:
+-    // XXX added this...
+-    void addButtons();
+ }; // end MiniMapView
+ 
+ extern MiniMapView miniMapView;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000096.html">[Netpanzer-cvs] r1060 - in trunk/netpanzer: nbproject	src/NetPanzer/Interfaces src/NetPanzer/PowerUps	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000098.html">[Netpanzer-cvs] r1062 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#97">[ date ]</a>
+              <a href="thread.html#97">[ thread ]</a>
+              <a href="subject.html#97">[ subject ]</a>
+              <a href="author.html#97">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

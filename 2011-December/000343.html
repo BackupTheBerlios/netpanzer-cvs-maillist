@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1317 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1317%20-%20trunk/netpanzer&In-Reply-To=%3C20111224025037.EBDCA48061D%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000342.html">
+   <LINK REL="Next"  HREF="000344.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1317 - trunk/netpanzer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1317%20-%20trunk/netpanzer&In-Reply-To=%3C20111224025037.EBDCA48061D%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1317 - trunk/netpanzer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec 24 03:50:37 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000342.html">[Netpanzer-cvs] r1316 - in branches/newpath: . scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	support/icon support/scripts
+</A></li>
+        <LI>Next message: <A HREF="000344.html">[Netpanzer-cvs] r1318 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/AI	NetPanzer/Classes/Network NetPanzer/Interfaces	NetPanzer/Objectives NetPanzer/PowerUps NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#343">[ date ]</a>
+              <a href="thread.html#343">[ thread ]</a>
+              <a href="subject.html#343">[ subject ]</a>
+              <a href="author.html#343">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-24 03:50:37 +0100 (Sat, 24 Dec 2011)
+New Revision: 1317
+
+Modified:
+   trunk/netpanzer/SConstruct
+Log:
+Merged little fix to SCons warnings from newpath
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2011-12-24 02:50:25 UTC (rev 1316)
++++ trunk/netpanzer/SConstruct	2011-12-24 02:50:37 UTC (rev 1317)
+@@ -57,8 +57,8 @@
+ # Add options
+ ################################################################
+ 
+-opts = Options()
+-opts.AddOptions(
++opts = Variables()
++opts.AddVariables(
+     ('mode','set compile mode to debug or release','release'),
+     ('datadir','define the extra directory where the netpanzer will look for data files, usefull for linux distributions, defaults to no extra directory',''),
+     ('sdlconfig','sets the sdl-config full path', 'sdl-config'),
+@@ -150,9 +150,9 @@
+ 
+ env.Append(CCFLAGS = ['-Wall'])
+ 
+-env.BuildDir(env['FINALBUILDDIR'],'.',duplicate=0)
+-crossmingwenv.BuildDir(crossmingwenv['FINALBUILDDIR'],'.',duplicate=0)
+-crosslinuxenv.BuildDir(crosslinuxenv['FINALBUILDDIR'],'.',duplicate=0)
++env.VariantDir(env['FINALBUILDDIR'],'.',duplicate=0)
++crossmingwenv.VariantDir(crossmingwenv['FINALBUILDDIR'],'.',duplicate=0)
++crosslinuxenv.VariantDir(crosslinuxenv['FINALBUILDDIR'],'.',duplicate=0)
+ 
+ luaenv = env.Clone()
+ physfsenv = env.Clone()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000342.html">[Netpanzer-cvs] r1316 - in branches/newpath: . scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	support/icon support/scripts
+</A></li>
+	<LI>Next message: <A HREF="000344.html">[Netpanzer-cvs] r1318 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/AI	NetPanzer/Classes/Network NetPanzer/Interfaces	NetPanzer/Objectives NetPanzer/PowerUps NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#343">[ date ]</a>
+              <a href="thread.html#343">[ thread ]</a>
+              <a href="subject.html#343">[ subject ]</a>
+              <a href="author.html#343">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

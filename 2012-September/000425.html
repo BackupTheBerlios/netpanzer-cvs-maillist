@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1401 -	trunk/netpanzer/src/NetPanzer/Views/Components
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1401%20-%0A%09trunk/netpanzer/src/NetPanzer/Views/Components&In-Reply-To=%3C20120910132907.BC82B55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000424.html">
+   <LINK REL="Next"  HREF="000426.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1401 -	trunk/netpanzer/src/NetPanzer/Views/Components</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1401%20-%0A%09trunk/netpanzer/src/NetPanzer/Views/Components&In-Reply-To=%3C20120910132907.BC82B55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1401 -	trunk/netpanzer/src/NetPanzer/Views/Components">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Mon Sep 10 15:29:07 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000424.html">[Netpanzer-cvs] r1400 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000426.html">[Netpanzer-cvs] r1402 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#425">[ date ]</a>
+              <a href="thread.html#425">[ thread ]</a>
+              <a href="subject.html#425">[ subject ]</a>
+              <a href="author.html#425">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-10 15:29:07 +0200 (Mon, 10 Sep 2012)
+New Revision: 1401
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+Log:
+Fix crash after resign and join again.................
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp	2012-09-10 12:45:26 UTC (rev 1400)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp	2012-09-10 13:29:07 UTC (rev 1401)
+@@ -58,8 +58,7 @@
+             ChatMessage *MsgData = (ChatMessage*)(f-&gt;Data);
+             delete MsgData;
+         }
+-        List.clear();
+-        dirty = true;
++        tStringListBox::Clear();
+     }
+     
+     int getNumLines( int width, const DataItem&amp; data);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-10 12:45:26 UTC (rev 1400)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-10 13:29:07 UTC (rev 1401)
+@@ -90,7 +90,7 @@
+     virtual void AddData(const std::string&amp; S, void * D);
+     virtual void deleteData(const DataItem&amp; data) { /* to be overriden */}
+     
+-    virtual void Clear(){List.clear();dirty = true;}
++    virtual void Clear(){List.clear();dirty = true; SelectedItem = List.end(); StartItem=List.end(); }
+     virtual int Count(){return List.size();}
+     virtual void onPaint(Surface &amp;dst, const DataItem&amp; data, int SubLine);
+     virtual void setLocation(int x, int y);
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000424.html">[Netpanzer-cvs] r1400 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000426.html">[Netpanzer-cvs] r1402 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#425">[ date ]</a>
+              <a href="thread.html#425">[ thread ]</a>
+              <a href="subject.html#425">[ subject ]</a>
+              <a href="author.html#425">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

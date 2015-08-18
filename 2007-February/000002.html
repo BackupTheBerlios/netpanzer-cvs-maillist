@@ -1,0 +1,330 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r955 - in trunk/netpanzer: . mk/autoconf
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r955%20-%20in%20trunk/netpanzer%3A%20.%20mk/autoconf&In-Reply-To=%3C200702031301.l13D1cTZ015699%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000001.html">
+   <LINK REL="Next"  HREF="000003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r955 - in trunk/netpanzer: . mk/autoconf</H1>
+    <B>matzebraun at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r955%20-%20in%20trunk/netpanzer%3A%20.%20mk/autoconf&In-Reply-To=%3C200702031301.l13D1cTZ015699%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r955 - in trunk/netpanzer: . mk/autoconf">matzebraun at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb  3 14:01:38 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000001.html">[Netpanzer-cvs] r954 - trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+        <LI>Next message: <A HREF="000003.html">[Netpanzer-cvs] r956 - in trunk/homepage: . images
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: matzebraun
+Date: 2007-02-03 14:01:37 +0100 (Sat, 03 Feb 2007)
+New Revision: 955
+
+Modified:
+   trunk/netpanzer/RELNOTES
+   trunk/netpanzer/configure.ac
+   trunk/netpanzer/mk/autoconf/installdirs.m4
+Log:
+release notes, fix for new autoconf
+
+Modified: trunk/netpanzer/RELNOTES
+===================================================================
+--- trunk/netpanzer/RELNOTES	2007-02-03 12:41:03 UTC (rev 954)
++++ trunk/netpanzer/RELNOTES	2007-02-03 13:01:37 UTC (rev 955)
+@@ -1,109 +1,116 @@
+-*** 0.8 ***
+-
+-* Call this final release 0.8 to better reflect the state of development
+-* You can move the camera to a defined group by pressing group key twice
+-* Server shuts itself down instead of stying in an endless loop
+-* The -c command handles <A HREF="netpanzer://">netpanzer://</A> URLs now
+-* Some additional infos are sent out by the server which help server browser
+-* Distribute cached palettes so that the first start should be faster now
+-* The code finally works on the Mac and probably other big-endian boxes
+-
+-*** 0.2.0-rc4 ***
+-
+-* Really fixed Duell map
+-* Fixed servercrash introduced in rc3
+-* Fixed connecting to servers on different port than 3030
+-
+-*** 0.2.0-rc3 ***
+-
+-* Fixed Duell map
+-* Fixed servers not always registering at all masterservers but only one
+-* Fixed some crashs in game
+-* Fixed several crashs and misbehaviour in the serverlist
+-* open a new console for win32 server and bot
+-* Fixed problem in log code that manifested on linux/ppc (thanks to Johannes
+-   Mockenhaupt for report+patch)
+-* Adding units with shift key now also works for groups and boxes (thanks to
+-   Rex Tsai for the patch)
+-* packet handling is more robust against malformed packets
+-* Added Support for pidfiles in server
+-* Wrote an HowTo on setting up a dedicated server
+-
+-*** 0.2.0-rc2 ***
+-
+-* Fixed a problem where servers started from menu crashed
+-
+-*** 0.2.0-rc1 ***
+-
+-This is a prerelease open for public testing. Especiacially the new ppc code is
+-not tested yet. I'd be happy about some feedback if it works or not
+-(<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>).
+-
+-* New masterserver protocol which should eleminate all problems with the server
+-  browser (also next xqf version will support netpanzer)
+-* Added a serverconsole
+-* Fixed endianess problems. ppc users can play with x86 users now.
+-* The server creates logfiles now that can be used for statistics or reports on
+-  webpages
+-* Replaced SDL_net with custom socket wrappers (this allows binding servers to
+-  addresses and eleminates a dependency)
+-* libxml2 replaced with a simple ini parser (eleminates another dependency)
+-* gcc 3.4 fixes
+-* lots and lots of bugfixes
+-
+-*** 0.1.5 ***
+-
+-This is an emergency bugfix release.
+-
+-* fixed a bug where pressing &quot;m&quot; or 1-9 in chat messages would toggle the
+-  minimap or panzer groups
+-* fixed a map in the dedicated server where the mapcycle string wasn't
+-  properly parsed.
+-* added an xpm icon.
+-
+-*** 0.1.4 ***
+-
+-Some small feature additions. Unfortunatley we changed the network protocol
+-again, so servers and clients should get updated soon. There's a bug in the old
+-0.1.3 server code that makes it crash when a 0.1.4 client connects.
+-                                                                                
+-    * It's possible to configure the mapcycle in the server
+-    * Players now have colors on the radar (thanks Viras)
+-    * small fixes to make netpanzer run on win32
+-    * a new quickconnect option for the commandline (usefull for external server      browsers like KNetpanzerbrowser 
+-	(<A HREF="http://www.suselinuxsupport.de/index.php?location=download">http://www.suselinuxsupport.de/index.php?location=download</A>)
+-
+-*** 0.1.3 ***
+-
+-This is still a maintenance and bugfix release. We're working on an editor and a
+-UI rewrite, but these have to wait for a later release. Changes:
+-
+-    * fix bug where the lobby view would always display 0/x players
+-    * some robustness and usability fixes for the irc lobby code
+-    * new slovakian flag
+-    * lots of code cleanups and rewrites (and still lots more to do)
+-    * unit spawnpoint can be choosen at the outposts now
+-    * some small UI improvements
+-    * reorganised build environment
+-    * network packets are smaller and more robust now
+-
+-*** 0.1.2 ***
+-
+-netPanzer 0.1.2 is available now:
+-
+-    * A new lobby view and server browser has been added
+-    * a man page has been added
+-    * The deciated server reads it's setting from a configuration file now
+-    * The bot player can now be started as a separate process.
+-    * polish and swedish flag has been added (we happily accept more flags)
+-    * several smaller bugfixes and improvements
+-
+-*** 0.1.1 ***
+-
+-    * checkboxes are clickable now
+-    * game no longer crashes after output occupation
+-
+-*** 0.1 ***
+-
+-Initial linux port
+-
++*** 0.8.1 ***
++
++* Change default masterserver to netpanzer.dyndns.org
++* Fix remote DOS when sending invalid frame number
++* Fix gcc 4.1 compilation
++* Make server handle clients more gracefully that drop during connect
++
++*** 0.8 ***
++
++* Call this final release 0.8 to better reflect the state of development
++* You can move the camera to a defined group by pressing group key twice
++* Server shuts itself down instead of stying in an endless loop
++* The -c command handles <A HREF="netpanzer://">netpanzer://</A> URLs now
++* Some additional infos are sent out by the server which help server browser
++* Distribute cached palettes so that the first start should be faster now
++* The code finally works on the Mac and probably other big-endian boxes
++
++*** 0.2.0-rc4 ***
++
++* Really fixed Duell map
++* Fixed servercrash introduced in rc3
++* Fixed connecting to servers on different port than 3030
++
++*** 0.2.0-rc3 ***
++
++* Fixed Duell map
++* Fixed servers not always registering at all masterservers but only one
++* Fixed some crashs in game
++* Fixed several crashs and misbehaviour in the serverlist
++* open a new console for win32 server and bot
++* Fixed problem in log code that manifested on linux/ppc (thanks to Johannes
++   Mockenhaupt for report+patch)
++* Adding units with shift key now also works for groups and boxes (thanks to
++   Rex Tsai for the patch)
++* packet handling is more robust against malformed packets
++* Added Support for pidfiles in server
++* Wrote an HowTo on setting up a dedicated server
++
++*** 0.2.0-rc2 ***
++
++* Fixed a problem where servers started from menu crashed
++
++*** 0.2.0-rc1 ***
++
++This is a prerelease open for public testing. Especiacially the new ppc code is
++not tested yet. I'd be happy about some feedback if it works or not
++(<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>).
++
++* New masterserver protocol which should eleminate all problems with the server
++  browser (also next xqf version will support netpanzer)
++* Added a serverconsole
++* Fixed endianess problems. ppc users can play with x86 users now.
++* The server creates logfiles now that can be used for statistics or reports on
++  webpages
++* Replaced SDL_net with custom socket wrappers (this allows binding servers to
++  addresses and eleminates a dependency)
++* libxml2 replaced with a simple ini parser (eleminates another dependency)
++* gcc 3.4 fixes
++* lots and lots of bugfixes
++
++*** 0.1.5 ***
++
++This is an emergency bugfix release.
++
++* fixed a bug where pressing &quot;m&quot; or 1-9 in chat messages would toggle the
++  minimap or panzer groups
++* fixed a map in the dedicated server where the mapcycle string wasn't
++  properly parsed.
++* added an xpm icon.
++
++*** 0.1.4 ***
++
++Some small feature additions. Unfortunatley we changed the network protocol
++again, so servers and clients should get updated soon. There's a bug in the old
++0.1.3 server code that makes it crash when a 0.1.4 client connects.
++                                                                                
++    * It's possible to configure the mapcycle in the server
++    * Players now have colors on the radar (thanks Viras)
++    * small fixes to make netpanzer run on win32
++    * a new quickconnect option for the commandline (usefull for external server      browsers like KNetpanzerbrowser 
++	(<A HREF="http://www.suselinuxsupport.de/index.php?location=download">http://www.suselinuxsupport.de/index.php?location=download</A>)
++
++*** 0.1.3 ***
++
++This is still a maintenance and bugfix release. We're working on an editor and a
++UI rewrite, but these have to wait for a later release. Changes:
++
++    * fix bug where the lobby view would always display 0/x players
++    * some robustness and usability fixes for the irc lobby code
++    * new slovakian flag
++    * lots of code cleanups and rewrites (and still lots more to do)
++    * unit spawnpoint can be choosen at the outposts now
++    * some small UI improvements
++    * reorganised build environment
++    * network packets are smaller and more robust now
++
++*** 0.1.2 ***
++
++netPanzer 0.1.2 is available now:
++
++    * A new lobby view and server browser has been added
++    * a man page has been added
++    * The deciated server reads it's setting from a configuration file now
++    * The bot player can now be started as a separate process.
++    * polish and swedish flag has been added (we happily accept more flags)
++    * several smaller bugfixes and improvements
++
++*** 0.1.1 ***
++
++    * checkboxes are clickable now
++    * game no longer crashes after output occupation
++
++*** 0.1 ***
++
++Initial linux port
++
+
+Modified: trunk/netpanzer/configure.ac
+===================================================================
+--- trunk/netpanzer/configure.ac	2007-02-03 12:41:03 UTC (rev 954)
++++ trunk/netpanzer/configure.ac	2007-02-03 13:01:37 UTC (rev 955)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [0.8-svn], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [0.8.1], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: trunk/netpanzer/mk/autoconf/installdirs.m4
+===================================================================
+--- trunk/netpanzer/mk/autoconf/installdirs.m4	2007-02-03 12:41:03 UTC (rev 954)
++++ trunk/netpanzer/mk/autoconf/installdirs.m4	2007-02-03 13:01:37 UTC (rev 955)
+@@ -32,6 +32,7 @@
+ bindir=AC_FIX_VARIABLEREF([$bindir])
+ sbindir=AC_FIX_VARIABLEREF([$sbindir])
+ libexecdir=AC_FIX_VARIABLEREF([$libexecdir])
++datarootdir=AC_FIX_VARIABLEREF([$datarootdir])
+ datadir=AC_FIX_VARIABLEREF([$datadir])
+ sysconfdir=AC_FIX_VARIABLEREF([$sysconfdir])
+ sharedstatedir=AC_FIX_VARIABLEREF([$sharedstatedir])
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000001.html">[Netpanzer-cvs] r954 - trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+	<LI>Next message: <A HREF="000003.html">[Netpanzer-cvs] r956 - in trunk/homepage: . images
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

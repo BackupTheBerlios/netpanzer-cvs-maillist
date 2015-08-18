@@ -1,0 +1,770 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1267 - in trunk/netpanzer/src/NetPanzer: Bot	Classes Classes/Network Interfaces Objectives	Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1267%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Bot%0A%09Classes%20Classes/Network%20Interfaces%20Objectives%0A%09Views/Components%20Views/Game&In-Reply-To=%3C20111025130336.CD4064813FD%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000292.html">
+   <LINK REL="Next"  HREF="000294.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1267 - in trunk/netpanzer/src/NetPanzer: Bot	Classes Classes/Network Interfaces Objectives	Views/Components Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1267%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Bot%0A%09Classes%20Classes/Network%20Interfaces%20Objectives%0A%09Views/Components%20Views/Game&In-Reply-To=%3C20111025130336.CD4064813FD%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1267 - in trunk/netpanzer/src/NetPanzer: Bot	Classes Classes/Network Interfaces Objectives	Views/Components Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 25 15:03:36 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000292.html">[Netpanzer-cvs] r1266 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes/Network NetPanzer/Core NetPanzer/Interfaces	NetPanzer/Particles NetPanzer/Units NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000294.html">[Netpanzer-cvs] r1268 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Interfaces	src/NetPanzer/Views src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#293">[ date ]</a>
+              <a href="thread.html#293">[ thread ]</a>
+              <a href="subject.html#293">[ subject ]</a>
+              <a href="author.html#293">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-25 15:03:36 +0200 (Tue, 25 Oct 2011)
+New Revision: 1267
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+Center the ingame flag selection when resolution changes, the window is closed when one flag is clicked. Also do some cleanup of internal player status in preparation to add new states: 'waiting for first flag selection' and maybe if is interesting 'spectating'.
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -122,8 +122,7 @@
+     PlayerID player_index;
+     for ( player_index = 0; player_index &lt; max_players; ++player_index)
+     {
+-        if (PlayerInterface::getPlayer(player_index)-&gt;getStatus() ==
+-                _player_state_active
++        if (PlayerInterface::isPlayerActive(player_index)
+                 &amp;&amp; localIndex != player_index
+                 &amp;&amp; !PlayerInterface::isAllied(localIndex, player_index) // XXX ALLY
+             )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -233,7 +233,7 @@
+         PlayerState *p = PlayerInterface::getPlayer(client-&gt;getPlayerIndex());
+         if ( p )
+         {
+-            p-&gt;setStatus( _player_state_kicked );
++            p-&gt;setStateKicked();
+         }
+         onClientDisconected(client, &quot;kicked&quot;);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -268,7 +268,7 @@
+     {
+         if ( time_out_timer.count() )
+         {
+-            player-&gt;setStatus( _player_state_free );
++            player-&gt;setStateFree();
+             return connect_state_idle;
+         }
+         return State&lt;T&gt;::state;
+@@ -288,7 +288,7 @@
+                                             client_setting-&gt;player_flag,
+                                             sizeof(client_setting-&gt;player_flag) );
+ 
+-            player-&gt;setStatus( _player_state_connecting );
++            player-&gt;setStateConnecting();
+ 
+             // ** send server game setting map, units, player, etc.
+             ConnectMesgServerGameSettings* server_game_setup
+@@ -321,7 +321,7 @@
+     {
+         if ( time_out_timer.count() )
+         {
+-            player-&gt;setStatus( _player_state_free );
++            player-&gt;setStateFree();
+             return connect_state_idle;
+         }
+         return State&lt;T&gt;::state;
+@@ -390,7 +390,7 @@
+         }
+         else if ( time_out_timer.count() )
+         {
+-            player-&gt;setStatus( _player_state_free );
++            player-&gt;setStateFree();
+             return connect_state_idle;
+         }
+         return State&lt;T&gt;::state;
+@@ -481,7 +481,7 @@
+         }
+         else if ( time_out_timer.count() )
+         {
+-            player-&gt;setStatus( _player_state_free );
++            player-&gt;setStateFree();
+             return connect_state_idle;
+         }
+         return State&lt;T&gt;::state;
+@@ -546,7 +546,7 @@
+         }
+         else if ( time_out_timer.count() )
+         {
+-            player-&gt;setStatus( _player_state_free );
++            player-&gt;setStateFree();
+             return connect_state_idle;
+         }
+         return State&lt;T&gt;::state;
+@@ -701,7 +701,7 @@
+ 
+         PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+ 
+-        player-&gt;setStatus( _player_state_active );
++        player-&gt;setStateActive();
+ 
+         PlayerFlagSync pfs;
+         pfs.player_id = connect_client-&gt;player_id;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -160,9 +160,8 @@
+                 continue;
+                 
+             PlayerState *ps=PlayerInterface::getPlayer(p);
+-            if (   (ps-&gt;status==_player_state_connecting 
+-                   || ps-&gt;status==_player_state_active )
+-                  &amp;&amp; ps-&gt;name == name
++            if ( (ps-&gt;isConnecting() || ps-&gt;isActive())
++               &amp;&amp; ps-&gt;name == name
+                )
+             {
+                 std::stringstream ssnamenum;
+@@ -293,16 +292,6 @@
+     this-&gt;id = id;
+ }
+ 
+-void PlayerState::setStatus( unsigned char status )
+-{
+-    PlayerState::status = status;
+-}
+-
+-unsigned char PlayerState::getStatus() const
+-{
+-    return status;
+-}
+-
+ FlagID PlayerState::getFlag() const
+ {
+     return id;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -107,8 +107,6 @@
+     short getObjectivesHeld() const;
+     void setObjectivesHeld( short objectives );
+     void setID( PlayerID id );
+-    void setStatus( unsigned char status );
+-    unsigned char getStatus() const;
+     FlagID getFlag() const;
+     short getTotal() const;
+     NetworkPlayerState getNetworkPlayerState() const;
+@@ -117,13 +115,19 @@
+     Uint8 getColor() const;
+ 
+     void setAdmin(bool flag) { admin_flag = flag; }
++    bool isAdmin()     const { return admin_flag; }
+ 
+-    bool isAdmin() const { return admin_flag; }
+-    bool isFree() const { return status == _player_state_free; }
+-    bool isAllocated() const { return status == _player_state_allocated; }
++    void setStateFree()       { status = _player_state_free; }
++    void setStateAllocated()  { status = _player_state_allocated; }
++    void setStateConnecting() { status = _player_state_connecting; }
++    void setStateActive()     { status = _player_state_active; }
++    void setStateKicked()     { status = _player_state_kicked; }
++
++    bool isFree()       const { return status == _player_state_free; }
++    bool isAllocated()  const { return status == _player_state_allocated; }
+     bool isConnecting() const { return status == _player_state_connecting; }
+-    bool isActive() const { return status == _player_state_active; }
+-    bool isKicked() const { return status == _player_state_kicked; }
++    bool isActive()     const { return status == _player_state_active; }
++    bool isKicked()     const { return status == _player_state_kicked; }
+ };
+ 
+ #endif // ** _PLAYERSTATE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -135,28 +135,22 @@
+     {
+         PlayerID max_players;
+         PlayerID local_player_index;
+-        PlayerState * player = 0;
+ 
+         local_player_index = PlayerInterface::getLocalPlayerIndex();
+ 
+         max_players = PlayerInterface::getMaxPlayers();
+         for (PlayerID i = 0; i &lt; max_players; ++i)
+         {
+-            player = PlayerInterface::getPlayer(i);
+-
+-            if (player-&gt;getStatus() == _player_state_active)
++            if ( PlayerInterface::isAllied( packet-&gt;fromPlayer, i) == true )
+             {
+-                if ( PlayerInterface::isAllied( packet-&gt;fromPlayer, i) == true )
++                if (local_player_index != i)
+                 {
+-                    if (local_player_index != i)
+-                    {
+-                        SERVER-&gt;sendMessage(i, &amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
+-                    }
+-                    else
+-                    {
+-                        post_on_server = true;
+-                    }
++                    SERVER-&gt;sendMessage(i, &amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
+                 }
++                else
++                {
++                    post_on_server = true;
++                }
+             }
+         }
+ 
+@@ -313,19 +307,19 @@
+ 
+ void ChatInterface::serversayTo(const PlayerID player, const NPString&amp; message)
+ {
+-    if ( player &gt;= PlayerInterface::getMaxPlayers() || player == INVALID_PLAYER_ID )
++    if ( ! PlayerInterface::isValidPlayerID(player) )
+     {
+         LOGGER.warning(&quot;CI_SST CHEAT Try to say something to unexisting player: %u&quot;,
+                        player);
+     }
+ 
+-    if ( PlayerInterface::getPlayer(player)-&gt;getStatus() != _player_state_active )
++    if ( ! PlayerInterface::isPlayerActive(player) )
+     {
+         LOGGER.warning(&quot;CI_SST CHEAT Try to say something to inactive player: %u&quot;,
+                        player);
+     }
+ 
+-    if (player == PlayerInterface::getLocalPlayerIndex())
++    if ( PlayerInterface::isLocalPlayer(player) )
+     {
+         ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+                                       message.c_str());
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -135,20 +135,20 @@
+                 PlayerID i;
+                 for ( i = 0; i&lt;PlayerInterface::getMaxPlayers(); ++i)
+                 {
+-                    PlayerState* playerstate =
+-                        PlayerInterface::getPlayer(i);
+-                    if(playerstate-&gt;getStatus() != _player_state_active)
+-                        continue;
+-                    //*Console::server
+-                    std::cout
+-                        &lt;&lt; std::setw(3) &lt;&lt; i &lt;&lt; &quot; &quot;
+-                        &lt;&lt; std::setw(30) &lt;&lt; playerstate-&gt;getName() &lt;&lt; &quot; &quot;
+-                        &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getKills() &lt;&lt; &quot; &quot;
+-                        &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getLosses() &lt;&lt; &quot; &quot;
+-                        &lt;&lt; std::setw(5) &lt;&lt; playerstate-&gt;getTotal() &lt;&lt; &quot; &quot;
+-                        &lt;&lt; std::setw(21) 
+-                        &lt;&lt; SERVER-&gt;getIP(playerstate-&gt;getID())
+-                        &lt;&lt; &quot;\n&quot;;
++                    PlayerState* playerstate = PlayerInterface::getPlayer(i);
++                    if ( playerstate-&gt;isActive() )
++                    {
++                        //*Console::server
++                        std::cout
++                            &lt;&lt; std::setw(3) &lt;&lt; i &lt;&lt; &quot; &quot;
++                            &lt;&lt; std::setw(30) &lt;&lt; playerstate-&gt;getName() &lt;&lt; &quot; &quot;
++                            &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getKills() &lt;&lt; &quot; &quot;
++                            &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getLosses() &lt;&lt; &quot; &quot;
++                            &lt;&lt; std::setw(5) &lt;&lt; playerstate-&gt;getTotal() &lt;&lt; &quot; &quot;
++                            &lt;&lt; std::setw(21)
++                            &lt;&lt; SERVER-&gt;getIP(playerstate-&gt;getID())
++                            &lt;&lt; &quot;\n&quot;;
++                    }
+                 }
+                 //*Console::server &lt;&lt; std::flush;
+                 std::cout &lt;&lt; std::flush;
+@@ -196,7 +196,7 @@
+         for (unsigned long i = 0; i &lt; max_players; i++)
+         {
+             player = PlayerInterface::getPlayer((unsigned short) i);
+-            if (player-&gt;getStatus() == _player_state_active)
++            if ( player-&gt;isActive() )
+             {
+                 if ( player-&gt;checkAutokick() )
+                 {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -275,8 +275,6 @@
+                 GameManager::resetGameLogic();
+                 SERVER-&gt;broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
+ 
+-                GameManager::respawnAllPlayers();
+-
+                 PlayerInterface::unlockPlayerStats();
+                 GameControlRulesDaemon::game_state = _game_state_in_progress;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -347,24 +347,6 @@
+     sound-&gt;playTankIdle();
+ }
+ 
+-void GameManager::respawnAllPlayers()
+-{
+-    PlayerState    *player_state;
+-    PlayerID max_players;
+-    PlayerID player_index;
+-
+-    max_players = PlayerInterface::getMaxPlayers();
+-
+-    for( player_index = 0; player_index &lt; max_players; ++player_index )
+-    {
+-        player_state = PlayerInterface::getPlayer( player_index );
+-        if ( player_state-&gt;getStatus() == _player_state_active )
+-        {
+-            spawnPlayer( player_index );
+-        }
+-    }
+-}
+-
+ // ******************************************************************
+ 
+ void GameManager::netMessageSetView(const NetMessage* message)
+@@ -488,7 +470,7 @@
+ 
+     SystemPingAcknowledge ping_ack;
+ 
+-    if ( player-&gt;getStatus() == _player_state_active
++    if ( player-&gt;isActive()
+          &amp;&amp; ping_request-&gt;getClientPlayerIndex() != MIN_PLAYER_ID
+        )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -66,7 +66,6 @@
+ 
+     // ** Game Rules Methods
+     static void spawnPlayer( PlayerID player );
+-    static void respawnAllPlayers();
+ 
+     static void initializeGameLogic();
+     static void reinitializeGameLogic();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -136,16 +136,17 @@
+     for ( i = 0; i &lt; maxPlayers; ++i)
+     {
+         PlayerState* playerState = PlayerInterface::getPlayer(i);
+-        if(playerState-&gt;getStatus() != _player_state_active)
+-            continue;
+-        s &lt;&lt; &quot;\\player_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getName()
+-          &lt;&lt; &quot;\\kills_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getKills()
+-          &lt;&lt; &quot;\\deaths_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getLosses()
+-          &lt;&lt; &quot;\\score_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getObjectivesHeld()
+-          &lt;&lt; &quot;\\points_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getTotal()
+-          &lt;&lt; &quot;\\flag_&quot;   &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; (int)i
+-          &lt;&lt; &quot;\\flagu_&quot;   &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; ResourceManager::getFlagUsedCount(i);
+-        n++;
++        if( playerState-&gt;isActive() )
++        {
++            s &lt;&lt; &quot;\\player_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getName()
++              &lt;&lt; &quot;\\kills_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getKills()
++              &lt;&lt; &quot;\\deaths_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getLosses()
++              &lt;&lt; &quot;\\score_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getObjectivesHeld()
++              &lt;&lt; &quot;\\points_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getTotal()
++              &lt;&lt; &quot;\\flag_&quot;   &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; (int)i
++              &lt;&lt; &quot;\\flagu_&quot;   &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; ResourceManager::getFlagUsedCount(i);
++            n++;
++        }
+     }
+     
+     s &lt;&lt; &quot;\\final\\&quot;;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -413,8 +413,6 @@
+     const char* playername = gameconfig-&gt;playername.c_str();
+     player_state-&gt;setName(playername);
+     
+-    //GameManager::spawnPlayer( PlayerInterface::getLocalPlayerIndex() );
+-    
+     LoadingView::update( &quot;Spawning Player ... (100%)&quot; );
+     
+     graphicsLoop();
+@@ -491,7 +489,7 @@
+                 if ( i != PlayerInterface::getLocalPlayerIndex() )
+                 {
+                     player = PlayerInterface::getPlayer((unsigned short) i);
+-                    if (player-&gt;getStatus() == _player_state_active)
++                    if ( player-&gt;isActive() )
+                     {
+                         if ( player-&gt;checkAutokick() )
+                         {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -190,7 +190,7 @@
+     {
+         player_lists[ player_id ].setID( player_id );
+         player_lists[ player_id ].resetStats();
+-        player_lists[ player_id ].setStatus( _player_state_free );
++        player_lists[ player_id ].setStateFree();
+         sprintf( temp_str, &quot;Player %u&quot;, player_id );
+         player_lists[ player_id ].setName( temp_str );
+     }
+@@ -286,10 +286,7 @@
+ 
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+-        if ( player_lists[ player_id ].getStatus() == _player_state_active )
+-        {
+-            count++;
+-        }
++        player_lists[ player_id ].isActive() &amp;&amp; count++;
+     } // ** for
+ 
+     return( count );
+@@ -300,7 +297,7 @@
+     local_player_index = 0;
+ 
+     SDL_mutexP(mutex);
+-    player_lists[local_player_index].setStatus(_player_state_active);
++    player_lists[local_player_index].setStateActive();
+     player_lists[local_player_index].unit_config.initialize();
+     SDL_mutexV(mutex);
+ 
+@@ -313,10 +310,7 @@
+     PlayerID player_id;
+     for ( player_id = 0, count=0; player_id &lt; max_players; ++player_id )
+     {
+-        if ( player_lists[ player_id ].getStatus() == _player_state_active )
+-        {
+-            ++count;
+-        }
++        player_lists[ player_id ].isActive() &amp;&amp; count++;
+     }
+     return count;
+ }
+@@ -329,9 +323,9 @@
+     SDL_mutexP(mutex);
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+-        if ( player_lists[ player_id ].getStatus() == _player_state_free )
++        if ( player_lists[ player_id ].isFree() )
+         {
+-            player_lists[ player_id ].setStatus( _player_state_allocated );
++            player_lists[ player_id ].setStateAllocated();
+             player_lists[ player_id ].resetStats();
+             player_lists[ player_id ].unit_config.initialize();
+             res = &amp;player_lists[ player_id ];
+@@ -348,7 +342,7 @@
+     if ( player_id &lt; max_players )
+     {
+         SDL_mutexP(mutex);
+-        if ( player_lists[player_id].getStatus() != _player_state_free )
++        if ( ! player_lists[player_id].isFree() )
+         {
+             UnitInterface::spawnPlayerUnits( location,
+                                              player_id,
+@@ -449,7 +443,7 @@
+         *completed = false;
+     }
+     
+-    if ( player_lists[ respawn_rule_player_index ].getStatus() == _player_state_active )
++    if ( player_lists[ respawn_rule_player_index ].isActive() )
+         if ( UnitInterface::getUnitCount( respawn_rule_player_index ) == 0 )
+         {
+             *player_state = &amp;player_lists[ respawn_rule_player_index ];
+@@ -492,7 +486,7 @@
+     SDL_mutexP(mutex);
+         player_lists[player_id].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
+         // XXX ALLY
+-        if ( player_lists[player_id].getStatus() == _player_state_free )
++        if ( player_lists[player_id].isFree() )
+         {
+             disconnectedPlayerAllianceCleanup(player_id);
+         }
+@@ -635,7 +629,7 @@
+         // XXX ALLY
+         disconnectedPlayerAllianceCleanup(player_id);
+ 
+-        player_state-&gt;setStatus( _player_state_free );
++        player_state-&gt;setStateFree();
+         player_state-&gt;setAdmin(false);
+ 
+         PlayerStateSync player_state_update(player_state-&gt;getNetworkPlayerState());
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -54,8 +54,17 @@
+         return (player &lt; getMaxPlayers()) &amp;&amp; player_lists[player].isActive();
+     }
+ 
+-    static bool isLocalPlayer(PlayerID player) { return player == local_player_index; }
++    static bool isLocalPlayer(PlayerID player)
++    {
++        return player == local_player_index;
++    }
+ 
++    static bool isValidPlayerID(const PlayerID player)
++    {
++        return player &lt; getMaxPlayers()
++            &amp;&amp; player != INVALID_PLAYER_ID;
++    }
++
+     static void setAdmin(PlayerID player, bool flag)
+     {
+         if ( player &lt; getMaxPlayers() )
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -131,7 +131,7 @@
+ void
+ Objective::attemptOccupationChange(PlayerState* player)
+ {
+-    if ( player-&gt;getStatus() != _player_state_active )
++    if ( ! player-&gt;isActive() )
+     {
+         return;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -314,7 +314,7 @@
+             if ( player_id != INVALID_PLAYER_ID )
+             {
+                 player = PlayerInterface::getPlayer(player_id);
+-                if ( player &amp;&amp; player-&gt;getStatus() != _player_state_active )
++                if ( player &amp;&amp; ! player-&gt;isActive() )
+                 {
+                     LOGGER.warning(&quot;OICH_OOU CHEAT SERVER sent inactive player_id %u&quot;,
+                                    player_id);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -724,7 +724,7 @@
+     // Check all components for a clicked event.
+     {    
+         ComponentsIterator i;
+-        for ( i=components.begin(); i != components.end(); i++)
++        for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++ )
+         {        
+             if ((*i)-&gt;contains(downPos) &amp;&amp; (*i)-&gt;contains(upPos)) {
+                 mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_CLICKED, now(), InputEvent::BUTTON1_MASK, upPos.x, upPos.y, 0, false);
+@@ -733,12 +733,13 @@
+ 
+                 actionPerformed(me);
+             }
+-        }}
++        }
++    }
+ 
+     // Report a mouse release to all components except for a clicked one.
+     {    
+         ComponentsIterator i;
+-        for ( i=components.begin(); i != components.end(); i++)
++        for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+         {        
+             if ((*i)-&gt;contains(upPos)) {
+                 mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_RELEASED, now(), InputEvent::BUTTON1_MASK, upPos.x, upPos.y, 0, false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -135,9 +135,10 @@
+     for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
+     {
+         PlayerState* state = PlayerInterface::getPlayer(i);
+-        if(state-&gt;getStatus() != _player_state_active)
+-            continue;
+-        states.push_back(state);
++        if( state-&gt;isActive() )
++        {
++            states.push_back(state);
++        }
+     }
+ 
+     switch(gameconfig-&gt;gametype) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -28,6 +28,7 @@
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;Views/Components/Button.hpp&quot;
+ #include &quot;Views/Components/Label.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
+ 
+ #include &quot;2D/Palette.hpp&quot;
+ 
+@@ -67,6 +68,8 @@
+                    sizeof(GameConfig::player_flag_data));
+ 
+             CLIENT-&gt;sendMessage(&amp;upf, sizeof(upf));
++
++            Desktop::setVisibility(&quot;GFlagSelectionView&quot;, false);
+         }
+         else
+         {
+@@ -86,21 +89,19 @@
+     setVisible(false);
+     setBordered(false);
+ 
+-    int x = (screen-&gt;getWidth() / 2) - 250;
+-    int y = (screen-&gt;getHeight() / 2) - 250;
+-    moveTo(iXY(x,y));
+-    resize(iXY(500, 500));
+-    checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+-
+     loaded = false;
+-    //init();
+-
+ }
+ 
+ void GFlagSelectionView::init()
+ {
+     removeComponents();
+ 
++    int x = (screen-&gt;getWidth() / 2) - 250;
++    int y = (screen-&gt;getHeight() / 2) - 250;
++    moveTo(iXY(x,y));
++    resize(iXY(500, 500));
++    checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
++
+     int tx = 20;
+     int ty = 14 + (FLAG_HEIGHT - Surface::getFontHeight()) / 2;
+     add( new Label(tx, ty, &quot;Current:&quot;, windowTextColor, windowTextColorShadow, true) );
+@@ -112,8 +113,8 @@
+ 
+     int yOffset = FLAG_HEIGHT + 8;
+ 
+-    int x = flagStartOffset.x;
+-    int y = flagStartOffset.y;
++    x = flagStartOffset.x;
++    y = flagStartOffset.y;
+ 
+     Surface game_flags;
+     std::vector&lt;string&gt; flag_names;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2011-10-24 12:21:06 UTC (rev 1266)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2011-10-25 13:03:36 UTC (rev 1267)
+@@ -148,9 +148,10 @@
+     for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
+     {
+         PlayerState* state = PlayerInterface::getPlayer(i);
+-        if(state-&gt;getStatus() != _player_state_active)
+-            continue;
+-        states.push_back(state);
++        if ( state-&gt;isActive() )
++        {
++            states.push_back(state);
++        }
+     }
+ 
+     switch(gameconfig-&gt;gametype) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000292.html">[Netpanzer-cvs] r1266 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes/Network NetPanzer/Core NetPanzer/Interfaces	NetPanzer/Particles NetPanzer/Units NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000294.html">[Netpanzer-cvs] r1268 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Interfaces	src/NetPanzer/Views src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#293">[ date ]</a>
+              <a href="thread.html#293">[ thread ]</a>
+              <a href="subject.html#293">[ subject ]</a>
+              <a href="author.html#293">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

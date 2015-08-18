@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1190 - in trunk/netpanzer:	src/NetPanzer/Interfaces src/NetPanzer/System support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1190%20-%20in%20trunk/netpanzer%3A%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%20support/scripts&In-Reply-To=%3C201001221429.o0METj2E023491%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000215.html">
+   <LINK REL="Next"  HREF="000217.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1190 - in trunk/netpanzer:	src/NetPanzer/Interfaces src/NetPanzer/System support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1190%20-%20in%20trunk/netpanzer%3A%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%20support/scripts&In-Reply-To=%3C201001221429.o0METj2E023491%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1190 - in trunk/netpanzer:	src/NetPanzer/Interfaces src/NetPanzer/System support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Jan 22 15:29:45 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000215.html">[Netpanzer-cvs] r1189 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000217.html">[Netpanzer-cvs] r1191 - in trunk/netpanzer/src/NetPanzer:	Interfaces System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-22 15:29:32 +0100 (Fri, 22 Jan 2010)
+New Revision: 1190
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/support/scripts/copy_datafiles.sh
+Log:
+- remove video doublebuffer, use directly the video surface. This avoids double blitting
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-21 13:28:26 UTC (rev 1189)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-22 14:29:32 UTC (rev 1190)
+@@ -157,8 +157,8 @@
+     iXY mode_res;
+     iXY old_res = screen ? iXY(screen-&gt;getWidth(), screen-&gt;getHeight()): iXY(0,0);
+     Uint32 flags = GameConfig::video_fullscreen ? SDL_FULLSCREEN : 0;
+-    flags |= GameConfig::video_hardwaresurface ? SDL_HWSURFACE : 0;
+-    flags |= GameConfig::video_doublebuffer ? SDL_DOUBLEBUF : 0;
++//    flags |= GameConfig::video_hardwaresurface ? SDL_HWSURFACE : 0;
++//    flags |= GameConfig::video_doublebuffer ? SDL_DOUBLEBUF : 0;
+ 
+     if ( ! GameConfig::video_fullscreen )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-21 13:28:26 UTC (rev 1189)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-22 14:29:32 UTC (rev 1190)
+@@ -95,17 +95,17 @@
+ void SDLVideo::setVideoMode(int width, int height, int bpp, Uint32 flags)
+ {
+     // eventually delete old backbuffer
+-    if(frontBuffer &amp;&amp; !(frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF)) {
+-        if(backBuffer)
+-            SDL_FreeSurface(backBuffer);
+-    }
++//    if(frontBuffer &amp;&amp; !(frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF)) {
++//        if(backBuffer)
++//            SDL_FreeSurface(backBuffer);
++//    }
+     
+     int new_width = width;
+     int new_height = height;
+     if ( ! (flags&amp;SDL_FULLSCREEN) )
+     {
+ //        bpp = 0;
+-        flags |= SDL_ANYFORMAT;
++//        flags |= SDL_ANYFORMAT;
+     }
+     else
+     {
+@@ -121,14 +121,14 @@
+         throw Exception(&quot;Couldn't set display mode (%dx%d, %X): %s&quot;,
+                 new_width, new_height, flags, SDL_GetError());
+ 
+-    if(! (frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF)) {
+-        backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, new_width, new_height,
+-                bpp, 0, 0, 0, 0);
+-        if(!backBuffer)
+-            throw Exception(&quot;Couldn't create backBuffer&quot;);
+-    } else {
+-        backBuffer = frontBuffer;
+-    }
++//    if(! (frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF)) {
++//        backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, new_width, new_height,
++//                bpp, 0, 0, 0, 0);
++//        if(!backBuffer)
++//            throw Exception(&quot;Couldn't create backBuffer&quot;);
++//    } else {
++//        backBuffer = frontBuffer;
++//    }
+ 
+     // let's scare the mouse :)
+     SDL_ShowCursor(SDL_DISABLE);
+@@ -140,7 +140,7 @@
+                                      Uint32 flags)
+ {
+     //flags |= SDL_HWPALETTE | SDL_ANYFORMAT;
+-    flags |= SDL_ANYFORMAT;
++//    flags |= SDL_ANYFORMAT;
+     int res = SDL_VideoModeOK(width, height, bpp, flags);
+ 
+     LOGGER.warning(&quot;Mode %dx%dx%d %s is %s&quot;, width, height, bpp,
+@@ -152,37 +152,39 @@
+ 
+ void SDLVideo::lockDoubleBuffer(unsigned char **buffer)
+ {
+-    if(SDL_MUSTLOCK(backBuffer) &amp;&amp; SDL_LockSurface(backBuffer))
++    if(SDL_MUSTLOCK(frontBuffer) &amp;&amp; SDL_LockSurface(frontBuffer))
+         throw Exception(&quot;Couldn't lock display buffer&quot;);
+ 
+-    *buffer = (unsigned char *)backBuffer-&gt;pixels;
++    *buffer = (unsigned char *)frontBuffer-&gt;pixels;
+ }
+ 
+ void SDLVideo::unlockDoubleBuffer()
+ {
+-    if(SDL_MUSTLOCK(backBuffer))
+-        SDL_UnlockSurface(backBuffer);
++    if(SDL_MUSTLOCK(frontBuffer))
++        SDL_UnlockSurface(frontBuffer);
+ }
+ 
+ void SDLVideo::copyDoubleBufferandFlip()
+ {
+-    if(! (frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF)) {
+-        SDL_BlitSurface(backBuffer, 0, frontBuffer, 0);
+-    }
++//    if(! (frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF)) {
++//        SDL_BlitSurface(backBuffer, 0, frontBuffer, 0);
++//    }
+ 
+-    if (SDL_Flip(frontBuffer))
+-        throw Exception(&quot;Error while swapping double buffer&quot;);        
++//    if (SDL_Flip(frontBuffer))
++//        throw Exception(&quot;Error while swapping double buffer&quot;);
++    SDL_UpdateRect(frontBuffer, 0, 0, 0, 0);
+ }
+ 
+ void SDLVideo::setPalette(SDL_Color *color)
+ {
+-    SDL_SetColors(backBuffer, color, 0, 256);
+-    if(frontBuffer != backBuffer &amp;&amp; frontBuffer-&gt;format-&gt;BitsPerPixel == 8)
+-        SDL_SetColors(frontBuffer, color, 0, 256);
++    SDL_SetPalette(frontBuffer, SDL_LOGPAL, color, 0, 256);
++//    SDL_SetColors(backBuffer, color, 0, 256);
++//    if(frontBuffer != backBuffer &amp;&amp; frontBuffer-&gt;format-&gt;BitsPerPixel == 8)
++//        SDL_SetColors(frontBuffer, color, 0, 256);
+ }
+ 
+ SDL_Surface* SDLVideo::getSurface()
+ {
+-    return backBuffer;
++    return frontBuffer;
+ }
+ 
+
+Modified: trunk/netpanzer/support/scripts/copy_datafiles.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/copy_datafiles.sh	2010-01-21 13:28:26 UTC (rev 1189)
++++ trunk/netpanzer/support/scripts/copy_datafiles.sh	2010-01-22 14:29:32 UTC (rev 1190)
+@@ -10,7 +10,7 @@
+ [ ! -d &quot;${DESTDIR}&quot; ] &amp;&amp; mkdir -p &quot;${DESTDIR}&quot;
+ 
+ echo -n &quot;Copying files&quot;
+-find maps pics powerups scripts sound units tilesets ! -type d  ! -path '*/.svn/*' ! -iname '.DS_Store' -print | \
++find cache maps pics powerups scripts sound units wads ! -type d  ! -path '*/.svn/*' ! -iname '.DS_Store' -print | \
+ 	while read fname; do 
+ 		DNAME=&quot;`dirname \&quot;${fname}\&quot;`&quot;
+ 		[ ! -d &quot;${DESTDIR}/${DNAME}&quot; ] &amp;&amp; mkdir -p &quot;${DESTDIR}/${DNAME}&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000215.html">[Netpanzer-cvs] r1189 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000217.html">[Netpanzer-cvs] r1191 - in trunk/netpanzer/src/NetPanzer:	Interfaces System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

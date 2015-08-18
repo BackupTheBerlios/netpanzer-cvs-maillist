@@ -1,0 +1,607 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1327 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Components Views/Game	Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1327%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Core%20Interfaces%20Views/Components%20Views/Game%0A%09Views/MainMenu/Multi&In-Reply-To=%3C20120105113422.B5C95480EE4%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000352.html">
+   <LINK REL="Next"  HREF="000354.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1327 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Components Views/Game	Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1327%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Core%20Interfaces%20Views/Components%20Views/Game%0A%09Views/MainMenu/Multi&In-Reply-To=%3C20120105113422.B5C95480EE4%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1327 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Components Views/Game	Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Jan  5 12:34:22 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000352.html">[Netpanzer-cvs] r1326 - in trunk/netpanzer: . src/Lib/ArrayUtil	src/Lib/Network src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000354.html">[Netpanzer-cvs] r1328 - trunk/netpanzer/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#353">[ date ]</a>
+              <a href="thread.html#353">[ thread ]</a>
+              <a href="subject.html#353">[ subject ]</a>
+              <a href="author.html#353">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-05 12:34:22 +0100 (Thu, 05 Jan 2012)
+New Revision: 1327
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+- improvement: Shows better messages when connecting to older or development servers.
+- improvement: Better handling of server disconnections on client side.
+- change: A player may not select any flag when entering the game. When pressing 'b' or ESC the flag selectiong window will dissapear and he become an &quot;spectator&quot; (something like a hack). He can then press 'b' at any time to select a flag an enter the game. For example is good for allying before spawning. Also note: if the player was previously conected to another server, the flag that will be seen is the flag that he was using previously on that server. (I might be wrong and it is the last flag that was used by the player that was conected on that server, need verification).
+
+
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -34,6 +34,10 @@
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Views/Game/LoadingView.hpp&quot;
+ 
++#include &quot;Core/NetworkGlobals.hpp&quot;
++
++#include &quot;System/Sound.hpp&quot;
++
+ enum { _connect_state_idle = 0,
+        _connect_state_waiting_link,
+        _connect_state_waiting_connect_start,
+@@ -78,6 +82,8 @@
+     time_out_timer.changePeriod( _CLIENT_CONNECT_TIME_OUT_TIME );
+     time_out_counter = 0;
+     connection_state = _connect_state_waiting_link;
++    LoadingView::append(&quot;&quot;);
++    LoadingView::append(NPString(&quot;Conecting to server &quot;) + gameconfig-&gt;serverConnect.c_str());
+ }
+ 
+ unsigned char ClientConnectDaemon::netMessageLinkAck(const NetMessage* message)
+@@ -99,11 +105,11 @@
+ 
+     case _join_request_result_invalid_protocol :
+         LoadingView::append( &quot;Link to Server FAILED!&quot; );
+-        LoadingView::append( &quot;Incorrect Network Protocol Revision&quot; );
+-        LoadingView::append( &quot;Please get a newer netPanzer version.&quot; );
+-        sprintf( buf, &quot;Server Protocol Version: %u&quot;,
+-                join_request_ack_mesg-&gt;getServerProtocolVersion());
+-        LoadingView::append( buf );
++        LoadingView::append( &quot;Incompatible game:&quot; );
++        LoadingView::append( getNetpanzerProtocolMessage(join_request_ack_mesg-&gt;getServerProtocolVersion()));
++//        sprintf( buf, &quot;Server Protocol Version: %u&quot;,
++//                join_request_ack_mesg-&gt;getServerProtocolVersion());
++//        LoadingView::append( buf );
+         rval = _connect_state_connect_failure;
+         failure_display_timer.reset();
+         break;
+@@ -244,7 +250,10 @@
+ 
+ void ClientConnectDaemon::serverConnectionBroken()
+ {
+-    ConsoleInterface::postMessage(Color::unitRed, false, 0, &quot;CONNECTION TO SERVER HAS BEEN UNEXPECTEDLY BROKEN.&quot; );
++    LoadingView::show();
++    LoadingView::append(&quot;Error in server connection&quot;);
++    failure_display_timer.reset();
++    connection_state = _connect_state_connect_failure;
+ }
+ 
+ void ClientConnectDaemon::connectFailureResult( unsigned char result_code )
+@@ -280,8 +289,28 @@
+         case _connect_state_waiting_link:
+             if ( message_id == _net_message_id_connect_join_game_request_ack )
+             {
++                time_out_timer.changePeriod( _CLIENT_CONNECT_TIME_OUT_TIME );
++                time_out_counter = 0;
+                 connection_state = netMessageLinkAck( message );
+             }
++            else
++            {
++                if ( time_out_timer.count() )
++                {
++                    if ( time_out_counter &lt; _CLIENT_CONNECT_RETRY_LIMIT )
++                    {
++                        LoadingView::append( &quot;Server is not responding...&quot; );
++                        time_out_counter++;
++                    }
++                    else
++                    {
++                        LoadingView::append( &quot;Connection to server failed...&quot;);
++                        LoadingView::append( &quot;it might be older netpanzer or server is down&quot; );
++                        connection_state = _connect_state_connect_failure;
++                        failure_display_timer.reset();
++                    }
++                }
++            }
+             break;
+ 
+         case _connect_state_waiting_connect_start :
+@@ -296,7 +325,7 @@
+ 
+                 ClientConnectRequest connect_request;
+                 CLIENT-&gt;sendMessage(&amp;connect_request, sizeof(ClientConnectRequest));
+-
++                sound-&gt;playTankIdle();
+                 connection_state = _connect_state_waiting_connect_result;
+             }
+             else if ( message_id == _net_message_id_connect_server_full )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -74,6 +74,10 @@
+ 
+         Desktop::setVisibility(&quot;DisconectedView&quot;, true);
+     }
++    else
++    {
++        ClientConnectDaemon::serverConnectionBroken();
++    }
+     
+     delete clientsocket;
+     clientsocket=0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -328,10 +328,9 @@
+ WorldInputCmdProcessor::evaluateKeyCommands()
+ {
+     if (KeyboardInterface::getKeyPressed(SDLK_b)
+-       &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag()
+        &amp;&amp; ! Desktop::getVisible(&quot;HelpScrollView&quot;) )
+     {
+-        if ( Desktop::getVisible(&quot;GFlagSelectionView&quot;)
++        if ( PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag()
+             || GameConfig::game_changeflagtime == 0
+             || Flagtimer.checkWithTimeOut(GameConfig::game_changeflagtime * 60000)
+            )
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -17,3 +17,42 @@
+ */
+ 
+ #include &quot;Core/NetworkGlobals.hpp&quot;
++#include &lt;cstddef&gt;
++
++struct version_data
++{
++    int protocol;
++    const char * text;
++};
++
++struct version_data older_versions[] =
++{
++    (struct version_data){ 1019, &quot;This server requires older netpanzer 0.8.2&quot; },
++    (struct version_data){ 1030, &quot;This server requires older netpanzer 0.8.3&quot; },
++    (struct version_data){ 1105, &quot;This server requires older netpanzer 0.8.4&quot; } // this is valid for future
++};
++
++#define NUM_OLD_VERSIONS (sizeof(older_versions)/sizeof(version_data))
++
++const char * getNetpanzerProtocolMessage(const int protocol)
++{
++    for ( size_t n = 0; n &lt; NUM_OLD_VERSIONS; n++)
++    {
++        if ( older_versions[n].protocol == protocol )
++        {
++            return older_versions[n].text;
++        }
++    }
++
++    if ( protocol &lt; older_versions[0].protocol )
++    {
++        return &quot;The server is a very old netpanzer version, cannot use&quot;;
++    }
++
++    if ( protocol &lt; older_versions[NUM_OLD_VERSIONS-1].protocol )
++    {
++        return &quot;This server is an older development version, cannot use&quot;;
++    }
++
++    return &quot;This server is a newer netpanzer, please check <A HREF="http://www.netpanzer.org">http://www.netpanzer.org</A>&quot;;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -22,4 +22,6 @@
+ #define NETPANZER_PROTOCOL_VERSION     1105
+ #define MASTERSERVER_PORT             28900
+ 
++const char * getNetpanzerProtocolMessage(const int protocol);
++
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -32,6 +32,8 @@
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+ 
++#include &quot;Units/UnitProfileInterface.hpp&quot;
++
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Game/LoadingView.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -20,14 +20,12 @@
+ #define _LABEL_HPP_
+ 
+ #include &quot;Component.hpp&quot;
+-#include &lt;string&gt;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+-using namespace std;
+-
+ class Label:public Component
+ {
+ public:
+-    Label(int x, int y, string t, PIX color, PIX bgcolor=Color::black, bool shadow=false)
++    Label(int x, int y, const NPString&amp; t, PIX color, PIX bgcolor=Color::black, bool shadow=false)
+     {
+         text = t;
+         background = bgcolor;
+@@ -50,7 +48,7 @@
+     }
+     
+ private:
+-    string text;
++    NPString text;
+     bool shadowed;
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -9,30 +9,34 @@
+ 
+ #include &quot;LoadingView.hpp&quot;
+ 
++#include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Classes/Network/NetworkClient.hpp&quot;
++
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;System/Sound.hpp&quot;
+-#include &quot;2D/Palette.hpp&quot;
+-#include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/Label.hpp&quot;
+-#include &quot;Classes/Network/NetworkClient.hpp&quot;
++#include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ 
++#include &quot;Particles/ParticleInterface.hpp&quot;
++
+ list&lt;string&gt; LoadingView::lines;
+ bool LoadingView::dirty = true;
+ 
+ static void bAbort()
+ {
+-    if(gameconfig-&gt;quickConnect) {
++    if(gameconfig-&gt;quickConnect)
++    {
+         GameManager::exitNetPanzer();
+         return;
+     }
+-    sound-&gt;stopTankIdle();
++    GameManager::quitNetPanzerGame();
+     Desktop::setVisibilityAllWindows(false);
+     Desktop::setVisibility(&quot;MainView&quot;, true);
+ }
+ 
+-
+ void
+ LoadingView::init()
+ {
+@@ -138,7 +142,6 @@
+     {
+         CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect, NPString(password_str.getString()));
+         ClientConnectDaemon::startConnectionProcess();
+-        sound-&gt;playTankIdle();
+         setNeedPassword(false);
+     }
+     else
+@@ -146,3 +149,84 @@
+         View::onComponentClicked(c);
+     }
+ }
++
++void
++LoadingView::update(const NPString&amp; text)
++{
++    LOGGER.info(&quot;Loading: %s&quot;, text.c_str());
++    lines.pop_back();
++    lines.push_back(text);
++    dirty=true;
++}
++
++void
++LoadingView::append(const NPString&amp; text)
++{
++    LOGGER.info(&quot;Loading: %s&quot;, text.c_str());
++    if ( lines.size() &gt;= LINELIMIT )
++    {
++        lines.pop_front();
++    }
++    lines.push_back(text);
++    dirty=true;
++}
++
++void
++LoadingView::loadFinish()
++{
++    Desktop::setVisibilityAllWindows(false);
++
++    // XXX rebuild the particle stuff here for units...
++    ParticleInterface::rebuildUnitParticleData();
++
++    // XXX this needed because has to create the special buttons for the
++    // defined units, has to be here because it has to be the &quot;netp&quot; palette
++    // and after loading the unit profiles
++    View * v = Desktop::getView(&quot;VehicleSelectionView&quot;);
++    if ( v )
++    {
++        Desktop::remove(v);
++        delete v;
++    }
++
++    Desktop::add(new VehicleSelectionView());
++
++    GameManager::setNetPanzerGameOptions();
++    Desktop::setVisibility(&quot;MiniMapView&quot;, true);
++    Desktop::setVisibility(&quot;GameView&quot;, true);
++    if ( PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() )
++    {
++        Desktop::setVisibility(&quot;GFlagSelectionView&quot;, true);
++        Desktop::setActiveView(&quot;GFlagSelectionView&quot;);
++    }
++}
++
++void
++LoadingView::loadError()
++{
++    if ( gameconfig-&gt;quickConnect )
++    {
++        GameManager::exitNetPanzer();
++    }
++    else if ( Desktop::getVisible(&quot;LoadingView&quot;) )
++    {
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MainView&quot;, true);
++        GameManager::quitNetPanzerGame();
++    }
++}
++
++void
++LoadingView::show()
++{
++    Desktop::setVisibilityAllWindows(false);
++    Desktop::setVisibility(&quot;LoadingView&quot;, true);
++    View *v = Desktop::getView(&quot;LoadingView&quot;);
++    Desktop::setFocusView(v);
++}
++
++void
++LoadingView::hide()
++{
++    Desktop::setVisibility(&quot;LoadingView&quot;, false);
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -18,22 +18,12 @@
+ #ifndef __LOADINGVIEW_HPP__
+ #define __LOADINGVIEW_HPP__
+ 
++#include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;Views/Components/View.hpp&quot;
+-#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Components/Button.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;Interfaces/GameManager.hpp&quot;
+-
+-#include &quot;Particles/ParticleInterface.hpp&quot;
+-#include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+-
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-
+ #include &lt;list&gt;
+-#include &lt;string&gt;
+ 
+-using namespace std;
+-
+ #define LINELIMIT 100
+ 
+ class Label;
+@@ -42,78 +32,20 @@
+ class LoadingView : public View
+ {
+ public:
+-    static void update(const string text)
+-    {
+-        LOGGER.info(&quot;Loading: %s&quot;, text.c_str());
+-        lines.pop_back();
+-        lines.push_back(text);
+-        dirty=true;
+-    }
+-
+-    static void append(const string text)
+-    {
+-        LOGGER.info(&quot;Loading: %s&quot;, text.c_str());
+-        if ( lines.size() &gt;= LINELIMIT )
+-        {
+-            lines.pop_front();
+-        }
+-        lines.push_back(text);
+-        dirty=true;
+-    }
+-
+     LoadingView()
+     {
+         init();
+     }
+ 
+-    static void loadFinish()
+-    {
+-        Desktop::setVisibilityAllWindows(false);
+-
+-        // XXX rebuild the particle stuff here for units...
+-        ParticleInterface::rebuildUnitParticleData();
+-
+-        // XXX this needed because has to create the special buttons for the
+-        // defined units, has to be here because it has to be the &quot;netp&quot; palette
+-        // and after loading the unit profiles
+-        Desktop::remove(Desktop::getView(&quot;VehicleSelectionView&quot;));
+-        Desktop::add(new VehicleSelectionView());
+-
+-        GameManager::setNetPanzerGameOptions();
+-        Desktop::setVisibility(&quot;MiniMapView&quot;, true);
+-        Desktop::setVisibility(&quot;GameView&quot;, true);
+-        Desktop::setVisibility(&quot;GFlagSelectionView&quot;, true);
+-        Desktop::setActiveView(&quot;GFlagSelectionView&quot;);
+-    }
+-
+-    static void loadError()
+-    {
+-        if ( gameconfig-&gt;quickConnect )
+-        {
+-            GameManager::exitNetPanzer();
+-        }
+-        else
+-        {
+-            Desktop::setVisibilityAllWindows(false);
+-            Desktop::setVisibility(&quot;MainView&quot;, true);
+-        }
+-    }
+-
+-    static void show()
+-    {
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;LoadingView&quot;, true);
+-        View *v = Desktop::getView(&quot;LoadingView&quot;);
+-        Desktop::setFocusView(v);
+-    }
+-
+-    static void hide()
+-    {
+-        Desktop::setVisibility(&quot;LoadingView&quot;, false);
+-    }
+-
+     virtual ~LoadingView() {}
+ 
++    static void update(const NPString&amp; text);
++    static void append(const NPString&amp; text);
++    static void loadFinish();
++    static void loadError();
++    static void show();
++    static void hide();
++
+     virtual void init();
+     virtual void doActivate();
+     virtual void doDeactivate();
+@@ -127,7 +59,7 @@
+     void onComponentClicked(Component* c);
+ 
+ private:
+-    static list&lt;string&gt; lines;
++    static std::list&lt;NPString&gt; lines;
+     static bool dirty;
+ 
+     Surface backgroundSurface;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2012-01-04 16:58:45 UTC (rev 1326)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2012-01-05 11:34:22 UTC (rev 1327)
+@@ -31,7 +31,6 @@
+ 
+ #include &quot;Views/Game/LoadingView.hpp&quot;
+ 
+-
+ ServerListView* serverlistview = 0;
+ 
+ ServerListView::ServerListView()
+@@ -142,12 +141,9 @@
+         } else if(server.status == masterserver::ServerInfo::TIMEOUT) {
+             clientArea.bltString(0,   y, server.address.c_str(), Color::gray);
+             clientArea.bltString(140, y, &quot;timeout&quot;, Color::gray);
+-        } else if(server.protocol &lt; NETPANZER_PROTOCOL_VERSION) {
++        } else if(server.protocol != NETPANZER_PROTOCOL_VERSION) {
+             clientArea.bltString(0,   y, server.address.c_str(), Color::gray);
+-            clientArea.bltString(140, y, &quot;server protocol too old&quot;, Color::gray);
+-        } else if(server.protocol &gt; NETPANZER_PROTOCOL_VERSION) {
+-            clientArea.bltString(0,   y, server.address.c_str(), Color::gray);
+-            clientArea.bltString(140, y, &quot;server protocol too new&quot;, Color::gray);
++            clientArea.bltString(140, y, getNetpanzerProtocolMessage(server.protocol), Color::gray);
+         } else {
+             std::stringstream playerstr;
+             playerstr &lt;&lt; server.players &lt;&lt; &quot;/&quot; &lt;&lt; server.maxplayers;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000352.html">[Netpanzer-cvs] r1326 - in trunk/netpanzer: . src/Lib/ArrayUtil	src/Lib/Network src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000354.html">[Netpanzer-cvs] r1328 - trunk/netpanzer/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#353">[ date ]</a>
+              <a href="thread.html#353">[ thread ]</a>
+              <a href="subject.html#353">[ subject ]</a>
+              <a href="author.html#353">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

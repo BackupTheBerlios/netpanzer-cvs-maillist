@@ -1,0 +1,407 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1155 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1155%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Scripts/bindings%20src/NetPanzer/Scripts/toluapkg&In-Reply-To=%3C200912291437.nBTEbbw9011550%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000182.html">
+   <LINK REL="Next"  HREF="000184.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1155 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1155%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Scripts/bindings%20src/NetPanzer/Scripts/toluapkg&In-Reply-To=%3C200912291437.nBTEbbw9011550%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1155 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 29 15:37:37 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000182.html">[Netpanzer-cvs] r1154 - in trunk/netpanzer: . pics/particles/lights	src/NetPanzer/Particles src/NetPanzer/Weapons
+</A></li>
+        <LI>Next message: <A HREF="000184.html">[Netpanzer-cvs] r1156 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Core Interfaces Particles PowerUps Units	Views/Components Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#183">[ date ]</a>
+              <a href="thread.html#183">[ thread ]</a>
+              <a href="subject.html#183">[ subject ]</a>
+              <a href="author.html#183">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-12-29 15:37:28 +0100 (Tue, 29 Dec 2009)
+New Revision: 1155
+
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/bindings/NetPanzerBindings.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/players.pkg
+Log:
+- Fixed loosing player names after change of map in server.
+- Added command to list players in server.
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2009-12-29 12:47:15 UTC (rev 1154)
++++ trunk/netpanzer/scripts/initialize.lua	2009-12-29 14:37:28 UTC (rev 1155)
+@@ -140,6 +140,29 @@
+         end
+     end,
+ 
++    listplayers_help = &quot;List the players&quot;,
++    listplayers = function(param,player)
++        local playerst;
++        local out;
++        for p = 0,PlayerInterface:getMaxPlayers()-1 do
++            playerst = PlayerInterface:getPlayer(p);
++            if playerst:isConnecting() then
++                if out then
++                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                else
++                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot;.. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                end
++            elseif playerst:isActive() then
++                if out then
++                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                else
++                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                end
++            end
++        end
++        ChatInterface:serversayTo(player, out);
++    end,
++
+     testrules = function(param)
+         test_game_rules();
+     end
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2009-12-29 12:47:15 UTC (rev 1154)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2009-12-29 14:37:28 UTC (rev 1155)
+@@ -126,6 +126,11 @@
+     void setFromNetworkPlayerState(const NetworkPlayerState* state);
+     void setColor( Uint32 index );
+     Uint8 getColor() const;
++
++    bool isFree() const { return status == _player_state_free; }
++    bool isAllocated() const { return status == _player_state_allocated; }
++    bool isConnecting() const { return status == _player_state_connecting; }
++    bool isActive() const { return status == _player_state_active; }
+ };
+ 
+ #endif // ** _PLAYERSTATE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-12-29 12:47:15 UTC (rev 1154)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-12-29 14:37:28 UTC (rev 1155)
+@@ -343,7 +343,6 @@
+ //                char str_buf[128];
+             LoadingView::append(&quot;Map loaded, sending ack...&quot;);
+ 
+-            global_engine_state-&gt;game_manager-&gt;reinitializeGameLogic();
+ //                if ( GameManager::gameMapLoad( &amp;percent_complete ) == false ) {
+ //
+ //                    sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+@@ -371,6 +370,7 @@
+                         case _net_message_class_player:
+                             if ( np.getNetMessage()-&gt;message_id == _net_message_id_player_connect_id )
+                             {
++                                global_engine_state-&gt;game_manager-&gt;reinitializeGameLogic();
+                                 LoadingView::append(&quot;Received my id...&quot;);
+                                 MessageRouter::routePacket(np);
+                                 loop_finished = false;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2009-12-29 12:47:15 UTC (rev 1154)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2009-12-29 14:37:28 UTC (rev 1155)
+@@ -21,6 +21,7 @@
+ #include &lt;SDL_thread.h&gt;
+ #include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
++#include &quot;Classes/Network/NetworkServer.hpp&quot;
+ 
+ class PlayerInterface
+ {
+@@ -59,6 +60,15 @@
+         return max_players;
+     }
+ 
++    static string getPlayerIP(Uint16 player_index)
++    {
++        if ( player_index == getLocalPlayerIndex() )
++        {
++            return &quot;local&quot;;
++        }
++        return NetworkServer::getIP(player_index);
++    }
++
+     static PlayerState* getPlayer(Uint16 player_index)
+     {
+         if ( player_index &lt; max_players )
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/bindings/NetPanzerBindings.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/bindings/NetPanzerBindings.hpp	2009-12-29 12:47:15 UTC (rev 1154)
++++ trunk/netpanzer/src/NetPanzer/Scripts/bindings/NetPanzerBindings.hpp	2009-12-29 14:37:28 UTC (rev 1155)
+@@ -1,6 +1,6 @@
+ /*
+ ** Lua binding: NetPanzer
+-** Generated automatically by tolua++-1.0.92 on Sun Dec 27 14:13:08 2009.
++** Generated automatically by tolua++-1.0.92 on Tue Dec 29 22:34:50 2009.
+ */
+ 
+ #ifndef __cplusplus
+@@ -2143,6 +2143,134 @@
+ }
+ #endif //#ifndef TOLUA_DISABLE
+ 
++/* method: isFree of class  PlayerState */
++#ifndef TOLUA_DISABLE_tolua_NetPanzer_PlayerState_isFree00
++static int tolua_NetPanzer_PlayerState_isFree00(lua_State* tolua_S)
++{
++#ifndef TOLUA_RELEASE
++ tolua_Error tolua_err;
++ if (
++     !tolua_isusertype(tolua_S,1,&quot;const PlayerState&quot;,0,&amp;tolua_err) ||
++     !tolua_isnoobj(tolua_S,2,&amp;tolua_err)
++ )
++  goto tolua_lerror;
++ else
++#endif
++ {
++  const PlayerState* self = (const PlayerState*)  tolua_tousertype(tolua_S,1,0);
++#ifndef TOLUA_RELEASE
++  if (!self) tolua_error(tolua_S,&quot;invalid 'self' in function 'isFree'&quot;, NULL);
++#endif
++  {
++   bool tolua_ret = (bool)  self-&gt;isFree();
++   tolua_pushboolean(tolua_S,(bool)tolua_ret);
++  }
++ }
++ return 1;
++#ifndef TOLUA_RELEASE
++ tolua_lerror:
++ tolua_error(tolua_S,&quot;#ferror in function 'isFree'.&quot;,&amp;tolua_err);
++ return 0;
++#endif
++}
++#endif //#ifndef TOLUA_DISABLE
++
++/* method: isAllocated of class  PlayerState */
++#ifndef TOLUA_DISABLE_tolua_NetPanzer_PlayerState_isAllocated00
++static int tolua_NetPanzer_PlayerState_isAllocated00(lua_State* tolua_S)
++{
++#ifndef TOLUA_RELEASE
++ tolua_Error tolua_err;
++ if (
++     !tolua_isusertype(tolua_S,1,&quot;const PlayerState&quot;,0,&amp;tolua_err) ||
++     !tolua_isnoobj(tolua_S,2,&amp;tolua_err)
++ )
++  goto tolua_lerror;
++ else
++#endif
++ {
++  const PlayerState* self = (const PlayerState*)  tolua_tousertype(tolua_S,1,0);
++#ifndef TOLUA_RELEASE
++  if (!self) tolua_error(tolua_S,&quot;invalid 'self' in function 'isAllocated'&quot;, NULL);
++#endif
++  {
++   bool tolua_ret = (bool)  self-&gt;isAllocated();
++   tolua_pushboolean(tolua_S,(bool)tolua_ret);
++  }
++ }
++ return 1;
++#ifndef TOLUA_RELEASE
++ tolua_lerror:
++ tolua_error(tolua_S,&quot;#ferror in function 'isAllocated'.&quot;,&amp;tolua_err);
++ return 0;
++#endif
++}
++#endif //#ifndef TOLUA_DISABLE
++
++/* method: isConnecting of class  PlayerState */
++#ifndef TOLUA_DISABLE_tolua_NetPanzer_PlayerState_isConnecting00
++static int tolua_NetPanzer_PlayerState_isConnecting00(lua_State* tolua_S)
++{
++#ifndef TOLUA_RELEASE
++ tolua_Error tolua_err;
++ if (
++     !tolua_isusertype(tolua_S,1,&quot;const PlayerState&quot;,0,&amp;tolua_err) ||
++     !tolua_isnoobj(tolua_S,2,&amp;tolua_err)
++ )
++  goto tolua_lerror;
++ else
++#endif
++ {
++  const PlayerState* self = (const PlayerState*)  tolua_tousertype(tolua_S,1,0);
++#ifndef TOLUA_RELEASE
++  if (!self) tolua_error(tolua_S,&quot;invalid 'self' in function 'isConnecting'&quot;, NULL);
++#endif
++  {
++   bool tolua_ret = (bool)  self-&gt;isConnecting();
++   tolua_pushboolean(tolua_S,(bool)tolua_ret);
++  }
++ }
++ return 1;
++#ifndef TOLUA_RELEASE
++ tolua_lerror:
++ tolua_error(tolua_S,&quot;#ferror in function 'isConnecting'.&quot;,&amp;tolua_err);
++ return 0;
++#endif
++}
++#endif //#ifndef TOLUA_DISABLE
++
++/* method: isActive of class  PlayerState */
++#ifndef TOLUA_DISABLE_tolua_NetPanzer_PlayerState_isActive00
++static int tolua_NetPanzer_PlayerState_isActive00(lua_State* tolua_S)
++{
++#ifndef TOLUA_RELEASE
++ tolua_Error tolua_err;
++ if (
++     !tolua_isusertype(tolua_S,1,&quot;const PlayerState&quot;,0,&amp;tolua_err) ||
++     !tolua_isnoobj(tolua_S,2,&amp;tolua_err)
++ )
++  goto tolua_lerror;
++ else
++#endif
++ {
++  const PlayerState* self = (const PlayerState*)  tolua_tousertype(tolua_S,1,0);
++#ifndef TOLUA_RELEASE
++  if (!self) tolua_error(tolua_S,&quot;invalid 'self' in function 'isActive'&quot;, NULL);
++#endif
++  {
++   bool tolua_ret = (bool)  self-&gt;isActive();
++   tolua_pushboolean(tolua_S,(bool)tolua_ret);
++  }
++ }
++ return 1;
++#ifndef TOLUA_RELEASE
++ tolua_lerror:
++ tolua_error(tolua_S,&quot;#ferror in function 'isActive'.&quot;,&amp;tolua_err);
++ return 0;
++#endif
++}
++#endif //#ifndef TOLUA_DISABLE
++
+ /* method: lockPlayerStats of class  PlayerInterface */
+ #ifndef TOLUA_DISABLE_tolua_NetPanzer_PlayerInterface_lockPlayerStats00
+ static int tolua_NetPanzer_PlayerInterface_lockPlayerStats00(lua_State* tolua_S)
+@@ -2431,6 +2559,36 @@
+ }
+ #endif //#ifndef TOLUA_DISABLE
+ 
++/* method: getPlayerIP of class  PlayerInterface */
++#ifndef TOLUA_DISABLE_tolua_NetPanzer_PlayerInterface_getPlayerIP00
++static int tolua_NetPanzer_PlayerInterface_getPlayerIP00(lua_State* tolua_S)
++{
++#ifndef TOLUA_RELEASE
++ tolua_Error tolua_err;
++ if (
++     !tolua_isusertable(tolua_S,1,&quot;PlayerInterface&quot;,0,&amp;tolua_err) ||
++     !tolua_isnumber(tolua_S,2,0,&amp;tolua_err) ||
++     !tolua_isnoobj(tolua_S,3,&amp;tolua_err)
++ )
++  goto tolua_lerror;
++ else
++#endif
++ {
++   int player_index = ((  int)  tolua_tonumber(tolua_S,2,0));
++  {
++   string tolua_ret = (string)  PlayerInterface::getPlayerIP(player_index);
++   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
++  }
++ }
++ return 1;
++#ifndef TOLUA_RELEASE
++ tolua_lerror:
++ tolua_error(tolua_S,&quot;#ferror in function 'getPlayerIP'.&quot;,&amp;tolua_err);
++ return 0;
++#endif
++}
++#endif //#ifndef TOLUA_DISABLE
++
+ /* get function: gametype of class  GameConfig */
+ #ifndef TOLUA_DISABLE_tolua_get_GameConfig_gametype
+ static int tolua_get_GameConfig_gametype(lua_State* tolua_S)
+@@ -3118,6 +3276,10 @@
+    tolua_function(tolua_S,&quot;getTotal&quot;,tolua_NetPanzer_PlayerState_getTotal00);
+    tolua_function(tolua_S,&quot;setColor&quot;,tolua_NetPanzer_PlayerState_setColor00);
+    tolua_function(tolua_S,&quot;getColor&quot;,tolua_NetPanzer_PlayerState_getColor00);
++   tolua_function(tolua_S,&quot;isFree&quot;,tolua_NetPanzer_PlayerState_isFree00);
++   tolua_function(tolua_S,&quot;isAllocated&quot;,tolua_NetPanzer_PlayerState_isAllocated00);
++   tolua_function(tolua_S,&quot;isConnecting&quot;,tolua_NetPanzer_PlayerState_isConnecting00);
++   tolua_function(tolua_S,&quot;isActive&quot;,tolua_NetPanzer_PlayerState_isActive00);
+   tolua_endmodule(tolua_S);
+   tolua_cclass(tolua_S,&quot;PlayerInterface&quot;,&quot;PlayerInterface&quot;,&quot;&quot;,NULL);
+   tolua_beginmodule(tolua_S,&quot;PlayerInterface&quot;);
+@@ -3131,6 +3293,7 @@
+    tolua_function(tolua_S,&quot;getLocalPlayerIndex&quot;,tolua_NetPanzer_PlayerInterface_getLocalPlayerIndex00);
+    tolua_function(tolua_S,&quot;getActivePlayerCount&quot;,tolua_NetPanzer_PlayerInterface_getActivePlayerCount00);
+    tolua_function(tolua_S,&quot;countPlayers&quot;,tolua_NetPanzer_PlayerInterface_countPlayers00);
++   tolua_function(tolua_S,&quot;getPlayerIP&quot;,tolua_NetPanzer_PlayerInterface_getPlayerIP00);
+   tolua_endmodule(tolua_S);
+   tolua_cclass(tolua_S,&quot;GameConfig&quot;,&quot;GameConfig&quot;,&quot;&quot;,NULL);
+   tolua_beginmodule(tolua_S,&quot;GameConfig&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/players.pkg
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/players.pkg	2009-12-29 12:47:15 UTC (rev 1154)
++++ trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/players.pkg	2009-12-29 14:37:28 UTC (rev 1155)
+@@ -22,6 +22,11 @@
+ 
+     void setColor( Uint32 index );
+     IntColor getColor() const;
++
++    bool isFree() const;
++    bool isAllocated() const;
++    bool isConnecting() const;
++    bool isActive() const;
+ };
+ 
+ class PlayerInterface
+@@ -43,5 +48,6 @@
+     static int getActivePlayerCount();
+ 
+     static int countPlayers();
++    static string getPlayerIP(Uint16 player_index);
+ };
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000182.html">[Netpanzer-cvs] r1154 - in trunk/netpanzer: . pics/particles/lights	src/NetPanzer/Particles src/NetPanzer/Weapons
+</A></li>
+	<LI>Next message: <A HREF="000184.html">[Netpanzer-cvs] r1156 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Core Interfaces Particles PowerUps Units	Views/Components Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#183">[ date ]</a>
+              <a href="thread.html#183">[ thread ]</a>
+              <a href="subject.html#183">[ subject ]</a>
+              <a href="author.html#183">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

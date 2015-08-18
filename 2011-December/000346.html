@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1320 - in branches/newpath/src/NetPanzer: Classes	Interfaces System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1320%20-%20in%20branches/newpath/src/NetPanzer%3A%20Classes%0A%09Interfaces%20System&In-Reply-To=%3C20111224072648.C8B36480EB4%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000345.html">
+   <LINK REL="Next"  HREF="000347.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1320 - in branches/newpath/src/NetPanzer: Classes	Interfaces System</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1320%20-%20in%20branches/newpath/src/NetPanzer%3A%20Classes%0A%09Interfaces%20System&In-Reply-To=%3C20111224072648.C8B36480EB4%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1320 - in branches/newpath/src/NetPanzer: Classes	Interfaces System">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec 24 08:26:48 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000345.html">[Netpanzer-cvs] r1319 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces System
+</A></li>
+        <LI>Next message: <A HREF="000347.html">[Netpanzer-cvs] r1321 - trunk/netpanzer/src/NetPanzer/Objectives
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#346">[ date ]</a>
+              <a href="thread.html#346">[ thread ]</a>
+              <a href="subject.html#346">[ subject ]</a>
+              <a href="author.html#346">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-24 08:26:48 +0100 (Sat, 24 Dec 2011)
+New Revision: 1320
+
+Modified:
+   branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.cpp
+   branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.hpp
+   branches/newpath/src/NetPanzer/System/SDLEvents.cpp
+Log:
+merged fix to keyboard from trunk into newpath
+
+Modified: branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-24 06:18:47 UTC (rev 1319)
++++ branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-24 07:26:48 UTC (rev 1320)
+@@ -93,6 +93,8 @@
+     lastSelectTimer.setTimeOut(400);
+     actionTimer.setTimeOut(100);
+     Flagtimer.reset();
++
++    last_selected_group = -1;
+ }
+ 
+ void
+@@ -100,12 +102,14 @@
+ {
+     working_list.copyList( selection_group_lists[ new_list_index ] );
+     working_list.select();
++    last_selected_group = new_list_index;
+ }
+ 
+ void WorldInputCmdProcessor::setSelectionList(unsigned long new_list_index)
+ {
+     selection_group_lists[new_list_index].copyList(working_list);
+     working_list.select();
++    last_selected_group = new_list_index;
+ }
+ 
+ void
+@@ -321,7 +325,7 @@
+ void
+ WorldInputCmdProcessor::evaluateKeyCommands()
+ {
+-    if (KeyboardInterface::isCharPressed('B') 
++    if (KeyboardInterface::getKeyPressed(SDLK_b)
+        &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag()
+        &amp;&amp; ! Desktop::getVisible(&quot;HelpScrollView&quot;) )
+     {
+@@ -334,32 +338,32 @@
+         }
+     }
+     
+-    if (KeyboardInterface::isCharPressed('M')) 
++    if ( KeyboardInterface::getKeyPressed(SDLK_m) )
+     {
+         Desktop::toggleVisibility( &quot;MiniMapView&quot; );
+     }
+     
+-    if ( KeyboardInterface::isCharPressed('O') )
++    if ( KeyboardInterface::getKeyPressed(SDLK_o) )
+     {
+         toggleDisplayOutpostNames();
+     }
+ 
+-    if ( KeyboardInterface::isCharPressed('F') )
++    if ( KeyboardInterface::getKeyPressed(SDLK_f) )
+     {
+         GameConfig::interface_show_flags = !GameConfig::interface_show_flags;
+     }
+ 
+-    if ( KeyboardInterface::isCharPressed('N') )
++    if ( KeyboardInterface::getKeyPressed(SDLK_n) )
+     {
+         GameConfig::interface_show_names = !GameConfig::interface_show_names;
+     }
+ 
+-    if ( KeyboardInterface::isCharPressed('D') )
++    if ( KeyboardInterface::getKeyPressed(SDLK_d) )
+     {
+         GameConfig::interface_show_health = !GameConfig::interface_show_health;
+     }
+ 
+-    if ( KeyboardInterface::isCharPressed('C') )
++    if ( KeyboardInterface::getKeyPressed(SDLK_c) )
+     {
+         static NTimer spamtimer(5000);
+         if (spamtimer.isTimeOut())
+@@ -398,15 +402,14 @@
+         setKeyboardInputModeChatMesg();
+     }
+ 
+-    if ( ( KeyboardInterface::getKeyState( SDLK_LCTRL ) ||
+-            KeyboardInterface::getKeyState( SDLK_RCTRL ) )
+-            &amp;&amp; (KeyboardInterface::isCharPressed('A') ))
++    if ( (KeyboardInterface::getKeyState(SDLK_LCTRL) || KeyboardInterface::getKeyState(SDLK_RCTRL))
++        &amp;&amp; (KeyboardInterface::getKeyPressed(SDLK_a) ))
+     {
+         setKeyboardInputModeAllieChatMesg();
+     }
+ 
+     //If space is pressed, jump to first currently attacked unit
+-    if( KeyboardInterface::getKeyState( SDLK_SPACE ) == true )
++    if( KeyboardInterface::getKeyPressed( SDLK_SPACE ) == true )
+     {
+         jumpLastAttackedUnit();
+     }
+@@ -453,77 +456,53 @@
+ void
+ WorldInputCmdProcessor::evaluateGroupingKeys()
+ {
+-    static const int KeyAzerty[10] = {38, 233, 34, 39, 40, 45, 232, 95, 231, 224};
+-    static const int KeyQwerty[10] = {SDLK_1, SDLK_2, SDLK_3,SDLK_4, SDLK_5, SDLK_6, SDLK_7, SDLK_8, SDLK_9, SDLK_0};
++    int group = -1;
+ 
+-    bool alt_status = false;
+-    bool ctrl_status = false;
++    for (int k = SDLK_0; k &lt;= SDLK_9; ++k )
++    {
++        if ( KeyboardInterface::getKeyPressed(k) )
++        {
++            group = k-SDLK_0;
++            break;
++        }
++    }
+ 
+-    if( (KeyboardInterface::getKeyState(SDLK_LCTRL) == true) ||
+-            (KeyboardInterface::getKeyState(SDLK_RCTRL) == true)) {
+-        ctrl_status = true;
++    if ( group == -1 ) return;
++
++    bool alt_status = KeyboardInterface::getKeyState( SDLK_LALT ) || KeyboardInterface::getKeyState( SDLK_RALT);
++    bool ctrl_status = KeyboardInterface::getKeyState(SDLK_LCTRL) || KeyboardInterface::getKeyState(SDLK_RCTRL);
++
++    if ( ctrl_status &amp;&amp; alt_status ) return; // nothing to do
++
++    if ( ctrl_status )
++    {
++        setSelectionList(group);
++        ConsoleInterface::postMessage(Color::brown, false, 0, &quot;Group %d created&quot;, group ? group : 10);
++        return;
+     }
+ 
+-    if( (KeyboardInterface::getKeyState( SDLK_LALT ) == true) ||
+-            (KeyboardInterface::getKeyState( SDLK_RALT ) == true)
+-      ) {
+-        alt_status = true;
++    if ( alt_status )
++    {
++        cycleSelectedUnits(group);
++        return;
+     }
+ 
+-    unsigned selected_bits=0;
+-    int released=0;
+-    for(int key_code= 0;  key_code&lt;=9; key_code++)
++    // if shift pressed will keep the selected units.
++    if ( !KeyboardInterface::getKeyState(SDLK_LSHIFT) &amp;&amp; !KeyboardInterface::getKeyState(SDLK_RSHIFT) )
+     {
+-        unsigned int b=1 &lt;&lt; (key_code-SDLK_0);
+-        if ( (KeyboardInterface::getKeyState( KeyAzerty[key_code] ) == true) ||
+-                (KeyboardInterface::getKeyState( KeyQwerty[key_code] ) == true) )
+-        {
+-            selected_bits|=key_code+1;
+-        }
+-        else if(current_selection_list_bits&amp;b)
+-        {
+-            // we've released a key
+-            released++;
+-        }
++        working_list.unGroup();
+     }
+ 
+-    if(released==0 &amp;&amp; selected_bits&gt;0 &amp;&amp; selected_bits!=current_selection_list_bits) {
+-        // we've pressed down a number key
+-        if(ctrl_status != true &amp;&amp; alt_status != true &amp;&amp;
+-                !KeyboardInterface::getKeyState(SDLK_LSHIFT) &amp;&amp;
+-                !KeyboardInterface::getKeyState(SDLK_RSHIFT)) {
+-            working_list.unGroup();
+-        }
+-        for(int key_code=0;  key_code&lt;=9; key_code++)
+-        {
+-            if ( (KeyboardInterface::getKeyState( KeyAzerty[key_code] ) == true) ||
+-                    (KeyboardInterface::getKeyState( KeyQwerty[key_code] ) == true) )
+-            {
+-                if(ctrl_status == true)
+-                {
+-                    setSelectionList(key_code);
+-                    ConsoleInterface::postMessage(Color::brown, false, 0, &quot;Group %d created&quot;, key_code+1);
+-                    continue;
+-                }
+-                if(alt_status == true)
+-                {
+-                    cycleSelectedUnits(key_code);
+-                    continue;
+-                }
+-                working_list.addList( selection_group_lists[key_code] );
+-            }
+-        }
+-        if(alt_status != true) {
+-            working_list.select();
+-            if(ctrl_status != true) {
+-                if ( !lastSelectTimer.isTimeOut() ) {
+-                    centerSelectedUnits();
+-                }
+-                lastSelectTimer.reset();
+-            }
+-        }
++    working_list.addList( selection_group_lists[group] );
++    working_list.select();
++
++    if ( last_selected_group == group &amp;&amp; !lastSelectTimer.isTimeOut() )
++    {
++        centerSelectedUnits();
+     }
+-    current_selection_list_bits=selected_bits;
++    lastSelectTimer.reset();
++    last_selected_group = group;
++
+ }
+ 
+ void
+@@ -645,7 +624,6 @@
+         return( select_success );
+     } else {
+         current_selection_list_index = 0xFFFF;
+-        current_selection_list_bits=0;
+         return( select_success );
+     }
+ }
+@@ -806,7 +784,6 @@
+                 working_list.selectUnit(world_pos );
+             }
+ 
+-            current_selection_list_bits=0;
+             current_selection_list_index = 0xFFFF;
+             if (working_list.unit_list.size() &gt; 0)
+             {
+
+Modified: branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-24 06:18:47 UTC (rev 1319)
++++ branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-24 07:26:48 UTC (rev 1320)
+@@ -51,8 +51,8 @@
+ 
+     SelectionList selection_group_lists[10];
+     SelectionList working_list;
++    int last_selected_group;
+     unsigned long current_selection_list_index;
+-    unsigned int current_selection_list_bits;
+     SelectionList target_list;
+ 
+     void switchSelectionList(unsigned long new_list_index);
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.cpp	2011-12-24 06:18:47 UTC (rev 1319)
++++ branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.cpp	2011-12-24 07:26:48 UTC (rev 1320)
+@@ -19,7 +19,6 @@
+ 
+ #include &quot;KeyboardInterface.hpp&quot;
+ 
+-int KeyboardInterface::key_table_unicode[SDLK_LAST];
+ bool KeyboardInterface::key_table[SDLK_LAST];
+ bool KeyboardInterface::previous_key_state[SDLK_LAST];
+ bool KeyboardInterface::textmode;
+@@ -27,31 +26,3 @@
+ int KeyboardInterface::char_buffer[ _CHAR_BUFFER_SIZE ];
+ unsigned long KeyboardInterface::char_buffer_front = 0;
+ unsigned long KeyboardInterface::char_buffer_rear = 0;
+-
+-void KeyboardInterface::sampleKeyboard()
+-{
+-    memcpy(previous_key_state, key_table, sizeof(key_table));
+-}
+-
+-void KeyboardInterface::keyPressed(int scancode, int Unicode)
+-{
+-    key_table_unicode[scancode] = Unicode;
+-    key_table[key_table_unicode[scancode]] = true;
+-}
+-
+-void KeyboardInterface::keyReleased(int scancode)
+-{
+-    key_table[key_table_unicode[scancode]] = false;
+-}
+-
+-bool KeyboardInterface::getKeyPressed(int scanCode)
+-{
+-    if(textmode)
+-	return false;
+-
+-    if (KeyboardInterface::getKeyState(scanCode) == true &amp;&amp;
+-            KeyboardInterface::getPrevKeyState(scanCode) == false)
+-        return true;
+-
+-    return false;
+-}
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.hpp	2011-12-24 06:18:47 UTC (rev 1319)
++++ branches/newpath/src/NetPanzer/Interfaces/KeyboardInterface.hpp	2011-12-24 07:26:48 UTC (rev 1320)
+@@ -28,7 +28,6 @@
+ class KeyboardInterface
+ {
+ protected:
+-    static int key_table_unicode[SDLK_LAST];
+     static bool key_table[SDLK_LAST];
+     static bool previous_key_state[SDLK_LAST];
+     static bool textmode;
+@@ -41,15 +40,30 @@
+     {
+         memset(key_table, 0, sizeof(key_table));
+         memset(previous_key_state, 0, sizeof(previous_key_state));
+-        memset(key_table_unicode, 0, sizeof(key_table_unicode));
+     }
+ 
+-    static void sampleKeyboard();
+-    static void keyPressed(int scancode, int Unicode);
+-    static void keyReleased(int scancode);
++    static void sampleKeyboard()
++    {
++        memcpy(previous_key_state, key_table, sizeof(key_table));
++    }
+ 
+-    static bool getKeyPressed(int scanCode);
++    static void keyPressed(int scancode) { key_table[scancode] = true; }
++    static void keyReleased(int scancode){ key_table[scancode] = false;}
+ 
++    static bool getKeyPressed(int scanCode)
++    {
++        return ! textmode
++               &amp;&amp; KeyboardInterface::getKeyState(scanCode)
++               &amp;&amp; ! KeyboardInterface::getPrevKeyState(scanCode);
++    }
++
++    static bool getKeyReleased(int scanCode)
++    {
++        return ! textmode
++                &amp;&amp; ! KeyboardInterface::getKeyState(scanCode)
++                &amp;&amp; KeyboardInterface::getPrevKeyState(scanCode);
++    }
++
+     static inline bool getKeyState(int scan_code)
+     {
+         return key_table[scan_code];
+@@ -86,23 +100,6 @@
+         return true;
+     }
+    
+-   static inline bool isCharPressed(char c)
+-    {
+-        if ( char_buffer_front == char_buffer_rear )
+-            return false;
+-
+-        int buffer_front;
+-    
+-        buffer_front = ( char_buffer_front + 1 ) &amp; _CHAR_BUFFER_MOD;
+-        if (char_buffer[ buffer_front ] == 0)
+-        {
+-            buffer_front = ( char_buffer_front + 2 ) &amp; _CHAR_BUFFER_MOD;
+-        }
+-        char car = toupper(char_buffer[ buffer_front ]);
+-        if (c == car) return true;
+-        return false;
+-    }
+-
+     static inline void putChar(int c)
+     {
+         char_buffer[ (char_buffer_rear + 1) &amp; _CHAR_BUFFER_MOD ] = c;
+
+Modified: branches/newpath/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/System/SDLEvents.cpp	2011-12-24 06:18:47 UTC (rev 1319)
++++ branches/newpath/src/NetPanzer/System/SDLEvents.cpp	2011-12-24 07:26:48 UTC (rev 1320)
+@@ -27,18 +27,6 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+-void Translate_Sym(SDL_KeyboardEvent *key)
+-{
+-    if(((key-&gt;keysym.unicode) != 0) &amp;&amp; (key-&gt;keysym.unicode &lt; 256) )
+-    {
+-        KeyboardInterface::keyPressed(key-&gt;keysym.sym, key-&gt;keysym.unicode);
+-    }
+-    else
+-    {
+-        KeyboardInterface::keyPressed(key-&gt;keysym.sym, key-&gt;keysym.sym);
+-    }     
+-}
+-
+ bool handleSDLEvents()
+ {
+     static SDL_Event event;
+@@ -59,24 +47,32 @@
+             MouseInterface::onMouseMoved(&amp;event.motion);
+             break;
+         case SDL_KEYDOWN: {
+-                
+-                Translate_Sym(&amp;event.key);
+-                char c = event.key.keysym.unicode &amp; 0x7F;
+-                if (isprint(c)) {
+-                    KeyboardInterface::putChar(c);
+-                } else {
+-                    // it's not a normal char put the 0 into the char buffer to
+-                    // indicate extended chars...
+-                    KeyboardInterface::putChar(0);
+-                    c = (event.key.keysym.unicode &amp; 0x7F) + 96;
+-                    // if key into a to z then put unicode and 96
+-                    if ((event.key.keysym.sym &gt; 96) &amp;&amp; (event.key.keysym.sym &lt; 123)) 
+-                        KeyboardInterface::putChar(c);
+-                    else KeyboardInterface::putChar(event.key.keysym.sym);
++//                LOGGER.debug(&quot;Pressed key : scancode[%x] unicode[%x]&quot;, event.key.keysym.sym, event.key.keysym.unicode);
++                KeyboardInterface::keyPressed(event.key.keysym.sym);
++
++                if ( (event.key.keysym.unicode &amp; 0xFF80) == 0 )
++                {
++                  char c = event.key.keysym.unicode &amp; 0x7F;
++                  if ( isprint(c) )
++                  {
++                      KeyboardInterface::putChar(c);
++                  }
++                  else
++                  {
++                      // extended chars, first push a 0
++                      KeyboardInterface::putChar(0);
++                      KeyboardInterface::putChar(event.key.keysym.sym);
++                  }
+                 }
++                else
++                {
++                    // international character ignored for now
++                }
++
+                 break;
+             }
+         case SDL_KEYUP:
++//            LOGGER.debug(&quot;Released key: scancode[%x] unicode[%x]&quot;, event.key.keysym.sym, event.key.keysym.unicode);
+             KeyboardInterface::keyReleased(event.key.keysym.sym);
+             break;
+        
+@@ -95,4 +91,4 @@
+     }
+ 
+     return false;
+-}
+\ No newline at end of file
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000345.html">[Netpanzer-cvs] r1319 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces System
+</A></li>
+	<LI>Next message: <A HREF="000347.html">[Netpanzer-cvs] r1321 - trunk/netpanzer/src/NetPanzer/Objectives
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#346">[ date ]</a>
+              <a href="thread.html#346">[ thread ]</a>
+              <a href="subject.html#346">[ subject ]</a>
+              <a href="author.html#346">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

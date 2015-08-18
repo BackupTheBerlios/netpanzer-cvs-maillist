@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1071 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1071%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Units%20Views/Game&In-Reply-To=%3C200809221546.m8MFkbjk008377%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000106.html">
+   <LINK REL="Next"  HREF="000108.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1071 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1071%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Units%20Views/Game&In-Reply-To=%3C200809221546.m8MFkbjk008377%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1071 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 22 17:46:37 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000106.html">[Netpanzer-cvs] r1070 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000108.html">[Netpanzer-cvs] r1072 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Units Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#107">[ date ]</a>
+              <a href="thread.html#107">[ thread ]</a>
+              <a href="subject.html#107">[ subject ]</a>
+              <a href="author.html#107">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-22 17:46:25 +0200 (Mon, 22 Sep 2008)
+New Revision: 1071
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+- Fix problem of units not able to move to some places (like capturing an outpost). The fix is in the client, the server is not affected by this problem.
+- Removed unneeded respawn commands when a client connects, is up to the rules manager to it (right now always respawn)
+- Added shadows to player names in rank window.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2008-09-22 11:18:01 UTC (rev 1070)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2008-09-22 15:46:25 UTC (rev 1071)
+@@ -460,7 +460,7 @@
+ 
+     PowerUpInterface::syncPowerUps( connect_client );
+ 
+-    GameManager::spawnPlayer( connect_client-&gt;getPlayerIndex() );
++    //GameManager::spawnPlayer( connect_client-&gt;getPlayerIndex() );
+ 
+     PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-22 11:18:01 UTC (rev 1070)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-22 15:46:25 UTC (rev 1071)
+@@ -374,7 +374,7 @@
+     player_state-&gt;setName(playername);
+     player_state-&gt;setFlag((unsigned char) gameconfig-&gt;playerflag);
+     
+-    GameManager::spawnPlayer( PlayerInterface::getLocalPlayerIndex() );
++    //GameManager::spawnPlayer( PlayerInterface::getLocalPlayerIndex() );
+     
+     LoadingView::update( &quot;Spawning Player ... (100%)&quot; );
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.hpp	2008-09-22 11:18:01 UTC (rev 1070)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.hpp	2008-09-22 15:46:25 UTC (rev 1071)
+@@ -25,6 +25,7 @@
+ {
+ protected:
+     friend class Vehicle;
++    friend class UnitInterface; // for unmark unit hack
+     
+     static BitArray unit_loc_map;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2008-09-22 11:18:01 UTC (rev 1070)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2008-09-22 15:46:25 UTC (rev 1071)
+@@ -43,6 +43,7 @@
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;UnitBlackBoard.hpp&quot;
+ 
+ 
+ //UnitList * UnitInterface::unit_lists;
+@@ -776,11 +777,12 @@
+                             create_mesg-&gt;getUnitID());
+             return;
+         }
+-        UnitBase* unit = newUnit(create_mesg-&gt;unit_type,
+-                iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                player_index,
+-                create_mesg-&gt;getUnitID());
++        iXY unitpos(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY());
++        UnitBase* unit = newUnit(create_mesg-&gt;unit_type, unitpos,
++                                 player_index, create_mesg-&gt;getUnitID());
+         addNewUnit(unit);
++        // remove unit from blackboard in client (we are client here)
++        UnitBlackBoard::unmarkUnitLoc( unitpos );
+     } catch(std::exception&amp; e) {
+         LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't create new unit '%s'&quot;, e.what());
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2008-09-22 11:18:01 UTC (rev 1070)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2008-09-22 15:46:25 UTC (rev 1071)
+@@ -56,17 +56,17 @@
+ 
+     unsigned xOffset = 0;
+     unsigned yOffset = 16;
+-    add( new Label( xOffset, yOffset, &quot;Name&quot;, Color::red) );
++    add( new Label( xOffset, yOffset, &quot;Name&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_NAME_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Flag&quot;, Color::red) );
++    add( new Label( xOffset, yOffset, &quot;Flag&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_FLAG_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Kills&quot;, Color::red) );
++    add( new Label( xOffset, yOffset, &quot;Kills&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_KILLS_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Losses&quot;, Color::red) );
++    add( new Label( xOffset, yOffset, &quot;Losses&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_LOSSES_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Points&quot;, Color::red) );
++    add( new Label( xOffset, yOffset, &quot;Points&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_POINTS_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Objective&quot;, Color::red) );
++    add( new Label( xOffset, yOffset, &quot;Objective&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_POINTS_CHARS*CHAR_XPIX;
+ 
+     // Define the scrollBar fot this view.
+@@ -167,7 +167,7 @@
+                 &quot;%-20s%10i%7i%6i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+-        dest.bltString(offset.x, offset.y, statBuf, state-&gt;getColor());
++        dest.bltStringShadowed(offset.x, offset.y, statBuf, state-&gt;getColor(), Color::gray64);
+         
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         flag-&gt;blt( dest, flagOffset.x, flagOffset.y );
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000106.html">[Netpanzer-cvs] r1070 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000108.html">[Netpanzer-cvs] r1072 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Units Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#107">[ date ]</a>
+              <a href="thread.html#107">[ thread ]</a>
+              <a href="subject.html#107">[ subject ]</a>
+              <a href="author.html#107">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

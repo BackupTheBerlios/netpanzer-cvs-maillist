@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1274 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1274%20-%0A%09trunk/netpanzer/src/NetPanzer/Classes/Network&In-Reply-To=%3C20111028215049.E6C60481468%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000299.html">
+   <LINK REL="Next"  HREF="000301.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1274 -	trunk/netpanzer/src/NetPanzer/Classes/Network</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1274%20-%0A%09trunk/netpanzer/src/NetPanzer/Classes/Network&In-Reply-To=%3C20111028215049.E6C60481468%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1274 -	trunk/netpanzer/src/NetPanzer/Classes/Network">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 28 23:50:49 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000299.html">[Netpanzer-cvs] r1273 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000301.html">[Netpanzer-cvs] r1275 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#300">[ date ]</a>
+              <a href="thread.html#300">[ thread ]</a>
+              <a href="subject.html#300">[ subject ]</a>
+              <a href="author.html#300">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-28 23:50:49 +0200 (Fri, 28 Oct 2011)
+New Revision: 1274
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+Log:
+Add message for ipFilter when client refused by server 
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-10-27 08:23:56 UTC (rev 1273)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-10-28 21:50:49 UTC (rev 1274)
+@@ -230,6 +230,11 @@
+             LoadingView::append( &quot;Connect Failure: Server Full&quot; );
+         }
+         break;
++
++    case _connect_result_server_already_connected : {
++            LoadingView::append( &quot;Connect Failure: You are aready connected&quot; );
++        }
++        break;
+     } // ** switch
+ 
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-10-27 08:23:56 UTC (rev 1273)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-10-28 21:50:49 UTC (rev 1274)
+@@ -102,7 +102,8 @@
+ 
+ enum { _connect_result_success,
+        _connect_result_server_busy,
+-       _connect_result_server_full
++       _connect_result_server_full,
++       _connect_result_server_already_connected
+      };
+ 
+ class ClientConnectResult : public NetMessage
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-27 08:23:56 UTC (rev 1273)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-28 21:50:49 UTC (rev 1274)
+@@ -232,8 +232,13 @@
+             ClientConnectResult connect_result;
+ 
+             PlayerState * player = PlayerInterface::allocateNewPlayer();
+-            if ( player == 0 )
++            if ((GameConfig::game_allowmultiip == false) &amp;&amp; 
++               (SERVER-&gt;isAlreadyConnected(connect_client) == true))
+             {
++                connect_result.result_code = _connect_result_server_already_connected;
++            }
++            else if ( player == 0 )
++            {
+                 connect_result.result_code = _connect_result_server_full;
+             }
+             else
+@@ -788,13 +793,8 @@
+ 
+     join_request_ack.setResultCode(_join_request_result_success);
+ 
+-
+-    if ((GameConfig::game_allowmultiip == false) &amp;&amp; (SERVER-&gt;isAlreadyConnected(packet-&gt;fromClient) == true))
++    if ( join_request_mesg-&gt;getProtocolVersion() != NETPANZER_PROTOCOL_VERSION )
+     {
+-        join_request_ack.setResultCode(_join_request_result_already_connected);
+-    }
+-    else if ( join_request_mesg-&gt;getProtocolVersion() != NETPANZER_PROTOCOL_VERSION )
+-    {
+         join_request_ack.setResultCode(_join_request_result_invalid_protocol);
+     }
+     else
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000299.html">[Netpanzer-cvs] r1273 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000301.html">[Netpanzer-cvs] r1275 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#300">[ date ]</a>
+              <a href="thread.html#300">[ thread ]</a>
+              <a href="subject.html#300">[ subject ]</a>
+              <a href="author.html#300">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

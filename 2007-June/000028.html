@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r983 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r983%20-%20in%20branches/netpanzer-0.8%3A%20.%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200706011534.l51FYc7P004984%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000029.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r983 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r983%20-%20in%20branches/netpanzer-0.8%3A%20.%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200706011534.l51FYc7P004984%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r983 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun  1 17:34:38 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000029.html">[Netpanzer-cvs] r984 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-01 17:34:37 +0200 (Fri, 01 Jun 2007)
+New Revision: 983
+
+Modified:
+   branches/netpanzer-0.8/configure.ac
+   branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+Hack to show something while resolving masterservers (in join view)
+
+Modified: branches/netpanzer-0.8/configure.ac
+===================================================================
+--- branches/netpanzer-0.8/configure.ac	2007-05-31 14:17:15 UTC (rev 982)
++++ branches/netpanzer-0.8/configure.ac	2007-06-01 15:34:37 UTC (rev 983)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [0.8.2-rc3], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [0.8.2-rc4], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2007-05-31 14:17:15 UTC (rev 982)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2007-06-01 15:34:37 UTC (rev 983)
+@@ -31,6 +31,8 @@
+ #include &quot;NetworkServer.hpp&quot;
+ #include &quot;Server.hpp&quot;
+ #include &quot;Client.hpp&quot;
++// XXX ultrahack
++#include &quot;ScreenSurface.hpp&quot;
+ 
+ static int previousSessionType = _game_session_join;
+ 
+@@ -65,6 +67,8 @@
+ 
+         Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+         Desktop::setVisibility(&quot;ServerListView&quot;, true);
++        Desktop::draw(*screen); // XXX ultrahack
++        screen-&gt;copyToVideoFlip(); // XXX uberhack
+         serverlistview-&gt;refresh();
+     }
+ }
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-05-31 14:17:15 UTC (rev 982)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-01 15:34:37 UTC (rev 983)
+@@ -101,7 +101,12 @@
+     }
+     
+     if(serverlist.empty()) {
+-        const char* msg = queryThread-&gt;getStateMessage();
++        const char* msg;
++        if ( queryThread ) {
++            msg = queryThread-&gt;getStateMessage();
++        } else {
++            msg = &quot;Resolving masterserver address&quot;;
++        }
+         clientArea.bltString(0, 0, msg, Color::white);
+         View::doDraw(windowArea, clientArea);
+         return;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000029.html">[Netpanzer-cvs] r984 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1150 - in trunk/netpanzer/src/NetPanzer:	Interfaces Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1150%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Units&In-Reply-To=%3C200912190346.nBJ3kl61028616%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000179.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1150 - in trunk/netpanzer/src/NetPanzer:	Interfaces Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1150%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Units&In-Reply-To=%3C200912190346.nBJ3kl61028616%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1150 - in trunk/netpanzer/src/NetPanzer:	Interfaces Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec 19 04:46:47 CET 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000179.html">[Netpanzer-cvs] r1151 - in trunk/netpanzer: . scripts src/Lib	src/Lib/2D src/Lib/Util src/Lib/toluapp src/NetPanzer/Classes	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Scripts src/NetPanzer/Scripts/bindings	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-12-19 04:46:39 +0100 (Sat, 19 Dec 2009)
+New Revision: 1150
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+Log:
+- Fix switching of map, was broken with new code.
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2009-11-08 11:57:31 UTC (rev 1149)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2009-12-19 03:46:39 UTC (rev 1150)
+@@ -250,26 +250,10 @@
+ 
+     NetworkState::updateNetworkStats();
+ 
+-    if ( global_game_state-&gt;unit_manager )
+-    {
+-        global_game_state-&gt;unit_manager-&gt;updateUnitStatus();
+-    }
+-
+-    ProjectileInterface::updateStatus();
+-    ObjectiveInterface::updateObjectiveStatus();
+-    PowerUpInterface::updateState();
+-    PathScheduler::run();
+-
+-    Physics::sim();
+-
+-    ParticleSystem2D::simAll();
+-    Particle2D::simAll();
+-
+ //    GameControlRulesDaemon::updateGameControlFlow(); // moved up
+ 
+     NetworkServer::sendRemaining();
+     NetworkClient::sendRemaining();
+-    BotManager::simBots();
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::inputLoop()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-11-08 11:57:31 UTC (rev 1149)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-12-19 03:46:39 UTC (rev 1150)
+@@ -33,6 +33,13 @@
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ 
++#include &quot;Weapons/ProjectileInterface.hpp&quot;
++#include &quot;PowerUps/PowerUpInterface.hpp&quot;
++#include &quot;Interfaces/PathScheduler.hpp&quot;
++#include &quot;Particles/Physics.hpp&quot;
++#include &quot;Particles/ParticleSystem2D.hpp&quot;
++#include &quot;Bot/BotManager.hpp&quot;
++
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Classes/Network/GameControlNetMessage.hpp&quot;
+@@ -70,7 +77,8 @@
+        _map_cycle_client_load_map,
+        _map_cycle_client_wait_for_resetgamelogic_or_connectid,
+        _map_cycle_client_wait_complete_connect,
+-       _map_cycle_client_wait_for_respawn_ack
++       _map_cycle_client_wait_for_respawn_ack,
++       _map_cycle_client_state_in_progress
+    };
+ 
+ enum { _execution_mode_loop_back_server,
+@@ -387,6 +395,11 @@
+                             }
+                             break;
+                         default:
++                            char buf[1024];
++                            snprintf(buf,sizeof(buf), &quot;Received unknown packet: %d:%d&quot;,
++                                        np.getNetMessage()-&gt;message_class,
++                                        np.getNetMessage()-&gt;message_id);
++                            LoadingView::append(buf);
+                             // TODO fail here if message is not expected
+                             ;
+                     }
+@@ -400,7 +413,7 @@
+             {
+                 LoadingView::loadFinish();
+                 map_cycle_fsm_client_respawn_ack_flag = false;
+-                map_cycle_fsm_client_state = _map_cycle_client_idle;
++                map_cycle_fsm_client_state = _map_cycle_client_state_in_progress;
+             }
+             break;
+ 
+@@ -415,13 +428,29 @@
+                         &amp;&amp; ((ConnectProcessStateMessage*)np.getNetMessage())-&gt;getMessageEnum() == _connect_state_sync_complete
+                        )
+                     {
+-                        map_cycle_fsm_client_state = _map_cycle_client_idle;
++                        map_cycle_fsm_client_state = _map_cycle_client_state_in_progress;
+                     }
+ 
+                     MessageRouter::routePacket(np);
+                 }
+             }
+             break;
++        case _map_cycle_client_state_in_progress:
++//            if ( global_game_state-&gt;unit_manager )
++//            {
++                global_game_state-&gt;unit_manager-&gt;updateUnitStatus();
++//            }
++
++            ProjectileInterface::updateStatus();
++            ObjectiveInterface::updateObjectiveStatus();
++            PowerUpInterface::updateState();
++            PathScheduler::run();
++
++            Physics::sim();
++
++            ParticleSystem2D::simAll();
++            Particle2D::simAll();
++            break;
+     } // ** switch
+ 
+     }
+@@ -557,8 +586,8 @@
+                 {
+                     ConsoleInterface::postMessage(Color::white, false, 0, &quot;Resetting game logic.&quot;);
+                     SystemResetGameLogic reset_game_logic_mesg;
++                    NetworkServer::broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
+                     global_engine_state-&gt;game_manager-&gt;resetGameLogic();
+-                    NetworkServer::broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
+                 }
+ 
+                 GameManager::respawnAllPlayers();
+@@ -577,6 +606,23 @@
+             break;
+ 
+         case _map_cycle_server_state_in_progress:
++//            if ( global_game_state-&gt;unit_manager )
++//            {
++                global_game_state-&gt;unit_manager-&gt;updateUnitStatus();
++//            }
++
++            ProjectileInterface::updateStatus();
++            ObjectiveInterface::updateObjectiveStatus();
++            PowerUpInterface::updateState();
++            PathScheduler::run();
++
++            Physics::sim();
++
++            ParticleSystem2D::simAll();
++            Particle2D::simAll();
++
++            BotManager::simBots();
++
+             checkGameRules();
+             break;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2009-11-08 11:57:31 UTC (rev 1149)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2009-12-19 03:46:39 UTC (rev 1150)
+@@ -193,7 +193,8 @@
+     ParticleInterface::initParticleSystems();
+ 
+     ParticleInterface::addCloudParticle(gameconfig-&gt;cloudcoverage);
+-    Physics::wind.setVelocity(gameconfig-&gt;windspeed, 107);}
++    Physics::wind.setVelocity(gameconfig-&gt;windspeed, 107);
++}
+ 
+ // ******************************************************************
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-11-08 11:57:31 UTC (rev 1149)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-12-19 03:46:39 UTC (rev 1150)
+@@ -115,7 +115,7 @@
+ 
+     UnitList &amp; getBucket(const unsigned int bucket_index)
+     {
+-        assert( bucket_index &lt; getSize() );
++//        assert( bucket_index &lt; getSize() );
+         return( buckets[ bucket_index ] );
+     }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000179.html">[Netpanzer-cvs] r1151 - in trunk/netpanzer: . scripts src/Lib	src/Lib/2D src/Lib/Util src/Lib/toluapp src/NetPanzer/Classes	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Scripts src/NetPanzer/Scripts/bindings	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

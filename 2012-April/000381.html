@@ -1,0 +1,533 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1357 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1357%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120427132206.7A5D655B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000380.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1357 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1357%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120427132206.7A5D655B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1357 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Fri Apr 27 15:22:06 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000380.html">[Netpanzer-cvs] r1356 - in trunk/netpanzer: pics/default	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Units src/NetPanzer/Views/Components	src/NetPanzer/Views/Game
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#381">[ date ]</a>
+              <a href="thread.html#381">[ thread ]</a>
+              <a href="subject.html#381">[ subject ]</a>
+              <a href="author.html#381">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-04-27 15:22:05 +0200 (Fri, 27 Apr 2012)
+New Revision: 1357
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+Log:
+TeamMode : 
+ - Add team flag on list (Teamview)
+ - Add team in End of round view
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-04-27 09:55:16 UTC (rev 1356)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-04-27 13:22:05 UTC (rev 1357)
+@@ -117,12 +117,29 @@
+     return Teams_lists[team_id].getTeamScore();
+ }
+ 
++Uint8 TeamManager::getTeamWin()
++{
++    long Score = 0;
++    Uint8 teamWin = 0;
++    
++    for (Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        Score = Teams_lists[team_id].getTeamScore();
++        if (Score &lt; Teams_lists[team_id].getTeamScore()) 
++        {
++            teamWin = team_id;
++            Score = Teams_lists[team_id].getTeamScore();
++        }
++    }
++    return teamWin;
++}
++
+ const std::string&amp; TeamManager::getTeamName( Uint8 team_id )
+ {
+     return Teams_lists[team_id].getName();
+ }
+ 
+-void TeamManager::drawFlag(Uint8 team_id, Surface &amp;dest, int x, int y)
++void TeamManager::drawFlag(Uint8 team_id, Surface&amp; dest, int x, int y)
+ {
+     Teams_lists[team_id].drawFlag(dest, x, y);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-04-27 09:55:16 UTC (rev 1356)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-04-27 13:22:05 UTC (rev 1357)
+@@ -39,9 +39,10 @@
+     static iXY getPlayerSpawnPoint(PlayerID player_id);
+ 
+     static long getTeamScore( Uint8 team_id );
++    static Uint8 getTeamWin();
+     static const std::string&amp; getTeamName( Uint8 team_id );
+     static bool testRuleScoreLimit( long score_limit );
+-    static void drawFlag(Uint8 team_id, Surface &amp;dest, int x, int y);
++    static void drawFlag( Uint8 team_id, Surface &amp;dest, int x, int y);
+     
+     static void PlayerrequestchangeTeam(PlayerID player_id, Uint8 newteam);
+     static void serverrequestchangeTeam(PlayerID player_id, Uint8 team_idx);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-04-27 09:55:16 UTC (rev 1356)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-04-27 13:22:05 UTC (rev 1357)
+@@ -1,39 +1,33 @@
+ /*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++Copyright (C) 2009 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &quot;Resources/ResourceManager.hpp&quot;
+ 
+-#include &lt;vector&gt;
+-#include &lt;algorithm&gt;
+-
+-#include &quot;Util/Exception.hpp&quot;
+ #include &quot;EndRoundView.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/TeamManager.hpp&quot;
+-#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
++#include &quot;Views/Components/cButton.hpp&quot;
+ 
+-#include &quot;Views/Components/Label.hpp&quot;
+-#include &quot;Views/Components/ViewGlobals.hpp&quot;
+-
+ #define HEADER_HEIGHT 70
+ #define ENTRY_HEIGHT 20
+ 
+@@ -51,11 +45,11 @@
+ #define WINDOW_WIDTH (TABLE_HEADER_PIX_LEN + ((DEFAULT_BORDER_SIZE+TABLE_BORDER) * 2 ) + 14+2)
+ 
+ static const char * table_header =
+-        &quot;      Name                 Frags Deaths Points Objs.&quot;;
++    &quot;      Name                 Frags Deaths Points Objs.&quot;;
+ 
+ static const char * stats_format = &quot;%-20s%6i%7i%7i%6i&quot;;
+ 
+-EndRoundView::EndRoundView() : SpecialButtonView()
++EndRoundView::EndRoundView() : GameTemplateView()
+ {
+     setSearchName(&quot;EndRoundView&quot;);
+     setTitle(&quot;Round stats&quot;);
+@@ -94,12 +88,13 @@
+     unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
+     clientArea.BltRoundRect(RectWinner, 14, Palette::green256.getColorArray());
+     clientArea.RoundRect(RectWinner,14, Color::gray);
+-    
++
+     clientArea.BltRoundRect(RectStates, 14, Palette::darkGray256.getColorArray());
+     clientArea.RoundRect(RectStates, 14, Color::gray);
+-    
+-    drawPlayerStats(clientArea, flagHeight);
+ 
++    if (GameConfig::game_teammode) drawTeamStats(clientArea, flagHeight);
++    else drawPlayerStats(clientArea, flagHeight);
++
+     View::doDraw(viewArea, clientArea);
+ } // end doDraw
+ 
+@@ -107,7 +102,8 @@
+     : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+ {
+ public:
+-    bool operator() (const PlayerState* state1, const PlayerState* state2) {
++    bool operator() (const PlayerState* state1, const PlayerState* state2)
++    {
+         return state1-&gt;getTotal() &gt; state2-&gt;getTotal();
+     }
+ };
+@@ -116,24 +112,15 @@
+     : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+ {
+ public:
+-    bool operator() (const PlayerState* state1, const PlayerState* state2) {
++    bool operator() (const PlayerState* state1, const PlayerState* state2)
++    {
+         int p1 = state1-&gt;getObjectivesHeld();
+         int p2 = state2-&gt;getObjectivesHeld();
+         return p1 &gt; p2 || (p1 == p2 &amp;&amp; state1-&gt;getTotal() &gt; state2-&gt;getTotal() );
+     }
+ };
+ 
+-class StatesSortByTeam
+-    : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+-{
+-public:
+-    bool operator() (const PlayerState* state1, const PlayerState* state2)
+-    {
+-            return state1-&gt;getTeamID() &lt; state2-&gt;getTeamID();
+-    }
+-};
+ 
+-
+ // drawPlayerStats
+ //---------------------------------------------------------------------------
+ // Purpose:
+@@ -152,25 +139,20 @@
+             states.push_back(state);
+         }
+     }
+-    if (GameConfig::game_teammode)
+-    {
+-        std::sort(states.begin(), states.end(), StatesSortByTeam());
+-    }
+-    else
+     switch(GameConfig::game_gametype)
+     {
+-        case _gametype_objective:
+-            std::sort(states.begin(), states.end(), StatesSortByObjectives());
+-            break;
+-        case _gametype_timelimit:
+-        case _gametype_fraglimit:
+-            std::sort(states.begin(), states.end(), StatesSortByPoints());
+-            break;
++    case _gametype_objective:
++        std::sort(states.begin(), states.end(), StatesSortByObjectives());
++        break;
++    case _gametype_timelimit:
++    case _gametype_fraglimit:
++        std::sort(states.begin(), states.end(), StatesSortByPoints());
++        break;
+     }
+ 
+     const PlayerState* Winner = states.front();
+     snprintf(statBuf, sizeof(statBuf),
+-            &quot;Winner is %s&quot;, Winner-&gt;getName().substr(0,20).c_str());
++             &quot;Winner is %s&quot;, Winner-&gt;getName().substr(0,20).c_str());
+     dest.bltStringCenteredInRect(RectWinner,statBuf, Color::yellow);
+ 
+ 
+@@ -185,24 +167,25 @@
+     ++cur_state;
+ 
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+-            i != states.end(); ++i) {
++            i != states.end(); ++i)
++    {
+         const PlayerState* state = *i;
+ 
+         snprintf(statBuf, sizeof(statBuf),
+-                stats_format, state-&gt;getName().substr(0,20).c_str(),
+-                state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+-                state-&gt;getObjectivesHeld());
++                 stats_format, state-&gt;getName().substr(0,20).c_str(),
++                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
++                 state-&gt;getObjectivesHeld());
+         dest.bltStringShadowed(NAME_START, cur_line_pos, statBuf,
+                                (cur_state == selected_line)?Color::yellow:Color::gray224,
+                                Color::gray64);
+-        
++
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         flag-&gt;blt( dest, FLAG_START, flag_pos );
+         if ( state-&gt;getID() != PlayerInterface::getLocalPlayerIndex() )
+         {
+             // XXX ALLY
+             bool meWithHim = PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), state-&gt;getID());
+-            bool himWithMe = PlayerInterface::isSingleAllied(state-&gt;getID(), PlayerInterface::getLocalPlayerIndex());            
++            bool himWithMe = PlayerInterface::isSingleAllied(state-&gt;getID(), PlayerInterface::getLocalPlayerIndex());
+             if ( meWithHim &amp;&amp; himWithMe )
+             {
+                 allyImage.bltTrans(dest, ALLY_START, flag_pos );
+@@ -230,6 +213,85 @@
+ 
+ }
+ 
++class StatesSortByTeam
++    : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
++{
++public:
++    bool operator() (const PlayerState* state1, const PlayerState* state2)
++    {
++        return state1-&gt;getTeamID() &lt; state2-&gt;getTeamID();
++    }
++};
++
++void EndRoundView::drawTeamStats(Surface&amp; dest, unsigned int flagHeight)
++{
++    char statBuf[256];
++
++    states.clear();
++    PlayerID i;
++    for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
++    {
++        PlayerState* state = PlayerInterface::getPlayer(i);
++        if( state-&gt;isActive() )
++        {
++            states.push_back(state);
++        }
++    }
++    std::sort(states.begin(), states.end(), StatesSortByTeam());
++
++    Uint8 TeamWin = TeamManager::getTeamWin();
++
++    TeamManager::drawFlag(TeamWin, dest, RectWinner.min.x+(RectWinner.getSizeX()/2)-7, RectWinner.min.y+5 );
++
++    snprintf(statBuf, sizeof(statBuf),
++             &quot;Winner is Team %s&quot;, TeamManager::getTeamName(TeamWin).substr(0,20).c_str());
++    dest.bltStringCenteredInRect(RectWinner,statBuf, Color::yellow);
++
++    int cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
++    int flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
++    Surface * flag = 0;
++    int cur_state = 0;
++
++    dest.bltString(0, cur_line_pos, table_header, Color::gray);
++    cur_line_pos += ENTRY_HEIGHT;
++    flag_pos += ENTRY_HEIGHT;
++    ++cur_state;
++    int current_Team = 0;
++
++    for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
++            i != states.end(); ++i)
++    {
++        const PlayerState* state = *i;
++
++        if (current_Team != state-&gt;getTeamID())
++        {
++            cur_line_pos += ENTRY_HEIGHT;
++            dest.drawLine(RectStates.min.x+10, cur_line_pos-10, RectStates.max.x-10, cur_line_pos-10, Color::lightGreen);
++            flag_pos += ENTRY_HEIGHT;
++            current_Team = state-&gt;getTeamID();
++        }
++
++        snprintf(statBuf, sizeof(statBuf),
++                 stats_format, state-&gt;getName().substr(0,20).c_str(),
++                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
++                 state-&gt;getObjectivesHeld());
++        dest.bltStringShadowed(NAME_START, cur_line_pos, statBuf,
++                               Color::gray224,
++                               Color::gray64);
++
++        TeamManager::drawFlag(current_Team, dest, FLAG_START-20, flag_pos );
++        flag = ResourceManager::getFlag(state-&gt;getFlag());
++        flag-&gt;blt( dest, FLAG_START, flag_pos );
++
++        colorImage.bltTransColor(dest, TABLE_HEADER_PIX_LEN+5, flag_pos, state-&gt;getColor());
++
++        cur_line_pos += ENTRY_HEIGHT;
++        flag_pos += ENTRY_HEIGHT;
++        ++cur_state;
++    }
++
++}
++
+ void EndRoundView::doActivate()
+ {
+     selected_line = -1;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp	2012-04-27 09:55:16 UTC (rev 1356)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp	2012-04-27 13:22:05 UTC (rev 1357)
+@@ -1,5 +1,5 @@
+ /*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
++Copyright (C) 2009 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+  
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+@@ -22,17 +22,18 @@
+ 
+ #include &lt;vector&gt;
+ #include &quot;2D/Surface.hpp&quot;
+-#include &quot;Views/MainMenu/SpecialButtonView.hpp&quot;
++#include &quot;GameTemplateView.hpp&quot;
+ 
+ class PlayerState;
+ 
+ //---------------------------------------------------------------------------
+-class EndRoundView : public SpecialButtonView
++class EndRoundView : public GameTemplateView
+ {
+ private:
+     int viewableMessageCount;
+     enum { ITEM_GAP_SPACE = 10 };
+     void drawPlayerStats(Surface &amp;dest, unsigned int flagHeight);
++    void drawTeamStats(Surface &amp;dest, unsigned int flagHeight);
+ 
+     Surface allyImage;
+     Surface allyRequestImage;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-04-27 09:55:16 UTC (rev 1356)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-04-27 13:22:05 UTC (rev 1357)
+@@ -26,7 +26,7 @@
+ #include &quot;Views/Components/cButton.hpp&quot;
+  
+  
+-static const char * stats_format = &quot;%-20s%6i%7i&quot;;
++static const char * stats_format = &quot;%-20s%6i%7i%6i&quot;;
+ static Uint8 newteam = 0;
+  
+ static void bChangeTeam()
+@@ -77,7 +77,7 @@
+     clientArea.BltRoundRect(secondrect, 14, Palette::darkGray256.getColorArray());
+     clientArea.RoundRect(secondrect,14, Color::gray);
+  
+-    drawTeams(clientArea, 20);
++    drawTeams(clientArea);
+     View::doDraw(viewArea, clientArea);
+ }
+  
+@@ -91,7 +91,7 @@
+     }
+ };
+  
+-void GTeamView::drawTeams(Surface &amp;dest, unsigned int flagHeight)
++void GTeamView::drawTeams(Surface &amp;dest)
+ {
+     char statBuf[256];
+  
+@@ -109,34 +109,36 @@
+  
+     int cur_line_pos = firstrect.min.y +20;
+     snprintf(statBuf, sizeof(statBuf), &quot;%-20s%6ld&quot;, TeamManager::getTeamName(0).c_str(), TeamManager::getTeamScore(0));
+-    dest.bltStringShadowed(firstrect.min.x+10, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
++    dest.bltStringShadowed(firstrect.min.x+30, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
+     TeamManager::drawFlag(0, dest, firstrect.min.x+(firstrect.getSizeX()/2), cur_line_pos-17 );
+     snprintf(statBuf, sizeof(statBuf), &quot;%-20s%6ld&quot;, TeamManager::getTeamName(1).c_str(), TeamManager::getTeamScore(1));
+-    dest.bltStringShadowed(secondrect.min.x+10, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
++    dest.bltStringShadowed(secondrect.min.x+30, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
+     TeamManager::drawFlag(1, dest, secondrect.min.x+(secondrect.getSizeX()/2), cur_line_pos-17);
+     cur_line_pos += 25;
+     dest.drawLine(firstrect.min.x+10, cur_line_pos-10, firstrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+     dest.drawLine(secondrect.min.x+10, cur_line_pos-10, secondrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+  
+-    int Start_x = firstrect.min.x+10;
++    int Start_x = firstrect.min.x+20;
+     int current_Team = 0;
+- 
++    
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i)
+     {
+         const PlayerState* state = *i;
+- 
++
+         if (current_Team != state-&gt;getTeamID())
+         {
+             cur_line_pos = firstrect.min.y +45;
+-            Start_x = secondrect.min.x+10;
++            Start_x = secondrect.min.x+20;
+             current_Team = state-&gt;getTeamID();
+         }
++        TeamManager::drawFlag(current_Team, dest, Start_x-16, cur_line_pos-5 );
++        
+         if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+         {
+             snprintf(statBuf, sizeof(statBuf),
+                      stats_format, state-&gt;getName().substr(0,20).c_str(),
+-                     state-&gt;getKills(), state-&gt;getLosses());
++                     state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getObjectivesHeld());
+             dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::cyan, Color::gray64);
+             if (current_Team &gt; 0)
+             {
+@@ -151,7 +153,7 @@
+         {
+             snprintf(statBuf, sizeof(statBuf),
+                      stats_format, state-&gt;getName().substr(0,20).c_str(),
+-                     state-&gt;getKills(), state-&gt;getLosses());
++                     state-&gt;getKills(), state-&gt;getLosses(),state-&gt;getObjectivesHeld());
+             dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::gray224, Color::gray64);
+         }
+         cur_line_pos += 20;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-04-27 09:55:16 UTC (rev 1356)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-04-27 13:22:05 UTC (rev 1357)
+@@ -33,7 +33,7 @@
+     iRect firstrect;
+     iRect secondrect;
+     std::vector&lt;const PlayerState*&gt; states;
+-    void drawTeams(Surface &amp;dest, unsigned int flagHeight);
++    void drawTeams(Surface &amp;dest);
+ 
+ public:
+     GTeamView();
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000380.html">[Netpanzer-cvs] r1356 - in trunk/netpanzer: pics/default	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Units src/NetPanzer/Views/Components	src/NetPanzer/Views/Game
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#381">[ date ]</a>
+              <a href="thread.html#381">[ thread ]</a>
+              <a href="subject.html#381">[ subject ]</a>
+              <a href="author.html#381">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,312 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r954 - trunk/netpanzer/src/NetPanzer/Classes/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r954%20-%20trunk/netpanzer/src/NetPanzer/Classes/Network&In-Reply-To=%3C200702031241.l13Cf3Sm014814%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000000.html">
+   <LINK REL="Next"  HREF="000002.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r954 - trunk/netpanzer/src/NetPanzer/Classes/Network</H1>
+    <B>matzebraun at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r954%20-%20trunk/netpanzer/src/NetPanzer/Classes/Network&In-Reply-To=%3C200702031241.l13Cf3Sm014814%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r954 - trunk/netpanzer/src/NetPanzer/Classes/Network">matzebraun at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb  3 13:41:03 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000000.html">[Netpanzer-cvs] r953 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Classes/Units NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000002.html">[Netpanzer-cvs] r955 - in trunk/netpanzer: . mk/autoconf
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: matzebraun
+Date: 2007-02-03 13:41:03 +0100 (Sat, 03 Feb 2007)
+New Revision: 954
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+Log:
+make server more robust against clients dropping during their connection setup
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-02-03 12:00:52 UTC (rev 953)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-02-03 12:41:03 UTC (rev 954)
+@@ -37,17 +37,9 @@
+ #include &quot;ConsoleInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+-enum { _connect_state_idle,
+-       _connect_state_wait_for_connect_request,
+-       _connect_state_attempt_player_alloc,
+-       _connect_state_wait_for_client_settings,
+-       _connect_state_wait_for_client_game_setup_ack,
+-       _connect_state_player_state_sync,
+-       _connect_state_unit_sync
+-     };
+-
+-
+-unsigned char       ServerConnectDaemon::connection_state = _connect_state_idle;
++ServerConnectDaemon::ConnectionState
++                    ServerConnectDaemon::connection_state 
++						= ServerConnectDaemon::connect_state_idle;
+ bool                ServerConnectDaemon::connection_lock_state = false;
+ PlayerID            ServerConnectDaemon::connect_player_id;
+ PlayerState*        ServerConnectDaemon::connect_player_state;
+@@ -95,7 +87,7 @@
+         }
+     }
+ 
+-    if ( (connection_state != _connect_state_idle) &amp;&amp;
++    if ( (connection_state != connect_state_idle) &amp;&amp;
+             (connect_player_id.getNetworkID() == new_player_id.getNetworkID()  )
+        )
+         return true;
+@@ -242,7 +234,7 @@
+ 
+ void ServerConnectDaemon::resetConnectFsm()
+ {
+-    connection_state = _connect_state_idle;
++    connection_state = connect_state_idle;
+     time_out_timer.reset();
+     time_out_counter = 0;
+ }
+@@ -256,7 +248,7 @@
+         connect_request   = connect_queue.front();
+         connect_queue.pop_front();
+         connect_player_id = connect_request.new_player_id;
+-        connection_state  = _connect_state_wait_for_connect_request;
++        connection_state  = connect_state_wait_for_connect_request;
+ 
+         ClientConnectStartConnect start_connect;
+ 
+@@ -279,7 +271,7 @@
+ {
+     if (message != 0) {
+         if ( message-&gt;message_id == _net_message_id_client_connect_request ) {
+-            connection_state = _connect_state_attempt_player_alloc;
++            connection_state = connect_state_attempt_player_alloc;
+             return false;
+         } else {
+             if ( time_out_timer.count() ) {
+@@ -322,7 +314,9 @@
+                                             sizeof(ClientConnectResult));
+ 
+         time_out_timer.reset();
+-        connection_state = _connect_state_wait_for_client_settings;
++		if(connection_state != connect_state_idle) {
++			connection_state = connect_state_wait_for_client_settings;
++		}
+         return true;
+     }
+ 
+@@ -358,7 +352,9 @@
+             delete server_game_setup;
+ 
+             time_out_timer.reset();
+-            connection_state = _connect_state_wait_for_client_game_setup_ack;
++			if(connection_state != connect_state_idle) {
++				connection_state = connect_state_wait_for_client_game_setup_ack;
++			}
+             return true;
+         } else {
+             if ( time_out_timer.count() ) {
+@@ -398,7 +394,9 @@
+             state_mesg.setMessageEnum(_connect_state_message_sync_player_info);
+             SERVER-&gt;sendMessage(connect_player_id, &amp;state_mesg,
+                     sizeof(ConnectProcessStateMessage));
+-            connection_state = _connect_state_player_state_sync;
++			if(connection_state != connect_state_idle) {
++				connection_state = connect_state_player_state_sync;
++			}
+         } else
+             if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ping ) {
+                 time_out_timer.reset();
+@@ -448,7 +446,9 @@
+             (connect_player_state-&gt;getNetworkPlayerState());
+ 
+         SERVER-&gt;sendMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+-        connection_state = _connect_state_unit_sync;
++		if(connection_state != connect_state_idle) {
++			connection_state = connect_state_unit_sync;
++		}
+         return true;
+     } else if ( percent_complete &gt; 0 ) {
+         state_mesg.setMessageEnum(_connect_state_message_sync_player_info_percent);
+@@ -502,7 +502,7 @@
+             sizeof(ConnectProcessStateMessage));
+     sendConnectionAlert( connect_player_id, _connect_alert_mesg_connect );
+ 
+-    connection_state = _connect_state_idle;
++    connection_state = connect_state_idle;
+     return true;
+ }
+ 
+@@ -512,7 +512,7 @@
+ 
+     do {
+         switch ( connection_state ) {
+-        case _connect_state_idle : {
++        case connect_state_idle : {
+                 if ( connectStateIdle() ) {
+                     end_cycle = true;
+                 } else {
+@@ -522,7 +522,7 @@
+             }
+             break;
+ 
+-        case _connect_state_wait_for_connect_request : {
++        case connect_state_wait_for_connect_request : {
+                 if ( connectStateWaitForConnectRequest( message ) ) {
+                     end_cycle = true;
+                 } else {
+@@ -532,7 +532,7 @@
+             break;
+ 
+ 
+-        case _connect_state_attempt_player_alloc : {
++        case connect_state_attempt_player_alloc : {
+                 if ( connectStateAttemptPlayerAlloc( ) ) {
+                     end_cycle = true;
+                 } else {
+@@ -542,7 +542,7 @@
+             break;
+ 
+ 
+-        case  _connect_state_wait_for_client_settings : {
++        case  connect_state_wait_for_client_settings : {
+                 if ( connectStateWaitForClientSettings( message ) ) {
+                     end_cycle = true;
+                 } else {
+@@ -551,7 +551,7 @@
+             }
+             break;
+ 
+-        case _connect_state_wait_for_client_game_setup_ack : {
++        case connect_state_wait_for_client_game_setup_ack : {
+                 if ( connectStateWaitForClientGameSetupAck( message ) ) {
+                     end_cycle = true;
+                 } else {
+@@ -560,7 +560,7 @@
+             }
+             break;
+ 
+-        case _connect_state_player_state_sync : {
++        case connect_state_player_state_sync : {
+                 if ( connectStatePlayerStateSync( ) ) {
+                     end_cycle = true;
+                 } else {
+@@ -569,7 +569,7 @@
+             }
+             break;
+ 
+-        case _connect_state_unit_sync : {
++        case connect_state_unit_sync : {
+                 if ( connectStateUnitSync( ) ) {
+                     end_cycle = true;
+                 } else {
+@@ -578,6 +578,9 @@
+             }
+             break;
+ 
++		default:
++			assert(false);
++
+         } // ** switch
+ 
+     } while( end_cycle == false );
+@@ -604,6 +607,19 @@
+     UnitInterface::destroyPlayerUnits(player_id.getIndex());
+     PlayerInterface::disconnectPlayerCleanup( player_id );
+ 
++	for(std::list&lt;ConnectQueueElement&gt;::iterator i = connect_queue.begin();
++			i != connect_queue.end(); /*nothing */) {
++		if(i-&gt;new_player_id == player_id) {
++			i = connect_queue.erase(i);
++			continue;
++		}
++
++		++i;
++	}
++	if(connect_player_id == player_id) {
++		connection_state = connect_state_idle;
++	}
++
+     return true;
+ }
+ 
+@@ -639,7 +655,7 @@
+ 
+ bool ServerConnectDaemon::isConnecting()
+ {
+-    if( connection_state == _connect_state_idle ) {
++    if( connection_state == connect_state_idle ) {
+         return false;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2007-02-03 12:00:52 UTC (rev 953)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2007-02-03 12:41:03 UTC (rev 954)
+@@ -41,7 +41,17 @@
+ class ServerConnectDaemon
+ {
+ protected:
+-    static unsigned char        connection_state;
++	enum ConnectionState {
++		connect_state_idle,
++	 	connect_state_wait_for_connect_request,
++	  	connect_state_attempt_player_alloc,
++	   	connect_state_wait_for_client_settings,
++		connect_state_wait_for_client_game_setup_ack,
++		connect_state_player_state_sync,
++		connect_state_unit_sync,
++     };
++
++    static ConnectionState      connection_state;
+     static bool                 connection_lock_state;
+     static PlayerID             connect_player_id;
+     static PlayerState*         connect_player_state;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000000.html">[Netpanzer-cvs] r953 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Classes/Units NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000002.html">[Netpanzer-cvs] r955 - in trunk/netpanzer: . mk/autoconf
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

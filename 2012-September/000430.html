@@ -1,0 +1,570 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1406 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1406%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Views/Game&In-Reply-To=%3C20120914144958.CADC055B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000429.html">
+   <LINK REL="Next"  HREF="000431.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1406 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1406%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Views/Game&In-Reply-To=%3C20120914144958.CADC055B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1406 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Fri Sep 14 16:49:58 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000429.html">[Netpanzer-cvs] r1405 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000431.html">[Netpanzer-cvs] r1407 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#430">[ date ]</a>
+              <a href="thread.html#430">[ thread ]</a>
+              <a href="subject.html#430">[ subject ]</a>
+              <a href="author.html#430">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-09-14 16:49:58 +0200 (Fri, 14 Sep 2012)
+New Revision: 1406
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VoteBox.cpp
+Log:
+Add vote for teammode
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2012-09-13 07:43:40 UTC (rev 1405)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2012-09-14 14:49:58 UTC (rev 1406)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -59,13 +59,13 @@
+ {
+ public:
+     NetworkPlayerState player_state;
+-    
++
+     PlayerStateSync()
+     {
+         message_class = _net_message_class_player;
+         message_id = _net_message_id_player_sync_state;
+     }
+-    
++
+     PlayerStateSync(NetworkPlayerState state)
+         : player_state(state)
+     {
+@@ -224,7 +224,7 @@
+         message_id = _net_message_id_player_flagtimer_update;
+         flag_timer = flagtimer;
+     }
+-    
++
+     Uint16 getflagtimer() const
+     {
+         return flag_timer;
+@@ -359,7 +359,7 @@
+ private:
+     PlayerID player_index;
+ public:
+-    bool  player_vote;
++    Uint8 player_vote;
+ 
+     PlayerSendVote()
+     {
+@@ -372,7 +372,7 @@
+         this-&gt;player_index = player_idx;
+         this-&gt;player_vote = player_vote;
+     }
+-    
++
+     PlayerID getPlayerIndex() const
+     {
+         return player_index;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-13 07:43:40 UTC (rev 1405)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-14 14:49:58 UTC (rev 1406)
+@@ -349,11 +349,11 @@
+     {
+         GameConfig::interface_show_flags = !GameConfig::interface_show_flags;
+     }
+-    
++
+     if ( KeyboardInterface::getKeyPressed(SDLK_v) )
+     {
+         //if (GameConfig::game_teammode)
+-            VoteManager::playerSendRequestVote(1);
++            VoteManager::playerSendRequestVote(surrender_vote);
+     }
+ 
+     if ( KeyboardInterface::getKeyPressed(SDLK_n) )
+@@ -443,18 +443,18 @@
+     {
+     	WorldViewInterface::scroll_left( 15 );
+     }
+-    
++
+     if ( KeyboardInterface::getKeyPressed( SDLK_PAGEUP ) )
+     {
+         ActionManager::runAction(&quot;chat_pgup&quot;);
+     }
+-    
++
+     if ( KeyboardInterface::getKeyPressed( SDLK_PAGEDOWN ) )
+     {
+         ActionManager::runAction(&quot;chat_pgdown&quot;);
+     }
+-    
+-    
++
++
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-09-13 07:43:40 UTC (rev 1405)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-09-14 14:49:58 UTC (rev 1406)
+@@ -24,6 +24,7 @@
+ #include &quot;Interfaces/Team.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
++#include &quot;Interfaces/ChatInterface.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+@@ -464,8 +465,38 @@
+ 
+ }
+ 
++void TeamManager::serversayToTeam(const Uint8 teamID, const NPString&amp; message)
++{
++    PlayerID player_id;
++    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
++        {
++            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID)
++            {
++                ChatInterface::serversayTo(player_id, message);
++            }
++        }
++    }
++}
++
++void TeamManager::sendMessageToTeam(const Uint8 teamID, NetMessage* message, size_t size)
++{
++    LOGGER.warning(&quot;sendmessage to team %d&quot;, teamID);
++    PlayerID player_id;
++    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
++        {
++            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID)
++            {
++                SERVER-&gt;sendMessage(player_id, message, size);
++                LOGGER.warning(&quot;sendmessage to %d&quot;, player_id);
++            }
++        }
++    }
++}
+ 
+ 
+ 
+ 
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-09-13 07:43:40 UTC (rev 1405)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-09-14 14:49:58 UTC (rev 1406)
+@@ -55,7 +55,7 @@
+     static void resetTeamStats();
+     static void sendScores();
+     static void receiveScores(const NetMessage* message);
+-    
++
+     static Uint8 getTeamWin();
+     static const std::string&amp; getTeamName( Uint8 team_id );
+     static bool testRuleScoreLimit( long score_limit );
+@@ -74,7 +74,9 @@
+     static void PlayerRequestReadyAccepted(PlayerID player_id);
+ 
+     static void netMessageChangeTeamRequest(const NetMessage* message);
+-    static void netMessageReadyRequest(const NetMessage* message);
++    static void netMessageReadyRequest(const NetMessage* message);
++    static void serversayToTeam(const Uint8 teamID, const NPString&amp; message);
++    static void sendMessageToTeam(const Uint8 teamID, NetMessage* message, size_t size);
+ 
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp	2012-09-13 07:43:40 UTC (rev 1405)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp	2012-09-14 14:49:58 UTC (rev 1406)
+@@ -20,6 +20,8 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+@@ -28,14 +30,16 @@
+ #include &quot;Views/Game/VoteBox.hpp&quot;
+ 
+ bool   VoteManager::vote_in_progress = false;
+-Uint8  VoteManager::type_vote = 0;
+-bool  *VoteManager::player_vote = 0;
++Uint8  VoteManager::type_vote = unassigned_vote;
++Uint8  *VoteManager::player_vote = 0;
+ Uint8  VoteManager::vote_counter = 0;
++Uint8  VoteManager::players_in_vote = 0;
+ Timer  VoteManager::voteTimer;
++Uint8  VoteManager::vote_team = 0xFF;
+ 
+ VoteBox *votebox;
+ 
+-const char *VoteStrings[2] = {&quot;unknow vote&quot;, &quot;Surrendering vote, you choose surrendering?\0&quot;};
++const char *VoteStrings[1] = {&quot;Surrendering vote, you choose surrendering?\0&quot;};
+ 
+ void VoteManager::netMessageVoteRequest(const NetMessage* message)
+ {
+@@ -44,24 +48,30 @@
+ 
+     if (vote_in_progress)
+     {
+-        vote_counter--;
+-        player_vote[ voteplayer-&gt;getPlayerIndex() ] = voteplayer-&gt;player_vote;
++        vote_counter--;
++        player_vote[ voteplayer-&gt;getPlayerIndex() ] = voteplayer-&gt;player_vote;
+         char buff[100];
+         sprintf(buff, &quot;player %s has voted, waiting %d votes&quot;,
+                 PlayerInterface::getPlayer(voteplayer-&gt;getPlayerIndex())-&gt;getName().c_str(),
+                 vote_counter);
+-        NPString buffstr = buff;
+-        ChatInterface::serversay(buffstr);
+-        if (vote_counter &lt; 1) 
++        if (GameConfig::game_teammode)
++            TeamManager::serversayToTeam(vote_team, buff);
++        else
++            ChatInterface::serversay(buff);
++        if (vote_counter &lt; 1)
+             checkPlayersVote();
+     }
+ }
+ 
+ void VoteManager::startVote(Uint8 type)
+ {
+-    resetVote();
+     vote_in_progress = true;
+     type_vote = type;
++    if (GameConfig::game_teammode)
++        vote_counter = TeamManager::CountPlayerinTeam(vote_team);
++    else
++        vote_counter = PlayerInterface::getActivePlayerCount();
++    players_in_vote = vote_counter;
+ }
+ 
+ void VoteManager::netMessageReceiveRequestVote(const NetMessage* message, PlayerID playerid)
+@@ -72,16 +82,21 @@
+     if ( NetworkState::status == _network_state_server )
+     {
+         if (vote_in_progress) return;
+-        startVote(vote_request-&gt;vote_type);
+-        serverSendRequestVote();
++        resetVote();
++        vote_team = PlayerInterface::getPlayer(playerid)-&gt;getTeamID();
++        startVote(vote_request-&gt;vote_type);
++        serverSendRequestVote();
+         char buff[100];
+         sprintf(buff, &quot;Player %s request vote&quot;,
+                 PlayerInterface::getPlayer(playerid)-&gt;getName().c_str());
+-        NPString buffstr = buff;
+-        ChatInterface::serversay(buff);
++        if (GameConfig::game_teammode)
++            TeamManager::serversayToTeam(vote_team, buff);
++        else
++            ChatInterface::serversay(buff);
+     }
+     else
+     {
++        resetVote();
+         startVote(vote_request-&gt;vote_type);
+         votebox = new VoteBox(VoteStrings[type_vote]);
+         Desktop::add(votebox);
+@@ -92,44 +107,48 @@
+ void VoteManager::resetVote()
+ {
+     vote_in_progress = false;
+-    type_vote = 0;
++    type_vote = unassigned_vote;
+     delete[] player_vote;
+     if (votebox)
+     {
+         Desktop::remove(votebox);
+     }
+-    player_vote = new bool [PlayerInterface::getActivePlayerCount()];
+-    for ( int i = 0; i &lt; PlayerInterface::getActivePlayerCount(); i++ )
++    player_vote = new Uint8 [PlayerInterface::getMaxPlayers()];
++    for ( int i = 0; i &lt; PlayerInterface::getMaxPlayers(); i++ )
+     {
+-        player_vote[ i ] = false;
++        player_vote[ i ] = vote_nothing;
+     }
+     if ( NetworkState::status == _network_state_server )
+         voteTimer.changePeriod(70);// more time for prevent some client retard (lag)
+         else
+         voteTimer.changePeriod(60);
+-    voteTimer.reset();
+-    vote_counter = PlayerInterface::getActivePlayerCount();
++    voteTimer.reset();
++    players_in_vote = 0;
++    vote_team = 0xFF;
+ }
+ 
+ void VoteManager::playerSendRequestVote(Uint8 type)
+ {
+     PlayerVoteRequested vote_request;
+     vote_request.set(type);
+-    CLIENT-&gt;sendMessage( &amp;vote_request, sizeof(PlayerVoteRequested));
++    CLIENT-&gt;sendMessage(&amp;vote_request, sizeof(PlayerVoteRequested));
+ }
+ 
+ void VoteManager::serverSendRequestVote()
+ {
+     PlayerVoteRequested vote_request;
+     vote_request.set(type_vote);
+-    SERVER-&gt;broadcastMessage( &amp;vote_request, sizeof(PlayerVoteRequested));
++    if (GameConfig::game_teammode)
++        TeamManager::sendMessageToTeam(vote_team, &amp;vote_request, sizeof(PlayerVoteRequested));
++    else
++        SERVER-&gt;broadcastMessage(&amp;vote_request, sizeof(PlayerVoteRequested));
+ }
+ 
+ void VoteManager::executeVoteAction()
+ {
+     switch (type_vote)
+     {
+-        case 1 :
++        case surrender_vote :
+             GameControlRulesDaemon::forceEndRound();
+             break;
+     }
+@@ -137,27 +156,36 @@
+ 
+ void VoteManager::checkPlayersVote()
+ {
++    if (GameConfig::game_teammode)
++        TeamManager::serversayToTeam(vote_team, &quot;Vote is end&quot;);
++    else
++        ChatInterface::serversay(&quot;Vote is end&quot;);
+ 
+-    ChatInterface::serversay(&quot;Vote is end&quot;);
+-
+-    int yes_vote = 0, no_vote = 0;
+-    
+-    for ( int i = 0; i &lt; PlayerInterface::getActivePlayerCount(); i++ )
++    Uint8 yes_vote = 0, no_vote = 0;
++
++    for ( int i = 0; i &lt; PlayerInterface::getMaxPlayers(); i++ )
+     {
+-        if (player_vote[ i ] == true) 
++        if (player_vote[ i ] == vote_yes)
+             yes_vote++;
+-        else
++        else
++        if (player_vote[ i ] == vote_no)
+             no_vote++;
+     }
+-    char buff[100];
+-    sprintf(buff, &quot; %d players has voted YES, %d has voted NO&quot;, yes_vote, no_vote);
+-    NPString buffstr = buff;
+-    ChatInterface::serversay(buffstr);
++    char buff[100];
++
++    no_vote = (players_in_vote-yes_vote)*100/players_in_vote;
++    yes_vote = (players_in_vote-no_vote)*100/players_in_vote;
++
++    sprintf(buff, &quot;%d %% players has voted YES, %d %% has voted NO&quot;, yes_vote, no_vote);
++    if (GameConfig::game_teammode)
++        TeamManager::serversayToTeam(vote_team, buff);
++    else
++        ChatInterface::serversay(buff);
+     vote_in_progress = false;
+-    if (yes_vote &gt; no_vote) executeVoteAction();
++    //if (yes_vote &gt; 80) executeVoteAction();
+ }
+ 
+-void VoteManager::playerVote(bool responce)
++void VoteManager::playerVote(Uint8 responce)
+ {
+     Desktop::setVisibility(&quot;votebox&quot;, false);
+     Desktop::remove(votebox);
+@@ -169,13 +197,13 @@
+ 
+ bool VoteManager::checkVoteTimer()
+ {
++    //server need to check the timer for stop vote
++    //if player crash or quit the game, vote don't ending
+     if (vote_in_progress)
+     {
+         return voteTimer.count();
+     }
+     return false;
+-    //server need to check the timer for stop vote
+-    //if player crash or quit the game, vote don't ending
+ }
+ 
+ int VoteManager::getTimer()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.hpp	2012-09-13 07:43:40 UTC (rev 1405)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.hpp	2012-09-14 14:49:58 UTC (rev 1406)
+@@ -18,22 +18,35 @@
+ 
+ #include &quot;Classes/Network/NetMessage.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
++
++enum { surrender_vote,
++       kick_player_vote,
++       unassigned_vote
++     };
++
++enum { vote_yes,
++       vote_no,
++       vote_nothing
++     };
++
+ 
+ class VoteManager
+ {
+ protected:
+     static Uint8 type_vote;
+     static bool vote_in_progress;
+-    static bool *player_vote;
++    static Uint8 *player_vote;
+     static Uint8 vote_counter;
+-    static Timer voteTimer;
++    static Uint8 players_in_vote;
++    static Timer voteTimer;
++    static Uint8 vote_team;
+ public:
+     static bool checkVoteTimer();
+     static void checkPlayersVote();
+     static void executeVoteAction();
+     static void resetVote();
+     static void startVote(Uint8 type);
+-    static void playerVote(bool responce);
++    static void playerVote(Uint8 responce);
+     static void playerSendRequestVote(Uint8 type);
+     static void serverSendRequestVote();
+     static void netMessageReceiveRequestVote(const NetMessage* message, PlayerID playerid);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VoteBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VoteBox.cpp	2012-09-13 07:43:40 UTC (rev 1405)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VoteBox.cpp	2012-09-14 14:49:58 UTC (rev 1406)
+@@ -28,10 +28,10 @@
+ class YesNoAction : public Action
+ {
+ private:
+-    bool result;
++    Uint8 result;
+ public:
+ //    VoteBox * view;
+-    YesNoAction(bool value) : Action(false){result = value;}
++    YesNoAction(Uint8 value) : Action(false){result = value;}
+     void execute()
+     {
+         VoteManager::playerVote(result);
+@@ -55,11 +55,11 @@
+     add(Button::createNewSpecialButton(&quot;Yes&quot;,
+                                        iXY(sizex/2-55, 35),
+                                        50,
+-                                       new YesNoAction(true)));
++                                       new YesNoAction(vote_yes)));
+     add(Button::createNewSpecialButton(&quot;No&quot;,
+                                        iXY(sizex/2+5, 35),
+                                        50,
+-                                       new YesNoAction(false)));
++                                       new YesNoAction(vote_no)));
+     LOGGER.warning(&quot;VoteBox %s&quot;, msg.c_str());
+ }
+ 
+@@ -74,6 +74,6 @@
+     clientArea.bltString(getClientRect().getSizeX()/2-50, getClientRect().getSizeY()-12,statBuf, Color::yellow);
+ 
+     View::doDraw(viewArea, clientArea);
+-    if (VoteManager::checkVoteTimer()) 
+-        VoteManager::playerVote(false);
++    if (VoteManager::checkVoteTimer())
++        VoteManager::playerVote(vote_nothing);
+ }
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000429.html">[Netpanzer-cvs] r1405 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000431.html">[Netpanzer-cvs] r1407 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#430">[ date ]</a>
+              <a href="thread.html#430">[ thread ]</a>
+              <a href="subject.html#430">[ subject ]</a>
+              <a href="author.html#430">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

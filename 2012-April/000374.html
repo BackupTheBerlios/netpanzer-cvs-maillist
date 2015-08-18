@@ -1,0 +1,2206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1350 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1350%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Core%20Interfaces%20Views/Game&In-Reply-To=%3C20120421202217.05D0B55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000373.html">
+   <LINK REL="Next"  HREF="000375.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1350 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1350%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Core%20Interfaces%20Views/Game&In-Reply-To=%3C20120421202217.05D0B55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1350 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Sat Apr 21 22:22:16 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000373.html">[Netpanzer-cvs] r1349 - trunk/netpanzer/src/NetPanzer/Network
+</A></li>
+        <LI>Next message: <A HREF="000375.html">[Netpanzer-cvs] r1351 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#374">[ date ]</a>
+              <a href="thread.html#374">[ thread ]</a>
+              <a href="subject.html#374">[ subject ]</a>
+              <a href="author.html#374">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-04-21 22:22:16 +0200 (Sat, 21 Apr 2012)
+New Revision: 1350
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SpawnList.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+Up protocol to 1106
+
+Add Teammode : 
+   Set with teammode = true in server.cfg
+   2 teams are created (no name fixed now)
+   Player are add in low team
+   First team spawn in up left spawn point on map
+   Second team spawn in bottom right spawn point on map
+   All players in team are allied automaticaly (manual alliance disabled)
+   Chat only with your team
+
+   
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -20,11 +20,12 @@
+ 
+ #include &lt;stdio.h&gt;
+ 
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;NetworkClient.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ 
+ #include &quot;Resources/ResourceManager.hpp&quot;
+@@ -217,6 +218,7 @@
+             LoadingView::append( &quot;Game Synchronized&quot; );
+             LoadingView::loadFinish();
+             connection_state = _connect_state_idle;
++            if (GameConfig::game_teammode) TeamManager::SynchPlayers();
+         }
+         break;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -177,10 +177,11 @@
+     char     map_name[32];
+ private:
+     Sint32  cloud_coverage;
+-    float    wind_speed;
++    float   wind_speed;
+     Sint32  game_type;
+ public:
+     Uint8  powerup_state;
++    Uint8  teammode_state;
+ private:
+     Sint32  frag_limit;
+     Sint32  time_limit;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -30,6 +30,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
+ 
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;SystemNetMessage.hpp&quot;
+@@ -393,6 +394,10 @@
+ 
+         if ( player &amp;&amp; sendalert &amp;&amp; ! kicked)
+         {
++            if (GameConfig::game_teammode)
++            {
++                TeamManager::removePlayer(player-&gt;getID(), player-&gt;getTeamID());
++            }
+             ConsoleInterface::postMessage(Color::cyan, true, player-&gt;getFlag(),
+                                       &quot;'%s' has left.&quot;,
+                                       player-&gt;getName().c_str());
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -41,6 +41,7 @@
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
+ 
+ enum ConnectionState
+ {
+@@ -84,13 +85,25 @@
+ 
+     player_state = PlayerInterface::getPlayer( client-&gt;getPlayerIndex() );
+ 
+-    connect_alert.set( client-&gt;getPlayerIndex(), _connect_alert_mesg_connect );
+ 
+-    ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
++    if (GameConfig::game_teammode)
++    {
++        TeamManager::addPlayer(player_state-&gt;getID());
++        ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
++                                  &quot;'%s' [%s] has joined the game int team %d.&quot;,
++                                  player_state-&gt;getName().c_str(),
++                                  client-&gt;getFullIPAddress().c_str(),
++                                  player_state-&gt;getTeamID());
++    } else
++    {
++        ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
+                                   &quot;'%s' [%s] has joined the game.&quot;,
+                                   player_state-&gt;getName().c_str(),
+-                                  client-&gt;getFullIPAddress().c_str() );
++                                  client-&gt;getFullIPAddress().c_str());
++    }
+ 
++    connect_alert.set( client-&gt;getPlayerIndex(), _connect_alert_mesg_connect );
++
+     player_state-&gt;resetAutokick();
+ 
+     if ( GameConfig::server_motd-&gt;length() &gt; 0 )
+@@ -729,7 +742,7 @@
+         connect_client-&gt;sendMessage( &amp;state_mesg,
+                                      sizeof(ConnectProcessStateMessage));
+         sendConnectionAlert( connect_client );
+-
++        
+         return connect_state_idle;
+     }
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -23,6 +23,7 @@
+ #include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;NetMessage.hpp&quot;
+ #include &quot;Types/iXY.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
+ 
+ #ifdef MSVC
+ #pragma pack(1)
+@@ -141,6 +142,7 @@
+ {
+ private:
+     PlayerID player_index;
++    Uint8 team_index; 
+ public:
+     Uint8 alert_enum;
+ 
+@@ -153,6 +155,7 @@
+     void set(const PlayerID player_idx, unsigned char alert_type)
+     {
+         player_index = player_idx;
++        team_index = PlayerInterface::getPlayer(player_idx)-&gt;getTeamID();
+         alert_enum = alert_type;
+     }                                               
+     
+@@ -160,6 +163,11 @@
+     {
+         return player_index;
+     }
++    
++    PlayerID getTeamID() const
++    {
++        return team_index;
++    }
+ 
+ } __attribute__((packed));
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -292,6 +292,11 @@
+     this-&gt;id = id;
+ }
+ 
++void PlayerState::setTeamID( Uint8 team_id )
++{
++    this-&gt;team_id = team_id;
++}
++
+ FlagID PlayerState::getFlag() const
+ {
+     return id;
+@@ -324,6 +329,7 @@
+ void PlayerState::getNetworkPlayerState(NetworkPlayerState&amp; state) const
+ {
+     state.id = id;
++    state.teamid = team_id;
+     memset(state.name, 0, sizeof(state.name));
+     strncpy(state.name, name.c_str(), sizeof(state.name)-1);
+     state.status = status;
+@@ -342,6 +348,7 @@
+     tmp[63] = 0;
+     name = tmp;
+     id = state-&gt;id;
++    team_id = state-&gt;teamid;
+     status = state-&gt;status;
+     kills = ltoh16(state-&gt;kills);
+     kill_points = ltoh16(state-&gt;kill_points);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -49,6 +49,7 @@
+     friend class PlayerStateSync;
+     
+     PlayerID id;
++    Uint8 teamid;
+     char name[64];
+     Uint8 status;
+     Sint16 kills;
+@@ -67,6 +68,7 @@
+ {
+ private:
+     PlayerID id;
++    Uint8 team_id;
+     std::string name;
+     unsigned char status;
+     short kills;
+@@ -91,6 +93,7 @@
+     const std::string&amp; getName() const;
+ 
+     PlayerID getID() const { return id; }
++    Uint8 getTeamID() const { return team_id; }
+ 
+     void resetAutokick();
+     bool checkAutokick();
+@@ -108,6 +111,7 @@
+     short getObjectivesHeld() const;
+     void setObjectivesHeld( short objectives );
+     void setID( PlayerID id );
++    void setTeamID( Uint8 team_id );
+     FlagID getFlag() const;
+     short getTotal() const;
+     NetworkPlayerState getNetworkPlayerState() const;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -26,6 +26,7 @@
+ #include &quot;Util/FileStream.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ 
+ SpawnList::SpawnList()
+ {
+@@ -80,3 +81,25 @@
+ 
+     return at(spawn_index);
+ }
++iXY SpawnList::getMinSpawnPoint()
++{
++    iXY curpoint , minpoint = at(0);
++    
++    for ( size_t i = 0; i &lt; size(); ++i )
++    {
++        curpoint = at(i); 
++        if ( (curpoint.x &lt; minpoint.x) &amp;&amp; (curpoint.y &lt; minpoint.y) ) minpoint = curpoint;
++    }
++    return minpoint;
++}
++iXY SpawnList::getMaxSpawnPoint()
++{
++    iXY curpoint, maxpoint = at(0);
++    
++    for ( size_t i = 0; i &lt; size(); ++i )
++    {
++        curpoint = at(i);  
++        if ( (curpoint.x &gt; maxpoint.x) &amp;&amp; (curpoint.y &gt; maxpoint.y) ) maxpoint = curpoint;
++    }
++    return maxpoint;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SpawnList.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SpawnList.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/SpawnList.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -32,6 +32,8 @@
+ 
+     void loadSpawnFile(const std::string&amp; file_path);
+     iXY getFreeSpawnPoint();
++    iXY getMinSpawnPoint();
++    iXY getMaxSpawnPoint();
+ };
+ 
+ #endif // ** _SPAWNLIST_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -234,7 +234,7 @@
+         // XXX ALLY
+         if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
+         {
+-            if ( KeyboardInterface::getKeyState(SDLK_a) )
++            if ( KeyboardInterface::getKeyState(SDLK_a) &amp;&amp; !GameConfig::game_teammode )
+             {
+                 if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
+                 {
+@@ -254,7 +254,7 @@
+         }
+         else
+         {
+-            if ( KeyboardInterface::getKeyState(SDLK_a) )
++            if ( KeyboardInterface::getKeyState(SDLK_a) &amp;&amp; !GameConfig::game_teammode )
+             {
+                 return _cursor_break_allie;
+             }
+@@ -400,7 +400,8 @@
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_LALT ) == false)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_RALT ) == false))
+     {
+-        setKeyboardInputModeChatMesg();
++        if (GameConfig::game_teammode) setKeyboardInputModeAllieChatMesg();
++        else setKeyboardInputModeChatMesg();
+     }
+ 
+     if ( (KeyboardInterface::getKeyState(SDLK_LCTRL) || KeyboardInterface::getKeyState(SDLK_RCTRL))
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -19,7 +19,7 @@
+ #define __NETWORK_GLOBALS_HPP__
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+-#define NETPANZER_PROTOCOL_VERSION     1105
++#define NETPANZER_PROTOCOL_VERSION     1106
+ #define MASTERSERVER_PORT             28900
+ 
+ const char * getNetpanzerProtocolMessage(const int protocol);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -124,7 +124,7 @@
+     PowerUpInterface::initialize();
+     ParticleInterface::initParticleSystems();
+ 
+-    GameManager::initializeGameLogic();
++//    GameManager::initializeGameLogic();
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::shutdownGameObjects()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -64,6 +64,7 @@
+ int       GameConfig::game_timelimit = 30;
+ int       GameConfig::game_fraglimit = 300;
+ bool      GameConfig::game_powerups = true;
++bool      GameConfig::game_teammode = false;
+ int       GameConfig::game_occupationpercentage = 75;
+ bool      GameConfig::game_allowallies = true;
+ int       GameConfig::game_cloudcoverage = 0;
+@@ -191,6 +192,7 @@
+     { &quot;timelimit&quot;,          GETSVTYPE_INT,     &amp;GameConfig::game_timelimit },
+     { &quot;fraglimit&quot;,          GETSVTYPE_INT,     &amp;GameConfig::game_fraglimit },
+     { &quot;powerups&quot;,           GETSVTYPE_BOOLEAN, &amp;GameConfig::game_powerups },
++    { &quot;teammode&quot;,           GETSVTYPE_BOOLEAN, &amp;GameConfig::game_teammode },
+     { &quot;occupationpercentage&quot;,GETSVTYPE_INT,    &amp;GameConfig::game_occupationpercentage },
+     { &quot;allowallies&quot;,        GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowallies },
+     { &quot;cloudcoverage&quot;,      GETSVTYPE_INT,     &amp;GameConfig::game_cloudcoverage },
+@@ -219,6 +221,7 @@
+     { &quot;timelimit&quot;,          SETSVTYPE_INT,     &amp;GameConfig::game_timelimit },
+     { &quot;fraglimit&quot;,          SETSVTYPE_INT,     &amp;GameConfig::game_fraglimit },
+     { &quot;powerups&quot;,           SETSVTYPE_BOOLEAN, &amp;GameConfig::game_powerups },
++    { &quot;teammode&quot;,           SETSVTYPE_BOOLEAN, &amp;GameConfig::game_teammode },
+     { &quot;occupationpercentage&quot;,SETSVTYPE_INT,    &amp;GameConfig::game_occupationpercentage },
+     { &quot;allowallies&quot;,        SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowallies },
+     { &quot;cloudcoverage&quot;,      SETSVTYPE_INT,     &amp;GameConfig::game_cloudcoverage },
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -143,6 +143,7 @@
+     static int       game_timelimit;
+     static int       game_fraglimit;
+     static bool      game_powerups;
++    static bool      game_teammode;
+     static int       game_occupationpercentage;
+     static bool      game_allowallies;
+     static int       game_cloudcoverage;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -1,23 +1,23 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-
++ 
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+-
++ 
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+@@ -25,20 +25,20 @@
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+-
++ 
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Classes/Network/GameControlNetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+-
++ 
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+-
++ 
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Game/LoadingView.hpp&quot;
+-
++ 
+ #include &quot;Util/Log.hpp&quot;
+-
++ 
+ enum { _map_cycle_server_state_idle,
+        _map_cycle_server_state_display_endgame_views,
+        _map_cycle_server_state_cycle_next_map,
+@@ -48,13 +48,13 @@
+        _map_cycle_server_state_sync_profiles,
+        _map_cycle_server_state_respawn_players
+      };
+-
++ 
+ enum { _map_cycle_client_idle,
+        _map_cycle_client_start_map_load,
+        _map_cycle_client_load_map,
+        _map_cycle_client_wait_for_respawn_ack
+      };
+-
++ 
+ enum { _execution_mode_loop_back_server,
+        _execution_mode_dedicated_server
+      };
+@@ -62,24 +62,24 @@
+        _game_state_in_progress,
+        _game_state_completed
+      };
+-
++ 
+ int GameControlRulesDaemon::execution_mode = _execution_mode_loop_back_server;
+ unsigned char GameControlRulesDaemon::game_state  = _game_state_idle;
+ std::string GameControlRulesDaemon::nextmap = &quot;&quot;;
+-
++ 
+ #define _MAP_CYCLE_ENDGAME_WAIT_PERIOD  (20) // seconds
+ #define _MAP_CYCLE_MAP_LOAD_WAIT_PERIOD (7) // seconds
+-
++ 
+ int GameControlRulesDaemon::map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+ Timer GameControlRulesDaemon::map_cycle_fsm_server_endgame_timer;
+ Timer GameControlRulesDaemon::map_cycle_fsm_server_map_load_timer;
+-
++ 
+ int GameControlRulesDaemon::map_cycle_fsm_client_state = _map_cycle_client_idle;
+ bool GameControlRulesDaemon::map_cycle_fsm_client_respawn_ack_flag = false;
+ char GameControlRulesDaemon::map_cycle_fsm_client_map_name[256];
+-
++ 
+ static unsigned int sync_profile_index = 0;
+-
++ 
+ //-----------------------------------------------------------------
+ void GameControlRulesDaemon::setStateServerInProgress()
+ {
+@@ -95,313 +95,351 @@
+ {
+     GameControlRulesDaemon::execution_mode = _execution_mode_dedicated_server;
+ }
+-
++ 
+ //-----------------------------------------------------------------
+ void GameControlRulesDaemon::mapCycleFsmClient()
+ {
+-    switch( map_cycle_fsm_client_state ) {
+-        case _map_cycle_client_idle :
++    switch( map_cycle_fsm_client_state )
++    {
++    case _map_cycle_client_idle :
++        return;
++ 
++    case _map_cycle_client_start_map_load :
++    {
++        LoadingView::show();
++ 
++        GameManager::shutdownParticleSystems();
++        ObjectiveInterface::resetLogic();
++ 
++        GameConfig::game_map-&gt;assign( map_cycle_fsm_client_map_name );
++ 
++        char buf[256];
++        snprintf(buf, sizeof(buf), &quot;Next Map '%s'.&quot;,
++                 GameConfig::game_map-&gt;c_str());
++        LoadingView::append( buf);
++        LoadingView::append( &quot;Loading Game Map ...&quot; );
++ 
++        try
++        {
++            GameManager::startGameMapLoad(GameConfig::game_map-&gt;c_str(), 16);
++        }
++        catch(std::exception&amp; e)
++        {
++            LoadingView::append(&quot;Error while loading map:&quot;);
++            LoadingView::append(e.what());
++            map_cycle_fsm_client_state = _map_cycle_client_idle;
+             return;
+-
+-        case _map_cycle_client_start_map_load : {
+-                LoadingView::show();
+-
+-                GameManager::shutdownParticleSystems();
+-                ObjectiveInterface::resetLogic();
+-
+-                GameConfig::game_map-&gt;assign( map_cycle_fsm_client_map_name );
+-
+-                char buf[256];
+-                snprintf(buf, sizeof(buf), &quot;Next Map '%s'.&quot;,
+-                        GameConfig::game_map-&gt;c_str());
+-                LoadingView::append( buf);
+-                LoadingView::append( &quot;Loading Game Map ...&quot; );
+-
+-                try {
+-                    GameManager::startGameMapLoad(GameConfig::game_map-&gt;c_str(), 16);
+-                } catch(std::exception&amp; e) {
+-                    LoadingView::append(&quot;Error while loading map:&quot;);
+-                    LoadingView::append(e.what());
+-                    map_cycle_fsm_client_state = _map_cycle_client_idle;
+-                    return;
+-                }
+-
+-                GameManager::resetGameLogic();
+-                map_cycle_fsm_client_state = _map_cycle_client_load_map;
+-                return;
+-            }
+-            break;
+-
+-        case _map_cycle_client_load_map : {
+-                int percent_complete;
+-                char str_buf[128];
+-
+-                if ( GameManager::gameMapLoad( &amp;percent_complete ) == false ) {
+-                    map_cycle_fsm_client_state = _map_cycle_client_wait_for_respawn_ack;
+-
+-                    sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-                    LoadingView::update( str_buf );
+-
+-                    LoadingView::append( &quot;Waiting to respawn ...&quot; );
+-                } else {
+-                    sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-                    LoadingView::update( str_buf );
+-                }
+-
+-                return;
+-            }
+-
+-        case _map_cycle_client_wait_for_respawn_ack : {
+-                if( map_cycle_fsm_client_respawn_ack_flag == true ) {
+-                    LoadingView::loadFinish();
+-                    map_cycle_fsm_client_respawn_ack_flag = false;
+-                    map_cycle_fsm_client_state = _map_cycle_client_idle;
+-                }
+-
+-                return;
+-            }
+-            break;
+-
++        }
++ 
++        GameManager::resetGameLogic();
++        map_cycle_fsm_client_state = _map_cycle_client_load_map;
++        return;
++    }
++    break;
++ 
++    case _map_cycle_client_load_map :
++    {
++        int percent_complete;
++        char str_buf[128];
++ 
++        if ( GameManager::gameMapLoad( &amp;percent_complete ) == false )
++        {
++            map_cycle_fsm_client_state = _map_cycle_client_wait_for_respawn_ack;
++ 
++            sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
++            LoadingView::update( str_buf );
++ 
++            LoadingView::append( &quot;Waiting to respawn ...&quot; );
++        }
++        else
++        {
++            sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
++            LoadingView::update( str_buf );
++        }
++ 
++        return;
++    }
++ 
++    case _map_cycle_client_wait_for_respawn_ack :
++    {
++        if( map_cycle_fsm_client_respawn_ack_flag == true )
++        {
++            LoadingView::loadFinish();
++            map_cycle_fsm_client_respawn_ack_flag = false;
++            map_cycle_fsm_client_state = _map_cycle_client_idle;
++        }
++ 
++        return;
++    }
++    break;
++ 
+     } // ** switch
+ }
+-
+-
++ 
++ 
+ void GameControlRulesDaemon::mapCycleFsmServer()
+ {
+-    switch( map_cycle_fsm_server_state ) {
+-        case _map_cycle_server_state_idle:
+-            break;
+-
+-        case _map_cycle_server_state_display_endgame_views: {
+-                ChatInterface::serversay(&quot;Round is over&quot;);
+-                                                                
+-                SystemViewControl view_control;
+-
+-                ServerConnectDaemon::lockConnectProcess();
+-
+-                view_control.set(&quot;EndRoundView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
+-
+-                if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server ) {
+-                    Desktop::setVisibility(&quot;GameView&quot;, true);
+-                    Desktop::setVisibility(&quot;EndRoundView&quot;, true );
+-                }
+-
+-                SERVER-&gt;broadcastMessage(&amp;view_control, sizeof(SystemViewControl));
+-
+-                map_cycle_fsm_server_endgame_timer.changePeriod( _MAP_CYCLE_ENDGAME_WAIT_PERIOD );
+-                map_cycle_fsm_server_endgame_timer.reset();
+-
+-                map_cycle_fsm_server_state = _map_cycle_server_state_cycle_next_map;
++    switch( map_cycle_fsm_server_state )
++    {
++    case _map_cycle_server_state_idle:
++        break;
++ 
++    case _map_cycle_server_state_display_endgame_views:
++    {
++        ChatInterface::serversay(&quot;Round is over&quot;);
++ 
++        SystemViewControl view_control;
++ 
++        ServerConnectDaemon::lockConnectProcess();
++ 
++        view_control.set(&quot;EndRoundView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
++ 
++        if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server )
++        {
++            Desktop::setVisibility(&quot;GameView&quot;, true);
++            Desktop::setVisibility(&quot;EndRoundView&quot;, true );
++        }
++ 
++        SERVER-&gt;broadcastMessage(&amp;view_control, sizeof(SystemViewControl));
++ 
++        map_cycle_fsm_server_endgame_timer.changePeriod( _MAP_CYCLE_ENDGAME_WAIT_PERIOD );
++        map_cycle_fsm_server_endgame_timer.reset();
++ 
++        map_cycle_fsm_server_state = _map_cycle_server_state_cycle_next_map;
++    }
++    break;
++ 
++    case _map_cycle_server_state_cycle_next_map :
++    {
++        if ( map_cycle_fsm_server_endgame_timer.count() &amp;&amp;
++                (ServerConnectDaemon::isConnecting() == false)
++           )
++        {
++            GameManager::shutdownParticleSystems();
++ 
++            if(nextmap != &quot;&quot;)
++            {
++                GameConfig::game_map-&gt;assign( nextmap );
++                nextmap = &quot;&quot;;
+             }
+-            break;
+-
+-        case _map_cycle_server_state_cycle_next_map : {
+-                if ( map_cycle_fsm_server_endgame_timer.count() &amp;&amp;
+-                        (ServerConnectDaemon::isConnecting() == false)
+-                   ) {
+-                    GameManager::shutdownParticleSystems();
+-
+-                    if(nextmap != &quot;&quot;) {
+-                        GameConfig::game_map-&gt;assign( nextmap );
+-                        nextmap = &quot;&quot;;
+-                    } else {
+-                        GameConfig::game_map-&gt;assign( MapsManager::getNextMap( *GameConfig::game_map ) );
+-                    }
+-                    
+-                    ConsoleInterface::postMessage(Color::white, false, 0, &quot;loading map '%s'.&quot;,
+-                            GameConfig::game_map-&gt;c_str());
+-
+-                    GameControlCycleMap cycle_map_mesg;
+-                    cycle_map_mesg.set( GameConfig::game_map-&gt;c_str() );
+-
+-                    SERVER-&gt;broadcastMessage( &amp;cycle_map_mesg, sizeof( GameControlCycleMap ));
+-
+-                    if ( GameControlRulesDaemon::execution_mode == _execution_mode_dedicated_server ) {
+-                        ObjectiveInterface::resetLogic();
+-
+-                        GameManager::dedicatedLoadGameMap(
+-                                GameConfig::game_map-&gt;c_str());
+-
+-                        GameManager::resetGameLogic();
+-
+-                        map_cycle_fsm_server_map_load_timer.changePeriod(_MAP_CYCLE_MAP_LOAD_WAIT_PERIOD);
+-                        map_cycle_fsm_server_map_load_timer.reset();
+-                        map_cycle_fsm_server_state = _map_cycle_server_state_wait_for_client_map_load;
+-                    } else {
+-                        LoadingView::show();
+-
+-                        LoadingView::append( &quot;Loading Game Map ...&quot; );
+-                        ObjectiveInterface::resetLogic();
+-
+-                        try {
+-                            GameManager::startGameMapLoad
+-                                (GameConfig::game_map-&gt;c_str(), 16);
+-                        } catch(std::exception&amp; e) {
+-                            LoadingView::append(
+-                                    &quot;Error while loading map:&quot;);
+-                            LoadingView::append(e.what());
+-                            map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+-                            return;
+-                        }
+-                        
+-                        GameManager::resetGameLogic();
+-                        map_cycle_fsm_server_state = _map_cycle_server_state_load_map;
+-                        return;
+-                    }
+-
+-                }
++            else
++            {
++                GameConfig::game_map-&gt;assign( MapsManager::getNextMap( *GameConfig::game_map ) );
+             }
+-            break;
+-
+-        case _map_cycle_server_state_load_map : {
+-                int percent_complete;
+-                char str_buf[128];
+-
+-                if ( GameManager::gameMapLoad( &amp;percent_complete ) == false ) {
+-                    map_cycle_fsm_server_state = _map_cycle_server_state_load_unit_profiles;
+-                }
+-
+-                sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-                LoadingView::update( str_buf );
++ 
++            ConsoleInterface::postMessage(Color::white, false, 0, &quot;loading map '%s'.&quot;,
++                                          GameConfig::game_map-&gt;c_str());
++ 
++            GameControlCycleMap cycle_map_mesg;
++            cycle_map_mesg.set( GameConfig::game_map-&gt;c_str() );
++ 
++            SERVER-&gt;broadcastMessage( &amp;cycle_map_mesg, sizeof( GameControlCycleMap ));
++ 
++            if ( GameControlRulesDaemon::execution_mode == _execution_mode_dedicated_server )
++            {
++                ObjectiveInterface::resetLogic();
++ 
++                GameManager::dedicatedLoadGameMap(
++                    GameConfig::game_map-&gt;c_str());
++ 
++                GameManager::resetGameLogic();
++ 
++                map_cycle_fsm_server_map_load_timer.changePeriod(_MAP_CYCLE_MAP_LOAD_WAIT_PERIOD);
++                map_cycle_fsm_server_map_load_timer.reset();
++                map_cycle_fsm_server_state = _map_cycle_server_state_wait_for_client_map_load;
+             }
+-            break;
+-
+-        case _map_cycle_server_state_wait_for_client_map_load : {
+-                if ( map_cycle_fsm_server_map_load_timer.count() ) {
+-                    ConsoleInterface::postMessage(Color::white, false, 0, &quot;game started.&quot;);
+-                    map_cycle_fsm_server_state = _map_cycle_server_state_load_unit_profiles;
+-                }
+-            }
+-            break;
+-
+-        case _map_cycle_server_state_load_unit_profiles: {
+-                UnitProfileInterface::loadUnitProfiles();
+-                Uint8 data[ _MAX_NET_PACKET_SIZE ];
+-                NetMessage *pmsg = (NetMessage*)&data;
+-                int len = UnitProfileInterface::fillProfileResetMessage(pmsg);
+-                SERVER-&gt;broadcastMessage(pmsg, len);
+-                sync_profile_index = 0;
+-                map_cycle_fsm_server_state = _map_cycle_server_state_sync_profiles;
+-            }
+-            break;
+-
+-        case _map_cycle_server_state_sync_profiles : {
+-                if ( sync_profile_index &lt;= UnitProfileInterface::getNumUnitTypes() )
++            else
++            {
++                LoadingView::show();
++ 
++                LoadingView::append( &quot;Loading Game Map ...&quot; );
++                ObjectiveInterface::resetLogic();
++ 
++                try
+                 {
+-                    Uint8 data[ _MAX_NET_PACKET_SIZE ];
+-                    NetMessage *pmsg = (NetMessage*)&data;
+-                    int len = UnitProfileInterface::fillProfileSyncMessage(pmsg, sync_profile_index);
+-                    SERVER-&gt;broadcastMessage(pmsg, len);
+-                    sync_profile_index++;
++                    GameManager::startGameMapLoad
++                    (GameConfig::game_map-&gt;c_str(), 16);
+                 }
+-                if ( sync_profile_index &gt;= UnitProfileInterface::getNumUnitTypes() )
++                catch(std::exception&amp; e)
+                 {
+-                    map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
++                    LoadingView::append(
++                        &quot;Error while loading map:&quot;);
++                    LoadingView::append(e.what());
++                    map_cycle_fsm_server_state = _map_cycle_server_state_idle;
++                    return;
+                 }
+-            }
+-            break;
+-
+-
+-        case _map_cycle_server_state_respawn_players : {
+-                SystemResetGameLogic reset_game_logic_mesg;
+-
++ 
+                 GameManager::resetGameLogic();
+-                SERVER-&gt;broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
+-
+-                PlayerInterface::unlockPlayerStats();
+-                GameControlRulesDaemon::game_state = _game_state_in_progress;
+-
+-                LoadingView::loadFinish();
+-
+-                GameControlCycleRespawnAck respawn_ack_mesg;
+-                SERVER-&gt;broadcastMessage( &amp;respawn_ack_mesg, sizeof(GameControlCycleRespawnAck));
+-
+-                map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+-
+-                ServerConnectDaemon::unlockConnectProcess();
++                map_cycle_fsm_server_state = _map_cycle_server_state_load_map;
++                return;
+             }
+-            break;
+-
++ 
++        }
++    }
++    break;
++ 
++    case _map_cycle_server_state_load_map :
++    {
++        int percent_complete;
++        char str_buf[128];
++ 
++        if ( GameManager::gameMapLoad( &amp;percent_complete ) == false )
++        {
++            map_cycle_fsm_server_state = _map_cycle_server_state_load_unit_profiles;
++        }
++ 
++        sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
++        LoadingView::update( str_buf );
++    }
++    break;
++ 
++    case _map_cycle_server_state_wait_for_client_map_load :
++    {
++        if ( map_cycle_fsm_server_map_load_timer.count() )
++        {
++            ConsoleInterface::postMessage(Color::white, false, 0, &quot;game started.&quot;);
++            map_cycle_fsm_server_state = _map_cycle_server_state_load_unit_profiles;
++        }
++    }
++    break;
++ 
++    case _map_cycle_server_state_load_unit_profiles:
++    {
++        UnitProfileInterface::loadUnitProfiles();
++        Uint8 data[ _MAX_NET_PACKET_SIZE ];
++        NetMessage *pmsg = (NetMessage*)&data;
++        int len = UnitProfileInterface::fillProfileResetMessage(pmsg);
++        SERVER-&gt;broadcastMessage(pmsg, len);
++        sync_profile_index = 0;
++        map_cycle_fsm_server_state = _map_cycle_server_state_sync_profiles;
++    }
++    break;
++ 
++    case _map_cycle_server_state_sync_profiles :
++    {
++        if ( sync_profile_index &lt;= UnitProfileInterface::getNumUnitTypes() )
++        {
++            Uint8 data[ _MAX_NET_PACKET_SIZE ];
++            NetMessage *pmsg = (NetMessage*)&data;
++            int len = UnitProfileInterface::fillProfileSyncMessage(pmsg, sync_profile_index);
++            SERVER-&gt;broadcastMessage(pmsg, len);
++            sync_profile_index++;
++        }
++        if ( sync_profile_index &gt;= UnitProfileInterface::getNumUnitTypes() )
++        {
++            map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
++        }
++    }
++    break;
++ 
++ 
++    case _map_cycle_server_state_respawn_players :
++    {
++        SystemResetGameLogic reset_game_logic_mesg;
++ 
++        GameManager::resetGameLogic();
++        SERVER-&gt;broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
++ 
++        PlayerInterface::unlockPlayerStats();
++        GameControlRulesDaemon::game_state = _game_state_in_progress;
++ 
++        LoadingView::loadFinish();
++ 
++        GameControlCycleRespawnAck respawn_ack_mesg;
++        SERVER-&gt;broadcastMessage( &amp;respawn_ack_mesg, sizeof(GameControlCycleRespawnAck));
++ 
++        map_cycle_fsm_server_state = _map_cycle_server_state_idle;
++ 
++        ServerConnectDaemon::unlockConnectProcess();
++    }
++    break;
++ 
+     } // ** switch
+ }
+-
++ 
+ void GameControlRulesDaemon::onTimelimitGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+-
++ 
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+-
++ 
+ void GameControlRulesDaemon::onFraglimitGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+-
++ 
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+-
++ 
+ void GameControlRulesDaemon::onObjectiveGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+-
++ 
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+-
++ 
+ void GameControlRulesDaemon::forceMapChange(std::string _nextmap)
+ {
+     nextmap = _nextmap;
+-
++ 
+     PlayerInterface::lockPlayerStats();
+-
++ 
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+-
++ 
+ void GameControlRulesDaemon::checkGameRules()
+ {
+     PlayerState *player_state;
+-
++ 
+     if ( (GameControlRulesDaemon::game_state == _game_state_in_progress) &amp;&amp;
+             (NetworkState::status == _network_state_server)
+        )
+     {
+         unsigned char game_type;
+         game_type = GameConfig::game_gametype;
+-
++ 
+         switch( game_type )
+         {
+-            case  _gametype_timelimit:
++        case  _gametype_timelimit:
++        {
++            int game_minutes = GameManager::getGameTime() / 60;
++            if( game_minutes &gt;= GameConfig::game_timelimit )
+             {
+-                int game_minutes = GameManager::getGameTime() / 60;
+-                if( game_minutes &gt;= GameConfig::game_timelimit )
+-                {
+-                    onTimelimitGameCompleted();
+-                }
+-                break;
+-            }   
+-            case _gametype_fraglimit:
++                onTimelimitGameCompleted();
++            }
++            break;
++        }
++        case _gametype_fraglimit:
++            if (GameConfig::game_teammode)
++            {
++                if (TeamManager::testRuleScoreLimit( long score_limit ))
++                    onFraglimitGameCompleted();
++            }
++            else
++            {
+                 if ( PlayerInterface::testRuleScoreLimit( GameConfig::game_fraglimit, &amp;player_state ) == true )
+-                {
+                     onFraglimitGameCompleted();
+-                }
+-                break;
+-
+-            case _gametype_objective:
++            }
++            break;
++ 
++        case _gametype_objective:
++        {
++            float ratio = (float) GameConfig::game_occupationpercentage / 100.0;
++            if (PlayerInterface::testRuleObjectiveRatio( ratio, &amp;player_state))
+             {
+-                float ratio = (float) GameConfig::game_occupationpercentage / 100.0;
+-                if (PlayerInterface::testRuleObjectiveRatio( ratio, &amp;player_state))
+-                {
+-                    onObjectiveGameCompleted( );
+-                }
+-                break;
++                onObjectiveGameCompleted( );
+             }
+-            default:
+-                // nothing
+-                ;
++            break;
+         }
+-
++        default:
++            // nothing
++            ;
++        }
++ 
+         // ** Check for Player Respawns **
+         bool respawn_rule_complete = false;
+         while( respawn_rule_complete == false )
+@@ -412,65 +450,74 @@
+                 GameManager::spawnPlayer( player_state-&gt;getID() );
+             }
+         }
+-
+     }
+-
+ }
+-
++ 
+ void GameControlRulesDaemon::netMessageCycleMap(const NetMessage* message)
+ {
+     GameControlCycleMap *cycle_map_mesg;
+-
++ 
+     cycle_map_mesg = (GameControlCycleMap *) message;
+-
++ 
+     snprintf(map_cycle_fsm_client_map_name, 256, &quot;%s&quot;, cycle_map_mesg-&gt;map_name);
+     map_cycle_fsm_client_state = _map_cycle_client_start_map_load;
+-
++ 
+ }
+-
++ 
+ void GameControlRulesDaemon::netMessageCycleRespawnAck(const NetMessage* )
+ {
+     map_cycle_fsm_client_respawn_ack_flag = true;
+ }
+-
++ 
+ void GameControlRulesDaemon::processNetMessage(const NetMessage* message)
+ {
+-    switch(message-&gt;message_id) {
+-        case _net_message_id_game_control_cycle_map :
+-            netMessageCycleMap(message);
+-            break;
+-
+-        case _net_message_id_game_control_cycle_respawn_ack :
+-            netMessageCycleRespawnAck(message);
+-            break;
+-
+-        default:
+-            LOGGER.warning(
+-                    &quot;Received GameControlRulesMessage with unknown id (%d-%d)&quot;,
+-                    message-&gt;message_class, message-&gt;message_id);
+-            break;
++    switch(message-&gt;message_id)
++    {
++    case _net_message_id_game_control_cycle_map :
++        netMessageCycleMap(message);
++        break;
++ 
++    case _net_message_id_game_control_cycle_respawn_ack :
++        netMessageCycleRespawnAck(message);
++        break;
++ 
++    default:
++        LOGGER.warning(
++            &quot;Received GameControlRulesMessage with unknown id (%d-%d)&quot;,
++            message-&gt;message_class, message-&gt;message_id);
++        break;
+     }
+ }
+-
++ 
+ void GameControlRulesDaemon::updateGameControlFlow()
+ {
+-    if ( NetworkState::status == _network_state_server ) {
++    if ( NetworkState::status == _network_state_server )
++    {
+         mapCycleFsmServer();
+-    } else {
++    }
++    else
++    {
+         mapCycleFsmClient();
+     }
+-
++ 
+     checkGameRules();
+ }
+-
++ 
+ void GameControlRulesDaemon::mapLoadFailureResponse(int result_code, const char *map_name)
+ {
+     char str_buf[128];
+-
+-    if( result_code == _mapload_result_no_map_file ) {
++ 
++    if( result_code == _mapload_result_no_map_file )
++    {
+         sprintf( str_buf, &quot;MAP %s NOT FOUND!&quot;, map_name );
+         LoadingView::append( str_buf);
+-    } else if( result_code == _mapload_result_no_wad_file ) {
+-            LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
+     }
++    else if( result_code == _mapload_result_no_wad_file )
++    {
++        LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
++    }
+ }
++ 
++ 
++ 
++ 
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -39,6 +39,7 @@
+ #include &quot;Interfaces/PathScheduler.hpp&quot;
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+ #include &quot;Weapons/ProjectileInterface.hpp&quot;
+ #include &quot;Interfaces/TileInterface.hpp&quot;
+@@ -203,6 +204,8 @@
+     UnitInterface::initialize( gameconfig-&gt;GetUnitsPerPlayer() );
+     PathScheduler::initialize();
+     PowerUpInterface::resetLogic();
++    // todo : change it for add more team
++    if (GameConfig::game_teammode) TeamManager::initialize(2);
+ }
+ 
+ // ******************************************************************
+@@ -294,6 +297,7 @@
+         &lt;&lt; &quot;RespawnType: &quot;  &lt;&lt; gameconfig-&gt;getRespawnTypeString() &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;Mapcycle: &quot;     &lt;&lt; *GameConfig::game_mapcycle &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;Powerups: &quot;     &lt;&lt; (GameConfig::game_powerups ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;TeamMode: &quot;     &lt;&lt; (GameConfig::game_teammode ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;AllowAllies: &quot;  &lt;&lt; (GameConfig::game_allowallies ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;CloudCoverage: &quot; &lt;&lt; GameConfig::game_cloudcoverage &lt;&lt; &quot; (Windspeed &quot; &lt;&lt; GameConfig::game_windspeed &lt;&lt; &quot;)&quot; &lt;&lt; std::endl;
+     
+@@ -313,9 +317,16 @@
+ void GameManager::spawnPlayer( PlayerID player )
+ {
+     sound-&gt;stopTankIdle();
+-
++    iXY spawn_point;
+     // ** Get a new spawn point and spawn the player **
+-    iXY spawn_point = MapInterface::getFreeSpawnPoint();
++    if (GameConfig::game_teammode)
++    {
++        spawn_point = TeamManager::getPlayerSpawnPoint(player);
++    }
++    else 
++    {
++        spawn_point = MapInterface::getFreeSpawnPoint();
++    }
+     PlayerInterface::spawnPlayer( player, spawn_point );
+ 
+     //** Change the location of the view camera to the spawn point **
+@@ -382,25 +393,48 @@
+ 
+     switch (connect_alert-&gt;alert_enum) {
+         case _connect_alert_mesg_connect:
+-            ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
+-                                          &quot;%s has joined the game.&quot;,
+-                    player_state-&gt;getName().c_str());
+ 
++            if (GameConfig::game_teammode)
++            {
++                TeamManager::addPlayerinTeam(connect_alert-&gt;getPlayerID(), connect_alert-&gt;getTeamID());
++                ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
++                                        &quot;%s has joined the game in team %d.&quot;,
++                                        player_state-&gt;getName().c_str(), 
++                                        player_state-&gt;getTeamID());
++            } else
++            {
++                 ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
++                                        &quot;%s has joined the game.&quot;,
++                                        player_state-&gt;getName().c_str());
++            }
++
+             break;
+ 
+         case _connect_alert_mesg_disconnect: 
++            if (GameConfig::game_teammode)
++            {
++                TeamManager::removePlayer(connect_alert-&gt;getPlayerID(), connect_alert-&gt;getTeamID());
++            }
+             ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
+-                                          &quot;%s has left the game.&quot;,
+-                    player_state-&gt;getName().c_str());
++                                        &quot;%s has left the game.&quot;,
++                                        player_state-&gt;getName().c_str());
+             break;
+ 
+         case _connect_alert_mesg_client_drop:
++            if (GameConfig::game_teammode)
++            {
++                TeamManager::removePlayer(connect_alert-&gt;getPlayerID(), connect_alert-&gt;getTeamID());
++            }
+             ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
+                     &quot;Connection to %s has been unexpectedly broken.&quot;,
+                     player_state-&gt;getName().c_str());
+             break;
+ 
+         case _connect_alert_mesg_client_kicked:
++            if (GameConfig::game_teammode)
++            {
++                TeamManager::removePlayer(connect_alert-&gt;getPlayerID(), connect_alert-&gt;getTeamID());
++            }
+             ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
+                 &quot;Player %s was kicked.&quot;,
+                 player_state-&gt;getName().c_str());
+@@ -432,6 +466,7 @@
+     game_setup-&gt;setWindSpeed(GameConfig::game_windspeed);
+     game_setup-&gt;setGameType(GameConfig::game_gametype);
+     game_setup-&gt;powerup_state = GameConfig::game_powerups;
++    game_setup-&gt;teammode_state = GameConfig::game_teammode;
+     game_setup-&gt;setFragLimit(GameConfig::game_fraglimit);
+     game_setup-&gt;setTimeLimit(GameConfig::game_timelimit);
+     game_setup-&gt;setElapsedTime(getGameTime());
+@@ -485,6 +520,7 @@
+     GameConfig::game_cloudcoverage = game_setup-&gt;getCloudCoverage();
+     GameConfig::game_windspeed = (int) game_setup-&gt;getWindSpeed();
+     GameConfig::game_powerups = game_setup-&gt;powerup_state;
++    GameConfig::game_teammode = game_setup-&gt;teammode_state;
+     GameConfig::game_gametype = game_setup-&gt;getGameType();
+     GameConfig::game_fraglimit = game_setup-&gt;getFragLimit();
+     GameConfig::game_timelimit = game_setup-&gt;getTimeLimit();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -165,6 +165,14 @@
+     {
+         return spawn_list.getFreeSpawnPoint();
+     }
++    static iXY getMinSpawnPoint()
++    {
++        return spawn_list.getMinSpawnPoint();
++    }
++    static iXY getMaxSpawnPoint()
++    {
++        return spawn_list.getMaxSpawnPoint();
++    }
+ 
+     static SpawnList* getSpawnList()
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -1,6 +1,6 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+@@ -10,7 +10,7 @@
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -21,6 +21,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+@@ -47,12 +48,12 @@
+ {
+     *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = true;
+ }
+-
++ 
+ static void clearAlliance(PlayerID by_player, PlayerID with_player )
+ {
+     *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = false;
+ }
+-
++ 
+ static void disconnectedPlayerAllianceCleanup(PlayerID index )
+ {
+     for ( PlayerID player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers(); ++player_index )
+@@ -61,7 +62,7 @@
+         clearAlliance( player_index, index );
+     }
+ }
+-
++ 
+ bool PlayerInterface::isAllied( PlayerID player, PlayerID with_player )
+ {
+     if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
+@@ -72,7 +73,7 @@
+     }
+     return false;
+ }
+-
++ 
+ bool PlayerInterface::isSingleAllied( PlayerID player, PlayerID with_player )
+ {
+     if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
+@@ -82,7 +83,7 @@
+     }
+     return false;
+ }
+-
++ 
+ static void handleAllianceMessage(const int type,
+                                   PlayerID by_player,
+                                   PlayerID with_player)
+@@ -92,7 +93,7 @@
+     if ( type == _player_make_alliance )
+     {
+         setAlliance(by_player, with_player);
+-
++ 
+         if ( by_player == local_player )
+         {
+             player_state = PlayerInterface::getPlayer(with_player);
+@@ -115,8 +116,8 @@
+             if ( PlayerInterface::isSingleAllied( local_player, player_state-&gt;getID()) )
+             {
+                 ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                           &quot;%s accepted your alliance request.&quot;,
+-                                           player_state-&gt;getName().c_str());
++                                              &quot;%s accepted your alliance request.&quot;,
++                                              player_state-&gt;getName().c_str());
+             }
+             else
+             {
+@@ -162,32 +163,42 @@
+                                               player_state-&gt;getName().c_str());
+             }
+         }
+-
++ 
+         clearAlliance(with_player, by_player);
+     }
+ }
+-
++ 
+ static void resetAllianceMatrix()
+ {
+     int matrix_size;
+-
++ 
+     matrix_size = PlayerInterface::getMaxPlayers() * PlayerInterface::getMaxPlayers();
+-
++ 
+     for ( int i = 0; i &lt; matrix_size; i++ )
+     {
+         alliance_matrix[ i ] = false;
+     }
+ }
+-
++ 
++void PlayerInterface::allyplayers(PlayerID by_player, PlayerID with_player )
++{
++    setAlliance( by_player, with_player );
++}
++ 
++void PlayerInterface::unallyplayers(PlayerID by_player, PlayerID with_player )
++{
++    clearAlliance( by_player, with_player );
++}
++ 
+ void PlayerInterface::initialize(const unsigned int _max_players)
+ {
+     char temp_str[64];
+     PlayerID player_id;
+     max_players = _max_players;
+-
++ 
+     delete[] player_lists;
+     player_lists = new PlayerState[max_players];
+-
++ 
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+         player_lists[ player_id ].setID( player_id );
+@@ -196,24 +207,24 @@
+         sprintf( temp_str, &quot;Player %u&quot;, player_id );
+         player_lists[ player_id ].setName( temp_str );
+     }
+-
++ 
+     delete[] alliance_matrix;
+     alliance_matrix = new bool [max_players * max_players];
+     resetAllianceMatrix();
+-
++ 
+     mutex = SDL_CreateMutex();
+     if(!mutex)
+     {
+         throw std::runtime_error(&quot;Couldn't create PlayerInterface mutex.&quot;);
+     }
+ }
+-
++ 
+ void PlayerInterface::reset()
+ {
+     resetPlayerStats(countPlayers() &gt; 0);
+     resetAllianceMatrix(); // XXX ALLY
+ }
+-
++ 
+ void PlayerInterface::cleanUp()
+ {
+     delete[] player_lists;
+@@ -221,34 +232,34 @@
+     delete[] alliance_matrix;
+     alliance_matrix = 0;
+     max_players = 0;
+-
++ 
+     SDL_DestroyMutex(mutex);
+     mutex = 0;
+ }
+-
++ 
+ void PlayerInterface::lock()
+ {
+     SDL_mutexP(mutex);
+ }
+-
++ 
+ void PlayerInterface::unLock()
+ {
+     SDL_mutexV(mutex);
+ }
+-
++ 
+ void PlayerInterface::setKill(PlayerState* by_player, PlayerState* on_player,
+-        UnitType unit_type)
++                              UnitType unit_type)
+ {
+     SDL_mutexP(mutex);
+     by_player-&gt;incKills( unit_type );
+     on_player-&gt;incLosses( unit_type );
+     SDL_mutexV(mutex);
+ }
+-
++ 
+ void PlayerInterface::lockPlayerStats()
+ {
+     PlayerID player_id;
+-
++ 
+     SDL_mutexP(mutex);
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+@@ -256,11 +267,11 @@
+     } // ** for
+     SDL_mutexV(mutex);
+ }
+-
++ 
+ void PlayerInterface::unlockPlayerStats()
+ {
+     PlayerID player_id;
+-
++ 
+     SDL_mutexP(mutex);
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+@@ -268,11 +279,11 @@
+     } // ** for
+     SDL_mutexV(mutex);
+ }
+-
++ 
+ void PlayerInterface::resetPlayerStats(bool keepAdmin)
+ {
+     PlayerID player_id;
+-
++ 
+     SDL_mutexP(mutex);
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+@@ -280,32 +291,32 @@
+     } // ** for
+     SDL_mutexV(mutex);
+ }
+-
++ 
+ int PlayerInterface::getActivePlayerCount()
+ {
+     PlayerID player_id;
+     int count = 0;
+-
++ 
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+         player_lists[ player_id ].isActive() &amp;&amp; count++;
+     } // ** for
+-
++ 
+     return( count );
+ }
+-
++ 
+ PlayerState* PlayerInterface::allocateLoopBackPlayer()
+ {
+     local_player_index = 0;
+-
++ 
+     SDL_mutexP(mutex);
+     player_lists[local_player_index].setStateSelectingFlag();
+     player_lists[local_player_index].unit_config.initialize();
+     SDL_mutexV(mutex);
+-
++ 
+     return &amp;player_lists[local_player_index];
+ }
+-
++ 
+ PlayerID PlayerInterface::countPlayers()
+ {
+     PlayerID count;
+@@ -316,12 +327,12 @@
+     }
+     return count;
+ }
+-
++ 
+ PlayerState * PlayerInterface::allocateNewPlayer()
+ {
+     PlayerID player_id;
+     PlayerState * res = 0;
+-
++ 
+     SDL_mutexP(mutex);
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+@@ -335,10 +346,9 @@
+         }
+     }
+     SDL_mutexV(mutex);
+-
+     return( res );
+ }
+-
++ 
+ void PlayerInterface::spawnPlayer( PlayerID player_id, const iXY &amp;location )
+ {
+     if ( player_id &lt; max_players )
+@@ -354,12 +364,12 @@
+         SDL_mutexV(mutex);
+     }
+ }
+-
+-
++ 
++ 
+ bool PlayerInterface::testRuleScoreLimit( long score_limit, PlayerState ** player_state )
+ {
+     PlayerID player_id;
+-
++ 
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+         if ( player_lists[ player_id ].getKills() &gt;= score_limit )
+@@ -367,33 +377,33 @@
+             *player_state = &amp;player_lists[ player_id ];
+             return( true );
+         } // ** if
+-
++ 
+     } // ** for
+-
++ 
+     return( false );
+ }
+-
++ 
+ static bool testRuleObjectiveOccupationRatio( PlayerID player_id,
+-                                              float precentage )
++        float precentage )
+ {
+     ObjectiveID num_objectives = ObjectiveInterface::getObjectiveCount();
+-
++ 
+     size_t occupation_ratio = (size_t) ( ((float) num_objectives) * precentage  + 0.999);
+-
++ 
+     if (occupation_ratio == 0)
+     {
+         occupation_ratio = 1;
+     }
+-
++ 
+     size_t occupied = 0;
+     for ( int i = 0; i &lt; num_objectives; ++i )
+     {
+         Objective *objective_state = ObjectiveInterface::getObjective(i);
+-
++ 
+         if ( objective_state-&gt;occupying_player != 0 )
+         {
+             PlayerID occuping_player_id = objective_state-&gt;occupying_player-&gt;getID();
+-
++ 
+             if ( occuping_player_id == player_id )
+             {
+                 occupied++;
+@@ -405,19 +415,19 @@
+             }
+         }
+     }
+-
++ 
+     if ( occupied &gt;= occupation_ratio )
+     {
+         return true;
+     }
+-
++ 
+     return false;
+ }
+-
++ 
+ bool PlayerInterface::testRuleObjectiveRatio( float precentage, PlayerState ** player_state )
+ {
+     PlayerID player_id;
+-
++ 
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+         if ( testRuleObjectiveOccupationRatio(player_id, precentage) )
+@@ -426,15 +436,15 @@
+             return true;
+         } // ** if
+     } // ** for
+-
++ 
+     return false;
+ }
+-
+-
++ 
++ 
+ bool PlayerInterface::testRulePlayerRespawn( bool *completed, PlayerState **player_state )
+ {
+     if ( respawn_rule_player_index == max_players
+-        || respawn_rule_player_index == INVALID_PLAYER_ID )
++            || respawn_rule_player_index == INVALID_PLAYER_ID )
+     {
+         respawn_rule_player_index = 0;
+         *completed = true;
+@@ -444,102 +454,104 @@
+     {
+         *completed = false;
+     }
+-    
++ 
+     if (  player_lists[ respawn_rule_player_index ].isPlaying()
+-       &amp;&amp; UnitInterface::getUnitCount( respawn_rule_player_index ) == 0 )
++            &amp;&amp; UnitInterface::getUnitCount( respawn_rule_player_index ) == 0 )
+     {
+         *player_state = &amp;player_lists[ respawn_rule_player_index ];
+         ++respawn_rule_player_index;
+         return( true );
+     }
+-
++ 
+     ++respawn_rule_player_index;
+     return( false );
+ }
+-
++ 
+ void PlayerInterface::netMessageConnectID(const NetMessage* message)
+ {
+     const PlayerConnectID *connect_mesg
+-        = (const PlayerConnectID *) message;
+-
++    = (const PlayerConnectID *) message;
++ 
+     local_player_index = connect_mesg-&gt;player_id;
+-    if(local_player_index &gt;= max_players) {
++    if(local_player_index &gt;= max_players)
++    {
+         LOGGER.warning(&quot;Invalide netMessageConnectID Message&quot;);
+         return;
+     }
+-
++ 
+ //    SDL_mutexP(mutex);
+ //    player_lists[local_player_index].setFromNetworkPlayerState
+ //        (&amp;connect_mesg-&gt;connect_state);
+ //    SDL_mutexV(mutex);
+ }
+-
++ 
+ void PlayerInterface::netMessageSyncState(const NetMessage* message)
+ {
+     const PlayerStateSync *sync_mesg
+-        = (const PlayerStateSync *) message;
++    = (const PlayerStateSync *) message;
+     PlayerID player_id = sync_mesg-&gt;player_state.getPlayerIndex();
+-
+-    if(player_id &gt;= max_players) {
++ 
++    if(player_id &gt;= max_players)
++    {
+         LOGGER.warning(&quot;Malformed MessageSyncState message&quot;);
+         return;
+     }
+-    
++ 
+     SDL_mutexP(mutex);
+-        player_lists[player_id].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
+-        // XXX ALLY
+-        if ( player_lists[player_id].isFree() )
+-        {
+-            disconnectedPlayerAllianceCleanup(player_id);
+-        }
+-        if ( player_id == local_player_index &amp;&amp; player_lists[player_id].isSelectingFlag() )
+-        {
+-            Desktop::setVisibility(&quot;GFlagSelectionView&quot;, true);
+-        }
++    player_lists[player_id].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
++    // XXX ALLY
++    if ( player_lists[player_id].isFree() )
++    {
++        disconnectedPlayerAllianceCleanup(player_id);
++    }
++    if ( player_id == local_player_index &amp;&amp; player_lists[player_id].isSelectingFlag() )
++    {
++        Desktop::setVisibility(&quot;GFlagSelectionView&quot;, true);
++    }
+     SDL_mutexV(mutex);
+ }
+-
++ 
+ void PlayerInterface::netMessageScoreUpdate(const NetMessage *message)
+ {
+-    const PlayerScoreUpdate* score_update 
+-        = (const PlayerScoreUpdate *) message;
+-
++    const PlayerScoreUpdate* score_update
++    = (const PlayerScoreUpdate *) message;
++ 
+     if(score_update-&gt;getKillByPlayerIndex() &gt;= PlayerInterface::getMaxPlayers()
+-            || score_update-&gt;getKillOnPlayerIndex() 
++            || score_update-&gt;getKillOnPlayerIndex()
+             &gt;= PlayerInterface::getMaxPlayers())
+     {
+         LOGGER.warning(&quot;Malformed score update packet.&quot;);
+         return;
+     }
+-
++ 
+     PlayerState* player1 = getPlayer(score_update-&gt;getKillByPlayerIndex());
+     PlayerState* player2 = getPlayer(score_update-&gt;getKillOnPlayerIndex());
+     setKill(player1, player2, (UnitType) score_update-&gt;unit_type );
+ }
+-
++ 
+ void PlayerInterface::netMessageAllianceRequest(const NetMessage *message)
+ {
+     if ( GameConfig::game_allowallies == false )
+     {
+         return;
+     }
+-
++ 
+     const PlayerAllianceRequest *allie_request
+-        = (const PlayerAllianceRequest *) message;
+-
++    = (const PlayerAllianceRequest *) message;
++ 
+     if(allie_request-&gt;getAllieByPlayerIndex() &gt;= max_players
+-       || allie_request-&gt;getAllieWithPlayerIndex() &gt;= max_players)
++            || allie_request-&gt;getAllieWithPlayerIndex() &gt;= max_players)
+     {
+         LOGGER.warning(&quot;Invalid alliance request message&quot;);
+         return;
+     }
+-
++ 
+     SDL_mutexP(mutex);
+     handleAllianceMessage(allie_request-&gt;alliance_request_type,
+                           allie_request-&gt;getAllieByPlayerIndex(),
+                           allie_request-&gt;getAllieWithPlayerIndex());
+     SDL_mutexV(mutex);
+-
++ 
+     PlayerAllianceUpdate allie_update;
+     allie_update.set(allie_request-&gt;getAllieByPlayerIndex(),
+                      allie_request-&gt;getAllieWithPlayerIndex(),
+@@ -556,108 +568,111 @@
+                             &amp;allie_update, sizeof(PlayerAllianceUpdate));
+     }
+ }
+-
++ 
+ void PlayerInterface::netMessageAllianceUpdate(const NetMessage* message)
+ {
+     const PlayerAllianceUpdate* allie_update
+-        = (const PlayerAllianceUpdate *) message;
+-
++    = (const PlayerAllianceUpdate *) message;
++ 
+     if(allie_update-&gt;getAllieByPlayerIndex() &gt;= max_players
+-       || allie_update-&gt;getAllieWithPlayerIndex() &gt;= max_players) {
++            || allie_update-&gt;getAllieWithPlayerIndex() &gt;= max_players)
++    {
+         LOGGER.warning(&quot;Invalid alliance update message&quot;);
+         return;
+     }
+-
++ 
+     SDL_mutexP(mutex);
+     handleAllianceMessage(allie_update-&gt;alliance_update_type,
+                           allie_update-&gt;getAllieByPlayerIndex(),
+                           allie_update-&gt;getAllieWithPlayerIndex());
+     SDL_mutexV(mutex);
+ }
+-
++ 
+ void PlayerInterface::processNetMessage(const NetPacket* packet)
+ {
+     const NetMessage* message = packet-&gt;getNetMessage();
+-    switch(message-&gt;message_id) {
+-        case _net_message_id_player_connect_id :
+-            netMessageConnectID(message);
+-            break;
+-
+-        case _net_message_id_player_sync_flag:
+-            {
+-                const PlayerFlagSync* pfs = (const PlayerFlagSync*)message;
+-                ResourceManager::updateFlagData(pfs-&gt;player_id,
+-                                                pfs-&gt;player_flag,
+-                                                sizeof(pfs-&gt;player_flag) );
+-
+-                player_lists[pfs-&gt;player_id].setStateActive();
+-            }
+-            break;
+-
+-        case _net_message_id_player_update_flag:
+-            {
+-                const UpdatePlayerFlag* upf = (const UpdatePlayerFlag*)message;
+-                ResourceManager::updateFlagData(packet-&gt;fromPlayer,
+-                                                upf-&gt;player_flag,
+-                                                sizeof(upf-&gt;player_flag) );
+-
+-                PlayerFlagSync pfs;
+-                pfs.player_id = packet-&gt;fromPlayer;
+-                memcpy(pfs.player_flag, upf-&gt;player_flag, sizeof(pfs.player_flag));
+-
+-                player_lists[packet-&gt;fromPlayer].setStateActive();
+-
+-                SERVER-&gt;broadcastMessage(&amp;pfs, sizeof(pfs));
+-            }
+-            break;
+-
+-        case _net_message_id_player_sync_state :
+-            netMessageSyncState(message);
+-            break;
+-
+-        case _net_message_id_player_score_update :
+-            netMessageScoreUpdate(message);
+-            break;
+-
+-        case _net_message_id_player_alliance_request :
+-            netMessageAllianceRequest(message);
+-            break;
+-
+-        case _net_message_id_player_alliance_update :
+-            netMessageAllianceUpdate(message);
+-            break;
+-
+-        case _net_message_id_player_flagtimer_update :
+-                const PlayerFlagTimerUpdate* pftu = (const PlayerFlagTimerUpdate*)message;
+-                gameconfig-&gt;game_changeflagtime = pftu-&gt;getflagtimer();
+-            break;
++    switch(message-&gt;message_id)
++    {
++    case _net_message_id_player_connect_id :
++        netMessageConnectID(message);
++        break;
++ 
++    case _net_message_id_player_sync_flag:
++    {
++        const PlayerFlagSync* pfs = (const PlayerFlagSync*)message;
++        ResourceManager::updateFlagData(pfs-&gt;player_id,
++                                        pfs-&gt;player_flag,
++                                        sizeof(pfs-&gt;player_flag) );
++ 
++        player_lists[pfs-&gt;player_id].setStateActive();
+     }
++    break;
++ 
++    case _net_message_id_player_update_flag:
++    {
++        const UpdatePlayerFlag* upf = (const UpdatePlayerFlag*)message;
++        ResourceManager::updateFlagData(packet-&gt;fromPlayer,
++                                        upf-&gt;player_flag,
++                                        sizeof(upf-&gt;player_flag) );
++ 
++        PlayerFlagSync pfs;
++        pfs.player_id = packet-&gt;fromPlayer;
++        memcpy(pfs.player_flag, upf-&gt;player_flag, sizeof(pfs.player_flag));
++ 
++        player_lists[packet-&gt;fromPlayer].setStateActive();
++ 
++        SERVER-&gt;broadcastMessage(&amp;pfs, sizeof(pfs));
++    }
++    break;
++ 
++    case _net_message_id_player_sync_state :
++        netMessageSyncState(message);
++        break;
++ 
++    case _net_message_id_player_score_update :
++        netMessageScoreUpdate(message);
++        break;
++ 
++    case _net_message_id_player_alliance_request :
++        netMessageAllianceRequest(message);
++        break;
++ 
++    case _net_message_id_player_alliance_update :
++        netMessageAllianceUpdate(message);
++        break;
++ 
++    case _net_message_id_player_flagtimer_update :
++        const PlayerFlagTimerUpdate* pftu = (const PlayerFlagTimerUpdate*)message;
++        gameconfig-&gt;game_changeflagtime = pftu-&gt;getflagtimer();
++        break;
++    }
+ }
+-
++ 
+ void PlayerInterface::disconnectPlayerCleanup( PlayerID player_id )
+ {
+     PlayerState *player_state = getPlayer( player_id );
+     if ( player_state )
+     {
+         SDL_mutexP(mutex);
+-
++ 
+         // XXX ALLY
+         disconnectedPlayerAllianceCleanup(player_id);
+-
++ 
+         player_state-&gt;setStateFree();
+         player_state-&gt;setAdmin(false);
+-
++ 
+         PlayerStateSync player_state_update(player_state-&gt;getNetworkPlayerState());
+-
++ 
+         SDL_mutexV(mutex);
+-
++ 
+         SERVER-&gt;broadcastMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+     }
+ }
+-
++ 
+ void PlayerInterface::SyncFlagTimer()
+ {
+     PlayerFlagTimerUpdate player_flagtimer_update(gameconfig-&gt;game_changeflagtime);
+-    
++ 
+     SERVER-&gt;broadcastMessage(&amp;player_flagtimer_update, sizeof(PlayerFlagTimerUpdate));
+ }
++ 
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -29,6 +29,7 @@
+     static PlayerState *player_lists;
+     static PlayerID max_players;
+     static PlayerID local_player_index;
++    static Uint8 team_index;
+ 
+     static SDL_mutex* mutex;
+ 
+@@ -131,6 +132,9 @@
+     static bool testRulePlayerRespawn( bool *completed, PlayerState **player_state );
+     
+     static void SyncFlagTimer();
++    
++    static void allyplayers(PlayerID by_player, PlayerID with_player );
++    static void unallyplayers(PlayerID by_player, PlayerID with_player );
+ 
+ protected:
+     static PlayerID respawn_rule_player_index;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2012-04-05 16:47:31 UTC (rev 1349)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2012-04-21 20:22:16 UTC (rev 1350)
+@@ -223,6 +223,7 @@
+ void RankView::lMouseDown(const iXY&amp; pos)
+ {
+     GameTemplateView::lMouseDown(pos);
++    if (GameConfig::game_teammode) return;
+     // XXX ALLY
+     if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= TABLE_START )
+     {
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000373.html">[Netpanzer-cvs] r1349 - trunk/netpanzer/src/NetPanzer/Network
+</A></li>
+	<LI>Next message: <A HREF="000375.html">[Netpanzer-cvs] r1351 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#374">[ date ]</a>
+              <a href="thread.html#374">[ thread ]</a>
+              <a href="subject.html#374">[ subject ]</a>
+              <a href="author.html#374">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

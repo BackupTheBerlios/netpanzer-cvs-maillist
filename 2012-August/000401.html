@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1377 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-August/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1377%20-%20trunk/netpanzer&In-Reply-To=%3C20120831121909.98A0055B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000400.html">
+   <LINK REL="Next"  HREF="000402.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1377 - trunk/netpanzer</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1377%20-%20trunk/netpanzer&In-Reply-To=%3C20120831121909.98A0055B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1377 - trunk/netpanzer">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Fri Aug 31 14:19:09 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000400.html">[Netpanzer-cvs] r1376 - in trunk/netpanzer: . src/NetPanzer/Network
+</A></li>
+        <LI>Next message: <A HREF="000402.html">[Netpanzer-cvs] r1378 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#401">[ date ]</a>
+              <a href="thread.html#401">[ thread ]</a>
+              <a href="subject.html#401">[ subject ]</a>
+              <a href="author.html#401">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-08-31 14:19:09 +0200 (Fri, 31 Aug 2012)
+New Revision: 1377
+
+Modified:
+   trunk/netpanzer/SConstruct
+Log:
+Fix bugs with packed structures on gcc, see: <A HREF="http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991">http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991</A>
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-08-30 11:32:07 UTC (rev 1376)
++++ trunk/netpanzer/SConstruct	2012-08-31 12:19:09 UTC (rev 1377)
+@@ -183,6 +183,10 @@
+ #    #crosslinuxenv.Append( _LIBFLAGS = [ '`' + crosslinuxenv['CXX'] + ' -print-file-name=libstdc++.a`' ] )
+ #    #crosslinuxenv.Prepend( _LIBFLAGS = [ '/usr/local/gcc/i686-linux/lib/gcc/i686-linux/4.2.4/../../../../i686-linux/lib/libstdc++.a' ] )
+ 
++# note, fix for gcc 4.7 if compiler is older and doesn't want to compile, comment these two
++env.Append(  CFLAGS = '-mno-ms-bitfields' )
++env.Append(  CXXFLAGS = '-mno-ms-bitfields' )
++
+ env.VariantDir(buildpath,'.',duplicate=0)
+ 
+ if env['with_lua'] == 'internal':
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000400.html">[Netpanzer-cvs] r1376 - in trunk/netpanzer: . src/NetPanzer/Network
+</A></li>
+	<LI>Next message: <A HREF="000402.html">[Netpanzer-cvs] r1378 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#401">[ date ]</a>
+              <a href="thread.html#401">[ thread ]</a>
+              <a href="subject.html#401">[ subject ]</a>
+              <a href="author.html#401">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,1517 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1394 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Actions src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1394%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Actions%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu&In-Reply-To=%3C20120904165239.6723955B10%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000417.html">
+   <LINK REL="Next"  HREF="000419.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1394 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Actions src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1394%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Actions%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu&In-Reply-To=%3C20120904165239.6723955B10%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1394 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Actions src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Tue Sep  4 18:52:39 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000417.html">[Netpanzer-cvs] r1393 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000419.html">[Netpanzer-cvs] r1395 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#418">[ date ]</a>
+              <a href="thread.html#418">[ thread ]</a>
+              <a href="subject.html#418">[ subject ]</a>
+              <a href="author.html#418">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-04 18:52:38 +0200 (Tue, 04 Sep 2012)
+New Revision: 1394
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp
+   trunk/netpanzer/src/NetPanzer/Actions/ActionManager.hpp
+   trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp
+   trunk/netpanzer/src/NetPanzer/Actions/ActionManagerSystemActions.cpp
+   trunk/netpanzer/src/NetPanzer/Actions/DisconnectAction.hpp
+   trunk/netpanzer/src/NetPanzer/Actions/HideViewAction.hpp
+   trunk/netpanzer/src/NetPanzer/Actions/QuitAction.hpp
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+Log:
+Added line auto-wrap and removed horizontal scroll bar in the chat view.
+
+Added new ActionManager, the common used functions will be done using Actions.
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/SConstruct	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -284,7 +284,7 @@
+ ################################################################
+ 
+ npdirs = &quot;&quot;&quot;
+-    Bot Classes Classes/AI Classes/Network Core Interfaces Network
++    Actions Bot Classes Classes/AI Classes/Network Core Interfaces Network
+     Objectives Particles PowerUps Resources Scripts System Units Weapons
+     Views Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
+     Views/MainMenu/Multi/MasterServer Views/MainMenu/Options
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -1398,6 +1398,24 @@
+     }
+ } // end Surface::bltString
+ 
++// bltStringLen
++//---------------------------------------------------------------------------
++// Purpose: Blits the specified string of text to the screen by making
++//          calls to blitChar for each character of the string. Does not
++//          handle wrapping.
++//---------------------------------------------------------------------------
++void Surface::bltStringLen(int x, int y, const char * str, int len, const Uint8 &amp;color)
++{
++    for (int index = 0; (index &lt; len) &amp;&amp; str[index] != 0; index++) {
++        // Don't attempt blank spaces.
++        if (str[index] == 32) {
++            continue;
++        }
++
++        bltChar8x8(x + (index &lt;&lt; 3), y, str[index], color);
++    }
++} // end Surface::bltStringLen
++
+ // bltStringShadowed
+ //---------------------------------------------------------------------------
+ void Surface::bltStringShadowed(int x, int y, char const *str, const Uint8 &amp;textColor, const Uint8 &amp;shadowColor)
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -201,6 +201,7 @@
+     // Blit a single character of text.
+     void bltChar8x8(int x, int y, unsigned char character, const PIX &amp;color);
+     void bltString(int x, int y, const char * str, const PIX&amp; color);
++    void bltStringLen(int x, int y, const char * str, int len, const PIX&amp; color);
+     void bltStringInBox(const iRect &amp;rect, const char *string, PIX color, int gapSpace = 14, bool drawBox = false);
+ 
+     // Blit a shadowed string of text.
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -0,0 +1,101 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * Created on September 4, 2012, 7:36 PM
++ */
++
++#include &quot;ActionManager.hpp&quot;
++
++#include &quot;Action.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++#include &lt;map&gt;
++
++static std::map&lt;NPString, Action*&gt; * actions = 0;
++
++void ActionManager::initialize()
++{
++    actions = new std::map&lt;NPString, Action*&gt;();
++    
++    addSystemActions();
++}
++
++void ActionManager::deinitialize()
++{
++    if ( actions )
++    {
++        std::map&lt;NPString, Action*&gt;::iterator i = actions-&gt;begin();
++        
++        while ( i != actions-&gt;end() )
++        {
++            delete i-&gt;second;
++            i++;
++        }
++        
++        actions-&gt;clear();
++        
++        delete actions;
++        actions = 0;
++    }
++}
++
++bool ActionManager::addAction(const NPString&amp; name, Action* action)
++{
++    std::map&lt;NPString, Action*&gt;::iterator i = actions-&gt;find(name);
++    if ( i != actions-&gt;end() )
++    {
++        return false;
++    }
++    
++    actions-&gt;insert(std::make_pair(name, action));
++    return true;
++}
++
++void ActionManager::deleteAction(const NPString&amp; name)
++{
++    std::map&lt;NPString, Action*&gt;::iterator i = actions-&gt;find(name);
++    if ( i != actions-&gt;end() )
++    {
++        delete i-&gt;second;
++        actions-&gt;erase(i);
++    }
++}
++
++Action* ActionManager::getAction(const NPString&amp; name)
++{
++    std::map&lt;NPString, Action*&gt;::iterator i = actions-&gt;find(name);
++    if ( i != actions-&gt;end() )
++    {
++        return i-&gt;second;
++    }
++    
++    LOGGER.warning(&quot;Action undefined: '%s'&quot;, name.c_str());
++    
++    return 0;
++}
++
++bool ActionManager::runAction(const NPString&amp; name)
++{
++    std::map&lt;NPString, Action*&gt;::iterator i = actions-&gt;find(name);
++    if ( i != actions-&gt;end() )
++    {
++        i-&gt;second-&gt;execute();
++        return true;
++    }
++    
++    return false;
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/ActionManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ActionManager.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/ActionManager.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -0,0 +1,46 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * Created on September 3, 2012, 7:13 PM
++ */
++
++#ifndef ACTIONMANAGER_HPP
++#define	ACTIONMANAGER_HPP
++
++#include &quot;Core/CoreTypes.hpp&quot;
++
++class Action;
++
++class ActionManager
++{
++public:
++    static void initialize();
++    static void deinitialize();
++    
++    static void addSystemActions();
++    static void addGUIActions();
++
++    static bool addAction(const NPString&amp; name, Action* action);
++    static void deleteAction(const NPString&amp; name);
++    
++    static Action* getAction(const NPString&amp; name);
++    
++    static bool runAction(const NPString&amp; name);
++    
++};
++
++#endif	/* ACTIONMANAGER_HPP */
++
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -0,0 +1,40 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * Created on September 4, 2012, 8:55 PM
++ */
++
++#include &quot;ActionManager.hpp&quot;
++
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;HideViewAction.hpp&quot;
++#include &quot;DisconnectAction.hpp&quot;
++
++void ActionManager::addGUIActions()
++{
++    if ( gameconfig-&gt;quickConnect )
++    {
++        addAction(&quot;disconnect&quot;, getAction(&quot;quit&quot;));
++    }
++    else
++    {
++        addAction(&quot;disconnect&quot;, new DisconnectAction());
++    }
++    
++    addAction(&quot;hide_confirmexit&quot;, new HideViewAction(&quot;AreYouSureExitView&quot;));
++    addAction(&quot;hide_confirmdisconnect&quot;, new HideViewAction(&quot;AreYouSureResignView&quot;));
++    
++}
+\ No newline at end of file
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/ActionManagerSystemActions.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ActionManagerSystemActions.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/ActionManagerSystemActions.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -0,0 +1,27 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * Created on September 4, 2012, 8:55 PM
++ */
++
++#include &quot;ActionManager.hpp&quot;
++
++#include &quot;QuitAction.hpp&quot;
++
++void ActionManager::addSystemActions()
++{
++    addAction(&quot;quit&quot;, new QuitAction());
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/DisconnectAction.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/DisconnectAction.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/DisconnectAction.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -0,0 +1,67 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * Created on September 4, 2012, 9:36 PM
++ */
++
++#ifndef DISCONNECTACTION_HPP
++#define	DISCONNECTACTION_HPP
++
++#include &quot;Action.hpp&quot;
++
++#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
++#include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;2D/Color.hpp&quot;
++
++
++class DisconnectAction : public Action
++{
++public:
++    DisconnectAction() : Action(true) {}
++    void execute()
++    {
++        MenuTemplateView * menuview = (MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;);
++        OptionsTemplateView * optionsview  = (OptionsTemplateView*)Desktop::getView(&quot;OptionsView&quot;);
++        
++        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
++
++        GameManager::quitNetPanzerGame();
++
++        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
++
++        if ( menuview )
++        {
++            menuview-&gt;hidePlayButton();
++        }
++        
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++        Desktop::setVisibility(&quot;MainView&quot;, true);
++
++        if ( optionsview )
++        {
++            optionsview-&gt;initButtons();
++            optionsview-&gt;setAlwaysOnBottom(true);
++        }
++    }
++};
++
++
++#endif	/* DISCONNECTACTION_HPP */
++
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/HideViewAction.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/HideViewAction.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/HideViewAction.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -0,0 +1,40 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * Created on September 4, 2012, 9:08 PM
++ */
++
++#ifndef HIDEVIEWACTION_HPP
++#define	HIDEVIEWACTION_HPP
++
++#include &quot;Action.hpp&quot;
++
++#include &quot;Views/Components/Desktop.hpp&quot;
++
++class HideViewAction : public Action
++{
++public:
++    NPString name;
++    HideViewAction(const NPString&amp; name) : Action(true), name(name) {}
++    void execute()
++    {
++        Desktop::setVisibility(name.c_str(), false);
++    }
++};
++
++#endif	/* HIDEVIEWACTION_HPP */
++
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/QuitAction.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/QuitAction.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/QuitAction.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -0,0 +1,43 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * 
++ * Created on September 4, 2012, 8:29 PM
++ */
++
++#ifndef QUITACTION_HPP
++#define	QUITACTION_HPP
++
++#include &quot;Action.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Interfaces/BaseGameManager.hpp&quot;
++
++class QuitAction : public Action
++{
++public:
++    QuitAction() : Action(true) {}
++    
++    void execute()
++    {
++//        Desktop::setVisibilityAllWindows(false);
++        
++        GameManager::quitNetPanzerGame();
++        gamemanager-&gt;stopMainLoop();
++    }
++};
++
++#endif	/* QUITACTION_HPP */
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -48,6 +48,7 @@
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+ #include &quot;Scripts/ScriptManager.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+@@ -315,6 +316,8 @@
+ {
+     network::NetworkManager::initialize();
+     
++    ActionManager::initialize();
++    
+     BaseGameManager *manager = initialise(argc, argv);
+ 
+     ScriptManager::runFile(&quot;unused&quot;,&quot;scripts/initialize.lua&quot;);
+@@ -351,6 +354,7 @@
+ #endif
+     
+     ScriptManager::close();
++    ActionManager::deinitialize();
+     network::NetworkManager::cleanUp();
+     return 0;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -104,6 +104,7 @@
+ #include &quot;Bot/Bot.hpp&quot;
+ 
+ #include &quot;Scripts/ScriptManager.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ PlayerGameManager::PlayerGameManager()
+     : sdlVideo(0), heartbeat(0), infosocket(0)
+@@ -238,6 +239,7 @@
+ //-----------------------------------------------------------------
+ bool PlayerGameManager::launchNetPanzerGame()
+ {
++    ActionManager::addGUIActions();
+     initializeWindowSubSystem();
+     return true;
+ }
+@@ -461,13 +463,7 @@
+     if ( heartbeat )
+         heartbeat-&gt;checkHeartbeat();
+ 
+-    // handle SDL Events
+-    if(handleSDLEvents())
+-    {
+-        // We got SDL_Quit, lets disconnect nicely.
+-        GameManager::exitNetPanzer();
+-        return false;
+-    }
++    handleSDLEvents();
+ 
+     if ( NetworkState::getNetworkStatus() == _network_state_server )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -26,6 +26,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ static SDLKey key_ascii_conversion[] =
+ {
+@@ -79,7 +80,7 @@
+     return key;
+ }
+ 
+-bool handleSDLEvents()
++void handleSDLEvents()
+ {
+     static SDL_Event event;
+ 
+@@ -87,7 +88,7 @@
+     while(SDL_PollEvent(&amp;event)) {
+         switch (event.type) {
+         case SDL_QUIT:
+-            return true;
++            ActionManager::runAction(&quot;quit&quot;);
+             break;
+         case SDL_MOUSEBUTTONDOWN:
+             MouseInterface::onMouseButtonDown(&amp;event.button);
+@@ -141,6 +142,4 @@
+             break;
+         }
+     }
+-
+-    return false;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.hpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -21,7 +21,7 @@
+ /** This functions iterates throgh the SDL event queue.
+  * It returns true if a quit message has been received, otherwise false.
+  */
+-bool handleSDLEvents();
++void handleSDLEvents();
+ 
+ #endif
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -142,6 +142,11 @@
+     b-&gt;setAction(action);
+     b-&gt;setTextColors(componentInActiveTextColor, componentFocusTextColor, componentActiveTextColor, componentInActiveTextColor);
+     b-&gt;setStateOffset(Button::BPRESSED, 1, 1);
++    
++    if ( ! action )
++    {
++        LOGGER.warning(&quot;No action defined for button '%s'&quot;, label.c_str());
++    }
+     return b;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -89,7 +89,6 @@
+     min.zero();
+     max.zero();
+     status                =  0;
+-    selectedInputField    = -1;
+     searchName            = 0;
+     title                 = 0;
+     subTitle              = 0;
+@@ -374,9 +373,7 @@
+     setActive(false);
+ 
+     doDeactivate();
+-
+-    selectedInputField    = -1;
+-
++    
+ } // end View::deactivate
+ 
+ // doDraw
+@@ -1149,14 +1146,3 @@
+     if (newStatus == true) status |=  STATUS_ACTIVE;
+     else                   status &amp;= ~STATUS_ACTIVE;
+ } // end setActive
+-
+-//---------------------------------------------------------------------------
+-void View::add(DEFAULT_VIEW_BUTTON button)
+-{
+-    if (button == CLOSE_VIEW_BUTTON) {}
+-    else if (button == MINMAX_VIEW_BUTTON) {}
+-    else {
+-        assert(false);
+-    }
+-}
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -32,18 +32,11 @@
+ 
+ using namespace std;
+ 
+-enum DEFAULT_VIEW_BUTTON
+-{
+-    CLOSE_VIEW_BUTTON,
+-    MINMAX_VIEW_BUTTON
+-};
+-
+ class View : public iRect, public StateChangedCallback
+ {
+     friend class Desktop;
+ public:
+     void add(Component *Component);
+-    void add(DEFAULT_VIEW_BUTTON button);
+ 
+ public:
+     typedef list&lt;Component *&gt; ComponentList;
+@@ -53,22 +46,11 @@
+     
+     Component *focusComponent;
+ 
+-    enum
+-    {
+-        MAX_WINDOW_CLIENT_XSIZE = 632
+-    };
+-    enum
+-    {
+-        MAX_WINDOW_CLIENT_YSIZE = 458
+-    };
+-
+ protected:
+-    virtual void     actionPerformed(mMouseEvent )
+-    {}
++    virtual void     actionPerformed(mMouseEvent ) {}
+     Surface*         getViewArea(Surface&amp; dest);
+     virtual Surface* getClientArea(Surface&amp; dest);
+ 
+-    int              selectedInputField;
+     char            *searchName;
+     char            *title;
+     char            *subTitle;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -28,27 +28,42 @@
+     return Surface::getTextLength(List[Index].text)+34;
+ }
+ 
+-void tChatBox::onPaint(Surface &amp;dst, int Index)
++void tChatBox::onPaint(Surface &amp;dst, int Index, int SubLine)
+ {
+-    int StartX = 3;
++    int StartX = 0;
++    PIX color = ctTexteNormal;
++    int StartChar = 0;
++    int NumPrintableChars = dst.getWidth() / 8;
++    
++    StartChar = SubLine * NumPrintableChars; // XXX not checking for out of bounds
++    
+     ChatMessage *MsgData = (ChatMessage*)(List[Index].Data);
+     if (MsgData)
+     {
++        color = MsgData-&gt;Color;
++        
+         if (MsgData-&gt;IsFlag)
+         {
+-            StartX = 23;
+-            Surface * flag = 0;
+-            flag = ResourceManager::getFlag(MsgData-&gt;FlagIndex);
+-            if (flag)
++            if ( ! SubLine )
+             {
+-                flag-&gt;blt(dst, 1, 0);
+-                dst.bltString(StartX , 4, List[Index].text.c_str(), MsgData-&gt;Color);
++                StartX = 24;
++                Surface * flag = 0;
++                flag = ResourceManager::getFlag(MsgData-&gt;FlagIndex);
++                if (flag)
++                {
++                    flag-&gt;blt(dst, 0, 0);
++                }
++                
++                NumPrintableChars -= 3;
+             }
+-            else dst.bltString(StartX , 4, List[Index].text.c_str(), MsgData-&gt;Color);
++            else
++            {
++                StartChar -= 3;
++            }
+         } 
+-        else dst.bltString(StartX , 4, List[Index].text.c_str(), MsgData-&gt;Color);
+     }
+-    else dst.bltString(StartX , 4, List[Index].text.c_str(), ctTexteNormal);
++    
++    dst.bltStringLen(StartX , 4, List[Index].text.c_str() + StartChar, NumPrintableChars, color);
+ }
+ 
+ void tChatBox::AddChat(std::string msg, PIX color, bool isflag, FlagID flagindex)
+@@ -62,3 +77,22 @@
+     AddData(msg, Datamsg);
+ }
+ 
++int tChatBox::getNumLines(int width, const DataItem&amp; data)
++{
++    int len = data.text.size() * 8;
++    
++    bool hasFlag = data.Data ? ((ChatMessage*)data.Data)-&gt;IsFlag : false;
++    
++    if ( hasFlag )
++    {
++        len += 3 * 8; // 3 more chars for the flag
++    }
++    
++    int nlines = len / width;
++    if ( len % width )
++    {
++        nlines += 1;
++    }
++    
++    return nlines;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -34,9 +34,12 @@
+ public:
+     tChatBox(iRect rect, StateChangedCallback* newcallback)
+         : tStringListBox(rect, newcallback)
+-    {    }
++    {
++        setAutoWrap(true);
++    }
++        
+     virtual int getMaxItemWidth(int Index);
+-    virtual void onPaint(Surface &amp;dst, int Index);
++    virtual void onPaint(Surface &amp;dst, int Index, int SubLine);
+     virtual void AddChat(std::string msg, PIX color, bool isflag, FlagID flagindex);
+     virtual void Clear()
+     {
+@@ -49,6 +52,9 @@
+         List.clear();
+         dirty = true;
+     }
++    
++    int getNumLines( int width, const DataItem&amp; data);
++    
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -30,11 +30,15 @@
+     setSize(rect.getSizeX(), rect.getSizeY());
+     background = ctWindowsbackground;
+     StartItem = 0;
++    StartSubLine = 0;
+     StartWidth = 0;
++    TotalLines = 0;
++    TotalPosition = 0;
+     MaxItemWidth = size.x;
+     SelectedItem = -1;
+     MaxItemView = (size.y-5)/ItemHeight;
+     AutoScroll = false;
++    AutoWrap = false;
+     dirty = true;
+ }
+ 
+@@ -68,38 +72,69 @@
+     return Surface::getTextLength(List[Index].text)+10;
+ }
+ 
+-void tStringListBox::Add(const std::string S)
++void tStringListBox::AddData(const std::string&amp; S, void * D)
+ {
++    int DisplaySize = size.x - 6;
++    
+     DataItem data;
+     data.text = S;
++    data.Data = D;
++    data.num_lines = getNumLines(DisplaySize, data);
+     List.push_back(data);
++    
++    TotalLines += data.num_lines;
++    
+     int HSize = getMaxItemWidth(List.size()-1);
+-    if (MaxItemWidth &lt; HSize) MaxItemWidth = HSize;
+-    if (VScrollBar) VScrollBar-&gt;setMax(List.size()-MaxItemView);
+-    if (HScrollBar) HScrollBar-&gt;setMax(MaxItemWidth-size.x);
+-    if (AutoScroll &amp;&amp; VScrollBar) 
++    
++    if (MaxItemWidth &lt; HSize)
+     {
+-        VScrollBar-&gt;setPosition(VScrollBar-&gt;getMax());
+-        StartItem = VScrollBar-&gt;getPosition();
++        MaxItemWidth = HSize;
+     }
+-    dirty = true;
+-}
+-
+-void tStringListBox::AddData(const std::string S, void * D)
+-{
+-    DataItem data;
+-    data.text = S;
+-    data.Data = D;
+-    List.push_back(data);
+-    int HSize = getMaxItemWidth(List.size()-1);
+-    if (MaxItemWidth &lt; HSize) MaxItemWidth = HSize;
+-    if (VScrollBar) VScrollBar-&gt;setMax(List.size()-MaxItemView);
+-    if (HScrollBar) HScrollBar-&gt;setMax(MaxItemWidth-size.x);
++    
++    if (VScrollBar)
++    {
++//        VScrollBar-&gt;setMax(List.size()-MaxItemView);
++        VScrollBar-&gt;setMax(TotalLines-MaxItemView);
++    }
++    
++    if (HScrollBar)
++    {
++        HScrollBar-&gt;setMax(MaxItemWidth-size.x);
++    }
++    
+     if (AutoScroll &amp;&amp; VScrollBar) 
+     {
+         VScrollBar-&gt;setPosition(VScrollBar-&gt;getMax());
+-        StartItem = VScrollBar-&gt;getPosition();
++        
++        int new_pos = VScrollBar-&gt;getPosition();
++        
++        if ( new_pos &lt; TotalPosition )
++        {
++            while ( TotalPosition &gt; new_pos )
++            {
++                if ( (--StartSubLine) &lt; 0 )
++                {
++                    StartItem -= 1;
++                    StartSubLine = List[StartItem].num_lines - 1;
++                }
++                TotalPosition -= 1;
++            }
++        }
++        else if ( new_pos &gt; TotalPosition )
++        {
++            while ( TotalPosition &lt; new_pos )
++            {
++                if ( (++StartSubLine) &gt;= List[StartItem].num_lines )
++                {
++                    StartItem += 1;
++                    StartSubLine = 0;
++                }
++                TotalPosition += 1;
++            }
++        }
++//        StartItem = VScrollBar-&gt;getPosition();
+     }
++    
+     dirty = true;
+ }
+ 
+@@ -110,25 +145,49 @@
+     int MaxItem = MaxItemView-StartItem;
+     if ( (StartItem+MaxItemView) &gt; (int)List.size()) MaxItem  = List.size();
+     else MaxItem = StartItem+MaxItemView;
+-    int row = 5;
+-    Surface RowPaint(MaxItemWidth+10, ItemHeight, 1);
+-    Surface Bitmap(size.x, ItemHeight, 1);
+-    for(int i = StartItem; i &lt; MaxItem; ++i)
++    int row = 4;
++    
++    int maxw = 0;
++    if ( AutoWrap )
+     {
++        maxw = size.x - 6;
++    }
++    else
++    {
++        maxw = MaxItemWidth+10;
++    }
++    
++    Surface RowPaint(maxw, ItemHeight, 1);
++    Surface Bitmap(size.x-6, ItemHeight, 1);
++    
++    int item_num = StartItem;
++    int subline_num = StartSubLine;
++    int max_size_y = size.y - ItemHeight;
++    
++    while ( (row &lt; max_size_y) &amp;&amp; (item_num &lt; List.size()) )
++    {
+         RowPaint.fill(background);
+-        if (SelectedItem == i)
++//        if (SelectedItem == i)
++//        {
++//            RowPaint.fill(ctTexteOver);
++//        }
++        onPaint(RowPaint, item_num, subline_num);
++        
++        iRect r(StartWidth, 0, StartWidth+(size.x-6), ItemHeight);
++        Bitmap.grab(RowPaint, r);
++        Bitmap.blt(surface, 3, row);
++        
++        row += ItemHeight;
++        subline_num += 1;
++        if ( subline_num &gt;= List[item_num].num_lines )
+         {
+-            RowPaint.fill(ctTexteOver);
++            subline_num = 0;
++            item_num += 1;
+         }
+-        onPaint(RowPaint, i);
+-        iRect r(StartWidth, 0, StartWidth+size.x, ItemHeight);
+-        Bitmap.grab(RowPaint, r);
+-        Bitmap.blt(surface, 0, row);
+-        row += ItemHeight;
+     }
+ }
+ 
+-void tStringListBox::onPaint(Surface &amp;dst, int Index)
++void tStringListBox::onPaint(Surface &amp;dst, int Index, int SubLine)
+ {
+     dst.bltString(1 , 4, List[Index].text.c_str(), ctTexteNormal);
+ }
+@@ -168,7 +227,36 @@
+ {
+     if (source == VScrollBar)
+     {
+-        StartItem = VScrollBar-&gt;getPosition();
++        
++//        StartItem = VScrollBar-&gt;getPosition();
++        
++        int new_pos = VScrollBar-&gt;getPosition();
++        
++        if ( new_pos &lt; TotalPosition )
++        {
++            while ( TotalPosition &gt; new_pos )
++            {
++                if ( (--StartSubLine) &lt; 0 )
++                {
++                    StartItem -= 1;
++                    StartSubLine = List[StartItem].num_lines - 1;
++                }
++                TotalPosition -= 1;
++            }
++        }
++        else if ( new_pos &gt; TotalPosition )
++        {
++            while ( TotalPosition &lt; new_pos )
++            {
++                if ( (++StartSubLine) &gt;= List[StartItem].num_lines )
++                {
++                    StartItem += 1;
++                    StartSubLine = 0;
++                }
++                TotalPosition += 1;
++            }
++        }
++
+         dirty = true;
+     }
+     if (source == HScrollBar)
+@@ -210,3 +298,32 @@
+     }
+ }
+ 
++void tStringListBox::setAutoWrap(bool autowrap)
++{
++    if ( this-&gt;AutoWrap != autowrap )
++    {
++        this-&gt;AutoWrap = autowrap;
++        StartSubLine = 0;
++        if ( autowrap )
++        {
++            int NumLines = 0;
++            int DisplaySize = size.x - 6;
++            int c;
++            
++            std::vector&lt;DataItem&gt;::iterator i = List.begin();
++            while ( i != List.end() )
++            {
++                c = getNumLines( DisplaySize, *i);
++                NumLines += c;
++                (*i).num_lines = c;
++                i++;
++            }
++            
++            TotalLines = NumLines;
++        }
++        else
++        {
++            TotalLines = List.size();
++        }
++    }
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -32,6 +32,7 @@
+ {
+ public:
+     std::string text;
++    int num_lines;
+     void * Data;
+ };
+ 
+@@ -47,19 +48,27 @@
+     
+     tVScrollBar *VScrollBar;
+     tHScrollBar *HScrollBar;
++    
+     int StartItem;
++    int StartSubLine;
+     int StartWidth;
++    
+     int MaxItemView;
+     int SelectedItem;
+     int MaxItemWidth;
++    
++    int TotalLines;
++    int TotalPosition;
++    
+     bool AutoScroll;
++    bool AutoWrap;
++    
+     virtual void render();
+     virtual void actionPerformed(const mMouseEvent &amp;me);
+ public:
+ 
+     tStringListBox(iRect rect, StateChangedCallback* newcallback = 0);
+-    virtual ~tStringListBox()
+-    {}
++    virtual ~tStringListBox() {}
+ 
+     virtual void setColor(PIX newColor);
+     virtual void setStateChangedCallback(StateChangedCallback* newcallback)
+@@ -72,17 +81,23 @@
+     virtual int getMaxItemWidth(int Index);
+     virtual int getSelectedItem();
+     virtual std::string getTextItem();
+-    virtual void Add(const std::string S);
+-    virtual void AddData(const std::string S, void * D);
++    
++    virtual void Add(const std::string&amp; S) { AddData(S, 0); }
++    virtual void AddData(const std::string&amp; S, void * D);
++    
+     virtual void Clear(){List.clear();dirty = true;}
+     virtual void Delete(int Index);
+     //virtual void Sort(){sort(List.begin(), List.end());dirty = true;}
+     virtual int IndexOf(const std::string S);
+     virtual int Count(){return List.size();}
+-    virtual void onPaint(Surface &amp;dst, int Index);
++    virtual void onPaint(Surface &amp;dst, int Index, int SubLine);
+     virtual void setLocation(int x, int y);
+     virtual void setLocation(const iXY &amp;p) { setLocation(p.x, p.y); }
+     virtual void setAutoScroll(bool Value){AutoScroll = Value;}
++    
++    void setAutoWrap(bool autowrap);
++    
++    virtual int getNumLines( int width, const DataItem&amp; data) { return 1; }
+ }; 
+ 
+ #endif 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -24,31 +24,8 @@
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ 
+-#include &quot;Actions/Action.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+-
+-class ExitNetPanzerAction : public Action
+-{
+-public:
+-    ExitNetPanzerAction() : Action(false) {}
+-    void execute()
+-    {
+-        GameManager::drawTextCenteredOnScreen(&quot;Exiting&quot;, Color::white);
+-        GameManager::exitNetPanzer();
+-    }
+-};
+-
+-class HideView : public Action
+-{
+-public:
+-    View * view;
+-    HideView(View * view) : Action(false), view(view) {}
+-    void execute()
+-    {
+-        Desktop::setVisibility(view-&gt;getSearchName(), false);
+-    }
+-};
+-
+ // AreYouSureExitView
+ //---------------------------------------------------------------------------
+ AreYouSureExitView::AreYouSureExitView() : SpecialButtonView()
+@@ -72,9 +49,9 @@
+ 
+     int x = (getClientRect().getSize().x - (141 * 2 + 20)) / 2;
+     int y = getClientRect().getSize().y/2 + 30;
+-    add( Button::createTextButton( &quot;YES&quot;, iXY(x, y), 137, new ExitNetPanzerAction()));
++    add( Button::createTextButton( &quot;YES&quot;, iXY(x, y), 137, ActionManager::getAction(&quot;quit&quot;)));
+     x += 141 + 10;
+-    add( Button::createTextButton( &quot;NO&quot;, iXY(x, y), 137, new HideView(this)));
++    add( Button::createTextButton( &quot;NO&quot;, iXY(x, y), 137, ActionManager::getAction(&quot;hide_confirmexit&quot;)));
+     loaded = true;
+ } // end AreYouSureExitView::init
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -30,60 +30,8 @@
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ 
+-#include &quot;Actions/Action.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+-class ResignGameAction : public Action
+-{
+-public:
+-    ResignGameAction() : Action(false) {}
+-    void execute()
+-    {
+-        if(gameconfig-&gt;quickConnect == true) {
+-            GameManager::exitNetPanzer();
+-            return;
+-        }
+-
+-        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+-
+-        // Vlad put all code in here for shutdown.
+-        //----------------------
+-        GameManager::quitNetPanzerGame();
+-        //----------------------
+-
+-        // Swap to the menu resolution.
+-        //GameManager::setVideoMode(iXY(640, 480), false);
+-
+-        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+-
+-        // Must remove the gameView first so that the initButtons detects that
+-        // and loads the correct buttons.
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-        Desktop::setVisibility(&quot;MainView&quot;, true);
+-        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+-
+-        View *v = Desktop::getView(&quot;OptionsView&quot;);
+-
+-        if (v != 0) 
+-        {
+-            ((OptionsTemplateView *)v)-&gt;initButtons();
+-            ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-        }
+-
+-    }
+-};
+-
+-class HideView : public Action
+-{
+-public:
+-    View * view;
+-    HideView(View * view) : Action(false), view(view) {}
+-    void execute()
+-    {
+-        Desktop::setVisibility(view-&gt;getSearchName(), false);
+-    }
+-};
+-
+ // AreYouSureResignView
+ //---------------------------------------------------------------------------
+ AreYouSureResignView::AreYouSureResignView() : SpecialButtonView()
+@@ -107,9 +55,9 @@
+ 
+     int x = (getClientRect().getSize().x - (141 * 2 + 20)) / 2;
+     int y = getClientRect().getSize().y/2 + 30;
+-    add( Button::createTextButton( &quot;YES&quot;, iXY(x, y), 137, new ResignGameAction()));
++    add( Button::createTextButton( &quot;YES&quot;, iXY(x, y), 137, ActionManager::getAction(&quot;disconnect&quot;)));
+     x += 141 + 10;
+-    add( Button::createTextButton( &quot;NO&quot;, iXY(x, y), 137, new HideView(this)));
++    add( Button::createTextButton( &quot;NO&quot;, iXY(x, y), 137, ActionManager::getAction(&quot;hide_confirmdisconnect&quot;)));
+     loaded = true;
+ } // end AreYouSureResignView::init
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -140,22 +140,19 @@
+     
+     HideWindow = false;
+ 
+-    iRect r(0, 15, getSizeX()-15, getSizeY()-31);
++    iRect r(0, 15, getSizeX()-15, getSizeY()-17);
+     ChatList = new tChatBox(r, 0);
+     vsbChat = new tVScrollBar();
+-    hsbChat = new tHScrollBar();
+     add(vsbChat);
+-    add(hsbChat);
+     ChatList-&gt;setVscrollBar(vsbChat);
+-    ChatList-&gt;setHscrollBar(hsbChat);
+     ChatList-&gt;setColor(0);
+     ChatList-&gt;setAutoScroll(true);
+     add(ChatList);
+     
+     input = new InputField();
+     input-&gt;setLocation(2 + 16,getSizeY()-16);
+-    input-&gt;setSize(getSizeX()-5,16);
+-    input-&gt;setMaxTextLength(100);
++    input-&gt;setSize(getSizeX()-(5 + 17),16);
++    input-&gt;setMaxTextLength(500);
+     input-&gt;setExcludedChars(&quot;\\&#65533;`&#65533;&quot;);
+     
+     add(input);
+@@ -320,12 +317,6 @@
+     moveTo(screen-&gt;getWidth()-getSizeX(), screen-&gt;getHeight()-getSizeY());
+ }
+ 
+-void ChatView::doActivate()
+-{
+-    Desktop::setActiveView(this);
+-//    View::selectedInputField = View::findInputFieldContaining(input-&gt;getPos());
+-}
+-
+ void ChatView::clear()
+ {
+     ChatList-&gt;Clear();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -33,7 +33,6 @@
+ 
+     tChatBox * ChatList;
+     tVScrollBar * vsbChat;
+-    tHScrollBar * hsbChat;
+     Button * bHideWindow;
+     Button * bShowWindow;
+     Button * switchModeButton;
+@@ -52,7 +51,6 @@
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void processEvents();
+     virtual void checkResolution(iXY oldResolution, iXY newResolution);
+-    virtual void doActivate();
+     void postMessage( PIX msgColor, bool hasFlag, FlagID flag, const char *format, ... );
+     void clear();
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -27,52 +27,9 @@
+ 
+ #include &quot;Util/Log.hpp&quot;
+ 
+-#include &quot;Actions/Action.hpp&quot;
+ #include &quot;Views/Components/Button.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+-class DisconnectConfirmedAction : public Action
+-{
+-public:
+-    DisconnectConfirmedAction() : Action(false) {}
+-    void execute()
+-    {
+-        if(gameconfig-&gt;quickConnect == true) {
+-            GameManager::exitNetPanzer();
+-            return;
+-        }
+-
+-        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+-
+-        // Vlad put all code in here for shutdown.
+-        //----------------------
+-        GameManager::quitNetPanzerGame();
+-        //----------------------
+-
+-        // Swap to the menu resolution.
+-        //GameManager::setVideoMode(iXY(640, 480), false);
+-
+-        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+-
+-
+-        // Must remove the gameView first so that the initButtons detects that
+-        // and loads the correct buttons.
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-        Desktop::setVisibility(&quot;MainView&quot;, true);
+-        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+-
+-        View *v = Desktop::getView(&quot;OptionsView&quot;);
+-
+-        if (v != 0) {
+-            ((OptionsTemplateView *)v)-&gt;initButtons();
+-            ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-        } else {
+-            assert(false);
+-        }
+-        LOGGER.warning(&quot;DisconectedView:: finished disconection&quot;);
+-    }
+-};
+-
+ DisconectedView::DisconectedView() : SpecialButtonView()
+ {
+     setSearchName(&quot;DisconectedView&quot;);
+@@ -90,8 +47,9 @@
+     moveTo(0,0);
+ 
+     int bsize = Surface::getTextLength(&quot; &quot;) * 8;
++    
+     add( Button::createTextButton(&quot;Ok&quot;, iXY((getClientRect().getSizeX()/2)-(bsize/2), (getClientRect().getSizeY()/2)+(Surface::getFontHeight() * 2)),
+-                                  bsize, new DisconnectConfirmedAction()));
++                                  bsize, ActionManager::getAction(&quot;disconnect&quot;)));
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-04 13:18:44 UTC (rev 1393)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-04 16:52:38 UTC (rev 1394)
+@@ -42,6 +42,7 @@
+ 
+ #include &quot;Actions/Action.hpp&quot;
+ #include &quot;Multi/PlayerNameView.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+@@ -129,18 +130,6 @@
+     }
+ };
+ 
+-class ExitNetPanzerAction : public Action
+-{
+-public:
+-    ExitNetPanzerAction() : Action(false) {}
+-    
+-    void execute()
+-    {
+-        Desktop::setVisibilityAllWindows(false);
+-        GameManager::exitNetPanzer();
+-    }
+-};
+-
+ class OpenResignGameViewAction : public Action
+ {
+ public:
+@@ -303,7 +292,7 @@
+     add( createMenuButton( &quot;Host&quot;,           hostPos,    false, new ShowHostViewAction()) );
+     add( createMenuButton( &quot;Options&quot;,        optionsPos, false, new ShowOptionsViewAction()) );
+     add( createMenuButton( &quot;Help&quot;,           helpPos,    false, new ShowHelpViewAction()) );
+-    add( createMenuButton( &quot;Exit netPanzer&quot;, exitPos,    false, new ExitNetPanzerAction()) );
++    add( createMenuButton( &quot;Exit netPanzer&quot;, exitPos,    false, ActionManager::getAction(&quot;quit&quot;)) );
+     
+     playButton = createMenuButton( &quot;Play&quot;, iXY(-100, 0), true, new PlayButtonClickedAction());
+     add( playButton );
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000417.html">[Netpanzer-cvs] r1393 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000419.html">[Netpanzer-cvs] r1395 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#418">[ date ]</a>
+              <a href="thread.html#418">[ thread ]</a>
+              <a href="subject.html#418">[ subject ]</a>
+              <a href="author.html#418">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

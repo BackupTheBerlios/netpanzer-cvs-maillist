@@ -1,0 +1,981 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1166 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Particles src/NetPanzer/Scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1166%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts&In-Reply-To=%3C201001091004.o09A49OA013347%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000193.html">
+   <LINK REL="Next"  HREF="000195.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1166 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Particles src/NetPanzer/Scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1166%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts&In-Reply-To=%3C201001091004.o09A49OA013347%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1166 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Particles src/NetPanzer/Scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan  9 11:04:09 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000193.html">[Netpanzer-cvs] r1165 - in trunk/netpanzer: pics/particles/lights	src/NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000195.html">[Netpanzer-cvs] r1167 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Units	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#194">[ date ]</a>
+              <a href="thread.html#194">[ thread ]</a>
+              <a href="subject.html#194">[ subject ]</a>
+              <a href="author.html#194">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-09 11:03:47 +0100 (Sat, 09 Jan 2010)
+New Revision: 1166
+
+Modified:
+   trunk/netpanzer/scripts/particles.lcfg
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+Log:
+- Updated the configuration way of the particles
+
+Modified: trunk/netpanzer/scripts/particles.lcfg
+===================================================================
+--- trunk/netpanzer/scripts/particles.lcfg	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/scripts/particles.lcfg	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -1,84 +1,80 @@
+-particles =
+-{
+-    -- puffs is required, must have: light, dark and dirt
+-    -- format is file_name, width, height, num_frames
+-    puffs =
+-    {
+-        light =
+-        {
+-            { &quot;pics/particles/puff/smokeLightPuff0004.png&quot;,  4,  4, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0008.png&quot;,  8,  8, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0012.png&quot;, 12, 12, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0016.png&quot;, 16, 16, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0020.png&quot;, 20, 20, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0024.png&quot;, 24, 24, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0028.png&quot;, 28, 28, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0032.png&quot;, 32, 32, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0036.png&quot;, 36, 36, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0040.png&quot;, 40, 40, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0044.png&quot;, 44, 44, 26 },
+-            { &quot;pics/particles/puff/smokeLightPuff0048.png&quot;, 48, 48, 26 }
+-        },
++-- clouds: required, single file
+ 
+-        dark =
+-        {
+-            { &quot;pics/particles/puff/smokeDarkPuff0004.png&quot;,  4,  4, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0008.png&quot;,  8,  8, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0012.png&quot;, 12, 12, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0016.png&quot;, 16, 16, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0020.png&quot;, 20, 20, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0024.png&quot;, 24, 24, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0028.png&quot;, 28, 28, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0032.png&quot;, 32, 32, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0036.png&quot;, 36, 36, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0040.png&quot;, 40, 40, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0044.png&quot;, 44, 44, 26 },
+-            { &quot;pics/particles/puff/smokeDarkPuff0048.png&quot;, 48, 48, 26 }
+-        },
++clouds = { &quot;pics/particles/clouds/clouds.png&quot;, 300, 300, 10 }
++flash  = { &quot;pics/particles/lights/flash2.png&quot;, 240, 194, 20 }
++chunks = { &quot;pics/particles/chunks/groundChunks.png&quot;, 2, 2, 256 }
++craters= { &quot;pics/particles/craters/craters.png&quot;, 32, 32, 3 }
+ 
+-        dirt =
+-        {
+-            { &quot;pics/particles/puff/dirtPuff0004.png&quot;,  4,  4, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0008.png&quot;,  8,  8, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0012.png&quot;, 12, 12, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0016.png&quot;, 16, 16, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0020.png&quot;, 20, 20, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0024.png&quot;, 24, 24, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0028.png&quot;, 28, 28, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0032.png&quot;, 32, 32, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0036.png&quot;, 36, 36, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0040.png&quot;, 40, 40, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0044.png&quot;, 44, 44, 26 },
+-            { &quot;pics/particles/puff/dirtPuff0048.png&quot;, 48, 48, 26 }
+-        }
+-    },
++-- puffs is required, must have: light, dark and dirt
++-- format is file_name, width, height, num_frames
+ 
+-    -- clouds: required, single file
+-    clouds = { &quot;pics/particles/clouds/clouds.png&quot;, 300, 300, 10 },
+-    flash  = { &quot;pics/particles/lights/flash2.png&quot;, 240, 194, 20 },
+-    chunks = { &quot;pics/particles/chunks/groundChunks.png&quot;, 2, 2, 256 },
+-    craters= { &quot;pics/particles/craters/craters.png&quot;, 32, 32, 3 },
++lightpuffs = 
++{
++    { &quot;pics/particles/puff/smokeLightPuff0004.png&quot;,  4,  4, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0008.png&quot;,  8,  8, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0012.png&quot;, 12, 12, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0016.png&quot;, 16, 16, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0020.png&quot;, 20, 20, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0024.png&quot;, 24, 24, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0028.png&quot;, 28, 28, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0032.png&quot;, 32, 32, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0036.png&quot;, 36, 36, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0040.png&quot;, 40, 40, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0044.png&quot;, 44, 44, 26 },
++    { &quot;pics/particles/puff/smokeLightPuff0048.png&quot;, 48, 48, 26 }
++}
++    
++darkpuffs =
++{
++    { &quot;pics/particles/puff/smokeDarkPuff0004.png&quot;,  4,  4, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0008.png&quot;,  8,  8, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0012.png&quot;, 12, 12, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0016.png&quot;, 16, 16, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0020.png&quot;, 20, 20, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0024.png&quot;, 24, 24, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0028.png&quot;, 28, 28, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0032.png&quot;, 32, 32, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0036.png&quot;, 36, 36, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0040.png&quot;, 40, 40, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0044.png&quot;, 44, 44, 26 },
++    { &quot;pics/particles/puff/smokeDarkPuff0048.png&quot;, 48, 48, 26 }
++}
++    
++dirtpuffs =
++{
++    { &quot;pics/particles/puff/dirtPuff0004.png&quot;,  4,  4, 26 },
++    { &quot;pics/particles/puff/dirtPuff0008.png&quot;,  8,  8, 26 },
++    { &quot;pics/particles/puff/dirtPuff0012.png&quot;, 12, 12, 26 },
++    { &quot;pics/particles/puff/dirtPuff0016.png&quot;, 16, 16, 26 },
++    { &quot;pics/particles/puff/dirtPuff0020.png&quot;, 20, 20, 26 },
++    { &quot;pics/particles/puff/dirtPuff0024.png&quot;, 24, 24, 26 },
++    { &quot;pics/particles/puff/dirtPuff0028.png&quot;, 28, 28, 26 },
++    { &quot;pics/particles/puff/dirtPuff0032.png&quot;, 32, 32, 26 },
++    { &quot;pics/particles/puff/dirtPuff0036.png&quot;, 36, 36, 26 },
++    { &quot;pics/particles/puff/dirtPuff0040.png&quot;, 40, 40, 26 },
++    { &quot;pics/particles/puff/dirtPuff0044.png&quot;, 44, 44, 26 },
++    { &quot;pics/particles/puff/dirtPuff0048.png&quot;, 48, 48, 26 }
++}
+ 
+-    explosions =
++explosions =
++{
+     {
+-        {
+-            { &quot;pics/particles/explosion/explosion0_0001.png&quot;, 13, 18, 16 },
+-            { &quot;pics/particles/explosion/explosion0_0002.png&quot;, 27, 36, 16 },
+-            { &quot;pics/particles/explosion/explosion0_0003.png&quot;, 41, 54, 16 },
+-            { &quot;pics/particles/explosion/explosion0_0004.png&quot;, 54, 73, 16 },
+-            { &quot;pics/particles/explosion/explosion0_0005.png&quot;, 68, 91, 16 },
+-            { &quot;pics/particles/explosion/explosion0_0006.png&quot;, 82, 109, 16 },
+-            { &quot;pics/particles/explosion/explosion0_0007.png&quot;, 96, 128, 16 }
+-        },
+-        
+-        {
+-            { &quot;pics/particles/explosion/explosion1_0001.png&quot;, 18, 13, 15 },
+-            { &quot;pics/particles/explosion/explosion1_0002.png&quot;, 36, 27, 15 },
+-            { &quot;pics/particles/explosion/explosion1_0003.png&quot;, 54, 41, 15 },
+-            { &quot;pics/particles/explosion/explosion1_0004.png&quot;, 73, 54, 15 },
+-            { &quot;pics/particles/explosion/explosion1_0005.png&quot;, 91, 68, 15 },
+-            { &quot;pics/particles/explosion/explosion1_0006.png&quot;, 109, 82, 15 },
+-            { &quot;pics/particles/explosion/explosion1_0007.png&quot;, 128, 96, 15 }
+-        }
++        { &quot;pics/particles/explosion/explosion0_0001.png&quot;, 13, 18, 16 },
++        { &quot;pics/particles/explosion/explosion0_0002.png&quot;, 27, 36, 16 },
++        { &quot;pics/particles/explosion/explosion0_0003.png&quot;, 41, 54, 16 },
++        { &quot;pics/particles/explosion/explosion0_0004.png&quot;, 54, 73, 16 },
++        { &quot;pics/particles/explosion/explosion0_0005.png&quot;, 68, 91, 16 },
++        { &quot;pics/particles/explosion/explosion0_0006.png&quot;, 82, 109, 16 },
++        { &quot;pics/particles/explosion/explosion0_0007.png&quot;, 96, 128, 16 }
++    },
++    
++    {
++        { &quot;pics/particles/explosion/explosion1_0001.png&quot;, 18, 13, 15 },
++        { &quot;pics/particles/explosion/explosion1_0002.png&quot;, 36, 27, 15 },
++        { &quot;pics/particles/explosion/explosion1_0003.png&quot;, 54, 41, 15 },
++        { &quot;pics/particles/explosion/explosion1_0004.png&quot;, 73, 54, 15 },
++        { &quot;pics/particles/explosion/explosion1_0005.png&quot;, 91, 68, 15 },
++        { &quot;pics/particles/explosion/explosion1_0006.png&quot;, 109, 82, 15 },
++        { &quot;pics/particles/explosion/explosion1_0007.png&quot;, 128, 96, 15 }
+     }
+-};
++}
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -32,6 +32,9 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Palette.hpp&quot;
+ #include &quot;Surface.hpp&quot;
++
++#include &quot;lua/lua.hpp&quot;
++
+ extern &quot;C&quot;
+ {
+     SDL_Surface *IMG_LoadPNG_RW(SDL_RWops *src);
+@@ -1151,3 +1154,34 @@
+         }
+     }
+ }
++
++int Surface::loadPNGSheetPointer(lua_State* L, void* v)
++{
++    if ( ! lua_istable(L, -1) )
++    {
++        return 0;
++    }
++
++    Surface** dest = (Surface**) v;
++
++    lua_rawgeti(L, -1, 1); // file_name
++    lua_rawgeti(L, -2, 2); // width
++    lua_rawgeti(L, -3, 3); // height
++    lua_rawgeti(L, -4, 4); // nframes
++
++    if ( ! *dest )
++    {
++        *dest = new Surface();
++    }
++
++    (*dest)-&gt;loadPNGSheet( lua_tostring(L, -4),
++                          lua_tointeger(L, -3),
++                          lua_tointeger(L, -2),
++                          lua_tointeger(L, -1));
++
++    lua_pop(L, 4);
++
++    (*dest)-&gt;setColorkey();
++    (*dest)-&gt;setOffsetCenter();
++    return 0;
++}
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -32,6 +32,7 @@
+ 
+ class Palette;
+ class Surface;
++struct lua_State;
+ 
+ typedef std::vector&lt;Surface*&gt; SurfaceList;
+ 
+@@ -190,6 +191,10 @@
+     void setAlpha(unsigned int alpha = 128);
+     void optimize();
+ 
++    // for scripts
++    // pointer is: pointer to a surface pointer;
++    static int loadPNGSheetPointer(lua_State *L, void *v);
++
+ private:
+     static SDL_Surface * blackScreen;
+     static int totalSurfaceCount;  // The number of surfaces alive.
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -95,48 +95,6 @@
+ 
+ } // end ChunkTrajectoryParticle2D::ChunkTrajectoryParticle2D
+ 
+-// init
+-//---------------------------------------------------------------------------
+-void ChunkTrajectoryParticle2D::init(lua_State *L)
+-{
+-    if ( staticPackedGroundChunks )
+-    {
+-        return; // already loaded
+-    }
+-
+-    int luatop = lua_gettop(L);
+-
+-    lua_getfield(L, -1, &quot;chunks&quot;);
+-    if ( ! lua_istable(L, -1) )
+-    {
+-        LOGGER.warning(&quot;chunks configuration not found.&quot;);
+-        lua_settop(L, luatop);
+-        return;
+-    }
+-
+-//    lua_rawgeti(L, -1, 1);
+-
+-    lua_rawgeti(L, -1, 1); // file_name
+-    lua_rawgeti(L, -2, 2); // width
+-    lua_rawgeti(L, -3, 3); // height
+-    lua_rawgeti(L, -4, 4); // nframes
+-
+-    Surface* s = new Surface();
+-    s-&gt;loadPNGSheet( lua_tostring(L, -4),
+-                    lua_tointeger(L, -3),
+-                    lua_tointeger(L, -2),
+-                    lua_tointeger(L, -1));
+-
+-//    lua_pop(L, 5);
+-
+-    s-&gt;setColorkey();
+-    s-&gt;setOffsetCenter();
+-
+-    staticPackedGroundChunks = s;
+-
+-    lua_settop(L, luatop);
+-} // end ChunkTrajectoryParticle2D::init
+-
+ // draw
+ //---------------------------------------------------------------------------
+ void ChunkTrajectoryParticle2D::draw(SpriteSorter &amp;sorter)
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -55,10 +55,7 @@
+ 
+     virtual void sim();
+     virtual void draw(SpriteSorter &amp;sorter);
++    
++}; // end ChunkTrajectoryParticle2D
+ 
+-    static void init(lua_State *L);
+-
+-}
+-; // end ChunkTrajectoryParticle2D
+-
+ #endif // __ChunkTrajectoryParticle2D_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -74,54 +74,28 @@
+ 
+ } // end CloudParticle2D::setRandomSurface
+ 
+-// init
+-//---------------------------------------------------------------------------
+-void CloudParticle2D::init(lua_State *L)
++int CloudParticle2D::loadClouds(lua_State * L, void * v)
+ {
+-    if ( staticPackedCloud )
++    Surface::loadPNGSheetPointer(L, &amp;staticPackedCloud);
++    if ( ! staticPackedCloud )
+     {
+-        return; // already loaded
++        LOGGER.warning(&quot;BAD clouds configuration, not loading clouds.&quot;);
++        return 0;
+     }
+ 
+-    int luatop = lua_gettop(L);
+-
+-    lua_getfield(L, -1, &quot;clouds&quot;);
+-    if ( ! lua_istable(L, -1) )
++    if ( ! staticCloudShadow )
+     {
+-        LOGGER.warning(&quot;clouds configuration not found.&quot;);
+-        lua_settop(L, luatop);
+-        return;
++        staticCloudShadow = new Surface();
+     }
+ 
+-//    lua_rawgeti(L, -1, 1);
+-
+-    lua_rawgeti(L, -1, 1); // file_name
+-    lua_rawgeti(L, -2, 2); // width
+-    lua_rawgeti(L, -3, 3); // height
+-    lua_rawgeti(L, -4, 4); // nframes
+-
+-    Surface* s = new Surface();
+-    s-&gt;loadPNGSheet( lua_tostring(L, -4),
+-                    lua_tointeger(L, -3),
+-                    lua_tointeger(L, -2),
+-                    lua_tointeger(L, -1));
+-
+-//    lua_pop(L, 5);
+-
+-    s-&gt;setColorkey();
+-    s-&gt;setOffsetCenter();
+-
+-    staticPackedCloud = s;
+-    staticCloudShadow = new Surface();
+     staticCloudShadow-&gt;createShadow(*staticPackedCloud);
+-
+-    s-&gt;setAlpha(128);
+-
+     staticCloudShadow-&gt;setAlpha(32);
+ 
+-    lua_settop(L, luatop);
+-} // end CloudParticle2D::init
++    staticPackedCloud-&gt;setAlpha(128);
+ 
++    return 0;
++}
++
+ // sim
+ //---------------------------------------------------------------------------
+ void CloudParticle2D::sim()
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -40,7 +40,7 @@
+                      float       windMin,
+                      float       windRand);
+ 
+-    static void init(lua_State *L);
++    static int loadClouds(lua_State * L, void * v);
+ 
+     virtual void sim();
+     virtual void draw(SpriteSorter &amp;sorter);
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -79,7 +79,7 @@
+ 
+ // init
+ //---------------------------------------------------------------------------
+-void CraterParticle2D::init(lua_State *L)
++int CraterParticle2D::loadCraters(lua_State *L, void *v)
+ {
+     craterCache.resize(40);
+     for (size_t i = 0; i &lt; craterCache.size(); i++) {
+@@ -87,42 +87,7 @@
+         craterCache[i].pos.zero();
+     }
+ 
+-    if ( staticPackedCrater )
+-    {
+-        return; // already loaded
+-    }
+-
+-    int luatop = lua_gettop(L);
+-
+-    lua_getfield(L, -1, &quot;craters&quot;);
+-    if ( ! lua_istable(L, -1) )
+-    {
+-        LOGGER.warning(&quot;craters configuration not found.&quot;);
+-        lua_settop(L, luatop);
+-        return;
+-    }
+-
+-//    lua_rawgeti(L, -1, 1);
+-
+-    lua_rawgeti(L, -1, 1); // file_name
+-    lua_rawgeti(L, -2, 2); // width
+-    lua_rawgeti(L, -3, 3); // height
+-    lua_rawgeti(L, -4, 4); // nframes
+-
+-    Surface* s = new Surface();
+-    s-&gt;loadPNGSheet( lua_tostring(L, -4),
+-                    lua_tointeger(L, -3),
+-                    lua_tointeger(L, -2),
+-                    lua_tointeger(L, -1));
+-
+-//    lua_pop(L, 5);
+-
+-    s-&gt;setColorkey();
+-    s-&gt;setOffsetCenter();
+-
+-    staticPackedCrater = s;
+-
+-    lua_settop(L, luatop);
++    return Surface::loadPNGSheetPointer(L, v);
+ } // end CraterParticle2D::init
+ 
+ // draw
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -39,7 +39,7 @@
+ public:
+     CraterParticle2D(const fXYZ  &amp;pos);
+ 
+-    static void init(lua_State *L);
++    static int loadCraters(lua_State *L, void *v);
+ 
+     static int getCacheHitCount()
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -31,7 +31,6 @@
+ } FlameArray;
+ 
+ static FlameArray* flame_array = 0;
+-static unsigned int num_explosions = 0;
+ 
+ const int explosionFPS = 18;
+ 
+@@ -63,33 +62,41 @@
+ 
+ // init
+ //---------------------------------------------------------------------------
+-void FlameParticle2D::init(lua_State *L)
++int FlameParticle2D::loadFlames(lua_State *L, void *v)
+ {
++    if ( ! lua_istable(L, -1) )
++    {
++        LOGGER.warning(&quot;BAD explosions configuration, not loaded.&quot;);
++        return 0;
++    }
++
+     if ( ! flame_array )
+     {
+-        int luatop = lua_gettop(L);
++        flame_array = new FlameArray;
++        flame_array-&gt;num_flames = 0;
++        flame_array-&gt;flameImageArray = 0;
++    }
+ 
+-        lua_getfield(L, -1, &quot;explosions&quot;);
+-        if ( ! lua_istable(L, -1) )
++
++    if ( flame_array-&gt;num_flames != lua_objlen(L, -1) )
++    {
++        if ( flame_array-&gt;flameImageArray )
+         {
+-            LOGGER.warning(&quot;explosions configuration not found.&quot;);
+-            lua_settop(L, luatop);
+-            return;
++            delete[] flame_array-&gt;flameImageArray;
+         }
+ 
+-        flame_array = new FlameArray;
+         flame_array-&gt;num_flames = lua_objlen(L,-1);
+         flame_array-&gt;flameImageArray = new ImageArray[flame_array-&gt;num_flames]();
++    }
+ 
+-        for ( int n = 1; n &lt;= flame_array-&gt;num_flames; ++n )
+-        {
+-            lua_rawgeti(L, -1, n);
+-            flame_array-&gt;flameImageArray[n-1].loadImageSheetArray(L);
+-            lua_pop(L, 1);
+-        }
+-        
+-        lua_settop(L, luatop);
++    for ( unsigned int n = 1; n &lt;= flame_array-&gt;num_flames; ++n )
++    {
++        lua_rawgeti(L, -1, n);
++        flame_array-&gt;flameImageArray[n-1].loadImageSheetArray(L);
++        lua_pop(L, 1);
+     }
++
++    return 0;
+ } // end FlameParticle2D::init
+ 
+ // draw
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -36,7 +36,7 @@
+                      float       lifetime,
+                      int         layer);
+ 
+-    static void init(lua_State *L);
++    static int loadFlames(lua_State *L, void *v);
+     
+ protected:
+     virtual void draw(SpriteSorter &amp;sorter);
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -44,48 +44,6 @@
+ 
+ } // end FlashParticle2D::FlashParticle2D
+ 
+-// init
+-//---------------------------------------------------------------------------
+-void FlashParticle2D::init(lua_State *L)
+-{
+-    if ( staticPackedFlash )
+-    {
+-        return; // already loaded
+-    }
+-
+-    int luatop = lua_gettop(L);
+-
+-    lua_getfield(L, -1, &quot;flash&quot;);
+-    if ( ! lua_istable(L, -1) )
+-    {
+-        LOGGER.warning(&quot;flash configuration not found.&quot;);
+-        lua_settop(L, luatop);
+-        return;
+-    }
+-
+-//    lua_rawgeti(L, -1, 1);
+-
+-    lua_rawgeti(L, -1, 1); // file_name
+-    lua_rawgeti(L, -2, 2); // width
+-    lua_rawgeti(L, -3, 3); // height
+-    lua_rawgeti(L, -4, 4); // nframes
+-
+-    Surface* s = new Surface();
+-    s-&gt;loadPNGSheet( lua_tostring(L, -4),
+-                    lua_tointeger(L, -3),
+-                    lua_tointeger(L, -2),
+-                    lua_tointeger(L, -1));
+-
+-//    lua_pop(L, 5);
+-
+-    s-&gt;setColorkey();
+-    s-&gt;setOffsetCenter();
+-
+-    staticPackedFlash = s;
+-
+-    lua_settop(L, luatop);
+-} // end FlashParticle2D::init
+-
+ // draw
+ //---------------------------------------------------------------------------
+ void FlashParticle2D::draw(SpriteSorter&amp; sorter)
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -37,7 +37,6 @@
+                      int   layer,
+                      bool  singleFrame = false);
+ 
+-    static void init(lua_State *L);
+ protected:
+     // The size relative to the original image.  This is so we can keep
+     // the images aspect ratio.
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -41,6 +41,8 @@
+ #include &quot;2D/Color.hpp&quot;
+ 
+ #include &quot;lua/lua.hpp&quot;
++#include &quot;Scripts/ScriptManager.hpp&quot;
++#include &quot;Scripts/ScriptHelper.hpp&quot;
+ 
+ std::vector&lt;UnitParticleInfo&gt; ParticleInterface::unitParticleInfo;
+ int ParticleInterface::unitBodyMaxArea                   = 0;
+@@ -56,7 +58,38 @@
+ vector&lt;int&gt; ParticleInterface::unitHitPointTable;
+ vector&lt;int&gt; ParticleInterface::unitAttackFactorTable;
+ 
++extern Surface* staticPackedFlash;
++extern Surface* staticPackedGroundChunks;
++extern Surface* staticPackedCrater;
+ 
++static const ScriptVarBindRecord particle_getters[] =
++{
++//    { &quot;clouds&quot;, CloudParticle2D::loadClouds, 0},
++    {0,0}
++};
++
++static const ScriptVarBindRecord particle_setters[] =
++{
++    { &quot;clouds&quot;,     CloudParticle2D::loadClouds,   0},
++    { &quot;flash&quot;,      Surface::loadPNGSheetPointer,  &amp;staticPackedFlash},
++    { &quot;chunks&quot;,     Surface::loadPNGSheetPointer,  &amp;staticPackedGroundChunks},
++    { &quot;craters&quot;,    CraterParticle2D::loadCraters, &amp;staticPackedCrater},
++    { &quot;lightpuffs&quot;, PuffParticle2D::loadLightPuff, 0},
++    { &quot;darkpuffs&quot;,  PuffParticle2D::loadDarkPuff,  0},
++    { &quot;dirtpuffs&quot;,  PuffParticle2D::loadDirtPuff,  0},
++    { &quot;explosions&quot;, FlameParticle2D::loadFlames,   0},
++
++    {0,0}
++};
++
++
++void ParticleInterface::registerScript(const char * table_name)
++{
++    ScriptManager::bindStaticVariables(table_name, &quot;ParticlesMetaTable&quot;,
++                                       particle_getters, particle_setters);
++
++}
++
+ //--------------------------------------------------------------------------
+ ParticleInterface::ParticleInterface()
+ {}
+@@ -444,37 +477,13 @@
+ {
+     if ( ! initialized )
+     {
+-        lua_State *L = luaL_newstate();
+-        int error = luaL_dofile(L, filesystem::getRealName(&quot;scripts/particles.lcfg&quot;).c_str());
+-        if (error)
+-        {
+-            LOGGER.warning(&quot;Can't initialize particles, lua error: %s\n&quot;,lua_tostring(L,-1));
+-            lua_close(L);
+-            return;
+-        }
++        ScriptManager::runFileInTable(&quot;scripts/particles.lcfg&quot;, &quot;particles&quot;);
+ 
+-        lua_getglobal(L, &quot;particles&quot;);
+-        if ( ! lua_istable(L, -1) )
+-        {
+-            LOGGER.warning(&quot;Particle configuration not found.&quot;);
+-            lua_close(L);
+-            return;
+-        }
+-
+-        PuffParticle2D::init(L);
+-        CloudParticle2D::init(L);
+-        FlameParticle2D::init(L);
+-        FlashParticle2D::init(L);
+-        ChunkTrajectoryParticle2D::init(L);
+-
+-        CraterParticle2D::init(L);
+-
+         // requires unit_profiles_interface
+         buildUnitTables();
+         // requires unit profiles sprites
+         getUnitParticleInfo();
+         
+-        lua_close(L);
+         initialized = true;
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -44,6 +44,8 @@
+ class ParticleInterface
+ {
+ private:
++    friend class ScriptManager;
++    static void registerScript(const char * table_name);
+     static std::vector&lt;UnitParticleInfo&gt; unitParticleInfo;
+     static int unitBodyMaxArea;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -138,43 +138,43 @@
+ 
+ static bool loadPuffData(lua_State *L, const char * field_name, int puff_num)
+ {
+-    lua_getfield(L, -1, field_name);
+     if ( ! lua_istable(L, -1) )
+     {
+-        LOGGER.warning(&quot;%s puffs configuration not found.&quot;, field_name);
+-        lua_pop(L, 1);
++        LOGGER.warning(&quot;BAD %s configuration, not loaded.&quot;, field_name);
+         return false;
+     }
+ 
+     puff_array-&gt;puffImageArray[puff_num].loadImageSheetArray(L);
+-
+-    lua_pop(L, 1);
++    return true;
+ }
+ 
+-// init
+-//---------------------------------------------------------------------------
+-void PuffParticle2D::init(lua_State* L)
++static void ensurePuffArray()
+ {
+     if ( ! puff_array )
+     {
+-        int luatop = lua_gettop(L);
+-
+-        lua_getfield(L, -1, &quot;puffs&quot;);
+-        if ( ! lua_istable(L, -1) )
+-        {
+-            LOGGER.warning(&quot;Puffs configuration not found.&quot;);
+-            lua_settop(L, luatop);
+-            return;
+-        }
+-
+         puff_array = new PuffArray;
+         puff_array-&gt;num_puff_types = 3;
+         puff_array-&gt;puffImageArray = new ImageArray[3]();
++    }
++}
+ 
+-        loadPuffData(L, &quot;light&quot;, 0);
+-        loadPuffData(L, &quot;dark&quot;, 1);
+-        loadPuffData(L, &quot;dirt&quot;, 2);
+-        
+-        lua_settop(L, luatop);
+-    }
+-} // end PuffParticle2D::init
++int PuffParticle2D::loadLightPuff(lua_State* L, void* v)
++{
++    ensurePuffArray();
++    loadPuffData(L, &quot;lightpuffs&quot;, LIGHT);
++    return 0;
++}
++
++int PuffParticle2D::loadDarkPuff(lua_State* L, void* v)
++{
++    ensurePuffArray();
++    loadPuffData(L, &quot;darkpuffs&quot;, DARK);
++    return 0;
++}
++
++int PuffParticle2D::loadDirtPuff(lua_State* L, void* v)
++{
++    ensurePuffArray();
++    loadPuffData(L, &quot;dirtpuffs&quot;, DIRT);
++    return 0;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -81,7 +81,9 @@
+                 isFarAway);
+     }
+ 
+-    static  void init(lua_State *L);
++    static int loadLightPuff(lua_State *L, void *v);
++    static int loadDarkPuff(lua_State *L, void *v);
++    static int loadDirtPuff(lua_State *L, void *v);
+     virtual void draw(SpriteSorter &amp;sorter);
+ 
+ }; // end PuffParticle2D
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-08 19:22:57 UTC (rev 1165)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-09 10:03:47 UTC (rev 1166)
+@@ -26,6 +26,7 @@
+ #include &quot;bindings/NetPanzerBindings.hpp&quot;
+ 
+ #include &quot;2D/Color.hpp&quot;
++#include &quot;Particles/ParticleInterface.hpp&quot;
+ 
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ 
+@@ -43,6 +44,7 @@
+         }
+         tolua_NetPanzer_open(luavm);
+         Color::registerScript(&quot;Color&quot;);
++        ParticleInterface::registerScript(&quot;particles&quot;);
+ 
+     }
+ 
+@@ -85,8 +87,8 @@
+     if ( lua_istable(luavm, -1) )
+     {
+         char cmd[128];
+-        int cmdpos = 0;
+-        int strpos = 0;
++        unsigned int cmdpos = 0;
++        unsigned int strpos = 0;
+ 
+         while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
+         {
+@@ -146,8 +148,8 @@
+     if ( lua_istable(luavm, -1) )
+     {
+         char cmd[128];
+-        int cmdpos = 0;
+-        int strpos = 0;
++        unsigned int cmdpos = 0;
++        unsigned int strpos = 0;
+ 
+         while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
+         {
+@@ -224,7 +226,7 @@
+     int r = luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
+     if ( r )
+     {
+-        LOGGER.warning(&quot;Error in runFileInTable: file loading error.&quot;);
++        LOGGER.warning(&quot;Error in runFileInTable: %s\n&quot;,lua_tostring(luavm,-1));
+         lua_pop(luavm,1);
+         return;
+     }
+@@ -232,9 +234,10 @@
+     lua_getglobal(luavm, table);
+     if ( ! lua_istable(luavm, -1) )
+     {
+-        LOGGER.warning(&quot;Error in runFileInTable: table doesn't exists.&quot;);
+-        lua_pop(luavm, 2);
+-        return;
++        lua_pop(luavm,1);
++        lua_createtable(luavm, 6, 0);
++        lua_pushvalue(luavm, -1);
++        lua_setglobal(luavm, table);
+     }
+ 
+     if ( ! lua_setfenv(luavm, -2) )
+@@ -280,8 +283,10 @@
+     bool isRegistered = !lua_isnil(luavm, -1);
+     if ( ! isRegistered )
+     {
+-        void * t = lua_newuserdata(luavm,sizeof(void*));
+-        (void)t;
++        lua_pop(luavm,1);
++        lua_createtable(luavm, 0, 0);
++        lua_pushvalue(luavm, -1);
++        lua_setglobal(luavm, objectName);
+     }
+ 
+     luaL_getmetatable(luavm, metaName);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000193.html">[Netpanzer-cvs] r1165 - in trunk/netpanzer: pics/particles/lights	src/NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000195.html">[Netpanzer-cvs] r1167 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Units	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#194">[ date ]</a>
+              <a href="thread.html#194">[ thread ]</a>
+              <a href="subject.html#194">[ subject ]</a>
+              <a href="author.html#194">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

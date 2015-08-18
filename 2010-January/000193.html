@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1165 - in trunk/netpanzer: pics/particles/lights	src/NetPanzer/Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1165%20-%20in%20trunk/netpanzer%3A%20pics/particles/lights%0A%09src/NetPanzer/Units&In-Reply-To=%3C201001081923.o08JN6o4015006%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000192.html">
+   <LINK REL="Next"  HREF="000194.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1165 - in trunk/netpanzer: pics/particles/lights	src/NetPanzer/Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1165%20-%20in%20trunk/netpanzer%3A%20pics/particles/lights%0A%09src/NetPanzer/Units&In-Reply-To=%3C201001081923.o08JN6o4015006%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1165 - in trunk/netpanzer: pics/particles/lights	src/NetPanzer/Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Jan  8 20:23:06 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000192.html">[Netpanzer-cvs] r1164 - trunk/netpanzer/src/Lib/2D
+</A></li>
+        <LI>Next message: <A HREF="000194.html">[Netpanzer-cvs] r1166 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Particles src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#193">[ date ]</a>
+              <a href="thread.html#193">[ thread ]</a>
+              <a href="subject.html#193">[ subject ]</a>
+              <a href="author.html#193">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-08 20:22:57 +0100 (Fri, 08 Jan 2010)
+New Revision: 1165
+
+Modified:
+   trunk/netpanzer/pics/particles/lights/flash2.png
+   trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Unit.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+Log:
+- Added fu's new flashes.
+- Added a death timer to tanks (0.5 seconds) before disapearing.
+
+
+Modified: trunk/netpanzer/pics/particles/lights/flash2.png
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2010-01-08 18:53:05 UTC (rev 1164)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2010-01-08 19:22:57 UTC (rev 1165)
+@@ -250,7 +250,8 @@
+         if ( death_counter == 5 )
+         {
+             unit_state.lifecycle_state = _UNIT_LIFECYCLE_INACTIVE;
+-
++            death_timer.setTimeOut(500);
++            death_timer.reset();
+             DestructUnitOpcode destruct_opcode;
+             destruct_opcode.setUnitID(id);
+             UnitInterface::sendOpcode(&amp;destruct_opcode);
+@@ -1798,6 +1799,8 @@
+ void Unit::unitOpcodeDestruct(const UnitOpcode* )
+ {
+     unit_state.lifecycle_state = _UNIT_LIFECYCLE_INACTIVE;
++    death_timer.setTimeOut(500);
++    death_timer.reset();
+ }
+ 
+ void Unit::syncUnit()
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.hpp	2010-01-08 18:53:05 UTC (rev 1164)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.hpp	2010-01-08 19:22:57 UTC (rev 1165)
+@@ -22,6 +22,7 @@
+ 
+ #include &quot;UnitState.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ #include &quot;Classes/UnitMessageTypes.hpp&quot;
+ #include &quot;Units/UnitOpcodes.hpp&quot;
+ #include &quot;Classes/AI/PathList.hpp&quot;
+@@ -74,6 +75,8 @@
+     std::string fireSound;
+     unsigned short weaponType;
+ 
++    NTimer death_timer;
++
+     Timer unit_state_timer;
+     Timer fsm_timer;
+     bool fsm_active_list[ 7 ];
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-01-08 18:53:05 UTC (rev 1164)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-01-08 19:22:57 UTC (rev 1165)
+@@ -192,7 +192,14 @@
+ 
+         if (unit-&gt;unit_state.lifecycle_state == _UNIT_LIFECYCLE_INACTIVE)
+         {
+-            removeUnit(i++);
++            if ( unit-&gt;death_timer.isTimeOut() )
++            {
++                removeUnit(i++);
++            }
++            else
++            {
++                ++i;
++            }
+             continue;
+         }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000192.html">[Netpanzer-cvs] r1164 - trunk/netpanzer/src/Lib/2D
+</A></li>
+	<LI>Next message: <A HREF="000194.html">[Netpanzer-cvs] r1166 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Particles src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#193">[ date ]</a>
+              <a href="thread.html#193">[ thread ]</a>
+              <a href="subject.html#193">[ subject ]</a>
+              <a href="author.html#193">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

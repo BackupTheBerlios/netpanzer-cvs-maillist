@@ -1,0 +1,704 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r998 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Options
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r998%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200709151449.l8FEnKv3006732%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000043.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r998 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Options</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r998%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200709151449.l8FEnKv3006732%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r998 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Options">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 15 16:49:20 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000043.html">[Netpanzer-cvs] r999 - in trunk/netpanzer: . src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#42">[ date ]</a>
+              <a href="thread.html#42">[ thread ]</a>
+              <a href="subject.html#42">[ subject ]</a>
+              <a href="author.html#42">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-09-15 16:49:17 +0200 (Sat, 15 Sep 2007)
+New Revision: 998
+
+Modified:
+   trunk/netpanzer/BUGS
+   trunk/netpanzer/ChangeLog
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/DummySound.cpp
+   trunk/netpanzer/src/NetPanzer/System/DummySound.hpp
+   trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp
+   trunk/netpanzer/src/NetPanzer/System/Sound.hpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+Log:
+- fixed problem when starting a game with more than 255 initial units.
+- when using int config variables, use minimum value if requested was less than
+  minimum, and max value if it was more than maximum.
+- fixed stopping the tank idle sound when a player host a non dedicated game 
+  and resigns
+- new sound options window (the base code was already done before), able to 
+  enable/disable and change volumes
+
+Modified: trunk/netpanzer/BUGS
+===================================================================
+--- trunk/netpanzer/BUGS	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/BUGS	2007-09-15 14:49:17 UTC (rev 998)
+@@ -1,3 +1,5 @@
++- when a client connect to a server, it will save the configuration that
++  the server sent to him when exit netpanzer.
+ - sometimes 2 players spawn at the same place - hard to fix, low priority
+ - it is reported that in timelimit mode games might end too early (ie. client
+   display 40/60 and game ends) - is it possible that the client time doesn't
+@@ -4,7 +6,7 @@
+   sync correctly with server time?
+ - Astar sometimes calculates strange paths. Very obvious if you try to capture
+   and outpost from the left side: Your panzers will drive around it before
+-  entering it.
++  entering it. (it is not a complete Astar, needs to rewrite)
+ - The no allies flag in the server config has no effect
+ - Clients pressing the Abort button when connecting leave a ghost on the server
+ which displays no IP. (i think matze fixed this in 0.8.1)
+
+Modified: trunk/netpanzer/ChangeLog
+===================================================================
+--- trunk/netpanzer/ChangeLog	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/ChangeLog	2007-09-15 14:49:17 UTC (rev 998)
+@@ -1,3 +1,12 @@
++15-Sep-2007 by Aaron Perez
++- fixed problem when starting a game with more than 255 initial units.
++- when using int config variables, use minimum value if requested was less than
++  minimum, and max value if it was more than maximum.
++- fixed stopping the tank idle sound when a player host a non dedicated game 
++  and resigns
++- new sound options window (the base code was already done before), able to 
++  enable/disable and change volumes
++
+ ... ChangeLog is not up to date...
+ 
+ 21-Feb-2005 by Matthias Braun
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -38,7 +38,7 @@
+ 
+     void initialize();
+ 
+-    inline unsigned char getSpawnUnitCount( unsigned char unit_type ) const
++    inline unsigned int getSpawnUnitCount( unsigned char unit_type ) const
+     {
+         return( unit_spawn_list[ unit_type ] );
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -20,6 +20,8 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;ConfigVariable.hpp&quot;
+ 
++#include &quot;Util/Log.hpp&quot;
++
+ ConfigVariable::ConfigVariable(const std::string&amp; newname)
+     : name(newname), defaultvalue(true)
+ {
+@@ -44,9 +46,15 @@
+ 
+ int ConfigInt::operator = (int newvalue)
+ {
+-    if(newvalue &lt; min || newvalue &gt; max)
+-        throw Exception(&quot;Configsetting '%s' out of range: %d (min: %d max: %d)&quot;,
+-                getName().c_str(), newvalue, min, max);
++    if (newvalue &lt; min) {
++        LOGGER.warning(&quot;Warning: Using minimum value (%d) for '%s' (wanted %d)&quot;,
++                        min, getName().c_str(), newvalue);
++        newvalue = min;
++    } else if ( newvalue &gt; max ) {
++        LOGGER.warning(&quot;Warning: Using maximum value (%d) for '%s' (wanted %d)&quot;,
++                        max, getName().c_str(), newvalue);
++        newvalue = max;        
++    }
+ 
+     value = newvalue;
+     setNonDefaultValue();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -81,6 +81,11 @@
+     GameControlRulesDaemon::game_state = _game_state_in_progress;
+ }
+ //-----------------------------------------------------------------
++void GameControlRulesDaemon::setStateServerIdle()
++{
++    GameControlRulesDaemon::game_state = _game_state_idle;
++}
++//-----------------------------------------------------------------
+ void GameControlRulesDaemon::setDedicatedServer()
+ {
+     GameControlRulesDaemon::execution_mode = _execution_mode_dedicated_server;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -52,12 +52,14 @@
+ 
+ public:
+     static void setStateServerInProgress();
++    static void setStateServerIdle();
+     static void setDedicatedServer();
+ 
+     static void forceMapChange(std::string map);
+ 
+     static void processNetMessage(const NetMessage* message);
+     static void updateGameControlFlow();
++    static unsigned char getGameState() { return game_state; }
+ };
+ 
+ #endif // ** _GAME_CONTROL_RULES_DAEMON_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -627,6 +627,7 @@
+     UnitInterface::reset();
+     PlayerInterface::reset();
+     ObjectiveInterface::resetLogic();
++    GameControlRulesDaemon::setStateServerIdle();
+ }
+ 
+ void GameManager::startGameTimer()
+
+Modified: trunk/netpanzer/src/NetPanzer/System/DummySound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/DummySound.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/System/DummySound.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -39,8 +39,8 @@
+ void DummySound::stopMusic()
+ {}
+ 
+-void DummySound::setSoundVolume(int)
++void DummySound::setSoundVolume(unsigned int)
+ {}
+ 
+-void DummySound::setMusicVolume(int)
++void DummySound::setMusicVolume(unsigned int)
+ {}
+
+Modified: trunk/netpanzer/src/NetPanzer/System/DummySound.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/DummySound.hpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/System/DummySound.hpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -35,11 +35,11 @@
+     }
+     virtual void stopChannel(int )
+     {}
+-    virtual void setSoundVolume(int );
++    virtual void setSoundVolume(unsigned int );
+ 
+     virtual void playMusic(const char* directory);
+     virtual void stopMusic();
+-    virtual void setMusicVolume(int volume);
++    virtual void setMusicVolume(unsigned int volume);
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -25,11 +25,12 @@
+ 
+ #include &quot;SDL.h&quot;
+ #define USE_RWOPS // we want Mix_LOadMUS_RW
+-#include &lt;SDL_mixer.h&gt;
++#include &quot;SDL_mixer.h&quot;
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;SDLSound.hpp&quot;
++#include &quot;GameConfig.hpp&quot;
+ 
+ #if (SDL_MIXER_MAJOR_VERSION &gt; 1) || (SDL_MIXER_MINOR_VERSION &gt; 2) || \
+     ((SDL_MIXER_MINOR_VERSION == 2) &amp;&amp; (SDL_MIXER_PATCHLEVEL &gt;= 6))
+@@ -196,6 +197,7 @@
+         }
+     }
+     filesystem::freeList(list);
++    setSoundVolume(gameconfig-&gt;effectsvolume);
+ }
+ //-----------------------------------------------------------------
+ /**
+@@ -210,9 +212,15 @@
+     return name.substr(0, pos);
+ }
+ 
+-void SDLSound::setSoundVolume(int )
++void SDLSound::setSoundVolume(unsigned int volume)
+ {
+-    // TODO...
++    if ( volume &gt; 100 ) volume = 100;
++    unsigned int sdlvol = (volume*100)/MIX_MAX_VOLUME;
++    chunks_t::iterator i = m_chunks.begin();
++    while ( i != m_chunks.end() ) {
++        Mix_VolumeChunk(i-&gt;second, sdlvol);
++        ++i;
++    }
+ }
+ 
+ //---------------------------------------------------------------------------
+@@ -223,6 +231,7 @@
+ {
+     // Part1: scan directory for music files
+     char **list = filesystem::enumerateFiles(directory);
++    setMusicVolume(gameconfig-&gt;musicvolume);
+ 
+     musicfiles.clear();
+     for (char **i = list; *i != NULL; i++) {
+@@ -250,14 +259,13 @@
+     // nicely fade the music out for 1 second
+     if(Mix_PlayingMusic()) {
+         Mix_HookMusicFinished(0);
+-        Mix_FadeOutMusic(1000);
+-        SDL_Delay(1000);
++        Mix_FadeOutMusic(500);
+     }
+ }
+ 
+-void SDLSound::setMusicVolume(int volume)
++void SDLSound::setMusicVolume(unsigned int volume)
+ {
+-    Mix_VolumeMusic(int (float(MIX_MAX_VOLUME) / 100. * volume));
++    Mix_VolumeMusic((volume*100)/MIX_MAX_VOLUME);
+ }
+ 
+ void SDLSound::nextSong()
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -37,11 +37,11 @@
+     virtual void playAmbientSound(const char* name, long distance);
+     virtual int playSoundRepeatedly(const char* name);
+     virtual void stopChannel(int channel);
+-    virtual void setSoundVolume(int volume);
++    virtual void setSoundVolume(unsigned int volume);
+ 
+     virtual void playMusic(const char* directory);
+     virtual void stopMusic();
+-    virtual void setMusicVolume(int volume);
++    virtual void setMusicVolume(unsigned int volume);
+ 
+ private:
+     chunks_t m_chunks;
+
+Modified: trunk/netpanzer/src/NetPanzer/System/Sound.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/Sound.hpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/System/Sound.hpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -43,12 +43,12 @@
+     virtual int playSoundRepeatedly(const char* name) = 0;
+     virtual void stopChannel(int channel) = 0;
+     /// set sound volume (0-100)
+-    virtual void setSoundVolume(int volume) = 0;
++    virtual void setSoundVolume(unsigned int volume) = 0;
+ 
+     virtual void playMusic(const char* directory) = 0;
+     virtual void stopMusic() = 0;
+     /// set music volume (0-100)
+-    virtual void setMusicVolume(int volume) = 0;
++    virtual void setMusicVolume(unsigned int volume) = 0;
+ 
+ private:
+     int m_tankIdleChannel;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -44,6 +44,7 @@
+ #else
+ iXY visualsPos = sub1;
+ iXY interfacePos = sub2;
++iXY soundPos = sub3; // XXX 2
+ #endif
+ 
+ iXY hostPos = sub1;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -21,7 +21,62 @@
+ #include &quot;GameConfig.hpp&quot;
+ #include &quot;GameViewGlobals.hpp&quot;
+ #include &quot;Desktop.hpp&quot;
++#include &quot;System/Sound.hpp&quot;
++#include &quot;System/SDLSound.hpp&quot;
++#include &quot;System/DummySound.hpp&quot;
++#include &quot;GameControlRulesDaemon.hpp&quot;
+ 
++static void bDecreaseSoundVolume()
++{
++    unsigned int v = gameconfig-&gt;effectsvolume;
++    if (v) {
++        --v;
++        gameconfig-&gt;effectsvolume = v;
++        sound-&gt;setSoundVolume(v);
++    }
++}
++
++static void bIncreaseSoundVolume()
++{
++    unsigned int v = gameconfig-&gt;effectsvolume;
++    if (v&lt;100) {
++        ++v;
++        gameconfig-&gt;effectsvolume = v;
++        sound-&gt;setSoundVolume(v);
++    }
++}
++
++int getSoundVolume()
++{
++    return gameconfig-&gt;effectsvolume;
++}
++
++static void bDecreaseMusicVolume()
++{
++    unsigned int v = gameconfig-&gt;musicvolume;
++    if (v) {
++        --v;
++        gameconfig-&gt;musicvolume = v;
++        sound-&gt;setMusicVolume(v);
++    }
++}
++
++static void bIncreaseMusicVolume()
++{
++    unsigned int v = gameconfig-&gt;musicvolume;
++    if (v&lt;100) {
++        ++v;
++        gameconfig-&gt;musicvolume = v;
++        sound-&gt;setMusicVolume(v);
++    }
++}
++
++int getMusicVolume()
++{
++    return gameconfig-&gt;musicvolume;
++}
++
++
+ // SoundView
+ //---------------------------------------------------------------------------
+ SoundView::SoundView() : OptionsTemplateView()
+@@ -37,39 +92,59 @@
+ {
+     OptionsTemplateView::initButtons();
+ 
+-#if 0
+     int xTextStart       = bodyTextRect.min.x;
+     int x                = xTextStart;
+     int y                = bodyTextRect.min.y;
+     int yOffset          =  15;
+-    int buttonXSize      =  90;
+     int arrowButtonWidth =  16;
+-#endif
+ 
+     // Settings
+     //----------------------------------------------------------------------
+ 
+-    //x = xTextStart;
+-    //addLabel(iXY(x, y), &quot;OPTION                            HOT KEY            SETTING&quot;, viewHeadingColor);
+-    //y += yOffset;
++    x = xTextStart;
++    addLabel(iXY(x, y), &quot;OPTION                                               SETTING&quot;, viewHeadingColor);
++    y += yOffset;
+     //
+-    //x = xTextStart;
+-    //addLabel(iXY(x, y), &quot;Sound State&quot;, Color::white);
+-    //x = optionsMeterStartX;
+-    //addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bSetSoundStateOff);
+-    //x += optionsMeterWidth + arrowButtonWidth;
+-    //addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bSetSoundStateOn);
+-    //y += yOffset;
++    
++    x = xTextStart;
++    addLabel(iXY(x,y), &quot;Sound Status&quot;, Color::white);
++    checkBoxSoundEnabled.setLabel(gameconfig-&gt;enablesound?&quot;Enabled&quot;:&quot;Disabled&quot;);
++    checkBoxSoundEnabled.setState(gameconfig-&gt;enablesound);
++    x += Surface::getTextLength(&quot;Sound Status: &quot;);
++    checkBoxSoundEnabled.setLocation(x, y-2);
++    checkBoxSoundEnabled.setStateChangedCallback(this);
++    add(&amp;checkBoxSoundEnabled);
++    y += yOffset;
++
++    x = xTextStart;
++    addLabel(iXY(x, y), &quot;Sound Volume&quot;, Color::white);
++    x = optionsMeterStartX;
++    addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseSoundVolume);
++    x += optionsMeterWidth + arrowButtonWidth;
++    addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseSoundVolume);
++    y += yOffset;
++
++    y += yOffset; // add a little separation
++    x = xTextStart;
++    addLabel(iXY(x,y), &quot;Music Status&quot;, Color::white);
++    checkBoxMusicEnabled.setLabel(gameconfig-&gt;enablemusic?&quot;Enabled&quot;:&quot;Disabled&quot;);
++    checkBoxMusicEnabled.setState(gameconfig-&gt;enablemusic);
++    x += Surface::getTextLength(&quot;Music Status: &quot;);
++    checkBoxMusicEnabled.setLocation(x, y-2);
++    checkBoxMusicEnabled.setStateChangedCallback(this);
++    add(&amp;checkBoxMusicEnabled);
++    y += yOffset;
++
++    x = xTextStart;
++    addLabel(iXY(x, y), &quot;Music Volume&quot;, Color::white);
++    x = optionsMeterStartX;
++    addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseMusicVolume);
++    x += optionsMeterWidth + arrowButtonWidth;
++    addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseMusicVolume);
++    y += yOffset;
++
+     //
+     //x = xTextStart;
+-    //addLabel(iXY(x, y), &quot;Sound Volume&quot;, Color::white);
+-    //x = optionsMeterStartX;
+-    //addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseSoundVolume);
+-    //x += optionsMeterWidth + arrowButtonWidth;
+-    //addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseSoundVolume);
+-    //y += yOffset;
+-    //
+-    //x = xTextStart;
+     //addLabel(iXY(x, y), &quot;Unit Acknowledgement&quot;, Color::white);
+     //x = optionsMeterStartX;
+     //addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, 0);
+@@ -92,36 +167,35 @@
+ {
+     MenuTemplateView::doDraw(viewArea, clientArea);
+ 
+-    //char strBuf[256];
+-    //
+-    //const int arrowButtonWidth = 16;
+-    //
+-    //iRect visualMeter;
+-    //int   meterUsageXSize = 0;
+-    //float percent         = 0.0f;
+-    //int   x               = optionsMeterStartX + arrowButtonWidth;
+-    //int   y               = bodyTextRect.min.y + 15;
+-    //int   yOffset         = 15;
+-    //
+-    //Surface tempSurface(optionsMeterWidth, 14, optionsMeterWidth, 1);
+-    //
+-    //// Sound State
+-    //tempSurface.fill(meterColor);
+-    //tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+-    //sprintf(strBuf, &quot;%s&quot;, getSoundState());
+-    //tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    //tempSurface.blt(clientArea, x, y);
+-    //
+-    //// Sound Volume
+-    //y += yOffset;
+-    //tempSurface.fill(meterColor);
+-    //tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+-    //sprintf(strBuf, &quot;%d %%&quot;, getSoundVolume());
+-    //tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    //tempSurface.blt(clientArea, x, y);
++    char strBuf[256];
++    
++    const int arrowButtonWidth = 16;
++    
++    iRect visualMeter;
++    int   x               = optionsMeterStartX + arrowButtonWidth;
++    int   y               = bodyTextRect.min.y + 15;
++    int   yOffset         = 15;
++    
++    Surface tempSurface(optionsMeterWidth, 14, 1);
++    
++    // Sound Volume
++    y += yOffset;
++    tempSurface.fill(meterColor);
++    tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
++    sprintf(strBuf, &quot;%d %%&quot;, getSoundVolume());
++    tempSurface.bltStringCenter(strBuf, meterTextColor);
++    tempSurface.blt(clientArea, x, y);
+ 
+-    clientArea.bltStringCenter(&quot;Not available for preview&quot;, Color::white);
++    // Music Volume
++    y += yOffset*3;
++    tempSurface.fill(meterColor);
++    tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
++    sprintf(strBuf, &quot;%d %%&quot;, getMusicVolume());
++    tempSurface.bltStringCenter(strBuf, meterTextColor);
++    tempSurface.blt(clientArea, x, y);
+ 
++    //clientArea.bltStringCenter(&quot;Not available for preview&quot;, Color::white);
++
+ } // end SoundView::doDraw
+ 
+ // loadTitleSurface
+@@ -131,3 +205,36 @@
+     doLoadTitleSurface(&quot;soundTitle&quot;);
+ 
+ } // end SoundView::loadTitleSurface
++
++void SoundView::stateChanged(Component* source)
++{
++    if (source == &amp;checkBoxSoundEnabled) {
++        gameconfig-&gt;enablesound = checkBoxSoundEnabled.getState();
++        
++        delete sound;
++
++        if ( checkBoxSoundEnabled.getState() ) {
++            sound = new SDLSound();
++            checkBoxSoundEnabled.setLabel(&quot;Enabled&quot;);
++            if ( GameControlRulesDaemon::getGameState() ) {
++                sound-&gt;playTankIdle();
++            }
++            if ( checkBoxMusicEnabled.getState() )
++                sound-&gt;playMusic(&quot;sound/music/&quot;);
++        } else {
++            sound = new DummySound();
++            checkBoxSoundEnabled.setLabel(&quot;Disabled&quot;);
++        }
++    } else if (source == &amp;checkBoxMusicEnabled) {
++        gameconfig-&gt;enablemusic = checkBoxMusicEnabled.getState();
++        
++        if ( checkBoxMusicEnabled.getState() ) {
++            sound-&gt;playMusic(&quot;sound/music/&quot;);
++            checkBoxMusicEnabled.setLabel(&quot;Enabled&quot;);
++        } else {
++            sound-&gt;stopMusic();
++            checkBoxMusicEnabled.setLabel(&quot;Disabled&quot;);
++        }
++    }
++    
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -20,6 +20,8 @@
+ 
+ #include &quot;View.hpp&quot;
+ #include &quot;OptionsTemplateView.hpp&quot;
++#include &quot;CheckBox.hpp&quot;
++#include &quot;StateChangedCallback.hpp&quot;
+ 
+ /////////////////////////////////////////////////////////////////////////////
+ // forward declarations
+@@ -32,16 +34,19 @@
+ /////////////////////////////////////////////////////////////////////////////
+ 
+ //--------------------------------------------------------------------------
+-class SoundView : public OptionsTemplateView
++class SoundView : public OptionsTemplateView, public StateChangedCallback
+ {
+ protected:
+     virtual void loadTitleSurface();
++    CheckBox checkBoxSoundEnabled;
++    CheckBox checkBoxMusicEnabled;
+ 
+ public:
+     SoundView();
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void initButtons();
++    virtual void stateChanged(Component* source);
+ }; // end SoundView
+ 
+ #endif // end __SoundView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2007-09-14 15:26:47 UTC (rev 997)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2007-09-15 14:49:17 UTC (rev 998)
+@@ -51,6 +51,22 @@
+     Desktop::setVisibility(&quot;VisualsView&quot;, true);
+ }
+ 
++static void bSound()
++{
++    if (Desktop::getVisible(&quot;GameView&quot;)) {
++        Desktop::setVisibility(&quot;ControlsView&quot;, false);
++        Desktop::setVisibility(&quot;VisualsView&quot;, false);
++        Desktop::setVisibility(&quot;InterfaceView&quot;, false);
++        //Desktop::setVisibility(&quot;SoundView&quot;, false);
++        Desktop::setVisibility(&quot;OptionsView&quot;, false);
++    } else {
++        Desktop::setVisibilityAllWindows(false);
++    }
++    Desktop::setVisibility(&quot;SoundView&quot;, true);
++    //Desktop::setVisibility(&quot;VisualsView&quot;, true);
++}
++
++
+ // OptionsTemplateView
+ //---------------------------------------------------------------------------
+ OptionsTemplateView::OptionsTemplateView() : MenuTemplateView()
+@@ -73,7 +89,7 @@
+ 
+     MenuTemplateView::initButtons();
+ 
+-#if 0 // XXX
++#if 1 // XXX
+     // Sound.
+     addSpecialButton(	soundPos,
+                       &quot;Sound&quot;,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000043.html">[Netpanzer-cvs] r999 - in trunk/netpanzer: . src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#42">[ date ]</a>
+              <a href="thread.html#42">[ thread ]</a>
+              <a href="subject.html#42">[ subject ]</a>
+              <a href="author.html#42">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

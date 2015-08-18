@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r963 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r963%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200703211817.l2LIHxTd008131%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000009.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r963 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r963%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200703211817.l2LIHxTd008131%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r963 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Mar 21 19:17:59 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000009.html">[Netpanzer-cvs] r962 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/AI NetPanzer/Interfaces	NetPanzer/Views/MainMenu/Multi
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#10">[ date ]</a>
+              <a href="thread.html#10">[ thread ]</a>
+              <a href="subject.html#10">[ subject ]</a>
+              <a href="author.html#10">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-03-21 19:17:58 +0100 (Wed, 21 Mar 2007)
+New Revision: 963
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+Log:
+Added possibility to configure the starting units configuration. There is a new section in the configuration files (netpanzer.ini or netpanzer-dedicated.ini)
+
+[spawnconfig]
+archer=0
+bear=0
+bobcat=0
+drake=0
+manta=2
+panther1=2
+spanzer=2
+stinger=1
+titan=2
+wolf=0
+
+If the sections doesn't exist it will be created with the default configuration (the same as the normal one). If the configured number of starting units is bigger than the max units per player, it will cut it down to the max units permited per player.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2007-03-20 18:12:31 UTC (rev 962)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2007-03-21 18:17:58 UTC (rev 963)
+@@ -54,19 +54,55 @@
+ 
+ PlayerUnitConfig::PlayerUnitConfig()
+ {
+-    initialize(9);
+ }
+ 
+ void PlayerUnitConfig::initialize( unsigned char max_allowed_units )
+ {
+-    PlayerUnitConfig::max_allowed_units = max_allowed_units;
++    PlayerUnitConfig::max_allowed_units = gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers;
+     memset( unit_spawn_list, 0, sizeof( unsigned char ) * _MAX_UNIT_TYPES );
+-    // *******************  CHANGE UNIT COUNT HERE **************************
+-    unit_spawn_list[ _unit_type_valentine ] = 2;        // &lt;-- RIGHT HERE
+-    unit_spawn_list[ _unit_type_leopard ] = 2;          // &lt;-- RIGHT HERE
+-    unit_spawn_list[ _unit_type_abrams ] = 2;           // &lt;-- RIGHT HERE
+-    unit_spawn_list[ _unit_type_hammerhead ] = 1;       // &lt;-- RIGHT HERE
+-    unit_spawn_list[ _unit_type_humvee ] = 2;           // &lt;-- RIGHT HERE
++    unsigned char rem_units = PlayerUnitConfig::max_allowed_units;
++    unsigned char numunits;
++
++    numunits = (rem_units &lt; gameconfig-&gt;archer)?rem_units:gameconfig-&gt;archer;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_archer ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;bear)?rem_units:gameconfig-&gt;bear;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_spahpanzer ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;bobcat)?rem_units:gameconfig-&gt;bobcat;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_lynx ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;drake)?rem_units:gameconfig-&gt;drake;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_m109 ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;manta)?rem_units:gameconfig-&gt;manta;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_valentine ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;panther1)?rem_units:gameconfig-&gt;panther1;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_leopard ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;spanzer)?rem_units:gameconfig-&gt;spanzer;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_humvee ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;stinger)?rem_units:gameconfig-&gt;stinger;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_hammerhead ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;titan)?rem_units:gameconfig-&gt;titan;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_abrams ] = numunits;
++    
++    numunits = (rem_units &lt; gameconfig-&gt;wolf)?rem_units:gameconfig-&gt;wolf;
++    rem_units-=numunits;
++    unit_spawn_list[ _unit_type_scorpion ] = numunits;
++    
+     unit_color = 0;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-03-20 18:12:31 UTC (rev 962)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-03-21 18:17:58 UTC (rev 963)
+@@ -105,7 +105,18 @@
+       radar_enemyoutpostcolor(&quot;enemyoutpostcolor&quot;, _color_red, 0, _color_last-1),
+       radar_unitsize(&quot;unitsize&quot;, _mini_map_unit_size_small, 0, _mini_map_unit_size_last-1),
+       radar_objectivedrawmode(&quot;objectivedrawmode&quot;, _mini_map_objective_draw_mode_outline_rect, 0, _mini_map_objective_draw_mode_last-1),
+-      radar_resizerate(&quot;resizerate&quot;, 400, 10, 1000)      
++      radar_resizerate(&quot;resizerate&quot;, 400, 10, 1000),
++      
++      titan(&quot;titan&quot;,2),
++      manta(&quot;manta&quot;,2),
++      panther1(&quot;panther1&quot;,2),
++      stinger(&quot;stinger&quot;,1),
++      spanzer(&quot;spanzer&quot;,2),
++      bobcat(&quot;bobcat&quot;,0),
++      wolf(&quot;wolf&quot;,0),
++      bear(&quot;bear&quot;,0),
++      drake(&quot;drake&quot;,0),
++      archer(&quot;archer&quot;,0)
+ {
+     this-&gt;configfile = configfile;
+     this-&gt;usePhysFS = usePhysFS;
+@@ -182,6 +193,17 @@
+     radarsettings.push_back(&amp;radar_objectivedrawmode);
+     radarsettings.push_back(&amp;radar_resizerate);
+     
++    spawnsettings.push_back(&amp;titan);
++    spawnsettings.push_back(&amp;manta);
++    spawnsettings.push_back(&amp;panther1);
++    spawnsettings.push_back(&amp;stinger);
++    spawnsettings.push_back(&amp;spanzer);
++    spawnsettings.push_back(&amp;bobcat);
++    spawnsettings.push_back(&amp;wolf);
++    spawnsettings.push_back(&amp;bear);
++    spawnsettings.push_back(&amp;drake);
++    spawnsettings.push_back(&amp;archer);
++    
+     try {
+         loadConfig();
+     } catch(std::exception&amp; e) {
+@@ -222,6 +244,7 @@
+     loadSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     loadSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+     loadSettings(inifile.getSection(&quot;server&quot;), serversettings);
++    loadSettings(inifile.getSection(&quot;spawnconfig&quot;),spawnsettings);
+ }
+ 
+ void GameConfig::loadSettings(const INI::Section&amp; section,
+@@ -296,6 +319,7 @@
+     saveSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     saveSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+     saveSettings(inifile.getSection(&quot;server&quot;), serversettings);
++    saveSettings(inifile.getSection(&quot;spawnconfig&quot;),spawnsettings);
+ 
+     if(usePhysFS) {
+         OFileStream out (configfile);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2007-03-20 18:12:31 UTC (rev 962)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2007-03-21 18:17:58 UTC (rev 963)
+@@ -188,6 +188,20 @@
+     ConfigInt   radar_unitsize;
+     ConfigInt   radar_objectivedrawmode;
+     ConfigInt   radar_resizerate;
++    
++    // spawnconfig settings
++    ConfigInt   titan;
++    ConfigInt   manta;
++    ConfigInt   panther1;
++    ConfigInt   stinger;
++    ConfigInt   spanzer;
++    ConfigInt   bobcat;
++    ConfigInt   wolf;
++    ConfigInt   bear;
++    ConfigInt   drake;
++    ConfigInt   archer;
++    
++    
+ 
+     PlayerUnitConfig unit_spawn_config;
+     
+@@ -321,7 +335,8 @@
+     std::vector&lt;ConfigVariable*&gt; visualssettings;
+     std::vector&lt;ConfigVariable*&gt; soundsettings;
+     std::vector&lt;ConfigVariable*&gt; interfacesettings;
+-    std::vector&lt;ConfigVariable*&gt; radarsettings;    
++    std::vector&lt;ConfigVariable*&gt; radarsettings;   
++    std::vector&lt;ConfigVariable*&gt; spawnsettings;
+ };
+ 
+ extern GameConfig* gameconfig;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000009.html">[Netpanzer-cvs] r962 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/AI NetPanzer/Interfaces	NetPanzer/Views/MainMenu/Multi
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#10">[ date ]</a>
+              <a href="thread.html#10">[ thread ]</a>
+              <a href="subject.html#10">[ subject ]</a>
+              <a href="author.html#10">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

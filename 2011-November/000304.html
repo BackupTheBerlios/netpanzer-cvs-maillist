@@ -1,0 +1,467 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1278 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1278%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C20111111201601.F0DFB4811EB%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000303.html">
+   <LINK REL="Next"  HREF="000305.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1278 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1278%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C20111111201601.F0DFB4811EB%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1278 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov 11 21:16:01 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000303.html">[Netpanzer-cvs] r1277 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game Views/MainMenu
+</A></li>
+        <LI>Next message: <A HREF="000305.html">[Netpanzer-cvs] r1279 - in trunk/netpanzer/src/NetPanzer/Views: .	Components MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#304">[ date ]</a>
+              <a href="thread.html#304">[ thread ]</a>
+              <a href="subject.html#304">[ subject ]</a>
+              <a href="author.html#304">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-11 21:16:01 +0100 (Fri, 11 Nov 2011)
+New Revision: 1278
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+Remove hold flag selection
+Add description on listserver
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -74,16 +74,11 @@
+ #include &quot;Views/MainMenu/Multi/HostView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/GetSessionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitSelectionView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/FlagSelectionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitColorView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/HostOptionsView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/MapSelectionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/PlayerNameView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/IPAddressView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/SoundView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/ControlsView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/InterfaceView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/VisualsView.hpp&quot;
+ #include &quot;Views/Game/RankView.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ #include &quot;Views/Game/CodeStatsView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -68,7 +68,6 @@
+ #include &quot;Views/MainMenu/Multi/HostView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/GetSessionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitSelectionView.hpp&quot;
+-#include &quot;Views/MainMenu/Multi/FlagSelectionView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/UnitColorView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/HostOptionsView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/MapSelectionView.hpp&quot;
+@@ -194,7 +193,6 @@
+     Desktop::add(new OptionsTemplateView());
+     Desktop::add(new OrderingView());
+     Desktop::add(new HelpView());
+-    Desktop::add(new FlagSelectionView());
+     Desktop::add(new HostOptionsView());
+     Desktop::add(new PlayerNameView());
+     Desktop::add(new ResignView());
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -23,10 +23,6 @@
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/SoundView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/ControlsView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/VisualsView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/InterfaceView.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ 
+ #include &quot;Util/Log.hpp&quot;
+@@ -68,38 +64,6 @@
+     } else {
+         assert(false);
+     }
+-
+-    v = Desktop::getView(&quot;SoundView&quot;);
+-    if (v != 0) {
+-        ((SoundView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+-
+-    v = Desktop::getView(&quot;ControlsView&quot;);
+-    if (v != 0) {
+-        ((ControlsView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+-
+-    v = Desktop::getView(&quot;VisualsView&quot;);
+-    if (v != 0) {
+-        ((VisualsView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+-
+-    v = Desktop::getView(&quot;InterfaceView&quot;);
+-    if (v != 0) {
+-        ((InterfaceView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+     LOGGER.warning(&quot;DisconectedView:: finished disconection&quot;);
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -59,7 +59,6 @@
+         Desktop::setVisibilityAllWindows(false);
+         Desktop::setVisibility(&quot;HostView&quot;, true);
+         Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
+-        Desktop::setVisibility(&quot;FlagSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
+         Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+@@ -69,7 +68,6 @@
+         gameconfig-&gt;hostorjoin = _game_session_join;
+         Desktop::setVisibilityAllWindows(false);
+         Desktop::setVisibility(&quot;JoinView&quot;, true);
+-        Desktop::setVisibility(&quot;FlagSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+         Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+         Desktop::setVisibility(&quot;ServerListView&quot;, true);
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -1,155 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &quot;Resources/ResourceManager.hpp&quot;
+-
+-#include &quot;FlagSelectionView.hpp&quot;
+-#include &quot;Views/Game/GameView.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
+-#include &quot;Util/Exception.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Views/Components/Button.hpp&quot;
+-#include &quot;Views/Components/Label.hpp&quot;
+-#include &quot;Views/Components/MouseEvent.hpp&quot;
+-#include &quot;2D/Color.hpp&quot;
+-
+-#define BORDER_SPACE 4
+-
+-class FlagButton : public Button
+-{
+-protected:
+-    FlagID fcode;
+-    FlagSelectionView* fsv;
+-public:
+-    FlagButton(FlagSelectionView* fsv, int x, int y, Surface &amp;s, FlagID flagCode)
+-        : Button(&quot;flag&quot;)
+-    {
+-        this-&gt;fsv = fsv;
+-        setLocation(x, y);
+-        setSize(s.getWidth(), s.getHeight());
+-        bimage.create(s.getWidth(), s.getHeight(), 1);
+-        s.blt(bimage, 0, 0);
+-        fcode = flagCode;
+-        
+-        setExtraBorder();
+-        borders[1][0] = Color::red;
+-        borders[1][1] = Color::darkRed;
+-        borders[2][0] = Color::green;
+-        borders[2][1] = Color::darkGreen;
+-    }
+-    
+-    void actionPerformed( const mMouseEvent &amp;e)
+-    {
+-        if ( e.getID() == mMouseEvent::MOUSE_EVENT_CLICKED )
+-        {
+-            fsv-&gt;setSelectedFlag(fcode);
+-        }
+-        else
+-        {
+-            Button::actionPerformed(e);
+-        }
+-    }
+-};
+-
+-// FlagSelectionView
+-//---------------------------------------------------------------------------
+-FlagSelectionView::FlagSelectionView() : RMouseHackView()
+-{
+-    setSearchName(&quot;FlagSelectionView&quot;);
+-    setTitle(&quot;Flag Selection&quot;);
+-    setSubTitle(&quot;&quot;);
+-
+-    setAllowResize(false);
+-    setAllowMove(false);
+-    setVisible(false);
+-
+-    // The thirty is to give more room to the map selectior view.
+-    moveTo(bodyTextRect.min.x + bodyTextRect.getSizeX() / 2 + 30,
+-           bodyTextRect.min.y + 5);
+-
+-    resizeClientArea(bodyTextRect.getSizeX() / 2 - 30, 180);
+-
+-    int tx = BORDER_SPACE;
+-    int ty = BORDER_SPACE + (FLAG_HEIGHT - Surface::getFontHeight()) / 2;
+-
+-    add( new Label(tx, ty, &quot;Current:&quot;, windowTextColor, windowTextColorShadow, true) );
+-
+-    loc_player_flag.x = tx + Surface::getTextLength(&quot;Current:&quot;) + BORDER_SPACE;
+-    loc_player_flag.y = BORDER_SPACE;
+-
+-    init();
+-
+-} // end FlagSelectionView::FlagSelectionView
+-
+-// init
+-//---------------------------------------------------------------------------
+-void FlagSelectionView::init()
+-{
+-    iXY flagStartOffset(BORDER_SPACE, BORDER_SPACE * 2 + FLAG_HEIGHT);
+-
+-    int yOffset = FLAG_HEIGHT + 2;
+-
+-    int x = flagStartOffset.x;
+-    int y = flagStartOffset.y;
+-
+-    ResourceManager::loadAllFlags(game_flags, flag_names);
+-    menu_flags.copy(game_flags);
+-
+-    unsigned int max_flags = menu_flags.getNumFrames();
+-    for (unsigned int i = 0; i &lt; max_flags; ++i)
+-    {
+-        menu_flags.setFrame(i);
+-        add( new FlagButton(this, x, y, menu_flags, i) );
+-
+-        x += FLAG_WIDTH + 2;
+-
+-        if (x &gt; flagStartOffset.x + getClientRect().getSizeX() - BORDER_SPACE - FLAG_WIDTH)
+-        {
+-            x = flagStartOffset.x;
+-            y += yOffset;
+-        }
+-    }
+-
+-    setSelectedFlag(0);
+-} // end FlagSelectionView::init
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void FlagSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    //iRect r(getViewRect());
+-    //viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+-    //clientArea.drawRect(clientArea.getRect(), Color::white);
+-    
+-    menu_flags.blt(clientArea, loc_player_flag.x, loc_player_flag.y);
+-
+-    View::doDraw(viewArea, clientArea);
+-
+-} // end FlagSelectionView::doDraw
+-
+-void
+-FlagSelectionView::setSelectedFlag(FlagID code)
+-{
+-    if ( code &lt; flag_names.size() )
+-    {
+-        menu_flags.setFrame(code);
+-        game_flags.setFrame(code);
+-        game_flags.frameToBuffer(GameConfig::player_flag_data, sizeof(GameConfig::player_flag_data));
+-    }
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -1,53 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __FlagSelectionView_hpp__
+-#define __FlagSelectionView_hpp__
+-
+-#include &quot;Core/CoreTypes.hpp&quot;
+-#include &quot;Views/MainMenu/RMouseHackView.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-
+-//---------------------------------------------------------------------------
+-class FlagSelectionView : public RMouseHackView
+-{
+-private:
+-    Surface menu_flags;
+-    Surface game_flags;
+-    std::vector&lt;std::string&gt; flag_names;
+-
+-    iXY loc_player_flag;
+-    const char * text_current;
+-    iXY loc_text_current;
+-
+-public:
+-    FlagSelectionView();
+-    virtual ~FlagSelectionView()
+-    {}
+-    
+-    void setSelectedFlag(FlagID code);
+-
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    //virtual int  lMouseUp(const iXY &amp;downPos, const iXY &amp;upPos);
+-    //virtual void drawBorder(Surface&amp; )
+-    //{}
+-
+-    void init();
+-}
+-; // end FlagSelectionView
+-
+-#endif // end __FlagSelectionView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -50,7 +50,6 @@
+ 
+         Desktop::setVisibility(&quot;HostView&quot;, true);
+         Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
+-        Desktop::setVisibility(&quot;FlagSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
+         Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+@@ -58,7 +57,6 @@
+         SERVER-&gt;openSession();
+     } else if (gameconfig-&gt;hostorjoin == _game_session_join) {
+         Desktop::setVisibility(&quot;JoinView&quot;, true);
+-        Desktop::setVisibility(&quot;FlagSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+ 
+         Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -29,7 +29,6 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;MapSelectionView.hpp&quot;
+ #include &quot;PlayerNameView.hpp&quot;
+-#include &quot;FlagSelectionView.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;IPAddressView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
+@@ -37,7 +37,7 @@
+ {
+     setSearchName(&quot;ServerListView&quot;);
+     setTitle(&quot;Servers&quot;);
+-    setSubTitle(&quot;&quot;);
++    setSubTitle(&quot; Name                         Players/max     Map          Ping   &quot;);
+ 
+     moveTo(bodyTextRect.min + iXY(0, 205));
+     resizeClientArea(bodyTextRect.max - bodyTextRect.min - iXY(0,170));
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000303.html">[Netpanzer-cvs] r1277 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game Views/MainMenu
+</A></li>
+	<LI>Next message: <A HREF="000305.html">[Netpanzer-cvs] r1279 - in trunk/netpanzer/src/NetPanzer/Views: .	Components MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#304">[ date ]</a>
+              <a href="thread.html#304">[ thread ]</a>
+              <a href="subject.html#304">[ subject ]</a>
+              <a href="author.html#304">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

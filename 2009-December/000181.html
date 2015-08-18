@@ -1,0 +1,1238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1153 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1153%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Scripts/toluapkg%20src/NetPanzer/Units&In-Reply-To=%3C200912281208.nBSC8u3s014749%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000180.html">
+   <LINK REL="Next"  HREF="000182.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1153 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1153%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Scripts/toluapkg%20src/NetPanzer/Units&In-Reply-To=%3C200912281208.nBSC8u3s014749%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1153 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec 28 13:08:56 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000180.html">[Netpanzer-cvs] r1152 - in trunk/netpanzer: pics/particles/lights	scripts src/Lib/ArrayUtil src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/AI	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Scripts src/NetPanzer/Scripts/bindings	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Units	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Weapons
+</A></li>
+        <LI>Next message: <A HREF="000182.html">[Netpanzer-cvs] r1154 - in trunk/netpanzer: . pics/particles/lights	src/NetPanzer/Particles src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-12-28 13:08:14 +0100 (Mon, 28 Dec 2009)
+New Revision: 1153
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/base_types.pkg
+   trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/chat.pkg
+   trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/config.pkg
+   trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/gamemanager.pkg
+Removed:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/src/NetPanzer/Bot/BotManager.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+Log:
+- Added missing pkg files for the tolua++ descriptions.
+- Chat messages now are not fixed size messages, can save space in short messages, and is possible to send larger messages now. Protocol is different now.
+- Fixed some problems introduced in previous commit.
+- Running of scripts is handled in ScriptManager now.
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/scripts/initialize.lua	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -1,6 +1,5 @@
+ 
+ LOGGER:log(&quot;Script initialization&quot;);
+-
+ LOGGER:log(&quot;gametype is &quot; .. gameconfig.gametype);
+ 
+ UserCommands =
+@@ -68,25 +67,10 @@
+         ConsoleInterface:post( Color.cyan, true, ps:getFlag(), &quot;Your name is &quot; .. ps:getName());
+         ConsoleInterface:post( Color.cyan, false, 0, &quot;Your id is &quot; .. ps:getID());
+         ConsoleInterface:post( Color.cyan, false, 0, &quot;Your have &quot; .. ps:getObjectivesHeld() .. &quot; bases&quot;);
+-    end,
+-
+-    testrules = function(param)
+-        test_game_rules();
+     end
++
+ };
+ 
+-function onUserMessage(msg)
+-    local cmd,arg = msg:match('^/(%w+) *(.*)');
+-    if cmd then
+-        local func = UserCommands[cmd];
+-        if type(func) == &quot;function&quot; then
+-            func(arg);
+-        end
+-    else
+-        ChatInterface:say(msg);
+-    end
+-end
+-
+ -- modes: 0=objective, 1=frag limit, 2=time limit
+ function test_game_rules()
+     if gameconfig.gametype == 2 then
+@@ -96,26 +80,31 @@
+ 
+ ServerCommands =
+ {
++    say_help = &quot;Says something to all players as server.&quot;,
+     say = function(param, player)
+         if param then
+             ChatInterface:serversay(param);
+         end
+     end,
+ 
++    kick_help = &quot;Kicks a player, use the player number (starts in 0)&quot;,
+     kick = function(param, player)
+         if param then
+             GameManager:kickPlayer(param);
+         end
+     end,
+ 
++    addbot_help = &quot;Adds a new bot to the server.&quot;,
+     addbot = function(param, player)
+         GameManager:addBot();
+     end,
+ 
++    removebots_help = &quot;Removes all bots from server&quot;,
+     removebots = function(param, player)
+         GameManager:removeAllBots();
+     end,
+ 
++    map_help = &quot;Change the map&quot;,
+     map = function(param, player)
+         local ok = GameManager:changeMap(param);
+         if ok then
+@@ -125,6 +114,7 @@
+         end
+     end,
+ 
++    listcommands_help = &quot;List the server commands&quot;,
+     listcommands = function(param, player)
+         local out;
+         for k,v in pairs(ServerCommands) do
+@@ -139,20 +129,18 @@
+         ChatInterface:serversayTo(player, out);
+     end,
+ 
++    _help = &quot;Type /server help &lt;wanted_command&gt; or /server listcommands&quot;,
++    help_help = &quot;Provides this kind of help&quot;,
++    help = function(param, player)
++        local ht = ServerCommands[param .. &quot;_help&quot;];
++        if ht then
++            ChatInterface:serversayTo( player, param .. &quot;: &quot; .. ht);
++        else
++            ChatInterface:serversayTo( player, &quot;Help not found for &quot; .. param .. &quot;. Use /server listcommands&quot;);
++        end
++    end,
++
+     testrules = function(param)
+         test_game_rules();
+     end
+ };
+-
+-function serverHandleMessage(msg, player)
+-    local cmd,arg = msg:match('^/(%w+) *(.*)');
+-    if cmd then
+-        local func = ServerCommands[cmd];
+-        if func and type(func) == &quot;function&quot; then
+-            func(arg, player);
+-        end
+---        ConsoleInterface:post( Color.cyan, false, 0, 'received command &quot;' .. msg .. '&quot; from player ' .. player);
+-        return false;
+-    end
+-    return true;
+-end
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotManager.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotManager.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -25,6 +25,7 @@
+ #include &quot;Bot.hpp&quot;
+ #include &quot;BotPlayer.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+@@ -32,6 +33,7 @@
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;Resources/ResourceManagerMessages.hpp&quot;
++#include &quot;Interfaces/ChatInterface.hpp&quot;
+ 
+ using namespace std;
+ 
+@@ -63,6 +65,7 @@
+         SystemConnectAlert connect_alert;
+         connect_alert.set( p-&gt;getID(), _connect_alert_mesg_connect );
+         NetworkServer::broadcastMessage( &amp;connect_alert, sizeof(SystemConnectAlert));
++        NetworkClient::sendMessage(&amp;connect_alert, sizeof(SystemConnectAlert));
+         
+         return p-&gt;getID();
+     }
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -1,130 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _CHATNETMESSAGE_HPP
+-#define _CHATNETMESSAGE_HPP
+-
+-#include &lt;string.h&gt;
+-#include &lt;assert.h&gt;
+-#include &quot;NetMessage.hpp&quot;
+-
+-enum { _net_message_id_chat_mesg_req,
+-       _net_message_id_chat_mesg
+-};
+-
+-enum { _chat_mesg_scope_player_set,
+-       _chat_mesg_scope_alliance,
+-       _chat_mesg_scope_enemies,
+-       _chat_mesg_scope_all,
+-       _chat_mesg_scope_server
+-};
+-
+-class ChatMesgRequest : public NetMessage
+-{
+-public:
+-    Uint8 message_scope;
+-    char player_set[32];
+-
+-private:
+-    Uint16 source_player_index;
+-public:
+-    char message_text[150];
+-
+-    ChatMesgRequest()
+-    {
+-        reset();
+-    }
+-    
+-    void reset()
+-    {
+-        message_class = _net_message_class_chat;
+-        message_id = _net_message_id_chat_mesg_req;
+-        memset(player_set, 0, sizeof(player_set));
+-        message_scope = _chat_mesg_scope_all;
+-    }
+-
+-    void setPlayerSet(Uint16 player_index)
+-    {
+-        assert(player_index &lt; sizeof(player_set));
+-        
+-        unsigned long index;
+-        unsigned char shift;
+-        unsigned char mask = 1;
+-
+-        index = player_index;
+-        shift = (unsigned char) ( 7 - (index &amp; (unsigned long) 7 ) ); // 7 - (index % 8)
+-        index = index &gt;&gt; 3;
+-        // index / 8
+-        mask = mask &lt;&lt; shift;
+-            
+-        player_set[index] = player_set[index] | mask;
+-    }
+-    
+-    void clearPlayerSet(Uint16 player_index)
+-    {
+-        assert(player_index &lt; sizeof(player_set));
+-        
+-        unsigned long index;
+-        unsigned char shift;
+-        unsigned char mask = 1;
+-
+-        index = (player_index);
+-        shift = (unsigned char) ( 7 - (index &amp; (unsigned long) 7 ) );
+-        index = index &gt;&gt; 3;
+-        mask = ~(mask &lt;&lt; shift);
+-        
+-        player_set[ index ] = player_set[index] &amp; mask;
+-    }
+-    Uint16 getSourcePlayerIndex() const
+-    {
+-        return SDL_SwapLE16(source_player_index);
+-    }
+-    void setSourcePlayerIndex(Uint16 playerIndex)
+-    {
+-        source_player_index = SDL_SwapLE16(playerIndex);
+-    }
+-} __attribute__((packed));
+-
+-
+-class ChatMesg: public NetMessage
+-{
+-public:
+-    unsigned char  message_scope;
+-private:
+-    Uint16 source_player_index;
+-public:
+-    char message_text[150];
+-
+-    ChatMesg()
+-    {
+-        message_class = _net_message_class_chat;
+-        message_id = _net_message_id_chat_mesg;
+-        memset(message_text, 0, sizeof(message_text));
+-    }
+-
+-    Uint16 getSourcePlayerIndex() const
+-    {
+-        return SDL_SwapLE16(source_player_index);
+-    }
+-    void setSourcePlayerIndex(Uint16 playerIndex)
+-    {
+-        source_player_index = SDL_SwapLE16(playerIndex);
+-    }
+-} __attribute__((packed));
+-
+-#endif
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -40,6 +40,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;Resources/ResourceManagerMessages.hpp&quot;
++#include &quot;NetworkClient.hpp&quot;
+ 
+ ServerConnectDaemon::ConnectionState 
+         ServerConnectDaemon::connection_state = ServerConnectDaemon::connect_state_idle;
+@@ -197,15 +198,10 @@
+ 
+     if ( ((std::string)gameconfig-&gt;motd).length() &gt; 0 )
+     {
+-        ChatMesg chat_mesg;
+-        chat_mesg.message_scope=_chat_mesg_scope_server;
+-        chat_mesg.setSourcePlayerIndex(0);
+-        snprintf(chat_mesg.message_text, sizeof(chat_mesg.message_text), &quot;%s&quot;,gameconfig-&gt;motd.c_str());
+-        chat_mesg.setSize(sizeof(ChatMesg));
+-        client-&gt;sendMessage( &amp;chat_mesg, sizeof(chat_mesg));
++        ChatInterface::serversayTo(client-&gt;getPlayerIndex(), gameconfig-&gt;motd.c_str());
+     }
+ 
+-    NetworkServer::broadcastMessage( &amp;connect_alert, sizeof(SystemConnectAlert));
++    NetworkServer::broadcastMessage(&amp;connect_alert, sizeof(SystemConnectAlert));
+ }
+ 
+ void ServerConnectDaemon::resetConnectFsm()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -434,8 +434,7 @@
+ WorldInputCmdProcessor::setKeyboardInputModeChatMesg()
+ {
+     ConsoleInterface::setInputStringStatus( true );
+-    ConsoleInterface::resetInputString( &quot;Message All: &quot; );
+-    ChatInterface::setMessageScopeAll();
++    ConsoleInterface::resetInputString( &quot;&gt; &quot; );
+     KeyboardInterface::flushCharBuffer();
+     KeyboardInterface::setTextMode(true);
+     enter_key_hit_count = 1;
+@@ -450,21 +449,10 @@
+     {
+         if(strcmp(chat_string, &quot;&quot;) != 0)
+         {
+-            lua_State *L = ScriptManager::getLuavm();
+-            lua_getglobal(L, &quot;onUserMessage&quot;);
+-            if ( lua_isfunction(L, -1) )
++            if ( chat_string[0] != '/' || ! ScriptManager::runUserCommand(&amp;chat_string[1]) )
+             {
+-                lua_pushstring(L, chat_string);
+-                if ( lua_pcall(L, 1, 0, 0) != 0 )
+-                {
+-                    LOGGER.warning(&quot;error running function 'onUserMessage': %s\n&quot;,lua_tostring(L, -1));
+-                }
++                ChatInterface::say(chat_string);
+             }
+-            else
+-            {
+-                lua_pop(L, 1);
+-                ChatInterface::sendCurrentMessage( chat_string );
+-            }
+         }
+         keyboard_input_mode = _keyboard_input_mode_command;
+         ConsoleInterface::setInputStringStatus(false);             
+@@ -475,8 +463,7 @@
+ WorldInputCmdProcessor::setKeyboardInputModeAllieChatMesg()
+ {
+     ConsoleInterface::setInputStringStatus( true );
+-    ConsoleInterface::resetInputString( &quot;Message Allies : &quot; );
+-    ChatInterface::setMessageScopeAllies();
++    ConsoleInterface::resetInputString( &quot;[Team]&gt; &quot; );
+     KeyboardInterface::flushCharBuffer();
+     KeyboardInterface::setTextMode(true);
+     enter_key_hit_count = 1;
+@@ -490,7 +477,7 @@
+     if ( getConsoleInputString( chat_string ) == true ) {
+         keyboard_input_mode = _keyboard_input_mode_command;
+         ConsoleInterface::setInputStringStatus( false );
+-        ChatInterface::sendCurrentMessage( chat_string );
++        ChatInterface::teamsay( chat_string );
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -19,7 +19,7 @@
+ #define __NETWORK_GLOBALS_HPP__
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+-#define NETPANZER_PROTOCOL_VERSION     1023
++#define NETPANZER_PROTOCOL_VERSION     1024
+ #define MASTERSERVER_PORT             28900
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -16,37 +16,99 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
++#include &lt;cstring&gt;
+ #include &quot;2D/Color.hpp&quot;
+ 
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+-#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;GameConfig.hpp&quot;
+ #include &quot;Util/NTimer.hpp&quot;
+ 
++#include &quot;Classes/Network/NetMessage.hpp&quot;
++#include &quot;Classes/Network/NetPacket.hpp&quot;
+ 
+-ChatMesgRequest ChatInterface::current_chat_mesg;
+-void (* ChatInterface::addChatString)( const char *message_text ) = 0;
++enum { _net_message_id_chat_mesg_req,
++       _net_message_id_chat_mesg
++};
+ 
+-void ChatInterface::chatMessageRequest(const NetPacket* packet)
++enum { _chat_mesg_scope_player_set,
++       _chat_mesg_scope_alliance,
++       _chat_mesg_scope_enemies,
++       _chat_mesg_scope_all,
++       _chat_mesg_scope_server
++};
++
++#define CHATREQUEST_HEADER_LEN (sizeof(NetMessage) + sizeof(Uint8))
++#define CHATMESG_HEADER_LEN (sizeof(NetMessage) + sizeof(Uint8) + sizeof(Uint16))
++#define MAX_CHAT_MSG_LEN (_MAX_NET_PACKET_SIZE - CHATMESG_HEADER_LEN)
++
++class ChatMesgRequest : public NetMessage
+ {
+-    bool post_on_server = false;
+-    ChatMesg chat_mesg;
+-    const ChatMesgRequest* chat_request = (const ChatMesgRequest*) packet-&gt;getNetMessage();
++public:
++    Uint8 message_scope;
++    char message_text[MAX_CHAT_MSG_LEN];
+ 
+-    if (   chat_request-&gt;message_scope != _chat_mesg_scope_server
+-        &amp;&amp; chat_request-&gt;getSourcePlayerIndex() != packet-&gt;fromPlayer )
++    ChatMesgRequest()
+     {
+-        LOGGER.warning(&quot;Chat message cheat from player %d&quot;, packet-&gt;fromPlayer);
+-        return;
++        reset();
+     }
+ 
++    void reset()
++    {
++        message_class = _net_message_class_chat;
++        message_id = _net_message_id_chat_mesg_req;
++        message_scope = _chat_mesg_scope_all;
++    }
++
++    int getTextLen() const
++    {
++        return getSize() - CHATREQUEST_HEADER_LEN;
++    }
++} __attribute__((packed));
++
++
++class ChatMesg: public NetMessage
++{
++public:
++    Uint8  message_scope;
++private:
++    Uint16 source_player_index;
++public:
++    char message_text[MAX_CHAT_MSG_LEN];
++
++    ChatMesg()
++    {
++        message_class = _net_message_class_chat;
++        message_id = _net_message_id_chat_mesg;
++        memset(message_text, 0, sizeof(message_text));
++    }
++
++    int getTextLen() const
++    {
++        return getSize() - CHATMESG_HEADER_LEN;
++    }
++
++    Uint16 getSourcePlayerIndex() const
++    {
++        return SDL_SwapLE16(source_player_index);
++    }
++    void setSourcePlayerIndex(Uint16 playerIndex)
++    {
++        source_player_index = SDL_SwapLE16(playerIndex);
++    }
++} __attribute__((packed));
++
++static void chatMessageRequest(const NetPacket* packet)
++{
++    const ChatMesgRequest* chat_request = (const ChatMesgRequest*) packet-&gt;getNetMessage();
++
+     if (   chat_request-&gt;message_scope == _chat_mesg_scope_server
+         &amp;&amp; NetworkState::getNetworkStatus() == _network_state_server
+         &amp;&amp; packet-&gt;fromClient )
+@@ -55,44 +117,24 @@
+         return;
+     }
+ 
+-    chat_mesg.setSourcePlayerIndex(chat_request-&gt;getSourcePlayerIndex());
++    bool post_on_server = false;
++    ChatMesg chat_mesg;
++    char text[MAX_CHAT_MSG_LEN+1];
++    int text_len = chat_request-&gt;getTextLen();
++
++    chat_mesg.setSourcePlayerIndex(packet-&gt;fromPlayer);
+     chat_mesg.message_scope = chat_request-&gt;message_scope;
+-    snprintf(chat_mesg.message_text, sizeof(chat_mesg.message_text), &quot;%s&quot;,
+-             chat_request-&gt;message_text);
++    memcpy(chat_mesg.message_text, chat_request-&gt;message_text, text_len);
++    memcpy(text, chat_request-&gt;message_text, text_len);
++    text[text_len] = 0;
+ 
+     if( chat_request-&gt;message_scope == _chat_mesg_scope_all )
+     {
+-            lua_State *L = ScriptManager::getLuavm();
+-            lua_getglobal(L, &quot;serverHandleMessage&quot;);
+-            if ( lua_isfunction(L, -1) )
+-            {
+-                lua_pushstring(L, chat_mesg.message_text);
+-                lua_pushinteger(L, packet-&gt;fromPlayer );
+-                if ( lua_pcall(L, 2, 1, 0) != 0 )
+-                {
+-                    LOGGER.warning(&quot;error running function 'serverHandleMessage': %s\n&quot;,lua_tostring(L, -1));
+-                }
+-
+-                if ( lua_isboolean(L,-1) )
+-                {
+-                    bool want_broadcast = lua_toboolean(L, -1);
+-                    lua_pop(L,1);
+-                    if ( want_broadcast )
+-                    {
+-                        NetworkServer::broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-                        post_on_server = true;
+-                    }
+-                }
+-            }
+-            else
+-            {
+-                lua_pop(L, 1);
+-                NetworkServer::broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-                post_on_server = true;
+-            }
+-
+-//        NetworkServer::broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-//        post_on_server = true;
++        if ( text[0] != '/' || ! ScriptManager::runServerCommand(&amp;text[1], packet-&gt;fromPlayer) )
++        {
++            NetworkServer::broadcastMessage(&amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
++            post_on_server = true;
++        }
+     }
+     else if( chat_request-&gt;message_scope == _chat_mesg_scope_alliance )
+     {
+@@ -109,12 +151,12 @@
+ 
+             if ( player-&gt;getStatus() == _player_state_active )
+             {
+-                if( PlayerInterface::isAllied( chat_request-&gt;getSourcePlayerIndex(), i ) == true )
++                if( PlayerInterface::isAllied( packet-&gt;fromPlayer, i ) == true )
+                 {
+                     if ( local_player_index != i )
+                     {
+                         NetworkServer::sendMessage((unsigned short)i, &amp;chat_mesg,
+-                                sizeof(ChatMesg));
++                                                CHATMESG_HEADER_LEN + text_len);
+                     }
+                     else
+                     {
+@@ -124,21 +166,20 @@
+             }
+         }
+ 
+-        if( chat_request-&gt;getSourcePlayerIndex() == PlayerInterface::getLocalPlayerIndex() )
++        if( packet-&gt;fromPlayer == PlayerInterface::getLocalPlayerIndex() )
+         {
+             post_on_server = true;
+         }
+         else
+         {
+-            NetworkServer::sendMessage( chat_request-&gt;getSourcePlayerIndex(),
+-                                 &amp;chat_mesg, sizeof(ChatMesg));
++            NetworkServer::sendMessage( packet-&gt;fromPlayer,
++                                 &amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
+         }
+     }
+     else if( chat_request-&gt;message_scope == _chat_mesg_scope_server )
+     {
+-        NetworkServer::broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+-                chat_mesg.message_text );
++        NetworkServer::broadcastMessage(&amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
++        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;, text);
+         return;
+     }
+ 
+@@ -148,14 +189,6 @@
+ 
+         player_state = PlayerInterface::getPlayer(chat_mesg.getSourcePlayerIndex() );
+ 
+-        if( (addChatString != 0) ) {
+-            char mesg_str[256];
+-            sprintf( mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str() );
+-
+-            addChatString( mesg_str );
+-            addChatString( chat_mesg.message_text );
+-        }
+-
+         IntColor color = Color::white;
+ 
+         switch ( chat_request-&gt;message_scope ) {
+@@ -175,11 +208,11 @@
+ 
+         // TODO add unitcolor
+         ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(), &quot;%s: %s&quot;,
+-                player_state-&gt;getName().c_str(), chat_mesg.message_text );
++                player_state-&gt;getName().c_str(), text);
+     }
+ }
+ 
+-void ChatInterface::chatMessage(const NetPacket* packet)
++static void chatMessage(const NetPacket* packet)
+ {
+     unsigned short local_player_index;
+     const ChatMesg *chat_mesg = (const ChatMesg*) packet-&gt;getNetMessage();
+@@ -191,8 +224,13 @@
+         return;
+     }
+ 
++    unsigned char text[MAX_CHAT_MSG_LEN+1];
++    int text_len = chat_mesg-&gt;getTextLen();
++    memcpy(text, chat_mesg-&gt;message_text, text_len);
++    text[text_len] = 0;
++
+     if( chat_mesg-&gt;message_scope == _chat_mesg_scope_server ) {
+-        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;, chat_mesg-&gt;message_text );
++        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;, text );
+         return;
+     }
+ 
+@@ -202,14 +240,6 @@
+ 
+     player_state = PlayerInterface::getPlayer( chat_mesg-&gt;getSourcePlayerIndex() );
+ 
+-    if ( (addChatString != 0) ) {
+-        char mesg_str[144];
+-        sprintf( mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str() );
+-
+-        addChatString( mesg_str );
+-        addChatString( chat_mesg-&gt;message_text );
+-    } // ** if
+-
+     IntColor color = Color::white;
+ 
+     switch ( chat_mesg-&gt;message_scope ) {
+@@ -228,7 +258,7 @@
+     } // ** switch
+ 
+     ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(), &quot;%s: %s&quot;,
+-            player_state-&gt;getName().c_str(), chat_mesg-&gt;message_text );
++                                        player_state-&gt;getName().c_str(), text);
+ }
+ 
+ void ChatInterface::processChatMessages(const NetPacket* packet)
+@@ -249,43 +279,6 @@
+     }
+ }
+ 
+-
+-void ChatInterface::setNewMessageCallBack( void (* addStringCallBack )( const char *message_text ) )
+-{
+-    addChatString = addStringCallBack;
+-}
+-
+-void ChatInterface::setMessageScopeAll()
+-{
+-    current_chat_mesg.message_scope =  _chat_mesg_scope_all;
+-}
+-
+-void ChatInterface::setMessageScopeAllies()
+-{
+-    current_chat_mesg.message_scope = _chat_mesg_scope_alliance;
+-}
+-
+-void ChatInterface::setMessageScopeEnemies()
+-{
+-    current_chat_mesg.message_scope = _chat_mesg_scope_enemies;
+-}
+-
+-void ChatInterface::setMessageScopeServer()
+-{
+-    current_chat_mesg.message_scope = _chat_mesg_scope_server;
+-}
+-
+-void ChatInterface::sendCurrentMessage( const char *message_text )
+-{
+-    current_chat_mesg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-    strncpy( current_chat_mesg.message_text, message_text, 149 );
+-    current_chat_mesg.message_text[ 149 ] = 0;
+-
+-    NetworkClient::sendMessage(&amp;current_chat_mesg, sizeof(ChatMesgRequest));
+-
+-    current_chat_mesg.reset();
+-}
+-
+ void
+ ChatInterface::sendQuickMessage(unsigned int n)
+ {
+@@ -336,42 +329,39 @@
+ 
+     if ( msg )
+     {
+-        sendCurrentMessage(msg);
++        say(msg);
+     }
+ }
+ 
+ void
+ ChatInterface::say(const char *message)
+ {
++    int text_len = strlen(message);
+     ChatMesgRequest cmsg;
+-    cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-    strncpy( cmsg.message_text, message, 149 );
+-    cmsg.message_text[ 149 ] = 0;
++    memcpy(cmsg.message_text, message, text_len );
+     cmsg.message_scope = _chat_mesg_scope_all;
+-    NetworkClient::sendMessage(&amp;cmsg, sizeof(cmsg));
++    NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN+text_len);
+ }
+ 
+ void
+ ChatInterface::teamsay(const char* message)
+ {
++    int text_len = strlen(message);
+     ChatMesgRequest cmsg;
+-    cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-    strncpy( cmsg.message_text, message, 149 );
+-    cmsg.message_text[ 149 ] = 0;
++    memcpy( cmsg.message_text, message, text_len );
+     cmsg.message_scope = _chat_mesg_scope_alliance;
+-    NetworkClient::sendMessage(&amp;cmsg, sizeof(cmsg));
++    NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN+text_len);
+ }
+ 
+ void
+ ChatInterface::serversay(const char* message)
+ {
++    int text_len = strlen(message);
+     ChatMesgRequest cmsg;
+-    cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-    strncpy( cmsg.message_text, message, 149 );
+-    cmsg.message_text[ 149 ] = 0;
++    strncpy( cmsg.message_text, message, text_len );
+     cmsg.message_scope = _chat_mesg_scope_server;
+ //    NetworkServer::broadcastMessage(&amp;cmsg, sizeof(cmsg));
+-    NetworkClient::sendMessage(&amp;cmsg, sizeof(cmsg));
++    NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN+text_len);
+ }
+ 
+ void
+@@ -383,12 +373,12 @@
+     }
+     else
+     {
+-        ChatMesgRequest cmsg;
++        int text_len = strlen(message);
++        ChatMesg cmsg;
+         cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-        strncpy( cmsg.message_text, message, 149 );
+-        cmsg.message_text[ 149 ] = 0;
++        strncpy( cmsg.message_text, message, text_len );
+         cmsg.message_scope = _chat_mesg_scope_server;
+-        NetworkServer::sendMessage(player, &amp;cmsg, sizeof(cmsg));
++        NetworkServer::sendMessage(player, &amp;cmsg, CHATMESG_HEADER_LEN+text_len);
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -18,19 +18,12 @@
+ #ifndef _CHATINTERFACE_HPP
+ #define _CHATINTERFACE_HPP
+ 
+-#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
+ #include &quot;Core/CoreTypes.hpp&quot;
++
+ class NetPacket;
+ 
+ class ChatInterface
+ {
+-protected:
+-    static ChatMesgRequest current_chat_mesg;
+-    static void (* addChatString)( const char *message_text );
+-
+-    static void chatMessageRequest(const NetPacket* packet);
+-    static void chatMessage(const NetPacket* packet);
+-
+ public:
+     static void processChatMessages(const NetPacket* packet);
+ 
+@@ -39,13 +32,6 @@
+     static void serversay(const char * message);
+     static void serversayTo(const Uint16 player, const char * message);
+ 
+-    // ** ChatView Interface Methods
+-    static void setNewMessageCallBack( void (* addStringCallBack)( const char *message_text ) );
+-    static void setMessageScopeAll();
+-    static void setMessageScopeAllies();
+-    static void setMessageScopeEnemies();
+-    static void setMessageScopeServer();
+-    static void sendCurrentMessage(const char *message_text);
+     static void sendQuickMessage(unsigned int n);
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -109,8 +109,7 @@
+             }
+             case ServerCommand::CHAT:
+             {
+-                ChatInterface::setMessageScopeServer();
+-                ChatInterface::sendCurrentMessage(command.argument.c_str());
++                ChatInterface::serversay(command.argument.c_str());
+                 break;
+             }
+             case ServerCommand::STATUS:
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -464,8 +464,7 @@
+ 
+         case _map_cycle_server_state_display_endgame_views:
+             {
+-                ChatInterface::setMessageScopeServer();
+-                ChatInterface::sendCurrentMessage(&quot;Round is over&quot;);
++                ChatInterface::serversay(&quot;Round is over&quot;);
+                                                                 
+                 SystemViewControl view_control;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -291,6 +291,7 @@
+     SystemConnectAlert msg;
+     msg.set( player, _connect_alert_mesg_disconnect);
+     NetworkServer::broadcastMessage(&amp;msg, sizeof(msg));
++    NetworkClient::sendMessage(&amp;msg, sizeof(msg));
+ }
+ 
+ void GameManager::kickPlayer(const Uint16 player)
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -24,6 +24,9 @@
+ 
+ #include &quot;bindings/NetPanzerBindings.hpp&quot;
+ 
++#include &quot;2D/Color.hpp&quot;
++#include &quot;Interfaces/ConsoleInterface.hpp&quot;
++
+ lua_State * ScriptManager::luavm = 0;
+ 
+ void
+@@ -70,6 +73,137 @@
+     }
+ }
+ 
++bool
++ScriptManager::runUserCommand(const char* str)
++{
++    int luatop = lua_gettop(luavm);
++
++    lua_getglobal(luavm, &quot;UserCommands&quot;);
++    if ( lua_istable(luavm, -1) )
++    {
++        char cmd[128];
++        int cmdpos = 0;
++        int strpos = 0;
++
++        while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
++        {
++            cmd[cmdpos++] = str[strpos++];
++        }
++
++        if ( cmdpos == 0 )
++        {
++            lua_settop(luavm, luatop);
++            return false;
++        }
++
++        if ( cmdpos == sizeof(cmd) )
++        {
++            cmd[sizeof(cmd)-1] = 0;
++        }
++        else
++        {
++            cmd[cmdpos] = 0;
++        }
++
++        lua_getfield(luavm, -1, cmd);
++        if ( lua_isfunction(luavm, -1) )
++        {
++            while ( str[strpos] &amp;&amp; isspace(str[strpos]) )
++            {
++                strpos++;
++            }
++
++            lua_pushstring(luavm, &amp;str[strpos]);
++            
++            if ( lua_pcall(luavm, 1, 0, 0) != 0 )
++            {
++                ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;Error running user command '%s': %s&quot;, str, lua_tostring(luavm, -1));
++            }
++        }
++        else
++        {
++            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;User command '%s' not found&quot;, str);
++        }
++    }
++    else
++    {
++        ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;There is no defined UserCommands&quot;, str);
++    }
++
++    lua_settop(luavm, luatop);
++    return true;
++}
++
++bool
++ScriptManager::runServerCommand(const char* str, Uint16 runPlayer)
++{
++    int luatop = lua_gettop(luavm);
++
++    lua_getglobal(luavm, &quot;ServerCommands&quot;);
++    if ( lua_istable(luavm, -1) )
++    {
++        char cmd[128];
++        int cmdpos = 0;
++        int strpos = 0;
++
++        while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
++        {
++            cmd[cmdpos++] = str[strpos++];
++        }
++
++        if ( cmdpos == 0 )
++        {
++            lua_settop(luavm, luatop);
++            return false;
++        }
++
++        if ( cmdpos == sizeof(cmd) )
++        {
++            cmd[sizeof(cmd)-1] = 0;
++        }
++        else
++        {
++            cmd[cmdpos] = 0;
++        }
++
++        lua_getfield(luavm, -1, cmd);
++        if ( lua_isfunction(luavm, -1) )
++        {
++            while ( str[strpos] &amp;&amp; isspace(str[strpos]) )
++            {
++                strpos++;
++            }
++
++            lua_pushstring(luavm, &amp;str[strpos]);
++            lua_pushnumber(luavm, runPlayer);
++            
++            if ( lua_pcall(luavm, 2, 0, 0) != 0 )
++            {
++                char errormsg[512];
++                snprintf(errormsg,sizeof(errormsg),
++                        &quot;Error running server command '%s': %s&quot;,
++                        str, lua_tostring(luavm, -1));
++                errormsg[sizeof(errormsg)-1] = 0;
++                ChatInterface::serversayTo(runPlayer, errormsg);
++            }
++        }
++        else
++        {
++            char errormsg[512];
++            snprintf(errormsg,sizeof(errormsg), &quot;Server command '%s' not found&quot;, str);
++            errormsg[sizeof(errormsg)-1] = 0;
++            ChatInterface::serversayTo(runPlayer, errormsg);
++        }
++    }
++    else
++    {
++        ChatInterface::serversayTo(runPlayer, &quot;There is no defined ServerCommands&quot;);
++    }
++
++    lua_settop(luavm, luatop);
++    return true;
++}
++
+ void
+ ScriptManager::runFile(const char * runname, const char * filename)
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -22,6 +22,7 @@
+ #define	_SCRIPTMANAGER_HPP
+ 
+ #include &quot;lua/lua.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+ class ScriptManager
+ {
+@@ -32,6 +33,8 @@
+     static void registerLib(const char * libname, const luaL_reg * functions);
+         
+     static void runStr(const char * runname, const char * str);
++    static bool runUserCommand(const char * str);
++    static bool runServerCommand(const char * str, Uint16 runPlayer);
+     
+     // NOTE: runFile has to run after FileSystem has been initialized.
+     static void runFile(const char * runname, const char * filename);
+
+Added: trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/base_types.pkg
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/base_types.pkg	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/base_types.pkg	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -0,0 +1,9 @@
++$#include &quot;Types/iXY.hpp&quot;
++
++struct iXY
++{
++    int x;
++    int y;
++    iXY();
++    iXY(int newx, int newy);
++};
+
+Added: trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/chat.pkg
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/chat.pkg	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/chat.pkg	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -0,0 +1,11 @@
++$#include &quot;Interfaces/ChatInterface.hpp&quot;
++
++typedef int Uint16;
++
++class ChatInterface
++{
++    static void say(const char *message_text);
++    static void teamsay(const char *message_text);
++    static void serversay(const char *message_text);
++    static void serversayTo(const Uint16 player, const char *message_text);
++};
+
+Added: trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/config.pkg
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/config.pkg	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/config.pkg	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -0,0 +1,13 @@
++$#include &quot;Interfaces/GameConfig.hpp&quot;
++
++typedef int ConfigInt;
++
++class GameConfig
++{
++    ConfigInt    gametype;
++    ConfigInt    timelimit;
++    ConfigInt    fraglimit;
++    ConfigInt    objectiveoccupationpercentage;
++};
++
++extern GameConfig* gameconfig;
+
+Added: trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/gamemanager.pkg
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/gamemanager.pkg	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Scripts/toluapkg/gamemanager.pkg	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -0,0 +1,23 @@
++$#include &quot;Interfaces/GameManager.hpp&quot;
++
++typedef int Uint16;
++
++class GameManager
++{
++    static void spawnPlayer( const Uint16 player );
++    static void spawnPlayerAt( const Uint16 player, const iXY&amp; position );
++    static void respawnAllPlayers();
++
++    static void kickPlayer( const Uint16 player );
++    static void destroyPlayerUnits( const Uint16 player );
++    static void disownPlayerObjectives( const Uint16 player );
++
++    static Uint16 addBot();
++    static void removeAllBots();
++
++    static void exitNetPanzer();
++    static void quitNetPanzerGame();
++
++    static bool changeMap(const char * map_name);
++
++};
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-12-27 14:50:29 UTC (rev 1152)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-12-28 12:08:14 UTC (rev 1153)
+@@ -165,11 +165,21 @@
+         bucket_rect.max.x += range_buckets;
+         bucket_rect.max.y += range_buckets;
+ 
++        if ( bucket_rect.min.x &lt; 0 )
++        {
++            bucket_rect.min.x = 0;
++        }
++
+         if ( (size_t)bucket_rect.max.x &gt;= column_size )
+         {
+             bucket_rect.max.x = column_size-1;
+         }
+ 
++        if ( bucket_rect.min.y &lt; 0 )
++        {
++            bucket_rect.min.y = 0;
++        }
++
+         if ( (size_t)bucket_rect.max.y &gt;= row_size )
+         {
+             bucket_rect.max.y = row_size-1;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000180.html">[Netpanzer-cvs] r1152 - in trunk/netpanzer: pics/particles/lights	scripts src/Lib/ArrayUtil src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/AI	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Scripts src/NetPanzer/Scripts/bindings	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Units	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Weapons
+</A></li>
+	<LI>Next message: <A HREF="000182.html">[Netpanzer-cvs] r1154 - in trunk/netpanzer: . pics/particles/lights	src/NetPanzer/Particles src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,457 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1043 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1043%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces&In-Reply-To=%3C200809031545.m83FjAbl031311%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000082.html">
+   <LINK REL="Next"  HREF="000084.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1043 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1043%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces&In-Reply-To=%3C200809031545.m83FjAbl031311%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1043 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep  3 17:45:10 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000082.html">[Netpanzer-cvs] r1042 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000084.html">[Netpanzer-cvs] r1044 - in trunk/netpanzer: nbproject	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#83">[ date ]</a>
+              <a href="thread.html#83">[ thread ]</a>
+              <a href="subject.html#83">[ subject ]</a>
+              <a href="author.html#83">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-03 17:45:02 +0200 (Wed, 03 Sep 2008)
+New Revision: 1043
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.hpp
+Log:
+- Replaced PowerUpList class with a vector
+- The size of the PowerUp Network messages is set automatically.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp	2008-09-03 13:05:11 UTC (rev 1042)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp	2008-09-03 15:45:02 UTC (rev 1043)
+@@ -43,6 +43,7 @@
+     {
+         message_class = _net_message_class_powerup;
+         message_id = _net_message_id_powerup_create;
++        setSize(sizeof(*this));
+     }
+     void set(iXY map_loc, int ID, int type)
+     {
+@@ -73,8 +74,8 @@
+ {
+ private:
+     Sint32  ID;
+-    Uint16 dummy; // XXX only here for compatibility reasons
+-    Uint16 player_id;
++    Uint16  dummy; // XXX only here for compatibility reasons
++    Uint16  player_id;
+     Sint32  unit_powerup_type;
+ 
+ public:
+@@ -82,6 +83,7 @@
+     {
+         message_class = _net_message_class_powerup;
+         message_id = _net_message_id_powerup_hit;
++        setSize(sizeof(*this));
+     }
+     void set(int ID, Uint16 player_id, int type=0)
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2008-09-03 13:05:11 UTC (rev 1042)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2008-09-03 15:45:02 UTC (rev 1043)
+@@ -35,7 +35,7 @@
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/PowerUpNetMessage.hpp&quot;
+ 
+-PowerUpList PowerUpInterface::powerup_list;
++PowerUpInterface::PowerUpList PowerUpInterface::powerup_list;
+ 
+ int PowerUpInterface::power_up_limit;
+ int PowerUpInterface::power_up_regen_time_upper_bound = 300;
+@@ -53,37 +53,6 @@
+                                       _powerup_enemy_radar
+                                     };
+ 
+-PowerUpList::PowerUpList()
+-    : id_counter(0)
+-{
+-}
+-
+-PowerUpList::~PowerUpList( )
+-{
+-    iterator i;
+-    for(i=begin(); i!=end(); i++) {
+-        delete *i;
+-    }
+-}
+-
+-PowerUp* PowerUpList::find(int ID)
+-{
+-    for(iterator i=begin(); i!=end(); i++) {
+-        PowerUp* powerup = *i;
+-        if(powerup-&gt;ID == ID)
+-            return powerup;
+-    }
+-
+-    return( 0 );
+-}
+-
+-void PowerUpList::addWithID(PowerUp *powerup)
+-{
+-    powerup-&gt;ID = id_counter++;
+-    push_back(powerup);
+-}
+-
+-//-----------------------------------------------------------------
+ void PowerUpInterface::setPowerUpLimits(unsigned long map_size_x,
+         unsigned long map_size_y )
+ {
+@@ -91,7 +60,10 @@
+ 
+     active_players = PlayerInterface::getActivePlayerCount();
+ 
++    // Magic Number 0.10 = 1/10 
+     int player_factor = int(( 0.10 ) * active_players);
++    
++    // Magic Number 0.0000625 = 1/16000
+     int power_up_limit = int( ( 0.0000625 ) * ( (map_size_x * map_size_y) ) );
+     power_up_limit = power_up_limit + (power_up_limit * player_factor);
+ 
+@@ -100,6 +72,13 @@
+     power_up_regen_time_lower_bound =  60;
+ }
+ 
++int
++PowerUpInterface::getNextPowerUpID()
++{
++    static unsigned int nextid = 0;
++    return nextid++;
++}
++
+ void PowerUpInterface::generatePowerUp()
+ {
+     unsigned long map_size_x, map_size_y;
+@@ -108,11 +87,13 @@
+     PowerUpCreateMesg create_mesg;
+     iXY loc;
+ 
+-    if( (powerup_list.size() &lt; (size_t) power_up_limit) ) {
++    if( (powerup_list.size() &lt; (size_t) power_up_limit) )
++    {
+         map_size_x = MapInterface::getWidth();
+         map_size_y = MapInterface::getHeight();
+ 
+-        do {
++        do
++        {
+             loc.x = rand() % map_size_x;
+             loc.y = rand() % map_size_y;
+         } while( MapInterface::getMovementValue( loc ) == 0xFF );
+@@ -124,34 +105,37 @@
+         powerup_type = powerup_probability_table[ prob_table_index ];
+ 
+ 
+-        switch( powerup_type ) {
+-        case _powerup_bonus_units :
+-            power_up = new BonusUnitPowerUp( loc, powerup_type );
+-            break;
++        switch( powerup_type )
++        {
++            case _powerup_bonus_units :
++                power_up = new BonusUnitPowerUp( loc, powerup_type );
++                break;
+ 
+-        case _powerup_unit :
+-            power_up = new UnitPowerUp( loc, powerup_type );
+-            break;
++            case _powerup_unit :
++                power_up = new UnitPowerUp( loc, powerup_type );
++                break;
+ 
+-        case _powerup_enemy_radar :
+-            power_up = new EnemyRadarPowerUp( loc, powerup_type );
+-            break;
+-            
+-        default:
+-            LOGGER.info(&quot;Unknown powerup type?!?&quot;);
+-            return;
++            case _powerup_enemy_radar :
++                power_up = new EnemyRadarPowerUp( loc, powerup_type );
++                break;
++
++            default:
++                LOGGER.info(&quot;Unknown powerup type?!?&quot;);
++                return;
+         }
+ 
+-        powerup_list.addWithID(power_up);
++        power_up-&gt;ID = getNextPowerUpID();
++        powerup_list.push_back(power_up);
+ 
+         create_mesg.set( power_up-&gt;map_loc,
+                          power_up-&gt;ID,
+                          power_up-&gt;type
+                        );
+ 
+-        SERVER-&gt;broadcastMessage(&amp;create_mesg, sizeof(PowerUpCreateMesg));
++        SERVER-&gt;broadcastMessage(&amp;create_mesg, sizeof(create_mesg));
+ 
+-        do {
++        do
++        {
+             next_regen_interval = rand() % (power_up_regen_time_upper_bound + 1);
+         } while( next_regen_interval &lt; power_up_regen_time_lower_bound );
+ 
+@@ -172,10 +156,12 @@
+ {
+     unsigned long map_size_x, map_size_y;
+ 
+-    if( gameconfig-&gt;powerups == false ) {
++    if( gameconfig-&gt;powerups == false )
++    {
+         return;
+     }
+ 
++    // here memory leak, should delete the pointer to powerups in the list
+     powerup_list.clear();
+ 
+     map_size_x = MapInterface::getWidth();
+@@ -185,7 +171,8 @@
+ 
+     regen_timer.changePeriod( power_up_regen_time_upper_bound );
+ 
+-    if ( NetworkState::status == _network_state_server ) {
++    if ( NetworkState::status == _network_state_server )
++    {
+         generatePowerUp();
+         generatePowerUp();
+         generatePowerUp();
+@@ -194,12 +181,15 @@
+ 
+ void PowerUpInterface::updateState()
+ {
+-    if( gameconfig-&gt;powerups == false ) {
++    if( gameconfig-&gt;powerups == false )
++    {
+         return;
+     }
+ 
+-    if ( NetworkState::status == _network_state_server ) {
+-        if( regen_timer.count() ) {
++    if ( NetworkState::status == _network_state_server )
++    {
++        if( regen_timer.count() )
++        {
+             generatePowerUp();
+         }
+     }
+@@ -210,10 +200,13 @@
+         PowerUp* powerup = *i;
+ 
+         if(powerup-&gt;life_cycle_state ==
+-                _power_up_lifecycle_state_inactive) {
++                _power_up_lifecycle_state_inactive)
++        {
+             delete powerup;
+             i = powerup_list.erase(i);
+-        } else {
++        }
++        else
++        {
+             powerup-&gt;updateState();
+             i++;
+         }
+@@ -222,12 +215,14 @@
+ 
+ void PowerUpInterface::offloadGraphics( SpriteSorter &amp;sorter )
+ {
+-    if( gameconfig-&gt;powerups == false ) {
++    if( gameconfig-&gt;powerups == false )
++    {
+         return;
+     }
+ 
+     PowerUpList::iterator i;
+-    for(i=powerup_list.begin(); i!=powerup_list.end(); i++) {
++    for(i=powerup_list.begin(); i!=powerup_list.end(); i++)
++    {
+         PowerUp* powerup = *i;
+         powerup-&gt;offloadGraphics(sorter);
+     }
+@@ -240,28 +235,29 @@
+ 
+     create_mesg = (PowerUpCreateMesg *) message;
+ 
+-    switch( create_mesg-&gt;getType() ) {
+-    case _powerup_bonus_units :
+-        power_up = new BonusUnitPowerUp( 
+-                iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                _powerup_bonus_units );
+-        break;
++    switch( create_mesg-&gt;getType() )
++    {
++        case _powerup_bonus_units :
++            power_up = new BonusUnitPowerUp( 
++                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
++                    _powerup_bonus_units );
++            break;
+ 
+-    case _powerup_unit :
+-        power_up = new UnitPowerUp(
+-                iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                _powerup_unit );
+-        break;
++        case _powerup_unit :
++            power_up = new UnitPowerUp(
++                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
++                    _powerup_unit );
++            break;
+ 
+-    case _powerup_enemy_radar :
+-        power_up = new EnemyRadarPowerUp(
+-                iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                _powerup_enemy_radar);
+-        break;
+-        
+-    default:
+-        LOGGER.info(&quot;Unknown powerup type?!?&quot;);
+-        return;
++        case _powerup_enemy_radar :
++            power_up = new EnemyRadarPowerUp(
++                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
++                    _powerup_enemy_radar);
++            break;
++
++        default:
++            LOGGER.info(&quot;Unknown powerup type?!?&quot;);
++            return;
+     }
+ 
+     power_up-&gt;ID = create_mesg-&gt;getID();
+@@ -271,21 +267,23 @@
+ 
+ void PowerUpInterface::netMessagePowerUpHit(const NetMessage* message)
+ {
+-    PowerUp *power_up;
+-    PowerUpHitMesg *hit_mesg;
++    PowerUpHitMesg *hit_mesg = (PowerUpHitMesg *) message;
+ 
+-    hit_mesg = (PowerUpHitMesg *) message;
+-
+-    power_up = powerup_list.find( hit_mesg-&gt;getID() );
+-
+-    if (power_up != 0) {
+-        power_up-&gt;onHitMessage( hit_mesg );
++    PowerUpList::iterator i;
++    for ( i = powerup_list.begin(); i != powerup_list.end(); i++)
++    {
++        if ( (*i)-&gt;ID == hit_mesg-&gt;getID() )
++        {
++            (*i)-&gt;onHitMessage( hit_mesg );
++            break;
++        }
+     }
+ }
+ 
+ void PowerUpInterface::processNetMessages(const NetMessage* message )
+ {
+-    switch(message-&gt;message_id) {
++    switch(message-&gt;message_id)
++    {
+         case _net_message_id_powerup_create:
+             netMessagePowerUpCreate(message);
+             break;
+@@ -313,9 +311,8 @@
+                          powerup_ptr-&gt;ID,
+                          powerup_ptr-&gt;type
+                        );
+-        create_mesg.setSize(sizeof(PowerUpCreateMesg));
+ 
+-        client-&gt;sendMessage( &amp;create_mesg, sizeof(PowerUpCreateMesg));
++        client-&gt;sendMessage( &amp;create_mesg, sizeof(create_mesg));
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.hpp	2008-09-03 13:05:11 UTC (rev 1042)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.hpp	2008-09-03 15:45:02 UTC (rev 1043)
+@@ -25,24 +25,14 @@
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
+ #include &quot;Network/ClientSocket.hpp&quot;
+ 
+-class PowerUpList : public std::vector&lt;PowerUp*&gt;
+-{
+-protected:
+-    int id_counter;
+-
+-public:
+-    PowerUpList();
+-    ~PowerUpList();
+-
+-    PowerUp* find(int ID);
+-    void addWithID(PowerUp *powerup);
+-};
+-
+ class PowerUpInterface
+ {
+ protected:
++    typedef std::vector&lt;PowerUp *&gt; PowerUpList;
+     static PowerUpList powerup_list;
+-
++    
++    static int getNextPowerUpID();
++    
+     static int power_up_limit;
+     static int power_up_regen_time_upper_bound;
+     static int power_up_regen_time_lower_bound;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000082.html">[Netpanzer-cvs] r1042 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000084.html">[Netpanzer-cvs] r1044 - in trunk/netpanzer: nbproject	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#83">[ date ]</a>
+              <a href="thread.html#83">[ thread ]</a>
+              <a href="subject.html#83">[ subject ]</a>
+              <a href="author.html#83">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

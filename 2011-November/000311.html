@@ -1,0 +1,384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1285 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1285%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/buttons/default%20src/NetPanzer/Views%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111116163936.72B72481446%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000310.html">
+   <LINK REL="Next"  HREF="000312.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1285 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1285%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/buttons/default%20src/NetPanzer/Views%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111116163936.72B72481446%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1285 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 16 17:39:36 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000310.html">[Netpanzer-cvs] r1284 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000312.html">[Netpanzer-cvs] r1286 - trunk/netpanzer/pics/backgrounds/menus/menu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#311">[ date ]</a>
+              <a href="thread.html#311">[ thread ]</a>
+              <a href="subject.html#311">[ subject ]</a>
+              <a href="author.html#311">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-16 17:39:36 +0100 (Wed, 16 Nov 2011)
+New Revision: 1285
+
+Modified:
+   trunk/netpanzer/pics/backgrounds/menus/buttons/default/page.bmp
+   trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+Log:
+Change menu color (some green)
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/buttons/default/page.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -53,10 +53,10 @@
+             callback-&gt;stateChanged(this);
+         dirty = true;
+     } else if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED) {
+-        textColor = Color::yellow;
++        textColor = componentFocusTextColor;
+         dirty = true; // draw text in red
+     } else if (me.getID() == mMouseEvent::MOUSE_EVENT_EXITED) {
+-        textColor = Color::white;
++        textColor = componentActiveTextColor;
+         dirty = true; // draw defaults;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -22,6 +22,7 @@
+ #include &quot;Component.hpp&quot;
+ #include &quot;MouseEvent.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;ViewGlobals.hpp&quot;
+ 
+ class StateChangedCallback;
+ 
+@@ -42,14 +43,14 @@
+             : Component(), state(false), callback(newcallback)
+     {
+         setSize( 14, 14);
+-        textColor = Color::white;
++        textColor = componentActiveTextColor;
+     }
+ 
+     CheckBox(const std::string&amp; newlabel, bool newstate = false)
+             : Component(), label(newlabel), state(newstate), callback(0)
+     {
+         setSize( 20+label.length()*8, 14);
+-        textColor = Color::white;
++        textColor = componentActiveTextColor;
+         dirty = true;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -178,7 +178,7 @@
+ 
+     // Draw the name of the choice.
+     dest.bltStringShadowed( position.x, pos.y + adjustedY,
+-                            componentName.c_str(), Color::white, Color::black);
++                            componentName.c_str(), componentActiveTextColor, Color::black);
+ 
+     getBounds(r);
+ 
+@@ -186,11 +186,11 @@
+ 
+     // Draw the border.
+     s.RoundRect(iRect(0, 0, s.getWidth() - 2, s.getHeight() - 2), 4, Color::gray96);
+-    s.RoundRect(iRect(1, 1, s.getWidth() - 1, s.getHeight() - 1), 4, Color::white);
++    s.RoundRect(iRect(1, 1, s.getWidth() - 1, s.getHeight() - 1), 4, componentActiveTextColor);
+     s.FillRoundRect(iRect(1, 1, s.getWidth() - 2, s.getHeight() - 2), 4, componentBodyColor);
+ 
+     if (!isOpen)	{
+-        s.bltStringShadowedCenter(choiceList[index].c_str(), Color::white, Color::black);
++        s.bltStringShadowedCenter(choiceList[index].c_str(), componentActiveTextColor, Color::black);
+     } else {
+         r = iRect(position.x, position.y, position.x + size.x, position.y + ChoiceItemHeight);
+ 
+@@ -201,11 +201,11 @@
+ 
+             if (i == mouseover) {
+                 // Higlight the selected item.
+-                s.fill(Color::white);
++                s.fill(componentActiveTextColor);
+                 s.bltStringCenter(choiceList[i].c_str(), Color::black);
+ 
+             } else {
+-                s.bltStringShadowedCenter(choiceList[i].c_str(), Color::white, Color::black);
++                s.bltStringShadowedCenter(choiceList[i].c_str(), componentActiveTextColor, Color::black);
+             }
+ 
+             r.translate(iXY(0, ChoiceItemHeight));
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.hpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -23,16 +23,16 @@
+ #define topLeftBorderColor           (Color::lightGray)
+ #define bottomRightBorderColor       (Color::black)
+ 
+-#define componentBodyColor           (Color::darkGray)
++#define componentBodyColor           (41)
+ #define componentTextColor           (Color::black)
+ #define componentInActiveTextColor   (Color::gray)
+ #define componentActiveTextColor     (Color::lightGray)
+ #define componentFocusTextColor      (Color::white)
+ 
+ #define activeWindowTitleTextColor   (Color::white)
+-#define activeWindowTitleBodyColor   (Color::darkGray)
++#define activeWindowTitleBodyColor   (componentBodyColor)
+ #define inactiveWindowTitleTextColor (Color::gray)
+-#define inactiveWindowTitleBodyColor (Color::darkGray)
++#define inactiveWindowTitleBodyColor (componentBodyColor)
+ 
+ extern Uint8 gForeground;
+ extern Uint8 gBackground;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -318,9 +318,9 @@
+     checkCursor();
+     checkRepeat();
+ 
+-    inputFieldSurface.fill(componentBodyColor);
+-    inputFieldSurface.drawButtonBorder(Color::white, Color::gray64);
+-    inputFieldSurface.bltString(4, 2, destString+strDisplayStart, Color::white);
++    inputFieldSurface.fill(componentTextColor);
++    inputFieldSurface.drawButtonBorder(topLeftBorderColor, Color::gray64);
++    inputFieldSurface.bltString(4, 2, destString+strDisplayStart, componentActiveTextColor);
+     inputFieldSurface.blt(dest, pos.x, pos.y);
+ } // draw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -147,7 +147,7 @@
+     clientArea.bltString(   4,
+                             clientArea.getHeight() - Surface::getFontHeight(),
+                             &quot;Note: Use the right mouse button to accomplish fast mouse clicking.&quot;,
+-                            Color::white);
++                            windowTextColor);
+ 
+     //char strBuf[256];
+     //sprintf(strBuf, &quot;%d&quot;, scrollBar-&gt;getValue());
+@@ -160,7 +160,7 @@
+ //--------------------------------------------------------------------------
+ void HelpScrollView::drawHelpText(Surface &amp;dest, const int &amp;, const int &amp;)
+ {
+-    PIX color   = Color::white;
++    PIX color   = windowTextColor;
+ 
+     //if (scrollBar != 0)
+     //{
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -21,11 +21,12 @@
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;Types/iRect.hpp&quot;
+ #include &quot;Types/iXY.hpp&quot;
++#include &quot;Components/ViewGlobals.hpp&quot;
+ 
+ // Globals meter colors.
+ #define windowTextColor             (Color::white)
+ #define windowTextColorShadow       (Color::black)
+-#define meterColor                  (Color::darkGray)
++#define meterColor                  (componentBodyColor)
+ #define meterTextColor              (Color::gray)
+ #define meterTopLeftBorderColor     (Color::lightGray)
+ #define meterBottomRightBorderColor (Color::black)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -70,5 +70,5 @@
+         &quot;Related Tools:\n&quot;
+         &quot;   Tobias Blerch, Ingo Ruhnke\n&quot;;
+ 
+-    viewArea.bltStringInBox(bodyTextRect, text, Color::white, 12);
++    viewArea.bltStringInBox(bodyTextRect, text, windowTextColor, 12);
+ } // end MainMenuView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -157,7 +157,7 @@
+ {
+     if(!gameconfig-&gt;quickConnect) {
+         add( new newButton( &quot;RESIGN&quot;, &quot;Resign&quot;, resignPos, 0) );
+-        add( new newButton( &quot;EXITNETNP&quot;, &quot;Exit netPanzer&quot;, exitPos, 1) );
++        add( new newButton( &quot;EXITNETNP&quot;, &quot;Exit netPanzer&quot;, exitPos, 0) );
+     } else {
+         add( new newButton( &quot;RESIGN&quot;, &quot;Resign&quot;, exitPos, 1) );
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -280,7 +280,7 @@
+ 
+     clientArea.bltString( 4, clientArea.getHeight() - Surface::getFontHeight(),
+                     &quot;Note: Use the right mouse button to accomplish fast mouse clicking.&quot;,
+-                    Color::white);
++                    windowTextColor);
+ 
+     View::doDraw(viewArea, clientArea);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-16 16:39:36 UTC (rev 1285)
+@@ -57,11 +57,11 @@
+ 
+ void Separator::draw(Surface &amp;dest)
+ {    
+-    dest.drawLine(position.x, position.y+3, position.x+20, position.y+3, Color::lightGray);
++    dest.drawLine(position.x, position.y+3, position.x+20, position.y+3, foreground);
+     dest.drawLine(position.x, position.y+2, position.x+20, position.y+2, Color::black);
+-    dest.bltStringShadowed(position.x+25,position.y, text.c_str(),  Color::lightGray, Color::black);
++    dest.bltStringShadowed(position.x+25,position.y, text.c_str(),  foreground, Color::black);
+     int lentxt = 30+dest.getTextLength(text);
+-    dest.drawLine(position.x+lentxt, position.y+3, xend, position.y+3, Color::lightGray);
++    dest.drawLine(position.x+lentxt, position.y+3, xend, position.y+3, foreground);
+     dest.drawLine(position.x+lentxt, position.y+2, xend, position.y+2, Color::black);
+ }
+ 
+@@ -165,7 +165,7 @@
+     //----------------------------------------------------------------------
+     int minWidth = 19 * 8;
+ 
+-    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;VISUAL&quot;, Color::white) );
++    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;VISUAL&quot;, componentActiveTextColor) );
+     y += yOffset;
+     x = xTextStart;
+     checkBoxFullscreen = new CheckBox();
+@@ -244,11 +244,11 @@
+     y += yOffset*2;
+    
+ // VISUAL OPTIONS
+-    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;INTERFACE&quot;, Color::white) );
++    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;INTERFACE&quot;, componentActiveTextColor) );
+ 
+     y += yOffset;
+     x = xTextStart;
+-    add( new Label( x, y+3, &quot;Scroll Rate:&quot;, Color::white) );
++    add( new Label( x, y+3, &quot;Scroll Rate:&quot;, windowTextColor) );
+     x += optionsMeterStartX;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseScrollRate);
+     x += optionsMeterWidth + arrowButtonWidth;
+@@ -257,11 +257,11 @@
+ 
+ // SOUND OPTIONS
+ 
+-    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;SOUND&quot;, Color::white) );
++    add( new Separator( bodyTextRect.min.x, y, bodyTextRect.max.x,  &quot;SOUND&quot;, componentActiveTextColor) );
+ 
+     y += yOffset;
+     x = xTextStart;
+-    add( new Label( x, y, &quot;Sound Status:&quot;, Color::white) );
++    add( new Label( x, y, &quot;Sound Status:&quot;, windowTextColor) );
+     checkBoxSoundEnabled = new CheckBox();
+     checkBoxSoundEnabled-&gt;setLabel(gameconfig-&gt;enablesound?&quot;Enabled&quot;:&quot;Disabled&quot;);
+     checkBoxSoundEnabled-&gt;setState(gameconfig-&gt;enablesound);
+@@ -272,7 +272,7 @@
+     y += yOffset;
+ 
+     x = xTextStart;
+-    add( new Label( x, y+3, &quot;Sound Volume:&quot;, Color::white) );
++    add( new Label( x, y+3, &quot;Sound Volume:&quot;, windowTextColor) );
+     x += optionsMeterStartX;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseSoundVolume);
+     x += optionsMeterWidth + arrowButtonWidth;
+@@ -281,7 +281,7 @@
+ 
+     y += yOffset; 
+     x = xTextStart;
+-    add( new Label( x, y, &quot;Music Status:&quot;, Color::white) );
++    add( new Label( x, y, &quot;Music Status:&quot;, windowTextColor) );
+     checkBoxMusicEnabled = new CheckBox();
+     checkBoxMusicEnabled-&gt;setLabel(gameconfig-&gt;enablemusic?&quot;Enabled&quot;:&quot;Disabled&quot;);
+     checkBoxMusicEnabled-&gt;setState(gameconfig-&gt;enablemusic);
+@@ -292,7 +292,7 @@
+     y += yOffset;
+ 
+     x = xTextStart;
+-    add( new Label( x, y+3, &quot;Music Volume:&quot;, Color::white) );
++    add( new Label( x, y+3, &quot;Music Volume:&quot;, windowTextColor) );
+     x += optionsMeterStartX;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseMusicVolume);
+     x += optionsMeterWidth + arrowButtonWidth;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000310.html">[Netpanzer-cvs] r1284 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000312.html">[Netpanzer-cvs] r1286 - trunk/netpanzer/pics/backgrounds/menus/menu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#311">[ date ]</a>
+              <a href="thread.html#311">[ thread ]</a>
+              <a href="subject.html#311">[ subject ]</a>
+              <a href="author.html#311">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

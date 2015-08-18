@@ -1,0 +1,1202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1222 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1222%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Resources%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20101108210735.D54EB4810DA%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000249.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1222 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1222%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Resources%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20101108210735.D54EB4810DA%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1222 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov  8 22:07:35 CET 2010</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000249.html">[Netpanzer-cvs] r1223 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#248">[ date ]</a>
+              <a href="thread.html#248">[ thread ]</a>
+              <a href="subject.html#248">[ subject ]</a>
+              <a href="author.html#248">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-11-08 22:07:35 +0100 (Mon, 08 Nov 2010)
+New Revision: 1222
+
+Modified:
+   trunk/netpanzer/
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+   trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+   trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+Log:
+half-baked flag sharing commit, need to commit before losing track of changes
+
+
+Property changes on: trunk/netpanzer
+___________________________________________________________________
+Modified: svn:ignore
+   - netpanzer
+.sconsign.dblite
+releases
+RELEASE_VERSION
+nb-netpanzer-debug
+nbproject
+build
+.dep.inc
+Makefile
+
+   + netpanzer
+.sconsign.dblite
+releases
+RELEASE_VERSION
+nb-netpanzer-debug
+nbproject
+build
+.dep.inc
+Makefile
+nb-netpanzer-debug-svn
+
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -230,7 +230,22 @@
+     static unsigned int getFontHeight();
+     static int getTextLength(const char* text);
+     static int getTextLength(const std::string&amp; text)
+-    { return getTextLength(text.c_str()); } 
++    {
++        return getTextLength(text.c_str());
++    }
++
++    void frameToBuffer(Uint8* dest, size_t dest_len)
++    {
++        size_t frame_len = getPitch()*getHeight();
++        memcpy(dest, mem, std::min(frame_len, dest_len));
++    }
++
++    void bufferToFrame(const Uint8* src, const size_t src_len)
++    {
++        size_t frame_len = getPitch()*getHeight();
++        memcpy(mem, src, std::min(frame_len, src_len));
++    }
++
+ }; // end Surface
+ 
+ #endif // __Surface_HPP__
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -236,26 +236,21 @@
+ {
+     bool end_cycle = false;
+ 
+-    do {
+-        switch ( connection_state ) {
++    switch ( connection_state )
++    {
+         case _connect_state_idle :
+             return;
+ 
+-        case _connect_state_wait_for_connect_start : {
+-                if ( message != 0 ) {
+-                    if ( message-&gt;message_id == _net_message_id_client_start_connect ) {
+-                        LoadingView::append( &quot;Connecting ...&quot; );
+-                        connection_state = _connect_state_send_connect_request;
+-                    } else {
+-                        end_cycle = true;
+-                    }
+-                } // ** if ( message != 0 )
+-                else {
+-                    end_cycle = true;
+-                }
+-
++        case _connect_state_wait_for_connect_start :
++            if ( message &amp;&amp; message-&gt;message_id == _net_message_id_client_start_connect )
++            {
++                LoadingView::append( &quot;Connecting ...&quot; );
++                connection_state = _connect_state_send_connect_request;
+             }
+-            break;
++            else
++            {
++                break;
++            }
+ 
+         case _connect_state_send_connect_request : {
+                 ClientConnectRequest connect_request;
+@@ -268,101 +263,85 @@
+             }
+             break;
+ 
+-        case _connect_state_wait_for_connect_result : {
+-                if ( message != 0 ) {
+-                    if ( message-&gt;message_id == _net_message_id_client_connect_result ) {
+-                        ClientConnectResult *connect_result;
++        case _connect_state_wait_for_connect_result :
++            if ( message &amp;&amp; message-&gt;message_id == _net_message_id_client_connect_result )
++            {
++                ClientConnectResult *connect_result;
+ 
+-                        connect_result = (ClientConnectResult *) message;
++                connect_result = (ClientConnectResult *) message;
+ 
+-                        if ( connect_result-&gt;result_code != _connect_result_success ) {
+-                            connectFailureResult( connect_result-&gt;result_code );
++                if ( connect_result-&gt;result_code != _connect_result_success )
++                {
++                    connectFailureResult( connect_result-&gt;result_code );
+ 
+-                            connection_state = _connect_state_connect_failure;
+-                            failure_display_timer.reset();
+-                        } else {
+-                            ConnectClientSettings client_setting;
++                    connection_state = _connect_state_connect_failure;
++                    failure_display_timer.reset();
++                }
++                else
++                {
++                    ConnectClientSettings client_setting;
+ 
+-                            client_setting.set( 
+-                                    gameconfig-&gt;playername.c_str(),
+-                                                gameconfig-&gt;getUnitColor(),
+-                                                gameconfig-&gt;playerflag );
++                    client_setting.set(gameconfig-&gt;playername.c_str());
+ 
+-                            CLIENT-&gt;sendMessage( &amp;client_setting, sizeof(ConnectClientSettings));
++                    CLIENT-&gt;sendMessage( &amp;client_setting, sizeof(ConnectClientSettings));
+ 
+-                            connection_state = _connect_state_wait_for_server_game_setup;
+-                        }
+-
+-                    } else {
+-                        if ( time_out_timer.count() ) {
+-                            if ( time_out_counter &lt; _CLIENT_CONNECT_RETRY_LIMIT ) {
+-                                ClientConnectRequest connect_request;
+-                                CLIENT-&gt;sendMessage( &amp;connect_request, sizeof(ClientConnectRequest));
+-                                time_out_counter++;
+-                            } else {
+-                                LoadingView::append( &quot;Connection To Server Failed&quot; );
+-                                connection_state = _connect_state_connect_failure;
+-                                failure_display_timer.reset();
+-                            }
+-                        }
+-
+-                    }
+-
+-                } // ** if ( message != 0 )
+-                else {
+-                    if ( time_out_timer.count() ) {
+-                        if ( time_out_counter &lt; _CLIENT_CONNECT_RETRY_LIMIT ) {
+-                            ClientConnectRequest connect_request;
+-                            CLIENT-&gt;sendMessage( &amp;connect_request, sizeof(ClientConnectRequest));
+-                            time_out_counter++;
+-                        } else {
+-                            LoadingView::append( &quot;Connection To Server Failed&quot; );
+-                            connection_state = _connect_state_connect_failure;
+-                        }
+-                    }
+-
++                    connection_state = _connect_state_wait_for_server_game_setup;
+                 }
+-
+-                end_cycle = true;
+             }
++            else if ( time_out_timer.count() )
++            {
++                if ( time_out_counter &lt; _CLIENT_CONNECT_RETRY_LIMIT )
++                {
++                    ClientConnectRequest connect_request;
++                    CLIENT-&gt;sendMessage( &amp;connect_request, sizeof(ClientConnectRequest));
++                    time_out_counter++;
++                }
++                else
++                {
++                    LoadingView::append( &quot;Connection To Server Failed&quot; );
++                    connection_state = _connect_state_connect_failure;
++                    failure_display_timer.reset();
++                }
++            }
+             break;
+ 
+-        case _connect_state_wait_for_server_game_setup : {
+-                if ( message != 0 ) {
+-                    if ( message-&gt;message_id == _net_message_id_connect_server_game_setup ) {
+-                        ConnectMesgClientGameSetupPing client_game_setup_ping;
++        case _connect_state_wait_for_server_game_setup :
++            if ( message &amp;&amp; message-&gt;message_id == _net_message_id_connect_server_game_setup )
++            {
++                ConnectMesgClientGameSetupPing client_game_setup_ping;
+ 
+-                        int result_code;
+-                        char str_buf[128];
+-                        ConnectMesgServerGameSettings *game_setup;
+-                        game_setup = (ConnectMesgServerGameSettings *) message;
++                int result_code;
++                char str_buf[128];
++                ConnectMesgServerGameSettings *game_setup;
++                game_setup = (ConnectMesgServerGameSettings *) message;
+ 
+-                        GameManager::startClientGameSetup( message, &amp;result_code );
++                GameManager::startClientGameSetup( message, &amp;result_code );
+ 
+-                        if( result_code == _mapload_result_no_map_file ) {
+-                            sprintf( str_buf, &quot;MAP %s NOT FOUND!&quot;, game_setup-&gt;map_name );
+-                            LoadingView::append( str_buf);
+-                            connection_state = _connect_state_connect_failure;
+-                            failure_display_timer.reset();
+-                        } else
+-                            if( result_code == _mapload_result_no_wad_file ) {
+-                                LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
+-                                LoadingView::append( &quot;please download the appropriate tileset&quot; );
+-                                LoadingView::append( &quot;from www.pyrosoftgames.com&quot; );
+-                                connection_state = _connect_state_connect_failure;
+-                                failure_display_timer.reset();
+-                            } else {
+-                                LoadingView::append( &quot;Loading Game Data ...&quot; );
++                if( result_code == _mapload_result_no_map_file )
++                {
++                    sprintf( str_buf, &quot;MAP %s NOT FOUND!&quot;, game_setup-&gt;map_name );
++                    LoadingView::append( str_buf);
++                    connection_state = _connect_state_connect_failure;
++                    failure_display_timer.reset();
++                }
++                else if( result_code == _mapload_result_no_wad_file )
++                {
++                    LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
++                    LoadingView::append( &quot;please download the appropriate tileset&quot; );
++                    LoadingView::append( &quot;from www.pyrosoftgames.com&quot; );
++                    connection_state = _connect_state_connect_failure;
++                    failure_display_timer.reset();
++                }
++                else
++                {
++                    LoadingView::append( &quot;Loading Game Data ...&quot; );
+ 
+-                                CLIENT-&gt;sendMessage( &amp;client_game_setup_ping, sizeof(ConnectMesgClientGameSetupPing));
++                    CLIENT-&gt;sendMessage( &amp;client_game_setup_ping, sizeof(ConnectMesgClientGameSetupPing));
+ 
+-                                connection_state = _connect_state_setup_client_game;
+-                            }
+-                    }
++                    connection_state = _connect_state_setup_client_game;
+                 }
+-
+-                end_cycle = true;
+             }
++
+             break;
+ 
+         case _connect_state_setup_client_game : {
+@@ -399,11 +378,8 @@
+             }
+             break;
+ 
+-        } // ** switch
++    } // ** switch
+ 
+-    } while( end_cycle == false );
+-
+-
+ }
+ 
+ void ClientConnectDaemon::connectProcess(const NetMessage* message)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -116,18 +116,10 @@
+     memset(&amp;player_name, 0, sizeof(player_name));
+ }
+ 
+-Sint16 ConnectClientSettings::getPlayerFlag() const
++void ConnectClientSettings::set(const char *player_name)
+ {
+-    return ltoh16(player_flag);
+-}
+-
+-void ConnectClientSettings::set(const char *player_name, Uint8 unit_color,
+-        Uint16 player_flag )
+-{
+     strncpy(ConnectClientSettings::player_name, player_name, 64);
+     ConnectClientSettings::player_name[63] = '\0';
+-    ConnectClientSettings::unit_color = unit_color;
+-    ConnectClientSettings::player_flag = htol16(player_flag);
+ }
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -148,15 +148,9 @@
+ {
+ public:
+     char player_name[64];
+-private:
+-    Sint16 player_flag;
+-public:
+-    Uint8 unit_color;
+ 
+     ConnectClientSettings();
+-    Sint16 getPlayerFlag() const;
+-    void set(const char *player_name, Uint8 unit_color,
+-             Uint16 player_flag );
++    void set(const char *player_name);
+ } __attribute__((packed));
+ 
+ class ConnectMesgServerGameSettings : public NetMessage
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -283,12 +283,7 @@
+ 
+             client_setting = (ConnectClientSettings *) message;
+             player-&gt;setName( client_setting-&gt;player_name );
+-            player-&gt;unit_config.setUnitColor( client_setting-&gt;unit_color );
+-            
+-            Uint8 flag = (Uint8) client_setting-&gt;getPlayerFlag();
+-            player-&gt;setFlag(flag);
+-
+-            player-&gt;setID( connect_client-&gt;getPlayerIndex() );
++            // XXX FLAG
+             player-&gt;setStatus( _player_state_connecting );
+ 
+             // ** send server game setting map, units, player, etc.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -94,12 +94,6 @@
+ static const size_t playerColorCount 
+     = sizeof(playerColorArray) / sizeof(Uint8*);
+ 
+-void
+-PlayerState::setColor(Uint32 index)
+-{
+-    colorIndex = index % playerColorCount;
+-}
+-
+ Uint8
+ PlayerState::getColor() const
+ {
+@@ -108,7 +102,7 @@
+ }
+ 
+ PlayerState::PlayerState()
+-    : team_id(NO_TEAM_ID), flag(0), status(0), kills(0), kill_points(0), losses(0),
++    : team_id(NO_TEAM_ID), status(0), kills(0), kill_points(0), losses(0),
+       loss_points(0), total(0), objectives_held(0), stats_locked(false),
+       colorIndex(0)
+ {
+@@ -116,7 +110,7 @@
+ }
+ 
+ PlayerState::PlayerState(const PlayerState&amp; other)
+-    :  id(other.id), name(other.name), team_id(other.team_id), flag(other.flag),
++    :  id(other.id), name(other.name), team_id(other.team_id),
+       status(other.status), kills(other.kills), kill_points(other.kill_points),
+       losses(other.losses), loss_points(other.loss_points),
+       total(other.total), objectives_held(other.objectives_held),
+@@ -133,7 +127,6 @@
+     team_id = other.team_id;
+     memcpy(team_name, other.team_name, MAX_TEAM_NAME_LEN+1);
+     
+-    flag = other.flag;
+     status = other.status;
+     kills = other.kills;
+     kill_points = other.kill_points;
+@@ -320,50 +313,9 @@
+     return status;
+ }
+ 
+-void PlayerState::setFlag(FlagID newflag)
+-{
+-    flag = newflag;
+-    
+-    bool recheck;
+-    do
+-    {
+-        recheck = false;
+-        PlayerID p;
+-        for ( p=0; p&lt;PlayerInterface::getMaxPlayers(); ++p )
+-        {
+-            if ( p == id )
+-                continue;
+-                
+-            PlayerState *ps=PlayerInterface::getPlayer(p);
+-            
+-            if (  (ps-&gt;status==_player_state_connecting 
+-                  || ps-&gt;status==_player_state_active )
+-                 &amp;&amp; ps-&gt;flag == flag
+-               )
+-            {
+-                // will autorotate because it is a byte
+-                do
+-                {
+-                    flag++;
+-                } while ( ! ResourceManager::isFlagActive(flag) );
+-                                    
+-                if ( flag != newflag ) // there are no free flags if it is ==
+-                {
+-                    recheck = true;
+-                }
+-                else
+-                {
+-                    LOGGER.warning(&quot;No more free flags&quot;);
+-                }   
+-                break;
+-            }
+-        }
+-    } while (recheck);
+-}
+-
+ FlagID PlayerState::getFlag() const
+ {
+-    return flag;
++    return id;
+ }
+ 
+ // this &quot;getTotal&quot; is used to calculate the frags.
+@@ -378,7 +330,6 @@
+ 
+     memset(state.name, 0, sizeof(state.name));
+     strncpy(state.name, name.c_str(), sizeof(state.name)-1);
+-    state.flag = flag;
+     state.id = id;
+     state.team_id = team_id;
+     memcpy(state.team_name, team_name, MAX_TEAM_NAME_LEN+1);
+@@ -403,12 +354,6 @@
+ 
+     memcpy(team_name, state-&gt;team_name, MAX_TEAM_NAME_LEN);
+     team_name[MAX_TEAM_NAME_LEN] = 0;
+-
+-    flag = state-&gt;flag;
+-    if ( ! ResourceManager::isFlagActive(flag) ) 
+-    {
+-        LOGGER.warning(&quot;Received flag is not registered: %u&quot;, flag);
+-    }
+     
+     id = state-&gt;id;
+     team_id = state-&gt;team_id;
+@@ -419,5 +364,4 @@
+     loss_points = ltoh16(state-&gt;loss_points);
+     total = ltoh16(state-&gt;total);
+     objectives_held = ltoh16(state-&gt;objectives_held);
+-    setColor(ltoh32(state-&gt;colorIndex));
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -49,7 +49,6 @@
+     char name[64];
+     TeamID team_id;
+     char team_name[MAX_TEAM_NAME_LEN+1];
+-    FlagID flag;
+     Uint8 status;
+     Sint16 kills;
+     Sint16 kill_points;
+@@ -73,7 +72,6 @@
+     TeamID  team_id;
+     char team_name[MAX_TEAM_NAME_LEN+1];
+ 
+-    FlagID flag;
+     unsigned char status;
+     short kills;
+     short kill_points;
+@@ -119,12 +117,10 @@
+     void setID( PlayerID id );
+     void setStatus( unsigned char status );
+     unsigned char getStatus() const;
+-    void setFlag(FlagID newflag);
+     FlagID getFlag() const;
+     short getTotal() const;
+     NetworkPlayerState getNetworkPlayerState() const;
+     void setFromNetworkPlayerState(const NetworkPlayerState* state);
+-    void setColor( Uint32 index );
+     Uint8 getColor() const;
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
++#include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;Classes/SelectionBoxSprite.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+@@ -67,7 +67,7 @@
+     allied_visiblity_state = false;
+     allie_state = false;
+     flag_visibility_state = false;
+-    unit_flag = ResourceManager::getEmptyImage();
++    unit_flag = 0;
+ }
+ 
+ 
+@@ -139,20 +139,20 @@
+         //surface-&gt;drawHLine(min_abs.x, max_abs.y-3, max_abs.x+1, box_color);
+     }
+ 
+-    if ( GameConfig::interface_show_flags == true )
++    if ( GameConfig::interface_show_flags == true  &amp;&amp; unit_flag )
+     {
+         //unit_flag.blt( *surface, iXY( min_abs.x, min_abs.y - unit_flag.getPix().y ) );
+         //surface-&gt;bltString(min_abs.x + 2, min_abs.y - 6, &quot;Panther1&quot;, Color::white);
+-        unit_flag-&gt;blt( *surface, min_abs.x, min_abs.y-unit_flag-&gt;getHeight()-1 );
++        unit_flag-&gt;blt( *surface, min_abs.x, min_abs.y - FLAG_HEIGHT - 1 );
+     }
+ 
+     if ( GameConfig::interface_show_names == true )
+     {
+         if ( playerName.length() &gt; 0 )
+         {   // XXX dirty trick, I don't center the text, just &quot;by hand&quot;
+-            surface-&gt;bltString(min_abs.x+unit_flag-&gt;getWidth() + 2,
+-                           min_abs.y - unit_flag-&gt;getHeight() + 2 ,
+-                           playerName.c_str(), Color::gray224);
++            surface-&gt;bltString( min_abs.x + FLAG_WIDTH  + 2,
++                                min_abs.y - FLAG_HEIGHT + 2,
++                                playerName.c_str(), Color::gray224);
+         }
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -40,6 +40,8 @@
+ typedef Uint16 UnitID;
+ 
+ typedef Uint8 FlagID;
++#define FLAG_WIDTH 20
++#define FLAG_HEIGHT 14
+ 
+ typedef Uint8 TeamID;
+ #define NO_TEAM_ID (0)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -132,17 +132,6 @@
+ void BaseGameManager::loadGameData()
+ {
+     UnitProfileInterface::loadUnitProfiles();
+-    
+-    int numflags = ResourceManager::loadDefaultFlags();
+-    if ( numflags &lt;= 0 )
+-    {
+-        throw Exception(&quot;Couldn't find any flag in pics/flags/.&quot;);
+-    }
+-
+-    if(gameconfig-&gt;playerflag.isDefaultValue())
+-    {
+-        gameconfig-&gt;playerflag=rand()%numflags;
+-    }
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::initializeNetworkSubSystem()
+@@ -182,6 +171,8 @@
+         if(!filesystem::exists(&quot;config&quot;))
+             filesystem::mkdir(&quot;config&quot;);
+         initializeGameConfig(configfile);
++        ResourceManager::initialize();
++
+         initializeSoundSubSystem();
+         initializeVideoSubSystem();
+         initializeGameObjects();
+@@ -206,6 +197,7 @@
+     shutdownSoundSubSystem();
+     shutdownVideoSubSystem();
+     shutdownInputDevices();
++    ResourceManager::finalize();
+     shutdownGameConfig();
+ }
+ //-----------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -53,7 +53,7 @@
+                    int min=0, int max=0x7fffffff);
+     ~ConfigInt();
+ 
+-    operator const int () const
++    operator int () const
+     { return value; }
+ 
+     int getMax() const
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -51,6 +51,8 @@
+ bool GameConfig::game_enable_bases = true;
+ int  GameConfig::game_base_capture_mode = 1; // normal capture;
+ 
++Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
++
+ #define WRITE_BOOL(v) ((v)?&quot;true&quot;:&quot;false&quot;)
+ 
+ // This generates the tables needed for script binding
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -23,6 +23,8 @@
+ #include &lt;vector&gt;
+ #include &lt;string&gt;
+ 
++#include &quot;Core/CoreTypes.hpp&quot;
++
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;2D/Color.hpp&quot;
+ #include &quot;Util/NoCopy.hpp&quot;
+@@ -126,6 +128,8 @@
+     static bool game_enable_bases;
+     static int  game_base_capture_mode; // 0=no capture, 1=normal, 2=...
+ 
++    static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
++
+     // game Settings (there are not saved to disk)
+     ConfigInt       hostorjoin;         // 1=host, 2=join
+     ConfigBool      quickConnect;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -377,7 +377,8 @@
+     player_state = PlayerInterface::allocateLoopBackPlayer();
+     const char* playername = gameconfig-&gt;playername.c_str();
+     player_state-&gt;setName(playername);
+-    player_state-&gt;setFlag((unsigned char) gameconfig-&gt;playerflag);
++    // XXX FLAG
++    //player_state-&gt;setFlag((unsigned char) gameconfig-&gt;playerflag);
+     
+     //GameManager::spawnPlayer( PlayerInterface::getLocalPlayerIndex() );
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -197,7 +197,6 @@
+         player_lists[ player_id ].setID( player_id );
+         player_lists[ player_id ].resetStats();
+         player_lists[ player_id ].setStatus( _player_state_free );
+-        player_lists[ player_id ].setFlag( 0 );
+         player_lists[ player_id ].unit_config.initialize();
+         sprintf( temp_str, &quot;Player %u&quot;, player_id );
+         player_lists[ player_id ].setName( temp_str );
+@@ -332,6 +331,7 @@
+ PlayerState * PlayerInterface::allocateNewPlayer()
+ {
+     PlayerID player_id;
++    PlayerState * res = 0;
+ 
+     SDL_mutexP(mutex);
+     for ( player_id = 0; player_id &lt; max_players; ++player_id )
+@@ -340,18 +340,14 @@
+         {
+             player_lists[ player_id ].setStatus( _player_state_allocated );
+             player_lists[ player_id ].resetStats();
+-            player_lists[ player_id ].setColor( player_id );
+-            player_lists[ player_id ].setID(player_id);
+             player_lists[ player_id ].setTeamID(NO_TEAM_ID);
+             player_lists[ player_id ].setTeamName(&quot;&quot;);
+-            SDL_mutexV(mutex);
+-            return( &amp;player_lists[ player_id ] );
+-        } // ** if
+-
+-    } // ** for
++            res = &amp;player_lists[ player_id ];
++        }
++    }
+     SDL_mutexV(mutex);
+ 
+-    return( 0 );
++    return( res );
+ }
+ 
+ void PlayerInterface::spawnPlayer( PlayerID player_id, const iXY &amp;location )
+
+Modified: trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -29,79 +29,97 @@
+ 
+ #define DEFAULT_FLAGS_PATH &quot;pics/flags/&quot;
+ 
+-
+-
+-Surface noimage;
+-
+ class _RMan
+ {
+ public:
+     _RMan()
+     {
++        flagList = new Surface*[256];
+         for (int n = 0; n &lt; 256; n++)
+         {
+-            flagList[n]=&noimage;
++            flagList[n]=new Surface(20,14,1);
++            flagList[n]-&gt;fill(0);
+         }
+     }
++
++    ~_RMan()
++    {
++        if ( flagList )
++        {
++            for (int n = 0; n &lt; 256; n++)
++            {
++                delete flagList[n];
++            }
++            delete[] flagList;
++            flagList = 0;
++        }
++    }
+     
+-    Surface * flagList[256];
++    Surface ** flagList;
+ };
+ 
+-_RMan RMan;
++_RMan *RMan = 0;
+ 
+-Surface *
+-ResourceManager::getEmptyImage()
++void
++ResourceManager::initialize()
+ {
+-    return &noimage;
++    if ( ! RMan )
++    {
++        RMan = new _RMan();
++    }
+ }
+-        
++
++void
++ResourceManager::finalize()
++{
++    if ( RMan )
++    {
++        delete RMan;
++        RMan = 0;
++    }
++}
++
+ // actually loads all the flags.
+ int
+-ResourceManager::loadDefaultFlags()
++ResourceManager::loadAllFlags(Surface&amp; flags, vector&lt;string&gt;&amp; names)
+ {
+-    noimage.create(20,14,1);
+-    noimage.fill(0);
+     char** list = filesystem::enumerateFiles(DEFAULT_FLAGS_PATH);
+-    
+-    vector&lt;string&gt; filenames;
+     string flagname;
+     
+     for(char** file = list; *file != 0; file++)
+     {
+-        flagname = DEFAULT_FLAGS_PATH;
+-        flagname += *file;
+-        if(flagname.find(&quot;.bmp&quot;) != string::npos)
++        flagname = *file;
++        if ( flagname.find(&quot;.bmp&quot;) != string::npos )
+         {
+-            filenames.push_back(flagname);
++            names.push_back(flagname);
+         }
+     }
+ 
+     filesystem::freeList(list);
+ 
+-    sort(filenames.begin(), filenames.end());
++    flags.create( FLAG_WIDTH, FLAG_HEIGHT, names.size());
+ 
+-    // Now load in the sorted BMP names.
+-    for (unsigned int i = 0; i &lt; filenames.size(); i++)
++    sort(names.begin(), names.end());
++    string path(DEFAULT_FLAGS_PATH);
++
++    for (vector&lt;string&gt;::size_type i = 0; i &lt; names.size(); i++)
+     {
+-        if ( RMan.flagList[i] != &amp;noimage )
+-            delete RMan.flagList[i];
+-        
+-        RMan.flagList[i] = new Surface();
+-        // XXX check for null man
+-        RMan.flagList[i]-&gt;loadBMP(filenames[i].c_str());
++        flags.setFrame(i);
++        flags.loadBMP((path+names[i]).c_str(), false);
+     }
+     
+-    return filenames.size();
++    return names.size();
+ }
+ 
+-Surface *
+-ResourceManager::getFlag(FlagID flag)
++bool
++ResourceManager::loadFlag(Surface* dest, string name)
+ {
+-    return RMan.flagList[flag];
++    dest-&gt;loadBMP((DEFAULT_FLAGS_PATH + name).c_str());
++    return true;
+ }
+ 
+-bool
+-ResourceManager::isFlagActive(FlagID flag)
++Surface *
++ResourceManager::getFlag(FlagID flag)
+ {
+-    return RMan.flagList[flag] != &noimage;
++    return RMan-&gt;flagList[flag];
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -22,6 +22,8 @@
+ #define	_RESOURCEMANAGER_HPP
+ 
+ #include &quot;Core/CoreTypes.hpp&quot;
++#include &lt;vector&gt;
++#include &lt;string&gt;
+ 
+ // forward declarations
+ class Surface;
+@@ -29,10 +31,12 @@
+ class ResourceManager
+ {
+ public:
+-    static Surface * getEmptyImage();
+-    static int loadDefaultFlags();
++    static void initialize();
++    static void finalize();
++
++    static int loadAllFlags(Surface&amp; flags, std::vector&lt;std::string&gt;&amp; names);
++    static bool loadFlag(Surface* dest, std::string name);
+     static Surface * getFlag(FlagID flag);
+-    static bool isFlagActive(FlagID flag);
+ };
+ 
+ #endif	/* _RESOURCEMANAGER_HPP */
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -28,17 +28,18 @@
+ #include &quot;Views/Components/MouseEvent.hpp&quot;
+ #include &quot;2D/Color.hpp&quot;
+ 
+-FlagID FlagSelectionView::playerFlagSelected = 0;
+-Surface FlagSelectionView::playerFlag;
++#define BORDER_SPACE 4
+ 
+ class FlagButton : public Button
+ {
+ protected:
+-    unsigned char fcode;
++    FlagID fcode;
++    FlagSelectionView* fsv;
+ public:
+-    FlagButton(int x, int y, Surface &amp;s, unsigned char flagCode)
++    FlagButton(FlagSelectionView* fsv, int x, int y, Surface &amp;s, FlagID flagCode)
+         : Button(&quot;flag&quot;)
+     {
++        this-&gt;fsv = fsv;
+         setLocation(x, y);
+         setSize(s.getWidth(), s.getHeight());
+         bimage.create(s.getWidth(), s.getHeight(), 1);
+@@ -56,7 +57,7 @@
+     {
+         if ( e.getID() == mMouseEvent::MOUSE_EVENT_CLICKED )
+         {
+-            FlagSelectionView::setSelectedFlag(fcode);
++            fsv-&gt;setSelectedFlag(fcode);
+         }
+         else
+         {
+@@ -83,6 +84,13 @@
+ 
+     resizeClientArea(bodyTextRect.getSizeX() / 2 - 10 - 30, 108);
+ 
++    text_current = &quot;Current:&quot;;
++    loc_text_current.x = BORDER_SPACE;
++    loc_text_current.y = BORDER_SPACE + (FLAG_HEIGHT - Surface::getFontHeight()) / 2;
++
++    loc_player_flag.x = loc_text_current.x + Surface::getTextLength(text_current) + BORDER_SPACE;
++    loc_player_flag.y = BORDER_SPACE;
++
+     init();
+ 
+ } // end FlagSelectionView::FlagSelectionView
+@@ -91,38 +99,27 @@
+ //---------------------------------------------------------------------------
+ void FlagSelectionView::init()
+ {
+-    Surface flag;
+-    // XXX we suppose all the flags has the same size
+-    Surface * curFlag = ResourceManager::getFlag(0);
+-    
+-    //flags.mapFromPalette(&quot;netp&quot;);
++    iXY flagStartOffset(BORDER_SPACE, BORDER_SPACE * 2 + FLAG_HEIGHT);
+ 
+-    iXY flagStartOffset(BORDER_SPACE, BORDER_SPACE * 2 + curFlag-&gt;getHeight());
++    int yOffset = FLAG_HEIGHT + 2;
+ 
+-    int yOffset = curFlag-&gt;getHeight() + 2;
+-
+     int x = flagStartOffset.x;
+     int y = flagStartOffset.y;
+ 
+-    // XXX to be able to do the loop we need int
+-    // but it should be FlagID
+-    // also, the 256 should be MAX_FLAG or similiar.
+-    for (unsigned int i = 0; i &lt; 256; i++)
++    ResourceManager::loadAllFlags(game_flags, flag_names);
++    menu_flags.copy(game_flags);
++    menu_flags.mapFromPalette(&quot;netp&quot;);
++
++    unsigned int max_flags = menu_flags.getNumFrames();
++    for (unsigned int i = 0; i &lt; max_flags; ++i)
+     {
+-        if ( ! ResourceManager::isFlagActive(i) )
+-            continue;
+-        
+-        // XXX we have to copy the flag because of different palettes
+-        curFlag = ResourceManager::getFlag(i);
+-        flag.create(curFlag-&gt;getWidth(), curFlag-&gt;getHeight(), 1);
+-        curFlag-&gt;blt(flag, 0, 0);
+-        flag.mapFromPalette(&quot;netp&quot;);
+-        
+-        add( new FlagButton( x, y, flag, i) );
++        menu_flags.setFrame(i);
++        add( new FlagButton(this, x, y, menu_flags, i) );
+ 
+-        x += flag.getWidth() + 2;
++        x += FLAG_WIDTH + 2;
+ 
+-        if (x &gt; flagStartOffset.x + getClientRect().getSizeX() - BORDER_SPACE - (int)flag.getWidth()) {
++        if (x &gt; flagStartOffset.x + getClientRect().getSizeX() - BORDER_SPACE - FLAG_WIDTH)
++        {
+             x = flagStartOffset.x;
+             y += yOffset;
+         }
+@@ -131,15 +128,11 @@
+     if(gameconfig-&gt;playerflag.isDefaultValue())
+     {
+         // new player, no flag...
+-        gameconfig-&gt;playerflag=rand()%255; // XXX be lucky, no check for flags.
++        gameconfig-&gt;playerflag=rand()%max_flags;
+     }
+     
+-    playerFlagSelected = gameconfig-&gt;playerflag;
+-    if ( ! ResourceManager::isFlagActive(playerFlagSelected) )
+-        playerFlagSelected = 0;
++    setSelectedFlag(0);
+     
+-    setSelectedFlag(playerFlagSelected);
+-    
+ } // end FlagSelectionView::init
+ 
+ // doDraw
+@@ -148,17 +141,15 @@
+ {
+     //iRect r(getViewRect());
+     //viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+-
+-    char strBuf[256];
+-    sprintf(strBuf, &quot;Current:&quot;);
+-    int CHAR_XPIX = 8; // XXX hardcoded
++    //clientArea.drawRect(clientArea.getRect(), Color::white);
+     
+-    clientArea.bltStringShadowed(
+-            BORDER_SPACE,
+-            BORDER_SPACE + (playerFlag.getHeight() - Surface::getFontHeight()) / 2,
+-            strBuf, windowTextColor, windowTextColorShadow);
++    clientArea.bltStringShadowed(loc_text_current.x,
++                                 loc_text_current.y,
++                                 text_current,
++                                 windowTextColor,
++                                 windowTextColorShadow);
+     
+-    playerFlag.blt(clientArea, BORDER_SPACE + strlen(strBuf) * CHAR_XPIX + BORDER_SPACE, BORDER_SPACE);
++    menu_flags.blt(clientArea, loc_player_flag.x, loc_player_flag.y);
+ 
+     View::doDraw(viewArea, clientArea);
+ 
+@@ -166,14 +157,10 @@
+ void
+ FlagSelectionView::setSelectedFlag(FlagID code)
+ {
+-    if ( ResourceManager::isFlagActive(code) )
++    if ( code &lt; flag_names.size() )
+     {
+-        // XXX have to map because of different palettes.
+-        Surface * rflag = ResourceManager::getFlag(code);
+-        playerFlag.create(rflag-&gt;getWidth(), rflag-&gt;getHeight(), 1);
+-        rflag-&gt;blt(playerFlag, 0, 0);
+-        playerFlag.mapFromPalette(&quot;netp&quot;);
+-        
+-        playerFlagSelected = code;    
++        menu_flags.setFrame(code);
++        game_flags.setFrame(code);
++        game_flags.frameToBuffer(GameConfig::player_flag_data, sizeof(GameConfig::player_flag_data));
+     }
+-}
+\ No newline at end of file
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -26,22 +26,20 @@
+ class FlagSelectionView : public RMouseHackView
+ {
+ private:
+-    static FlagID playerFlagSelected;
+-    static Surface playerFlag;
+-    
+-    enum { BORDER_SPACE = 4 };
++    Surface menu_flags;
++    Surface game_flags;
++    std::vector&lt;std::string&gt; flag_names;
+ 
++    iXY loc_player_flag;
++    const char * text_current;
++    iXY loc_text_current;
++
+ public:
+     FlagSelectionView();
+     virtual ~FlagSelectionView()
+     {}
+     
+-    static void setSelectedFlag(FlagID code);
+-    
+-    static FlagID getSelectedFlag()
+-    {
+-        return playerFlagSelected;
+-    }
++    void setSelectedFlag(FlagID code);
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     //virtual int  lMouseUp(const iXY &amp;downPos, const iXY &amp;upPos);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2010-06-08 13:54:09 UTC (rev 1221)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2010-11-08 21:07:35 UTC (rev 1222)
+@@ -36,6 +36,7 @@
+ 
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
+ 
+ char HostJoinTemplateView::gameTypeBuf[256];
+ 
+@@ -80,7 +81,8 @@
+         return;
+ 
+     // Set the player flag.
+-    gameconfig-&gt;playerflag = FlagSelectionView::getSelectedFlag();
++    // XXX FLAG
++    //gameconfig-&gt;playerflag = FlagSelectionView::getSelectedFlag();
+ 
+     // Close all menu views.
+     Desktop::setVisibilityAllWindows(false);
+@@ -94,6 +96,7 @@
+     MenuTemplateView::backgroundSurface.free();
+ 
+     PlayerGameManager* manager = (PlayerGameManager*) gamemanager;
++    ResourceManager::getFlag(0)-&gt;bufferToFrame(GameConfig::player_flag_data, sizeof(GameConfig::player_flag_data));
+     manager-&gt;launchMultiPlayerGame();
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000249.html">[Netpanzer-cvs] r1223 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#248">[ date ]</a>
+              <a href="thread.html#248">[ thread ]</a>
+              <a href="subject.html#248">[ subject ]</a>
+              <a href="author.html#248">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

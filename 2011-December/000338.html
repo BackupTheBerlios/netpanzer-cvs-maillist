@@ -1,0 +1,498 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1312 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1312%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20support/scripts&In-Reply-To=%3C20111222160827.65950481510%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000337.html">
+   <LINK REL="Next"  HREF="000339.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1312 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1312%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20support/scripts&In-Reply-To=%3C20111222160827.65950481510%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1312 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec 22 17:08:27 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000337.html">[Netpanzer-cvs] r1311 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts support/icon
+</A></li>
+        <LI>Next message: <A HREF="000339.html">[Netpanzer-cvs] r1313 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#338">[ date ]</a>
+              <a href="thread.html#338">[ thread ]</a>
+              <a href="subject.html#338">[ subject ]</a>
+              <a href="author.html#338">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-22 17:08:26 +0100 (Thu, 22 Dec 2011)
+New Revision: 1312
+
+Added:
+   trunk/netpanzer/support/scripts/make-linux-portable.sh
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+Log:
+- Fix sorting players by points correctly on ranking view and winner view
+- Fix crashing when selecting flags with right mouse button
+- Fix clossing the flag selection window without selecting flags
+- Fix correctly timing the flag change &quot;since the last flag change&quot; not when opening the window.
+- Fix keyboard not working correctly when mouse is over Help, Ranking and flag selection window
+- Added configuration to compile netpanzer for linux more portable
+- Added script to generate automatically a linux package file.
+
+To create a package, go to the root of the netpazner code and create a file RELEASE_VERSION, the first line will be the release version:
+
+# echo &quot;0.8.4&quot; &gt; RELEASE_VERSION
+
+Run the script to build the portable version:
+
+# support/scripts/make-linux-portable.sh
+
+When the script finished a new folder is created, name &quot;releases&quot;, it will contain the file netpanzer-linux-&lt;version&gt;.tar.gz. Other players can uncompress this file and run the netpanzer executable
+
+Example, after running the script, file is
+
+netpanzer-linux-0.8.4.tar.gz
+
+# tar zxf netpanzer-linux-0.8.4.tar.gz
+# cd netpanzer
+# ./netpanzer
+
+The user is required to have SDL and SDL_Mixer installed.
+
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/SConstruct	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -124,7 +124,7 @@
+     #crosslinuxenv.Append( _LIBFLAGS = [ '`' + crosslinuxenv['CXX'] + ' -print-file-name=libstdc++.a`' ] )
+     #crosslinuxenv.Prepend( _LIBFLAGS = [ '/usr/local/gcc/i686-linux/lib/gcc/i686-linux/4.2.4/../../../../i686-linux/lib/libstdc++.a' ] )
+     
+-
++env.Append( LINKFLAGS = [ '-static-libgcc' ] )
+ env['FINALBUILDDIR'] = 'build/' + env['mode'] + '/'
+ env['FINALLIBSDIR'] = env['FINALBUILDDIR'] + 'libs/'
+ crossmingwenv['FINALBUILDDIR'] = 'build/crossmingw/' + env['mode'] + '/'
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -332,17 +332,13 @@
+     if (KeyboardInterface::isCharPressed('B') 
+        &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() ) 
+     {
+-        if (GameConfig::game_changeflagtime == 0)
++        if ( Desktop::getVisible(&quot;GFlagSelectionView&quot;)
++            || GameConfig::game_changeflagtime == 0
++            || Flagtimer.checkWithTimeOut(GameConfig::game_changeflagtime * 60000)
++           )
+         {
+             Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
+-            Flagtimer.reset();
+         }
+-        else 
+-        if (Flagtimer.checkWithTimeOut(GameConfig::game_changeflagtime * 60000)) 
+-        {
+-            Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
+-            Flagtimer.reset();
+-        }
+     }
+     
+     if (KeyboardInterface::isCharPressed('M')) 
+@@ -1117,10 +1113,11 @@
+ }
+ 
+ void
+-WorldInputCmdProcessor::process()
++WorldInputCmdProcessor::process(bool process_mouse)
+ {
+     evaluateKeyboardEvents();
+-    evaluateMouseEvents();
++    if ( process_mouse )
++        evaluateMouseEvents();
+ 
+     working_list.validateList();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -108,7 +108,7 @@
+ 
+     WorldInputCmdProcessor();
+ 
+-    void process();
++    void process(bool process_mouse = true);
+ 
+     void inFocus();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -767,7 +767,7 @@
+ 
+     // Check all components for a dragged event.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++)
++    for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+     {        
+         if ((*i)-&gt;contains(newPos) &amp;&amp; (*i)-&gt;contains(downPos) &amp;&amp; newPos!=prevPos) {
+             mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_DRAGGED, now(), InputEvent::BUTTON1_MASK, newPos.x, newPos.y, 0, false);
+@@ -798,7 +798,7 @@
+ 
+     // Check all components for a pressed event.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++)
++    for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+     {        
+         if ((*i)-&gt;contains(pos)) {
+             mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_PRESSED, now(), InputEvent::BUTTON2_MASK, pos.x, pos.y, 0, false);
+@@ -821,7 +821,7 @@
+ 
+     // Check all components for a clicked event.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++)
++    for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+     {        
+         if ((*i)-&gt;contains(downPos) &amp;&amp; (*i)-&gt;contains(upPos)) {
+             mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_CLICKED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
+@@ -839,7 +839,7 @@
+     if (reportRelease) {
+         // Check all components for a release event.
+         ComponentsIterator i;
+-        for ( i=components.begin(); i != components.end(); i++)
++        for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+         {        
+             if ((*i)-&gt;contains(upPos)) {
+                 mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_RELEASED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -103,16 +103,12 @@
+     View::doDraw(viewArea, clientArea);
+ } // end doDraw
+ 
+-class StatesSortByFrags
++class StatesSortByPoints
+     : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        if(state1-&gt;getKills() &gt; state2-&gt;getKills())
+-            return true;
+-        if(state1-&gt;getLosses() &lt; state2-&gt;getLosses())
+-            return true;
+-        return false;
++        return state1-&gt;getTotal() &gt; state2-&gt;getTotal();
+     }
+ };
+ 
+@@ -121,7 +117,9 @@
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        return state1-&gt;getObjectivesHeld() &gt; state2-&gt;getObjectivesHeld();
++        int p1 = state1-&gt;getObjectivesHeld();
++        int p2 = state2-&gt;getObjectivesHeld();
++        return p1 &gt; p2 || (p1 == p2 &amp;&amp; state1-&gt;getTotal() &gt; state2-&gt;getTotal() );
+     }
+ };
+ 
+@@ -151,7 +149,7 @@
+             break;
+         case _gametype_timelimit:
+         case _gametype_fraglimit:
+-            std::sort(states.begin(), states.end(), StatesSortByFrags());
++            std::sort(states.begin(), states.end(), StatesSortByPoints());
+             break;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -23,6 +23,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+@@ -70,6 +71,7 @@
+             CLIENT-&gt;sendMessage(&amp;upf, sizeof(upf));
+ 
+             Desktop::setVisibility(&quot;GFlagSelectionView&quot;, false);
++            COMMAND_PROCESSOR.Flagtimer.reset();
+ //            PlayerInterface::getLocalPlayer()-&gt;setStateActive();
+         }
+         else
+@@ -174,3 +176,8 @@
+     resize(iXY(newResolution.x, newResolution.y));
+     moveTo(iXY(0,0));
+ }
++
++void GFlagSelectionView::processEvents()
++{
++    COMMAND_PROCESSOR.process(false);
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.hpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.hpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -43,6 +43,8 @@
+     virtual void doDeactivate();
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void checkResolution(iXY oldResolution, iXY newResolution);
++    virtual void processEvents();
++
+     //virtual int  lMouseUp(const iXY &amp;downPos, const iXY &amp;upPos);
+     //virtual void drawBorder(Surface&amp; )
+     //{}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -16,13 +16,12 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;HelpScrollView.hpp&quot;
+ #include &quot;GameView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+-
+ // HelpScrollView
+ //---------------------------------------------------------------------------
+ HelpScrollView::HelpScrollView() : SpecialButtonView()
+@@ -248,3 +247,10 @@
+ {
+     /* empty */
+ } // end HelpScrollView::doActivate
++
++void HelpScrollView::processEvents()
++{
++    if ( Desktop::getVisible(&quot;GameView&quot;) )
++        COMMAND_PROCESSOR.process(false);
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -59,6 +59,8 @@
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void actionPerformed(mMouseEvent me);
+     virtual void doActivate();
++    virtual void processEvents();
++
+ }
+ ; // end HelpScrollView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -30,6 +30,7 @@
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+ #include &quot;Views/Components/Label.hpp&quot;
+ 
+@@ -112,16 +113,12 @@
+     View::doDraw(viewArea, clientArea);
+ } // end doDraw
+ 
+-class StatesSortByFrags
++class StatesSortByPoints
+     : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        if(state1-&gt;getKills() &gt; state2-&gt;getKills())
+-            return true;
+-        if(state1-&gt;getLosses() &lt; state2-&gt;getLosses())
+-            return true;
+-        return false;
++        return state1-&gt;getTotal() &gt; state2-&gt;getTotal();
+     }
+ };
+ 
+@@ -130,7 +127,9 @@
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        return state1-&gt;getObjectivesHeld() &gt; state2-&gt;getObjectivesHeld();
++        int p1 = state1-&gt;getObjectivesHeld();
++        int p2 = state2-&gt;getObjectivesHeld();
++        return p1 &gt; p2 || (p1 == p2 &amp;&amp; state1-&gt;getTotal() &gt; state2-&gt;getTotal() );
+     }
+ };
+ 
+@@ -160,7 +159,7 @@
+             break;
+         case _gametype_timelimit:
+         case _gametype_fraglimit:
+-            std::sort(states.begin(), states.end(), StatesSortByFrags());
++            std::sort(states.begin(), states.end(), StatesSortByPoints());
+             break;
+     }
+ 
+@@ -269,3 +268,8 @@
+ {
+     selected_line = -1;
+ }
++
++void RankView::processEvents()
++{
++    COMMAND_PROCESSOR.process(false);
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -60,7 +60,7 @@
+     virtual void mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos);
+     virtual void doActivate();
+     virtual void doDeactivate();
+-//    virtual void processEvents();
++    virtual void processEvents();
+ }
+ ; // end _WIN
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2011-12-22 11:59:10 UTC (rev 1311)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -16,7 +16,6 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;HelpView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Game/GameView.hpp&quot;
+
+Added: trunk/netpanzer/support/scripts/make-linux-portable.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-linux-portable.sh	                        (rev 0)
++++ trunk/netpanzer/support/scripts/make-linux-portable.sh	2011-12-22 16:08:26 UTC (rev 1312)
+@@ -0,0 +1,44 @@
++#! /bin/bash
++
++if [ ! -f RELEASE_VERSION ]; then
++    echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
++    exit 1
++fi
++
++RELEASEDIR=&quot;releases&quot;
++VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
++NPDEST=/tmp/netpanzer
++ZIPNAME=&quot;netpanzer-linux-${VERSION}.tar.gz&quot;
++EXENAME=&quot;netpanzer&quot;
++
++echo &quot;Making netPanzer linux portable version ${VERSION}&quot;
++
++mkdir -p build/{release,debug}/libs
++ln -s &quot;`g++ -print-file-name=libstdc++.a`&quot; build/release/libs/libstdc++.a
++ln -s &quot;`g++ -print-file-name=libstdc++.a`&quot; build/debug/libs/libstdc++.a
++
++scons
++
++strip &quot;${EXENAME}&quot;
++
++[ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
++
++mkdir -p &quot;${NPDEST}&quot;
++cp &quot;${EXENAME}&quot; &quot;${NPDEST}&quot;
++
++support/scripts/copy_datafiles.sh &quot;${NPDEST}&quot;
++support/scripts/copy_docfiles.sh &quot;${NPDEST}&quot;
++
++[ ! -d &quot;${RELEASEDIR}&quot; ] &amp;&amp; mkdir &quot;${RELEASEDIR}&quot;
++
++
++find &quot;${NPDEST}&quot; -name &quot;*/.*&quot; -exec rm -f &quot;{}&quot; \;
++
++pushd &quot;${NPDEST}/..&quot;
++tar zcvf &quot;${ZIPNAME}&quot; `basename &quot;${NPDEST}&quot;`
++popd
++
++[ -f &quot;${RELEASEDIR}/${ZIPNAME}&quot; ] &amp;&amp; rm -f &quot;${RELEASEDIR}/${ZIPNAME}&quot;
++
++mv &quot;${NPDEST}/../${ZIPNAME}&quot; &quot;${RELEASEDIR}&quot;
++rm -rf &quot;${NPDEST}&quot;
+
+
+Property changes on: trunk/netpanzer/support/scripts/make-linux-portable.sh
+___________________________________________________________________
+Added: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000337.html">[Netpanzer-cvs] r1311 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts support/icon
+</A></li>
+	<LI>Next message: <A HREF="000339.html">[Netpanzer-cvs] r1313 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#338">[ date ]</a>
+              <a href="thread.html#338">[ thread ]</a>
+              <a href="subject.html#338">[ subject ]</a>
+              <a href="author.html#338">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

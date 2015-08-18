@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1304 - in trunk/netpanzer: src/Lib/2D support/icon
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1304%20-%20in%20trunk/netpanzer%3A%20src/Lib/2D%20support/icon&In-Reply-To=%3C20111207123948.456C0481457%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000329.html">
+   <LINK REL="Next"  HREF="000331.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1304 - in trunk/netpanzer: src/Lib/2D support/icon</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1304%20-%20in%20trunk/netpanzer%3A%20src/Lib/2D%20support/icon&In-Reply-To=%3C20111207123948.456C0481457%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1304 - in trunk/netpanzer: src/Lib/2D support/icon">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Wed Dec  7 13:39:47 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000329.html">[Netpanzer-cvs] r1303 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000331.html">[Netpanzer-cvs] r1305 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#330">[ date ]</a>
+              <a href="thread.html#330">[ thread ]</a>
+              <a href="subject.html#330">[ subject ]</a>
+              <a href="author.html#330">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-12-07 13:39:47 +0100 (Wed, 07 Dec 2011)
+New Revision: 1304
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/ColorTable.cpp
+   trunk/netpanzer/support/icon/npicon.rc
+Log:
+Update rc file for 0.8.4-RC3
+Remove condition always false for load palette, now the palette is not always recreated.
+
+Modified: trunk/netpanzer/src/Lib/2D/ColorTable.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/ColorTable.cpp	2011-12-05 12:43:41 UTC (rev 1303)
++++ trunk/netpanzer/src/Lib/2D/ColorTable.cpp	2011-12-07 12:39:47 UTC (rev 1304)
+@@ -290,11 +290,6 @@
+ 	for(size_t i=0; i&lt;PALETTE_LENGTH; i++) {
+ 	    SDL_Color checkcolor;
+ 	    file-&gt;read(&amp;checkcolor, sizeof(Uint8), 3);
+-	    if(    Palette::originalColor[i].r != checkcolor.r
+-            || Palette::originalColor[i].g != checkcolor.g
+-            || Palette::originalColor[i].b != checkcolor.b )
+-	       	throw Exception(&quot;couldn't load colortable '%s': &quot;
+-	   		&quot;palettes don't match&quot;, filename);
+ 	}
+ 
+ 	// put the color table data into the colorArray
+@@ -303,6 +298,7 @@
+ 	throw Exception(&quot;couldn't load colortable '%s': %s&quot;,
+ 		filename, e.what());
+     }
++    LOGGER.info(&quot;Loading ColorTable '%s'&quot;, filename);
+ } // end ColorTable::loadTable
+ 
+ // saveTable
+
+Modified: trunk/netpanzer/support/icon/npicon.rc
+===================================================================
+--- trunk/netpanzer/support/icon/npicon.rc	2011-12-05 12:43:41 UTC (rev 1303)
++++ trunk/netpanzer/support/icon/npicon.rc	2011-12-07 12:39:47 UTC (rev 1304)
+@@ -1,40 +1,40 @@
+-#include &quot;winresrc.h&quot;
+-
+-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+-
+-/////////////////////////////////////////////////////////////////////////////
+-//
+-// Version
+-//
+-
+-VS_VERSION_INFO VERSIONINFO
+- FILEVERSION 0,8,3,1
+- PRODUCTVERSION 0,8,3,1
+- FILEFLAGSMASK 0x3fL
+- FILEFLAGS 0x0L
+- FILEOS 0x40004L
+- FILETYPE 0x2L
+- FILESUBTYPE 0x0L
+-BEGIN
+-    BLOCK &quot;StringFileInfo&quot;
+-    BEGIN
+-        BLOCK &quot;040904b0&quot;
+-        BEGIN
+-            VALUE &quot;CompanyName&quot;, &quot;\0&quot;
+-            VALUE &quot;FileDescription&quot;, &quot;Multiplayer tank battle game\0&quot;
+-            VALUE &quot;FileVersion&quot;, &quot;1, 2, 11, 0\0&quot;
+-            VALUE &quot;InternalName&quot;, &quot;NetPanzer\0&quot;
+-            VALUE &quot;LegalCopyright&quot;, &quot;Copyright(c) 1998 Pyrosoft Inc. and nepanzer-devel team\0&quot;
+-            VALUE &quot;OriginalFilename&quot;, &quot;NetPanzer.exe\0&quot;
+-            VALUE &quot;ProductName&quot;, &quot;NetPanzer\0&quot;
+-            VALUE &quot;ProductVersion&quot;, &quot;0.8.3.1\0&quot;
+-        END
+-    END
+-    BLOCK &quot;VarFileInfo&quot;
+-    BEGIN
+-        VALUE &quot;Translation&quot;, 0x409, 1200
+-    END
+-END
+-
++#include &quot;winresrc.h&quot;
++
++LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
++
++/////////////////////////////////////////////////////////////////////////////
++//
++// Version
++//
++
++VS_VERSION_INFO VERSIONINFO
++ FILEVERSION 0,8,4,3
++ PRODUCTVERSION 0,8,4,3
++ FILEFLAGSMASK 0x3fL
++ FILEFLAGS 0x0L
++ FILEOS 0x40004L
++ FILETYPE 0x2L
++ FILESUBTYPE 0x0L
++BEGIN
++    BLOCK &quot;StringFileInfo&quot;
++    BEGIN
++        BLOCK &quot;040904b0&quot;
++        BEGIN
++            VALUE &quot;CompanyName&quot;, &quot;\0&quot;
++            VALUE &quot;FileDescription&quot;, &quot;Multiplayer tank battle game\0&quot;
++            VALUE &quot;FileVersion&quot;, &quot;0, 8, 4, 3\0&quot;
++            VALUE &quot;InternalName&quot;, &quot;NetPanzer\0&quot;
++            VALUE &quot;LegalCopyright&quot;, &quot;Copyright(c) 1998 Pyrosoft Inc. and nepanzer-devel team\0&quot;
++            VALUE &quot;OriginalFilename&quot;, &quot;NetPanzer.exe\0&quot;
++            VALUE &quot;ProductName&quot;, &quot;NetPanzer\0&quot;
++            VALUE &quot;ProductVersion&quot;, &quot;0.8.4-RC3\0&quot;
++        END
++    END
++    BLOCK &quot;VarFileInfo&quot;
++    BEGIN
++        VALUE &quot;Translation&quot;, 0x409, 1200
++    END
++END
++
+ MAINICON ICON &quot;netpanzer.ico&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000329.html">[Netpanzer-cvs] r1303 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000331.html">[Netpanzer-cvs] r1305 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#330">[ date ]</a>
+              <a href="thread.html#330">[ thread ]</a>
+              <a href="subject.html#330">[ subject ]</a>
+              <a href="author.html#330">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

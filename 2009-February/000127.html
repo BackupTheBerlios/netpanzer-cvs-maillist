@@ -1,0 +1,406 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1095 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1095%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units&In-Reply-To=%3C200902211240.n1LCeFoT016273%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000126.html">
+   <LINK REL="Next"  HREF="000128.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1095 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1095%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units&In-Reply-To=%3C200902211240.n1LCeFoT016273%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1095 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb 21 13:40:15 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000126.html">[Netpanzer-cvs] r1094 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000128.html">[Netpanzer-cvs] r1096 - in trunk/netpanzer/src/NetPanzer/Views:	Game MainMenu/Multi MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#127">[ date ]</a>
+              <a href="thread.html#127">[ thread ]</a>
+              <a href="subject.html#127">[ subject ]</a>
+              <a href="author.html#127">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-02-21 13:39:57 +0100 (Sat, 21 Feb 2009)
+New Revision: 1095
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+Log:
+- Added mising #include &lt;cassert&gt; in WorldMap.cpp and TileSet.cpp
+- Some cleanups in UnitInterface (work in progress)
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2009-02-21 10:16:23 UTC (rev 1094)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2009-02-21 12:39:57 UTC (rev 1095)
+@@ -23,10 +23,8 @@
+ #include &quot;Units/Unit.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Classes/Network/UnitNetMessage.hpp&quot;
++#include &quot;Classes/PlayerState.hpp&quot;
+ 
+-
+-
+-
+ UnitSync::UnitSync(ClientSocket * c)
+     : client(c), count(0), unitid(0), unitstosync(0), lastunit(0)
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2009-02-21 10:16:23 UTC (rev 1094)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2009-02-21 12:39:57 UTC (rev 1095)
+@@ -20,9 +20,10 @@
+ #include &quot;Classes/TileSet.hpp&quot;
+ 
+ #include &lt;memory&gt;
+-#include &lt;stdio.h&gt;
+-#include &lt;stdlib.h&gt;
++#include &lt;cstdio&gt;
++#include &lt;cstdlib&gt;
+ #include &lt;unistd.h&gt;
++#include &lt;cassert&gt;
+ 
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp	2009-02-21 10:16:23 UTC (rev 1094)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp	2009-02-21 12:39:57 UTC (rev 1095)
+@@ -17,10 +17,11 @@
+ */
+ #include &lt;config.h&gt;
+ 
+-#include &lt;stdlib.h&gt;
+-#include &lt;stdio.h&gt;
+-#include &lt;string.h&gt;
++#include &lt;cstdlib&gt;
++#include &lt;cstdio&gt;
++#include &lt;cstring&gt;
+ #include &lt;memory&gt;
++#include &lt;cassert&gt;
+ 
+ #include &quot;Classes/WorldMap.hpp&quot;
+ #include &quot;Port/MapData.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-02-21 10:16:23 UTC (rev 1094)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-02-21 12:39:57 UTC (rev 1095)
+@@ -27,6 +27,7 @@
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Interfaces/PathScheduler.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
++#include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;Weapons/ProjectileInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-02-21 10:16:23 UTC (rev 1094)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-02-21 12:39:57 UTC (rev 1095)
+@@ -25,13 +25,12 @@
+ #include &quot;UnitBucketArray.hpp&quot;
+ #include &quot;UnitOpcodeDecoder.hpp&quot;
+ #include &quot;UnitBlackBoard.hpp&quot;
++#include &quot;Unit.hpp&quot;
+ 
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ 
+-#include &quot;Units/Unit.hpp&quot;
+-
+ #include &quot;Types/iXY.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+@@ -55,7 +54,6 @@
+ UnitInterface::PlayerUnitList UnitInterface::playerUnitLists;
+ UnitBucketArray UnitInterface::unit_bucket_array;
+ 
+-unsigned short UnitInterface::max_players;
+ PlacementMatrix UnitInterface::unit_placement_matrix;
+ 
+ UnitID UnitInterface::lastUnitID;
+@@ -79,11 +77,8 @@
+ 
+ void UnitInterface::initialize( unsigned long max_units )
+ {
+-    max_players = PlayerInterface::getMaxPlayers();
++    playerUnitLists.resize(PlayerInterface::getMaxPlayers());
+ 
+-    //unit_lists = new UnitList [ max_players ];
+-    playerUnitLists.resize(max_players);
+-
+     unit_bucket_array.initialize(MapInterface::getSize(), TileInterface::getTileSize() );
+ 
+     lastUnitID = 0;
+@@ -205,14 +200,11 @@
+     
+     // unit explosion sound
+     sound-&gt;playAmbientSound(&quot;expl&quot;,                   
+-            WorldViewInterface::getCameraDistance(
+-                unit-&gt;unit_state.location ) );
++            WorldViewInterface::getCameraDistance( unit-&gt;unit_state.location ));
+     
+-    // delete the unit
+     unit_bucket_array.removeUnit(unit);
+ 
+     UnitList&amp; plist = playerUnitLists[unit-&gt;player-&gt;getID()];
+-    
+     plist.erase(std::remove(plist.begin(), plist.end(), unit), plist.end());
+     
+     units.erase(i);
+@@ -229,32 +221,26 @@
+ 	    
+         if (unit-&gt;unit_state.lifecycle_state == _UNIT_LIFECYCLE_INACTIVE)
+         {
+-            Units::iterator next = i;
+-            ++next;
+-            removeUnit(i);
+-            i = next;
++            removeUnit(i++);
+             continue;
+         }
++
++        ++i;
+ 	    
+-        unsigned long pre_update_bucket_index;
+-        unsigned long post_update_bucket_index;
++        unsigned int bucket_before;
++        bucket_before = unit_bucket_array.worldLocToBucketIndex(
++                                                    unit-&gt;unit_state.location );
+ 
+-        pre_update_bucket_index 
+-            = unit_bucket_array.worldLocToBucketIndex(
+-                    unit-&gt;unit_state.location );
+-
+         unit-&gt;updateState();
+ 
+-        post_update_bucket_index 
+-            = unit_bucket_array.worldLocToBucketIndex(
+-                    unit-&gt;unit_state.location );
++        unsigned int bucket_after;
++        bucket_after = unit_bucket_array.worldLocToBucketIndex(
++                                                    unit-&gt;unit_state.location );
+ 
+-        if ( post_update_bucket_index != pre_update_bucket_index )
++        if ( bucket_before != bucket_after )
+         {
+-            unit_bucket_array.moveUnit(unit,
+-                    pre_update_bucket_index, post_update_bucket_index );
++            unit_bucket_array.moveUnit( unit, bucket_before, bucket_after );
+         }
+-        ++i;
+     }
+ 
+     if ( NetworkState::status == _network_state_server )
+@@ -329,7 +315,9 @@
+ {
+     UnitID newID = lastUnitID++;
+     while(getUnit(newID) != 0)
++    {
+         newID = lastUnitID++;
++    }
+ 
+     return newID;
+ }
+@@ -371,7 +359,7 @@
+ void UnitInterface::addNewUnit(Unit *unit)
+ {
+     units.insert(std::make_pair(unit-&gt;id, unit));
+-   
++
+     playerUnitLists[unit-&gt;player-&gt;getID()].push_back(unit);
+ 
+     unit_bucket_array.addUnit(unit);
+@@ -745,9 +733,11 @@
+     const UnitIniSyncMessage* sync_message 
+         = (const UnitIniSyncMessage *) net_message;
+ 
+-    try {
++    try
++    {
+         std::map&lt;UnitID, Unit*&gt;::iterator uit = units.find(sync_message-&gt;getUnitID());
+-        if ( uit != units.end() ) {
++        if ( uit != units.end() )
++        {
+             LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Received an existing unit [%d]&quot;,
+                             sync_message-&gt;getUnitID());
+             return;
+@@ -757,7 +747,9 @@
+                 sync_message-&gt;getPlayerID(), sync_message-&gt;getUnitID());
+         unit-&gt;in_sync_flag = false;
+         addNewUnit(unit);
+-    } catch(std::exception&amp; e) {
++    }
++    catch(std::exception&amp; e)
++    {
+         LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't sync unit '%s'&quot;, e.what());
+     }
+ }
+@@ -791,7 +783,8 @@
+         = (const UnitRemoteDestroy *) net_message;
+ 
+     Units::iterator i = units.find(remote_destroy-&gt;getUnitToDestroy());
+-    if(i != units.end()) {
++    if(i != units.end())
++    {
+         removeUnit(i);
+     }
+ }
+@@ -805,9 +798,11 @@
+ 
+     Uint16 player_index = create_mesg-&gt;getPlayerID();
+ 
+-    try {
++    try
++    {
+         std::map&lt;UnitID, Unit*&gt;::iterator uit = units.find(create_mesg-&gt;getUnitID());
+-        if ( uit != units.end() ) {
++        if ( uit != units.end() )
++        {
+             LOGGER.warning(&quot;UnitInterface::unitCreateMessage() Received an existing unit [%d]&quot;,
+                             create_mesg-&gt;getUnitID());
+             return;
+@@ -818,9 +813,11 @@
+         addNewUnit(unit);
+         // remove unit from blackboard in client (we are client here)
+         UnitBlackBoard::unmarkUnitLoc( unitpos );
+-    } catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't create new unit '%s'&quot;, e.what());
+     }
++    catch(std::exception&amp; e)
++    {
++        LOGGER.warning(&quot;UnitInterface::unitCreateMessage() Couldn't create new unit '%s'&quot;, e.what());
++    }
+ }
+ 
+ // ******************************************************************
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2009-02-21 10:16:23 UTC (rev 1094)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2009-02-21 12:39:57 UTC (rev 1095)
+@@ -15,25 +15,29 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
++
+ #ifndef _UNITINTERFACE_HPP
+ #define _UNITINTERFACE_HPP
+ 
+ #include &lt;vector&gt;
+ #include &lt;map&gt;
+-#include &quot;Units/UnitBucketArray.hpp&quot;
+-#include &quot;Classes/UnitMessage.hpp&quot;
+-#include &quot;Classes/PlayerState.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
+-#include &quot;Classes/PlacementMatrix.hpp&quot;
++#include &lt;cassert&gt;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+-#include &quot;Classes/Network/UnitNetMessage.hpp&quot;
+-#include &quot;Units/UnitOpcodeEncoder.hpp&quot;
++#include &quot;UnitBucketArray.hpp&quot;
++#include &quot;UnitOpcodeEncoder.hpp&quot;
+ 
+-enum { _search_all_players,
+-       _search_player,
+-       _search_exclude_player,
+-       _search_enemy_only };
++#include &quot;Classes/PlacementMatrix.hpp&quot;
++#include &quot;Classes/PlayerUnitConfig.hpp&quot;
+ 
++enum
++{
++    _search_all_players,
++    _search_player,
++    _search_exclude_player,
++    _search_enemy_only
++};
++
+ enum { _no_unit_found, _unit_player, _unit_allied, _unit_enemy };
+ 
+ class NetPacket;
+@@ -49,7 +53,6 @@
+     static PlayerUnitList playerUnitLists;
+         
+     static UnitBucketArray unit_bucket_array;
+-    static unsigned short max_players;
+     static size_t units_per_player;
+     static PlacementMatrix unit_placement_matrix;
+ 
+@@ -75,21 +78,13 @@
+ 
+     static const UnitList&amp; getPlayerUnits(Uint16 player_id)
+     {
+-        assert(player_id &lt; max_players);
++        assert(player_id &lt; playerUnitLists.size());
+         return playerUnitLists[player_id];
+     }
+ 
+-#if 0
+-    static UnitList * getUnitList(size_t player)
+-    {
+-        assert( (player &lt; max_players) );
+-        return ( &amp;unit_lists[ player ] );
+-    }
+-#endif
+-
+     static size_t getUnitCount(unsigned short player_index)
+     {
+-        assert( (player_index &lt; max_players) );
++        assert( player_index &lt; playerUnitLists.size() );
+         return playerUnitLists[player_index].size();
+     }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000126.html">[Netpanzer-cvs] r1094 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000128.html">[Netpanzer-cvs] r1096 - in trunk/netpanzer/src/NetPanzer/Views:	Game MainMenu/Multi MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#127">[ date ]</a>
+              <a href="thread.html#127">[ thread ]</a>
+              <a href="subject.html#127">[ subject ]</a>
+              <a href="author.html#127">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

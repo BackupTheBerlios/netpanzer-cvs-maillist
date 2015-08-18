@@ -1,0 +1,961 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1316 - in branches/newpath: . scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	support/icon support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1316%20-%20in%20branches/newpath%3A%20.%20scripts%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09support/icon%20support/scripts&In-Reply-To=%3C20111224025025.B6EF548061D%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000341.html">
+   <LINK REL="Next"  HREF="000343.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1316 - in branches/newpath: . scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	support/icon support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1316%20-%20in%20branches/newpath%3A%20.%20scripts%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09support/icon%20support/scripts&In-Reply-To=%3C20111224025025.B6EF548061D%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1316 - in branches/newpath: . scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	support/icon support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec 24 03:50:25 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000341.html">[Netpanzer-cvs] r1315 - tags/netpanzer/0.8.4
+</A></li>
+        <LI>Next message: <A HREF="000343.html">[Netpanzer-cvs] r1317 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#342">[ date ]</a>
+              <a href="thread.html#342">[ thread ]</a>
+              <a href="subject.html#342">[ subject ]</a>
+              <a href="author.html#342">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-24 03:50:25 +0100 (Sat, 24 Dec 2011)
+New Revision: 1316
+
+Modified:
+   branches/newpath/SConstruct
+   branches/newpath/scripts/servercommands.lua
+   branches/newpath/src/NetPanzer/Bot/BotPlayer.cpp
+   branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+   branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   branches/newpath/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   branches/newpath/src/NetPanzer/Core/NetworkGlobals.hpp
+   branches/newpath/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   branches/newpath/src/NetPanzer/Interfaces/GameConfig.cpp
+   branches/newpath/src/NetPanzer/Interfaces/GameConfig.hpp
+   branches/newpath/src/NetPanzer/Interfaces/GameManager.cpp
+   branches/newpath/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   branches/newpath/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   branches/newpath/src/NetPanzer/Units/Vehicle.cpp
+   branches/newpath/src/NetPanzer/Units/Vehicle.hpp
+   branches/newpath/src/NetPanzer/Views/Components/View.cpp
+   branches/newpath/src/NetPanzer/Views/Game/EndRoundView.cpp
+   branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+   branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.hpp
+   branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.hpp
+   branches/newpath/src/NetPanzer/Views/Game/RankView.cpp
+   branches/newpath/src/NetPanzer/Views/Game/RankView.hpp
+   branches/newpath/src/NetPanzer/Views/MainMenu/HelpView.cpp
+   branches/newpath/support/icon/npicon.rc
+   branches/newpath/support/scripts/make-windows-binary.sh
+Log:
+Merged 0.8.4 fixes into newpath. For vehicles removed some timers and converted to counters.
+
+Modified: branches/newpath/SConstruct
+===================================================================
+--- branches/newpath/SConstruct	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/SConstruct	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -124,7 +124,7 @@
+     #crosslinuxenv.Append( _LIBFLAGS = [ '`' + crosslinuxenv['CXX'] + ' -print-file-name=libstdc++.a`' ] )
+     #crosslinuxenv.Prepend( _LIBFLAGS = [ '/usr/local/gcc/i686-linux/lib/gcc/i686-linux/4.2.4/../../../../i686-linux/lib/libstdc++.a' ] )
+     
+-
++env.Append( LINKFLAGS = [ '-static-libgcc' ] )
+ env['FINALBUILDDIR'] = 'build/' + env['mode'] + '/'
+ env['FINALLIBSDIR'] = env['FINALBUILDDIR'] + 'libs/'
+ crossmingwenv['FINALBUILDDIR'] = 'build/crossmingw/' + env['mode'] + '/'
+@@ -245,7 +245,8 @@
+ # for crossmingw platform
+ if 'crossmingw' in COMMAND_LINE_TARGETS:
+     crossmingwenv.ParseConfig(env['crossmingwsdlconfig'] + ' --cflags --libs')
+-    crossmingwenv.Append( NPLIBS = [ 'SDL_mixer' ] )
++    crossmingwenv.Prepend( _LIBFLAGS = [ '-L/usr/local/lib', '/usr/local/lib/SDL_mixer.lib' ] )
++#    crossmingwenv.Append( NPLIBS = [ '/usr/local/lib/SDL_mixer.lib' ] )
+ 
+ # for crosslinux platform
+ if 'crosslinux' in COMMAND_LINE_TARGETS:
+
+Modified: branches/newpath/scripts/servercommands.lua
+===================================================================
+--- branches/newpath/scripts/servercommands.lua	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/scripts/servercommands.lua	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -199,5 +199,16 @@
+                 end
+                 return counttime == 0;
+             end);
++    end,
++
++    flagtimer_help = &quot;sets the time for changing flag&quot;,
++    flagtimer = function(param, player)
++        if ( param == &quot;&quot; ) then
++            netpanzer.serversayto( player, &quot;flagtimer time is &quot; .. config.game.changeflagtime);
++        else
++            config.game.changeflagtime = param;
++            netpanzer.syncflagtimer();
++            netpanzer.serversayto( player, &quot;flagtimer time was set to &quot; .. config.game.changeflagtime);
++        end
+     end
+ };
+
+Modified: branches/newpath/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Bot/BotPlayer.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Bot/BotPlayer.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -32,7 +32,6 @@
+ #include &quot;Units/UnitBase.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Objectives/Objective.hpp&quot;
+-#include &quot;Units/Vehicle.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ //-----------------------------------------------------------------
+
+Modified: branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -188,3 +188,13 @@
+     elapsed_time = (time_t)htol32((Uint32)elapsedTime);
+ }
+ 
++Sint32 ConnectMesgServerGameSettings::getFlagTime() const
++{
++    return ltoh32(flag_time);
++}
++
++void ConnectMesgServerGameSettings::setFlagTime(Sint32 flagtime)
++{
++    flag_time = htol32(flagtime);
++}
++
+
+Modified: branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -185,6 +185,7 @@
+     Sint32  frag_limit;
+     Sint32  time_limit;
+     time_t   elapsed_time;
++    Sint32  flag_time;
+ 
+ public:
+     ConnectMesgServerGameSettings();
+@@ -206,6 +207,8 @@
+     void setTimeLimit(Sint32 timeLimit);
+     time_t getElapsedTime() const;
+     void setElapsedTime(time_t elapsedTime);
++    Sint32 getFlagTime() const;
++    void setFlagTime(Sint32 flagtime);
+ } __attribute__((packed));
+ 
+ class ConnectMesgClientGameSetupAck : public NetMessage
+
+Modified: branches/newpath/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -27,7 +27,8 @@
+        _net_message_id_player_sync_state,
+        _net_message_id_player_score_update,
+        _net_message_id_player_alliance_request,
+-       _net_message_id_player_alliance_update
++       _net_message_id_player_alliance_update,
++       _net_message_id_player_flagtimer_update
+      };
+ 
+ #ifdef MSVC
+@@ -207,6 +208,25 @@
+ }
+ __attribute__((packed));
+ 
++class PlayerFlagTimerUpdate : public NetMessage
++{
++public:
++    Uint16 flag_timer;
++
++    PlayerFlagTimerUpdate(Uint16 flagtimer)
++    {
++        message_class = _net_message_class_player;
++        message_id = _net_message_id_player_flagtimer_update;
++        flag_timer = flagtimer;
++    }
++    
++    Uint16 getflagtimer() const
++    {
++        return flag_timer;
++    }
++}
++__attribute__((packed));
++
+ #ifdef MSVC
+ #pragma pack()
+ #endif
+
+Modified: branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -56,8 +56,6 @@
+ 
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ 
+-#include &quot;Units/Vehicle.hpp&quot;
+-
+ #include &quot;Scripts/ScriptManager.hpp&quot;
+ 
+ WorldInputCmdProcessor COMMAND_PROCESSOR;
+@@ -94,7 +92,7 @@
+ 
+     lastSelectTimer.setTimeOut(400);
+     actionTimer.setTimeOut(100);
+-
++    Flagtimer.reset();
+ }
+ 
+ void
+@@ -324,13 +322,15 @@
+ WorldInputCmdProcessor::evaluateKeyCommands()
+ {
+     if (KeyboardInterface::isCharPressed('B') 
+-       &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() ) 
++       &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag()
++       &amp;&amp; ! Desktop::getVisible(&quot;HelpScrollView&quot;) )
+     {
+-        static NTimer Flagtimer(150000);
+-        if (Flagtimer.isTimeOut())
++        if ( Desktop::getVisible(&quot;GFlagSelectionView&quot;)
++            || GameConfig::game_changeflagtime == 0
++            || Flagtimer.checkWithTimeOut(GameConfig::game_changeflagtime * 60000)
++           )
+         {
+             Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
+-            Flagtimer.reset();
+         }
+     }
+     
+@@ -369,7 +369,8 @@
+         }
+     }
+ 
+-    if (KeyboardInterface::getKeyPressed(SDLK_F1)) {
++    if ( KeyboardInterface::getKeyPressed(SDLK_F1)
++       &amp;&amp; ! Desktop::getVisible(&quot;GFlagSelectionView&quot;) ) {
+         Desktop::toggleVisibility( &quot;HelpScrollView&quot; );
+     }
+     
+@@ -1056,10 +1057,11 @@
+ }
+ 
+ void
+-WorldInputCmdProcessor::process()
++WorldInputCmdProcessor::process(bool process_mouse)
+ {
+     evaluateKeyboardEvents();
+-    evaluateMouseEvents();
++    if ( process_mouse )
++        evaluateMouseEvents();
+ 
+     working_list.validateList();
+ }
+
+Modified: branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -102,9 +102,11 @@
+     static ObjectiveID selected_objective_id;
+ 
+ public:
++    NTimer Flagtimer;
++
+     WorldInputCmdProcessor();
+ 
+-    void process();
++    void process(bool process_mouse = true);
+ 
+     void inFocus();
+ 
+
+Modified: branches/newpath/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Core/NetworkGlobals.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Core/NetworkGlobals.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -19,7 +19,7 @@
+ #define __NETWORK_GLOBALS_HPP__
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+-#define NETPANZER_PROTOCOL_VERSION     1104
++#define NETPANZER_PROTOCOL_VERSION     1105
+ #define MASTERSERVER_PORT             28900
+ 
+ #endif
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -27,12 +27,12 @@
+ #include &quot;Console.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+-#define CommandMax 12
++#define CommandMax 13
+ 
+ std::string CommandList[CommandMax] = {
+     &quot;/server listcommands&quot;, &quot;/server adminlogin&quot;, &quot;/server unitspawnlist&quot;, &quot;/server unitprofiles&quot;,
+     &quot;/server listprofiles&quot;, &quot;/server kick&quot;, &quot;/server baselimit&quot;, &quot;/server gamepass&quot;,
+-    &quot;/server map &quot;, &quot;/server autokick&quot;, &quot;/server say&quot;, &quot;/server listplayers&quot;}; 
++    &quot;/server map &quot;, &quot;/server autokick&quot;, &quot;/server say&quot;, &quot;/server listplayers&quot;, &quot;/server flagtimer&quot;}; 
+ 
+ bool ConsoleInterface::stdout_pipe;
+ 
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/GameConfig.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Interfaces/GameConfig.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -57,6 +57,7 @@
+ NPString* GameConfig::game_unit_spawnlist = 0;
+ NPString* GameConfig::game_adminpass = 0;
+ NPString* GameConfig::game_gamepass = 0;
++int       GameConfig::game_changeflagtime = 15; // minutes
+ 
+ Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
+ 
+@@ -120,6 +121,7 @@
+     { &quot;unit_spawnlist&quot;,    GETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         GETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+     { &quot;gamepass&quot;,          GETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
++    { &quot;changeflagtime&quot;,    GETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime},
+     {0,0}
+ };
+ 
+@@ -134,6 +136,7 @@
+     { &quot;unit_spawnlist&quot;,    SETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         SETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+     { &quot;gamepass&quot;,          SETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
++    { &quot;changeflagtime&quot;,    SETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime },
+     {0,0}
+ };
+ 
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/GameConfig.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Interfaces/GameConfig.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -136,6 +136,7 @@
+     static NPString* game_unit_spawnlist; // &quot;,&quot; or space separated list with the numbers of each unit to spawn with
+     static NPString* game_adminpass;     // the secret password for admins
+     static NPString* game_gamepass;      // the secret password for entering game
++    static int       game_changeflagtime; // in minutes
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+ 
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -59,7 +59,6 @@
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Classes/Network/ConnectNetMessage.hpp&quot;
+-#include &quot;Units/Vehicle.hpp&quot;
+ #include &quot;Units/UnitGlobals.hpp&quot;
+ 
+ #include &quot;2D/Palette.hpp&quot;
+@@ -286,6 +285,7 @@
+         &lt;&lt; &quot;MaxPlayers: &quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;MaxUnits: &quot; &lt;&lt; gameconfig-&gt;maxunits &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;AutoKick: &quot; &lt;&lt; GameConfig::game_autokicktime &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;FlagTimer: &quot; &lt;&lt; GameConfig::game_changeflagtime &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;Gametype: &quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;ObjectivePercentage: &quot; &lt;&lt;
+             gameconfig-&gt;objectiveoccupationpercentage &lt;&lt; &quot;\n&quot;
+@@ -436,6 +436,7 @@
+     game_setup-&gt;setFragLimit(gameconfig-&gt;fraglimit);
+     game_setup-&gt;setTimeLimit(gameconfig-&gt;timelimit);
+     game_setup-&gt;setElapsedTime(getGameTime());
++    game_setup-&gt;setFlagTime(gameconfig-&gt;game_changeflagtime);
+ 
+     return game_setup;
+ }
+@@ -488,7 +489,7 @@
+     gameconfig-&gt;gametype = game_setup-&gt;getGameType();
+     gameconfig-&gt;fraglimit = game_setup-&gt;getFragLimit();
+     gameconfig-&gt;timelimit = game_setup-&gt;getTimeLimit();
+-
++    gameconfig-&gt;game_changeflagtime = game_setup-&gt;getFlagTime();
+     startGameTimer();
+     game_elapsed_time_offset = game_setup-&gt;getElapsedTime();
+ 
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -53,7 +53,6 @@
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Classes/Network/ConnectNetMessage.hpp&quot;
+-#include &quot;Units/Vehicle.hpp&quot;
+ #include &quot;Units/UnitGlobals.hpp&quot;
+ 
+ #include &quot;2D/Palette.hpp&quot;
+@@ -527,14 +526,24 @@
+         if (KeyboardInterface::getKeyPressed(SDLK_ESCAPE)) {
+             if (!Desktop::getView(&quot;OptionsView&quot;)-&gt;getVisible())
+             {
+-                
+-                View *v = Desktop::getView(&quot;OptionsView&quot;);
+-                assert(v != 0);
+-                ((OptionsTemplateView *)v)-&gt;initButtons();
+-                ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
++                if ( Desktop::getVisible(&quot;HelpScrollView&quot;) )
++                {
++                    Desktop::toggleVisibility(&quot;HelpScrollView&quot;);
++                }
++                else if ( Desktop::getVisible(&quot;GFlagSelectionView&quot;) )
++                {
++                    Desktop::toggleVisibility(&quot;GFlagSelectionView&quot;);
++                }
++                else
++                {
++                    View *v = Desktop::getView(&quot;OptionsView&quot;);
++                    assert(v != 0);
++                    ((OptionsTemplateView *)v)-&gt;initButtons();
++                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+ 
+-                Desktop::setVisibility(&quot;OptionsView&quot;, true);
+-                Desktop::setActiveView(&quot;OptionsView&quot;);
++                    Desktop::setVisibility(&quot;OptionsView&quot;, true);
++                    Desktop::setActiveView(&quot;OptionsView&quot;);
++                }
+             }
+             else
+             {
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -626,6 +626,11 @@
+         case _net_message_id_player_alliance_update :
+             netMessageAllianceUpdate(message);
+             break;
++
++        case _net_message_id_player_flagtimer_update :
++                const PlayerFlagTimerUpdate* pftu = (const PlayerFlagTimerUpdate*)message;
++                gameconfig-&gt;game_changeflagtime = pftu-&gt;getflagtimer();
++            break;
+     }
+ }
+ 
+@@ -649,3 +654,10 @@
+         SERVER-&gt;broadcastMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+     }
+ }
++
++void PlayerInterface::SyncFlagTimer()
++{
++    PlayerFlagTimerUpdate player_flagtimer_update(gameconfig-&gt;game_changeflagtime);
++    
++    SERVER-&gt;broadcastMessage(&amp;player_flagtimer_update, sizeof(PlayerFlagTimerUpdate));
++}
+
+Modified: branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -129,6 +129,8 @@
+     static bool testRuleObjectiveRatio( float precentage, PlayerState ** player_state );
+ 
+     static bool testRulePlayerRespawn( bool *completed, PlayerState **player_state );
++    
++    static void SyncFlagTimer();
+ 
+ protected:
+     static PlayerID respawn_rule_player_index;
+
+Modified: branches/newpath/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -231,6 +231,12 @@
+     return 1;
+ }
+ 
++static int npmodule_SyncFlagTimer (lua_State *L)
++{
++    PlayerInterface::SyncFlagTimer();
++    return 0;
++}
++
+ static const luaL_Reg npmodule[] =
+ {
+     {&quot;say&quot;,           npmodule_say},
+@@ -244,6 +250,7 @@
+     {&quot;map&quot;,           npmodule_map},
+     {&quot;listmaps&quot;,      npmodule_listMaps},
+     {&quot;listprofiles&quot;,  npmodule_listProfiles},
++    {&quot;syncflagtimer&quot;, npmodule_SyncFlagTimer},
+     {NULL, NULL}
+ };
+ 
+
+Modified: branches/newpath/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Units/Vehicle.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Units/Vehicle.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -135,7 +135,6 @@
+     body_anim_shadow.attachSprite( &amp;turret_anim, zero );
+     body_anim_shadow.attachSprite( &amp;select_info_box, zero );
+ 
+-    aiFsmMoveToLoc_wait_count = 0;
+ }
+ 
+ void Vehicle::setUnitProperties( unsigned char utype )
+@@ -896,7 +895,6 @@
+                 setFsmMoveMapSquare( aiFsmMoveToLoc_next_square );
+ 
+                 aiFsmMoveToLoc_state = _aiFsmMoveToLoc_move_wait;
+-                aiFsmMoveToLoc_wait_count = 0;
+             }
+             else
+             {
+@@ -913,7 +911,6 @@
+                         PathRequest path_request;
+                         path_request.set(id, aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_goal, 0, &amp;path, _path_request_full );
+                         PathScheduler::requestPath( path_request );
+-                        aiFsmMoveToLoc_wait_count = 0;
+                     }
+                     else
+                     {
+@@ -923,8 +920,6 @@
+                         PathRequest path_request;
+                         path_request.set(id, aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_goal, 0, &amp;path, _path_request_update );
+                         PathScheduler::requestPath( path_request );
+-                        // XXX the more times timeout the longer will take next time --&gt; bad idea
+-                        aiFsmMoveToLoc_wait_count = 0;
+                     }
+ 
+                     aiFsmMoveToLoc_state = _aiFsmMoveToLoc_path_generate;
+@@ -1561,7 +1556,6 @@
+     aiFsmMoveToLoc_next_marked = false;
+     ai_command_state = _ai_command_move_to_loc;
+     aiFsmMoveToLoc_state = _aiFsmMoveToLoc_path_generate;
+-    aiFsmMoveToLoc_wait_count = 0;
+ 
+     opcode_move_timer.changePeriod( 0.10f );
+     move_opcode_sent = false;
+
+Modified: branches/newpath/src/NetPanzer/Units/Vehicle.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Units/Vehicle.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Units/Vehicle.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -28,6 +28,24 @@
+ #include &quot;Classes/Sprite.hpp&quot;
+ #include &quot;Classes/SelectionBoxSprite.hpp&quot;
+ 
++class TimesCounter
++{
++public:
++    TimesCounter() : times(0), timeout(0) { }
++    TimesCounter(unsigned int timeout) : times(0), timeout(timeout) { }
++    ~TimesCounter() {}
++
++    bool isTimeOut() { return ++times &gt;= timeout; }
++    void reset() { times = 0; }
++
++    void setTimeOut( unsigned int timeout) { this-&gt;timeout = timeout; }
++
++
++private:
++    unsigned int times;
++    unsigned int timeout;
++};
++
+ enum { _control_move_map_square,
+        _control_turret_track_point,
+        _control_turret_track_target,
+
+Modified: branches/newpath/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Components/View.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Components/View.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -767,7 +767,7 @@
+ 
+     // Check all components for a dragged event.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++)
++    for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+     {        
+         if ((*i)-&gt;contains(newPos) &amp;&amp; (*i)-&gt;contains(downPos) &amp;&amp; newPos!=prevPos) {
+             mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_DRAGGED, now(), InputEvent::BUTTON1_MASK, newPos.x, newPos.y, 0, false);
+@@ -798,7 +798,7 @@
+ 
+     // Check all components for a pressed event.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++)
++    for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+     {        
+         if ((*i)-&gt;contains(pos)) {
+             mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_PRESSED, now(), InputEvent::BUTTON2_MASK, pos.x, pos.y, 0, false);
+@@ -821,7 +821,7 @@
+ 
+     // Check all components for a clicked event.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++)
++    for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+     {        
+         if ((*i)-&gt;contains(downPos) &amp;&amp; (*i)-&gt;contains(upPos)) {
+             mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_CLICKED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
+@@ -839,7 +839,7 @@
+     if (reportRelease) {
+         // Check all components for a release event.
+         ComponentsIterator i;
+-        for ( i=components.begin(); i != components.end(); i++)
++        for ( i=components.begin(); ! components.empty() &amp;&amp; i != components.end(); i++)
+         {        
+             if ((*i)-&gt;contains(upPos)) {
+                 mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_RELEASED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
+
+Modified: branches/newpath/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -103,16 +103,12 @@
+     View::doDraw(viewArea, clientArea);
+ } // end doDraw
+ 
+-class StatesSortByFrags
++class StatesSortByPoints
+     : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        if(state1-&gt;getKills() &gt; state2-&gt;getKills())
+-            return true;
+-        if(state1-&gt;getLosses() &lt; state2-&gt;getLosses())
+-            return true;
+-        return false;
++        return state1-&gt;getTotal() &gt; state2-&gt;getTotal();
+     }
+ };
+ 
+@@ -121,7 +117,9 @@
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        return state1-&gt;getObjectivesHeld() &gt; state2-&gt;getObjectivesHeld();
++        int p1 = state1-&gt;getObjectivesHeld();
++        int p2 = state2-&gt;getObjectivesHeld();
++        return p1 &gt; p2 || (p1 == p2 &amp;&amp; state1-&gt;getTotal() &gt; state2-&gt;getTotal() );
+     }
+ };
+ 
+@@ -151,7 +149,7 @@
+             break;
+         case _gametype_timelimit:
+         case _gametype_fraglimit:
+-            std::sort(states.begin(), states.end(), StatesSortByFrags());
++            std::sort(states.begin(), states.end(), StatesSortByPoints());
+             break;
+     }
+ 
+
+Modified: branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -23,6 +23,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+@@ -70,6 +71,7 @@
+             CLIENT-&gt;sendMessage(&amp;upf, sizeof(upf));
+ 
+             Desktop::setVisibility(&quot;GFlagSelectionView&quot;, false);
++            COMMAND_PROCESSOR.Flagtimer.reset();
+ //            PlayerInterface::getLocalPlayer()-&gt;setStateActive();
+         }
+         else
+@@ -174,3 +176,8 @@
+     resize(iXY(newResolution.x, newResolution.y));
+     moveTo(iXY(0,0));
+ }
++
++void GFlagSelectionView::processEvents()
++{
++    COMMAND_PROCESSOR.process(false);
++}
+
+Modified: branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Game/GFlagSelectionView.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -43,6 +43,8 @@
+     virtual void doDeactivate();
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void checkResolution(iXY oldResolution, iXY newResolution);
++    virtual void processEvents();
++
+     //virtual int  lMouseUp(const iXY &amp;downPos, const iXY &amp;upPos);
+     //virtual void drawBorder(Surface&amp; )
+     //{}
+
+Modified: branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -16,13 +16,12 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;HelpScrollView.hpp&quot;
+ #include &quot;GameView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+-
+ // HelpScrollView
+ //---------------------------------------------------------------------------
+ HelpScrollView::HelpScrollView() : SpecialButtonView()
+@@ -131,6 +130,7 @@
+     insert(&quot;  /server help                      Show Help window (same 'F1')&quot;);
+     insert(&quot;  /server map [map name]            Restart game with the given map&quot;);
+     insert(&quot;  /server autokick [timeout]        Show/set autokick for inactive players&quot;);
++    insert(&quot;  /server flagtimer [timeout]       Show/set flag change timer&quot;);
+     insert(&quot;  /server countdown [timeout]       Generate a countdown (same 'c')&quot;);
+     insert(&quot;  /server say [your talk]           Server say something in chat&quot;);
+     insert(&quot;  /server listplayers               List players with the assigned number&quot;);
+@@ -247,3 +247,10 @@
+ {
+     /* empty */
+ } // end HelpScrollView::doActivate
++
++void HelpScrollView::processEvents()
++{
++    if ( Desktop::getVisible(&quot;GameView&quot;) )
++        COMMAND_PROCESSOR.process(false);
++}
++
+
+Modified: branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -59,6 +59,8 @@
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void actionPerformed(mMouseEvent me);
+     virtual void doActivate();
++    virtual void processEvents();
++
+ }
+ ; // end HelpScrollView
+ 
+
+Modified: branches/newpath/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Game/RankView.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Game/RankView.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -30,6 +30,7 @@
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+ #include &quot;Views/Components/Label.hpp&quot;
+ 
+@@ -112,16 +113,12 @@
+     View::doDraw(viewArea, clientArea);
+ } // end doDraw
+ 
+-class StatesSortByFrags
++class StatesSortByPoints
+     : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        if(state1-&gt;getKills() &gt; state2-&gt;getKills())
+-            return true;
+-        if(state1-&gt;getLosses() &lt; state2-&gt;getLosses())
+-            return true;
+-        return false;
++        return state1-&gt;getTotal() &gt; state2-&gt;getTotal();
+     }
+ };
+ 
+@@ -130,7 +127,9 @@
+ {
+ public:
+     bool operator() (const PlayerState* state1, const PlayerState* state2) {
+-        return state1-&gt;getObjectivesHeld() &gt; state2-&gt;getObjectivesHeld();
++        int p1 = state1-&gt;getObjectivesHeld();
++        int p2 = state2-&gt;getObjectivesHeld();
++        return p1 &gt; p2 || (p1 == p2 &amp;&amp; state1-&gt;getTotal() &gt; state2-&gt;getTotal() );
+     }
+ };
+ 
+@@ -160,7 +159,7 @@
+             break;
+         case _gametype_timelimit:
+         case _gametype_fraglimit:
+-            std::sort(states.begin(), states.end(), StatesSortByFrags());
++            std::sort(states.begin(), states.end(), StatesSortByPoints());
+             break;
+     }
+ 
+@@ -269,3 +268,8 @@
+ {
+     selected_line = -1;
+ }
++
++void RankView::processEvents()
++{
++    COMMAND_PROCESSOR.process(false);
++}
+
+Modified: branches/newpath/src/NetPanzer/Views/Game/RankView.hpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/Game/RankView.hpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/Game/RankView.hpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -60,7 +60,7 @@
+     virtual void mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos);
+     virtual void doActivate();
+     virtual void doDeactivate();
+-//    virtual void processEvents();
++    virtual void processEvents();
+ }
+ ; // end _WIN
+ 
+
+Modified: branches/newpath/src/NetPanzer/Views/MainMenu/HelpView.cpp
+===================================================================
+--- branches/newpath/src/NetPanzer/Views/MainMenu/HelpView.cpp	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/src/NetPanzer/Views/MainMenu/HelpView.cpp	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -16,7 +16,6 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;HelpView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Game/GameView.hpp&quot;
+
+Modified: branches/newpath/support/icon/npicon.rc
+===================================================================
+--- branches/newpath/support/icon/npicon.rc	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/support/icon/npicon.rc	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -8,8 +8,8 @@
+ //
+ 
+ VS_VERSION_INFO VERSIONINFO
+- FILEVERSION 0,8,4,3
+- PRODUCTVERSION 0,8,4,3
++ FILEVERSION 0,8,4,0
++ PRODUCTVERSION 0,8,4,0
+  FILEFLAGSMASK 0x3fL
+  FILEFLAGS 0x0L
+  FILEOS 0x40004L
+@@ -22,12 +22,12 @@
+         BEGIN
+             VALUE &quot;CompanyName&quot;, &quot;\0&quot;
+             VALUE &quot;FileDescription&quot;, &quot;Multiplayer tank battle game\0&quot;
+-            VALUE &quot;FileVersion&quot;, &quot;0, 8, 4, 3\0&quot;
++            VALUE &quot;FileVersion&quot;, &quot;0, 8, 4\0&quot;
+             VALUE &quot;InternalName&quot;, &quot;NetPanzer\0&quot;
+             VALUE &quot;LegalCopyright&quot;, &quot;Copyright(c) 1998 Pyrosoft Inc. and nepanzer-devel team\0&quot;
+             VALUE &quot;OriginalFilename&quot;, &quot;NetPanzer.exe\0&quot;
+             VALUE &quot;ProductName&quot;, &quot;NetPanzer\0&quot;
+-            VALUE &quot;ProductVersion&quot;, &quot;0.8.4-RC3\0&quot;
++            VALUE &quot;ProductVersion&quot;, &quot;0.8.4\0&quot;
+         END
+     END
+     BLOCK &quot;VarFileInfo&quot;
+
+Modified: branches/newpath/support/scripts/make-windows-binary.sh
+===================================================================
+--- branches/newpath/support/scripts/make-windows-binary.sh	2011-12-24 02:24:39 UTC (rev 1315)
++++ branches/newpath/support/scripts/make-windows-binary.sh	2011-12-24 02:50:25 UTC (rev 1316)
+@@ -14,10 +14,10 @@
+ echo &quot;Making netPanzer windows version ${VERSION}&quot;
+ 
+ scons crossmingw \
+-      crossmingwcompilerprefix=i686-mingw32-\
+-      crossmingwsdlconfig=/usr/local/gcc/mingw-3.4.5/bin/sdl-config
++      crossmingwcompilerprefix=i586-mingw32msvc-\
++      crossmingwsdlconfig=/usr/local/bin/sdl-config-mingw
+ 
+-i686-mingw32-strip &quot;${EXENAME}&quot;
++i586-mingw32msvc-strip &quot;${EXENAME}&quot;
+ 
+ [ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
+ 
+@@ -27,8 +27,10 @@
+ support/scripts/copy_datafiles.sh &quot;${NPDEST}&quot;
+ support/scripts/copy_docfiles.sh &quot;${NPDEST}&quot;
+ 
+-cp /usr/local/gcc/mingw-3.4.5/usr/bin/SDL.dll &quot;${NPDEST}&quot;
+-cp /usr/local/gcc/mingw-3.4.5/usr/lib/*.dll &quot;${NPDEST}&quot;
++cp /usr/local/bin/SDL.dll &quot;${NPDEST}&quot;
++cp /usr/local/lib/*.dll &quot;${NPDEST}&quot;
++cp /usr/local/bin/README-SDL.txt &quot;${NPDEST}&quot;
++cp /usr/local/bin/README-SDL_mixer.txt &quot;${NPDEST}&quot;
+ 
+ [ ! -d &quot;${RELEASEDIR}&quot; ] &amp;&amp; mkdir &quot;${RELEASEDIR}&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000341.html">[Netpanzer-cvs] r1315 - tags/netpanzer/0.8.4
+</A></li>
+	<LI>Next message: <A HREF="000343.html">[Netpanzer-cvs] r1317 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#342">[ date ]</a>
+              <a href="thread.html#342">[ thread ]</a>
+              <a href="subject.html#342">[ subject ]</a>
+              <a href="author.html#342">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

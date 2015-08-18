@@ -1,0 +1,395 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1000 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/Classes
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1000%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Util%0A%09src/NetPanzer/Classes&In-Reply-To=%3C200709161442.l8GEg5cO008063%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000043.html">
+   <LINK REL="Next"  HREF="000045.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1000 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/Classes</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1000%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Util%0A%09src/NetPanzer/Classes&In-Reply-To=%3C200709161442.l8GEg5cO008063%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1000 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/Classes">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 16 16:42:05 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000043.html">[Netpanzer-cvs] r999 - in trunk/netpanzer: . src/NetPanzer/Classes
+</A></li>
+        <LI>Next message: <A HREF="000045.html">[Netpanzer-cvs] r1001 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#44">[ date ]</a>
+              <a href="thread.html#44">[ thread ]</a>
+              <a href="subject.html#44">[ subject ]</a>
+              <a href="author.html#44">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-09-16 16:42:05 +0200 (Sun, 16 Sep 2007)
+New Revision: 1000
+
+Added:
+   trunk/netpanzer/src/Lib/Util/NTimer.hpp
+Modified:
+   trunk/netpanzer/BUGS
+   trunk/netpanzer/ChangeLog
+   trunk/netpanzer/TODO
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+Log:
+- double click one unit selects all units in screen of same type
+
+Modified: trunk/netpanzer/BUGS
+===================================================================
+--- trunk/netpanzer/BUGS	2007-09-16 03:51:02 UTC (rev 999)
++++ trunk/netpanzer/BUGS	2007-09-16 14:42:05 UTC (rev 1000)
+@@ -1,3 +1,4 @@
++- cursor scroll is always same speed, should use scrollrate
+ - when a client connect to a server, it will save the configuration that
+   the server sent to him when exit netpanzer.
+ - sometimes 2 players spawn at the same place - hard to fix, low priority
+
+Modified: trunk/netpanzer/ChangeLog
+===================================================================
+--- trunk/netpanzer/ChangeLog	2007-09-16 03:51:02 UTC (rev 999)
++++ trunk/netpanzer/ChangeLog	2007-09-16 14:42:05 UTC (rev 1000)
+@@ -1,8 +1,8 @@
+ 16-Sep-2006 by Aaron Perez
+ - added a timer to the right click function to unselect units only if some
+   time passed. (100 miliseconds)
+-- units are selecte while moving the mouse on real time
+-- double-click will select all units in screen
++- units are selected while moving the mouse on real time
++- double-click will select all units in screen of the same type
+ 
+ 15-Sep-2007 by Aaron Perez
+ - fixed problem when starting a game with more than 255 initial units.
+
+Modified: trunk/netpanzer/TODO
+===================================================================
+--- trunk/netpanzer/TODO	2007-09-16 03:51:02 UTC (rev 999)
++++ trunk/netpanzer/TODO	2007-09-16 14:42:05 UTC (rev 1000)
+@@ -2,11 +2,6 @@
+ -after having a full nodelist in A* the server is getting slow
+     - no idea how to solve this, have to leave it open I guess...
+ -create a new netpanzer-music package which adds pronobozos music to the game
+--shorten time netpanzer is trying to access the masterserver
+--compile SDL_mixer on windows with mp3 and ogg support
+--make sure flag resolution works correctly (2 players with same flags). Someone
+-reported that after someone else joined he could only build panzers with
+-different flags, while his old tanks stayed the same.
+ -you get wrong capture messages when capturing an outpost that belonged to a
+ player that just left the game.
+ 
+@@ -22,23 +17,11 @@
+ *** New Masterserver code
+  * Create UDP broadcast code for LAN games
+ 
+-*** Network
+- * Analyse if TCP was really a good choice. Question:
+-    - what happens if a client can't keep up with the bandwith, will it stall
+-      the server? (kromxp: no, it will be dropped from server)
+- * An UDP protocol would need to be designed (taking a look at TNL or raknet
+-   would also be a good idea)
+-
+ *** Server related
+  * refactor bot code, so that it is possible to directly spawn bots at the
+    server, after that we could easily add a &quot;Skirmish&quot; button to the main menu.
+  * let dedicated server output statistics on console or in some log files. 
+-   Also all message should be outputted with timestamps.
+-   So that you can generate nice html pages with statistics of the players :)
+-    - done
+  * the Server has a massive memory leak somewhere - might be fixed now
+- * impelement 'initialunits' param in PlayerUnitConfig::initialize()
+-     - kromxp: this is done, but in other way.
+  * synchronize resources between server and clients, both should have same flags
+    collection and map. Let them automatically download these things.
+  * server console doesn't react really way with all the messages of players
+@@ -50,7 +33,6 @@
+  * Convert the 256 color stuff to truecolor, usage of opengl is probably a good
+    idea.
+  * bots should have different names and different flags - partly implemented
+- * make it possible to have different colors for different players - DONE
+  * display alliances in the status screens.
+  * think about setting unit spawnpoint/opening outpost view. It's very hard to
+    select units standing in your base because of the other 2 functions.
+@@ -62,16 +44,12 @@
+  * Display tip of the day while loading the map.
+  * Improve userinterface:
+  * Make usual shortcuts (known from other RTSes) work:
+-  -CTRL+Number for defining groups - done
+-  -pressing a number twice to center screen on the group - done
+-  -Scroll map with right mouse - done
+-  -scrolling map with cursor keys
+-  -Space jumps to last action - done
+   -a key to cycle through all (offline) outposts
+   -add possibilty for setting waypoints (ALT+leftclick?)
+   -add possibility to set markers for allies
+-  -double clicking on a unit marks all units of the same type on screen
+-    (tripple clicking marks all units of this type on the map?)
++  -double clicking on a unit marks all units of the same type on screen -done
++    (tripple clicking marks all units of this type on the map?
++     or all units in screen?)
+   -&quot;subclassing&quot; like in WC3: A key that cycles though different unit types in
+    the currently selected group.
+   - S key stops tanks
+@@ -118,5 +96,3 @@
+    defend an objective would be things that come to mind
+  * make panzers always hit their targets instead of missing moving units?
+ 
+-kromxp:
+-   wow i have also many of the same ideas explained here.
+
+Added: trunk/netpanzer/src/Lib/Util/NTimer.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/NTimer.hpp	2007-09-16 03:51:02 UTC (rev 999)
++++ trunk/netpanzer/src/Lib/Util/NTimer.hpp	2007-09-16 14:42:05 UTC (rev 1000)
+@@ -0,0 +1,45 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef _NTIMER_HPP_
++#define _NTIMER_HPP_
++
++#include &quot;SDL.h&quot;
++
++class NTimer
++{
++public:
++    NTimer() : starttime(0), timeout(0) {};
++    NTimer(Uint32 t) : starttime(0), timeout(t) {};
++    
++    inline void reset()              { starttime = SDL_GetTicks(); }
++
++    inline Uint32 getStartTime()     { return starttime; }
++
++    inline void setTimeOut(Uint32 t) { timeout = t; }
++
++    inline Uint32 getTimeOut()       { return timeout; }
++    
++    inline bool isTimeOut() { return (SDL_GetTicks()-starttime)&gt;timeout; }
++    
++private:
++    Uint32 starttime;
++    Uint32 timeout;
++};
++
++#endif // _NTIMER_HPP_
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2007-09-16 03:51:02 UTC (rev 999)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2007-09-16 14:42:05 UTC (rev 1000)
+@@ -20,6 +20,8 @@
+ #include &quot;UnitInterface.hpp&quot;
+ #include &quot;PlayerInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;UnitBase.hpp&quot;
++#include &quot;WorldViewInterface.hpp&quot;
+ #include &lt;algorithm&gt;
+ 
+ bool SelectionList::selectUnit(iXY point)
+@@ -89,6 +91,49 @@
+     return true;
+ }
+ 
++bool SelectionList::selectSameTypeVisible( iXY point, bool addunits)
++{
++    Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
++
++    if(!addunits) {
++        deselect();
++        unit_list.clear();
++    }
++
++    std::vector&lt;UnitID&gt; temp_list;
++
++    UnitInterface::queryUnitsAt(temp_list, point, player_id, _search_player);
++    
++    if ( temp_list.empty() )
++        return false;
++        
++    unsigned char t=UnitInterface::getUnit(temp_list[0])-&gt;unit_state.unit_type;
++    temp_list.clear();
++    
++    iRect wr;
++    WorldViewInterface::getViewWindow(&amp;wr);
++    UnitInterface::queryUnitsAt(temp_list, wr, player_id, _search_player);
++    
++    int p = temp_list.size();
++    if ( !p )
++        return false;
++
++    p--;
++    do {
++        if ( UnitInterface::getUnit(temp_list[p])-&gt;unit_state.unit_type == t)
++            unit_list.push_back(temp_list[p]);
++    } while (p--);
++
++    temp_list.clear();
++    
++    select();
++    if (unit_list.size() == 0)
++        return false;
++    
++    resetUnitCycling();
++    return true;
++}
++
+ void SelectionList::select()
+ {
+     unsigned long id_list_index;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp	2007-09-16 03:51:02 UTC (rev 999)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp	2007-09-16 14:42:05 UTC (rev 1000)
+@@ -40,6 +40,7 @@
+     bool selectTarget( iXY point );
+ 
+     bool selectBounded(iRect bounds, bool addunits);
++    bool selectSameTypeVisible(iXY point, bool addunits);
+ 
+     bool isSelected()
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-09-16 03:51:02 UTC (rev 999)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-09-16 14:42:05 UTC (rev 1000)
+@@ -39,7 +39,7 @@
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;ScreenSurface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ #include &quot;GameConfig.hpp&quot;
+ 
+@@ -612,29 +612,20 @@
+         
+         click_status = getCursorStatus(world_pos);
+         switch(click_status) {
+-            case _cursor_player_unit:
+-                static Timer dclick_timer;
++            case _cursor_player_unit: {
++                static NTimer dclick_timer(200);
++                bool addunits = false;
+                 if( (KeyboardInterface::getKeyState(SDLK_LSHIFT) == true) ||
+                         (KeyboardInterface::getKeyState(SDLK_RSHIFT) == true)) {
+-                    if ( ! dclick_timer.count() ) {
+-                        iRect wr;
+-                        WorldViewInterface::getViewWindow(&amp;wr);
+-                        working_list.selectBounded(wr,true);
+-                        LOGGER.warning(&quot;Selected %d units(Added)&quot;, working_list.unit_list.size());
+-                        break;
+-                    } else {
+-                        working_list.addUnit(world_pos);
+-                    }
++                    addunits = true;
++                }
++                if ( ! dclick_timer.isTimeOut() ) {
++                    working_list.selectSameTypeVisible(world_pos,addunits);
++                    break;
++                } else if (addunits) {
++                    working_list.addUnit(world_pos);
+                 } else {
+-                    if ( ! dclick_timer.count() ) {
+-                        iRect wr;
+-                        WorldViewInterface::getViewWindow(&amp;wr);
+-                        working_list.selectBounded(wr,false);
+-                        LOGGER.warning(&quot;Selected %d units&quot;, working_list.unit_list.size());
+-                        break;
+-                    } else {
+-                        working_list.selectUnit(world_pos );
+-                    }
++                    working_list.selectUnit(world_pos );
+                 }
+ 
+                 current_selection_list_bits=0;
+@@ -645,9 +636,9 @@
+                     if(unit)
+                         unit-&gt;soundSelected();
+                 }
+-                dclick_timer.changePeriod(0.2);
++                dclick_timer.reset();
+                 break;
+-
++            } // case
+             case _cursor_move:
+             case _cursor_blocked:
+                 if(outpost_goal_selection == -1)
+@@ -672,18 +663,18 @@
+ void
+ WorldInputCmdProcessor::evalRightMButtonEvents(const MouseEvent&amp; event)
+ {
+-    static Timer mtimer;
++    static NTimer mtimer(100);
+     if (event.event == MouseEvent::EVENT_DOWN ) {
+         right_mouse_scroll=true;
+         right_mouse_scroll_pos=event.pos;
+         right_mouse_scrolled_pos.x=right_mouse_scrolled_pos.y=0;
+-        mtimer.changePeriod(0.1);
++        mtimer.reset();
+     }
+     if (right_mouse_scroll &amp;&amp; event.event == MouseEvent::EVENT_UP ) {
+         right_mouse_scroll=false;
+         if ( right_mouse_scrolled_pos.x==0 
+                             &amp;&amp; right_mouse_scrolled_pos.y==0
+-                            &amp;&amp; mtimer.count() ) {
++                            &amp;&amp; mtimer.isTimeOut() ) {
+             // simple right click on the same position
+             working_list.unGroup();
+         }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000043.html">[Netpanzer-cvs] r999 - in trunk/netpanzer: . src/NetPanzer/Classes
+</A></li>
+	<LI>Next message: <A HREF="000045.html">[Netpanzer-cvs] r1001 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#44">[ date ]</a>
+              <a href="thread.html#44">[ thread ]</a>
+              <a href="subject.html#44">[ subject ]</a>
+              <a href="author.html#44">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

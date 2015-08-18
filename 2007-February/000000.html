@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r953 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Classes/Units NetPanzer/Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r953%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes%20NetPanzer/Classes/Network%0A%09NetPanzer/Classes/Units%20NetPanzer/Interfaces&In-Reply-To=%3C200702031200.l13C0rHb020985%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000001.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r953 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Classes/Units NetPanzer/Interfaces</H1>
+    <B>matzebraun at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r953%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes%20NetPanzer/Classes/Network%0A%09NetPanzer/Classes/Units%20NetPanzer/Interfaces&In-Reply-To=%3C200702031200.l13C0rHb020985%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r953 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Classes/Units NetPanzer/Interfaces">matzebraun at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb  3 13:00:53 CET 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000001.html">[Netpanzer-cvs] r954 - trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: matzebraun
+Date: 2007-02-03 13:00:52 +0100 (Sat, 03 Feb 2007)
+New Revision: 953
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/PackedSurface.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/UnitMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+Log:
+- fix server+client not checking transmitted flag (this fixes that DOS reported by Luigi Auriemma)
+- fix a bunch of warnings 
+
+
+
+Modified: trunk/netpanzer/src/Lib/2D/PackedSurface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/PackedSurface.cpp	2006-05-01 21:42:38 UTC (rev 952)
++++ trunk/netpanzer/src/Lib/2D/PackedSurface.cpp	2007-02-03 12:00:52 UTC (rev 953)
+@@ -215,7 +215,7 @@
+ 	//fps = float(file-&gt;readSLE32()) / 65536;
+ 	// XXX is this correct?!?
+ 	int32_t fpsint = file-&gt;readSLE32();
+-	fps = * ((float*) &amp;fpsint);
++	fps = * ((float*) (void*) &amp;fpsint);
+ 	offset.x = file-&gt;readSLE32();
+ 	offset.y = file-&gt;readSLE32();
+     
+@@ -257,9 +257,8 @@
+ 	file-&gt;writeSLE32(pix.x);
+ 	file-&gt;writeSLE32(pix.y);
+     
+-	// XXX bad not endian safe :-/
+ 	// is this correct?!?
+-	file-&gt;writeSLE32( *((uint32_t*) (&amp;fps)) );
++	file-&gt;writeSLE32( *((uint32_t*) (void*) (&amp;fps)) );
+ 
+ 	file-&gt;writeSLE32(offset.x);
+ 	file-&gt;writeSLE32(offset.y);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2006-05-01 21:42:38 UTC (rev 952)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-02-03 12:00:52 UTC (rev 953)
+@@ -28,6 +28,7 @@
+ #include &quot;NetworkServer.hpp&quot;
+ #include &quot;GameManager.hpp&quot;
+ #include &quot;GameConfig.hpp&quot;
++#include &quot;SelectionBoxSprite.hpp&quot;
+ 
+ #include &quot;PlayerNetMessage.hpp&quot;
+ #include &quot;ConnectNetMessage.hpp&quot;
+@@ -337,7 +338,13 @@
+             client_setting = (ConnectClientSettings *) message;
+             connect_player_state-&gt;setName( client_setting-&gt;player_name );
+             connect_player_state-&gt;unit_config.setUnitColor( client_setting-&gt;unit_color );
+-            connect_player_state-&gt;setFlag( client_setting-&gt;getPlayerFlag() );
++			uint8_t flag = (uint8_t) client_setting-&gt;getPlayerFlag();
++			if(flag &lt; UNIT_FLAGS_SURFACE.getFrameCount()) {
++				connect_player_state-&gt;setFlag(flag);
++			} else {
++				connect_player_state-&gt;setFlag(0);
++				LOGGER.warning(&quot;Invalid flag number received&quot;);
++		 	}
+ 
+             connect_player_state-&gt;setID( connect_player_id.getNetworkID() );
+             connect_player_state-&gt;setStatus( _player_state_connecting );
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2006-05-01 21:42:38 UTC (rev 952)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2007-02-03 12:00:52 UTC (rev 953)
+@@ -16,8 +16,11 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ #include &lt;config.h&gt;
++
+ #include &quot;Util/Endian.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ #include &quot;PlayerState.hpp&quot;
++#include &quot;SelectionBoxSprite.hpp&quot;
+ 
+ uint16_t NetworkPlayerState::getPlayerIndex() const
+ {
+@@ -259,6 +262,7 @@
+ 
+ void PlayerState::setFlag(unsigned char flag)
+ {
++	assert(flag &lt; UNIT_FLAGS_SURFACE.getFrameCount());
+     PlayerState::flag = flag;
+ }
+ 
+@@ -298,7 +302,12 @@
+     memcpy(tmp, state-&gt;name, 64); 
+     tmp[63] = 0;
+     name = tmp;
+-    flag = state-&gt;flag;
++	if(state-&gt;flag &lt; UNIT_FLAGS_SURFACE.getFrameCount()) {
++		flag = state-&gt;flag;
++	} else {
++		flag = 0;
++		LOGGER.warning(&quot;Invalid flag number received&quot;);
++	}
+     ID.setIndex(ltoh16(state-&gt;playerindex_id));
+     status = state-&gt;status;
+     kills = ltoh16(state-&gt;kills);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2006-05-01 21:42:38 UTC (rev 952)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2007-02-03 12:00:52 UTC (rev 953)
+@@ -54,7 +54,7 @@
+ 
+ PlayerUnitConfig::PlayerUnitConfig()
+ {
+-    initialize(10000);
++    initialize(9);
+ }
+ 
+ void PlayerUnitConfig::initialize( unsigned char max_allowed_units )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/UnitMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/UnitMessage.hpp	2006-05-01 21:42:38 UTC (rev 952)
++++ trunk/netpanzer/src/NetPanzer/Classes/UnitMessage.hpp	2007-02-03 12:00:52 UTC (rev 953)
+@@ -45,7 +45,7 @@
+ public:
+     UnitMessage()
+     {
+-        this-&gt;unit_id = 0xBADBADBA;
++        this-&gt;unit_id = 0xBADB;
+         message_id = 0;
+         message_flags = 0;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Units/Vehicle.cpp	2006-05-01 21:42:38 UTC (rev 952)
++++ trunk/netpanzer/src/NetPanzer/Classes/Units/Vehicle.cpp	2007-02-03 12:00:52 UTC (rev 953)
+@@ -346,7 +346,7 @@
+ 
+ void Vehicle::setFsmMoveMapSquare( unsigned long square )
+ {
+-    long goal_angle;
++    long goal_angle = 0;
+     long delta;
+     unsigned short rotation;
+ 
+@@ -1297,7 +1297,7 @@
+ void Vehicle::aiFsmManualMove()
+ {
+     bool end_cycle = false;
+-    signed char offset_x, offset_y;
++    signed char offset_x = 0, offset_y = 0;
+     size_t next_square;
+ 
+     do {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2006-05-01 21:42:38 UTC (rev 952)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2007-02-03 12:00:52 UTC (rev 953)
+@@ -196,7 +196,7 @@
+     do {
+         switch ( pathing_fsm_state ) {
+         case _pathing_fsm_state_initialize : {
+-                unsigned long abs_new_goal;
++                unsigned long abs_new_goal = 0;
+                 iXY new_goal;
+                 unsigned long path_length;
+ 
+@@ -249,7 +249,7 @@
+     do {
+         switch ( pathing_fsm_state ) {
+         case _pathing_fsm_state_initialize_part_a : {
+-                unsigned long abs_new_goal;
++                unsigned long abs_new_goal = 0;
+                 iXY new_goal;
+ 
+                 working_start = path_request.start;
+@@ -282,7 +282,7 @@
+ 
+ 
+         case _pathing_fsm_state_initialize_part_b : {
+-                unsigned long abs_new_goal;
++                unsigned long abs_new_goal = 0;
+                 iXY new_goal;
+ 
+                 for ( unsigned long i = 0; i &lt; path_splice_length; i++ ) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000001.html">[Netpanzer-cvs] r954 - trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

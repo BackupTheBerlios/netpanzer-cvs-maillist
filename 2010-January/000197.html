@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1169 - in trunk/netpanzer: . scripts	src/NetPanzer/Scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1169%20-%20in%20trunk/netpanzer%3A%20.%20scripts%0A%09src/NetPanzer/Scripts&In-Reply-To=%3C201001100310.o0A3AEDV023441%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000196.html">
+   <LINK REL="Next"  HREF="000198.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1169 - in trunk/netpanzer: . scripts	src/NetPanzer/Scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1169%20-%20in%20trunk/netpanzer%3A%20.%20scripts%0A%09src/NetPanzer/Scripts&In-Reply-To=%3C201001100310.o0A3AEDV023441%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1169 - in trunk/netpanzer: . scripts	src/NetPanzer/Scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 10 04:10:14 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000196.html">[Netpanzer-cvs] r1168 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+        <LI>Next message: <A HREF="000198.html">[Netpanzer-cvs] r1170 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#197">[ date ]</a>
+              <a href="thread.html#197">[ thread ]</a>
+              <a href="subject.html#197">[ subject ]</a>
+              <a href="author.html#197">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-10 04:10:05 +0100 (Sun, 10 Jan 2010)
+New Revision: 1169
+
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/scripts/usercommands.lua
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+Log:
+- Added adam85's patch for missing includes and usercommands changes.
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2010-01-09 20:07:05 UTC (rev 1168)
++++ trunk/netpanzer/SConstruct	2010-01-10 03:10:05 UTC (rev 1169)
+@@ -204,9 +204,9 @@
+ # Configure Environments
+ ################################################################
+ 
+-env.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/lib/physfs', 'src/Lib/lua', 'src/Lib/toluapp'] )
+-crossmingwenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/lib/physfs', 'src/Lib/lua', 'src/Lib/toluapp'])
+-crosslinuxenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/lib/physfs', 'src/Lib/lua', 'src/Lib/toluapp'])
++env.Append(           CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/lib/physfs', 'src/Lib/lua', 'src/Lib/toluapp'] )
++crossmingwenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/lib/physfs', 'src/Lib/lua', 'src/Lib/toluapp'] )
++crosslinuxenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/lib/physfs', 'src/Lib/lua', 'src/Lib/toluapp'] )
+ 
+ # for this platform
+ if thisplatform == 'darwin':
+@@ -247,15 +247,17 @@
+ ################################################################
+ 
+ # BUILDS NETWORK
+-MakeStaticLib(networkenv, 'npnetwork', 'Network', '*.cpp')
++MakeStaticLib(          networkenv, 'npnetwork', 'Network', '*.cpp')
+ MakeStaticLib(crossmingwnetworkenv, 'npnetwork', 'Network', '*.cpp')
+ MakeStaticLib(crosslinuxnetworkenv, 'npnetwork', 'Network', '*.cpp')
+ 
+ # BUILDS LUA
+-luaenv.Append( CPPPATH = [ 'src/Lib/lua', 'src/Lib/toluapp'] )
+-MakeStaticLib(luaenv, 'nplua', 'lua toluapp', '*.c')
+-MakeStaticLib(crossmingwluaenv, 'nplua', 'lua', '*.c')
+-MakeStaticLib(crosslinuxluaenv, 'nplua', 'lua', '*.c')
++luaenv.Append(           CPPPATH = [ 'src/Lib/lua', 'src/Lib/toluapp'] )
++crossmingwluaenv.Append( CPPPATH = [ 'src/Lib/lua', 'src/Lib/toluapp'] )
++crosslinuxluaenv.Append( CPPPATH = [ 'src/Lib/lua', 'src/Lib/toluapp'] )
++MakeStaticLib(          luaenv, 'nplua', 'lua toluapp', '*.c')
++MakeStaticLib(crossmingwluaenv, 'nplua', 'lua toluapp', '*.c')
++MakeStaticLib(crosslinuxluaenv, 'nplua', 'lua toluapp', '*.c')
+ 
+ # BUILDS PHYSFS
+ physfsenv.Append( CFLAGS = '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -DPHYSFS_NO_CDROM_SUPPORT=1' )
+@@ -274,7 +276,11 @@
+ env.Append( CFLAGS = '-DZ_PREFIX=1' )
+ env.Append( CPPPATH = 'src/Lib/physfs/zlib123' )
+ MakeStaticLib(env, 'np2d', '2D 2D/libpng', '*.c*')
++crossmingwenv.Append( CFLAGS = '-DZ_PREFIX=1' )
++crossmingwenv.Append( CPPPATH = 'src/Lib/physfs/zlib123' )
+ MakeStaticLib(crossmingwenv, 'np2d', '2D 2D/libpng', '*.c*')
++crosslinuxenv.Append( CFLAGS = '-DZ_PREFIX=1' )
++crosslinuxenv.Append( CPPPATH = 'src/Lib/physfs/zlib123' )
+ MakeStaticLib(crosslinuxenv, 'np2d', '2D 2D/libpng', '*.c*')
+ 
+ # BUILDS REST OF LIBRARIES
+@@ -303,7 +309,7 @@
+     
+ crosslinuxenv.Append( NPSOURCES = globSources(crosslinuxenv, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;) )
+ 
+-env.Append( NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
++env.Append(           NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
+ crossmingwenv.Append( NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
+ crosslinuxenv.Append( NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
+ 
+@@ -316,7 +322,7 @@
+ if crosslinuxenv.has_key('LIBS'):
+     crosslinuxenv.Append( NPLIBS = crosslinuxenv['LIBS'] )
+ 
+-env.Append( NPLIBPATH = env['FINALLIBSDIR'] )
++env.Append(           NPLIBPATH =           env['FINALLIBSDIR'] )
+ crossmingwenv.Append( NPLIBPATH = crossmingwenv['FINALLIBSDIR'] )
+ crosslinuxenv.Append( NPLIBPATH = crosslinuxenv['FINALLIBSDIR'] )
+ 
+
+Modified: trunk/netpanzer/scripts/usercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/usercommands.lua	2010-01-09 20:07:05 UTC (rev 1168)
++++ trunk/netpanzer/scripts/usercommands.lua	2010-01-10 03:10:05 UTC (rev 1169)
+@@ -63,8 +63,11 @@
+         local ps = PlayerInterface:getLocalPlayer();
+         ConsoleInterface:post( Color.cyan, true, ps:getFlag(), &quot;Your name is &quot; .. ps:getName());
+         ConsoleInterface:post( Color.cyan, false, 0, &quot;Your id is &quot; .. ps:getID());
+-        ConsoleInterface:post( Color.cyan, false, 0, &quot;Your have &quot; .. ps:getObjectivesHeld() .. &quot; bases&quot;);
++        local numOb = ps:getObjectivesHeld();
++        if (numOb == 0) then ConsoleInterface:post( Color.cyan, false, 0, &quot;You have'nt bases&quot;)
++        elseif (numOb == 1) then ConsoleInterface:post( Color.cyan, false, 0, &quot;You have 1 base&quot;)
++    	else ConsoleInterface:post( Color.cyan, false, 0, &quot;You have &quot; .. numOb .. &quot; bases&quot;) end
+     end
+-
++    
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-09 20:07:05 UTC (rev 1168)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-10 03:10:05 UTC (rev 1169)
+@@ -18,6 +18,10 @@
+  * Created on October 8, 2008, 10:53 PM
+  */
+ 
++#include &lt;iostream&gt;
++#include &lt;stdio.h&gt;
++#include &lt;string.h&gt;
++
+ #include &quot;ScriptHelper.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000196.html">[Netpanzer-cvs] r1168 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+	<LI>Next message: <A HREF="000198.html">[Netpanzer-cvs] r1170 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#197">[ date ]</a>
+              <a href="thread.html#197">[ thread ]</a>
+              <a href="subject.html#197">[ subject ]</a>
+              <a href="author.html#197">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,1096 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1423 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Network web
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1423%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Network%20web&In-Reply-To=%3C20121223164217.1CC7A55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1423 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Network web</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1423%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Network%20web&In-Reply-To=%3C20121223164217.1CC7A55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1423 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Network web">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sun Dec 23 17:42:16 CET 2012</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#447">[ date ]</a>
+              <a href="thread.html#447">[ thread ]</a>
+              <a href="subject.html#447">[ subject ]</a>
+              <a href="author.html#447">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-12-23 17:42:16 +0100 (Sun, 23 Dec 2012)
+New Revision: 1423
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.cpp
+   trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.hpp
+   trunk/netpanzer/web/
+   trunk/netpanzer/web/index.html
+   trunk/netpanzer/web/netpanzer.png
+Modified:
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+Log:
+Add little http server sharing the game port (default=3030).
+
+Currently for testing it can download files under the web folder.
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2012-10-31 21:08:26 UTC (rev 1422)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -74,6 +74,16 @@
+     doClose();
+ }
+ 
++void
++TCPSocket::changeObserver(TCPSocketObserver* o)
++{
++    observer = o;
++    if ( observer )
++    {
++        observer-&gt;onConnected(this);
++    }
++}
++
+ size_t
+ TCPSocket::send(const void* data, size_t size)
+ {
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2012-10-31 21:08:26 UTC (rev 1422)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -45,11 +45,12 @@
+ public:
+ //    TCPSocket(const Address&amp; bindaddr, const Address&amp; address, bool blocking = true);
+ 
+-
+     TCPSocket(const Address&amp; address, TCPSocketObserver *o) throw(NetworkException);
+     TCPSocket(const std::string&amp; host,const std::string&amp; port, TCPSocketObserver *o) throw(NetworkException);
+ 
+     void destroy();
++    
++    void changeObserver(TCPSocketObserver *o);
+ 
+     size_t send(const void* data, size_t datasize);
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-10-31 21:08:26 UTC (rev 1422)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -40,6 +40,8 @@
+ #include &quot;Network/TCPSocket.hpp&quot;
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+ 
++#include &quot;Network/HTTPServerSocket.hpp&quot;
++
+ NetworkServer* SERVER = 0;
+ 
+ NetworkServer::NetworkServer()
+@@ -247,6 +249,15 @@
+         (*i)-&gt;sendRemaining();
+         i++;
+     }
++    
++    HTTPList::iterator h = http_list.begin(),
++                       x = http_list.end();
++    
++    while ( h != x )
++    {
++        (*h)-&gt;work();
++        h++;
++    }
+ }
+ 
+ bool
+@@ -304,7 +315,9 @@
+ {
+     (void)so;
+     (void)fromaddr;
+-    return new ClientSocket(this);
++    HTTPServerSocket * hss = new HTTPServerSocket();
++    http_list.push_back(hss);
++    return hss;
+ }
+ 
+ void
+@@ -397,3 +410,9 @@
+         }
+     }
+ }
++
++void NetworkServer::onHTTPServerSocketDisconnected(HTTPServerSocket* socket)
++{
++    http_list.remove(socket);
++    delete(socket);
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2012-10-31 21:08:26 UTC (rev 1422)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -27,18 +27,22 @@
+ 
+ using namespace network;
+ 
++class HTTPServerSocket;
++
+ class NetworkServer : public NetworkInterface,
+                       public TCPListenSocketObserver,
+                       public ClientSocketObserver
+ {
+ protected:
+     typedef std::list&lt;ClientSocket*&gt; ClientList;
++    typedef std::list&lt;HTTPServerSocket*&gt; HTTPList;
++    
+     ClientList client_list;
++    HTTPList http_list;
+ 
+     void updateKeepAliveState();
+     void resetClientList();
+ 
+-    
+ public:
+     NetworkServer();
+     virtual ~NetworkServer();
+@@ -66,7 +70,9 @@
+     void kickClient(const PlayerID index);
+ 
+     std::string getIP(const PlayerID player_index);
+-
++    
++    void onHTTPServerSocketDisconnected(HTTPServerSocket * socket);
++    
+ protected:
+     TCPSocketObserver * onNewConnection(TCPListenSocket *so,const Address &amp;fromaddr);
+     void onSocketError(TCPListenSocket *so);
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2012-10-31 21:08:26 UTC (rev 1422)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -71,8 +71,9 @@
+         throw;
+     }
+ }
+-ClientSocket::ClientSocket(ClientSocketObserver *o)
+-    : observer(o), socket(0), sendpos(0), tempoffset(0), player_id(INVALID_PLAYER_ID)
++
++ClientSocket::ClientSocket(ClientSocketObserver *o, network::TCPSocket * so)
++    : observer(o), socket(so), sendpos(0), tempoffset(0), player_id(INVALID_PLAYER_ID)
+ {
+     initId();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2012-10-31 21:08:26 UTC (rev 1422)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -42,7 +42,7 @@
+ {
+ public:
+     ClientSocket(ClientSocketObserver *o, const std::string&amp; serveraddress);
+-    ClientSocket(ClientSocketObserver *o);
++    ClientSocket(ClientSocketObserver *o, network::TCPSocket * so = 0);
+     ~ClientSocket();
+ 
+     //void read();
+@@ -79,6 +79,7 @@
+ private:
+     friend class ServerConnectDaemon;
+     friend class NetworkClient;
++    friend class HTTPServerSocket;
+     void initId();
+     ClientSocketObserver * observer;
+     network::TCPSocket* socket;
+
+Added: trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.cpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -0,0 +1,534 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;HTTPServerSocket.hpp&quot;
++
++#include &quot;Util/Log.hpp&quot;
++
++#include &lt;string&gt;
++#include &lt;sstream&gt;
++#include &lt;algorithm&gt;
++#include &lt;string.h&gt;
++
++#include &quot;WebSocketUtil.hpp&quot;
++#include &quot;Classes/Network/NetworkServer.hpp&quot;
++#include &quot;Classes/Network/NetMessage.hpp&quot;
++#include &quot;Classes/Network/ConnectNetMessage.hpp&quot;
++#include &quot;Util/FileSystem.hpp&quot;
++
++static const char websocket_reply_data[] = {
++    &quot;HTTP/1.1 101 Switching Protocols\r\n&quot;
++    &quot;Upgrade: websocket\r\n&quot;
++    &quot;Connection: Upgrade\r\n&quot;
++    &quot;Sec-WebSocket-Accept:                             \r\n&quot;
++    &quot;\r\n&quot;
++//        Sec-WebSocket-Protocol: chat&quot;
++};
++
++static const char http_reply_404[] = {
++    &quot;HTTP/1.1 404 Not Found\r\n&quot;
++    &quot;Content-Type: text/plain\r\n&quot;
++    &quot;Content-Length: 18\r\n&quot;
++    &quot;\r\n&quot;
++    &quot;Resource not found&quot;
++};
++
++static const struct cts {
++  const char *extension;
++  const char *content_type;
++}
++content_types[] =
++{
++    { &quot;.html&quot;,&quot;text/html&quot; },
++    { &quot;.htm&quot;, &quot;text/html&quot; },
++    { &quot;.css&quot;, &quot;text/css&quot; },
++    { &quot;.xml&quot;, &quot;text/xml&quot; },
++
++    { &quot;.js&quot;, &quot;application/x-javascript&quot; },
++
++    { &quot;.ico&quot;,  &quot;image/x-icon&quot; },
++    { &quot;.txt&quot;,  &quot;text/plain&quot; },
++    { &quot;.gif&quot;,  &quot;image/gif&quot; },
++    { &quot;.jpg&quot;,  &quot;image/jpeg&quot; },
++    { &quot;.jpeg&quot;, &quot;image/jpeg&quot; },
++    { &quot;.png&quot;,  &quot;image/png&quot; },
++    { &quot;.bmp&quot;,  &quot;image/bmp&quot; },
++
++    //  {&quot;.wav&quot;, &quot;audio/x-wav&quot;},
++    //  {&quot;.mp3&quot;, &quot;audio/x-mp3&quot;},
++    //  {&quot;.ogg&quot;, &quot;audio/ogg&quot;},
++    { &quot;.zip&quot;, &quot;application/x-zip-compressed&quot; },
++};
++
++static const char * getContentType(const std::string&amp; path)
++{
++    std::string::size_type dot_pos = path.rfind('.');
++    if ( dot_pos != std::string::npos )
++    {
++        std::string extension(path, dot_pos);
++        
++        for ( int n = 0, e = sizeof(content_types)/sizeof(cts); n &lt; e; n++ )
++        {
++            if ( ! extension.compare(content_types[n].extension) )
++            {
++                return content_types[n].content_type;
++            }
++        }
++    }
++    
++    return &quot;text/plain&quot;;
++}
++
++struct State
++{
++    enum
++    {
++        DISCONNECTED = 0,
++        JUST_CONNECTED,
++        WAITING_REQUEST,
++        CONNECTED,
++        SENDING,
++        SENDING_FILE
++    };
++};
++
++HTTPServerSocket::HTTPServerSocket()
++{
++    socket = 0;
++    state = State::DISCONNECTED;
++    receive_length = 0;
++    send_length = 0;
++    sending_file = 0;
++}
++
++HTTPServerSocket::~HTTPServerSocket()
++{
++    close();
++}
++
++void HTTPServerSocket::close()
++{
++    if ( socket )
++    {
++        socket-&gt;destroy();
++        socket = 0;
++    }
++    
++    if ( sending_file )
++    {
++        delete sending_file;
++        sending_file = 0;
++    }
++}
++
++void HTTPServerSocket::onConnected(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPServerSocket connected&quot;);
++    socket = so;
++    state = State::JUST_CONNECTED;
++    receive_length = 0;
++    send_length = 0;
++}
++
++void HTTPServerSocket::onDisconected(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPServerSocket disconnected&quot;);
++    socket = 0;
++    state = State::DISCONNECTED;
++    // this will delete me
++    SERVER-&gt;onHTTPServerSocketDisconnected(this);
++}
++
++void HTTPServerSocket::onSocketError(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPServerSocket error&quot;);
++    socket = 0;
++    state = State::DISCONNECTED;
++    SERVER-&gt;onHTTPServerSocketDisconnected(this);
++}
++
++template&lt;&gt; inline
++void HTTPServerSocket::onReceiveState&lt;State::WAITING_REQUEST&gt;(const char * data, const int len)
++{
++    std::string str(data, len);
++    
++    LOGGER.debug(&quot;Received:\n%s\n[END]&quot;, str.c_str());
++    
++    memcpy(receive_buffer+receive_length, data, len );
++    receive_length += len;
++    
++    try_handle_request();
++}
++
++template&lt;&gt; inline
++void HTTPServerSocket::onReceiveState&lt;State::CONNECTED&gt;(const char * data, const int len)
++{
++    uint8_t opcode = data[0];
++    bool is_fin = opcode &amp; 0x80;
++    opcode &amp;= 0xf;
++    
++    uint8_t paylen = data[1];
++    bool is_mask = paylen &amp; 0x80;
++    paylen &amp;= 0x7f;
++
++    int data_pos = 2;
++    
++    uint32_t imask = 0;
++    
++    if ( paylen == 126 )
++    {
++        paylen = (data[2] &lt;&lt; 8) | data[3];
++        data_pos = 4;
++    }
++    if ( paylen == 127 )
++    {
++        
++    }
++    
++    if ( is_mask )
++    {
++        imask = ((uint8_t)data[data_pos++]);
++        imask |= ((uint8_t)data[data_pos++]) &lt;&lt; 8;
++        imask |= ((uint8_t)data[data_pos++]) &lt;&lt; 16;
++        imask |= ((uint8_t)data[data_pos++]) &lt;&lt; 24;
++    }
++    
++    int to_copy = len - data_pos;
++    memcpy(receive_buffer, data+data_pos, to_copy);
++    
++    if ( is_mask )
++    {
++        uint8_t * ptr = receive_buffer;
++        for ( int n = 0; n &lt; to_copy; n += 4 )
++        {
++            uint32_t * p = reinterpret_cast&lt;uint32_t*&gt;(ptr);
++            p[0] ^= imask;
++            ptr += 4;
++        }
++    }
++    
++    receive_buffer[to_copy] = 0;
++    
++    LOGGER.debug(&quot;Received message [%s]&quot;, receive_buffer);
++    
++}
++
++template&lt;&gt; inline
++void HTTPServerSocket::onReceiveState&lt;State::SENDING&gt;(const char * data, const int len)
++{
++    memcpy(receive_buffer+receive_length, data, len );
++    receive_length += len;
++}
++template&lt;&gt; inline
++void HTTPServerSocket::onReceiveState&lt;State::SENDING_FILE&gt;(const char * data, const int len)
++{
++    memcpy(receive_buffer+receive_length, data, len );
++    receive_length += len;
++}
++
++void HTTPServerSocket::onDataReceived(network::TCPSocket *so, const char *data, const int len)
++{
++    switch ( state )
++    {
++        case State::JUST_CONNECTED :
++            if ( (data[1] == 0 )
++               &amp;&amp;(data[2] == _net_message_class_connect)
++               &amp;&amp;(data[3] == _net_message_id_connect_join_game_request) )
++            {
++                // it is an old client connecting
++                ClientSocket * cs = new ClientSocket(SERVER, socket);
++                socket-&gt;changeObserver(cs);
++                socket = 0; // so the socket is not closed
++                close();
++                SERVER-&gt;onHTTPServerSocketDisconnected(this);
++                
++                cs-&gt;onDataReceived(so, data, len);
++                return;
++            }
++            
++            state = State::WAITING_REQUEST;
++            // fall through, it shall be an HTTP request
++            
++#define CASE(X) case X: onReceiveState&lt;X&gt;(data, len); break;
++        CASE(State::WAITING_REQUEST)
++        CASE(State::CONNECTED)
++        CASE(State::SENDING)
++        CASE(State::SENDING_FILE)
++#undef CASE
++    }
++    
++}
++
++void HTTPServerSocket::try_handle_request()
++{
++    uint8_t * new_begin;
++    uint8_t * buffer_ptr = receive_buffer;
++    uint8_t * buffer_end = receive_buffer + receive_length;
++
++    while ( buffer_ptr &amp;&amp; (buffer_ptr &lt; buffer_end) )
++    {
++        if ( *buffer_ptr == 13 )
++        {
++            ++buffer_ptr;
++        }
++        
++        if ( buffer_ptr &lt; buffer_end )
++        {
++            if ( *buffer_ptr == 10 )
++            {
++                // handle request;
++                new_begin = buffer_ptr+1;
++                int to_copy = buffer_end - new_begin;
++                
++                receive_length = new_begin - receive_buffer;
++                
++                handle_request();
++                
++                receive_length = to_copy;
++                if ( to_copy &gt; 0 )
++                {
++                    memmove(receive_buffer, new_begin, to_copy);
++                }
++                break;
++            }
++            
++            buffer_ptr = reinterpret_cast&lt;uint8_t*&gt;(memchr(buffer_ptr, 10, buffer_end - buffer_ptr));
++            if ( buffer_ptr )
++            {
++                ++buffer_ptr;
++            }
++        }
++    }
++}
++
++bool HTTPServerSocket::decode_request()
++{
++    char * token_start = reinterpret_cast&lt;char*&gt;(receive_buffer);
++    char * buffer_end = token_start + receive_length;
++
++    request_method.clear();
++    request_path.clear();
++    request_version.clear();
++    request_headers.clear();
++    
++    while ( (token_start &lt; buffer_end) &amp;&amp; (*token_start != ' ') )
++        request_method.append(1, *(token_start++));
++
++    ++token_start;
++    while ( (token_start &lt; buffer_end) &amp;&amp; (*token_start != ' ') )
++        request_path.append(1, *(token_start++));
++    
++    ++token_start;
++    while ( (token_start &lt; buffer_end) &amp;&amp; ( (*token_start != 13) &amp;&amp; (*token_start != 10)) )
++        request_version.append(1, *(token_start++));
++    
++    while ( (token_start &lt; buffer_end) &amp;&amp; ( (*token_start == 13) || (*token_start == 10)) )
++        ++token_start;
++    
++    if ( request_version.compare(&quot;HTTP/1.1&quot;) )
++    {
++        return false; // bad version
++    }
++    
++    std::string header_name;
++    std::string header_value;
++    
++    while ( token_start &lt; buffer_end )
++    {
++        header_name.clear();
++        header_value.clear();
++        
++        while ( (token_start &lt; buffer_end) &amp;&amp; (*token_start != ':') )
++            header_name.append(1, tolower(*(token_start++)));
++        
++        do
++        {
++            ++token_start;
++        } while ( (token_start &lt; buffer_end) &amp;&amp; (*token_start == ' ') );
++        
++        while ( (token_start &lt; buffer_end) &amp;&amp; ( (*token_start != 13) &amp;&amp; (*token_start != 10)) )
++            header_value.append(1, *(token_start++));
++    
++        while ( (token_start &lt; buffer_end) &amp;&amp; ( (*token_start == 13) || (*token_start == 10)) )
++            ++token_start;
++        
++        if ( header_name.size() )
++        {
++            request_headers[header_name] = header_value;
++            LOGGER.debug(&quot;Header '%s' = '%s'&quot;, header_name.c_str(), header_value.c_str());
++        }
++    }
++    
++    return true;
++}
++
++bool HTTPServerSocket::handle_request()
++{
++    if ( ! decode_request() )
++    {
++        LOGGER.debug(&quot;Bad headers!!!&quot;);
++        return false;
++    }
++    
++    headers::iterator connection = request_headers.find(&quot;connection&quot;);
++    headers::iterator sec_websocket_key = request_headers.find(&quot;sec-websocket-key&quot;);
++    headers::iterator upgrade = request_headers.find(&quot;upgrade&quot;);
++    
++    if ( ( connection != request_headers.end() )
++       &amp;&amp;( sec_websocket_key != request_headers.end() )
++       &amp;&amp;( upgrade != request_headers.end() ) )
++    {
++        if ( ( connection-&gt;second.find(&quot;Upgrade&quot;) != std::string::npos )
++           &amp;&amp;( ! upgrade-&gt;second.compare(&quot;websocket&quot;) )
++           &amp;&amp;( sec_websocket_key-&gt;second.size() == 24 ) )
++        {
++            char repply_data[sizeof(websocket_reply_data)];
++            memcpy(repply_data, websocket_reply_data, sizeof(websocket_reply_data));
++            
++            WebSocket_HandShake(sec_websocket_key-&gt;second.c_str(), repply_data+97);
++            LOGGER.debug(&quot;Repply data:\n%s\n[END]&quot;,repply_data);
++            
++            socket-&gt;send(repply_data, sizeof(repply_data)-1);
++            state = State::CONNECTED;
++        }
++        
++        return true;
++    }
++    
++    std::string path(&quot;/web&quot;);
++    std::string::size_type pos = request_path.find(&quot;://&quot;);
++    
++    if ( pos != std::string::npos )
++    {
++        pos += 3;
++        if ( pos &lt; request_path.size() )
++        {
++            pos = request_path.find('/', pos);
++            if ( pos != std::string::npos )
++            {
++                path = request_path.substr(pos);
++            }
++            else
++            {
++                path += &quot;/&quot;;
++            }
++        }
++        else
++        {
++            path += &quot;/&quot;;
++        }
++    }
++    else
++    {
++        path += request_path;
++    }
++    
++    if ( filesystem::isDirectory(path) )
++    {
++        path += &quot;index.html&quot;;
++    }
++    
++    if ( filesystem::exists(path) )
++    {
++        filesystem::ReadFile * file = filesystem::openRead(path);
++        
++        int flen = file-&gt;length();
++        
++        std::stringstream ss;
++        
++        ss &lt;&lt; &quot;HTTP/1.1 200 OK\r\n&quot;
++           &lt;&lt; &quot;Content-Type: &quot; &lt;&lt; getContentType(path) &lt;&lt; &quot;\r\n&quot;
++           &lt;&lt; &quot;Content-Length: &quot; &lt;&lt; flen &lt;&lt; &quot;\r\n&quot;
++           &lt;&lt; &quot;\r\n&quot;
++           ;
++        
++        send_length = ss.tellp();
++        
++        memcpy(send_buffer, ss.str().c_str(), send_length);
++        
++        if ( flen &gt; (sizeof(send_buffer) - send_length) )
++        {
++            int to_read_now = (sizeof(send_buffer) - send_length);
++            file-&gt;read(send_buffer+send_length, 1, to_read_now);
++            sending_file = file;
++            sending_file_remain = flen - to_read_now;
++            state = State::SENDING_FILE;
++            send_length += to_read_now;
++        }
++        else
++        {
++            file-&gt;read(send_buffer+send_length, 1, flen);
++            delete file;
++            state = State::SENDING;
++            send_length += flen;
++        }
++        
++    }
++    else
++    {
++        send_length = sizeof(http_reply_404)-1;
++        memcpy(send_buffer, http_reply_404, send_length);
++        state = State::SENDING;
++    }
++
++    return true;
++}
++
++void HTTPServerSocket::work()
++{
++    if ( state == State::SENDING || state == State::SENDING_FILE )
++    {
++        size_t s = socket-&gt;send(send_buffer, send_length);
++        if ( !s )
++        {
++            return; // early bail out
++        }
++
++        if ( s != send_length )
++        {
++            memmove(send_buffer, send_buffer+s, send_length-s);
++            send_length -= s;
++        }
++        else
++        {
++            send_length = 0;
++        }
++        
++        if ( state == State::SENDING_FILE )
++        {
++            int to_read = std::min(sizeof(send_buffer) - send_length, sending_file_remain);
++            
++            sending_file-&gt;read(send_buffer+send_length, 1, to_read);
++            sending_file_remain -= to_read;
++            send_length += to_read;
++            
++            if ( ! sending_file_remain )
++            {
++                state = State::SENDING;
++                delete sending_file;
++                sending_file = 0;
++            }
++        }
++        
++        if ( ! send_length )
++        {
++            state = State::WAITING_REQUEST;
++            try_handle_request();
++        }
++    }
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPServerSocket.hpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -0,0 +1,77 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * Created on December 23, 2012, 11:00 AM
++ */
++
++#ifndef HTTPSERVERSOCKET_HPP
++#define	HTTPSERVERSOCKET_HPP
++
++#include &quot;Network/TCPSocket.hpp&quot;
++#include &quot;Util/FileSystem.hpp&quot;
++#include &lt;stdint.h&gt;
++#include &lt;string&gt;
++#include &lt;map&gt;
++
++#define HTTPSERVERSOCKET_RBUFFER_SIZE (16384)
++#define HTTPSERVERSOCKET_SBUFFER_SIZE (16384)
++
++class HTTPServerSocket : public network::TCPSocketObserver
++{
++public:
++    HTTPServerSocket();
++    virtual ~HTTPServerSocket();
++    
++    void close();
++    void work();
++    
++protected:
++    void onDataReceived(network::TCPSocket *so, const char *data, const int len);
++    void onConnected(network::TCPSocket *so);
++    void onDisconected(network::TCPSocket *so);
++    void onSocketError(network::TCPSocket *so);
++
++private:
++    network::TCPSocket * socket;
++    
++    filesystem::ReadFile * sending_file;
++    unsigned int sending_file_remain;
++    
++    uint8_t receive_buffer[HTTPSERVERSOCKET_RBUFFER_SIZE];
++    int receive_length;
++    
++    uint8_t send_buffer[HTTPSERVERSOCKET_SBUFFER_SIZE];
++    int send_length;
++    
++    int state;
++    
++    template&lt;int&gt; void onReceiveState(const char * data, const int len);
++    
++    void try_handle_request();
++    bool decode_request();
++    bool handle_request();
++    
++    std::string request_method;
++    std::string request_path;
++    std::string request_version;
++    
++    typedef std::map&lt;std::string, std::string&gt; headers;
++    headers request_headers;
++    
++};
++
++#endif	/* HTTPSERVERSOCKET_HPP */
++
+
+Added: trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.cpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -0,0 +1,162 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;WebSocketUtil.hpp&quot;
++
++#include &quot;Core/CoreTypes.hpp&quot;
++
++static const char b2h[17] = &quot;0123456789abcdef&quot;;
++static const char b64[65] = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;;
++
++static const uint32_t round_1[10] =
++{
++    0x32353845, 0x41464135, 0x2d453931, 0x342d3437, 0x44412d39, 0x3543412d,
++    0x43354142, 0x30444338, 0x35423131, 0x80000000
++};
++
++static const uint32_t round_2[80] = 
++{
++    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x000001e0, 0x00000000, 0x00000000,
++    0x000003c0, 0x00000000, 0x00000000, 0x00000780, 0x00000000, 0x000003c0,
++    0x00000f00, 0x00000000, 0x00000000, 0x00001e00, 0x00000000, 0x00000cc0,
++    0x00003c00, 0x00000440, 0x00000000, 0x00007800, 0x00000f00, 0x00003300,
++    0x0000f000, 0x00000f00, 0x00000000, 0x0001ef00, 0x00000000, 0x0000cc00,
++    0x0003c000, 0x00004380, 0x00000000, 0x00078f00, 0x0000ff00, 0x00032680,
++    0x000f0000, 0x0000f000, 0x00003300, 0x001eff00, 0x00000000, 0x000cb800,
++    0x003c0000, 0x00040b00, 0x0000f000, 0x0078ff00, 0x000ff000, 0x00338700,
++    0x00f00000, 0x000fc300, 0x0000f000, 0x01efbb00, 0x00000000, 0x00cc0000,
++    0x03c0f000, 0x00438000, 0x00000000, 0x078f0000, 0x00ff0000, 0x03269e00,
++    0x0f000000, 0x00f0f000, 0x00333c00, 0x1eff8800, 0x00000000, 0x0cb88800,
++    0x3c00f000, 0x040a4a00, 
++};
++static inline uint32_t rotate_1(uint32_t value)
++{
++    return (value &lt;&lt; 1) | (value &gt;&gt; 31);
++}
++
++static inline uint32_t rotate_5(uint32_t value)
++{
++    return (value &lt;&lt; 5) | (value &gt;&gt; 27);
++}
++
++static inline uint32_t rotate_30(uint32_t value)
++{
++    return (value &lt;&lt; 30) | (value &gt;&gt; 2);
++}
++void WebSocket_HandShake(const char* data, char * out)
++{
++    uint32_t W[80]
++            ,tmp
++            ,A, FA = A = 0x67452301
++            ,B, FB = B = 0xEFCDAB89
++            ,C, FC = C = 0x98BADCFE
++            ,D, FD = D = 0x10325476
++            ,E, FE = E = 0xC3D2E1F0 ;
++
++    for ( int n = 0; n &lt; 6; n++ )
++    {
++        tmp  = *(data++) &lt;&lt; 24;
++        tmp |= *(data++) &lt;&lt; 16;
++        tmp |= *(data++) &lt;&lt;  8;
++        tmp |= *(data++);
++        W[n] = tmp;
++    }
++
++    memcpy(&amp;W[6], round_1, sizeof(round_1));
++
++    for ( int n = 16; n &lt; 80; n++ )
++    {
++       W[n] = rotate_1(W[n-3] ^ W[n-8] ^ W[n-14] ^ W[n-16]);
++    }
++
++    const uint32_t * p = W;
++
++#define BASE(F,K) tmp =  rotate_5(A) + (F) + E + (*(p++)) + (K); E=D; D=C; C=rotate_30(B); B=A; A=tmp;
++#define G BASE((((C^D)&amp;B)^D),                 0x5A827999)
++#define R BASE((B ^ C ^ D),                   0x6ED9EBA1)
++#define O BASE(((B &amp; C) | (B &amp; D) | (C &amp; D)), 0x8F1BBCDC)
++#define K BASE((B ^ C ^ D),                   0xCA62C1D6)
++    G G G G G G G G G G G G G G G G G G G G
++    R R R R R R R R R R R R R R R R R R R R
++    O O O O O O O O O O O O O O O O O O O O
++    K K K K K K K K K K K K K K K K K K K K
++
++    A = FA += A;
++    B = FB += B;
++    C = FC += C;
++    D = FD += D;
++    E = FE += E;
++
++    p = round_2;
++
++    G G G G G G G G G G G G G G G G G G G G
++    R R R R R R R R R R R R R R R R R R R R
++    O O O O O O O O O O O O O O O O O O O O
++    K K K K K K K K K K K K K K K K K K K K
++#undef K
++#undef O
++#undef R
++#undef G
++#undef BASE
++
++    FA += A;
++    FB += B;
++    FC += C;
++    FD += D;
++    FE += E;
++
++    *(out++) = b64[FA &gt;&gt; 26];
++    *(out++) = b64[(FA &gt;&gt; 20) &amp; 0x3f];
++    *(out++) = b64[(FA &gt;&gt; 14) &amp; 0x3f];
++    *(out++) = b64[(FA &gt;&gt;  8) &amp; 0x3f];
++    *(out++) = b64[(FA &gt;&gt;  2) &amp; 0x3f];
++
++    *(out++) = b64[((FA&amp;3) &lt;&lt; 4)|((FB&gt;&gt;28)&amp;0x0f)];
++
++    *(out++) = b64[(FB &gt;&gt; 22) &amp; 0x3f];
++    *(out++) = b64[(FB &gt;&gt; 16) &amp; 0x3f];
++    *(out++) = b64[(FB &gt;&gt; 10) &amp; 0x3f];
++    *(out++) = b64[(FB &gt;&gt;  4) &amp; 0x3f];
++
++    *(out++) = b64[((FB&amp;0xf) &lt;&lt; 2)|((FC&gt;&gt;30)&amp;0x03)];
++
++    *(out++) = b64[(FC &gt;&gt; 24) &amp; 0x3f];
++    *(out++) = b64[(FC &gt;&gt; 18) &amp; 0x3f];
++    *(out++) = b64[(FC &gt;&gt; 12) &amp; 0x3f];
++    *(out++) = b64[(FC &gt;&gt;  6) &amp; 0x3f];
++    *(out++) = b64[FC &amp; 0x3f];
++
++    *(out++) = b64[FD &gt;&gt; 26];
++    *(out++) = b64[(FD &gt;&gt; 20) &amp; 0x3f];
++    *(out++) = b64[(FD &gt;&gt; 14) &amp; 0x3f];
++    *(out++) = b64[(FD &gt;&gt;  8) &amp; 0x3f];
++    *(out++) = b64[(FD &gt;&gt;  2) &amp; 0x3f];
++
++    *(out++) = b64[((FD&amp;3) &lt;&lt; 4)|((FE&gt;&gt;28)&amp;0x0f)];
++
++    *(out++) = b64[(FE &gt;&gt; 22) &amp; 0x3f];
++    *(out++) = b64[(FE &gt;&gt; 16) &amp; 0x3f];
++    *(out++) = b64[(FE &gt;&gt; 10) &amp; 0x3f];
++    *(out++) = b64[(FE &gt;&gt;  4) &amp; 0x3f];
++    *(out++) = b64[(FE &lt;&lt;  2) &amp; 0x3f];
++
++    *(out++) = '=';
++
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Network/WebSocketUtil.hpp	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -0,0 +1,27 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * Created on December 23, 2012, 4:25 PM
++ */
++
++#ifndef WEBSOCKETUTIL_HPP
++#define	WEBSOCKETUTIL_HPP
++
++void WebSocket_HandShake(const char* data, char * out);
++
++
++#endif	/* WEBSOCKETUTIL_HPP */
++
+
+Added: trunk/netpanzer/web/index.html
+===================================================================
+--- trunk/netpanzer/web/index.html	                        (rev 0)
++++ trunk/netpanzer/web/index.html	2012-12-23 16:42:16 UTC (rev 1423)
+@@ -0,0 +1,11 @@
++&lt;!DOCTYPE html&gt;
++&lt;html&gt;
++    &lt;head&gt;
++        &lt;title&gt;NetPanzer&lt;/title&gt;
++        &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
++    &lt;/head&gt;
++    &lt;body&gt;
++        &lt;h1&gt;Say hello&lt;/h1&gt;
++        &lt;img alt=&quot;titan&quot; src=&quot;netpanzer.png&quot;/&gt;
++    &lt;/body&gt;
++&lt;/html&gt;
+
+Copied: trunk/netpanzer/web/netpanzer.png (from rev 1422, trunk/netpanzer/netpanzer.png)
+===================================================================
+(Binary files differ)
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#447">[ date ]</a>
+              <a href="thread.html#447">[ thread ]</a>
+              <a href="subject.html#447">[ subject ]</a>
+              <a href="author.html#447">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

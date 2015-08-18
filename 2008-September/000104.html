@@ -1,0 +1,336 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1068 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1068%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Network&In-Reply-To=%3C200809211718.m8LHILXN006255%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000103.html">
+   <LINK REL="Next"  HREF="000105.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1068 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1068%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Network&In-Reply-To=%3C200809211718.m8LHILXN006255%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1068 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 21 19:18:21 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000103.html">[Netpanzer-cvs] r1067 - in trunk/netpanzer: nbproject	src/NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000105.html">[Netpanzer-cvs] r1069 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#104">[ date ]</a>
+              <a href="thread.html#104">[ thread ]</a>
+              <a href="subject.html#104">[ subject ]</a>
+              <a href="author.html#104">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-21 19:18:12 +0200 (Sun, 21 Sep 2008)
+New Revision: 1068
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+Log:
+- Change the way the disconnections are handled, should fix the &quot;status&quot; crash (and other bugs)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2008-09-21 10:57:57 UTC (rev 1067)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2008-09-21 17:18:12 UTC (rev 1068)
+@@ -19,6 +19,7 @@
+ #include &lt;algorithm&gt;
+ 
+ #include &quot;NetMessage.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+@@ -31,6 +32,11 @@
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;SystemNetMessage.hpp&quot;
++#include &quot;ConnectNetMessage.hpp&quot;
++
++
+ NetworkServer* SERVER = 0;
+ 
+ NetworkServer::NetworkServer()
+@@ -241,7 +247,8 @@
+     
+     if ( i != client_list.end() )
+     {
+-        ServerConnectDaemon::startClientDropProcess((*i)-&gt;client_socket);
++        // XXX hack
++        onClientDisconected(client, &quot;dropped&quot;);
+     }
+ }
+ 
+@@ -250,7 +257,7 @@
+ {
+     
+     ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() &amp;&amp; (*i)-&gt;client_socket != client)
++    while ( i != client_list.end() )
+     {
+         if ( (*i)-&gt;client_socket == client )
+         {
+@@ -351,27 +358,94 @@
+ void
+ NetworkServer::onClientDisconected(ClientSocket *s, const char * msg)
+ {
+-    // XXX WARNING possible double free when shutdownclienttransport is called
+-    LOGGER.warning(&quot;NetworkServer::onClientDisconected( %d, '%s')&quot;, s-&gt;getId(), msg);
++    LOGGER.debug(&quot;NetworkServer::onClientDisconected( %d, '%s')&quot;, s-&gt;getId(), msg);
++    
++    bool cleandisconnect = false;
++    bool sendalert = true;
++    
+     if ( ServerConnectDaemon::inConnectQueue(s) )
+     {
+-        LOGGER.warning(&quot;NetworkServer: client bad disconnected while connecting [%d]&quot;, s-&gt;getId());
+-        ServerConnectDaemon::startClientDropProcess(s);
++        // player was connecting and dropped.
++        ServerConnectDaemon::removeClientFromQueue(s);
++        sendalert = false;
++        LOGGER.debug(&quot;NetworkServer::onClientDisconected player was connecting&quot;);
+     }
+-    else
++    
++    if ( NetworkInterface::receive_queue.isReady() )
+     {
+-        ClientList::iterator i = client_list.begin();
+-        while ( i != client_list.end() )
++        unsigned long frontsave = NetworkInterface::receive_queue.front;
++        while ( NetworkInterface::receive_queue.isReady() )
+         {
+-            if ( (*i)-&gt;client_socket == s )
++            LOGGER.debug(&quot;NetworkServer::onClientDisconected there was a packet&quot;);
++            NetPacket packet;
++
++            NetworkInterface::receive_queue.dequeue(&amp;packet);
++
++            if ( packet.fromClient == s )
+             {
+-                LOGGER.warning(&quot;NetworkServer: client bad disconnection [%d]&quot;, s-&gt;getId());
+-                ServerConnectDaemon::startClientDropProcess(s);
+-                break;
++                LOGGER.debug(&quot;NetworkServer::onClientDisconected the packet was from our friend&quot;);
++                const NetMessage * netmessage = packet.getNetMessage();
++                if (   netmessage-&gt;message_class == _net_message_class_connect 
++                    &amp;&amp; netmessage-&gt;message_id == _net_message_id_connect_netPanzer_client_disconnect )
++                {
++                    LOGGER.debug(&quot;NetworkServer::onClientDisconected so is a clean disconnect&quot;);
++                    cleandisconnect = true;
++                }
+             }
+-            ++i;
+         }
++        NetworkInterface::receive_queue.front = frontsave;
+     }
++    
++    Uint16 player_index = s-&gt;getPlayerIndex();
++    
++    ClientList::iterator i = client_list.begin();
++    while ( i != client_list.end() )
++    {
++        if ( (*i)-&gt;client_socket == s )
++        {
++            LOGGER.debug(&quot;NetworkServer:onClientDisconnected found client in list, removing and deleting [%d]&quot;, player_index);
++            client_list.erase(i);
++            delete (*i)-&gt;client_socket; // this is &quot;s&quot;
++            delete *i;
++            break;
++        }
++        ++i;
++    }
++    
++    if ( player_index != 0xffff )
++    {
++        PlayerState * player = PlayerInterface::getPlayer(player_index);
++        if ( player &amp;&amp; sendalert )
++        {
++            ConsoleInterface::postMessage(Color::cyan, true, player-&gt;getFlag(),
++                                      &quot;'%s' has left.&quot;,
++                                      player-&gt;getName().c_str());
++        }
++        
++        ObjectiveInterface::disownPlayerObjectives( player_index );
++
++        UnitInterface::destroyPlayerUnits( player_index );
++
++        PlayerInterface::disconnectPlayerCleanup( player_index );    
++
++        if ( sendalert )
++        {
++            SystemConnectAlert msg;
++            if ( cleandisconnect )
++            {
++                msg.set( player_index, _connect_alert_mesg_disconnect);
++            }
++            else
++            {
++                msg.set( player_index, _connect_alert_mesg_client_drop );
++            }
++
++            SERVER-&gt;broadcastMessage(&amp;msg, sizeof(msg));
++        }
++    }
++    
++
++//    LOGGER.warning(&quot;NetworkServer::onClientDisconected( %d, '%s')&quot;, s-&gt;getId(), msg);
+ }
+ 
+ ClientSocket *
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2008-09-21 10:57:57 UTC (rev 1067)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2008-09-21 17:18:12 UTC (rev 1068)
+@@ -120,13 +120,7 @@
+ 
+ void ServerConnectDaemon::netPacketClientDisconnect(const NetPacket *packet)
+ {
+-    // Note: this invalidates the ConnectMesgNetPanzerClientDisconnect playerID
+-    // value, just use the networkID, this way avoid possible fake packet
+-    // to kick other player.
+-    // In a future protocol version PlayerID should be removed from this packet.
+-    PlayerState *player = PlayerInterface::getPlayer(packet-&gt;fromClient-&gt;getPlayerIndex());
+-    if (player)
+-        startDisconnectionProcess(packet-&gt;fromClient);
++    // nothing, useless, remove
+ }
+ 
+ void ServerConnectDaemon::netPacketClientJoinRequest(const NetPacket* packet)
+@@ -534,6 +528,17 @@
+     connectFsm( 0 );
+ }
+ 
++void
++ServerConnectDaemon::removeClientFromQueue(ClientSocket *client)
++{
++    connect_queue.remove(client);
++    
++    if( connect_client == client )
++    {
++        connection_state = connect_state_idle;
++    }    
++}
++
+ bool ServerConnectDaemon::disconnectClient( ClientSocket * client )
+ {
+     connect_queue.remove(client);
+@@ -560,35 +565,12 @@
+ 
+ void ServerConnectDaemon::startDisconnectionProcess( ClientSocket * client )
+ {
+-    SystemConnectAlert msg;
+-    msg.set( client-&gt;getPlayerIndex(), _connect_alert_mesg_disconnect );
+-
+-    PlayerState * player = PlayerInterface::getPlayer(client-&gt;getPlayerIndex());
+-
+-    disconnectClient( client );
+-
+-    ConsoleInterface::postMessage(Color::cyan, true, player-&gt;getFlag(),
+-                                  &quot;'%s' has left the game.&quot;,
+-                                  (player)?player-&gt;getName().c_str():&quot;&quot;);
+-
+-    SERVER-&gt;broadcastMessage(&amp;msg, sizeof(msg));
++    // nothing, useless, remove
+ }
+ 
+ void ServerConnectDaemon::startClientDropProcess( ClientSocket * client )
+ {
+-    SystemConnectAlert msg;
+-    msg.set( client-&gt;getPlayerIndex(), _connect_alert_mesg_client_drop );
+-
+-    PlayerState * player = PlayerInterface::getPlayer(client-&gt;getPlayerIndex());
+-    
+-    disconnectClient( client );
+-
+-    ConsoleInterface::postMessage(Color::cyan, true, player-&gt;getFlag(),
+-                                  &quot;'%s' has left the game for some reason.&quot;,
+-                                  (player)?player-&gt;getName().c_str():&quot;&quot;);
+-
+-    SERVER-&gt;broadcastMessage(&amp;msg, sizeof(msg));
+-
++    // nothing, useless, remove
+ }
+ 
+ void ServerConnectDaemon::lockConnectProcess()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2008-09-21 10:57:57 UTC (rev 1067)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2008-09-21 17:18:12 UTC (rev 1068)
+@@ -92,6 +92,7 @@
+     static bool getConnectLockStatus();
+ 
+     static bool isConnecting();
++    static void removeClientFromQueue(ClientSocket *client);
+ };
+ 
+ #endif // ** _SERVERCONNECTDAEMON_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2008-09-21 10:57:57 UTC (rev 1067)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2008-09-21 17:18:12 UTC (rev 1068)
+@@ -226,7 +226,7 @@
+ void
+ ClientSocket::onConnected(network::TCPSocket *so)
+ {
+-    LOGGER.warning(&quot;ClientSocket: connected, id=%d&quot;, id);
++    LOGGER.debug(&quot;ClientSocket: connected, id=%d&quot;, id);
+     socket = so;
+     observer-&gt;onClientConnected(this);
+ }
+@@ -235,7 +235,7 @@
+ ClientSocket::onDisconected(network::TCPSocket *so)
+ {
+     (void)so;
+-    LOGGER.warning(&quot;ClientSocket: Disconected id=%d&quot;, id);
++    LOGGER.debug(&quot;ClientSocket: Disconected id=%d&quot;, id);
+     socket=0;
+     observer-&gt;onClientDisconected(this, &quot;Network connection closed&quot;);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000103.html">[Netpanzer-cvs] r1067 - in trunk/netpanzer: nbproject	src/NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000105.html">[Netpanzer-cvs] r1069 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#104">[ date ]</a>
+              <a href="thread.html#104">[ thread ]</a>
+              <a href="subject.html#104">[ subject ]</a>
+              <a href="author.html#104">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

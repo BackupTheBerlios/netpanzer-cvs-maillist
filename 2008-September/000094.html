@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1056 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1056%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200809150816.m8F8GgI8002180%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000093.html">
+   <LINK REL="Next"  HREF="000095.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1056 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1056%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200809150816.m8F8GgI8002180%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1056 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 15 10:16:42 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000093.html">[Netpanzer-cvs] r1054 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Objectives Particles PowerUps	Resources Units
+</A></li>
+        <LI>Next message: <A HREF="000095.html">[Netpanzer-cvs] r1059 - in trunk/netpanzer/src/NetPanzer:	Interfaces System Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-15 10:16:19 +0200 (Mon, 15 Sep 2008)
+New Revision: 1056
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+Log:
+- Added some separation between flags and names in chat. And the names over tanks are shown when the flag is shown(temporal solution)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2008-09-14 09:32:55 UTC (rev 1055)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2008-09-15 08:16:19 UTC (rev 1056)
+@@ -78,7 +78,8 @@
+     min_abs = (world_pos + selection_area.min) - world_win.min;
+     max_abs = (world_pos + selection_area.max) - world_win.min;
+ 
+-    if ( box_state == true ) {
++    if ( box_state == true )
++    {
+ 
+         // Modified the vehicle selection box and moved the hitpoints outside,
+         // the box status check, because I may want the hitpoints drawn all the time.
+@@ -87,32 +88,38 @@
+         assert(max_hit_points &gt; 0);
+ 
+         // Draw the selection box.
+-        if (gameconfig-&gt;unitselectionmode == _unit_selection_box_draw_mode_rect) {
++        if (gameconfig-&gt;unitselectionmode == _unit_selection_box_draw_mode_rect)
++        {
+             // Draw the rectangle selection box.
+             surface-&gt;drawRect(iRect(min_abs, max_abs), selectionBoxColor);
+-        } else if (gameconfig-&gt;unitselectionmode == _unit_selection_box_draw_mode_rect_edges) {
++        }
++        else // if (gameconfig-&gt;unitselectionmode == _unit_selection_box_draw_mode_rect_edges)
++        {
+             surface-&gt;drawBoxCorners(
+                     iRect(min_abs.x, min_abs.y, max_abs.x, max_abs.y),
+                     7, selectionBoxColor);
+-
+-        } else {
+-            assert(false);
+         }
+ 
+     } // ** box_state == true
+ 
+     // Draw the unit hitpoints.
+-    if ( gameconfig-&gt;drawunitdamage || (box_state == true) ) {
++    if ( gameconfig-&gt;drawunitdamage || (box_state == true) )
++    {
+         // Draw a color coded hit bar.
+         Uint8 hitBarColor;
+ 
+         float hitPointPercent = float(hit_points) / float(max_hit_points);
+ 
+-        if (hitPointPercent &lt; 0.3f) {
++        if (hitPointPercent &lt; 0.3f)
++        {
+             hitBarColor = Color::red;
+-        } else if (hitPointPercent &lt; 0.6f) {
++        }
++        else if (hitPointPercent &lt; 0.6f)
++        {
+             hitBarColor = Color::yellow;
+-        } else {
++        }
++        else
++        {
+             hitBarColor = Color::green;
+         }
+ 
+@@ -132,19 +139,20 @@
+         //surface-&gt;drawHLine(min_abs.x, max_abs.y-3, max_abs.x+1, box_color);
+     }
+ 
+-    if ( gameconfig-&gt;drawunitflags == true ) {
++    if ( gameconfig-&gt;drawunitflags == true )
++    {
+         //unit_flag.blt( *surface, iXY( min_abs.x, min_abs.y - unit_flag.getPix().y ) );
+         //surface-&gt;bltString(min_abs.x + 2, min_abs.y - 6, &quot;Panther1&quot;, Color::white);
+         unit_flag-&gt;blt( *surface, min_abs.x, min_abs.y-unit_flag-&gt;getHeight()-1 );
++        if ( playerName.length() &gt; 0 )
++        {   // XXX dirty trick, I don't center the text, just &quot;by hand&quot;
++            surface-&gt;bltString(min_abs.x+unit_flag-&gt;getWidth() + 2,
++                           min_abs.y - unit_flag-&gt;getHeight() + 2 ,
++                           playerName.c_str(), Color::white);
++        }
+     }
+ 
+-    if ( playerName.length() &gt; 0 )
+-    {   // XXX dirty trick, I don't center the text, just &quot;by hand&quot;
+-        surface-&gt;bltString(min_abs.x+unit_flag-&gt;getWidth() + 2,
+-                       min_abs.y - unit_flag-&gt;getHeight() + 2 ,
+-                       playerName.c_str(), Color::white);
+-    }
+-    
++
+     /*
+     if ( (flag_visibility_state == true) &amp;&amp; (allie_state == true) )
+      { 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2008-09-14 09:32:55 UTC (rev 1055)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2008-09-15 08:16:19 UTC (rev 1056)
+@@ -196,7 +196,7 @@
+             if ( line_list[ index ].hasFlag )
+             {
+                 flag = ResourceManager::getFlag(line_list[index].flag);
+-                flagextrax = flag-&gt;getWidth();
++                flagextrax = flag-&gt;getWidth()+2;
+                 flag-&gt;blt(surface, current_line.x, current_line.y);
+             }
+             else
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000093.html">[Netpanzer-cvs] r1054 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Objectives Particles PowerUps	Resources Units
+</A></li>
+	<LI>Next message: <A HREF="000095.html">[Netpanzer-cvs] r1059 - in trunk/netpanzer/src/NetPanzer:	Interfaces System Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

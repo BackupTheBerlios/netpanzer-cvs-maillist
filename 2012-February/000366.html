@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1340 - in trunk/netpanzer: pics/flags	src/NetPanzer/Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1340%20-%20in%20trunk/netpanzer%3A%20pics/flags%0A%09src/NetPanzer/Interfaces&In-Reply-To=%3C20120204083620.B52F348158A%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000367.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1340 - in trunk/netpanzer: pics/flags	src/NetPanzer/Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1340%20-%20in%20trunk/netpanzer%3A%20pics/flags%0A%09src/NetPanzer/Interfaces&In-Reply-To=%3C20120204083620.B52F348158A%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1340 - in trunk/netpanzer: pics/flags	src/NetPanzer/Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb  4 09:36:20 CET 2012</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000367.html">[Netpanzer-cvs] r1341 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#366">[ date ]</a>
+              <a href="thread.html#366">[ thread ]</a>
+              <a href="subject.html#366">[ subject ]</a>
+              <a href="author.html#366">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-02-04 09:36:20 +0100 (Sat, 04 Feb 2012)
+New Revision: 1340
+
+Added:
+   trunk/netpanzer/pics/flags/panama.bmp
+Removed:
+   trunk/netpanzer/pics/flags/panam?\195?\161.bmp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+Log:
+fix not saving the player name on the config file
+
+Added: trunk/netpanzer/pics/flags/panama.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/flags/panama.bmp
+___________________________________________________________________
+Added: svn:mime-type
+   + image/x-ms-bmp
+
+Deleted: trunk/netpanzer/pics/flags/panam?\195?\161.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-01-18 00:32:14 UTC (rev 1339)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-02-04 08:36:20 UTC (rev 1340)
+@@ -297,7 +297,18 @@
+     {0,0}
+ };
+ 
++static const ScriptVarBindRecord player_getters[] =
++{
++    { &quot;name&quot;,           GETSVTYPE_STRING,  &amp;GameConfig::player_name },
++    {0,0}
++};
+ 
++static const ScriptVarBindRecord player_setters[] =
++{
++    { &quot;name&quot;,           SETSVTYPE_STRING,  &amp;GameConfig::player_name },
++    {0,0}
++};
++
+ void GameConfig::registerScript(const NPString&amp; table_name)
+ {
+     if ( ! game_unit_profiles )
+@@ -383,6 +394,9 @@
+                                        &quot;ConfigServerMetaTable&quot;,
+                                        server_getters, server_setters);
+ 
++    ScriptManager::bindStaticVariables(table_name + &quot;.player&quot;,
++                                       &quot;ConfigPlayerMetaTable&quot;,
++                                       player_getters, player_setters);
+ }
+ 
+ GameConfig::GameConfig(const std::string&amp; luaconfigfile,bool usePhysFS)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000367.html">[Netpanzer-cvs] r1341 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#366">[ date ]</a>
+              <a href="thread.html#366">[ thread ]</a>
+              <a href="subject.html#366">[ subject ]</a>
+              <a href="author.html#366">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

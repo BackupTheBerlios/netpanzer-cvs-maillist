@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1273 - trunk/netpanzer/src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1273%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111027082356.A5D27481343%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000298.html">
+   <LINK REL="Next"  HREF="000300.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1273 - trunk/netpanzer/src/NetPanzer/Views/Game</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1273%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111027082356.A5D27481343%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1273 - trunk/netpanzer/src/NetPanzer/Views/Game">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct 27 10:23:56 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000298.html">[Netpanzer-cvs] r1272 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Views
+</A></li>
+        <LI>Next message: <A HREF="000300.html">[Netpanzer-cvs] r1274 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-27 10:23:56 +0200 (Thu, 27 Oct 2011)
+New Revision: 1273
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+Log:
+Resolve bug in exit and resign
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2011-10-26 20:27:33 UTC (rev 1272)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2011-10-27 08:23:56 UTC (rev 1273)
+@@ -46,9 +46,9 @@
+     setSearchName(&quot;AreYouSureExitView&quot;);
+     setTitle(&quot;Exit netPanzer&quot;);
+     setSubTitle(&quot;&quot;);
++    loaded = false;
++	} // end AreYouSureExitView::AreYouSureExitView
+ 
+-} // end AreYouSureExitView::AreYouSureExitView
+-
+ // init
+ //---------------------------------------------------------------------------
+ void AreYouSureExitView::init()
+@@ -67,6 +67,7 @@
+     add( Button::createSpecialButton( &quot;YES&quot;, &quot;YES&quot;, iXY(x, y)) );
+     x += 141 + 10;
+     add( Button::createSpecialButton( &quot;NO&quot;, &quot;NO&quot;, iXY(x, y)) );
++    loaded = true;
+ } // end AreYouSureExitView::init
+ 
+ // doDraw
+@@ -87,7 +88,10 @@
+ //---------------------------------------------------------------------------
+ void AreYouSureExitView::doActivate()
+ {
+-    init();
++    if ( ! loaded )
++    {
++	init();
++    }
+     Desktop::setActiveView(this);
+ 
+ } // end AreYouSureExitView::doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp	2011-10-26 20:27:33 UTC (rev 1272)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp	2011-10-27 08:23:56 UTC (rev 1273)
+@@ -26,7 +26,8 @@
+ {
+ private:
+     void init();
+-
++    bool loaded;
++	
+ public:
+     AreYouSureExitView();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2011-10-26 20:27:33 UTC (rev 1272)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2011-10-27 08:23:56 UTC (rev 1273)
+@@ -117,7 +117,8 @@
+     setSearchName(&quot;AreYouSureResignView&quot;);
+     setTitle(&quot;Resign&quot;);
+     setSubTitle(&quot;&quot;);
+-} // end AreYouSureResignView::AreYouSureResignView
++    loaded = false;
++	} // end AreYouSureResignView::AreYouSureResignView
+ 
+ // init
+ //---------------------------------------------------------------------------
+@@ -137,7 +138,8 @@
+     add( Button::createSpecialButton( &quot;YES&quot;, &quot;YES&quot;, iXY(x, y)) );
+     x += 141 + 10;
+     add( Button::createSpecialButton( &quot;NO&quot;, &quot;NO&quot;, iXY(x, y)) );
+-} // end AreYouSureResignView::init
++    loaded = true;
++	} // end AreYouSureResignView::init
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+@@ -157,7 +159,10 @@
+ //---------------------------------------------------------------------------
+ void AreYouSureResignView::doActivate()
+ {
+-    init();
++    if ( ! loaded )
++    {
++	init();
++    }
+     Desktop::setActiveView(this);
+ } // end AreYouSureResignView::doActivate
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp	2011-10-26 20:27:33 UTC (rev 1272)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp	2011-10-27 08:23:56 UTC (rev 1273)
+@@ -26,7 +26,8 @@
+ {
+ private:
+     void init();
+-
++    bool loaded;
++	
+ public:
+     AreYouSureResignView();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-10-26 20:27:33 UTC (rev 1272)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2011-10-27 08:23:56 UTC (rev 1273)
+@@ -155,7 +155,8 @@
+     {
+         init();
+     }
+-}
++    Desktop::setActiveView(this);
++	}
+ 
+ void GFlagSelectionView::doDeactivate()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2011-10-26 20:27:33 UTC (rev 1272)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2011-10-27 08:23:56 UTC (rev 1273)
+@@ -54,18 +54,13 @@
+ void
+ LoadingView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-//    if ( Palette::getName() != &quot;netpmenu&quot; )
+-//    {
+-//        GameManager::loadPalette(&quot;netpmenu&quot;);
+-//    }
+-
+     if (dirty)
+         render();
+ 
+-    //screen-&gt;fill(Color::black);
++    screen-&gt;fill(Color::black);
+     backgroundSurface.blt(clientArea, 0, 0);
+-    clientArea.FillRoundRect(iRect(165, 40, 635, 225), 10, Color::black);
+-    clientArea.RoundRect(iRect(165, 40, 635, 225), 10, Color::yellow);
++    clientArea.FillRoundRect(iRect(165, 40, 635, 225), 10, Color::black);
++    clientArea.RoundRect(iRect(165, 40, 635, 225), 10, Color::yellow);
+     surface.blt(clientArea, 172, 45);
+ 
+     View::doDraw(viewArea, clientArea);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000298.html">[Netpanzer-cvs] r1272 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Views
+</A></li>
+	<LI>Next message: <A HREF="000300.html">[Netpanzer-cvs] r1274 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

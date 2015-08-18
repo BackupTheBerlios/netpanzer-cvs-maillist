@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1130 - in trunk/netpanzer: . support/icon	support/macosx
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1130%20-%20in%20trunk/netpanzer%3A%20.%20support/icon%0A%09support/macosx&In-Reply-To=%3C200906280411.n5S4BpTj016013%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000158.html">
+   <LINK REL="Next"  HREF="000160.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1130 - in trunk/netpanzer: . support/icon	support/macosx</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1130%20-%20in%20trunk/netpanzer%3A%20.%20support/icon%0A%09support/macosx&In-Reply-To=%3C200906280411.n5S4BpTj016013%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1130 - in trunk/netpanzer: . support/icon	support/macosx">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jun 28 06:11:51 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000158.html">[Netpanzer-cvs] r1129 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000160.html">[Netpanzer-cvs] r1131 - trunk/netpanzer/support/macosx
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#159">[ date ]</a>
+              <a href="thread.html#159">[ thread ]</a>
+              <a href="subject.html#159">[ subject ]</a>
+              <a href="author.html#159">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-28 06:11:34 +0200 (Sun, 28 Jun 2009)
+New Revision: 1130
+
+Added:
+   trunk/netpanzer/support/icon/netpanzer.icns
+   trunk/netpanzer/support/macosx/basedmg.dmg
+   trunk/netpanzer/support/macosx/make_appbundle.sh
+Modified:
+   trunk/netpanzer/
+   trunk/netpanzer/support/icon/titan.png
+Log:
+- created script to make Mac OS X app bundles and disk image files of netpanzer
+- created a icon (icns) for the app bundle
+- created a base image file for the script
+
+
+
+Property changes on: trunk/netpanzer
+___________________________________________________________________
+Name: svn:ignore
+   - .sconsign.dblite
+build
+RELEASE_VERSION
+
+   + .sconsign.dblite
+build
+RELEASE_VERSION
+netpanzer
+releases
+
+
+Added: trunk/netpanzer/support/icon/netpanzer.icns
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/support/icon/netpanzer.icns
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/support/icon/titan.png
+===================================================================
+(Binary files differ)
+
+Added: trunk/netpanzer/support/macosx/basedmg.dmg
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/support/macosx/basedmg.dmg
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/support/macosx/make_appbundle.sh
+===================================================================
+--- trunk/netpanzer/support/macosx/make_appbundle.sh	2009-06-27 10:30:03 UTC (rev 1129)
++++ trunk/netpanzer/support/macosx/make_appbundle.sh	2009-06-28 04:11:34 UTC (rev 1130)
+@@ -0,0 +1,75 @@
++#! /bin/bash
++
++RELEASEDIR=&quot;releases&quot;
++APPNAME=&quot;NetPanzer&quot;
++BASEDMG=&quot;support/macosx/basedmg.dmg&quot;
++TEMPDMG=&quot;${RELEASEDIR}/tempdmg.dmg&quot;
++FINALDMG=&quot;${RELEASEDIR}/NetPanzer.dmg&quot;
++DMGROOT=&quot;${RELEASEDIR}/MacOS_DMGROOT&quot;
++DMGDOC=&quot;${DMGROOT}/Documentation&quot;
++APPDIR=&quot;${DMGROOT}/${APPNAME}.app&quot;
++CONTENTSDIR=&quot;${APPDIR}/Contents&quot;
++
++echo &quot;Cleaning work folder&quot;
++[ ! -d ${RELEASEDIR} ] &amp;&amp; mkdir ${RELEASEDIR}
++
++rm -f ${TEMPDMG}
++rm -f ${FINALDMG}
++
++echo &quot;Uncompressing and mounting dmg&quot;
++hdiutil convert &quot;${BASEDMG}&quot; -format UDRW -o &quot;${TEMPDMG}&quot;
++hdiutil attach &quot;${TEMPDMG}&quot; -mountpoint &quot;${DMGROOT}&quot;
++
++mkdir &quot;${CONTENTSDIR}&quot; &quot;${CONTENTSDIR}&quot;/{Frameworks,MacOS,Resources}
++
++echo -n &quot;Copying files&quot;
++find cache maps pics powerups scripts sound units wads ! -type d  ! -path '*/.svn/*' ! -iname '.DS_Store' -print | \
++	while read fname; do 
++		DNAME=&quot;`dirname \&quot;${fname}\&quot;`&quot;
++		[ ! -d &quot;${CONTENTSDIR}/Resources/${DNAME}&quot; ] &amp;&amp; mkdir -p &quot;${CONTENTSDIR}/Resources/${DNAME}&quot;
++		cp &quot;${fname}&quot; &quot;${CONTENTSDIR}/Resources/${fname}&quot;
++		echo -n &quot;.&quot;
++	done
++	
++cp BUGS ChangeLog COPYING LICENSE-physfs.txt README README-zlib123.txt RELNOTES TODO &quot;${DMGDOC}&quot;
++echo -n &quot;.&quot;
++cp support/icon/netpanzer.icns &quot;${CONTENTSDIR}/Resources&quot;
++echo -n &quot;.&quot;
++cp netpanzer &quot;${CONTENTSDIR}/MacOS/&quot;
++echo &quot;.&quot;
++
++echo &quot;Copying needed frameworks...&quot;
++cp -R /Library/Frameworks/SDL{,_image}.framework &quot;${CONTENTSDIR}/Frameworks&quot;
++
++echo &quot;Creating info files...&quot;
++
++echo -n 'APPL????' &gt; &quot;${CONTENTSDIR}/PkgInfo&quot;
++
++cat &lt;&lt; EOF &gt; &quot;${CONTENTSDIR}/Info.plist&quot;
++&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
++&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;<A HREF="http://www.apple.com/DTDs/PropertyList-1.0.dtd">http://www.apple.com/DTDs/PropertyList-1.0.dtd</A>&quot;&gt;
++&lt;plist version=&quot;1.0&quot;&gt;
++&lt;dict&gt;
++	&lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;
++	&lt;string&gt;English&lt;/string&gt;
++	&lt;key&gt;CFBundleExecutable&lt;/key&gt;
++	&lt;string&gt;netpanzer&lt;/string&gt;
++	&lt;key&gt;CFBundleIconFile&lt;/key&gt;
++	&lt;string&gt;netpanzer.icns&lt;/string&gt;
++	&lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;
++	&lt;string&gt;6.0&lt;/string&gt;
++	&lt;key&gt;CFBundlePackageType&lt;/key&gt;
++	&lt;string&gt;APPL&lt;/string&gt;
++	&lt;key&gt;CFBundleSignature&lt;/key&gt;
++	&lt;string&gt;????&lt;/string&gt;
++	&lt;key&gt;CFBundleVersion&lt;/key&gt;
++	&lt;string&gt;0.0.1d1&lt;/string&gt;
++&lt;/dict&gt;
++&lt;/plist&gt;
++EOF
++
++echo &quot;Unmounting and creating final DMG&quot;
++hdiutil detach &quot;${DMGROOT}&quot; -force
++hdiutil resize -sectors min &quot;${TEMPDMG}&quot;
++hdiutil convert &quot;${TEMPDMG}&quot; -format UDZO -o &quot;${FINALDMG}&quot; -imagekey zlib-level=9
++rm -f &quot;${TEMPDMG}&quot;
+
+
+Property changes on: trunk/netpanzer/support/macosx/make_appbundle.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000158.html">[Netpanzer-cvs] r1129 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000160.html">[Netpanzer-cvs] r1131 - trunk/netpanzer/support/macosx
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#159">[ date ]</a>
+              <a href="thread.html#159">[ thread ]</a>
+              <a href="subject.html#159">[ subject ]</a>
+              <a href="author.html#159">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

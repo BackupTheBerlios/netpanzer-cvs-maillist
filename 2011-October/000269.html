@@ -1,0 +1,453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1243 - trunk/netpanzer/src/NetPanzer/PowerUps
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1243%20-%20trunk/netpanzer/src/NetPanzer/PowerUps&In-Reply-To=%3C20111006121221.8459B481309%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000268.html">
+   <LINK REL="Next"  HREF="000270.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1243 - trunk/netpanzer/src/NetPanzer/PowerUps</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1243%20-%20trunk/netpanzer/src/NetPanzer/PowerUps&In-Reply-To=%3C20111006121221.8459B481309%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1243 - trunk/netpanzer/src/NetPanzer/PowerUps">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct  6 14:12:21 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000268.html">[Netpanzer-cvs] r1242 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000270.html">[Netpanzer-cvs] r1244 - trunk/netpanzer/src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#269">[ date ]</a>
+              <a href="thread.html#269">[ thread ]</a>
+              <a href="subject.html#269">[ subject ]</a>
+              <a href="author.html#269">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-06 14:12:21 +0200 (Thu, 06 Oct 2011)
+New Revision: 1243
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+Log:
+PowerUp make some effect (random 1-8%)
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2011-10-05 08:10:20 UTC (rev 1242)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2011-10-06 12:12:21 UTC (rev 1243)
+@@ -54,19 +54,18 @@
+                                     };
+ 
+ void PowerUpInterface::setPowerUpLimits(unsigned long map_size_x,
+-        unsigned long map_size_y )
++                                        unsigned long map_size_y )
+ {
+     int active_players;
+ 
+     active_players = PlayerInterface::getActivePlayerCount();
+ 
+-    // Magic Number 0.10 = 1/10 
++    // Magic Number 0.10 = 1/10
+     int player_factor = int(( 0.10 ) * active_players);
+-    
++
+     // Magic Number 0.0000625 = 1/16000
+     int power_up_limit = int( ( 0.0000625 ) * ( (map_size_x * map_size_y) ) );
+     power_up_limit = power_up_limit + (power_up_limit * player_factor);
+-
+     PowerUpInterface::power_up_limit = power_up_limit;
+     power_up_regen_time_upper_bound =  300;
+     power_up_regen_time_lower_bound =  60;
+@@ -87,7 +86,7 @@
+     PowerUpCreateMesg create_mesg;
+     iXY loc;
+ 
+-    if( (powerup_list.size() &lt; (size_t) power_up_limit) )
++    while (powerup_list.size() &lt; (size_t) power_up_limit)
+     {
+         map_size_x = MapInterface::getWidth();
+         map_size_y = MapInterface::getHeight();
+@@ -96,9 +95,8 @@
+         loc.y = rand() % map_size_y;
+         if ( MapInterface::getMovementValue( loc ) == 0xFF )
+         {
+-            return; // no powerup, try next time.
++            continue; // no powerup, try next time.
+         }
+-
+         int prob_table_index;
+         int powerup_type;
+ 
+@@ -108,21 +106,21 @@
+ 
+         switch( powerup_type )
+         {
+-            case _powerup_bonus_units :
+-                power_up = new BonusUnitPowerUp( loc, powerup_type );
+-                break;
++        case _powerup_bonus_units :
++            power_up = new BonusUnitPowerUp( loc, powerup_type );
++            break;
+ 
+-            case _powerup_unit :
+-                power_up = new UnitPowerUp( loc, powerup_type );
+-                break;
++        case _powerup_unit :
++            power_up = new UnitPowerUp( loc, powerup_type );
++            break;
+ 
+-            case _powerup_enemy_radar :
+-                power_up = new EnemyRadarPowerUp( loc, powerup_type );
+-                break;
++        case _powerup_enemy_radar :
++            power_up = new EnemyRadarPowerUp( loc, powerup_type );
++            break;
+ 
+-            default:
+-                LOGGER.info(&quot;Unknown powerup type?!?&quot;);
+-                return;
++        default:
++            LOGGER.info(&quot;Unknown powerup type?!?&quot;);
++            return;
+         }
+ 
+         power_up-&gt;ID = getNextPowerUpID();
+@@ -178,8 +176,6 @@
+     if ( NetworkState::status == _network_state_server )
+     {
+         generatePowerUp();
+-        generatePowerUp();
+-        generatePowerUp();
+     }
+ }
+ 
+@@ -241,27 +237,27 @@
+ 
+     switch( create_mesg-&gt;getType() )
+     {
+-        case _powerup_bonus_units :
+-            power_up = new BonusUnitPowerUp( 
+-                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                    _powerup_bonus_units );
+-            break;
++    case _powerup_bonus_units :
++        power_up = new BonusUnitPowerUp(
++            iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
++            _powerup_bonus_units );
++        break;
+ 
+-        case _powerup_unit :
+-            power_up = new UnitPowerUp(
+-                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                    _powerup_unit );
+-            break;
++    case _powerup_unit :
++        power_up = new UnitPowerUp(
++            iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
++            _powerup_unit );
++        break;
+ 
+-        case _powerup_enemy_radar :
+-            power_up = new EnemyRadarPowerUp(
+-                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                    _powerup_enemy_radar);
+-            break;
++    case _powerup_enemy_radar :
++        power_up = new EnemyRadarPowerUp(
++            iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
++            _powerup_enemy_radar);
++        break;
+ 
+-        default:
+-            LOGGER.info(&quot;Unknown powerup type?!?&quot;);
+-            return;
++    default:
++        LOGGER.info(&quot;Unknown powerup type?!?&quot;);
++        return;
+     }
+ 
+     power_up-&gt;ID = create_mesg-&gt;getID();
+@@ -288,18 +284,18 @@
+ {
+     switch(message-&gt;message_id)
+     {
+-        case _net_message_id_powerup_create:
+-            netMessagePowerUpCreate(message);
+-            break;
++    case _net_message_id_powerup_create:
++        netMessagePowerUpCreate(message);
++        break;
+ 
+-        case _net_message_id_powerup_hit:
+-            netMessagePowerUpHit(message);
+-            break;
++    case _net_message_id_powerup_hit:
++        netMessagePowerUpHit(message);
++        break;
+ 
+-        default:
+-            LOGGER.warning(&quot;Unknown PowerUpMessage type (id %d-%d)&quot;,
+-                    message-&gt;message_class, message-&gt;message_id);
+-            break;
++    default:
++        LOGGER.warning(&quot;Unknown PowerUpMessage type (id %d-%d)&quot;,
++                       message-&gt;message_class, message-&gt;message_id);
++        break;
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2011-10-05 08:10:20 UTC (rev 1242)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2011-10-06 12:12:21 UTC (rev 1243)
+@@ -34,7 +34,6 @@
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ 
+-
+ enum { _unit_powerup_hitpoints,
+        _unit_powerup_range,
+        _unit_powerup_firepower,
+@@ -46,53 +45,41 @@
+      };
+ 
+ UnitPowerUp::UnitPowerUp(iXY map_loc, int type)
+-        : PowerUp( map_loc, type )
++    : PowerUp( map_loc, type )
+ {
+     unit_powerup_type = rand() % _unit_powerup_enum_count;
+ }
+ 
+ void UnitPowerUp::powerUpHitPoints( UnitState *unit_state)
+ {
+-    /* wtf someone did test lua here before!!!
+-    lua_Object hit_points;
+-
+-    lua_pushnumber( (double) (unit_state-&gt;hit_points) );
+-    lua_pushnumber( (double) (unit_state-&gt;max_hit_points) );
+-    lua_callfunction( lua_getglobal(&quot;UnitPowerUpHitPoints&quot;) ); 
+-    hit_points = lua_getresult(1);
+-    unit_state-&gt;hit_points = (short) lua_getnumber( hit_points ); 
+-    unit_state-&gt;max_hit_points = unit_state-&gt;hit_points; 
+-    */
+-    float percent = (rand() % 100) / 100;
+-    int new_hitpoints = int(unit_state-&gt;max_hit_points +
+-			    (unit_state-&gt;max_hit_points * percent));
++    int percent = (int)(rand() % 8)+1;
++    int new_hitpoints = unit_state-&gt;max_hit_points+
++                        (int)((double)unit_state-&gt;max_hit_points * ((double)percent/(double)100));
+     unit_state-&gt;hit_points = new_hitpoints;
+     unit_state-&gt;max_hit_points = new_hitpoints;
+-
+ }
+ 
+ void UnitPowerUp::powerUpRange( UnitState *unit_state)
+ {
+-    float percent = (((rand() % 100) / 100) * 50) / 100;
+-    int new_weapon_range = int(unit_state-&gt;weapon_range +
+-			      (unit_state-&gt;weapon_range * percent));
++    int percent = (int)(rand() % 8)+1;
++    int new_weapon_range = unit_state-&gt;weapon_range+
++                           (int)((double)unit_state-&gt;weapon_range * ((double)percent/(double)100));
+     unit_state-&gt;weapon_range = new_weapon_range;
+ }
+ 
+ void UnitPowerUp::powerUpFirePower( UnitState *unit_state)
+ {
+-    int max_percent_increase = 50;
+-    float percent = (((rand() % 100) / 100) * max_percent_increase) / 100;
+-
+-    int new_damage_factor = int(unit_state-&gt;damage_factor +
+-	    (unit_state-&gt;damage_factor * percent));
++    int percent = (int)(rand() % 8)+1;
++    int new_damage_factor = unit_state-&gt;damage_factor+
++                            (int)((double)unit_state-&gt;damage_factor * ((double)percent/(double)100));
+     unit_state-&gt;damage_factor = new_damage_factor;
+ }
+ 
+ void UnitPowerUp::powerUpSpeed( UnitState *unit_state)
+ {
+-    int new_speed_factor = int(unit_state-&gt;speed_factor + 
+-	    floor( (((rand() % 100) / 100) * 5) ));
++    int percent = (int)(rand() % 10)+1;
++    int new_speed_factor = unit_state-&gt;speed_factor+
++                           (int)((double)unit_state-&gt;speed_factor * ((double)percent/(double)100));
+     unit_state-&gt;speed_factor = new_speed_factor;
+ }
+ 
+@@ -103,12 +90,12 @@
+ 
+ void UnitPowerUp::powerUpReload( UnitState *unit_state)
+ {
+-    int max_percent_decrease = 50;
+-    float percent = (((rand() % 100) / 100) * max_percent_decrease) / 100;
+-
+-    int new_reload_time = int(unit_state-&gt;reload_time -
+-			     (unit_state-&gt;reload_time * percent));
++    int percent = (int)(rand() % 6)+1;
++    int new_reload_time = unit_state-&gt;reload_time-
++                          (int)((double)unit_state-&gt;reload_time * ((double)percent/(double)100));
+     unit_state-&gt;reload_time = new_reload_time;
++    if (unit_state-&gt;reload_time &lt; 20 ) unit_state-&gt;reload_time = 20;
++
+ }
+ 
+ void UnitPowerUp::powerUpDestruct( UnitID unit_id )
+@@ -122,26 +109,26 @@
+ {
+     switch( type )
+     {
+-        case _unit_powerup_hitpoints:
+-            return( &quot;UNIT HITPOINTS&quot; );
++    case _unit_powerup_hitpoints:
++        return( &quot;UNIT HITPOINTS&quot; );
+ 
+-        case _unit_powerup_range:
+-            return( &quot;UNIT WEAPON RANGE&quot; );
++    case _unit_powerup_range:
++        return( &quot;UNIT WEAPON RANGE&quot; );
+ 
+-        case _unit_powerup_firepower:
+-            return( &quot;UNIT FIREPOWER&quot; );
++    case _unit_powerup_firepower:
++        return( &quot;UNIT FIREPOWER&quot; );
+ 
+-        case _unit_powerup_speed:
+-            return( &quot;UNIT SPEED&quot; );
++    case _unit_powerup_speed:
++        return( &quot;UNIT SPEED&quot; );
+ 
+-        case _unit_powerup_repair:
+-            return( &quot;UNIT REPAIR&quot; );
++    case _unit_powerup_repair:
++        return( &quot;UNIT REPAIR&quot; );
+ 
+-        case _unit_powerup_reload:
+-            return( &quot;UNIT RELOAD TIME&quot; );
++    case _unit_powerup_reload:
++        return( &quot;UNIT RELOAD TIME&quot; );
+ 
+-        case _unit_powerup_destruct:
+-            return( &quot;UNIT DESTRUCT&quot; );
++    case _unit_powerup_destruct:
++        return( &quot;UNIT DESTRUCT&quot; );
+     }
+ 
+     return(&quot;&quot;);
+@@ -155,33 +142,33 @@
+ 
+     switch( unit_powerup_type )
+     {
+-        case _unit_powerup_hitpoints:
+-            powerUpHitPoints( &amp;(unit-&gt;unit_state) );
+-            break;
++    case _unit_powerup_hitpoints:
++        powerUpHitPoints( &amp;(unit-&gt;unit_state) );
++        break;
+ 
+-        case _unit_powerup_range:
+-            powerUpRange( &amp;(unit-&gt;unit_state) );
+-            break;
++    case _unit_powerup_range:
++        powerUpRange( &amp;(unit-&gt;unit_state) );
++        break;
+ 
+-        case _unit_powerup_firepower:
+-            powerUpFirePower( &amp;(unit-&gt;unit_state) );
+-            break;
++    case _unit_powerup_firepower:
++        powerUpFirePower( &amp;(unit-&gt;unit_state) );
++        break;
+ 
+-        case _unit_powerup_speed:
+-            powerUpSpeed( &amp;(unit-&gt;unit_state) );
+-            break;
++    case _unit_powerup_speed:
++        powerUpSpeed( &amp;(unit-&gt;unit_state) );
++        break;
+ 
+-        case _unit_powerup_repair:
+-            powerUpRepair( &amp;(unit-&gt;unit_state) );
+-            break;
++    case _unit_powerup_repair:
++        powerUpRepair( &amp;(unit-&gt;unit_state) );
++        break;
+ 
+-        case _unit_powerup_reload:
+-            powerUpReload( &amp;(unit-&gt;unit_state) );
+-            break;
++    case _unit_powerup_reload:
++        powerUpReload( &amp;(unit-&gt;unit_state) );
++        break;
+ 
+-        case _unit_powerup_destruct:
+-            powerUpDestruct( unit_id );
+-            break;
++    case _unit_powerup_destruct:
++        powerUpDestruct( unit_id );
++        break;
+     }
+ 
+     PowerUpHitMesg hit_mesg;
+@@ -190,8 +177,10 @@
+ 
+     life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+-    if(unit-&gt;player == PlayerInterface::getLocalPlayer()) {
+-        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;YOU GOT A %s POWERUP&quot;, powerupTypeToString( unit_powerup_type ) );
++    if(unit-&gt;player == PlayerInterface::getLocalPlayer())
++    {
++        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;YOU GOT A %s POWERUP&quot;, 
++                                      powerupTypeToString( unit_powerup_type ) );
+     }
+ }
+ 
+@@ -203,7 +192,6 @@
+     if( PlayerInterface::getLocalPlayerIndex() == message-&gt;getPlayerID() )
+     {
+         ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;YOU GOT A %s POWERUP&quot;,
+-                        powerupTypeToString( message-&gt;getUnitPowerupType() ) );
++                                      powerupTypeToString( message-&gt;getUnitPowerupType() ) );
+     }
+-
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000268.html">[Netpanzer-cvs] r1242 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000270.html">[Netpanzer-cvs] r1244 - trunk/netpanzer/src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#269">[ date ]</a>
+              <a href="thread.html#269">[ thread ]</a>
+              <a href="subject.html#269">[ subject ]</a>
+              <a href="author.html#269">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

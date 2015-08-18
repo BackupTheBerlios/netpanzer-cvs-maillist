@@ -1,0 +1,1238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1144 - trunk/phpmasterserver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-July/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1144%20-%20trunk/phpmasterserver&In-Reply-To=%3C200907121002.n6CA2sgg010053%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000172.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1144 - trunk/phpmasterserver</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1144%20-%20trunk/phpmasterserver&In-Reply-To=%3C200907121002.n6CA2sgg010053%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1144 - trunk/phpmasterserver">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul 12 12:02:54 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000172.html">[Netpanzer-cvs] r1143 - in trunk: . phpmasterserver	phpmasterserver/doc
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#173">[ date ]</a>
+              <a href="thread.html#173">[ thread ]</a>
+              <a href="subject.html#173">[ subject ]</a>
+              <a href="author.html#173">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-07-12 12:02:36 +0200 (Sun, 12 Jul 2009)
+New Revision: 1144
+
+Added:
+   trunk/phpmasterserver/MasterHeartbeat.php
+   trunk/phpmasterserver/SocketManager.php
+   trunk/phpmasterserver/TCPListener.php
+   trunk/phpmasterserver/UDPListener.php
+Modified:
+   trunk/phpmasterserver/ClientSock.php
+   trunk/phpmasterserver/MasterInfo.php
+   trunk/phpmasterserver/MasterList.php
+   trunk/phpmasterserver/ServerInfo.php
+   trunk/phpmasterserver/ServerList.php
+   trunk/phpmasterserver/phpmasterserver.php
+Log:
+- phpmasterserver can only run on php5 now, it uses classes for almost everithing.
+
+Modified: trunk/phpmasterserver/ClientSock.php
+===================================================================
+--- trunk/phpmasterserver/ClientSock.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/ClientSock.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -16,31 +16,70 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
++require_once &quot;MasterList.php&quot;;
++require_once &quot;ServerList.php&quot;;
++
+ class ClientSock
+ {
+-    var $sock;
+-    var $state;
+-    var $ip;
+-    var $port;
+-    var $data;
+-    var $removeme;
++    public $_socket;
++    public $state;
++    public $ip;
++    public $port;
++    public $data;
++    public $removeme;
+ 	
+-    function ClientSock($socket)
++    public function __construct( $socket )
+     {
+-        $this-&gt;sock = $socket;
++        $this-&gt;_socket = $socket;
+         socket_getpeername( $socket, $this-&gt;ip, $this-&gt;port);
+         print &quot;New client: &quot; . $this-&gt;ip . &quot;:&quot; . $this-&gt;port . &quot; socket &quot; . $socket . &quot;\n&quot;;
+         $this-&gt;data = &quot;&quot;;
+         $this-&gt;removeme = false;
+     }
+-	
+-    function sendError( $msg )
++    
++    public function wantsToReceive()
+     {
++        return true;
++    }
++    
++    public function wantsToSend()
++    {
++        return false;
++    }
++    
++    public function onReadyToReceive()
++    {
++        $data = @socket_read( $this-&gt;_socket, 1024);
++        if ( $data === false )
++        {
++            $etype = socket_last_error( $this-&gt;_socket);
++            if (   $etype != SOCKET_EAGAIN
++                &amp;&amp; $etype != SOCKET_EINTR )
++            {
++                print &quot;Client ERROR: {$this-&gt;ip}:{$this-&gt;port}\n&quot;;
++                $this-&gt;removeme = true;
++            }
++            print &quot;Other ERROR: {$this-&gt;ip}:{$this-&gt;port}\n&quot;;
++        }
++        else if ( strlen($data) == 0 )
++        {
++            print &quot;Client disconnected: {$this-&gt;ip}:{$this-&gt;port}\n&quot;;
++            $this-&gt;removeme = true;
++        }
++        else
++        {
++            print &quot;Client data from {$this-&gt;ip}:{$this-&gt;port}: $data\n&quot;;
++            $this-&gt;onQueryReceived($data);
++        }
++    }
++    
++    private function sendError( $msg )
++    {
+         $fullmsg = &quot;\\error\\$msg\\final\\&quot;;
+-        socket_write($this-&gt;sock, $fullmsg);
++        socket_write($this-&gt;_socket, $fullmsg);
+     }
+ 	
+-    function onQueryReceived( $rdata )
++    public function onQueryReceived( $rdata )
+     {
+         $this-&gt;data .= $rdata;
+         if ( substr($this-&gt;data, -7) == &quot;\\final\\&quot; )
+@@ -49,7 +88,7 @@
+         }
+     }
+ 	
+-    function handleQuery()
++    private function handleQuery()
+     {
+         $str = $this-&gt;data;
+         $this-&gt;data = &quot;&quot;;
+@@ -72,16 +111,14 @@
+             }
+             else
+             {
+-                # some unknown command send, ignore the rest
+                 break;
+             }
+             $command = strtok(&quot;\\&quot;);
+-            print &quot;next command is $command&quot;;
+         }
+-        socket_write($this-&gt;sock, &quot;\\&quot;);
++        socket_write($this-&gt;_socket, &quot;\\&quot;);
+     }
+     
+-    function getAttributes()
++    private function getAttributes()
+     {
+         $att = array();
+         while (1)
+@@ -102,7 +139,7 @@
+         return $att;
+     }
+     
+-    function handleHeartbeat($attributes)
++    private function handleHeartbeat( $attributes )
+     {
+ 
+         if ( ! isset($attributes['port']) || $attributes['port'] &lt; 1 || $attributes['port'] &gt; 65535)
+@@ -117,22 +154,31 @@
+         }
+         elseif ( $attributes['gamename'] == &quot;netpanzer&quot; )
+         {
+-            global $serverList;
+             if ( isset($attributes['protocol']) &amp;&amp; $attributes['protocol'] &gt; 1 &amp;&amp; $attributes['protocol'] &lt; 65535 )
+             {
+-                $sinfo = new ServerInfo($this-&gt;ip, $attributes['port'], $this-&gt;gameprotocol, $this);
++                $sinfo = ServerList::getServer( $this-&gt;ip, $attributes['port'] );
++                if ( ! isset( $sinfo ) )
++                {
++                    print &quot;New server on {$this-&gt;ip}:{$attributes['port']}\n&quot;;
++                    $sinfo = new ServerInfo($this-&gt;ip, $attributes['port'], $attributes['protocol'], $this);
++                    ServerList::addServer($sinfo);
++                }
++                else
++                {
++                    print &quot;Heartbeat of server on {$this-&gt;ip}:{$attributes['port']}\n&quot;;
++                    $sinfo-&gt;clientSock = $this;
++                    $sinfo-&gt;protocol = $attributes['protocol'];
++                }
+                 $sinfo-&gt;sendQuery();
+-                $serverList-&gt;addServer($sinfo);
+             }
+         }
+         elseif ( $attributes['gamename'] == &quot;master&quot; )
+         {
+-            global $masterList;
+             global $MASTERPASSWORD;
+             
+             if ( isset( $attributes['password']) &amp;&amp; $attributes['password'] == $MASTERPASSWORD )
+             {
+-                $sinfo = $masterList-&gt;getServer($this-&gt;ip, $attributes['port']);
++                $sinfo = MasterList::getServer($this-&gt;ip, $attributes['port']);
+                 if ( isset($sinfo) )
+                 {
+                     $sinfo-&gt;touch();
+@@ -141,13 +187,13 @@
+                 {
+                     print &quot;New MasterServer connected: {$this-&gt;ip}:{$attributes['port']}\n&quot;;
+                     $sinfo = new MasterInfo($this-&gt;ip, $attributes['port']);
+-                    $masterList-&gt;addServer($sinfo);
++                    MasterList::addServer($sinfo);
+                 }
+             }
+         }
+     }
+ 	
+-    function handleListQuery($attributes)
++    private function handleListQuery( $attributes )
+     {
+         if ( ! isset($attributes['gamename']) )
+         {
+@@ -156,9 +202,8 @@
+         }
+         if ( $attributes['gamename'] == &quot;netpanzer&quot; )
+         {
+-            global $serverList;
+             $answer = &quot;&quot;;
+-            foreach ($serverList-&gt;servers as $srv)
++            foreach ( ServerList::$servers as $srv )
+             {
+                 if ( $srv-&gt;alive == false )
+                 {
+@@ -175,27 +220,26 @@
+                 }
+             }
+             $answer .= &quot;\\final&quot;;
+-            socket_write($this-&gt;sock, $answer);
++            socket_write($this-&gt;_socket, $answer);
+         }
+         elseif ( $attributes['gamename'] == &quot;master&quot; )
+         {
+-            global $masterList;
+-            socket_getsockname($this-&gt;sock, $myip, $myport);
++            socket_getsockname($this-&gt;_socket, $myip, $myport);
+             $answer = &quot;\\ip\\$myip\\port\\$myport&quot;;
+-            foreach ($masterList-&gt;servers as $srv)
++            foreach ( MasterList::$servers as $srv)
+             {
+                 $answer .= &quot;\\ip\\$srv-&gt;ip\\port\\$srv-&gt;port&quot;;
+             }
+             $answer .= &quot;\\final&quot;;
+-            socket_write($this-&gt;sock, $answer);
++            socket_write($this-&gt;_socket, $answer);
+         }
+         else
+         {
+-            socket_Write($this-&gt;sock, &quot;\\error\\Wrong query\\final\\&quot;);
++            socket_Write($this-&gt;_socket, &quot;\\error\\Wrong query\\final\\&quot;);
+         }
+     }
+     
+-    function handleQuitCommand($attributes)
++    private function handleQuitCommand( $attributes )
+     {
+         if ( ! isset($attributes['port']) || $attributes['port'] &lt; 1 || $attributes['port'] &gt; 65535 )
+         {
+@@ -203,23 +247,23 @@
+         }
+         else
+         {
+-            global $serverList;
+-            $srvinfo = $serverList-&gt;getServer($this-&gt;ip, $attributes['port']);
++            $srvinfo = ServerList::getServer($this-&gt;ip, $attributes['port']);
+             if ( isset($srvinfo) )
+             {
+-                socket_write($this-&gt;sock, &quot;\\final\\&quot;);
+-                $serverList-&gt;removeServer($this-&gt;ip, $attributes['port']);
++                socket_write($this-&gt;_socket, &quot;\\final\\&quot;);
++                ServerList::removeServer($this-&gt;ip, $attributes['port']);
+             }
+         }
+         $this-&gt;removeme = true;
+     }
+     
+-    function serverDidReply()
++    public function serverDidReply()
+     {
+-        socket_write($this-&gt;sock, &quot;\\final\\&quot;);
++        print &quot;Server did repply\n&quot;;
++        socket_write($this-&gt;_socket, &quot;final\\&quot;);
+     }
+ 	
+-    function serverDidTimeout()
++    public function serverDidTimeout()
+     {
+         $this-&gt;sendError(&quot;Unable to query server, check your port settings&quot;);
+         $this-&gt;removeme = true;
+
+Added: trunk/phpmasterserver/MasterHeartbeat.php
+===================================================================
+--- trunk/phpmasterserver/MasterHeartbeat.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/MasterHeartbeat.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -0,0 +1,89 @@
++&lt;?php
++# phpmasterserver - a masterserver in php for netPanzer games
++# (c)2009 by Aaron Perez Sanchez (<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>)
++# netPanzer homepage is: <A HREF="http://www.netpanzer.org">http://www.netpanzer.org</A>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++class MasterHeartbeat
++{
++    public $_socket;
++    public $removeme = false;
++    private $master;
++    private $isConnecting;
++    
++    public function __construct( MasterInfo $master )
++    {
++        $this-&gt;_socket = @socket_create(AF_INET, SOCK_STREAM, 0);
++        if ( $this-&gt;_socket === false )
++        {
++            throw new Exception(&quot;Could not create tcp socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_set_nonblock($this-&gt;_socket);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not set non blocking socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $this-&gt;master = $master;
++        $res = @socket_connect($this-&gt;_socket, $master-&gt;ip, $master-&gt;port);
++        if ( $res === false )
++        {
++            $error = socket_last_error($this-&gt;_socket);
++            if ( $error != SOCKET_EINPROGRESS )
++            {
++                @socket_close($this-&gt;_socket);
++                throw new Exception(&quot;Error connecting to masterserver {$srv-&gt;ip}:{$srv-&gt;port}&quot;, $error);
++            }
++            else
++            {
++                $this-&gt;isConnecting = true;
++            }
++        }
++        else
++        {
++            $this-&gt;isConnecting = false;
++            $this-&gt;sendHeartbeat();
++        }
++    }
++    
++    public function wantsToReceive()
++    {
++        return ! $this-&gt;isConnecting;
++    }
++    
++    public function wantsToSend()
++    {
++        return $this-&gt;isConnecting;
++    }
++
++    
++    public function onReadyToSend()
++    {
++        $this-&gt;isConnecting = false;
++        $this-&gt;sendHeartbeat();
++    }
++    
++    public function sendHeartbeat()
++    {
++        global $listenport;
++        global $MASTERPASSWORD;
++        $msg = &quot;\\heartbeat\\port\\$listenport\\gamename\\master\\password\\$MASTERPASSWORD\\final\\&quot;;
++        @socket_write( $this-&gt;_socket, $msg );
++        $this-&gt;removeme = true;
++    }
++}
++
++?&gt;
+\ No newline at end of file
+
+Modified: trunk/phpmasterserver/MasterInfo.php
+===================================================================
+--- trunk/phpmasterserver/MasterInfo.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/MasterInfo.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -18,31 +18,32 @@
+ 
+ class MasterInfo
+ {
+-    var $ip;
+-    var $port;
+-    var $lastHeartbeatTime;
+-    var $lastConnectTime;
++    public $ip;
++    public $port;
++    public $lastHeartbeatTime;
++    public $lastConnectTime;
++    public $removeable;
+     
+-    function MasterInfo( $ip, $port )
++    public function __construct( $ip, $port, $canRemove = true )
+     {
+         $this-&gt;ip = $ip;
+         $this-&gt;port = $port;
+         $this-&gt;lastHeartbeatTime = time();
++        $this-&gt;removeable = $canRemove;
+     }
+ 	
+-    function touch()
++    public function touch()
+     {
+         $this-&gt;lastHeartbeatTime = time();
+     }
+     
+-    function sendHeartbeat($sock)
++    public function sendHeartbeat( $sock )
+     {
+         global $listenport;
+         global $MASTERPASSWORD;
+         $msg = &quot;\\heartbeat\\port\\$listenport\\gamename\\master\\password\\$MASTERPASSWORD\\final\\&quot;;
+         @socket_write($sock, $msg);
+     }
+-    
+ }
+ 
+ ?&gt;
+\ No newline at end of file
+
+Modified: trunk/phpmasterserver/MasterList.php
+===================================================================
+--- trunk/phpmasterserver/MasterList.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/MasterList.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -17,48 +17,84 @@
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+ require_once &quot;MasterInfo.php&quot;;
++require_once &quot;MasterHeartbeat.php&quot;;
++require_once &quot;SocketManager.php&quot;;
+ 
+ class MasterList
+ {
+-    var $servers;
++    public static $servers = array();
++    private static $lastHeartbeatTime;
+     
+-    function MasterList()
++    public static function Initialize()
+     {
+-        $this-&gt;servers = array();
++        self::$lastHeartbeatTime = time();
++        #$this-&gt;servers = array();
+     }
+     
+-    function addServer($masterinfo)
++    public static function addServer( MasterInfo $masterinfo )
+     {
+         $sid = $masterinfo-&gt;ip . &quot;:&quot; . $masterinfo-&gt;port;
+-        $this-&gt;servers[$sid] = $masterinfo;
++        self::$servers[$sid] = $masterinfo;
+     }
+     
+-    function removeServer($ip, $port)
++    public static function removeServer( $ip, $port )
+     {
+         $sid = $ip . &quot;:&quot; . $port;
+-        unset($this-&gt;servers[$sid]);
++        unset(self::$servers[$sid]);
+     }
+     
+-    function getServer($ip, $port)
++    public static function getServer( $ip, $port )
+     {
+         $sid = $ip . &quot;:&quot; . $port;
+-        return( @$this-&gt;servers[$sid]);
++        return( @self::$servers[$sid]);
+     }
+     
+-    function checkTimeouts()
++    public static function checkTimeouts()
+     {
+         global $MASTERTIMEOUT;
+-
++        global $MASTERUPDATETIME;
++        
+         $curtime = time();
+-        foreach ( $this-&gt;servers as $srv )
++        if ( $curtime - self::$lastHeartbeatTime &gt;= $MASTERUPDATETIME )
+         {
+-#            print &quot;Curtime = $curtime lasthb = $srv-&gt;lastHeartbeatTime diff=&quot; . ($curtime - $srv-&gt;lastHeartbeatTime) . &quot;\n&quot;;
++            self::$lastHeartbeatTime = $curtime;
++            foreach ( self::$servers as $srv )
++            {
++                try
++                {
++                    $hb = new MasterHeartbeat($srv);
++                    SocketManager::addSocket($hb);
++                }
++                catch ( Exception $e)
++                {
++                    print &quot;Heartbeat error: &quot; . $e-&gt;getMessage() . &quot;\n&quot;;
++                }
++            }
++        }
++        
++        foreach ( self::$servers as $srv )
++        {
+             if ( $curtime - $srv-&gt;lastHeartbeatTime &gt;= $MASTERTIMEOUT)
+             {
+-                print &quot;Masterserver Timeout, removing {$srv-&gt;ip}:{$srv-&gt;port}\n&quot;;
+-                $this-&gt;removeServer($srv-&gt;ip, $srv-&gt;port);
++                if ( $srv-&gt;removeable === true )
++                {
++                    print &quot;Masterserver Timeout, removing {$srv-&gt;ip}:{$srv-&gt;port}\n&quot;;
++                    self::removeServer($srv-&gt;ip, $srv-&gt;port);
++                }
++                else
++                {
++                    print &quot;Masterserver Timeout (unremoveable) {$srv-&gt;ip}:{$srv-&gt;port}\n&quot;;
++                }
+             }
+         }
+     }
++    
++    public static function dumpServers()
++    {
++        foreach ( self::$servers as $srv )
++        {
++            print &quot;Masterserver: $srv-&gt;ip:$srv-&gt;port\n&quot;;
++        }
++    }
+ }
+ ?&gt;
+\ No newline at end of file
+
+Modified: trunk/phpmasterserver/ServerInfo.php
+===================================================================
+--- trunk/phpmasterserver/ServerInfo.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/ServerInfo.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -16,16 +16,18 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
++require_once &quot;UDPListener.php&quot;;
++
+ class ServerInfo
+ {
+-    var $ip;
+-    var $port;
+-    var $protocol;
+-    var $lastHeartbeatTime;
+-    var $alive;
+-    var $clientSock;
++    public $ip;
++    public $port;
++    public $protocol;
++    public $lastHeartbeatTime;
++    public $alive;
++    public $clientSock;
+     
+-    function ServerInfo( $ip, $port, $protocol, $client )
++    public function __construct( $ip, $port, $protocol, ClientSock $client )
+     {
+         $this-&gt;ip = $ip;
+         $this-&gt;port = $port;
+@@ -35,7 +37,7 @@
+         $this-&gt;clientSock = $client;
+     }
+ 	
+-    function touch()
++    public function touch()
+     {
+         $this-&gt;lastHeartbeatTime = time();
+         if ( isset($this-&gt;clientSock) )
+@@ -46,14 +48,14 @@
+         $this-&gt;alive = true;
+     }
+ 	
+-    function sendQuery()
++    public function sendQuery()
+     {
+-        global $udpsock;
++        global $udpListener;
+         $msg = &quot;status&quot;;
+-        socket_sendto($udpsock, $msg, strlen($msg), 0, $this-&gt;ip, $this-&gt;port);
++        socket_sendto($udpListener-&gt;_socket, $msg, strlen($msg), 0, $this-&gt;ip, $this-&gt;port);
+     }
+ 
+-    function onTimeout()
++    public function onTimeout()
+     {
+         if ( isset($this-&gt;clientSock) )
+         {
+
+Modified: trunk/phpmasterserver/ServerList.php
+===================================================================
+--- trunk/phpmasterserver/ServerList.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/ServerList.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -20,46 +20,54 @@
+ 
+ class ServerList
+ {
+-    var $servers;
+-    function ServerList()
++    public static $servers = array();
++    
++    public static function Initialize()
+     {
+-        $this-&gt;servers = array();
++        #$this-&gt;servers = array();
+     }
+     
+-    function addServer($serverinfo)
++    public static function addServer( ServerInfo $serverinfo )
+     {
+         $sid = $serverinfo-&gt;ip . &quot;:&quot; . $serverinfo-&gt;port;
+-        $this-&gt;servers[$sid] = $serverinfo;
++        self::$servers[$sid] = $serverinfo;
+     }
+     
+-    function removeServer($ip, $port)
++    public function removeServer( $ip, $port )
+     {
+         $sid = $ip . &quot;:&quot; . $port;
+-        unset($this-&gt;servers[$sid]);
++        unset(self::$servers[$sid]);
+     }
+     
+-    function getServer($ip, $port)
++    public function getServer( $ip, $port )
+     {
+         $sid = $ip . &quot;:&quot; . $port;
+-        return( $this-&gt;servers[$sid]);
++        return( @self::$servers[$sid]);
+     }
+     
+-    function checkTimeouts()
++    public function checkTimeouts()
+     {
+         global $SRVTIMEOUT;
+         $curtime = time();
+-        foreach ( $this-&gt;servers as $srv )
++        foreach ( self::$servers as $srv )
+         {
+-#            print &quot;Curtime = $curtime lasthb = $srv-&gt;lastHeartbeatTime diff=&quot; . ($curtime - $srv-&gt;lastHeartbeatTime) . &quot;\n&quot;;
+             if ( $curtime - $srv-&gt;lastHeartbeatTime &gt;= $SRVTIMEOUT)
+             {
+                 print &quot;Server Timeout, removing\n&quot;;
+                 if ( $srv-&gt;onTimeout() == true )
+                 {
+-                    $this-&gt;removeServer($srv-&gt;ip, $srv-&gt;port);
++                    self::removeServer($srv-&gt;ip, $srv-&gt;port);
+                 }
+             }
+         }
+     }
++    
++    public static function dumpServers()
++    {
++        foreach ( self::$servers as $srv )
++        {
++            print &quot;Gameserver: $srv-&gt;ip:$srv-&gt;port\n&quot;;
++        }
++    }
+ }
+ ?&gt;
+\ No newline at end of file
+
+Added: trunk/phpmasterserver/SocketManager.php
+===================================================================
+--- trunk/phpmasterserver/SocketManager.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/SocketManager.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -0,0 +1,98 @@
++&lt;?php
++# phpmasterserver - a masterserver in php for netPanzer games
++# (c)2009 by Aaron Perez Sanchez (<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>)
++# netPanzer homepage is: <A HREF="http://www.netpanzer.org">http://www.netpanzer.org</A>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++class SocketManager
++{
++    private static $socketMap = array();
++    
++    public static function Initialize()
++    {
++        #self::$socketMap = array();
++    }
++    
++    public static function addSocket( $client )
++    {
++        self::$socketMap[$client-&gt;_socket] = $client;
++    }
++    
++    public static function removeSocket( $client )
++    {
++        unset( self::$socketMap[$client-&gt;_socket] );
++    }
++    
++    public static function handleEvents()
++    {
++        print &quot;There are &quot; . count(self::$socketMap) . &quot; sockets\n&quot;;
++        $readsocks = array();
++        $writesocks = array();
++        
++        foreach ( self::$socketMap as $so)
++        {
++            if ( $so-&gt;wantsToReceive() )
++            {
++                $readsocks[] = $so-&gt;_socket;
++            }
++            
++            if ( $so-&gt;wantsToSend() )
++            {
++                $writesocks[] = $so-&gt;_socket;
++            }
++        }
++        
++        $thenull = NULL;
++        $selres = @socket_select( $readsocks, $writesocks, $thenull, 1 );
++        if ( $selres === false )
++        {
++            throw new Exception(&quot;Some error on select()&quot;, socket_last_error());
++        }
++        else if ( $selres &gt; 0 )
++        {
++            foreach ($readsocks as $sock)
++            {
++                $handler = self::$socketMap[$sock];
++                if ( isset($handler) )
++                {
++                    $handler-&gt;onReadyToReceive();
++                }
++            }
++            
++            foreach ( $writesocks as $sock )
++            {
++                $handler = self::$socketMap[$sock];
++                if ( isset($handler) )
++                {
++                    $handler-&gt;onReadyToSend();
++                }
++            }
++        }
++        
++        foreach ( self::$socketMap as $so )
++        {
++            if ( $so-&gt;removeme === true )
++            {
++                print &quot;Removing socket: $so-&gt;_socket\n&quot;;
++                @socket_shutdown( $so-&gt;_socket );
++                @socket_close( $so-&gt;_socket );
++                unset( self::$socketMap[$so-&gt;_socket] );
++            }
++        }
++    }
++    
++}
++
++?&gt;
+\ No newline at end of file
+
+Added: trunk/phpmasterserver/TCPListener.php
+===================================================================
+--- trunk/phpmasterserver/TCPListener.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/TCPListener.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -0,0 +1,91 @@
++&lt;?php
++# phpmasterserver - a masterserver in php for netPanzer games
++# (c)2009 by Aaron Perez Sanchez (<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>)
++# netPanzer homepage is: <A HREF="http://www.netpanzer.org">http://www.netpanzer.org</A>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++require_once &quot;SocketManager.php&quot;;
++
++class TCPListener
++{
++    public $_socket;
++    public $removeme = false;
++    
++    public function __construct( $listenIP, $listenPort )
++    {
++        $this-&gt;_socket = @socket_create(AF_INET, SOCK_STREAM, 0);
++        if ( $this-&gt;_socket === false )
++        {
++            throw new Exception(&quot;Could not create tcp socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_set_nonblock($this-&gt;_socket);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not set non blocking socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_set_option($this-&gt;_socket, SOL_SOCKET, SO_REUSEADDR, 1);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not set reuse address on socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_bind( $this-&gt;_socket, $listenIP, $listenPort);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not bind on socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_listen( $this-&gt;_socket, 32);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not listen on socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++    }
++    
++    public function __destruct()
++    {
++        @socket_close($this-&gt;_socket);
++    }
++    
++    public function wantsToReceive()
++    {
++        return true;
++    }
++    
++    public function wantsToSend()
++    {
++        return false;
++    }
++    
++    public function onReadyToReceive()
++    {
++        while ( ($thenewsock = @socket_accept($this-&gt;_socket)) !== false )
++        {
++            print &quot;New Client: $thenewsock\n&quot;;
++            $newClient = new ClientSock($thenewsock);
++            SocketManager::addSocket( $newClient );
++        }
++    }
++    
++    public function onReadyToSend()
++    {
++        
++    }
++    
++}
++
++?&gt;
+\ No newline at end of file
+
+Added: trunk/phpmasterserver/UDPListener.php
+===================================================================
+--- trunk/phpmasterserver/UDPListener.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/UDPListener.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -0,0 +1,97 @@
++&lt;?php
++# phpmasterserver - a masterserver in php for netPanzer games
++# (c)2009 by Aaron Perez Sanchez (<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>)
++# netPanzer homepage is: <A HREF="http://www.netpanzer.org">http://www.netpanzer.org</A>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++require_once &quot;ServerInfo.php&quot;;
++require_once &quot;ServerList.php&quot;;
++
++class UDPListener
++{
++    public $_socket;
++    public $removeme = false;
++    
++    public function __construct( $listenIP, $listenPort )
++    {
++        $this-&gt;_socket = @socket_create(AF_INET, SOCK_DGRAM, 0);
++        if ( $this-&gt;_socket === false )
++        {
++            throw new Exception(&quot;Could not create tcp socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_set_nonblock($this-&gt;_socket);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not set non blocking socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_set_option($this-&gt;_socket, SOL_SOCKET, SO_REUSEADDR, 1);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not set reuse address on socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++        
++        $res = @socket_bind( $this-&gt;_socket, $listenIP, $listenPort);
++        if ( $res === false )
++        {
++            throw new Exception(&quot;Could not bind on socket&quot;, socket_last_error($this-&gt;_socket));
++        }
++    }
++    
++    public function __destruct()
++    {
++        @socket_close($this-&gt;_socket);
++    }
++
++    
++    public function wantsToReceive()
++    {
++        return true;
++    }
++    
++    public function wantsToSend()
++    {
++        return false;
++    }
++    
++    public function onReadyToReceive()
++    {
++        print &quot;Something received from UDP\n&quot;;
++        $datalen = @socket_recvfrom($this-&gt;_socket, $data, 1500, 0, $fromip, $fromport);
++        while ( $datalen &gt; 0 )
++        {
++            $srvdata = ServerList::getServer($fromip, $fromport);
++            if ( $srvdata === NULL)
++            {
++                print &quot;Received UDP packet from unknown server: $fromip:$fromport\n&quot;;
++            }
++            else
++            {
++                print &quot;Received UDP packet from $fromip:$fromport\n&quot;;
++                $srvdata-&gt;touch();
++            }
++            $datalen = @socket_recvfrom($udpsock, $data, 1500, 0, $fromip, $fromport);
++        }
++    }
++    
++    public function onReadyToSend()
++    {
++        
++    }
++    
++}
++
++?&gt;
+\ No newline at end of file
+
+Modified: trunk/phpmasterserver/phpmasterserver.php
+===================================================================
+--- trunk/phpmasterserver/phpmasterserver.php	2009-07-08 23:57:01 UTC (rev 1143)
++++ trunk/phpmasterserver/phpmasterserver.php	2009-07-12 10:02:36 UTC (rev 1144)
+@@ -23,194 +23,36 @@
+ require_once &quot;ServerList.php&quot;;
+ require_once &quot;MasterList.php&quot;;
+ require_once &quot;MasterInfo.php&quot;;
++require_once &quot;UDPListener.php&quot;;
++require_once &quot;TCPListener.php&quot;;
+ 
+ set_time_limit(0);
+ 
+-$udpsock = socket_create(AF_INET, SOCK_DGRAM, 0) or die(&quot;Could not create udp socket\n&quot;);
+-socket_set_nonblock($udpsock);
+-if (!socket_set_option($udpsock, SOL_SOCKET, SO_REUSEADDR, 1))
+-{ 
+-    echo socket_strerror(socket_last_error($sock)); 
+-    exit; 
+-} 
+-socket_bind($udpsock, $listenip, 0) or die(&quot;Could not bind to socket\n&quot;);
++$udpListener = new UDPListener($listenip, $listenport);
++$tcpListener = new TCPListener($listenip, $listenport);
+ 
+-$tcpsock = socket_create(AF_INET, SOCK_STREAM, 0) or die(&quot;Could not create tcp socket\n&quot;);
+-socket_set_nonblock($tcpsock);
+-if (!socket_set_option($tcpsock, SOL_SOCKET, SO_REUSEADDR, 1))
+-{ 
+-    echo socket_strerror(socket_last_error($tcpsock)); 
+-    exit; 
+-} 
+-socket_bind($tcpsock, $listenip, $listenport) or die(&quot;Could not bind to socket\n&quot;);
+-socket_listen( $tcpsock, 32);
++ServerList::Initialize();
++MasterList::Initialize();
++SocketManager::Initialize();
+ 
+-$serverList = new ServerList();
+-$masterList = new MasterList();
++$testms = new MasterInfo( &quot;83.142.228.166&quot;, 28900, false);
++MasterList::addServer($testms);
+ 
+-$testms = new MasterInfo(&quot;83.142.228.166&quot;, 28900);
+-$masterList-&gt;addServer($testms);
++SocketManager::addSocket($udpListener);
++SocketManager::addSocket($tcpListener);
+ 
+-$clients = array();
+-$masterMap = array();
+-
+-$thenull = NULL;
+-
+ $isRunning = true;
+ 
+-$lastMSHeartbeat = 0;
+-
+ while ( $isRunning )
+ {
+-    print &quot;There are &quot; . count($clients) . &quot; clients\n&quot;;
+-    
+-    $serverList-&gt;checkTimeouts();
+-    $masterList-&gt;checkTimeouts();
++    ServerList::checkTimeouts();
++    MasterList::checkTimeouts();
+ 
+-    foreach ( $masterList-&gt;servers as $srv )
+-    {
+-        print &quot;Masterserver: $srv-&gt;ip:$srv-&gt;port running\n&quot;;
+-    }
+-    
+-    foreach ( $serverList-&gt;servers as $srv )
+-    {
+-        print &quot;Server: $srv-&gt;ip:$srv-&gt;port running\n&quot;;
+-    }
+-	
+-    $writesocks = array();
+-    if ( time() - $lastMSHeartbeat &gt;= $MASTERUPDATETIME )
+-    {
+-        $lastMSHeartbeat = time();
+-        foreach ( $masterList-&gt;servers as $srv )
+-        {
+-            $msock =  socket_create(AF_INET, SOCK_STREAM, 0);
+-            socket_set_nonblock($msock);
+-            $res = @socket_connect($msock, $srv-&gt;ip, $srv-&gt;port);
+-            if ( $res === false )
+-            {
+-                $error = socket_last_error($msock);
+-                if ( $error != SOCKET_EINPROGRESS )
+-                {
+-                    print &quot;Error connecting to masterserver {$srv-&gt;ip}:{$srv-&gt;port}\n&quot;;
+-                    socket_close($msock);
+-                }
+-                else
+-                {
+-                    $masterMap[$msock] = $srv;
+-                    $writesocks[] = $msock;
+-                }
+-            }
+-            else
+-            {
+-                $srv-&gt;sendHeartbeat($msock);
+-                @socket_shutdown($msock);
+-                @socket_close($msock);
+-            }
+-        }
+-    }
+-    
+-    $readsocks = array($tcpsock, $udpsock);
+-    foreach ( $clients as $clt )
+-    {
+-	$readsocks[] = $clt-&gt;sock;
+-    }
+-    
+-    print &quot;Listening with &quot; . count($readsocks) . &quot; read sockets and &quot; . count($writesocks) . &quot; write sockets\n&quot;;
++    MasterList::dumpServers();
++    ServerList::dumpServers();
+ 
+-    $selres = socket_select( $readsocks, $writesocks, $thenull, 1 );
+-    if ( $selres === false )
+-    {
+-        print &quot;Some error happened on select&quot;;	
+-        $isRunning = false;
+-        continue;
+-    }
+-    else if ( $selres == 0 )
+-    {
+-        continue;
+-    }
+-    print &quot;Something happened\n&quot;;
+-    foreach ($readsocks as $sock)
+-    {
+-        if ( $sock == $tcpsock )
+-        {
+-            while ( ($thenewsock = @socket_accept($tcpsock)) !== false )
+-            {
+-                print &quot;New Client: $thenewsock\n&quot;;
+-                $newClient = new ClientSock($thenewsock);
+-                $clients[$thenewsock] = $newClient;
+-            }
+-        }
+-        else if ( $sock == $udpsock )
+-        {
+-            $datalen = @socket_recvfrom($udpsock, $bug, 1500, 0, $fromip, $fromport);
+-            while ( $datalen &gt; 0 )
+-            {
+-                $srvdata = $serverList-&gt;getServer($fromip, $fromport);
+-                if ( $srvdata === NULL)
+-                {
+-                    print &quot;Received UDP packet from unknown server: $fromip:$fromport\n&quot;;
+-                }
+-                else
+-                {
+-                    print &quot;Received UDP packet from $fromip:$fromport\n&quot;;
+-                    $srvdata-&gt;touch();
+-                }
+-                $datalen = @socket_recvfrom($udpsock, $bug, 1500, 0, $fromip, $fromport);
+-            }
+-        }
+-        else
+-        {
+-            $client = $clients[$sock];
+-            if ( $client != NULL )
+-            {
+-                $data = @socket_read($sock, 1024);
+-                if ( $data === false )
+-                {
+-                    $etype = socket_last_error($sock);
+-                    if (   $etype != SOCKET_EAGAIN
+-                        &amp;&amp; $etype != SOCKET_EINTR )
+-                    {
+-                        print &quot;Client ERROR: {$clients[$sock]-&gt;ip}:{$clients[$sock]-&gt;port}\n&quot;;
+-                        $client-&gt;removeme = true;
+-                    }
+-                    print &quot;Other ERROR: {$clients[$sock]-&gt;ip}:{$clients[$sock]-&gt;port}\n&quot;;
+-                }
+-                else if ( strlen($data) == 0 )
+-                {
+-                    print &quot;Client disconnected: {$clients[$sock]-&gt;ip}:{$clients[$sock]-&gt;port}\n&quot;;
+-                    $client-&gt;removeme = true;
+-                }
+-                else
+-                {
+-                    print &quot;Client data from {$clients[$sock]-&gt;ip}:{$clients[$sock]-&gt;port}: $data\n&quot;;
+-                    $clients[$sock]-&gt;onQueryReceived($data);
+-                }
+-            }
+-        }
+-    }
++    SocketManager::handleEvents();
+     
+-    foreach ( $writesocks as $sock )
+-    {
+-        $srv = $masterMap[$sock];
+-        $srv-&gt;sendHeartbeat($sock);
+-        @socket_shutdown($sock);
+-        @socket_close($sock);
+-        unset($masterMap[$sock]);
+-    }
+-    
+-    foreach ( $clients as $clt )
+-    {
+-        if ( $clt-&gt;removeme === true )
+-        {
+-            print &quot;Removing socket: $clt-&gt;sock\n&quot;;
+-            @socket_shutdown($clt-&gt;sock);
+-            @socket_close($clt-&gt;sock);
+-            unset($clients[$clt-&gt;sock]);
+-        }
+-    }
+ }
+ 
+-socket_close($tcpsock);
+-socket_close($udpsock);
+-
+ ?&gt;
+\ No newline at end of file
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000172.html">[Netpanzer-cvs] r1143 - in trunk: . phpmasterserver	phpmasterserver/doc
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#173">[ date ]</a>
+              <a href="thread.html#173">[ thread ]</a>
+              <a href="subject.html#173">[ subject ]</a>
+              <a href="author.html#173">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

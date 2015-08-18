@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1219 - in trunk/netpanzer/src/NetPanzer:	Interfaces Particles Views/Components	Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1219%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Particles%20Views/Components%0A%09Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C201006050314.o553EaCh025515%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000246.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1219 - in trunk/netpanzer/src/NetPanzer:	Interfaces Particles Views/Components	Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1219%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Particles%20Views/Components%0A%09Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C201006050314.o553EaCh025515%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1219 - in trunk/netpanzer/src/NetPanzer:	Interfaces Particles Views/Components	Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun  5 05:14:36 CEST 2010</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000246.html">[Netpanzer-cvs] r1220 - in trunk/netpanzer/src: Lib/2D Lib/optionmm	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Core NetPanzer/Interfaces NetPanzer/Network	NetPanzer/Objectives NetPanzer/Scripts NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#245">[ date ]</a>
+              <a href="thread.html#245">[ thread ]</a>
+              <a href="subject.html#245">[ subject ]</a>
+              <a href="author.html#245">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-06-05 05:14:27 +0200 (Sat, 05 Jun 2010)
+New Revision: 1219
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+Log:
+- fix some problems deleted memory
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2010-05-30 07:40:30 UTC (rev 1218)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2010-06-05 03:14:27 UTC (rev 1219)
+@@ -92,6 +92,7 @@
+                 delete msiter-&gt;second;
+                 msiter-&gt;first-&gt;destroy();
+                 masterservers.erase(msiter);
++                break; // no more checking today, next time, iterator invalid
+             }
+         }
+     } else if ( nextHeartbeat.isTimeOut(now) ) {
+
+Deleted: trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp	2010-05-30 07:40:30 UTC (rev 1218)
++++ trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp	2010-06-05 03:14:27 UTC (rev 1219)
+@@ -1,52 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#ifndef __FlashParticle2D_hpp__
+-#define __FlashParticle2D_hpp__
+-
+-
+-
+-#include &quot;ExplosionFireParticle2D.hpp&quot;
+-
+-
+-// FlashParticle2D
+-//--------------------------------------------------------------------------
+-class FlashParticle2D : public ExplosionFireParticle2D
+-{
+-public:
+-    FlashParticle2D(fXYZ pos, int xSize);
+-
+-    static void init();
+-
+-protected:
+-    int xSize;
+-
+-    Surface static flashSprite;
+-    //Surface static explosionLightSprite1;
+-
+-    //SpriteBltBrightness explosionLightSurface0;
+-    //SpriteBltBrightness explosionLightSurface1;
+-    SpriteBltBlendScale flashSurface;
+-    //SpriteBltBlendScale explosionLightSurface1;
+-
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
+-
+-}
+-; // end FlashParticle2D
+-
+-#endif // __FlashParticle2D_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2010-05-30 07:40:30 UTC (rev 1218)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2010-06-05 03:14:27 UTC (rev 1219)
+@@ -180,7 +180,7 @@
+ void cInputField::setExcludedCharacters(const char *exChars)
+ {
+     if ( excludedCharacters ) {
+-        delete excludedCharacters;
++        delete[] excludedCharacters;
+         excludedCharacters = 0;
+     }
+     excludedCharacters = new char [strlen(exChars) + 1];
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2010-05-30 07:40:30 UTC (rev 1218)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2010-06-05 03:14:27 UTC (rev 1219)
+@@ -366,6 +366,7 @@
+         if ( i-&gt;second-&gt;status == ServerInfo::TIMEOUT ) {
+             LOGGER.warning(&quot;Server [%s] timeout, removing&quot;, i-&gt;first.c_str());
+             querying_server.erase(i);
++            break; // no more today, needed for invalid iterator
+         } else if ( now - i-&gt;second-&gt;querystartticks &gt; QUERY_TIMEOUT ) {
+             LOGGER.warning(&quot;Server [%s] timeout, retrying&quot;, i-&gt;first.c_str());
+             sendQuery(i-&gt;second);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000246.html">[Netpanzer-cvs] r1220 - in trunk/netpanzer/src: Lib/2D Lib/optionmm	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Core NetPanzer/Interfaces NetPanzer/Network	NetPanzer/Objectives NetPanzer/Scripts NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#245">[ date ]</a>
+              <a href="thread.html#245">[ thread ]</a>
+              <a href="subject.html#245">[ subject ]</a>
+              <a href="author.html#245">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1263 - in trunk/netpanzer/src/NetPanzer/Views: .	MainMenu MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1263%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%20.%0A%09MainMenu%20MainMenu/Multi&In-Reply-To=%3C20111017104202.B3EED48145D%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000288.html">
+   <LINK REL="Next"  HREF="000290.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1263 - in trunk/netpanzer/src/NetPanzer/Views: .	MainMenu MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1263%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%20.%0A%09MainMenu%20MainMenu/Multi&In-Reply-To=%3C20111017104202.B3EED48145D%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1263 - in trunk/netpanzer/src/NetPanzer/Views: .	MainMenu MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct 17 12:42:02 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000288.html">[Netpanzer-cvs] r1262 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network
+</A></li>
+        <LI>Next message: <A HREF="000290.html">[Netpanzer-cvs] r1264 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#289">[ date ]</a>
+              <a href="thread.html#289">[ thread ]</a>
+              <a href="subject.html#289">[ subject ]</a>
+              <a href="author.html#289">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-17 12:42:02 +0200 (Mon, 17 Oct 2011)
+New Revision: 1263
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+Log:
+Change Butons placement, remove multi buton, join and host disrect acces
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2011-10-15 17:46:09 UTC (rev 1262)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2011-10-17 10:42:02 UTC (rev 1263)
+@@ -21,20 +21,21 @@
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+-iXY exitPos(635, 10);
+ iXY readyPos(480, 32);
+ iXY backPos(480, 575);
+-iXY nextPos(635, 575);
+-iXY mainPos(16, 7);
+-iXY multiPos(16, 27);
+-iXY optionsPos(16, 47);
+-iXY helpPos(16, 67);
++iXY mainPos(20, 7);
++iXY joinPos(mainPos.x+ButonWidth, 7);
++iXY hostPos(joinPos.x+ButonWidth, 7);
++iXY optionsPos(hostPos.x+ButonWidth, 7);
++iXY helpPos(optionsPos.x+ButonWidth, 7);
++iXY exitPos(optionsPos.x+ButonWidth, helpPos.y+ButonHeight);
++iXY nextPos(optionsPos.x+ButonWidth, 573);
+ iXY creditsPos(0, 0);
+ 
+-const iXY sub1(169, 7);
+-const iXY sub2(169, 27);
+-const iXY sub3(169, 47);
+-const iXY sub4(169, 67);
++const iXY sub1(mainPos.x, mainPos.y+ButonHeight);
++const iXY sub2(joinPos.x, sub1.y);
++const iXY sub3(hostPos.x, sub1.y);
++const iXY sub4(optionsPos.x, sub1.y);
+ 
+ #if 0 // XXX
+ iXY soundPos = sub1;
+@@ -47,11 +48,9 @@
+ iXY soundPos = sub3; // XXX 2
+ #endif
+ 
+-iXY hostPos = sub1;
+-iXY joinPos = sub2;
+ 
+ iXY returnToGamePos = mainPos;
+-iXY resignPos = multiPos;
++iXY resignPos = joinPos;
+ 
+ iRect bodyTextRect(145, 110, 760, 510);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-10-15 17:46:09 UTC (rev 1262)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-10-17 10:42:02 UTC (rev 1263)
+@@ -36,6 +36,9 @@
+ #define optionsMeterStartX          (448)
+ #define optionsColorMeterStartX     (342)
+ 
++#define ButonWidth                  (155)
++#define ButonHeight                  (30)
++
+ // Button placement locations.
+ extern iXY exitPos;
+ extern iXY readyPos;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-10-15 17:46:09 UTC (rev 1262)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-10-17 10:42:02 UTC (rev 1263)
+@@ -32,6 +32,7 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
++#include &quot;Multi/ServerListView.hpp&quot;
+ 
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+@@ -51,29 +52,27 @@
+     Desktop::setVisibility(&quot;MainView&quot;, true);
+ }
+ 
+-static void bMulti()
++static void bHost()
+ {
+-    if (strcmp(MenuTemplateView::currentMultiView, &quot;GetSessionView&quot;) == 0) {
++        gameconfig-&gt;hostorjoin = _game_session_host;
+         Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;GetSessionView&quot;, true);
+-    } else if (strcmp(MenuTemplateView::currentMultiView, &quot;HostView&quot;) == 0) {
+-        Desktop::setVisibilityAllWindows(false);
+         Desktop::setVisibility(&quot;HostView&quot;, true);
+         Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;FlagSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
+         Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+-    } else if (strcmp(MenuTemplateView::currentMultiView, &quot;JoinView&quot;) == 0) {
++}
++static void bJoin()
++{
++        gameconfig-&gt;hostorjoin = _game_session_join;
+         Desktop::setVisibilityAllWindows(false);
+         Desktop::setVisibility(&quot;JoinView&quot;, true);
+         Desktop::setVisibility(&quot;FlagSelectionView&quot;, true);
+         Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+         Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+         Desktop::setVisibility(&quot;ServerListView&quot;, true);
+-    } else {
+-        assert(false);
+-    }
++        serverlistview-&gt;refresh();
+ }
+ 
+ static void bOptions()
+@@ -161,10 +160,14 @@
+                       &quot;Main&quot;,
+                       bMain);
+ 
+-    addSpecialButton(	multiPos,
+-                      &quot;Multiplayer&quot;,
+-                      bMulti);
++    addSpecialButton(	joinPos,
++                      &quot;Join&quot;,
++                      bJoin);
+ 
++    addSpecialButton(	hostPos,
++                      &quot;Host&quot;,
++                      bHost);
++
+     addSpecialButton(	optionsPos,
+                       &quot;Options&quot;,
+                       bOptions);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-10-15 17:46:09 UTC (rev 1262)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-10-17 10:42:02 UTC (rev 1263)
+@@ -108,12 +108,12 @@
+     setSubTitle(&quot;&quot;);
+ 
+     // Back.
+-    addSpecialButton(	backPos,
+-                      &quot;Back&quot;,
+-                      bBack);
++//    addSpecialButton(	backPos,
++//                      &quot;Back&quot;,
++//                      bBack);
+ 
+     addSpecialButton(   nextPos,
+-                      &quot;Next&quot;,
++                      &quot;Join&quot;,
+                       bNext);
+ 
+ } // end HostJoinTemplateView constructor
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000288.html">[Netpanzer-cvs] r1262 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network
+</A></li>
+	<LI>Next message: <A HREF="000290.html">[Netpanzer-cvs] r1264 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#289">[ date ]</a>
+              <a href="thread.html#289">[ thread ]</a>
+              <a href="subject.html#289">[ subject ]</a>
+              <a href="author.html#289">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

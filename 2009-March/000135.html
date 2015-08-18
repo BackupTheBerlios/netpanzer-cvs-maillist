@@ -1,0 +1,390 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1103 - in trunk/netpanzer/src/NetPanzer: Units	Views/Components Views/Game Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1103%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Units%0A%09Views/Components%20Views/Game%20Views/MainMenu/Multi&In-Reply-To=%3C200903121419.n2CEJfYe027837%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000134.html">
+   <LINK REL="Next"  HREF="000136.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1103 - in trunk/netpanzer/src/NetPanzer: Units	Views/Components Views/Game Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1103%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Units%0A%09Views/Components%20Views/Game%20Views/MainMenu/Multi&In-Reply-To=%3C200903121419.n2CEJfYe027837%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1103 - in trunk/netpanzer/src/NetPanzer: Units	Views/Components Views/Game Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Mar 12 15:19:41 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000134.html">[Netpanzer-cvs] r1102 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000136.html">[Netpanzer-cvs] r1107 - trunk/netpanzer/nbproject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#135">[ date ]</a>
+              <a href="thread.html#135">[ thread ]</a>
+              <a href="subject.html#135">[ subject ]</a>
+              <a href="author.html#135">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-03-12 15:19:26 +0100 (Thu, 12 Mar 2009)
+New Revision: 1103
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+Log:
+- Moved the Button creation to cpp file to avoid being inline.
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-03-11 23:34:21 UTC (rev 1102)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-03-12 14:19:26 UTC (rev 1103)
+@@ -859,7 +859,9 @@
+     iXY map_loc;
+     MapInterface::pointXYtoMapXY( unit_state.location, &amp;map_loc );
+     if ( map_loc == aiFsmMoveToLoc_goal )
++    {
+         return true;
++    }
+ 
+     return false;
+ }
+@@ -1720,21 +1722,32 @@
+ //-----------------------------------------------------------------
+ void Unit::updateFsmState()
+ {
+-    if ( fsm_timer.count() ) {
++    if ( fsm_timer.count() )
++    {
+         if ( fsm_active_list[ _control_move_map_square ] == true )
++        {
+             fsmMoveMapSquare();
++        }
+ 
+         if ( fsm_active_list[ _control_turret_track_point ] == true )
++        {
+             fsmTurretTrackPoint();
++        }
+ 
+         if ( fsm_active_list[ _control_turret_track_target ] == true )
++        {
+             fsmTurretTrackTarget();
++        }
+ 
+         if ( fsm_active_list[ _control_gunnery_location ] == true )
++        {
+             fsmGunneryLocation();
++        }
+ 
+         if ( fsm_active_list[ _control_gunnery_target ] == true )
++        {
+             fsmGunneryTarget();
++        }
+     }
+ }
+ 
+@@ -1838,7 +1851,9 @@
+ 
+     target_unit_ptr = UnitInterface::getUnit( aiFsmAttackUnit_target_ID );
+     if ( target_unit_ptr == 0 )
++    {
+         return;
++    }
+ 
+     target_unit_state = &amp;(target_unit_ptr-&gt;unit_state);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2009-03-11 23:34:21 UTC (rev 1102)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2009-03-12 14:19:26 UTC (rev 1103)
+@@ -23,6 +23,17 @@
+ 
+ #include &quot;MouseEvent.hpp&quot;
+ 
++Button::Button(const std::string &amp;cname)
++        : Component(&quot;Button.&quot; + cname)
++{
++    setTextColors(Color::white, Color::red, Color::yellow);
++    position.zero();
++    label.clear();
++    bstate = BNORMAL;
++    memset(borders, 0, sizeof(borders));
++    extraBorder = 0;
++    dirty = true;
++}
+ 
+ // render
+ void
+@@ -61,7 +72,8 @@
+ 
+ // actionPerformed
+ //---------------------------------------------------------------------------
+-void Button::actionPerformed(const mMouseEvent &amp;me)
++void
++Button::actionPerformed(const mMouseEvent &amp;me)
+ {
+     if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
+                 || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED)
+@@ -84,3 +96,54 @@
+         ((View *)parent)-&gt;onComponentClicked(this);
+     }
+ } // end Button::actionPerformed
++
++Button *
++Button::createTextButton(   std::string cname,
++                            std::string label,
++                            iXY loc,
++                            int bwidth,
++                            int customcode)
++{
++    Button * b = new Button(cname);
++    b-&gt;setLabel(label);
++    b-&gt;setLocation(loc);
++    b-&gt;setTextButtonSize(bwidth);
++    b-&gt;setCustomCode(customcode);
++    b-&gt;setNormalBorder();
++    return b;
++}
++
++Button *
++Button::createSpecialButton( std::string cname,
++                             std::string label,
++                             iXY loc,
++                             int customcode)
++{
++    Surface bnormal;
++    bnormal.loadBMP(&quot;pics/backgrounds/menus/buttons/default/specialbutton0.bmp&quot;);
++
++    Surface bhover;
++    bhover.loadBMP(&quot;pics/backgrounds/menus/buttons/default/specialbutton1.bmp&quot;);
++
++    Surface bclick;
++    bclick.loadBMP(&quot;pics/backgrounds/menus/buttons/default/specialbutton2.bmp&quot;);
++
++    Surface spbutton(bnormal.getWidth(), bnormal.getHeight(), 3);
++
++    spbutton.setFrame(0);
++    bnormal.blt(spbutton,0,0);
++    spbutton.setFrame(1);
++    bhover.blt(spbutton,0,0);
++    spbutton.setFrame(2);
++    bclick.blt(spbutton,0,0);
++    spbutton.setFrame(0);
++
++    Button *b = new Button(cname);
++    b-&gt;setImage(spbutton);
++    b-&gt;setLabel(label);
++    b-&gt;setLocation(loc);
++    b-&gt;setTextColors(Color::yellow, Color::white, Color::white);
++    b-&gt;setCustomCode(customcode);
++
++    return b;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2009-03-11 23:34:21 UTC (rev 1102)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2009-03-12 14:19:26 UTC (rev 1103)
+@@ -53,69 +53,21 @@
+     }
+ 
+ public:
+-    Button(const std::string &amp;cname) : Component(&quot;Button.&quot; + cname)
+-    {
+-        setTextColors(Color::white, Color::red, Color::yellow);
+-        position.zero();
+-        label.clear();
+-        bstate = BNORMAL;
+-        memset(borders, 0, sizeof(borders));
+-        extraBorder = 0;
+-        dirty = true;
+-    }
++    Button(const std::string &amp;cname);
+ 
+-    virtual ~Button()
+-    {}
++    virtual ~Button() {}
+ 
+     static Button * createTextButton(   std::string cname,
+                                         std::string label,
+                                         iXY loc,
+                                         int bwidth,
+-                                        int customcode = -1)
+-    {
+-        Button * b = new Button(cname);
+-        b-&gt;setLabel(label);
+-        b-&gt;setLocation(loc);
+-        b-&gt;setTextButtonSize(bwidth);
+-        b-&gt;setCustomCode(customcode);
+-        b-&gt;setNormalBorder();
+-        return b;
+-    }
++                                        int customcode = -1);
+ 
+     static Button * createSpecialButton(std::string cname,
+                                         std::string label,
+                                         iXY loc,
+-                                        int customcode = -1)
+-    {
+-        Surface bnormal;
+-        bnormal.loadBMP(&quot;pics/backgrounds/menus/buttons/default/specialbutton0.bmp&quot;);
++                                        int customcode = -1);
+ 
+-        Surface bhover;
+-        bhover.loadBMP(&quot;pics/backgrounds/menus/buttons/default/specialbutton1.bmp&quot;);
+-
+-        Surface bclick;
+-        bclick.loadBMP(&quot;pics/backgrounds/menus/buttons/default/specialbutton2.bmp&quot;);
+-
+-        Surface spbutton(bnormal.getWidth(), bnormal.getHeight(), 3);
+-
+-        spbutton.setFrame(0);
+-        bnormal.blt(spbutton,0,0);
+-        spbutton.setFrame(1);
+-        bhover.blt(spbutton,0,0);
+-        spbutton.setFrame(2);
+-        bclick.blt(spbutton,0,0);
+-        spbutton.setFrame(0);
+-
+-        Button *b = new Button(cname);
+-        b-&gt;setImage(spbutton);
+-        b-&gt;setLabel(label);
+-        b-&gt;setLocation(loc);
+-        b-&gt;setTextColors(Color::yellow, Color::white, Color::white);
+-        b-&gt;setCustomCode(customcode);
+-
+-        return b;
+-    }
+-
+     void setTextColors( PIX normal, PIX over, PIX pressed)
+     {
+         textColors[BNORMAL] = normal;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2009-03-11 23:34:21 UTC (rev 1102)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2009-03-12 14:19:26 UTC (rev 1103)
+@@ -69,27 +69,15 @@
+ 
+ } // end VehicleSelectionView::doActivate
+ 
+-// mouseEnter
+-//--------------------------------------------------------------------------
+-//void GameTemplateView::mouseEnter(const iXY &amp;pos)
+-//{
+-//	if (!mouse.getButtonMask())
+-//	{
+-//		Desktop::setActiveView(this);
+-//	}
+-//
+-//} // end GameTemplateView::mouseEnter
+-
+ // mouseMove
+ //--------------------------------------------------------------------------
+ void GameTemplateView::mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos)
+ {
+     View::mouseMove(prevPos, newPos);
+ 
+-    if (!MouseInterface::getButtonMask() &amp;&amp; Desktop::getFocus() != this) {
++    if (!MouseInterface::getButtonMask() &amp;&amp; Desktop::getFocus() != this)
++    {
+         Desktop::setFocusView(this);
+-
+-        COMMAND_PROCESSOR.closeSelectionBox();
+     }
+ 
+ } // end GameTemplateView::mouseMove
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-03-11 23:34:21 UTC (rev 1102)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-03-12 14:19:26 UTC (rev 1103)
+@@ -82,6 +82,7 @@
+     resize(iXY(screen-&gt;getWidth(), screen-&gt;getHeight()));
+     moveTo(iXY(0, 0));
+ } // end GameView::init
++
+ void
+ GameView::checkResolution(iXY oldResolution, iXY newResolution)
+ {
+@@ -141,6 +142,12 @@
+     COMMAND_PROCESSOR.inFocus();
+ } // end GameView::doActivate
+ 
++void
++GameView::doDeactivate()
++{
++    COMMAND_PROCESSOR.closeSelectionBox();
++}
++
+ // processEvents
+ //---------------------------------------------------------------------------
+ void GameView::processEvents()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp	2009-03-11 23:34:21 UTC (rev 1102)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp	2009-03-12 14:19:26 UTC (rev 1103)
+@@ -34,6 +34,7 @@
+ protected:
+     virtual void processEvents();
+     void doActivate();
++    void doDeactivate();
+     void checkResolution(iXY oldResolution, iXY newResolution);
+ 
+ private:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2009-03-11 23:34:21 UTC (rev 1102)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2009-03-12 14:19:26 UTC (rev 1103)
+@@ -54,7 +54,7 @@
+ 
+ public:
+     MapSelectionView();
+-    ~MapSelectionView();
++    virtual ~MapSelectionView();
+ 
+     virtual void doDraw();
+     virtual void drawBorder(Surface&amp; )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000134.html">[Netpanzer-cvs] r1102 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000136.html">[Netpanzer-cvs] r1107 - trunk/netpanzer/nbproject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#135">[ date ]</a>
+              <a href="thread.html#135">[ thread ]</a>
+              <a href="subject.html#135">[ subject ]</a>
+              <a href="author.html#135">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

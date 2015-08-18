@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1096 - in trunk/netpanzer/src/NetPanzer/Views:	Game MainMenu/Multi MainMenu/Options
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1096%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Game%20MainMenu/Multi%20MainMenu/Options&In-Reply-To=%3C200902211246.n1LCkjwf027057%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000127.html">
+   <LINK REL="Next"  HREF="000129.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1096 - in trunk/netpanzer/src/NetPanzer/Views:	Game MainMenu/Multi MainMenu/Options</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1096%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Game%20MainMenu/Multi%20MainMenu/Options&In-Reply-To=%3C200902211246.n1LCkjwf027057%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1096 - in trunk/netpanzer/src/NetPanzer/Views:	Game MainMenu/Multi MainMenu/Options">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb 21 13:46:45 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000127.html">[Netpanzer-cvs] r1095 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+        <LI>Next message: <A HREF="000129.html">[Netpanzer-cvs] r1097 - in trunk/netpanzer/src/NetPanzer:	Objectives Units Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-02-21 13:46:36 +0100 (Sat, 21 Feb 2009)
+New Revision: 1096
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+Log:
+- Fix some compilation errors on gcc &gt;= 4.3
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-02-21 12:39:57 UTC (rev 1095)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-02-21 12:46:36 UTC (rev 1096)
+@@ -95,6 +95,7 @@
+ void
+ AreYouSureResignView::onComponentClicked(Component* c)
+ {
++    View *v = 0;
+     switch ( c-&gt;getCustomCode() )
+     {
+         case BTN_YES:
+@@ -124,8 +125,7 @@
+             Desktop::setVisibilityAllWindows(false);
+             Desktop::setVisibility(&quot;MainView&quot;, true);
+ 
+-            View *v = Desktop::getView(&quot;OptionsView&quot;);
+-
++            v = Desktop::getView(&quot;OptionsView&quot;);
+             if (v != 0)
+             {
+                 ((OptionsTemplateView *)v)-&gt;initButtons();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2009-02-21 12:39:57 UTC (rev 1095)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2009-02-21 12:46:36 UTC (rev 1096)
+@@ -135,8 +135,7 @@
+ 
+             MenuTemplateView::backgroundSurface.free();
+ 
+-            PlayerGameManager* manager = (PlayerGameManager*) gamemanager;
+-            manager-&gt;launchMultiPlayerGame();
++            ((PlayerGameManager*)gamemanager)-&gt;launchMultiPlayerGame();
+             break;
+ 
+         default:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2009-02-21 12:39:57 UTC (rev 1095)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2009-02-21 12:46:36 UTC (rev 1096)
+@@ -251,7 +251,7 @@
+             break;
+ 
+         case INC_MUSIC:
+-            unsigned int v = gameconfig-&gt;musicvolume;
++            v = gameconfig-&gt;musicvolume;
+             if (v&lt;100)
+             {
+                 ++v;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000127.html">[Netpanzer-cvs] r1095 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+	<LI>Next message: <A HREF="000129.html">[Netpanzer-cvs] r1097 - in trunk/netpanzer/src/NetPanzer:	Objectives Units Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

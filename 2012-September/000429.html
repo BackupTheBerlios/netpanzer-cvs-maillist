@@ -1,0 +1,1053 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1405 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1405%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Components%20Views/Game&In-Reply-To=%3C20120913074341.467AE55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000428.html">
+   <LINK REL="Next"  HREF="000430.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1405 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1405%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Components%20Views/Game&In-Reply-To=%3C20120913074341.467AE55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1405 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Thu Sep 13 09:43:41 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000428.html">[Netpanzer-cvs] r1404 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000430.html">[Netpanzer-cvs] r1406 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#429">[ date ]</a>
+              <a href="thread.html#429">[ thread ]</a>
+              <a href="subject.html#429">[ subject ]</a>
+              <a href="author.html#429">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-09-13 09:43:40 +0200 (Thu, 13 Sep 2012)
+New Revision: 1405
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+Log:
+Add hide and show function in component
+TeamMode:
+- Resolve ready button on restart game
+- Resolve Ready action
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-09-12 21:20:02 UTC (rev 1404)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-09-13 07:43:40 UTC (rev 1405)
+@@ -15,9 +15,9 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+- 
++
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+- 
++
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+@@ -35,12 +35,12 @@
+ #include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+ 
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+- 
++
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Game/LoadingView.hpp&quot;
+- 
++
+ #include &quot;Util/Log.hpp&quot;
+- 
++
+ enum { _map_cycle_server_state_idle,
+        _map_cycle_server_state_display_endgame_views,
+        _map_cycle_server_state_cycle_next_map,
+@@ -52,7 +52,7 @@
+        _map_cycle_server_restart_team,
+        _map_cycle_server_prepare_team
+      };
+- 
++
+ enum { _map_cycle_client_idle,
+        _map_cycle_client_start_map_load,
+        _map_cycle_client_load_map,
+@@ -60,29 +60,29 @@
+        _map_cycle_client_prepare_team,
+        _map_cycle_client_team_start
+      };
+- 
++
+ enum { _execution_mode_loop_back_server,
+        _execution_mode_dedicated_server
+      };
+- 
++
+ int GameControlRulesDaemon::execution_mode = _execution_mode_loop_back_server;
+ unsigned char GameControlRulesDaemon::game_state  = _game_state_idle;
+ std::string GameControlRulesDaemon::nextmap = &quot;&quot;;
+- 
++
+ #define _MAP_CYCLE_ENDGAME_WAIT_PERIOD  (20) // seconds
+ #define _MAP_CYCLE_MAP_LOAD_WAIT_PERIOD (7) // seconds
+- 
++
+ int GameControlRulesDaemon::map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+ Timer GameControlRulesDaemon::map_cycle_fsm_server_endgame_timer;
+ Timer GameControlRulesDaemon::map_cycle_fsm_server_map_load_timer;
+ Timer GameControlRulesDaemon::cooldown;
+- 
++
+ int GameControlRulesDaemon::map_cycle_fsm_client_state = _map_cycle_client_idle;
+ bool GameControlRulesDaemon::map_cycle_fsm_client_respawn_ack_flag = false;
+ char GameControlRulesDaemon::map_cycle_fsm_client_map_name[256];
+- 
++
+ static unsigned int sync_profile_index = 0;
+- 
++
+ //-----------------------------------------------------------------
+ void GameControlRulesDaemon::setStateServerInProgress()
+ {
+@@ -107,7 +107,7 @@
+ {
+     GameControlRulesDaemon::execution_mode = _execution_mode_dedicated_server;
+ }
+- 
++
+ //-----------------------------------------------------------------
+ void GameControlRulesDaemon::mapCycleFsmClient()
+ {
+@@ -115,22 +115,22 @@
+     {
+     case _map_cycle_client_idle :
+         return;
+- 
++
+     case _map_cycle_client_start_map_load :
+     {
+         LoadingView::show();
+- 
++
+         GameManager::shutdownParticleSystems();
+         ObjectiveInterface::resetLogic();
+- 
++
+         GameConfig::game_map-&gt;assign( map_cycle_fsm_client_map_name );
+- 
++
+         char buf[256];
+         snprintf(buf, sizeof(buf), &quot;Next Map '%s'.&quot;,
+                  GameConfig::game_map-&gt;c_str());
+         LoadingView::append( buf);
+         LoadingView::append( &quot;Loading Game Map ...&quot; );
+- 
++
+         try
+         {
+             GameManager::startGameMapLoad(GameConfig::game_map-&gt;c_str(), 16);
+@@ -142,25 +142,25 @@
+             map_cycle_fsm_client_state = _map_cycle_client_idle;
+             return;
+         }
+- 
++
+         GameManager::resetGameLogic();
+         map_cycle_fsm_client_state = _map_cycle_client_load_map;
+         return;
+     }
+     break;
+- 
++
+     case _map_cycle_client_load_map :
+     {
+         int percent_complete;
+         char str_buf[128];
+- 
++
+         if ( GameManager::gameMapLoad( &amp;percent_complete ) == false )
+         {
+             map_cycle_fsm_client_state = _map_cycle_client_wait_for_respawn_ack;
+- 
++
+             sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+             LoadingView::update( str_buf );
+- 
++
+             LoadingView::append( &quot;Waiting to respawn ...&quot; );
+         }
+         else
+@@ -168,10 +168,10 @@
+             sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+             LoadingView::update( str_buf );
+         }
+- 
++
+         return;
+     }
+- 
++
+     case _map_cycle_client_wait_for_respawn_ack :
+     {
+         if( map_cycle_fsm_client_respawn_ack_flag == true )
+@@ -203,7 +203,7 @@
+         return;
+     }
+     break;
+- 
++
+     case _map_cycle_client_team_start :
+     {
+         Desktop::setVisibility(&quot;PrepareTeam&quot;, false);
+@@ -212,43 +212,43 @@
+         return;
+     }
+     break;
+-    
++
+     } // ** switch
+ }
+- 
+- 
++
++
+ void GameControlRulesDaemon::mapCycleFsmServer()
+ {
+     switch( map_cycle_fsm_server_state )
+     {
+     case _map_cycle_server_state_idle:
+         break;
+- 
++
+     case _map_cycle_server_state_display_endgame_views:
+     {
+         ChatInterface::serversay(&quot;Round is over&quot;);
+- 
++
+         SystemViewControl view_control;
+- 
++
+         ServerConnectDaemon::lockConnectProcess();
+- 
++
+         view_control.set(&quot;EndRoundView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
+- 
++
+         if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server )
+         {
+             Desktop::setVisibility(&quot;GameView&quot;, true);
+             Desktop::setVisibility(&quot;EndRoundView&quot;, true );
+         }
+- 
++
+         SERVER-&gt;broadcastMessage(&amp;view_control, sizeof(SystemViewControl));
+- 
++
+         map_cycle_fsm_server_endgame_timer.changePeriod( _MAP_CYCLE_ENDGAME_WAIT_PERIOD );
+         map_cycle_fsm_server_endgame_timer.reset();
+- 
++
+         map_cycle_fsm_server_state = _map_cycle_server_state_cycle_next_map;
+     }
+     break;
+- 
++
+     case _map_cycle_server_state_cycle_next_map :
+     {
+         if ( map_cycle_fsm_server_endgame_timer.count() &amp;&amp;
+@@ -256,7 +256,7 @@
+            )
+         {
+             GameManager::shutdownParticleSystems();
+- 
++
+             if(nextmap != &quot;&quot;)
+             {
+                 GameConfig::game_map-&gt;assign( nextmap );
+@@ -266,19 +266,19 @@
+             {
+                 GameConfig::game_map-&gt;assign( MapsManager::getNextMap( *GameConfig::game_map ) );
+             }
+- 
++
+             ConsoleInterface::postMessage(Color::white, false, 0, &quot;loading map '%s'.&quot;,
+                                           GameConfig::game_map-&gt;c_str());
+- 
++
+             GameControlCycleMap cycle_map_mesg;
+             cycle_map_mesg.set( GameConfig::game_map-&gt;c_str() );
+- 
++
+             SERVER-&gt;broadcastMessage( &amp;cycle_map_mesg, sizeof( GameControlCycleMap ));
+- 
++
+             if ( GameControlRulesDaemon::execution_mode == _execution_mode_dedicated_server )
+             {
+                 ObjectiveInterface::resetLogic();
+- 
++
+                 GameManager::dedicatedLoadGameMap(
+                     GameConfig::game_map-&gt;c_str());
+ 
+@@ -291,10 +291,10 @@
+             else
+             {
+                 LoadingView::show();
+- 
++
+                 LoadingView::append( &quot;Loading Game Map ...&quot; );
+                 ObjectiveInterface::resetLogic();
+- 
++
+                 try
+                 {
+                     GameManager::startGameMapLoad
+@@ -308,31 +308,31 @@
+                     map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+                     return;
+                 }
+- 
++
+                 GameManager::resetGameLogic();
+                 map_cycle_fsm_server_state = _map_cycle_server_state_load_map;
+                 return;
+             }
+- 
++
+         }
+     }
+     break;
+- 
++
+     case _map_cycle_server_state_load_map :
+     {
+         int percent_complete;
+         char str_buf[128];
+- 
++
+         if ( GameManager::gameMapLoad( &amp;percent_complete ) == false )
+         {
+             map_cycle_fsm_server_state = _map_cycle_server_state_load_unit_profiles;
+         }
+- 
++
+         sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+         LoadingView::update( str_buf );
+     }
+     break;
+- 
++
+     case _map_cycle_server_state_wait_for_client_map_load :
+     {
+         if ( map_cycle_fsm_server_map_load_timer.count() )
+@@ -342,7 +342,7 @@
+         }
+     }
+     break;
+- 
++
+     case _map_cycle_server_state_load_unit_profiles:
+     {
+         UnitProfileInterface::loadUnitProfiles();
+@@ -354,7 +354,7 @@
+         map_cycle_fsm_server_state = _map_cycle_server_state_sync_profiles;
+     }
+     break;
+- 
++
+     case _map_cycle_server_state_sync_profiles :
+     {
+         if ( sync_profile_index &lt;= UnitProfileInterface::getNumUnitTypes() )
+@@ -371,20 +371,20 @@
+         }
+     }
+     break;
+- 
++
+     case _map_cycle_server_state_respawn_players :
+     {
+         SystemResetGameLogic reset_game_logic_mesg;
+- 
++
+         GameManager::resetGameLogic();
+         SERVER-&gt;broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
+- 
++
+         PlayerInterface::unlockPlayerStats();
+         LoadingView::loadFinish();
+- 
++
+         GameControlCycleRespawnAck respawn_ack_mesg;
+         SERVER-&gt;broadcastMessage( &amp;respawn_ack_mesg, sizeof(GameControlCycleRespawnAck));
+- 
++
+         if (GameConfig::game_teammode)
+         {
+             map_cycle_fsm_server_state = _map_cycle_server_restart_team;
+@@ -396,7 +396,7 @@
+         ServerConnectDaemon::unlockConnectProcess();
+     }
+     break;
+-    
++
+     case _map_cycle_server_restart_team :
+     {
+         map_cycle_fsm_server_state = _map_cycle_server_prepare_team;
+@@ -405,11 +405,12 @@
+         cooldown.reset();
+     }
+     break;
+-    
++
+     case _map_cycle_server_prepare_team :
+     {
+         if (cooldown.count() || TeamManager::CheckisPlayerReady())
+         {
++            TeamManager::BalancedTeam();
+             GameControlCycleTeamStart team_start_mesg;
+             SERVER-&gt;broadcastMessage(&amp;team_start_mesg, sizeof(GameControlCycleTeamStart));
+             TeamManager::SpawnTeams();
+@@ -418,40 +419,40 @@
+         }
+     }
+     break;
+- 
++
+     } // ** switch
+ }
+- 
++
+ void GameControlRulesDaemon::onTimelimitGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+- 
++
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+- 
++
+ void GameControlRulesDaemon::onFraglimitGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+- 
++
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+- 
++
+ void GameControlRulesDaemon::onObjectiveGameCompleted()
+ {
+     PlayerInterface::lockPlayerStats();
+- 
++
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+- 
++
+ void GameControlRulesDaemon::forceMapChange(std::string _nextmap)
+ {
+     nextmap = _nextmap;
+- 
++
+     PlayerInterface::lockPlayerStats();
+- 
++
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+@@ -459,24 +460,24 @@
+ void GameControlRulesDaemon::forceEndRound()
+ {
+     PlayerInterface::lockPlayerStats();
+- 
++
+     map_cycle_fsm_server_state = _map_cycle_server_state_display_endgame_views;
+     GameControlRulesDaemon::game_state = _game_state_completed;
+ }
+ 
+- 
++
+ void GameControlRulesDaemon::checkGameRules()
+ {
+     PlayerState *player_state;
+ 
+- 
++
+     if ( (GameControlRulesDaemon::game_state == _game_state_in_progress) &amp;&amp;
+             (NetworkState::status == _network_state_server)
+        )
+     {
+         unsigned char game_type;
+         game_type = GameConfig::game_gametype;
+- 
++
+         switch( game_type )
+         {
+         case  _gametype_timelimit:
+@@ -500,7 +501,7 @@
+                     onFraglimitGameCompleted();
+             }
+             break;
+- 
++
+         case _gametype_objective:
+         {
+             float ratio = (float) GameConfig::game_occupationpercentage / 100.0;
+@@ -524,7 +525,7 @@
+             // nothing
+             ;
+         }
+- 
++
+         // ** Check for Player Respawns **
+         bool respawn_rule_complete = false;
+         while( respawn_rule_complete == false )
+@@ -533,23 +534,22 @@
+             {
+                 PlayerInterface::resetPlayerUnitConfig( player_state-&gt;getID() );
+                 GameManager::spawnPlayer( player_state-&gt;getID() );
+-                LOGGER.warning(&quot;respawn_rule_complete&quot;);
+             }
+         }
+     }
+ }
+- 
++
+ void GameControlRulesDaemon::netMessageCycleMap(const NetMessage* message)
+ {
+     GameControlCycleMap *cycle_map_mesg;
+- 
++
+     cycle_map_mesg = (GameControlCycleMap *) message;
+- 
++
+     snprintf(map_cycle_fsm_client_map_name, 256, &quot;%s&quot;, cycle_map_mesg-&gt;map_name);
+     map_cycle_fsm_client_state = _map_cycle_client_start_map_load;
+- 
++
+ }
+- 
++
+ void GameControlRulesDaemon::netMessageCycleRespawnAck(const NetMessage* )
+ {
+     map_cycle_fsm_client_respawn_ack_flag = true;
+@@ -559,7 +559,7 @@
+ {
+     GameControlCyclePrepareTeam *prepare_team_mesg;
+     prepare_team_mesg = (GameControlCyclePrepareTeam *) message;
+-    
++
+     map_cycle_fsm_client_state = _map_cycle_client_prepare_team;
+     GameControlRulesDaemon::game_state = _game_state_prepare_team;
+     cooldown.changePeriod(prepare_team_mesg-&gt;Cooldown);
+@@ -570,7 +570,7 @@
+     map_cycle_fsm_client_state = _map_cycle_client_team_start;
+     GameControlRulesDaemon::game_state = _game_state_idle;
+ }
+- 
++
+ void GameControlRulesDaemon::processNetMessage(const NetMessage* message)
+ {
+     switch(message-&gt;message_id)
+@@ -578,7 +578,7 @@
+     case _net_message_id_game_control_cycle_map :
+         netMessageCycleMap(message);
+         break;
+- 
++
+     case _net_message_id_game_control_cycle_respawn_ack :
+         netMessageCycleRespawnAck(message);
+         break;
+@@ -590,7 +590,7 @@
+     case _net_message_id_game_control_cycle_team_start :
+         netMessageCycleTeamStart(message);
+         break;
+- 
++
+     default:
+         LOGGER.warning(
+             &quot;Received GameControlRulesMessage with unknown id (%d-%d)&quot;,
+@@ -598,7 +598,7 @@
+         break;
+     }
+ }
+- 
++
+ void GameControlRulesDaemon::updateGameControlFlow()
+ {
+     if ( NetworkState::status == _network_state_server )
+@@ -609,14 +609,14 @@
+     {
+         mapCycleFsmClient();
+     }
+- 
++
+     checkGameRules();
+ }
+- 
++
+ void GameControlRulesDaemon::mapLoadFailureResponse(int result_code, const char *map_name)
+ {
+     char str_buf[128];
+- 
++
+     if( result_code == _mapload_result_no_map_file )
+     {
+         sprintf( str_buf, &quot;MAP %s NOT FOUND!&quot;, map_name );
+@@ -627,7 +627,6 @@
+         LoadingView::append( &quot;MAP TILE SET NOT FOUND!&quot; );
+     }
+ }
+- 
+- 
+- 
+- 
+\ No newline at end of file
++
++
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-09-12 21:20:02 UTC (rev 1404)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-09-13 07:43:40 UTC (rev 1405)
+@@ -32,6 +32,8 @@
+ #include &quot;Util/StringUtil.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Objectives/Objective.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Game/PrepareTeam.hpp&quot;
+ 
+ Team       * TeamManager::Teams_lists = 0;
+ Uint8        TeamManager::max_Teams = 0;
+@@ -147,6 +149,11 @@
+ {
+     resetPlayerReady();
+     resetTeamStats();
++    PrepareTeam *v = (PrepareTeam*)Desktop::getView(&quot;PrepareTeam&quot;);
++    if ( v )
++    {
++        v-&gt;resetReady();
++    }
+ }
+ 
+ void TeamManager::addPlayerinTeam(PlayerID player_id, Uint8 team_id)
+@@ -368,10 +375,10 @@
+ 
+ void TeamManager::ServerRequestReady(PlayerID player_id)
+ {
+-    setReady(player_id);
++    setReady(player_id);
+     PlayerReadyRequest Ready_request;
+     Ready_request.set(player_id, ready_Accepted);
+-    SERVER-&gt;broadcastMessage( &amp;Ready_request, sizeof(PlayerReadyRequest));
++    SERVER-&gt;broadcastMessage( &amp;Ready_request, sizeof(PlayerReadyRequest));
+ }
+ 
+ bool TeamManager::CheckisPlayerReady()
+@@ -383,7 +390,7 @@
+             return true;
+         }
+     }
+-    return false;
++    return false;
+ }
+ 
+ void TeamManager::PlayerRequestReadyAccepted(PlayerID player_id)
+@@ -418,7 +425,7 @@
+ {
+     const TeamScoreSync* score_Sync
+     = (const TeamScoreSync *) message;
+-    
++
+     if (score_Sync-&gt;TeamID &lt; max_Teams)
+         Teams_lists[score_Sync-&gt;TeamID].syncScore(score_Sync-&gt;getKills(), score_Sync-&gt;getLosses());
+ }
+@@ -427,13 +434,13 @@
+ {
+     const PlayerTeamRequest* changeTeamRequest
+     = (const PlayerTeamRequest *) message;
+-    
++
+     switch(changeTeamRequest-&gt;request_type)
+     {
+     case change_team_request :
+         serverrequestchangeTeam(changeTeamRequest-&gt;getPlayerIndex(),changeTeamRequest-&gt;gettoteamindex());
+         break;
+- 
++
+     case change_team_Accepted:
+         PlayerchangeTeam(changeTeamRequest-&gt;getPlayerIndex(),changeTeamRequest-&gt;gettoteamindex());
+         break;
+@@ -443,18 +450,18 @@
+ {
+     const PlayerReadyRequest* ReadyRequest
+     = (const PlayerReadyRequest *) message;
+-    
++
+     switch(ReadyRequest-&gt;request_type)
+     {
+     case ready_request :
+         ServerRequestReady(ReadyRequest-&gt;getPlayerIndex());
+         break;
+- 
++
+     case change_team_Accepted:
+         PlayerRequestReadyAccepted(ReadyRequest-&gt;getPlayerIndex());
+         break;
+     }
+-    
++
+ }
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-12 21:20:02 UTC (rev 1404)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-13 07:43:40 UTC (rev 1405)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -53,7 +53,7 @@
+     {
+         delete clickAction;
+     }
+-    
++
+     clickAction = action;
+ }
+ 
+@@ -62,6 +62,8 @@
+ Button::render()
+ {
+     surface.fill(0);
++    dirty = false;
++    if (!visible) return;
+     if ( bimage.getNumFrames() == 1 )
+     {
+         bimage.bltTrans(surface, extraBorder + state_offset[bstate].x, extraBorder + state_offset[bstate].y);
+@@ -73,24 +75,23 @@
+     }
+     else
+     {
+-        surface.fill(componentBodyColor);        
++        surface.fill(componentBodyColor);
+     }
+ 
+     if ( borders[bstate][0]|extraBorder ) // only 1 | (binary or)
+     {
+         surface.drawButtonBorder(borders[bstate][0], borders[bstate][1]);
+     }
+-   
++
+     if ( label.length() )
+     {
+         Surface text;
+         text.renderText( label.c_str(), textColors[bstate], 0);
+         // blit centered and transparent
+         text.bltTrans(surface, ((surface.getWidth()/2) - (text.getWidth()/2))+state_offset[bstate].x,
+-                      ((surface.getHeight()/2) - (text.getHeight()/2))+state_offset[bstate].y);        
++                      ((surface.getHeight()/2) - (text.getHeight()/2))+state_offset[bstate].y);
+     }
+-   
+-    dirty = false;
++
+ }
+ 
+ // actionPerformed
+@@ -98,11 +99,11 @@
+ void
+ Button::actionPerformed(const mMouseEvent &amp;me)
+ {
+-    if ( bstate == BDISABLED )
++    if ( bstate == BDISABLED || !visible)
+     {
+         return;
+     }
+-        
++
+     if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
+                 || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED)
+     {
+@@ -142,7 +143,7 @@
+     b-&gt;setAction(action);
+     b-&gt;setTextColors(componentInActiveTextColor, componentFocusTextColor, componentActiveTextColor, componentInActiveTextColor);
+     b-&gt;setStateOffset(Button::BPRESSED, 1, 1);
+-    
++
+     if ( ! action )
+     {
+         LOGGER.warning(&quot;No action defined for button '%s'&quot;, label.c_str());
+@@ -158,7 +159,7 @@
+ {
+     Surface bitmap;
+     bitmap.loadBMP(itButton);
+-    
++
+     Surface bstart;
+     bstart.grab(bitmap, iRect(0, 0, 15, bitmap.getHeight()));
+     Surface bend;
+@@ -176,14 +177,14 @@
+         bmiddle.blt(spbutton,15+(msize*i),0);
+     }
+     bend.blt(spbutton,spbutton.getWidth()-15,0);
+-    
++
+     Button *b = new Button();
+     b-&gt;setImage(spbutton);
+     b-&gt;setLabel(label);
+     b-&gt;setLocation(loc);
+     b-&gt;setTextColors(ctTexteNormal, ctTexteOver, ctTextePressed, ctTexteDisable);
+     b-&gt;setStateOffset(Button::BPRESSED, 1, 1);
+-    
++
+     b-&gt;setAction(action);
+ 
+     return b;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2012-09-12 21:20:02 UTC (rev 1404)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2012-09-13 07:43:40 UTC (rev 1405)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -70,7 +70,7 @@
+     {
+         reset();
+     }
+-    
++
+     virtual ~Component()
+     {
+     }
+@@ -91,7 +91,7 @@
+         //surface.create(r.getSizeX(), r.getSizeY(), 1);
+         dirty = true;
+     }
+-    
++
+     virtual void setSize(int x, int y)
+     {
+         size.x=x;
+@@ -101,23 +101,44 @@
+     }
+ 
+     void setLocation(int x, int y);
+-    void setLocation(const iXY &amp;p) { setLocation(p.x, p.y); }
+-    
++    void setLocation(const iXY &amp;p)
++    {
++        setLocation(p.x, p.y);
++    }
++
++    void show()
++    {
++        if (!visible)
++        {
++            visible = true;
++            dirty=true;
++        }
++    }
++
++    void hide()
++    {
++        if (visible)
++        {
++            visible = false;
++            dirty=true;
++        }
++    }
++
+     virtual void draw(Surface &amp;dest)
+     {
+         iRect bounds;
+         getBounds(bounds);
+-        
++
+         if ( dirty )
+             render();
+-        
++
+         surface.bltTrans(dest, bounds.min.x, bounds.min.y);
+     }
+-    
++
+     virtual void render() = 0;
+     virtual void actionPerformed(const mMouseEvent &amp;me) = 0;
+     virtual void handleKeyboard() {}
+-    
++
+ private:
+     Component(const Component&amp;);
+     void operator=(const Component&amp;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-09-12 21:20:02 UTC (rev 1404)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-09-13 07:43:40 UTC (rev 1405)
+@@ -69,7 +69,7 @@
+     menuImage.loadBMP(&quot;pics/backgrounds/menus/menu/canon.bmp&quot;);
+     vsImage.loadBMP(&quot;pics/backgrounds/menus/menu/vs.bmp&quot;);
+ 
+-    moveTo((screen-&gt;getWidth()/2) - (menuImage.getWidth()/2), 
++    moveTo((screen-&gt;getWidth()/2) - (menuImage.getWidth()/2),
+            (screen-&gt;getHeight()/2) - ( menuImage.getHeight()/1.5));
+     resize(menuImage.getWidth(), menuImage.getHeight()+300);
+     menuImageXY.x = 0;
+@@ -89,13 +89,13 @@
+     secondrect.min.y = firstrect.min.y;
+     secondrect.max.x = rect.max.x-20;
+     secondrect.max.y = firstrect.max.y;
+-    
++
+     changebutton = Button::createNewSpecialButton( &quot; &gt;&gt; &quot;,
+                                                    iXY(firstrect.max.x+29, (firstrect.min.y+50)),
+                                                    (secondrect.min.x-firstrect.max.x)-39,
+                                                    new ChangeTeamAction(this));
+     add(changebutton);
+-    
++
+     readybutton = Button::createNewSpecialButton( &quot;Ready&quot;,
+                                                   iXY(firstrect.max.x+29, (firstrect.min.y+85)),
+                                                   (secondrect.min.x-firstrect.max.x)-39,
+@@ -120,7 +120,7 @@
+ 
+ void PrepareTeam::init()
+ {
+-    moveTo((screen-&gt;getWidth()/2) - (menuImage.getWidth()/2), 
++    moveTo((screen-&gt;getWidth()/2) - (menuImage.getWidth()/2),
+            (screen-&gt;getHeight()/3) - ( menuImage.getHeight()));
+     resize(menuImage.getWidth(), menuImage.getHeight()+300);
+     menuImageXY.x = 0;
+@@ -140,7 +140,7 @@
+     secondrect.min.y = firstrect.min.y;
+     secondrect.max.x = rect.max.x-25;
+     secondrect.max.y = firstrect.max.y;
+-    
++
+     changebutton-&gt;setLocation(iXY(firstrect.max.x+29, (firstrect.min.y+50)));
+     readybutton-&gt;setLocation(iXY(firstrect.max.x+29, (firstrect.min.y+85)));
+     StateTeam1-&gt;setLocation(firstrect.min);
+@@ -208,8 +208,8 @@
+     snprintf(statBuf, sizeof(statBuf), &quot;Name: %-20s&quot;, MapInterface::getMap()-&gt;getName().c_str());
+     dest.bltString(start.x+nextx, start.y, statBuf, ctTexteNormal);
+     start.y+= 13;
+-    snprintf(statBuf, sizeof(statBuf), &quot;Players: %i/%i&quot;,  
+-             PlayerInterface::getActivePlayerCount(), 
++    snprintf(statBuf, sizeof(statBuf), &quot;Players: %i/%i&quot;,
++             PlayerInterface::getActivePlayerCount(),
+              GameConfig::game_maxplayers);
+     dest.bltString(start.x, start.y, statBuf, ctTexteNormal);
+     snprintf(statBuf, sizeof(statBuf), &quot;Objectives: %i&quot;, (int) ObjectiveInterface::getObjectiveCount());
+@@ -294,3 +294,9 @@
+     changebutton-&gt;disable();
+     readybutton-&gt;disable();
+ }
++
++void PrepareTeam::resetReady()
++{
++    changebutton-&gt;enable();
++    readybutton-&gt;enable();
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-09-12 21:20:02 UTC (rev 1404)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-09-13 07:43:40 UTC (rev 1405)
+@@ -56,9 +56,10 @@
+     virtual void checkResolution(iXY oldResolution, iXY newResolution);
+     virtual void processEvents();
+     void init();
+-    
++
+     void changeTeam();
+     void playerReady();
++    void resetReady();
+ };
+ 
+ #endif // PREPARETEAM_HPP
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000428.html">[Netpanzer-cvs] r1404 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000430.html">[Netpanzer-cvs] r1406 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#429">[ date ]</a>
+              <a href="thread.html#429">[ thread ]</a>
+              <a href="subject.html#429">[ subject ]</a>
+              <a href="author.html#429">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

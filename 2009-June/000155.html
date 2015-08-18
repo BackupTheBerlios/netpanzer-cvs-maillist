@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1126 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1126%20-%20trunk/netpanzer&In-Reply-To=%3C200906221058.n5MAwqsQ016925%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000154.html">
+   <LINK REL="Next"  HREF="000156.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1126 - trunk/netpanzer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1126%20-%20trunk/netpanzer&In-Reply-To=%3C200906221058.n5MAwqsQ016925%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1126 - trunk/netpanzer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 22 12:58:52 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000154.html">[Netpanzer-cvs] r1125 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000156.html">[Netpanzer-cvs] r1127 - in trunk/netpanzer/src/Lib/physfs: .	archivers platform zlib123
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#155">[ date ]</a>
+              <a href="thread.html#155">[ thread ]</a>
+              <a href="subject.html#155">[ subject ]</a>
+              <a href="author.html#155">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-22 12:58:37 +0200 (Mon, 22 Jun 2009)
+New Revision: 1126
+
+Modified:
+   trunk/netpanzer/README
+   trunk/netpanzer/SConstruct
+Log:
+- added &quot;datadir&quot; parameter to compilation
+- updated README file.
+
+
+Modified: trunk/netpanzer/README
+===================================================================
+--- trunk/netpanzer/README	2009-06-22 01:09:02 UTC (rev 1125)
++++ trunk/netpanzer/README	2009-06-22 10:58:37 UTC (rev 1126)
+@@ -38,8 +38,8 @@
+ * normal gnu compiler and additional tools (g++ version 3.2 or later is
+   required at the moment)
+ 
+-* perforce jam 2.5 or later (used as build tool)
+-  <A HREF="ftp://ftp.perforce.com/pub/jam">ftp://ftp.perforce.com/pub/jam</A>
++* SCons build tool
++  <A HREF="http://www.scons.org/">http://www.scons.org/</A>
+ 
+ * SDL 1.2.5 or later
+   <A HREF="http://www.libsdl.org">http://www.libsdl.org</A>
+@@ -50,36 +50,107 @@
+ Thanks to all the authors of these helpful libraries that made our development
+ easy and straightforward.
+ 
+-2.2 Building
++2.2 Building without installing on non Windows
+ 
+-To build and install the game use the following commands:
++To build the game and run as normal user do the following:
+ 
+-./configure
+-jam
+- (You probably need to be root for the installation, so using &quot;su&quot; is a good
+-  idea here)
+-jam install
++# scons
+ 
+-The configure script also lets you set some more options like the installation
+-directory (--prefix argument). You'll get a full list of these if you invoke
+-&quot;configure --help&quot;. The game should be installed now.
++When scons finish without errors the game is ready to play, type this:
+ 
+-2.3 Music
++# ./netpanzer
+ 
++Remember that next time you want to play you have to go to the same folder where
++you compiled and type './netpanzer'
++
++2.3 Building on Windows
++
++Building on windows is a little bit more complicated, developers shouldn't have
++any big problem.
++
++MinGW should be installed in C:\mingw
++
++Get the development libraries of SDL for mingw32, copy the include directory to
++C:\mingw\include\SDL so you have the file &quot;C:\mingw\include\SDL\SDL.h&quot;, and the
++lib folder to C:\mingw\lib
++
++Get SDL_mixer development libraries for VC8, copy the header file to
++C:\mingw\include\SDL and the .lib file to c:\mingw\lib
++
++Python and scons should be installed and working.
++
++To compile netpanzer run scons on the folder where you have the netpanzer source
++code:
++
++C:\Some\Folder\With\Netpanzer&gt; scons
++
++After scons finish without errors you have to copy all the .DLL files from SDL
++and from SDL_mixer to the netpanzer folder.
++
++To run you can type 'netpanzer' or click on the netpanzer.exe file in explorer.
++
++2.4 Building for distribution on non Windows operating systems
++
++If you plan to distribute NetPanzer for installation (on Linux systems, for example)
++there are some extra steps to be taken care.
++
++NetPanzer needs to know where the data files will be stored when the game runs. To
++set this data you have to add the parameter &quot;datadir=/some/dir/&quot; at compile time
++and NetPanzer will look there for its data files. Example:
++
++# scons datadir=/usr/local/games/netpanzer
++
++Using the sample line, after NetPanzer is built, it will look in /usr/local/games/netpanzer
++for it's data files.
++
++For versioning, there is a file called &quot;RELEASE_VERSION&quot;, the first line on that file will
++be the version that NetPanzer will show. You can use that file to change the version of
++the game shown. You should modify the file before compilation.
++
++Actually there is no install script, you will have to prepare the script by yourself.
++The installation is actually easy, and you only have to copy several files. The following
++directories should be copied on the &quot;datadir&quot; destination:
++- cache/
++- fonts/
++- maps/
++- pics/
++- powerups/
++- scripts/
++- sound/
++- units/
++- wads/
++
++If you want to copy some documentation, the &quot;doc&quot; folder has it. There is also the BUGS,
++COPYING, ChangeLog, README (this file), RELNOTES and TODO.
++
++&quot;netpanzer.desktop&quot; is a sample file for using on desktop systems.
++
++&quot;netpanzer.png&quot; and &quot;netpanzer.xpm&quot; are some sample icons to be use with the game.
++
++And of course, the file &quot;netpanzer&quot; is the main binary that should be on the PATH.
++
++2.5 Music
++
+ Netpanzer doesn't come with own musicfiles yet. However you can place your
+ favourite .mp3, .ogg or .mod files into the sound/music directory and netpanzer
+ will play these in random order while you play.
+ 
+-2.4 Starting the game
++2.6 Starting the game
+ 
+-You can start the game by typing
++You can start the game in several ways:
+ 
+-netpanzer
++If you compiled yourself NetPanzer (and didn't install), first &quot;cd&quot; to the folder where
++you compiled it and type:
++# ./netpanzer
+ 
+-Note that on first startup the game needs some time to precalculate some data.
+-This might take up to 5 minutes. So just wait a bit when you have a black
+-screen.
++If NetPanzer was installed and is in the PATH, type
++# netpanzer
+ 
++It is possible that in your distribution NetPanzer was installed and has a menu item,
++if that is the case, just click on the item.
++
++On Windows, you can click on the &quot;netpanzer.exe&quot; file.
++
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+ 3. Gameplay
+@@ -91,6 +162,8 @@
+ 
+ 4. Dedicated Server and Configuration Files
+ 
++Note: This has to be reviewed.
++
+ You can start a dedicated netpanzer server (a pure server, without any video
+ output). By starting netpanzer with the -d commandline option.
+ 
+@@ -163,8 +236,13 @@
+ 
+ 5. Bot Players
+ 
+--- this has to change for new mode --
++Bot players can be spawn only on the dedicated server. To do that enter the 
++server console and type:
++&gt; addbot
+ 
++A new bot will appear on the game. Type help on the server console for more
++info and commands.
++
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+ 6. Contact
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-06-22 01:09:02 UTC (rev 1125)
++++ trunk/netpanzer/SConstruct	2009-06-22 10:58:37 UTC (rev 1126)
+@@ -60,6 +60,7 @@
+ opts = Options()
+ opts.AddOptions(
+     ('mode','set compile mode to debug or release','release'),
++    ('datadir','define the extra directory where the netpanzer will look for data files, usefull for linux distributions, defaults to no extra directory',''),
+     ('sdlconfig','sets the sdl-config full path', 'sdl-config'),
+     ('crosslinuxcompilerprefix', 'sets the prefix for the cross linux compiler, example: i686-pc-linux-gnu-', ''),
+     ('crossmingwcompilerprefix', 'sets the prefix for the cross mingw compiler, example: i686-mingw32-', ''),
+@@ -184,6 +185,9 @@
+     NPVERSION = 'svn-' + SVERSION;
+ 
+ env.Append( CCFLAGS = [ '-DPACKAGE_VERSION=\\&quot;' + NPVERSION + '\\&quot;' ] )
++if env['datadir'] != '':
++    env.Append( CCFLAGS = [ '-DNP_DATADIR=\\&quot;' +  env['datadir'] + '\\&quot;' ])
++    
+ crossmingwenv.Append( CCFLAGS = [ '-DPACKAGE_VERSION=\\&quot;' + NPVERSION + '\\&quot;' ] )
+ crosslinuxenv.Append( CCFLAGS = [ '-DPACKAGE_VERSION=\\&quot;' + NPVERSION + '\\&quot;' ] )
+ 
+@@ -269,28 +273,10 @@
+ ################################################################
+ 
+ npdirs = &quot;&quot;&quot;
+-    Bot
+-    Classes
+-    Classes/AI
+-    Classes/Network
+-    Core
+-    Interfaces
+-    Network
+-    Objectives
+-    Particles
+-    PowerUps
+-    Resources
+-    Scripts
+-    System
+-    Units
+-    Weapons
+-    Views
+-    Views/Components
+-    Views/Game
+-    Views/MainMenu
+-    Views/MainMenu/Multi
+-    Views/MainMenu/Multi/MasterServer
+-    Views/MainMenu/Options
++    Bot Classes Classes/AI Classes/Network Core Interfaces Network
++    Objectives Particles PowerUps Resources Scripts System Units Weapons
++    Views Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
++    Views/MainMenu/Multi/MasterServer Views/MainMenu/Options
+ &quot;&quot;&quot;
+ 
+ env.Append( NPSOURCES = globSources(env, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;) )
+@@ -320,8 +306,6 @@
+ crossmingwenv.Append( NPLIBPATH = crossmingwenv['FINALLIBSDIR'] )
+ crosslinuxenv.Append( NPLIBPATH = crosslinuxenv['FINALLIBSDIR'] )
+ 
+-
+-
+ netpanzer = env.Program( env['FINALEXENAME'], env['NPSOURCES'],
+              LIBS=env['NPLIBS'], LIBPATH=env['NPLIBPATH'] )
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000154.html">[Netpanzer-cvs] r1125 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000156.html">[Netpanzer-cvs] r1127 - in trunk/netpanzer/src/Lib/physfs: .	archivers platform zlib123
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#155">[ date ]</a>
+              <a href="thread.html#155">[ thread ]</a>
+              <a href="subject.html#155">[ subject ]</a>
+              <a href="author.html#155">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

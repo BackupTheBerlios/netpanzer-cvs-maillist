@@ -1,0 +1,361 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1396 - in trunk/netpanzer/src/NetPanzer: Actions	Classes/Network Interfaces Scripts Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1396%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Actions%0A%09Classes/Network%20Interfaces%20Scripts%20Views/Game&In-Reply-To=%3C20120905121227.5C08355B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000419.html">
+   <LINK REL="Next"  HREF="000421.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1396 - in trunk/netpanzer/src/NetPanzer: Actions	Classes/Network Interfaces Scripts Views/Game</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1396%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Actions%0A%09Classes/Network%20Interfaces%20Scripts%20Views/Game&In-Reply-To=%3C20120905121227.5C08355B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1396 - in trunk/netpanzer/src/NetPanzer: Actions	Classes/Network Interfaces Scripts Views/Game">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Wed Sep  5 14:12:27 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000419.html">[Netpanzer-cvs] r1395 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+        <LI>Next message: <A HREF="000421.html">[Netpanzer-cvs] r1397 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#420">[ date ]</a>
+              <a href="thread.html#420">[ thread ]</a>
+              <a href="subject.html#420">[ subject ]</a>
+              <a href="author.html#420">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-05 14:12:26 +0200 (Wed, 05 Sep 2012)
+New Revision: 1396
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp
+   trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+Log:
+All quit and disconnect actions consolidated in one place.
+
+Fix crash after exit when removing duplicated actions.
+
+Modified: trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Actions/ActionManager.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -38,16 +38,26 @@
+ {
+     if ( actions )
+     {
+-        std::map&lt;NPString, Action*&gt;::iterator i = actions-&gt;begin();
++        Action * a;
++        std::map&lt;NPString, Action*&gt;::iterator i;
+         
+-        while ( i != actions-&gt;end() )
++        for ( i = actions-&gt;begin(); i != actions-&gt;end(); i = actions-&gt;begin() )
+         {
+-            delete i-&gt;second;
+-            i++;
++            a = i-&gt;second;
++            for ( ; i != actions-&gt;end() ; )
++            {
++                if ( i-&gt;second == a )
++                {
++                    actions-&gt;erase(i++);
++                }
++                else
++                {
++                    ++i;
++                }
++            }
++            delete a;
+         }
+-        
+-        actions-&gt;clear();
+-        
++
+         delete actions;
+         actions = 0;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Actions/ActionManagerGUIActions.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -28,10 +28,12 @@
+     if ( gameconfig-&gt;quickConnect )
+     {
+         addAction(&quot;disconnect&quot;, getAction(&quot;quit&quot;));
++        addAction(&quot;loaderror&quot;,  getAction(&quot;quit&quot;));
+     }
+     else
+     {
+         addAction(&quot;disconnect&quot;, new DisconnectAction());
++        addAction(&quot;loaderror&quot;,  getAction(&quot;disconnect&quot;));
+     }
+     
+     addAction(&quot;hide_confirmexit&quot;, new HideViewAction(&quot;AreYouSureExitView&quot;));
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -38,6 +38,7 @@
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+ 
+ #include &quot;System/Sound.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ enum { _connect_state_idle = 0,
+        _connect_state_waiting_link,
+@@ -452,8 +453,9 @@
+             }
+             break;
+         case _connect_state_connect_failure : {
+-                if ( failure_display_timer.count() == true ) {
+-                    LoadingView::loadError();
++                if ( failure_display_timer.count() == true )
++                {
++                    ActionManager::runAction(&quot;loaderror&quot;);
+                     connection_state = _connect_state_idle;
+                 }
+             }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -49,6 +49,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ 
+ #include &quot;Scripts/ScriptManager.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+@@ -110,7 +111,7 @@
+         switch(command.type) {
+             case ServerCommand::QUIT:
+             {
+-                GameManager::exitNetPanzer();
++                ActionManager::runAction(&quot;quit&quot;);
+                 break;
+             }
+             case ServerCommand::CHAT:
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -610,14 +610,6 @@
+     // nothing
+ }
+ 
+-// ******************************************************************
+-void GameManager::exitNetPanzer()
+-{
+-    quitNetPanzerGame();
+-
+-    gamemanager-&gt;stopMainLoop();
+-}
+-
+ void GameManager::quitNetPanzerGame()
+ {
+     if ( NetworkState::status == _network_state_client ) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -79,8 +79,6 @@
+     static ConnectMesgServerGameSettings* getServerGameSetup();
+ 
+ public:
+-    static void exitNetPanzer();
+-
+     static void quitNetPanzerGame();
+ 
+     static void setNetPanzerGameOptions();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -321,7 +321,7 @@
+         wait.changePeriod( 4 );
+         while( !wait.count() );
+ 
+-        LoadingView::loadError();
++        ActionManager::runAction(&quot;loaderror&quot;);
+         return;
+     }
+ 
+@@ -341,7 +341,7 @@
+         GameManager::startGameMapLoad(mapname, 20);
+     } catch(std::exception&amp; e) {
+         LOGGER.warning(&quot;Error while loading map '%s': %s&quot;, mapname, e.what());
+-        LoadingView::loadError();
++        ActionManager::runAction(&quot;loaderror&quot;);
+         return;
+     }
+ 
+@@ -382,7 +382,7 @@
+         SERVER-&gt;closeSession();
+ 
+         GameControlRulesDaemon::setStateServerIdle();
+-        LoadingView::loadError();
++        ActionManager::runAction(&quot;loaderror&quot;);
+         return;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -30,6 +30,7 @@
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ #include &lt;sstream&gt;
+ 
+@@ -77,7 +78,7 @@
+ 
+ static int npmodule_quit (lua_State *L)
+ {
+-    GameManager::exitNetPanzer();
++    ActionManager::runAction(&quot;quit&quot;);
+     return 0;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -26,29 +26,11 @@
+ 
+ #include &quot;Actions/Action.hpp&quot;
+ #include &quot;Views/Components/InputField.hpp&quot;
++#include &quot;Actions/ActionManager.hpp&quot;
+ 
+ list&lt;string&gt; LoadingView::lines;
+ bool LoadingView::dirty = true;
+ 
+-class AbortLoadingAction : public Action
+-{
+-public:
+-    AbortLoadingAction() : Action(false) {}
+-    void execute()
+-    {
+-        if(gameconfig-&gt;quickConnect)
+-        {
+-            GameManager::exitNetPanzer();
+-            return;
+-        }
+-        GameManager::quitNetPanzerGame();
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-        Desktop::setVisibility(&quot;MainView&quot;, true);
+-        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+-    }
+-};
+-
+ class BeginPasswordConnectAction : public Action
+ {
+ public:
+@@ -83,9 +65,12 @@
+ 
+     resize(800, 600);
+ 
+-    add( Button::createTextButton(&quot;Abort&quot;, iXY(340, 15), 100, new AbortLoadingAction()));
++    Action * onAbort = ( gameconfig-&gt;quickConnect )
++                       ? ActionManager::getAction(&quot;quit&quot;)
++                       : ActionManager::getAction(&quot;disconnect&quot;);
++    
++    add( Button::createTextButton(&quot;Abort&quot;, iXY(340, 15), 100, onAbort));
+ 
+-
+     okButton = Button::createTextButton(&quot;Enter&quot;, iXY(340,100), 100, new BeginPasswordConnectAction(this));
+     
+     passwordLabel = new Label(340, 68, &quot;Game Password&quot;, Color::white);
+@@ -220,23 +205,6 @@
+ }
+ 
+ void
+-LoadingView::loadError()
+-{
+-    if ( gameconfig-&gt;quickConnect )
+-    {
+-        GameManager::exitNetPanzer();
+-    }
+-    else if ( Desktop::getVisible(&quot;LoadingView&quot;) )
+-    {
+-        Desktop::setVisibilityAllWindows(false);
+-        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-        Desktop::setVisibility(&quot;MainView&quot;, true);
+-        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+-        GameManager::quitNetPanzerGame();
+-    }
+-}
+-
+-void
+ LoadingView::show()
+ {
+     Desktop::setVisibilityAllWindows(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-09-05 11:06:22 UTC (rev 1395)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-09-05 12:12:26 UTC (rev 1396)
+@@ -43,7 +43,6 @@
+     static void update(const NPString&amp; text);
+     static void append(const NPString&amp; text);
+     static void loadFinish();
+-    static void loadError();
+     static void show();
+     static void hide();
+ 
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000419.html">[Netpanzer-cvs] r1395 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+	<LI>Next message: <A HREF="000421.html">[Netpanzer-cvs] r1397 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#420">[ date ]</a>
+              <a href="thread.html#420">[ thread ]</a>
+              <a href="subject.html#420">[ subject ]</a>
+              <a href="author.html#420">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

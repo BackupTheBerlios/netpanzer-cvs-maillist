@@ -1,0 +1,2309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1338 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Objectives PowerUps System	Units Views Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1338%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Core%20Interfaces%20Objectives%20PowerUps%20System%0A%09Units%20Views%20Views/Components%20Views/Game%20Views/MainMenu%0A%09Views/MainMenu/Multi%20Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C20120117180000.4A609482457%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000363.html">
+   <LINK REL="Next"  HREF="000365.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1338 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Objectives PowerUps System	Units Views Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1338%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Core%20Interfaces%20Objectives%20PowerUps%20System%0A%09Units%20Views%20Views/Components%20Views/Game%20Views/MainMenu%0A%09Views/MainMenu/Multi%20Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C20120117180000.4A609482457%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1338 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Objectives PowerUps System	Units Views Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 17 18:59:59 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000363.html">[Netpanzer-cvs] r1337 - in trunk/netpanzer: .	src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000365.html">[Netpanzer-cvs] r1339 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#364">[ date ]</a>
+              <a href="thread.html#364">[ thread ]</a>
+              <a href="subject.html#364">[ subject ]</a>
+              <a href="author.html#364">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-17 18:59:59 +0100 (Tue, 17 Jan 2012)
+New Revision: 1338
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+Log:
+got rid of the ini files for configuration, all is in cfg files now, this way (with some help from lua scripts) many more things can be configurable while game is running. The ini code is still there just in case want to be used, but will be removed if not.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -359,7 +359,7 @@
+                 {
+                     ConnectClientSettings client_setting;
+ 
+-                    client_setting.set(gameconfig-&gt;playername.c_str());
++                    client_setting.set(GameConfig::player_name-&gt;c_str());
+                     memcpy(&amp;client_setting.player_flag, GameConfig::player_flag_data, sizeof(client_setting.player_flag));
+ 
+                     CLIENT-&gt;sendMessage( &amp;client_setting, sizeof(ConnectClientSettings));
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -105,8 +105,8 @@
+     
+     try
+     {
+-        Address addr = Address::resolve(gameconfig-&gt;bindaddress,
+-                                        gameconfig-&gt;serverport,
++        Address addr = Address::resolve(*GameConfig::server_bindaddress,
++                                        GameConfig::server_port,
+                                         true, true ); // tcp for binding
+         
+         socket = new TCPListenSocket(addr, this);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -93,9 +93,9 @@
+ 
+     player_state-&gt;resetAutokick();
+ 
+-    if ( ((std::string)gameconfig-&gt;motd).length() &gt; 0 )
++    if ( GameConfig::server_motd-&gt;length() &gt; 0 )
+     {
+-        ChatInterface::serversayTo(client-&gt;getPlayerIndex(), gameconfig-&gt;motd.c_str());
++        ChatInterface::serversayTo(client-&gt;getPlayerIndex(), GameConfig::server_motd-&gt;c_str());
+     }
+ 
+     SERVER-&gt;broadcastMessage( &amp;connect_alert, sizeof(SystemConnectAlert));
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -33,7 +33,7 @@
+ 
+ void PlayerUnitConfig::initialize()
+ {
+-    max_allowed_units = gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers;
++    max_allowed_units = GameConfig::game_maxunits / GameConfig::game_maxplayers;
+ 
+     int num_types = UnitProfileInterface::getNumUnitTypes();
+     unit_spawn_list.resize(num_types, 0);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -88,7 +88,7 @@
+         assert(max_hit_points &gt; 0);
+ 
+         // Draw the selection box.
+-        if (gameconfig-&gt;unitselectionmode == _unit_selection_box_draw_mode_rect)
++        if (GameConfig::interface_unitselectionmode == _unit_selection_box_draw_mode_rect)
+         {
+             // Draw the rectangle selection box.
+             surface-&gt;drawRect(iRect(min_abs, max_abs), selectionBoxColor);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -65,7 +65,8 @@
+ {
+     size_t spawn_index;
+ 
+-    switch(gameconfig-&gt;respawntype) {
++    switch ( GameConfig::game_respawntype )
++    {
+         case _game_config_respawn_type_round_robin :
+             spawn_index = (last_spawn_index + 1) % size();
+             last_spawn_index = spawn_index;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -133,7 +133,7 @@
+     float scroll_rate;
+ 
+     time_slice = TimerInterface::getTimeSlice();
+-    scroll_rate = gameconfig-&gt;scrollrate;
++    scroll_rate = GameConfig::interface_scrollrate;
+ 
+     scroll_increment = (long) (scroll_rate * time_slice);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -293,13 +293,16 @@
+         }                                                               
+         if (master_server_option.value().size() &gt; 0) {
+             if (master_server_option.value() == &quot;none&quot;) {
+-                gameconfig-&gt;masterservers = &quot;&quot;;
++                *GameConfig::server_masterservers = &quot;&quot;;
+             }
+             else {
+-                gameconfig-&gt;masterservers = master_server_option.value();
++                *GameConfig::server_masterservers = master_server_option.value();
+             }
+         }
+-        if(port_option.value()) { gameconfig-&gt;serverport=port_option.value(); }
++        if ( port_option.value() )
++        {
++            GameConfig::server_port=port_option.value();
++        }
+ 
+         return manager;
+     } catch(std::exception&amp; e) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -95,9 +95,9 @@
+ void BaseGameManager::initializeGameConfig(const std::string&amp; configfile)
+ {
+     if(configfile == &quot;&quot;)
+-        gameconfig = new GameConfig(&quot;config/netpanzer.ini&quot;, &quot;/config/client.cfg&quot;);
++        gameconfig = new GameConfig(&quot;/config/client.cfg&quot;);
+     else
+-        gameconfig = new GameConfig(configfile, &quot;/config/client.cfg&quot;, false);
++        gameconfig = new GameConfig(configfile, false);
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::shutdownGameConfig()
+@@ -143,7 +143,7 @@
+     ServerMessageRouter::initialize();
+     ClientMessageRouter::initialize();
+ 
+-    ServerConnectDaemon::initialize( gameconfig-&gt;maxplayers );
++    ServerConnectDaemon::initialize( GameConfig::game_maxplayers );
+ 
+     NetworkState::setNetworkStatus( _network_state_server );
+     NetworkState::resetNetworkStats();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -56,9 +56,9 @@
+ void BotGameManager::initializeGameConfig(const std::string&amp; configfile)
+ {
+     if(configfile == &quot;&quot;)
+-        gameconfig = new GameConfig(&quot;/config/netpanzer-bot.ini&quot;, &quot;/config/bot.cfg&quot;);
++        gameconfig = new GameConfig(&quot;/config/bot.cfg&quot;);
+     else
+-        gameconfig = new GameConfig(configfile, &quot;/config/bot.cfg&quot;, false);
++        gameconfig = new GameConfig(configfile, false);
+ }
+ //-----------------------------------------------------------------
+ void BotGameManager::initializeInputDevices()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -160,7 +160,8 @@
+ void
+ Console::mapSwitch(const std::string&amp; mapname)
+ {
+-    if(gameconfig-&gt;logging) {
++    if ( GameConfig::server_logging )
++    {
+         if(!filesystem::exists(&quot;logs&quot;)) {
+             filesystem::mkdir(&quot;logs&quot;);
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -90,9 +90,9 @@
+ void DedicatedGameManager::initializeGameConfig(const std::string&amp; configfile)
+ {
+     if(configfile == &quot;&quot;)
+-        gameconfig = new GameConfig(&quot;/config/netpanzer-dedicated.ini&quot;, &quot;/config/server.cfg&quot;);
++        gameconfig = new GameConfig(&quot;/config/server.cfg&quot;);
+     else
+-        gameconfig = new GameConfig(configfile, &quot;/config/server.cfg&quot;, false);
++        gameconfig = new GameConfig(configfile, false);
+ }
+ //-----------------------------------------------------------------
+ void DedicatedGameManager::initializeInputDevices()
+@@ -122,10 +122,10 @@
+             {
+                 //*Console::server
+                 std::cout
+-                    &lt;&lt; &quot;Server &quot; &lt;&lt; gameconfig-&gt;playername
++                    &lt;&lt; &quot;Server &quot; &lt;&lt; *GameConfig::server_name
+                     &lt;&lt; &quot; version &quot; &lt;&lt; PACKAGE_VERSION &lt;&lt; &quot; port &quot;
+-                    &lt;&lt; gameconfig-&gt;serverport &lt;&lt; &quot;\n&quot;
+-                    &lt;&lt; &quot;Map: &quot; &lt;&lt; gameconfig-&gt; map &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; GameConfig::server_port &lt;&lt; &quot;\n&quot;
++                    &lt;&lt; &quot;Map: &quot; &lt;&lt; *GameConfig::game_map &lt;&lt; &quot;\n&quot;
+                     &lt;&lt; std::setw(3) &lt;&lt; &quot;ID&quot; &lt;&lt; &quot; &quot;
+                     &lt;&lt; std::setw(30) &lt;&lt; &quot;Name&quot; &lt;&lt; &quot; &quot;
+                     &lt;&lt; std::setw(4) &lt;&lt; &quot;Kill&quot; &lt;&lt; &quot; &quot;
+@@ -232,9 +232,9 @@
+     ScriptManager::runFile(&quot;server_commands_load&quot;,&quot;scripts/servercommands.lua&quot;);
+     ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
+ 
+-    gameconfig-&gt;map = MapsManager::getNextMap(&quot;&quot;);
++    GameConfig::game_map-&gt;assign(MapsManager::getNextMap(&quot;&quot;));
+ 
+-    GameManager::dedicatedLoadGameMap(gameconfig-&gt;map.c_str());
++    GameManager::dedicatedLoadGameMap(GameConfig::game_map-&gt;c_str());
+ 
+     UnitProfileInterface::loadUnitProfiles();
+     ParticleInterface::rebuildUnitParticleData();
+@@ -255,14 +255,14 @@
+     Particle2D::setCreateParticles(false);
+ 
+     *Console::server &lt;&lt; &quot;contacting masterserver.&quot; &lt;&lt; std::endl;
+-    if((bool) gameconfig-&gt;publicServer &amp;&amp;
+-        (const std::string&amp;) gameconfig-&gt;masterservers != &quot;&quot;) {
++    if( GameConfig::server_public
++        &amp;&amp; *GameConfig::server_masterservers != &quot;&quot;) {
+         try {
+             if ( infosocket ) {
+                 delete infosocket;
+                 infosocket = 0;
+             }
+-            infosocket = new InfoSocket(gameconfig-&gt;serverport);
++            infosocket = new InfoSocket(GameConfig::server_port);
+             if ( heartbeat ) {
+                 delete heartbeat;
+                 heartbeat = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -58,7 +58,53 @@
+ NPString* GameConfig::game_adminpass = 0;
+ NPString* GameConfig::game_gamepass = 0;
+ int       GameConfig::game_changeflagtime = 15; // minutes
++int       GameConfig::game_gametype = 0;
++int       GameConfig::game_maxplayers = 8;
++int       GameConfig::game_maxunits = 8*40;
++int       GameConfig::game_timelimit = 30;
++int       GameConfig::game_fraglimit = 300;
++bool      GameConfig::game_powerups = true;
++int       GameConfig::game_occupationpercentage = 75;
++bool      GameConfig::game_allowallies = true;
++int       GameConfig::game_cloudcoverage = 0;
++int       GameConfig::game_respawntype = 0;
++int       GameConfig::game_windspeed = 30;
++NPString* GameConfig::game_map = 0;
++NPString* GameConfig::game_mapcycle = 0;
+ 
++bool      GameConfig::sound_enable = true;
++bool      GameConfig::sound_music = true;
++int       GameConfig::sound_musicvol = 100;
++bool      GameConfig::sound_effects = true;
++int       GameConfig::sound_effectsvol = 100;
++
++int       GameConfig::radar_playerunitcolor = _color_aqua;
++int       GameConfig::radar_selectedunitcolor = _color_white;
++int       GameConfig::radar_alliedunitcolor = _color_orange;
++int       GameConfig::radar_playeroutpostcolor = _color_blue;
++int       GameConfig::radar_alliedoutpostcolor = _color_orange;
++int       GameConfig::radar_enemyoutpostcolor = _color_red;
++int       GameConfig::radar_unitsize = _mini_map_unit_size_small;
++
++int       GameConfig::interface_attacknotificationtime = 5;
++int       GameConfig::interface_vehicleselectioncolor = _color_blue;
++int       GameConfig::interface_unitselectionmode = _unit_selection_box_draw_mode_rect_edges;
++int       GameConfig::interface_unitinfodrawlayer = 0;
++int       GameConfig::interface_scrollrate = 1000;
++int       GameConfig::interface_rankposition_x = 100;
++int       GameConfig::interface_rankposition_y = 100;
++int       GameConfig::interface_viewdrawbackgroundmode = (int)VIEW_BACKGROUND_DARK_GRAY_BLEND;
++
++int       GameConfig::server_port = NETPANZER_DEFAULT_PORT_TCP;
++NPString* GameConfig::server_bindaddress = 0;
++NPString* GameConfig::server_motd = 0;
++bool      GameConfig::server_logging = false;
++bool      GameConfig::server_public = true;
++NPString* GameConfig::server_masterservers = 0;
++NPString* GameConfig::server_name = 0;
++
++NPString* GameConfig::player_name = 0;
++
+ Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
+ 
+ #define WRITE_BOOL(v) ((v)?&quot;true&quot;:&quot;false&quot;)
+@@ -94,52 +140,164 @@
+     {0,0}
+ };
+ 
++
+ static const ScriptVarBindRecord interface_getters[] =
+ {
+-    { &quot;show_health&quot;,   GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_health },
+-    { &quot;show_flags&quot;,    GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_flags },
+-    { &quot;show_names&quot;,    GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_names },
++    { &quot;show_health&quot;,            GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_health },
++    { &quot;show_flags&quot;,             GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_flags },
++    { &quot;show_names&quot;,             GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_names },
++    { &quot;attacknotificationime&quot;,  GETSVTYPE_INT,     &amp;GameConfig::interface_attacknotificationtime},
++    { &quot;vehicleselectioncolor&quot;,  GETSVTYPE_INT,     &amp;GameConfig::interface_vehicleselectioncolor},
++    { &quot;unitselectionmode&quot;,      GETSVTYPE_INT,     &amp;GameConfig::interface_unitselectionmode},
++    { &quot;unitinfodrawlayer&quot;,      GETSVTYPE_INT,     &amp;GameConfig::interface_unitinfodrawlayer},
++    { &quot;scrollrate&quot;,             GETSVTYPE_INT,     &amp;GameConfig::interface_scrollrate},
++    { &quot;rankposition_x&quot;,         GETSVTYPE_INT,     &amp;GameConfig::interface_rankposition_x},
++    { &quot;rankposition_y&quot;,         GETSVTYPE_INT,     &amp;GameConfig::interface_rankposition_y},
++    { &quot;viewdrawbackgroundmode&quot;, GETSVTYPE_INT,     &amp;GameConfig::interface_viewdrawbackgroundmode},
+     {0,0}
+ };
+ 
+ static const ScriptVarBindRecord interface_setters[] =
+ {
+-    { &quot;show_health&quot;,   SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_health },
+-    { &quot;show_flags&quot;,    SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_flags },
+-    { &quot;show_names&quot;,    SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_names },
++    { &quot;show_health&quot;,            SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_health },
++    { &quot;show_flags&quot;,             SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_flags },
++    { &quot;show_names&quot;,             SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_names },
++    { &quot;attacknotificationime&quot;,  SETSVTYPE_INT,     &amp;GameConfig::interface_attacknotificationtime},
++    { &quot;vehicleselectioncolor&quot;,  SETSVTYPE_INT,     &amp;GameConfig::interface_vehicleselectioncolor},
++    { &quot;unitselectionmode&quot;,      SETSVTYPE_INT,     &amp;GameConfig::interface_unitselectionmode},
++    { &quot;unitinfodrawlayer&quot;,      SETSVTYPE_INT,     &amp;GameConfig::interface_unitinfodrawlayer},
++    { &quot;scrollrate&quot;,             SETSVTYPE_INT,     &amp;GameConfig::interface_scrollrate},
++    { &quot;rankposition_x&quot;,         SETSVTYPE_INT,     &amp;GameConfig::interface_rankposition_x},
++    { &quot;rankposition_y&quot;,         SETSVTYPE_INT,     &amp;GameConfig::interface_rankposition_y},
++    { &quot;viewdrawbackgroundmode&quot;, SETSVTYPE_INT,     &amp;GameConfig::interface_viewdrawbackgroundmode},
+     {0,0}
+ };
+ 
+ static const ScriptVarBindRecord game_getters[] =
+ {
+-    { &quot;enable_bases&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
+-    { &quot;base_capture_mode&quot;, GETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
+-    { &quot;base_limit&quot;,        GETSVTYPE_INT,     &amp;GameConfig::game_base_limit },
+-    { &quot;autokicktime&quot;,      GETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+-    { &quot;allowmultiip&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+-    { &quot;unit_profiles&quot;,     GETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+-    { &quot;unit_spawnlist&quot;,    GETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+-    { &quot;adminpass&quot;,         GETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+-    { &quot;gamepass&quot;,          GETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
+-    { &quot;changeflagtime&quot;,    GETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime},
++    { &quot;enable_bases&quot;,       GETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
++    { &quot;base_capture_mode&quot;,  GETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
++    { &quot;base_limit&quot;,         GETSVTYPE_INT,     &amp;GameConfig::game_base_limit },
++    { &quot;autokicktime&quot;,       GETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
++    { &quot;allowmultiip&quot;,       GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
++    { &quot;unit_profiles&quot;,      GETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
++    { &quot;unit_spawnlist&quot;,     GETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
++    { &quot;adminpass&quot;,          GETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
++    { &quot;gamepass&quot;,           GETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
++    { &quot;changeflagtime&quot;,     GETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime},
++    { &quot;gametype&quot;,           GETSVTYPE_INT,     &amp;GameConfig::game_gametype },
++    { &quot;maxplayers&quot;,         GETSVTYPE_INT,     &amp;GameConfig::game_maxplayers },
++    { &quot;maxunits&quot;,           GETSVTYPE_INT,     &amp;GameConfig::game_maxunits },
++    { &quot;timelimit&quot;,          GETSVTYPE_INT,     &amp;GameConfig::game_timelimit },
++    { &quot;fraglimit&quot;,          GETSVTYPE_INT,     &amp;GameConfig::game_fraglimit },
++    { &quot;powerups&quot;,           GETSVTYPE_BOOLEAN, &amp;GameConfig::game_powerups },
++    { &quot;occupationpercentage&quot;,GETSVTYPE_INT,    &amp;GameConfig::game_occupationpercentage },
++    { &quot;allowallies&quot;,        GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowallies },
++    { &quot;cloudcoverage&quot;,      GETSVTYPE_INT,     &amp;GameConfig::game_cloudcoverage },
++    { &quot;respawntype&quot;,        GETSVTYPE_INT,     &amp;GameConfig::game_respawntype },
++    { &quot;windspeed&quot;,          GETSVTYPE_INT,     &amp;GameConfig::game_windspeed },
++    { &quot;map&quot;,                GETSVTYPE_STRING,  &amp;GameConfig::game_map },
++    { &quot;mapcycle&quot;,           GETSVTYPE_STRING,  &amp;GameConfig::game_mapcycle },
+     {0,0}
+ };
+ 
+ static const ScriptVarBindRecord game_setters[] =
+ {
+-    { &quot;enable_bases&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
+-    { &quot;base_capture_mode&quot;, SETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
+-    { &quot;base_limit&quot;,        SETSVTYPE_INT,     &amp;GameConfig::game_base_limit },
+-    { &quot;autokicktime&quot;,      SETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+-    { &quot;allowmultiip&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+-    { &quot;unit_profiles&quot;,     SETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+-    { &quot;unit_spawnlist&quot;,    SETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+-    { &quot;adminpass&quot;,         SETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+-    { &quot;gamepass&quot;,          SETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
+-    { &quot;changeflagtime&quot;,    SETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime },
++    { &quot;enable_bases&quot;,       SETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
++    { &quot;base_capture_mode&quot;,  SETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
++    { &quot;base_limit&quot;,         SETSVTYPE_INT,     &amp;GameConfig::game_base_limit },
++    { &quot;autokicktime&quot;,       SETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
++    { &quot;allowmultiip&quot;,       SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
++    { &quot;unit_profiles&quot;,      SETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
++    { &quot;unit_spawnlist&quot;,     SETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
++    { &quot;adminpass&quot;,          SETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
++    { &quot;gamepass&quot;,           SETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
++    { &quot;changeflagtime&quot;,     SETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime},
++    { &quot;gametype&quot;,           SETSVTYPE_INT,     &amp;GameConfig::game_gametype },
++    { &quot;maxplayers&quot;,         SETSVTYPE_INT,     &amp;GameConfig::game_maxplayers },
++    { &quot;maxunits&quot;,           SETSVTYPE_INT,     &amp;GameConfig::game_maxunits },
++    { &quot;timelimit&quot;,          SETSVTYPE_INT,     &amp;GameConfig::game_timelimit },
++    { &quot;fraglimit&quot;,          SETSVTYPE_INT,     &amp;GameConfig::game_fraglimit },
++    { &quot;powerups&quot;,           SETSVTYPE_BOOLEAN, &amp;GameConfig::game_powerups },
++    { &quot;occupationpercentage&quot;,SETSVTYPE_INT,    &amp;GameConfig::game_occupationpercentage },
++    { &quot;allowallies&quot;,        SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowallies },
++    { &quot;cloudcoverage&quot;,      SETSVTYPE_INT,     &amp;GameConfig::game_cloudcoverage },
++    { &quot;respawntype&quot;,        SETSVTYPE_INT,     &amp;GameConfig::game_respawntype },
++    { &quot;windspeed&quot;,          SETSVTYPE_INT,     &amp;GameConfig::game_windspeed },
++    { &quot;map&quot;,                SETSVTYPE_STRING,  &amp;GameConfig::game_map },
++    { &quot;mapcycle&quot;,           SETSVTYPE_STRING,  &amp;GameConfig::game_mapcycle },
+     {0,0}
+ };
+ 
++static const ScriptVarBindRecord sound_getters[] =
++{
++    { &quot;enable&quot;,             GETSVTYPE_BOOLEAN, &amp;GameConfig::sound_enable},
++    { &quot;music&quot;,              GETSVTYPE_BOOLEAN, &amp;GameConfig::sound_music},
++    { &quot;musicvol&quot;,           GETSVTYPE_INT,     &amp;GameConfig::sound_musicvol},
++    { &quot;effects&quot;,            GETSVTYPE_BOOLEAN, &amp;GameConfig::sound_effects},
++    { &quot;effectsvol&quot;,         GETSVTYPE_INT,     &amp;GameConfig::sound_effectsvol},
++    {0,0}
++};
++
++static const ScriptVarBindRecord sound_setters[] =
++{
++    { &quot;enable&quot;,             SETSVTYPE_BOOLEAN, &amp;GameConfig::sound_enable},
++    { &quot;music&quot;,              SETSVTYPE_BOOLEAN, &amp;GameConfig::sound_music},
++    { &quot;musicvol&quot;,           SETSVTYPE_INT,     &amp;GameConfig::sound_musicvol},
++    { &quot;effects&quot;,            SETSVTYPE_BOOLEAN, &amp;GameConfig::sound_effects},
++    { &quot;effectsvol&quot;,         SETSVTYPE_INT,     &amp;GameConfig::sound_effectsvol},
++    {0,0}
++};
++
++static const ScriptVarBindRecord radar_getters[] =
++{
++    { &quot;playerunitcolor&quot;,    GETSVTYPE_INT,     &amp;GameConfig::radar_playerunitcolor},
++    { &quot;selectedunitcolor&quot;,  GETSVTYPE_INT,     &amp;GameConfig::radar_selectedunitcolor},
++    { &quot;alliedunitcolor&quot;,    GETSVTYPE_INT,     &amp;GameConfig::radar_alliedunitcolor},
++    { &quot;playeroutpostcolor&quot;, GETSVTYPE_INT,     &amp;GameConfig::radar_playeroutpostcolor},
++    { &quot;alliedoutpostcolor&quot;, GETSVTYPE_INT,     &amp;GameConfig::radar_alliedoutpostcolor},
++    { &quot;enemyoutpostcolor&quot;,  GETSVTYPE_INT,     &amp;GameConfig::radar_enemyoutpostcolor},
++    { &quot;unitsize&quot;,           GETSVTYPE_INT,     &amp;GameConfig::radar_unitsize},
++    {0,0}
++};
++
++static const ScriptVarBindRecord radar_setters[] =
++{
++    { &quot;playerunitcolor&quot;,    SETSVTYPE_INT,     &amp;GameConfig::radar_playerunitcolor},
++    { &quot;selectedunitcolor&quot;,  SETSVTYPE_INT,     &amp;GameConfig::radar_selectedunitcolor},
++    { &quot;alliedunitcolor&quot;,    SETSVTYPE_INT,     &amp;GameConfig::radar_alliedunitcolor},
++    { &quot;playeroutpostcolor&quot;, SETSVTYPE_INT,     &amp;GameConfig::radar_playeroutpostcolor},
++    { &quot;alliedoutpostcolor&quot;, SETSVTYPE_INT,     &amp;GameConfig::radar_alliedoutpostcolor},
++    { &quot;enemyoutpostcolor&quot;,  SETSVTYPE_INT,     &amp;GameConfig::radar_enemyoutpostcolor},
++    { &quot;unitsize&quot;,           SETSVTYPE_INT,     &amp;GameConfig::radar_unitsize},
++    {0,0}
++};
++
++static const ScriptVarBindRecord server_getters[] =
++{
++    { &quot;port&quot;,           GETSVTYPE_INT,     &amp;GameConfig::server_port },
++    { &quot;bindaddress&quot;,    GETSVTYPE_STRING,  &amp;GameConfig::server_bindaddress },
++    { &quot;motd&quot;,           GETSVTYPE_STRING,  &amp;GameConfig::server_motd },
++    { &quot;logging&quot;,        GETSVTYPE_BOOLEAN, &amp;GameConfig::server_logging },
++    { &quot;public&quot;,         GETSVTYPE_BOOLEAN, &amp;GameConfig::server_public },
++    { &quot;masterservers&quot;,  GETSVTYPE_STRING,  &amp;GameConfig::server_masterservers },
++    { &quot;name&quot;,           GETSVTYPE_STRING,  &amp;GameConfig::server_name },
++    {0,0}
++};
++
++static const ScriptVarBindRecord server_setters[] =
++{
++    { &quot;port&quot;,           SETSVTYPE_INT,     &amp;GameConfig::server_port },
++    { &quot;bindaddress&quot;,    SETSVTYPE_STRING,  &amp;GameConfig::server_bindaddress },
++    { &quot;motd&quot;,           SETSVTYPE_STRING,  &amp;GameConfig::server_motd },
++    { &quot;logging&quot;,        SETSVTYPE_BOOLEAN, &amp;GameConfig::server_logging },
++    { &quot;public&quot;,         SETSVTYPE_BOOLEAN, &amp;GameConfig::server_public },
++    { &quot;masterservers&quot;,  SETSVTYPE_STRING,  &amp;GameConfig::server_masterservers },
++    { &quot;name&quot;,           SETSVTYPE_STRING,  &amp;GameConfig::server_name },
++    {0,0}
++};
++
++
+ void GameConfig::registerScript(const NPString&amp; table_name)
+ {
+     if ( ! game_unit_profiles )
+@@ -162,6 +320,41 @@
+         game_gamepass = new NPString(&quot;&quot;);
+     }
+ 
++    if ( ! game_map )
++    {
++        game_map = new NPString(&quot;&quot;);
++    }
++
++    if ( ! game_mapcycle )
++    {
++        game_mapcycle = new NPString(&quot;&quot;);
++    }
++
++    if ( ! server_bindaddress )
++    {
++        server_bindaddress = new NPString(&quot;&quot;);
++    }
++
++    if ( ! server_motd )
++    {
++        server_motd = new NPString(&quot;Welcome to NetPanzer Server&quot;);
++    }
++
++    if ( ! server_masterservers )
++    {
++        server_masterservers = new NPString(&quot;masterserver.netpanzer.org, masterserver2.netpanzer.org, masterserver.netpanzer.info&quot;);
++    }
++
++    if ( ! server_name )
++    {
++        server_name = new NPString(&quot;NetPanzer Server&quot;);
++    }
++
++    if ( ! player_name )
++    {
++        player_name = new NPString(&quot;Player&quot;);
++    }
++
+     ScriptManager::bindStaticVariables(table_name + &quot;.video&quot;,
+                                        &quot;ConfigVideoMetaTable&quot;,
+                                        video_getters, video_setters);
+@@ -174,123 +367,64 @@
+                                        &quot;ConfigGameMetaTable&quot;,
+                                        game_getters, game_setters);
+ 
++    ScriptManager::bindStaticVariables(table_name + &quot;.sound&quot;,
++                                       &quot;ConfigSoundMetaTable&quot;,
++                                       sound_getters, sound_setters);
++
++    ScriptManager::bindStaticVariables(table_name + &quot;.radar&quot;,
++                                       &quot;ConfigRadarMetaTable&quot;,
++                                       radar_getters, radar_setters);
++
++    ScriptManager::bindStaticVariables(table_name + &quot;.interface&quot;,
++                                       &quot;ConfigInterfaceMetaTable&quot;,
++                                       interface_getters, interface_setters);
++
++    ScriptManager::bindStaticVariables(table_name + &quot;.server&quot;,
++                                       &quot;ConfigServerMetaTable&quot;,
++                                       server_getters, server_setters);
++
+ }
+ 
+-GameConfig::GameConfig(const std::string&amp; configfile, const std::string&amp; luaconfigfile,bool usePhysFS)
++GameConfig::GameConfig(const std::string&amp; luaconfigfile,bool usePhysFS)
+     // VariableName(&quot;Name&quot;, value [, minimum, maximum])
+     :
+       hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
+       quickConnect(&quot;quickconnect&quot;, false),
+       needPassword(&quot;needpassword&quot;, false),
+-      serverConnect(&quot;serverconnect&quot;, &quot;&quot;),
++      serverConnect(&quot;serverconnect&quot;, &quot;&quot;)
+     
+-      playername(&quot;name&quot;, &quot;Player&quot;),
+-      masterservers(&quot;masterservers&quot;, &quot;masterserver.netpanzer.org, masterserver2.netpanzer.org, masterserver.netpanzer.info&quot;),
+-      
+-      serverport(&quot;serverport&quot;, NETPANZER_DEFAULT_PORT_TCP,0,65535),
+-      bindaddress(&quot;bindaddress&quot;, &quot;&quot;),
+-      gametype(&quot;gametype&quot;, _gametype_objective, 0, _gametype_last-1),
+-      maxplayers(&quot;maxplayers&quot;, 8, 1, 25),
+-      maxunits(&quot;maxunits&quot;, 500, 25, 10000),
+-      timelimit(&quot;timelimit&quot;, 50, 1),
+-      fraglimit(&quot;fraglimit&quot;, 500, 50),
+-      powerups(&quot;powerups&quot;, true),
+-      objectiveoccupationpercentage(&quot;objectivepercentage&quot;, 75, 1, 100),
+-      allowallies(&quot;allowallies&quot;, true),
+-      cloudcoverage(&quot;cloudcoverage&quot;, 0),
+-      respawntype(&quot;respawntype&quot;, _game_config_respawn_type_round_robin, 0,
+-                _game_config_respawn_type_last-1),
+-      windspeed(&quot;windspeed&quot;, 30),
+-      map(&quot;map&quot;, &quot;Bad Neuburg&quot;),
+-      mapcycle(&quot;mapcycle&quot;, &quot;Cramped, Tight Quarters, Two Villages&quot;),
+-      motd(&quot;motd&quot;,&quot;&quot;),
+-      logging(&quot;logging&quot;, false),
+-      publicServer(&quot;public&quot;, true),
+-      
+-      enablesound(&quot;enable&quot;, true),
+-      enablemusic(&quot;music&quot;, true),
+-      musicvolume(&quot;musicvolume&quot;, 80, 0, 100),
+-      enableeffects(&quot;effects&quot;, true),
+-      effectsvolume(&quot;effectsvolume&quot;, 100, 0, 100),
+-      
+-      attacknotificationtime(&quot;attacknotificationtime&quot;, 5, 0, 100),
+-      vehicleselectioncolor(&quot;vehicleselectioncolor&quot;, _color_blue, 0, _color_last-1),
+-      unitselectionmode(&quot;unitselectionmode&quot;, _unit_selection_box_draw_mode_rect_edges, 0, _unit_selection_box_draw_mode_last-1),
+-      unitinfodrawlayer(&quot;unitinfodrawlayer&quot;, 0, 0, 1),
+-      scrollrate(&quot;scrollrate&quot;, 1000, 100, 10000),
+-      rankposition(&quot;rankposition&quot;, iXY(0,0)),
+-      viewdrawbackgroundmode(&quot;viewdrawbackgroundmode&quot;,(int)VIEW_BACKGROUND_DARK_GRAY_BLEND),
+-                  
+-      radar_playerunitcolor(&quot;playerunitcolor&quot;, _color_aqua, 0, _color_last-1),
+-      radar_selectedunitcolor(&quot;selectedunitcolor&quot;, _color_white, 0, _color_last-1),
+-      radar_alliedunitcolor(&quot;alliedunitcolor&quot;, _color_orange, 0, _color_last-1),
+-      radar_playeroutpostcolor(&quot;playeroutpostcolor&quot;, _color_blue, 0, _color_last-1),
+-      radar_alliedoutpostcolor(&quot;alliedoutpostcolor&quot;, _color_orange, 0, _color_last),
+-      radar_enemyoutpostcolor(&quot;enemyoutpostcolor&quot;, _color_red, 0, _color_last-1),
+-      radar_unitsize(&quot;unitsize&quot;, _mini_map_unit_size_small, 0, _mini_map_unit_size_last-1)
+ {
+-    this-&gt;configfile = configfile;
+     this-&gt;luaconfigfile = luaconfigfile;
+     this-&gt;usePhysFS = usePhysFS;
+ 
+     std::stringstream default_player;
+     default_player &lt;&lt; &quot;Player&quot; &lt;&lt; (rand()%1000);
+-    playername=default_player.str();
+-    playersettings.push_back(&amp;playername);
+-    playersettings.push_back(&amp;masterservers);
++    if ( ! player_name )
++    {
++        player_name = new NPString();
++    }
+ 
+-    serversettings.push_back(&amp;serverport);
+-    serversettings.push_back(&amp;bindaddress);
+-    serversettings.push_back(&amp;gametype);
+-    serversettings.push_back(&amp;maxplayers);
+-    serversettings.push_back(&amp;maxunits);
+-    serversettings.push_back(&amp;timelimit);
+-    serversettings.push_back(&amp;fraglimit);
+-    serversettings.push_back(&amp;powerups);
+-    serversettings.push_back(&amp;objectiveoccupationpercentage);
+-    serversettings.push_back(&amp;allowallies);
+-    serversettings.push_back(&amp;cloudcoverage);
+-    serversettings.push_back(&amp;respawntype);
+-    serversettings.push_back(&amp;windspeed);
+-    serversettings.push_back(&amp;mapcycle);
+-    serversettings.push_back(&amp;motd);
+-    serversettings.push_back(&amp;logging);
+-    serversettings.push_back(&amp;publicServer);
+-   
+-    soundsettings.push_back(&amp;enablesound);
+-    soundsettings.push_back(&amp;enablemusic);
+-    soundsettings.push_back(&amp;musicvolume);
+-    soundsettings.push_back(&amp;enableeffects);
+-    soundsettings.push_back(&amp;effectsvolume);
+-
+-    interfacesettings.push_back(&amp;attacknotificationtime);
+-    interfacesettings.push_back(&amp;vehicleselectioncolor);
+-    interfacesettings.push_back(&amp;unitselectionmode);
+-    interfacesettings.push_back(&amp;unitinfodrawlayer);
+-    interfacesettings.push_back(&amp;scrollrate);
+-    interfacesettings.push_back(&amp;rankposition);
+-    interfacesettings.push_back(&amp;viewdrawbackgroundmode);
+-
+-    radarsettings.push_back(&amp;radar_playerunitcolor);
+-    radarsettings.push_back(&amp;radar_alliedunitcolor);
+-    radarsettings.push_back(&amp;radar_playeroutpostcolor);
+-    radarsettings.push_back(&amp;radar_alliedoutpostcolor);
+-    radarsettings.push_back(&amp;radar_enemyoutpostcolor);
+-    radarsettings.push_back(&amp;radar_unitsize);
++    player_name-&gt;assign(default_player.str());
+     
+-    try {
++    try
++    {
+         loadConfig();
+-    } catch(std::exception&amp; e) {
++    }
++    catch(std::exception&amp; e)
++    {
+         LOG((&quot;couldn't read game configuration: %s&quot;, e.what()));
+-	LOG((&quot;Using default config. (this is normal on first startup)&quot;));
++        LOG((&quot;Using default config. (this is normal on first startup)&quot;));
+     }
+ }
+ 
+ GameConfig::~GameConfig()
+ {
+-    try {
++    try
++    {
+         saveConfig();
+-    } catch(std::exception&amp; e) {
++    }
++    catch(std::exception&amp; e)
++    {
+         LOG((&quot;couldn't save game configuration: %s&quot;, e.what()));
+     }
+ }
+@@ -299,108 +433,26 @@
+ {
+     ScriptManager::loadConfigFile(luaconfigfile.c_str(), &quot;config&quot;);
+ 
+-    INI::Store inifile;
+-    if(usePhysFS) {
+-        IFileStream in(configfile);
+-        inifile.load(in);
+-    } else {
+-        std::ifstream in(configfile.c_str());
+-        inifile.load(in);
+-    }
++// these lines might be usefull infuture? 2012-01-18
++//    if(usePhysFS)
++//    {
++//        IFileStream in(configfile);
++//        inifile.load(in);
++//    } else {
++//        std::ifstream in(configfile.c_str());
++//        inifile.load(in);
++//    }
+ 
+-    loadSettings(inifile.getSection(&quot;game&quot;), gamesettings);
+-    loadSettings(inifile.getSection(&quot;player&quot;), playersettings);
+-    if (playername.c_str()[0]==0) {
++    if ( player_name-&gt;length() == 0 )
++    {
+         std::stringstream default_player;
+         default_player &lt;&lt; &quot;Player&quot; &lt;&lt; (rand()%1000);
+-        playername=default_player.str();
++        player_name-&gt;assign(default_player.str());
+     }
+-    loadSettings(inifile.getSection(&quot;sound&quot;), soundsettings);
+-    loadSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+-    loadSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+-    loadSettings(inifile.getSection(&quot;server&quot;), serversettings);
+ }
+ 
+-void GameConfig::loadSettings(const INI::Section&amp; section,
+-        std::vector&lt;ConfigVariable*&gt;&amp; settings)
+-{
+-    try {
+-        std::vector&lt;ConfigVariable*&gt;::iterator i;
+-        for(i = settings.begin(); i != settings.end(); i++) {
+-            ConfigVariable* var = *i;
+-
+-            try {
+-                ConfigInt* confint = dynamic_cast&lt;ConfigInt*&gt; (var);
+-                if(confint) {
+-                    *confint = section.getIntValue(confint-&gt;getName());
+-                    continue;
+-                }
+-
+-                ConfigXY* confxy = dynamic_cast&lt;ConfigXY*&gt; (var);
+-                if(confxy) {
+-                    confxy-&gt;set(section.getIntValue(confxy-&gt;getName() + &quot;_x&quot;),
+-                            section.getIntValue(confxy-&gt;getName() + &quot;_y&quot;));
+-                    continue;
+-                }
+-
+-                ConfigBool* confbool = dynamic_cast&lt;ConfigBool*&gt; (var);
+-                if(confbool) {
+-                    std::string str =
+-                        section.getValue(confbool-&gt;getName());
+-                    if(str == &quot;yes&quot; || str == &quot;1&quot; || str == &quot;on&quot;)
+-                        *confbool = true;
+-                    else if(str == &quot;no&quot; || str == &quot;0&quot; || str == &quot;off&quot;)
+-                        *confbool = false;
+-                    else
+-                        throw Exception(&quot;No boolean value for setting '%s'.&quot;,
+-                                        confbool-&gt;getName().c_str());
+-                    continue;
+-                }
+-
+-                ConfigStringSpecialChars* confstringspecial = dynamic_cast&lt;ConfigStringSpecialChars*&gt; (var);
+-                if(confstringspecial) {
+-                    *confstringspecial = section.getValue(confstringspecial-&gt;getName());
+-                    continue;
+-                }
+-                
+-                ConfigString* confstring = dynamic_cast&lt;ConfigString*&gt; (var);
+-                if(confstring)
+-                    *confstring = section.getValue(confstring-&gt;getName());
+-
+-
+-                // we have a value from config file in the variable now
+-                //var-&gt;setNonDefaultValue();
+-                // now each subclass changethis if the value has been changed
+-            } catch(std::exception&amp; e) {
+-                LOG((&quot;Skipping config '%s': %s&quot;, var-&gt;getName().c_str(),
+-                            e.what()));
+-            }
+-        }
+-    } catch(std::exception&amp; e) {
+-        LOG((&quot;Couldn't find config section '%s', skipping...&quot;,
+-                    section.getName().c_str()));
+-    }
+-}
+-
+ void GameConfig::saveConfig()
+ {
+-    INI::Store inifile;
+-
+-    saveSettings(inifile.getSection(&quot;game&quot;), gamesettings);
+-    saveSettings(inifile.getSection(&quot;player&quot;), playersettings);
+-    saveSettings(inifile.getSection(&quot;sound&quot;), soundsettings);
+-    saveSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+-    saveSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+-    saveSettings(inifile.getSection(&quot;server&quot;), serversettings);
+-
+-    if(usePhysFS) {
+-        OFileStream out (configfile);
+-        inifile.save(out);
+-    } else {
+-        std::ofstream out(configfile.c_str());
+-        inifile.save(out);
+-    }
+-
+     lua_State *L = ScriptManager::getLuavm();
+ 
+     lua_getglobal(L,&quot;config&quot;);
+@@ -442,35 +494,4 @@
+ 
+ }
+ 
+-void GameConfig::saveSettings(INI::Section&amp; section,
+-    std::vector&lt;ConfigVariable*&gt;&amp; settings)
+-{
+-    std::vector&lt;ConfigVariable*&gt;::iterator i;
+-    for(i = settings.begin(); i != settings.end(); i++) {
+-        ConfigVariable* var = *i;
+-
+-        ConfigInt* confint = dynamic_cast&lt;ConfigInt*&gt; (var);
+-        if(confint)
+-            section.setIntValue(confint-&gt;getName(), *confint);
+-            
+-        ConfigBool* confbool = dynamic_cast&lt;ConfigBool*&gt; (var);
+-        if(confbool)
+-            section.setValue(confbool-&gt;getName(), *confbool ? &quot;yes&quot; : &quot;no&quot;);
+-
+-        ConfigXY* confxy = dynamic_cast&lt;ConfigXY*&gt; (var);
+-        if(confxy) {
+-            section.setIntValue(confxy-&gt;getName() + &quot;_x&quot;,
+-                    ((const iXY&amp;)(*confxy)).x);
+-            section.setIntValue(confxy-&gt;getName() + &quot;_y&quot;,
+-                    ((const iXY&amp;)(*confxy)).y);
+-        }
+-
+-        ConfigString* confstring = dynamic_cast&lt;ConfigString*&gt; (var);
+-        if(confstring) {
+-            section.setValue(confstring-&gt;getName(),
+-                    (const std::string&amp;) *confstring);
+-        }
+-    }
+-}
+-
+ GameConfig* gameconfig = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -106,7 +106,7 @@
+ class GameConfig : public NoCopy
+ {
+ public:
+-    GameConfig(const std::string&amp; configfile, const std::string&amp; luaconfigfile, bool usePhysFS = true);
++    GameConfig(const std::string&amp; luaconfigfile, bool usePhysFS = true);
+     ~GameConfig();
+ 
+     void loadConfig();
+@@ -123,9 +123,9 @@
+     static bool         video_usedirectx;
+ #endif
+ 
+-    static bool interface_show_health;
+-    static bool interface_show_flags;
+-    static bool interface_show_names;
++    static bool      interface_show_health;
++    static bool      interface_show_flags;
++    static bool      interface_show_names;
+ 
+     static bool      game_enable_bases;
+     static int       game_base_capture_mode; // 0=no capture, 1=normal, 2=...
+@@ -137,6 +137,19 @@
+     static NPString* game_adminpass;     // the secret password for admins
+     static NPString* game_gamepass;      // the secret password for entering game
+     static int       game_changeflagtime; // in minutes
++    static int       game_gametype;
++    static int       game_maxplayers;
++    static int       game_maxunits;
++    static int       game_timelimit;
++    static int       game_fraglimit;
++    static bool      game_powerups;
++    static int       game_occupationpercentage;
++    static bool      game_allowallies;
++    static int       game_cloudcoverage;
++    static int       game_respawntype;
++    static int       game_windspeed;
++    static NPString* game_map;
++    static NPString* game_mapcycle;
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+ 
+@@ -146,65 +159,54 @@
+     ConfigBool      needPassword;
+     ConfigString    serverConnect;      // server to connect to
+ 
+-    // player settings
+-    ConfigStringSpecialChars playername;
+-    ConfigString masterservers;
++    static NPString* player_name;
+ 
++
+     // server settings
+-    ConfigInt    serverport;
+-    ConfigString bindaddress;
+-    ConfigInt    gametype;             //Objectives, FragLimit, TimeLimit
+-    ConfigInt    maxplayers;
+-    ConfigInt    maxunits;
+-    ConfigInt    timelimit;
+-    ConfigInt    fraglimit;
+-    ConfigBool   powerups;
+-    ConfigInt    objectiveoccupationpercentage;
+-    ConfigBool   allowallies;
+-    ConfigInt    cloudcoverage;
+-    ConfigInt    respawntype;
+-    ConfigInt    windspeed;
+-    ConfigString map;
+-    ConfigString mapcycle;
+-    ConfigString motd;
+-    ConfigBool   logging;
+-    ConfigBool   publicServer;
++    static int       server_port;
++    static NPString* server_bindaddress;
++    static NPString* server_motd;
++    static bool      server_logging;
++    static bool      server_public;
++    static NPString* server_masterservers;
++    static NPString* server_name;
+ 
+-    // sound settings
+-    ConfigBool  enablesound;
+-    ConfigBool  enablemusic;
+-    ConfigInt   musicvolume;
+-    ConfigBool  enableeffects;
+-    ConfigInt   effectsvolume;
+-   
+-    // interface settings
+-    ConfigInt   attacknotificationtime;
+-    ConfigInt   vehicleselectioncolor;
+-    ConfigInt   unitselectionmode;
+-    ConfigInt   unitinfodrawlayer;
+-    ConfigInt   scrollrate;
+-    ConfigXY    rankposition;
+-    ConfigInt   viewdrawbackgroundmode;
+ 
++    static bool      sound_enable;
++    static bool      sound_music;
++    static int       sound_musicvol;
++    static bool      sound_effects;
++    static int       sound_effectsvol;
++
++    static int       interface_attacknotificationtime;
++    static int       interface_vehicleselectioncolor;
++    static int       interface_unitselectionmode;
++    static int       interface_unitinfodrawlayer;
++    static int       interface_scrollrate;
++    static int       interface_rankposition_x;
++    static int       interface_rankposition_y;
++    static int       interface_viewdrawbackgroundmode;
++
+     // radar settings
+-    ConfigInt   radar_playerunitcolor;
+-    ConfigInt   radar_selectedunitcolor;
+-    ConfigInt   radar_alliedunitcolor;
+-    ConfigInt   radar_playeroutpostcolor;
+-    ConfigInt   radar_alliedoutpostcolor;
+-    ConfigInt   radar_enemyoutpostcolor;
+-    ConfigInt   radar_unitsize;
++    static int       radar_playerunitcolor;
++    static int       radar_selectedunitcolor;
++    static int       radar_alliedunitcolor;
++    static int       radar_playeroutpostcolor;
++    static int       radar_alliedoutpostcolor;
++    static int       radar_enemyoutpostcolor;
++    static int       radar_unitsize;
+     
+ public:
+     const char* getGameTypeString() const
+     {
+-        switch(gametype) {
+-        case _gametype_objective :
+-            return( &quot;Objective&quot; );
+-        case _gametype_fraglimit :
+-            return( &quot;Frag Limit&quot; );
+-        case _gametype_timelimit :
+-            return( &quot;Time Limit&quot; );
++        switch ( game_gametype )
++        {
++            case _gametype_objective :
++                return( &quot;Objective&quot; );
++            case _gametype_fraglimit :
++                return( &quot;Frag Limit&quot; );
++            case _gametype_timelimit :
++                return( &quot;Time Limit&quot; );
+         }
+         return( &quot;Unknown&quot; );
+     }
+@@ -212,24 +214,25 @@
+ 
+     int GetUnitsPerPlayer() const
+     {
+-        return maxunits / maxplayers;
++        return game_maxunits / game_maxplayers;
+     }
+ 
+     int GetTimeLimitSeconds() const
+     {
+-        return timelimit * 60;
++        return game_timelimit * 60;
+     }
+ 
+     const char * getRespawnTypeString() const
+     {
+-        switch( respawntype ) {
+-        case _game_config_respawn_type_round_robin :
+-            return( &quot;Round Robin&quot; );
+-            break;
++        switch( game_respawntype )
++        {
++            case _game_config_respawn_type_round_robin :
++                return( &quot;Round Robin&quot; );
++                break;
+ 
+-        case _game_config_respawn_type_random :
+-            return( &quot;Random&quot; );
+-            break;
++            case _game_config_respawn_type_random :
++                return( &quot;Random&quot; );
++                break;
+         } // ** switch
+ 
+         assert(false);
+@@ -268,7 +271,7 @@
+     
+     PIX getVehicleSelectionBoxColor() const
+     {
+-        return( colorEnumToPix( vehicleselectioncolor ) );
++        return( colorEnumToPix( interface_vehicleselectioncolor ) );
+     }
+ 
+     const char *getMiniMapUnitSizeString() const
+@@ -285,7 +288,6 @@
+     friend class ScriptManager;
+     static void registerScript(const NPString&amp; table_name);
+ 
+-    std::string configfile;
+     std::string luaconfigfile;
+     bool usePhysFS;
+ 
+@@ -313,17 +315,6 @@
+         assert(false);
+         return( Color::white );
+     }
+-
+-    void loadSettings(const INI::Section&amp;,
+-            std::vector&lt;ConfigVariable*&gt;&amp; settings);
+-    void saveSettings(INI::Section&amp;, std::vector&lt;ConfigVariable*&gt;&amp; settings);
+-
+-    std::vector&lt;ConfigVariable*&gt; gamesettings;
+-    std::vector&lt;ConfigVariable*&gt; playersettings;
+-    std::vector&lt;ConfigVariable*&gt; serversettings;
+-    std::vector&lt;ConfigVariable*&gt; soundsettings;
+-    std::vector&lt;ConfigVariable*&gt; interfacesettings;
+-    std::vector&lt;ConfigVariable*&gt; radarsettings;
+ };
+ 
+ extern GameConfig* gameconfig;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -109,16 +109,16 @@
+                 GameManager::shutdownParticleSystems();
+                 ObjectiveInterface::resetLogic();
+ 
+-                gameconfig-&gt;map = map_cycle_fsm_client_map_name;
++                GameConfig::game_map-&gt;assign( map_cycle_fsm_client_map_name );
+ 
+                 char buf[256];
+                 snprintf(buf, sizeof(buf), &quot;Next Map '%s'.&quot;,
+-                        gameconfig-&gt;map.c_str());
++                        GameConfig::game_map-&gt;c_str());
+                 LoadingView::append( buf);
+                 LoadingView::append( &quot;Loading Game Map ...&quot; );
+ 
+                 try {
+-                    GameManager::startGameMapLoad(gameconfig-&gt;map.c_str(), 16);
++                    GameManager::startGameMapLoad(GameConfig::game_map-&gt;c_str(), 16);
+                 } catch(std::exception&amp; e) {
+                     LoadingView::append(&quot;Error while loading map:&quot;);
+                     LoadingView::append(e.what());
+@@ -202,18 +202,17 @@
+                     GameManager::shutdownParticleSystems();
+ 
+                     if(nextmap != &quot;&quot;) {
+-                        gameconfig-&gt;map = nextmap;
++                        GameConfig::game_map-&gt;assign( nextmap );
+                         nextmap = &quot;&quot;;
+                     } else {
+-                        gameconfig-&gt;map 
+-                            = MapsManager::getNextMap(gameconfig-&gt;map);
++                        GameConfig::game_map-&gt;assign( MapsManager::getNextMap( *GameConfig::game_map ) );
+                     }
+                     
+                     ConsoleInterface::postMessage(Color::white, false, 0, &quot;loading map '%s'.&quot;,
+-                            gameconfig-&gt;map.c_str());
++                            GameConfig::game_map-&gt;c_str());
+ 
+                     GameControlCycleMap cycle_map_mesg;
+-                    cycle_map_mesg.set( gameconfig-&gt;map.c_str() );
++                    cycle_map_mesg.set( GameConfig::game_map-&gt;c_str() );
+ 
+                     SERVER-&gt;broadcastMessage( &amp;cycle_map_mesg, sizeof( GameControlCycleMap ));
+ 
+@@ -221,7 +220,7 @@
+                         ObjectiveInterface::resetLogic();
+ 
+                         GameManager::dedicatedLoadGameMap(
+-                                gameconfig-&gt;map.c_str());
++                                GameConfig::game_map-&gt;c_str());
+ 
+                         GameManager::resetGameLogic();
+ 
+@@ -236,7 +235,7 @@
+ 
+                         try {
+                             GameManager::startGameMapLoad
+-                                (gameconfig-&gt;map.c_str(), 16);
++                                (GameConfig::game_map-&gt;c_str(), 16);
+                         } catch(std::exception&amp; e) {
+                             LoadingView::append(
+                                     &quot;Error while loading map:&quot;);
+@@ -369,21 +368,21 @@
+        )
+     {
+         unsigned char game_type;
+-        game_type = gameconfig-&gt;gametype;
++        game_type = GameConfig::game_gametype;
+ 
+         switch( game_type )
+         {
+             case  _gametype_timelimit:
+             {
+                 int game_minutes = GameManager::getGameTime() / 60;
+-                if( game_minutes &gt;= gameconfig-&gt;timelimit )
++                if( game_minutes &gt;= GameConfig::game_timelimit )
+                 {
+                     onTimelimitGameCompleted();
+                 }
+                 break;
+             }   
+             case _gametype_fraglimit:
+-                if ( PlayerInterface::testRuleScoreLimit( gameconfig-&gt;fraglimit, &amp;player_state ) == true )
++                if ( PlayerInterface::testRuleScoreLimit( GameConfig::game_fraglimit, &amp;player_state ) == true )
+                 {
+                     onFraglimitGameCompleted();
+                 }
+@@ -391,7 +390,7 @@
+ 
+             case _gametype_objective:
+             {
+-                float ratio = (float) gameconfig-&gt;objectiveoccupationpercentage / 100.0;
++                float ratio = (float) GameConfig::game_occupationpercentage / 100.0;
+                 if (PlayerInterface::testRuleObjectiveRatio( ratio, &amp;player_state))
+                 {
+                     onObjectiveGameCompleted( );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -198,7 +198,7 @@
+ // ******************************************************************
+ void GameManager::initializeGameLogic()
+ {
+-    PlayerInterface::initialize(gameconfig-&gt;maxplayers);
++    PlayerInterface::initialize(GameConfig::game_maxplayers);
+     UnitBlackBoard::initializeBlackBoard();
+     UnitInterface::initialize( gameconfig-&gt;GetUnitsPerPlayer() );
+     PathScheduler::initialize();
+@@ -271,8 +271,8 @@
+     temp_path.append(&quot;.opt&quot;);
+     ObjectiveInterface::loadObjectiveList( temp_path.c_str() );
+ 
+-    ParticleInterface::addCloudParticle(gameconfig-&gt;cloudcoverage);
+-    Physics::wind.setVelocity(gameconfig-&gt;windspeed, 107);
++    ParticleInterface::addCloudParticle(GameConfig::game_cloudcoverage);
++    Physics::wind.setVelocity(GameConfig::game_windspeed, 107);
+ }
+ 
+ // ******************************************************************
+@@ -280,23 +280,22 @@
+ void GameManager::dedicatedLoadGameMap(const char *map_name )
+ {
+     Console::mapSwitch(map_name);
+-    *Console::server &lt;&lt; &quot;Server Settings:\n&quot;
+-        &lt;&lt; &quot;Map: &quot; &lt;&lt; gameconfig-&gt;map &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;MaxPlayers: &quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;MaxUnits: &quot; &lt;&lt; gameconfig-&gt;maxunits &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;AutoKick: &quot; &lt;&lt; GameConfig::game_autokicktime &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;FlagTimer: &quot; &lt;&lt; GameConfig::game_changeflagtime &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;Gametype: &quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
++    *Console::server        &lt;&lt; &quot;Server Settings:\n&quot;
++        &lt;&lt; &quot;Map: &quot;          &lt;&lt; *GameConfig::game_map &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;MaxPlayers: &quot;   &lt;&lt; GameConfig::game_maxplayers &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;MaxUnits: &quot;     &lt;&lt; GameConfig::game_maxunits &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;AutoKick: &quot;     &lt;&lt; GameConfig::game_autokicktime &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;FlagTimer: &quot;    &lt;&lt; GameConfig::game_changeflagtime &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;Gametype: &quot;     &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;ObjectivePercentage: &quot; &lt;&lt;
+-            gameconfig-&gt;objectiveoccupationpercentage &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;TimeLimit: &quot; &lt;&lt; gameconfig-&gt;timelimit &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;FragLimit: &quot; &lt;&lt; gameconfig-&gt;fraglimit &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;RespawnType: &quot; &lt;&lt; gameconfig-&gt;getRespawnTypeString() &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;Mapcycle: &quot; &lt;&lt; gameconfig-&gt;mapcycle &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;Powerups: &quot; &lt;&lt; (gameconfig-&gt;powerups ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;AllowAllies: &quot; &lt;&lt; (gameconfig-&gt;allowallies ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;CloudCoverage: &quot; &lt;&lt; gameconfig-&gt;cloudcoverage &lt;&lt; &quot; (Windspeed &quot;
+-           &lt;&lt; gameconfig-&gt;windspeed &lt;&lt; &quot;)&quot; &lt;&lt; std::endl;
++            GameConfig::game_occupationpercentage &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;TimeLimit: &quot;    &lt;&lt; GameConfig::game_timelimit &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;FragLimit: &quot;    &lt;&lt; GameConfig::game_fraglimit &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;RespawnType: &quot;  &lt;&lt; gameconfig-&gt;getRespawnTypeString() &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;Mapcycle: &quot;     &lt;&lt; *GameConfig::game_mapcycle &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;Powerups: &quot;     &lt;&lt; (GameConfig::game_powerups ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;AllowAllies: &quot;  &lt;&lt; (GameConfig::game_allowallies ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;CloudCoverage: &quot; &lt;&lt; GameConfig::game_cloudcoverage &lt;&lt; &quot; (Windspeed &quot; &lt;&lt; GameConfig::game_windspeed &lt;&lt; &quot;)&quot; &lt;&lt; std::endl;
+     
+     map_path = &quot;maps/&quot;;
+     map_path.append(map_name);
+@@ -426,17 +425,17 @@
+     ConnectMesgServerGameSettings* game_setup 
+         = new ConnectMesgServerGameSettings();
+ 
+-    game_setup-&gt;setMaxPlayers(gameconfig-&gt;maxplayers);
+-    game_setup-&gt;setMaxUnits(gameconfig-&gt;maxunits);
+-    snprintf(game_setup-&gt;map_name, 32, &quot;%s&quot;, gameconfig-&gt;map.c_str());
+-    game_setup-&gt;setCloudCoverage(gameconfig-&gt;cloudcoverage);
+-    game_setup-&gt;setWindSpeed(gameconfig-&gt;windspeed);
+-    game_setup-&gt;setGameType(gameconfig-&gt;gametype);
+-    game_setup-&gt;powerup_state = gameconfig-&gt;powerups;
+-    game_setup-&gt;setFragLimit(gameconfig-&gt;fraglimit);
+-    game_setup-&gt;setTimeLimit(gameconfig-&gt;timelimit);
++    game_setup-&gt;setMaxPlayers(GameConfig::game_maxplayers);
++    game_setup-&gt;setMaxUnits(GameConfig::game_maxunits);
++    snprintf(game_setup-&gt;map_name, 32, &quot;%s&quot;, GameConfig::game_map-&gt;c_str());
++    game_setup-&gt;setCloudCoverage(GameConfig::game_cloudcoverage);
++    game_setup-&gt;setWindSpeed(GameConfig::game_windspeed);
++    game_setup-&gt;setGameType(GameConfig::game_gametype);
++    game_setup-&gt;powerup_state = GameConfig::game_powerups;
++    game_setup-&gt;setFragLimit(GameConfig::game_fraglimit);
++    game_setup-&gt;setTimeLimit(GameConfig::game_timelimit);
+     game_setup-&gt;setElapsedTime(getGameTime());
+-    game_setup-&gt;setFlagTime(gameconfig-&gt;game_changeflagtime);
++    game_setup-&gt;setFlagTime(GameConfig::game_changeflagtime);
+ 
+     return game_setup;
+ }
+@@ -481,15 +480,15 @@
+     const ConnectMesgServerGameSettings* game_setup
+         = (const ConnectMesgServerGameSettings*) message;
+ 
+-    gameconfig-&gt;maxplayers = game_setup-&gt;getMaxPlayers();
+-    gameconfig-&gt;maxunits = game_setup-&gt;getMaxUnits();
+-    gameconfig-&gt;cloudcoverage = game_setup-&gt;getCloudCoverage();
+-    gameconfig-&gt;windspeed = (int) game_setup-&gt;getWindSpeed();
+-    gameconfig-&gt;powerups = game_setup-&gt;powerup_state;
+-    gameconfig-&gt;gametype = game_setup-&gt;getGameType();
+-    gameconfig-&gt;fraglimit = game_setup-&gt;getFragLimit();
+-    gameconfig-&gt;timelimit = game_setup-&gt;getTimeLimit();
+-    gameconfig-&gt;game_changeflagtime = game_setup-&gt;getFlagTime();
++    GameConfig::game_maxplayers = game_setup-&gt;getMaxPlayers();
++    GameConfig::game_maxunits = game_setup-&gt;getMaxUnits();
++    GameConfig::game_cloudcoverage = game_setup-&gt;getCloudCoverage();
++    GameConfig::game_windspeed = (int) game_setup-&gt;getWindSpeed();
++    GameConfig::game_powerups = game_setup-&gt;powerup_state;
++    GameConfig::game_gametype = game_setup-&gt;getGameType();
++    GameConfig::game_fraglimit = game_setup-&gt;getFragLimit();
++    GameConfig::game_timelimit = game_setup-&gt;getTimeLimit();
++    GameConfig::game_changeflagtime = game_setup-&gt;getFlagTime();
+     startGameTimer();
+     game_elapsed_time_offset = game_setup-&gt;getElapsedTime();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -45,7 +45,7 @@
+ 
+ Heartbeat::Heartbeat() : nextHeartbeat(HEARTBEAT_INTERVAL)
+ {
+-    StringTokenizer mstokenizer(gameconfig-&gt;masterservers, ',');
++    StringTokenizer mstokenizer(*GameConfig::server_masterservers, ',');
+     string servname;
+     while( (servname = removeSurroundingSpaces(mstokenizer.getNextToken())) != &quot;&quot;) {
+         try {
+@@ -57,7 +57,7 @@
+     }
+     
+     stringstream msg;
+-    msg &lt;&lt; &quot;\\heartbeat\\gamename\\netpanzer\\port\\&quot; &lt;&lt; gameconfig-&gt;serverport                     
++    msg &lt;&lt; &quot;\\heartbeat\\gamename\\netpanzer\\port\\&quot; &lt;&lt; GameConfig::server_port
+         &lt;&lt; &quot;\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION
+         &lt;&lt; &quot;\\final\\&quot;;
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -39,14 +39,14 @@
+ 
+ InfoSocket::InfoSocket(int p) : socket(0)
+ {
+-    Address addr = Address::resolve( gameconfig-&gt;bindaddress, p, false, true);
++    Address addr = Address::resolve( *GameConfig::server_bindaddress, p, false, true);
+     socket = new network::UDPSocket(addr,this);
+     
+     // This parameters are fixed always
+     // others I plan to be modificable while game is running.
+     stringstream s;
+     s &lt;&lt; &quot;gamename\\netpanzer\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION
+-      &lt;&lt; &quot;\\hostname\\&quot; &lt;&lt; gameconfig-&gt;playername
++      &lt;&lt; &quot;\\hostname\\&quot; &lt;&lt; *GameConfig::player_name
+       &lt;&lt; &quot;\\gameversion\\&quot; &lt;&lt; PACKAGE_VERSION;
+     statusHead = s.str();
+ }
+@@ -114,9 +114,9 @@
+     PlayerID maxPlayers = PlayerInterface::getMaxPlayers();
+     
+     s &lt;&lt; statusHead
+-      &lt;&lt; &quot;\\mapname\\&quot;    &lt;&lt; gameconfig-&gt;map
+-      &lt;&lt; &quot;\\mapcycle\\&quot;   &lt;&lt; gameconfig-&gt;mapcycle
+-      &lt;&lt; &quot;\\password\\&quot; &lt;&lt; (gameconfig-&gt;game_gamepass-&gt;size() == 0 ? 'n' : 'y')
++      &lt;&lt; &quot;\\mapname\\&quot;    &lt;&lt; *GameConfig::game_map
++      &lt;&lt; &quot;\\mapcycle\\&quot;   &lt;&lt; *GameConfig::game_mapcycle
++      &lt;&lt; &quot;\\password\\&quot;   &lt;&lt; (GameConfig::game_gamepass-&gt;size() == 0 ? 'n' : 'y')
+       &lt;&lt; &quot;\\numplayers\\&quot; &lt;&lt; (int)playingPlayers
+       &lt;&lt; &quot;\\maxplayers\\&quot; &lt;&lt; (int)maxPlayers;
+     
+@@ -128,8 +128,8 @@
+     s &lt;&lt; &quot;\\gamestyle\\&quot; &lt;&lt; gameconfig-&gt;getGameTypeString()
+       &lt;&lt; &quot;\\units_per_player\\&quot; &lt;&lt; gameconfig-&gt;GetUnitsPerPlayer()
+       &lt;&lt; &quot;\\time\\&quot; &lt;&lt; GameManager::getGameTime()/60
+-      &lt;&lt; &quot;\\timelimit\\&quot; &lt;&lt; gameconfig-&gt;timelimit
+-      &lt;&lt; &quot;\\fraglimit\\&quot; &lt;&lt; gameconfig-&gt;fraglimit
++      &lt;&lt; &quot;\\timelimit\\&quot; &lt;&lt; GameConfig::game_timelimit
++      &lt;&lt; &quot;\\fraglimit\\&quot; &lt;&lt; GameConfig::game_fraglimit
+       &lt;&lt; &quot;\\objectivelimit\\&quot; &lt;&lt; ObjectiveInterface::getObjectiveLimit();
+ 
+     int n = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -41,7 +41,7 @@
+     using std::string;
+ 
+     // parse the mapcycle in the config
+-    const string&amp; mapcycle = gameconfig-&gt;mapcycle;
++    const string&amp; mapcycle = *GameConfig::game_mapcycle;
+     string::size_type i = mapcycle.find(',', 0);
+     string::size_type lasti = 0;
+     if(i == string::npos)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -144,7 +144,7 @@
+     
+     LOGGER.info(&quot;Initializing sound system.&quot;);
+     try {
+-        if(gameconfig-&gt;enablesound)
++        if ( GameConfig::sound_enable )
+             sound = new SDLSound();
+     } catch(std::exception&amp; e) {
+         LOGGER.warning(&quot;Couldn't initialize sound: %s&quot;, e.what());
+@@ -153,12 +153,13 @@
+     if(sound == 0)
+         sound = new DummySound();
+ 
+-    sound-&gt;setSoundVolume(gameconfig-&gt;effectsvolume);
++    sound-&gt;setSoundVolume(GameConfig::sound_effectsvol);
+ 
+     // start some music
+-    if(gameconfig-&gt;enablemusic) {
++    if ( GameConfig::sound_music )
++    {
+         sound-&gt;playMusic(&quot;sound/music/&quot;);
+-        sound-&gt;setMusicVolume(gameconfig-&gt;musicvolume);
++        sound-&gt;setMusicVolume(GameConfig::sound_musicvol);
+     }
+ }
+ //-----------------------------------------------------------------
+@@ -291,14 +292,15 @@
+ 	CLIENT = new NetworkClient();
+         SERVER-&gt;hostSession();
+ 
+-        if((bool) gameconfig-&gt;publicServer &amp;&amp;
+-                (const std::string&amp;) gameconfig-&gt;masterservers != &quot;&quot;) {
++        if ( GameConfig::server_public
++             &amp;&amp; GameConfig::server_masterservers-&gt;size() != 0 )
++        {
+             try {
+                 if ( infosocket ) {
+                     delete infosocket;
+                     infosocket = 0;
+                 }
+-                infosocket = new InfoSocket(gameconfig-&gt;serverport);
++                infosocket = new InfoSocket(GameConfig::server_port);
+                 if ( heartbeat ) {
+                     delete heartbeat;
+                     heartbeat = 0;
+@@ -336,8 +338,8 @@
+     LoadingView::append( &quot;Loading Game Data ...&quot; );
+     graphicsLoop();
+     
+-    gameconfig-&gt;map = MapsManager::getNextMap(&quot;&quot;);
+-    const char* mapname = gameconfig-&gt;map.c_str();
++    GameConfig::game_map-&gt;assign( MapsManager::getNextMap(&quot;&quot;) );
++    const char* mapname = GameConfig::game_map-&gt;c_str();
+ 
+     try {
+         GameManager::startGameMapLoad(mapname, 20);
+@@ -404,7 +406,7 @@
+     graphicsLoop();
+     
+     player_state = PlayerInterface::allocateLoopBackPlayer();
+-    const char* playername = gameconfig-&gt;playername.c_str();
++    const char* playername = GameConfig::player_name-&gt;c_str();
+     player_state-&gt;setName(playername);
+     
+     LoadingView::update( &quot;Spawning Player ... (100%)&quot; );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -519,7 +519,7 @@
+ 
+ void PlayerInterface::netMessageAllianceRequest(const NetMessage *message)
+ {
+-    if ( gameconfig-&gt;allowallies == false )
++    if ( GameConfig::game_allowallies == false )
+     {
+         return;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -500,7 +500,7 @@
+ ObjectiveInterface::getObjectiveLimit()
+ {
+     float percentage
+-        = (float) gameconfig-&gt;objectiveoccupationpercentage / 100.0;
++        = (float) GameConfig::game_occupationpercentage / 100.0;
+     int wincount = (int) ( ((float) getObjectiveCount()) * percentage + 0.999);
+     if(wincount == 0)
+         wincount = 1;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -153,7 +153,7 @@
+ {
+     unsigned long map_size_x, map_size_y;
+ 
+-    if( gameconfig-&gt;powerups == false )
++    if( GameConfig::game_powerups == false )
+     {
+         return;
+     }
+@@ -181,7 +181,7 @@
+ 
+ void PowerUpInterface::updateState()
+ {
+-    if( gameconfig-&gt;powerups == false )
++    if( GameConfig::game_powerups == false )
+     {
+         return;
+     }
+@@ -215,7 +215,7 @@
+ 
+ void PowerUpInterface::offloadGraphics( SpriteSorter &amp;sorter )
+ {
+-    if( gameconfig-&gt;powerups == false )
++    if( GameConfig::game_powerups == false )
+     {
+         return;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -197,7 +197,7 @@
+         }
+     }
+     filesystem::freeList(list);
+-    setSoundVolume(gameconfig-&gt;effectsvolume);
++    setSoundVolume(GameConfig::sound_effectsvol);
+ }
+ //-----------------------------------------------------------------
+ /**
+@@ -231,7 +231,7 @@
+ {
+     // Part1: scan directory for music files
+     char **list = filesystem::enumerateFiles(directory);
+-    setMusicVolume(gameconfig-&gt;musicvolume);
++    setMusicVolume(GameConfig::sound_musicvol);
+ 
+     musicfiles.clear();
+     for (char **i = list; *i != NULL; i++) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -1938,7 +1938,7 @@
+     unit_state.hit_points -= weapon_hit-&gt;getDamageFactor();
+     unit_state.threat_level = _threat_level_under_attack;
+     threat_level_under_attack_timer.changePeriod(
+-            gameconfig-&gt;attacknotificationtime);
++            GameConfig::interface_attacknotificationtime);
+ 
+     UpdateStateUnitOpcode update_state_opcode;
+ 
+@@ -2295,7 +2295,7 @@
+ 
+         //Added layer selection to the selection box info.
+         select_info_box.setAttrib( unit_state.location,
+-                gameconfig-&gt;unitinfodrawlayer );
++                GameConfig::interface_unitinfodrawlayer );
+         select_info_box.setHitPoints( unit_state.hit_points );
+ 
+         sorter.forceAddSprite( &amp;body_anim_shadow );
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -55,18 +55,18 @@
+              gameconfig-&gt;getGameTypeString(),
+              
+              int(UnitInterface::getUnitCount(PlayerInterface::getLocalPlayerIndex())),
+-             gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers,
++             GameConfig::game_maxunits / GameConfig::game_maxplayers,
+              
+              PlayerInterface::getLocalPlayer()-&gt;getKills(),
+-             (gameconfig-&gt;gametype == _gametype_fraglimit)?(int)gameconfig-&gt;fraglimit:0,
++             (GameConfig::game_gametype == _gametype_fraglimit)?(int)GameConfig::game_fraglimit:0,
+              
+              PlayerInterface::getLocalPlayer()-&gt;getObjectivesHeld(),
+-             (gameconfig-&gt;gametype == _gametype_objective)?ObjectiveInterface::getObjectiveLimit():0,
++             (GameConfig::game_gametype == _gametype_objective)?ObjectiveInterface::getObjectiveLimit():0,
+              
+              (int)GameManager::getGameTime() / 3600,
+              (int)(GameManager::getGameTime() / 60) % 60,
+-             (gameconfig-&gt;gametype == _gametype_timelimit)?gameconfig-&gt;timelimit / 60:0,
+-             (gameconfig-&gt;gametype == _gametype_timelimit)?gameconfig-&gt;timelimit % 60:0,
++             (GameConfig::game_gametype == _gametype_timelimit)?GameConfig::game_timelimit / 60:0,
++             (GameConfig::game_gametype == _gametype_timelimit)?GameConfig::game_timelimit % 60:0,
+              
+              TimerInterface::getFPSAvg()
+              );
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -143,7 +143,8 @@
+         }
+     }
+ 
+-    switch(gameconfig-&gt;gametype) {
++    switch(GameConfig::game_gametype)
++    {
+         case _gametype_objective:
+             std::sort(states.begin(), states.end(), StatesSortByObjectives());
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -42,13 +42,13 @@
+ {
+     // Check for view blending mode change.
+     if (KeyboardInterface::getKeyPressed(SDLK_1)) {
+-        gameconfig-&gt;viewdrawbackgroundmode = VIEW_BACKGROUND_DARK_GRAY_BLEND;
++        GameConfig::interface_viewdrawbackgroundmode = VIEW_BACKGROUND_DARK_GRAY_BLEND;
+     } else if (KeyboardInterface::getKeyPressed(SDLK_2)) {
+-        gameconfig-&gt;viewdrawbackgroundmode = VIEW_BACKGROUND_LIGHT_GRAY_BLEND;
++        GameConfig::interface_viewdrawbackgroundmode = VIEW_BACKGROUND_LIGHT_GRAY_BLEND;
+     } else if (KeyboardInterface::getKeyPressed(SDLK_3)) {
+-        gameconfig-&gt;viewdrawbackgroundmode = VIEW_BACKGROUND_SOLID_BLACK;
++        GameConfig::interface_viewdrawbackgroundmode = VIEW_BACKGROUND_SOLID_BLACK;
+     } else if (KeyboardInterface::getKeyPressed(SDLK_4)) {
+-        gameconfig-&gt;viewdrawbackgroundmode = VIEW_BACKGROUND_TRANSPARENT;
++        GameConfig::interface_viewdrawbackgroundmode = VIEW_BACKGROUND_TRANSPARENT;
+     }
+ 
+     if (getAllowMove())
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -304,13 +304,13 @@
+     dest.bltString(pos.x, pos.y, &quot;-- Environment Info --&quot;, Color::green);
+     pos.y += yOffset;
+ 
+-    int windSpeed = gameconfig-&gt;windspeed;
++    int windSpeed = GameConfig::game_windspeed;
+     sprintf(strBuf, &quot;Wind:   %s (%d pix/sec)&quot;,
+             HostOptionsView::windSpeedString.c_str(), windSpeed);
+     dest.bltString(pos.x, pos.y, strBuf, Color::yellow);
+     pos.y += yOffset;
+ 
+-    int cloudCount = gameconfig-&gt;cloudcoverage;
++    int cloudCount = GameConfig::game_cloudcoverage;
+     sprintf(strBuf, &quot;Clouds: %s (%d allocated)&quot;,
+             HostOptionsView::cloudCoverageString.c_str(), cloudCount);
+     dest.bltString(pos.x, pos.y, strBuf, Color::yellow);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -64,7 +64,7 @@
+     setSubTitle(&quot; - TAB&quot;);
+ 
+     setAllowResize(false);
+-    moveTo(gameconfig-&gt;rankposition);
++    moveTo(GameConfig::interface_rankposition_x, GameConfig::interface_rankposition_y);
+     resize(iXY(WINDOW_WIDTH, 200));
+     checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+ 
+@@ -153,7 +153,8 @@
+         }
+     }
+ 
+-    switch(gameconfig-&gt;gametype) {
++    switch(GameConfig::game_gametype)
++    {
+         case _gametype_objective:
+             std::sort(states.begin(), states.end(), StatesSortByObjectives());
+             break;
+@@ -215,7 +216,8 @@
+ 
+ void RankView::notifyMoveTo()
+ {
+-    gameconfig-&gt;rankposition=min;
++    GameConfig::interface_rankposition_x = min.x;
++    GameConfig::interface_rankposition_y = min.y;
+ }
+ 
+ void RankView::lMouseDown(const iXY&amp; pos)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -412,7 +412,7 @@
+                                 strBuf, color);
+     }
+ 
+-    int unitPerPlayer = gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers;
++    int unitPerPlayer = GameConfig::game_maxunits / GameConfig::game_maxplayers;
+     sprintf(strBuf, &quot;%d/%d&quot;, int(UnitInterface::getUnitCount(PlayerInterface::getLocalPlayerIndex())), unitPerPlayer);
+     clientArea.bltString(unitsBuiltPos.x, unitsBuiltPos.y, strBuf, color);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -68,11 +68,11 @@
+ //--------------------------------------------------------------------------
+ void bltBlendRect(Surface &amp;dest, const iRect &amp;r)
+ {
+-    if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_DARK_GRAY_BLEND) {
++    if (GameConfig::interface_viewdrawbackgroundmode == VIEW_BACKGROUND_DARK_GRAY_BLEND) {
+         dest.BltRoundRect(r, 10, Palette::darkGray256.getColorArray());
+-    } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_LIGHT_GRAY_BLEND) {
++    } else if (GameConfig::interface_viewdrawbackgroundmode == VIEW_BACKGROUND_LIGHT_GRAY_BLEND) {
+         dest.BltRoundRect(r, 10, Palette::gray256.getColorArray());
+-    } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_SOLID_BLACK) {
++    } else if (GameConfig::interface_viewdrawbackgroundmode == VIEW_BACKGROUND_SOLID_BLACK) {
+         dest.fillRect(r, Color::black);
+-    } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_TRANSPARENT) {}
++    } else if (GameConfig::interface_viewdrawbackgroundmode == VIEW_BACKGROUND_TRANSPARENT) {}
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -53,7 +53,7 @@
+ 
+ static void bPlay()
+ {
+-    if ((const std::string&amp;) gameconfig-&gt;playername == &quot;&quot;)
++    if ( GameConfig::player_name-&gt;length() == 0 )
+         return;
+ 
+     // Check a few things which should be ok.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -33,36 +33,36 @@
+ 
+ static int getCurMaxPlayersCount()
+ {
+-    return gameconfig-&gt;maxplayers;
++    return GameConfig::game_maxplayers;
+ }
+ 
+ static int  getCurMaxUnitCount()
+ {
+-    return gameconfig-&gt;maxunits;
++    return GameConfig::game_maxunits;
+ }
+ 
+ static void bDecreasePlayerCount()
+ {
+-    if(gameconfig-&gt;maxplayers - 1 &gt;= gameconfig-&gt;maxplayers.getMin())
+-        gameconfig-&gt;maxplayers = gameconfig-&gt;maxplayers - 1;
++    if(GameConfig::game_maxplayers - 1 &gt;= 2)
++        GameConfig::game_maxplayers = GameConfig::game_maxplayers - 1;
+ }
+ 
+ static void bIncreasePlayerCount()
+ {
+-    if(gameconfig-&gt;maxplayers + 1 &lt;= gameconfig-&gt;maxplayers.getMax())
+-        gameconfig-&gt;maxplayers = gameconfig-&gt;maxplayers + 1;
++    if(GameConfig::game_maxplayers + 1 &lt;= 16)
++        GameConfig::game_maxplayers = GameConfig::game_maxplayers + 1;
+ }
+ 
+ static void bDecreaseMaxUnitCount()
+ {
+-    if(gameconfig-&gt;maxunits - 5 &gt;= gameconfig-&gt;maxunits.getMin())
+-        gameconfig-&gt;maxunits = gameconfig-&gt;maxunits - 5;
++    if(GameConfig::game_maxunits - 5 &gt;= 2)
++        GameConfig::game_maxunits = GameConfig::game_maxunits - 5;
+ }
+ 
+ static void bIncreaseMaxUnitCount()
+ {
+-    if(gameconfig-&gt;maxunits + 5 &lt;= gameconfig-&gt;maxunits.getMax())
+-        gameconfig-&gt;maxunits = gameconfig-&gt;maxunits + 5;
++    if(GameConfig::game_maxunits + 5 &lt;= 1000)
++        GameConfig::game_maxunits = GameConfig::game_maxunits + 5;
+ }
+ 
+ void HostOptionsView::updateGameConfigCloudCoverage()
+@@ -85,27 +85,27 @@
+     switch (cloudCoverageCount) {
+     case 0: {
+             cloudCoverageString = &quot;Clear&quot;;
+-            gameconfig-&gt;cloudcoverage = (int(clearCloudCount));
++            GameConfig::game_cloudcoverage = (int(clearCloudCount));
+         }
+         break;
+     case 1: {
+             cloudCoverageString = &quot;Broken&quot;;
+-            gameconfig-&gt;cloudcoverage = (int(brokenCloudCount));
++            GameConfig::game_cloudcoverage = (int(brokenCloudCount));
+         }
+         break;
+     case 2: {
+             cloudCoverageString = &quot;Partly Cloudy&quot;;
+-            gameconfig-&gt;cloudcoverage = (int(partlyCloudyCloudCount));
++            GameConfig::game_cloudcoverage = (int(partlyCloudyCloudCount));
+         }
+         break;
+     case 3: {
+             cloudCoverageString = &quot;Overcast&quot;;
+-            gameconfig-&gt;cloudcoverage = (int(overcastCloudCount));
++            GameConfig::game_cloudcoverage = (int(overcastCloudCount));
+         }
+         break;
+     case 4: {
+             cloudCoverageString = &quot;Extremely Cloudy&quot;;
+-            gameconfig-&gt;cloudcoverage = (int(fuckingCloudyCloudCount));
++            GameConfig::game_cloudcoverage = (int(fuckingCloudyCloudCount));
+         }
+         break;
+     }
+@@ -115,17 +115,17 @@
+ {
+     switch (gameType) {
+     case 0: {
+-            gameconfig-&gt;gametype = _gametype_objective;
++            GameConfig::game_gametype = _gametype_objective;
+         }
+         break;
+ 
+     case 1: {
+-            gameconfig-&gt;gametype = _gametype_fraglimit;
++            GameConfig::game_gametype = _gametype_fraglimit;
+         }
+         break;
+ 
+     case 2: {
+-            gameconfig-&gt;gametype = _gametype_timelimit;
++            GameConfig::game_gametype = _gametype_timelimit;
+         }
+         break;
+ 
+@@ -135,7 +135,7 @@
+ 
+ static const char * getGameTypeString()
+ {
+-    switch ( gameconfig-&gt;gametype ) {
++    switch ( GameConfig::game_gametype ) {
+     case _gametype_objective: {
+             return( &quot;Objective&quot; );
+         }
+@@ -157,41 +157,41 @@
+ 
+ static void bIncreaseTimeLimit()
+ {
+-    if(gameconfig-&gt;timelimit + 5 &lt;= gameconfig-&gt;timelimit.getMax())
+-        gameconfig-&gt;timelimit = gameconfig-&gt;timelimit + 5;
++    if(GameConfig::game_timelimit + 5 &lt;= 240)
++        GameConfig::game_timelimit = GameConfig::game_timelimit + 5;
+ }
+ 
+ static void bDecreaseTimeLimit()
+ {
+-    if(gameconfig-&gt;timelimit - 5 &gt;= gameconfig-&gt;timelimit.getMin())
+-        gameconfig-&gt;timelimit = gameconfig-&gt;timelimit - 5;
++    if(GameConfig::game_timelimit - 5 &gt;= 5)
++        GameConfig::game_timelimit = GameConfig::game_timelimit - 5;
+ }
+ 
+ static int getTimeLimitHours()
+ {
+-    return gameconfig-&gt;timelimit / 60;
++    return GameConfig::game_timelimit / 60;
+ }
+ 
+ static int getTimeLimitMinutes()
+ {
+-    return gameconfig-&gt;timelimit % 60;
++    return GameConfig::game_timelimit % 60;
+ }
+ 
+ static void bIncreaseFragLimit()
+ {
+-    if(gameconfig-&gt;fraglimit + 5 &lt;= gameconfig-&gt;fraglimit.getMax())
+-        gameconfig-&gt;fraglimit = gameconfig-&gt;fraglimit + 5;
++    if(GameConfig::game_fraglimit + 5 &lt;= 1000)
++        GameConfig::game_fraglimit = GameConfig::game_fraglimit + 5;
+ }
+ 
+ static void bDecreaseFragLimit()
+ {
+-    if(gameconfig-&gt;fraglimit - 5 &gt;= gameconfig-&gt;fraglimit.getMin())
+-        gameconfig-&gt;fraglimit = gameconfig-&gt;fraglimit - 5;
++    if(GameConfig::game_fraglimit - 5 &gt;= 5)
++        GameConfig::game_fraglimit = GameConfig::game_fraglimit - 5;
+ }
+ 
+ static int getFragLimit()
+ {
+-    return gameconfig-&gt;fraglimit;
++    return GameConfig::game_fraglimit;
+ }
+ 
+ void HostOptionsView::updateWindSpeedString()
+@@ -205,27 +205,27 @@
+     switch (windSpeed) {
+     case 0: {
+             windSpeedString = &quot;Calm&quot;;
+-            gameconfig-&gt;windspeed = int(calmWindSpeed);
++            GameConfig::game_windspeed = int(calmWindSpeed);
+         }
+         break;
+     case 1: {
+             windSpeedString = &quot;Breezy&quot;;
+-            gameconfig-&gt;windspeed = int(breezyWindSpeed);
++            GameConfig::game_windspeed = int(breezyWindSpeed);
+         }
+         break;
+     case 2: {
+             windSpeedString = &quot;Brisk Winds&quot;;
+-            gameconfig-&gt;windspeed = int(briskWindSpeed);
++            GameConfig::game_windspeed = int(briskWindSpeed);
+         }
+         break;
+     case 3: {
+             windSpeedString = &quot;Heavy Winds&quot;;
+-            gameconfig-&gt;windspeed = int(heavyWindSpeed);
++            GameConfig::game_windspeed = int(heavyWindSpeed);
+         }
+         break;
+     case 4: {
+             windSpeedString = &quot;Typhoon&quot;;
+-            gameconfig-&gt;windspeed = int(typhoonWindSpeed);
++            GameConfig::game_windspeed = int(typhoonWindSpeed);
+         }
+         break;
+     }
+@@ -233,23 +233,21 @@
+ 
+ static int getObjectiveCapturePercent()
+ {
+-    return gameconfig-&gt;objectiveoccupationpercentage;
++    return GameConfig::game_occupationpercentage;
+ }
+ 
+ static void bIncreaseObjectiveCapturePercent()
+ {
+-    if(gameconfig-&gt;objectiveoccupationpercentage + 5 &lt;=
+-            gameconfig-&gt;objectiveoccupationpercentage.getMax())
+-        gameconfig-&gt;objectiveoccupationpercentage =
+-            gameconfig-&gt;objectiveoccupationpercentage + 5;
++    if(GameConfig::game_occupationpercentage + 5 &lt;= 100)
++        GameConfig::game_occupationpercentage =
++            GameConfig::game_occupationpercentage + 5;
+ }
+ 
+ static void bDecreaseObjectiveCapturePercent()
+ {
+-    if(gameconfig-&gt;objectiveoccupationpercentage - 5 &gt;=
+-            gameconfig-&gt;objectiveoccupationpercentage.getMin())
+-        gameconfig-&gt;objectiveoccupationpercentage = 
+-            gameconfig-&gt;objectiveoccupationpercentage - 5;
++    if(GameConfig::game_occupationpercentage - 5 &gt;= 5 )
++        GameConfig::game_occupationpercentage =
++            GameConfig::game_occupationpercentage - 5;
+ }
+ 
+ 
+@@ -406,12 +404,12 @@
+     xChoiceOffset += minWidth + 10;
+ 
+     checkPublic.setLabel(&quot;Public&quot;);
+-    checkPublic.setState(gameconfig-&gt;publicServer);
++    checkPublic.setState(GameConfig::server_public);
+     checkPublic.setLocation(2, 125);
+     add(&amp;checkPublic);
+ 
+     checkPowerUp.setLabel(&quot;PowerUps&quot;);
+-    checkPowerUp.setState(gameconfig-&gt;powerups);
++    checkPowerUp.setState(GameConfig::game_powerups);
+     checkPowerUp.setLocation(120, 125);
+     add(&amp;checkPowerUp);
+ 
+@@ -528,11 +526,11 @@
+ {
+     if (me.getSource()==&amp;checkPublic) {
+         if ( getVisible() ) {
+-            gameconfig-&gt;publicServer = checkPublic.getState();
++            GameConfig::server_public = checkPublic.getState();
+         }
+     } else if (me.getSource()==&amp;checkPowerUp) {
+         if ( getVisible() ) {
+-            gameconfig-&gt;powerups = checkPowerUp.getState();
++            GameConfig::game_powerups = checkPowerUp.getState();
+         }
+     } else if (me.getSource()==&amp;choiceWindSpeed) {
+         windSpeed = choiceWindSpeed.getSelectedIndex();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -44,7 +44,7 @@
+         MapSelectionView::curMap = 0;
+     }
+ 
+-    gameconfig-&gt;mapcycle = MapSelectionView::mapList[MapSelectionView::curMap]-&gt;name;
++    GameConfig::game_mapcycle-&gt;assign( MapSelectionView::mapList[MapSelectionView::curMap]-&gt;name );
+     HostOptionsView::updateGameConfigCloudCoverage();
+ }
+ 
+@@ -59,7 +59,7 @@
+         MapSelectionView::curMap = MapSelectionView::mapList.size() - 1;
+     }
+ 
+-    gameconfig-&gt;mapcycle = MapSelectionView::mapList[MapSelectionView::curMap]-&gt;name;
++    GameConfig::game_mapcycle-&gt;assign( MapSelectionView::mapList[MapSelectionView::curMap]-&gt;name );
+     HostOptionsView::updateGameConfigCloudCoverage();
+ }
+ 
+@@ -245,7 +245,7 @@
+     }
+ 
+     curMap = 0;
+-    gameconfig-&gt;mapcycle = MapSelectionView::mapList[curMap]-&gt;name;
++    GameConfig::game_mapcycle-&gt;assign( MapSelectionView::mapList[curMap]-&gt;name );
+ 
+     // Success
+     return -1;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -54,7 +54,7 @@
+ {
+     // parse masterserverlist
+     std::string server;
+-    StringTokenizer tokenizer(gameconfig-&gt;masterservers, ',');
++    StringTokenizer tokenizer(*GameConfig::server_masterservers, ',');
+     while( (server = tokenizer.getNextToken()) != &quot;&quot;) {
+         masterservers.push_back(removeSurroundingSpaces(server));
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -53,8 +53,8 @@
+ //---------------------------------------------------------------------------
+ void PlayerNameView::init()
+ {
+-    playerName.init(gameconfig-&gt;playername.c_str(), INPUT_FIELD_CHARACTERS);
+-    playerName.setString(gameconfig-&gt;playername);
++    playerName.init(GameConfig::player_name-&gt;c_str(), INPUT_FIELD_CHARACTERS);
++    playerName.setString(*GameConfig::player_name);
+     cInputField* input 
+         = addInputField(iXY(BORDER_SPACE, BORDER_SPACE+2), &amp;playerName, &quot;&quot;, true, INPUT_FIELD_CHARACTERS);
+     input-&gt;setTextAction(textChanged);
+@@ -73,6 +73,6 @@
+ 
+ void PlayerNameView::textChanged(cInputField* input)
+ {
+-    gameconfig-&gt;playername = input-&gt;getDestString();
++    GameConfig::player_name-&gt;assign( input-&gt;getDestString() );
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2012-01-15 15:26:33 UTC (rev 1337)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2012-01-17 17:59:59 UTC (rev 1338)
+@@ -69,69 +69,69 @@
+ 
+ static void bIncreaseScrollRate()
+ {
+-    if(gameconfig-&gt;scrollrate + 100 &lt;= gameconfig-&gt;scrollrate.getMax())
+-        gameconfig-&gt;scrollrate = gameconfig-&gt;scrollrate + 100;
++    if(GameConfig::interface_scrollrate + 100 &lt;= 10000)
++        GameConfig::interface_scrollrate = GameConfig::interface_scrollrate + 100;
+ }
+ 
+ static void bDecreaseScrollRate()
+ {
+-    if(gameconfig-&gt;scrollrate - 100 &gt;= gameconfig-&gt;scrollrate.getMin())
+-        gameconfig-&gt;scrollrate = gameconfig-&gt;scrollrate - 100;
++    if(GameConfig::interface_scrollrate - 100 &gt;= 500 )
++        GameConfig::interface_scrollrate = GameConfig::interface_scrollrate - 100;
+ }
+ 
+ static int getScrollRate()
+ {
+-    return (int) gameconfig-&gt;scrollrate;
++    return (int) GameConfig::interface_scrollrate;
+ }
+ 
+ static void bDecreaseSoundVolume()
+ {
+-    unsigned int v = gameconfig-&gt;effectsvolume;
++    unsigned int v = GameConfig::sound_effectsvol;
+     if (v) {
+         --v;
+-        gameconfig-&gt;effectsvolume = v;
++        GameConfig::sound_effectsvol = v;
+         sound-&gt;setSoundVolume(v);
+     }
+ }
+ 
+ static void bIncreaseSoundVolume()
+ {
+-    unsigned int v = gameconfig-&gt;effectsvolume;
++    unsigned int v = GameConfig::sound_effectsvol;
+     if (v&lt;100) {
+         ++v;
+-        gameconfig-&gt;effectsvolume = v;
++        GameConfig::sound_effectsvol = v;
+         sound-&gt;setSoundVolume(v);
+     }
+ }
+ 
+ static int getSoundVolume()
+ {
+-    return gameconfig-&gt;effectsvolume;
++    return GameConfig::sound_effectsvol;
+ }
+ 
+ static void bDecreaseMusicVolume()
+ {
+-    unsigned int v = gameconfig-&gt;musicvolume;
++    unsigned int v = GameConfig::sound_musicvol;
+     if (v) {
+         --v;
+-        gameconfig-&gt;musicvolume = v;
++        GameConfig::sound_musicvol = v;
+         sound-&gt;setMusicVolume(v);
+     }
+ }
+ 
+ static void bIncreaseMusicVolume()
+ {
+-    unsigned int v = gameconfig-&gt;musicvolume;
++    unsigned int v = GameConfig::sound_musicvol;
+     if (v&lt;100) {
+         ++v;
+-        gameconfig-&gt;musicvolume = v;
++        GameConfig::sound_musicvol = v;
+         sound-&gt;setMusicVolume(v);
+     }
+ }
+ 
+ static int getMusicVolume()
+ {
+-    return gameconfig-&gt;musicvolume;
++    return GameConfig::sound_musicvol;
+ }
+ 
+ 
+@@ -265,8 +265,8 @@
+     x = xTextStart;
+     add( new Label( x, y, &quot;Sound Status:&quot;, windowTextColor) );
+     checkBoxSoundEnabled = new CheckBox();
+-    checkBoxSoundEnabled-&gt;setLabel(gameconfig-&gt;enablesound?&quot;Enabled&quot;:&quot;Disabled&quot;);
+-    checkBoxSoundEnabled-&gt;setState(gameconfig-&gt;enablesound);
++    checkBoxSoundEnabled-&gt;setLabel(GameConfig::sound_enable?&quot;Enabled&quot;:&quot;Disabled&quot;);
++    checkBoxSoundEnabled-&gt;setState(GameConfig::sound_enable);
+     x += optionsMeterStartX;
+     checkBoxSoundEnabled-&gt;setLocation(x, y-2);
+     checkBoxSoundEnabled-&gt;setStateChangedCallback(this);
+@@ -285,8 +285,8 @@
+     x = xTextStart;
+     add( new Label( x, y, &quot;Music Status:&quot;, windowTextColor) );
+     checkBoxMusicEnabled = new CheckBox();
+-    checkBoxMusicEnabled-&gt;setLabel(gameconfig-&gt;enablemusic?&quot;Enabled&quot;:&quot;Disabled&quot;);
+-    checkBoxMusicEnabled-&gt;setState(gameconfig-&gt;enablemusic);
++    checkBoxMusicEnabled-&gt;setLabel(GameConfig::sound_music?&quot;Enabled&quot;:&quot;Disabled&quot;);
++    checkBoxMusicEnabled-&gt;setState(GameConfig::sound_music);
+     x += optionsMeterStartX;
+     checkBoxMusicEnabled-&gt;setLocation(x, y-2);
+     checkBoxMusicEnabled-&gt;setStateChangedCallback(this);
+@@ -326,8 +326,7 @@
+ 
+     y += yOffset*7;
+ 
+-    sprintf(strBuf, &quot;%d %%&quot;, int((float(getScrollRate()) / 
+-                    float(gameconfig-&gt;scrollrate.getMax())) * 100.0f));
++    sprintf(strBuf, &quot;%d %%&quot;, int((float(getScrollRate()) / 10000.0f * 100.0f)));
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+     tempSurface.blt(clientArea, x, y);
+     y += yOffset*2;
+@@ -417,7 +416,7 @@
+     }
+     else if ( source == checkBoxMusicEnabled )
+     {
+-        gameconfig-&gt;enablemusic = checkBoxMusicEnabled-&gt;getState();
++        GameConfig::sound_music = checkBoxMusicEnabled-&gt;getState();
+        
+         if ( checkBoxMusicEnabled-&gt;getState() ) {
+             sound-&gt;playMusic(&quot;sound/music/&quot;);
+@@ -429,7 +428,7 @@
+     }
+     else if ( source == checkBoxSoundEnabled )
+     {
+-        gameconfig-&gt;enablesound = checkBoxSoundEnabled-&gt;getState();
++        GameConfig::sound_enable = checkBoxSoundEnabled-&gt;getState();
+ 
+         delete sound;
+ 
+@@ -471,4 +470,4 @@
+ void OptionsTemplateView::onComponentClicked(Component* c)
+ {
+         MenuTemplateView::onComponentClicked(c);
+-}
+\ No newline at end of file
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000363.html">[Netpanzer-cvs] r1337 - in trunk/netpanzer: .	src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000365.html">[Netpanzer-cvs] r1339 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#364">[ date ]</a>
+              <a href="thread.html#364">[ thread ]</a>
+              <a href="subject.html#364">[ subject ]</a>
+              <a href="author.html#364">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

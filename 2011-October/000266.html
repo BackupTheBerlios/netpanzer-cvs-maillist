@@ -1,0 +1,445 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1240 - trunk/netpanzer/src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1240%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111004140121.9A7FA4811C4%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000265.html">
+   <LINK REL="Next"  HREF="000267.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1240 - trunk/netpanzer/src/NetPanzer/Views/Game</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1240%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111004140121.9A7FA4811C4%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1240 - trunk/netpanzer/src/NetPanzer/Views/Game">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct  4 16:01:21 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000265.html">[Netpanzer-cvs] r1239 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000267.html">[Netpanzer-cvs] r1241 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Scripts src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#266">[ date ]</a>
+              <a href="thread.html#266">[ thread ]</a>
+              <a href="subject.html#266">[ subject ]</a>
+              <a href="author.html#266">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-04 16:01:21 +0200 (Tue, 04 Oct 2011)
+New Revision: 1240
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+Log:
+revert previous commit and resolve conflict (Add Username on Outpost)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-10-04 11:49:18 UTC (rev 1239)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-10-04 14:01:21 UTC (rev 1240)
+@@ -16,23 +16,30 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+-#include &quot;Util/Exception.hpp&quot;
+ #include &quot;VehicleSelectionView.hpp&quot;
+-#include &quot;Units/UnitTypes.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
++
+ #include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
++
+ #include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
++
+ #include &quot;Util/Math.hpp&quot;
++#include &quot;Util/Exception.hpp&quot;
++
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
++
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Units/UnitTypes.hpp&quot;
++
++#include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Label.hpp&quot;
+@@ -48,18 +55,9 @@
+         return;
+     }
+     
+-    // Send the server the selected unit and whether factory power is on.
+-    TerminalOutpostUnitGenRequest term_mesg;
+-    
+-    term_mesg.unit_gen_request.set( CURRENT_SELECTED_OUTPOST_ID,
+-                                   (char) vsvSelectedUnit,
+-                                   vsvUnitGenOn );
+-    
+-    CLIENT-&gt;sendMessage(&amp;term_mesg, sizeof(term_mesg));
+-    
+-    if(NetworkState::status == _network_state_client) {
+-        ObjectiveInterface::sendMessage( &amp;(term_mesg.unit_gen_request) );
+-    }
++    ObjectiveInterface::sendChangeGeneratingUnit(CURRENT_SELECTED_OUTPOST_ID,
++                                                 (char)vsvSelectedUnit,
++                                                 vsvUnitGenOn);
+ }
+ 
+ static void bOK()
+@@ -134,14 +132,13 @@
+ 
+ void activateVehicleSelectionView(ObjectiveID outpost_id)
+ {
+-    OutpostStatus outpost_status;
+-
+     CURRENT_SELECTED_OUTPOST_ID = outpost_id;
+ 
+-    outpost_status  = ObjectiveInterface::getOutpostStatus(CURRENT_SELECTED_OUTPOST_ID);
+-    vsvSelectedUnit = outpost_status.unit_generation_type;
+-    vsvUnitGenOn    = outpost_status.unit_generation_on_off;
++    Objective* obj = ObjectiveInterface::getObjective(outpost_id);
+ 
++    vsvSelectedUnit = obj-&gt;unit_generation_type;
++    vsvUnitGenOn    = obj-&gt;unit_generation_on_flag;
++
+     if (vsvUnitGenOn) {
+         VehicleSelectionView::setPowerOn();
+     } else {
+@@ -301,7 +298,7 @@
+ //--------------------------------------------------------------------------
+ void VehicleSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    if ( ObjectiveInterface::getObjectiveState(CURRENT_SELECTED_OUTPOST_ID)-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
++    if ( ObjectiveInterface::getObjective(CURRENT_SELECTED_OUTPOST_ID)-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
+     {
+         Desktop::setVisibilityNoDoAnything(&quot;VehicleSelectionView&quot;, false);
+         changeMade = false;
+@@ -379,10 +376,18 @@
+ 
+     bltViewBackground(viewArea);
+ 
+-    OutpostStatus outpost_status;
++    Objective* obj = ObjectiveInterface::getObjective(CURRENT_SELECTED_OUTPOST_ID);
+ 
+-    outpost_status = ObjectiveInterface::getOutpostStatus( CURRENT_SELECTED_OUTPOST_ID );
++    int remaining_time = 0;
++    int generation_time = 0;
+ 
++    if ( obj-&gt;unit_generation_on_flag )
++    {
++        remaining_time = obj-&gt;unit_generation_timer.getTimeLeft();
++        UnitProfile* profile = UnitProfileInterface::getUnitProfile(obj-&gt;unit_generation_type);
++        generation_time = profile-&gt;regen_time;
++    }
++
+     if (vsvUnitGenOn)
+     {
+         sprintf(strBuf, &quot;%s&quot;, getUnitName(vsvSelectedUnit));
+@@ -390,10 +395,8 @@
+                                 strBuf, color);
+ 
+         sprintf(strBuf, &quot;%01d:%02d/%01d:%02d&quot;,
+-                    ((int)outpost_status.unit_generation_time_remaining) / 60,
+-                    ((int)outpost_status.unit_generation_time_remaining) % 60,
+-                    ((int)outpost_status.unit_generation_time) / 60,
+-                    ((int)outpost_status.unit_generation_time) % 60);
++                        remaining_time / 60, remaining_time % 60,
++                        generation_time / 60, generation_time % 60);
+          
+         clientArea.bltString(   timeRequiredPos.x, timeRequiredPos.y, 
+                                 strBuf, color);
+@@ -509,162 +512,112 @@
+ //---------------------------------------------------------------------------
+ void VehicleSelectionView::drawMiniProductionStatus(Surface &amp;dest)
+ {
++    char strBuf[256];
++    char outpostNameBuf[256];
++    char outpostUserNameBuf[256];
++    char productionUnitBuf[256];
++    char timeLeftBuf[256];
+     iRect         objectiveBounds;
+-    unsigned char objectiveOwner;
+     iRect         gameViewRect;
+-    OutpostStatus outpostStatus;
+-    ObjectiveID   objectiveID = 0;
+ 
+     WorldViewInterface::getViewWindow(&amp;gameViewRect);
+-    ObjectiveInterface::startObjectivePositionEnumeration();
+ 
+-    while(ObjectiveInterface::objectivePositionEnumeration(&amp;objectiveBounds, &amp;objectiveOwner, &amp;objectiveID )) {
+-        char strBuf[256];
+-        char outpostNameBuf[256];
+-        char productionUnitBuf[256];
+-        char timeLeftBuf[256];
+-        ObjectiveState *objective_state;
++    ObjectiveID objective_id;
+ 
+-        objective_state = ObjectiveInterface::getObjectiveState( objectiveID );
++    Objective* obj;
++    ObjectiveID max_objective = ObjectiveInterface::getObjectiveCount();
+ 
+-        switch(objectiveOwner) {
+-            //break;
++    for ( objective_id = 0; objective_id &lt; max_objective; ++objective_id)
++    {
++        obj = ObjectiveInterface::getObjective( objective_id );
+ 
+-        case _objective_disposition_player: {
++        bool owned = obj-&gt;occupying_player &amp;&amp; obj-&gt;occupying_player == PlayerInterface::getLocalPlayer();
+ 
+-                iXY objectiveScreenPos(objectiveBounds.min - gameViewRect.min);
++        if ( ! displayOutpostNames &amp;&amp; ( ! owned || ! displayMiniProductionStatus ) )
++        {
++            continue;
++        }
+ 
+-                outpostStatus = ObjectiveInterface::getOutpostStatus(objectiveID);
++        miniProductionRect.min = obj-&gt;area.getAbsRect(obj-&gt;location).min - gameViewRect.min;
++        miniProductionRect.max.x = miniProductionRect.min.x + 140;
++        miniProductionRect.max.y = miniProductionRect.min.y + (owned ? 50 : 20);
++        if ( owned ) 
++        {
++            miniProductionRect.min.y-=16;
++            int length = strlen( obj-&gt;occupying_player-&gt;getName().c_str() );
++            if (length &gt; 10)
++            {
++                strncpy(strBuf, obj-&gt;occupying_player-&gt;getName().c_str() , 7);
++                sprintf(outpostUserNameBuf, &quot;User:  %s...&quot;, strBuf);
++            }
++            else
++            {
++                sprintf(outpostUserNameBuf, &quot;User:  %s&quot;, obj-&gt;occupying_player-&gt;getName().c_str() );
++            }
++        }
++        iXY pos(miniProductionRect.min);
++        pos.x += 4;
++        pos.y += 4;
+ 
+-                assert(screen-&gt;getDoesExist());
++        // Make sure the name will fit reasonably in the area.
++        int length = strlen( obj-&gt;name );
++        if (length &gt; 10)
++        {
++            strncpy(strBuf, obj-&gt;name , 7);
++            sprintf(outpostNameBuf, &quot;Outpost:  %s...&quot;, strBuf);
++        }
++        else
++        {
++            sprintf(outpostNameBuf, &quot;Outpost:  %s&quot;, (const char *) obj-&gt;name );
++        }
++        checkMiniProductionRect(outpostNameBuf);
+ 
+-                miniProductionRect.min   = objectiveScreenPos;
+-                miniProductionRect.max.x = 0;
+-                miniProductionRect.max.y = miniProductionRect.min.y + 50;
+-
+-                if (!displayMiniProductionStatus &amp;&amp; !displayOutpostNames) {
+-                    return;
+-                }
+-
+-                if (!outpostStatus.unit_generation_on_off) {
+-                    miniProductionRect.max.x = miniProductionRect.min.x + 140;
+-
+-                    iXY pos;
+-
+-                    pos.x = miniProductionRect.min.x + 4;
+-                    pos.y = miniProductionRect.min.y + 4;
+-
+-
+-                    // Make sure the name will fit reasonably in the area.
+-                    int length = strlen( objective_state-&gt;name );
+-                    if (length &gt; 20) {
+-                        strncpy(strBuf, (const char *) objective_state-&gt;name , 20);
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s...&quot;, strBuf);
+-
+-                    } else {
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s&quot;, (const char *) objective_state-&gt;name );
+-                    }
+-                    checkMiniProductionRect(outpostNameBuf);
+-
+-
+-                    //pos.x = (miniProductionRect.getSizeX() - strlen(&quot;Production Off&quot;) * CHAR_XPIX) / 2 + miniProductionRect.min.x;
+-                    //pos.y = (miniProductionRect.getSizeY() - CHAR_YPIX) / 2 + miniProductionRect.min.y;
+-
+-                    // Objective is off.
+-                    dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
+-
+-                    dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
+-                    pos.y += 16;
+-                    dest.bltString(pos.x, pos.y, &quot;Production Off&quot;, Color::white);
+-
+-                } else {
+-                    // Objective is on.
+-
+-                    iXY pos;
+-                    pos.x = miniProductionRect.min.x + unitImages.getWidth() + 4;
+-                    pos.y = miniProductionRect.min.y + 4;
+-
+-                    // Make sure the name will fit reasonably in the area.
+-                    int length = strlen( objective_state-&gt;name );
+-                    if (length &gt; 20) {
+-                        strncpy(strBuf, (const char *) objective_state-&gt;name , 20);
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s...&quot;, strBuf);
+-
+-                    } else {
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s&quot;, (const char *) objective_state-&gt;name );
+-                    }
+-                    checkMiniProductionRect(outpostNameBuf);
+-
+-                    sprintf(productionUnitBuf, &quot;Production: %s&quot;,
+-                            getUnitName(outpostStatus.unit_generation_type));
+-                    checkMiniProductionRect(productionUnitBuf);
+-
+-                    sprintf(timeLeftBuf, &quot;Time Left:  %01d:%02d&quot;,
+-                            ((int)outpostStatus.unit_generation_time_remaining)
+-                                / 60,
+-                            ((int)outpostStatus.unit_generation_time_remaining)
+-                                % 60);
+-                    checkMiniProductionRect(timeLeftBuf);
+-
+-                    dest.bltLookup(miniProductionRect,
+-                            Palette::darkGray256.getColorArray());
+-
+-                    dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
+-                    pos.y += 16;
+-                    dest.bltString(pos.x, pos.y, productionUnitBuf, Color::white);
+-                    pos.y += 16;
+-                    dest.bltString(pos.x, pos.y, timeLeftBuf, Color::white);
+-                    pos.y += 16;
+-
+-                    // Draw the current production unit image.
+-                    drawUnitImage(dest, miniProductionRect.min + iXY(1,1), outpostStatus.unit_generation_type);
+-                }
+-
+-                //vsvUnitGenOn    = outpost_status.unit_generation_on_off;
+-
++        if ( owned )
++        {
++            if ( ! obj-&gt;unit_generation_on_flag )
++            {
++                // Objective is off.
++                dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
++                dest.bltString(pos.x, pos.y, outpostUserNameBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, &quot;Production Off&quot;, Color::white);
+             }
+-            break;
++            else
++            {
++                // Objective is on.
++                pos.x += unitImages.getWidth();
+ 
+-        case _objective_disposition_allie :
+-        case _objective_disposition_enemy :
+-        case _objective_disposition_unoccupied : {
+-                if( displayOutpostNames == true ) {
+-                    iXY objectiveScreenPos(objectiveBounds.min - gameViewRect.min);
++                sprintf(productionUnitBuf, &quot;Production: %s&quot;, getUnitName(obj-&gt;unit_generation_type));
++                checkMiniProductionRect(productionUnitBuf);
+ 
+-                    assert(screen-&gt;getDoesExist());
++                float tleft = obj-&gt;unit_generation_timer.getTimeLeft();
++                sprintf(timeLeftBuf, &quot;Time Left:  %01d:%02d&quot;,
++                        ((int)tleft) / 60,
++                        ((int)tleft) % 60);
++                checkMiniProductionRect(timeLeftBuf);
+ 
+-                    miniProductionRect.min   = objectiveScreenPos;
+-                    miniProductionRect.max.x = 0;
+-                    miniProductionRect.max.y = miniProductionRect.min.y + 20;
++                dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
+ 
+-                    miniProductionRect.max.x = miniProductionRect.min.x + 140;
++                dest.bltString(pos.x, pos.y, outpostUserNameBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, productionUnitBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, timeLeftBuf, Color::white);
++                pos.y += 16;
+ 
+-                    iXY pos;
+-
+-                    pos.x = miniProductionRect.min.x + 4;
+-                    pos.y = miniProductionRect.min.y + 4;
+-
+-
+-                    // Make sure the name will fit reasonably in the area.
+-                    int length = strlen( objective_state-&gt;name );
+-                    if (length &gt; 20) {
+-                        strncpy(strBuf, (const char *) objective_state-&gt;name , 20);
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s...&quot;, strBuf);
+-
+-                    } else {
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s&quot;, (const char *) objective_state-&gt;name );
+-                    }
+-                    checkMiniProductionRect(outpostNameBuf);
+-
+-                    dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
+-
+-                    dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
+-                }
++                // Draw the current production unit image.
++                drawUnitImage(dest, miniProductionRect.min + iXY(1,1), obj-&gt;unit_generation_type);
+             }
+-            break;
+-
+         }
+-
++        else
++        {
++            dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
++            dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
++        }
+     }
+ 
+ } // end VehicleSelectionView::drawMiniProductionStatus
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000265.html">[Netpanzer-cvs] r1239 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000267.html">[Netpanzer-cvs] r1241 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Scripts src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#266">[ date ]</a>
+              <a href="thread.html#266">[ thread ]</a>
+              <a href="subject.html#266">[ subject ]</a>
+              <a href="author.html#266">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

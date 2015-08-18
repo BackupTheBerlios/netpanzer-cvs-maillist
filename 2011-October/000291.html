@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1265 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1265%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Views/Game&In-Reply-To=%3C20111021113146.04F094813D9%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000290.html">
+   <LINK REL="Next"  HREF="000292.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1265 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views/Game</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1265%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Views/Game&In-Reply-To=%3C20111021113146.04F094813D9%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1265 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views/Game">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 21 13:31:45 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000290.html">[Netpanzer-cvs] r1264 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000292.html">[Netpanzer-cvs] r1266 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes/Network NetPanzer/Core NetPanzer/Interfaces	NetPanzer/Particles NetPanzer/Units NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#291">[ date ]</a>
+              <a href="thread.html#291">[ thread ]</a>
+              <a href="subject.html#291">[ subject ]</a>
+              <a href="author.html#291">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-21 13:31:45 +0200 (Fri, 21 Oct 2011)
+New Revision: 1265
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+Log:
+Add some blt function for transparency
+Change endroundview for roundrect
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-10-19 12:05:17 UTC (rev 1264)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-10-21 11:31:45 UTC (rev 1265)
+@@ -1741,6 +1741,31 @@
+   }
+ }
+ 
++void Surface::BltCircle(int cx, int cy, int radius, const PIX table[])
++{
++  int d, y, x;
++
++  d = 3 - (2 * radius);
++  x = 0;
++  y = radius;
++
++  while (y &gt;= x) {
++    bltHLine(cx - x, cy - y,cx+ (x + 1), table);
++    bltHLine(cx - x, cy + y,cx+ (x + 1), table);
++    bltHLine(cx - y, cy - x,cx+ (y + 1), table);
++    bltHLine(cx - y, cy + x,cx+ (y + 1), table);
++
++    if (d &lt; 0)
++      d = d + (4 * x) + 6;
++    else {
++      d = d + 4 * (x - y) + 10;
++      y--;
++    }
++    x++;
++  }
++}
++
++
+ void Surface::RoundRect(iRect rect, int radius, PIX color)
+ {
+     int d, y, x;
+@@ -1833,3 +1858,80 @@
+   }
+ }
+ 
++void Surface::BltRoundRect(iRect rect, int radius, const PIX table[])
++{
++    int d, y, x;
++
++    d = 3 - (2 * radius);
++    x = 0;
++    y = radius;
++
++    if ( !getWidth() || !getHeight() ) return;
++
++    orderCoords(rect);
++
++    // Check for trivial rejection
++    if      (rect.max.x &lt;  0)     return;
++    else if (rect.max.y &lt;  0)     return;
++    else if (rect.min.x &gt;= (int)getWidth()) return;
++    else if (rect.min.y &gt;= (int)getHeight()) return;
++
++    // Check for clipping
++    if (rect.min.x &lt;  0)     rect.min.x = 0;
++    if (rect.min.y &lt;  0)     rect.min.y = 0;
++    if (rect.max.x &gt;= (int)getWidth())  rect.max.x = getWidth() - 1;
++    if (rect.max.y &gt;= (int)getHeight()) rect.max.y = getHeight() - 1;
++
++    bltLookup(iRect(rect.min.x,rect.min.y+radius,
++                   rect.max.x,rect.max.y-radius), table);
++
++  while (y &gt;= x) {
++    bltHLine((rect.min.x+radius) - x, (rect.min.y+radius) - y,(rect.max.x-radius)+ x, table);//up
++    bltHLine((rect.min.x+radius) - x, (rect.max.y-radius) + y,(rect.max.x-radius)+ x, table);//down
++    bltHLine((rect.min.x+radius) - y, (rect.min.y+radius) - x,(rect.max.x-radius)+ y, table);//up
++    bltHLine((rect.min.x+radius) - y, (rect.max.y-radius) + x,(rect.max.x-radius)+ y, table);//down
++
++    if (d &lt; 0)
++      d = d + (4 * x) + 6;
++    else {
++      d = d + 4 * (x - y) + 10;
++      y--;
++    }
++    x++;
++  }
++}
++
++void Surface::bltHLine(int x1, int y, int x2, const PIX table[])
++{
++    assert(getDoesExist());
++    assert(this != 0);
++
++    // Check for trivial rejection
++    if ( y &lt; 0 || x2 &lt;= 0
++         || y &gt;= (int)getHeight()
++         || x1 &gt;= (int)getWidth() )
++         return;
++
++    assert(mem != 0);
++    if (mem == 0) return;
++
++    orderCoords(x1, x2);
++
++    unsigned length = x2 - x1;
++    PIX *ptr = mem + y * (int)getPitch();
++
++    // CLIP LEFT
++    if (x1 &lt; 0) {
++        length += x1;
++    }	else {
++        ptr += x1;
++    }
++
++    // CLIP RIGHT
++    if (x2 &gt;= (int)getWidth()) length -= (x2 - getWidth());
++
++    for(size_t x=0; x&lt;length; x++)
++        ptr[x] = table[ptr[x]];
++
++} // end Surface::drawHLine
++
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2011-10-19 12:05:17 UTC (rev 1264)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2011-10-21 11:31:45 UTC (rev 1265)
+@@ -236,9 +236,12 @@
+ 
+     void circle(int cx, int cy, int radius, PIX color);
+     void FillCircle(int cx, int cy, int radius, PIX color);
++    void BltCircle(int cx, int cy, int radius, const PIX table[]);
+     void RoundRect(iRect rect, int radius, PIX color);
+     void FillRoundRect(iRect rect, int radius, PIX color);
+-    
++    void BltRoundRect(iRect rect, int radius, const PIX table[]);
++    void bltHLine(int x1, int y, int x2, const PIX table[]);
++        
+     void frameToBuffer(Uint8* dest, size_t dest_len)
+     {
+         size_t frame_len = getPitch()*getHeight();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-10-19 12:05:17 UTC (rev 1264)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-10-21 11:31:45 UTC (rev 1265)
+@@ -86,13 +86,13 @@
+     RectWinner.min.x = RectWinner.min.y = 0;
+     RectStates = RectWinner;
+     RectWinner.max.y = HEADER_HEIGHT-10;
+-    clientArea.bltLookup(RectWinner, Palette::green256.getColorArray());
+-    clientArea.drawRect(RectWinner, Color::gray);
++    clientArea.BltRoundRect(RectWinner, 15, Palette::green256.getColorArray());
++    clientArea.RoundRect(RectWinner,15, Color::gray);
+ 
+     RectStates.min.y = HEADER_HEIGHT;
+     
+-    clientArea.bltLookup(RectStates, Palette::brightness256.getColorArray());
+-    clientArea.drawRect(RectStates, Color::gray);
++    clientArea.BltRoundRect(RectStates, 15, Palette::brightness256.getColorArray());
++    clientArea.RoundRect(RectStates, 15, Color::gray);
+     
+     drawPlayerStats(clientArea, flagHeight);
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000290.html">[Netpanzer-cvs] r1264 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000292.html">[Netpanzer-cvs] r1266 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes/Network NetPanzer/Core NetPanzer/Interfaces	NetPanzer/Particles NetPanzer/Units NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#291">[ date ]</a>
+              <a href="thread.html#291">[ thread ]</a>
+              <a href="subject.html#291">[ subject ]</a>
+              <a href="author.html#291">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

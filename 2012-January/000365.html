@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1339 - trunk/netpanzer/src/NetPanzer/Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1339%20-%20trunk/netpanzer/src/NetPanzer/Interfaces&In-Reply-To=%3C20120118003214.CFB4B48244B%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000364.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1339 - trunk/netpanzer/src/NetPanzer/Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1339%20-%20trunk/netpanzer/src/NetPanzer/Interfaces&In-Reply-To=%3C20120118003214.CFB4B48244B%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1339 - trunk/netpanzer/src/NetPanzer/Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jan 18 01:32:14 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000364.html">[Netpanzer-cvs] r1338 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Objectives PowerUps System	Units Views Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi Views/MainMenu/Multi/MasterServer
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#365">[ date ]</a>
+              <a href="thread.html#365">[ thread ]</a>
+              <a href="subject.html#365">[ subject ]</a>
+              <a href="author.html#365">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-18 01:32:14 +0100 (Wed, 18 Jan 2012)
+New Revision: 1339
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+Log:
+fix: game.mapcycle CANNOT be empty, added a default mapcycle of 'Two clans, Bullet Hole'
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-01-17 17:59:59 UTC (rev 1338)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-01-18 00:32:14 UTC (rev 1339)
+@@ -327,7 +327,7 @@
+ 
+     if ( ! game_mapcycle )
+     {
+-        game_mapcycle = new NPString(&quot;&quot;);
++        game_mapcycle = new NPString(&quot;Two clans, Bullet Hole&quot;);
+     }
+ 
+     if ( ! server_bindaddress )
+@@ -449,6 +449,11 @@
+         default_player &lt;&lt; &quot;Player&quot; &lt;&lt; (rand()%1000);
+         player_name-&gt;assign(default_player.str());
+     }
++
++    if ( game_mapcycle-&gt;length() == 0 )
++    {
++        game_mapcycle-&gt;assign(&quot;Two clans&quot;);
++    }
+ }
+ 
+ void GameConfig::saveConfig()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000364.html">[Netpanzer-cvs] r1338 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Objectives PowerUps System	Units Views Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi Views/MainMenu/Multi/MasterServer
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#365">[ date ]</a>
+              <a href="thread.html#365">[ thread ]</a>
+              <a href="subject.html#365">[ subject ]</a>
+              <a href="author.html#365">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

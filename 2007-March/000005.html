@@ -1,0 +1,556 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r958 - trunk/netpanzer/src/Lib/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r958%20-%20trunk/netpanzer/src/Lib/Network&In-Reply-To=%3C200703151323.l2FDNmMd000328%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000006.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r958 - trunk/netpanzer/src/Lib/Network</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r958%20-%20trunk/netpanzer/src/Lib/Network&In-Reply-To=%3C200703151323.l2FDNmMd000328%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r958 - trunk/netpanzer/src/Lib/Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Mar 15 14:23:48 CET 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000006.html">[Netpanzer-cvs] r959 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-03-15 14:23:47 +0100 (Thu, 15 Mar 2007)
+New Revision: 958
+
+Modified:
+   trunk/netpanzer/src/Lib/Network/Address.cpp
+   trunk/netpanzer/src/Lib/Network/Address.hpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+Log:
+Small changes in networking code:
+- Make Address less friendly to encapsulate internal data better
+- Use sockaddr_storage in Address instead of sockaddr_in
+- created several macros to remove severa conditional compilation directives (makes code more readable)
+- save the value of errno/WSAGetLastError() to avoid possible problems with the error code changing (man errno for for information) 
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.cpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/Address.cpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -30,14 +30,16 @@
+ 
+ Address::Address()
+ {
+-    memset(&amp;addr, 0, sizeof(addr));
+-    addr.sin_family = AF_INET;
+-    addr.sin_addr.s_addr = INADDR_ANY;
++    memset(&amp;ss, 0, sizeof(ss));
++    ss_len=sizeof(ss);
++    ss.ss_family = AF_INET;
++    //addr.sin_addr.s_addr = INADDR_ANY;
+ }
+ 
+ Address::Address(const Address&amp; other)
+ {
+-    memcpy(&amp;addr, &amp;other.addr, sizeof(addr));
++    memcpy(&amp;ss, &amp;other.ss, sizeof(ss));
++    ss_len=other.ss_len;
+ }
+ 
+ void
+@@ -45,36 +47,39 @@
+ {
+     if(&amp;other == this) // ignore self assignment
+         return;
+-    memcpy(&amp;addr, &amp;other.addr, sizeof(addr));
++    memcpy(&amp;ss, &amp;other.ss, sizeof(ss));
++    ss_len=other.ss_len;
+ }
+ 
+ bool
+ Address::operator==(const Address&amp; other) const
+ {
+-    if(addr.sin_addr.s_addr == other.addr.sin_addr.s_addr
+-            &amp;&amp; addr.sin_port == other.addr.sin_port)
+-        return true;
+-
+-    return false;
++    return !memcmp(&amp;ss,&amp;other.ss,ss_len); // todo: check for ss_len too
+ }
+ 
+ std::string
+ Address::getIP() const
+ {
+-    return std::string(inet_ntoa(addr.sin_addr));
++    // XXX quick hack to get it working until get full ss support
++    // TODO: make a real ipaddress conversion function
++    return std::string(inet_ntoa(((struct sockaddr_in &amp;)ss).sin_addr));
+ }
+ 
+ uint16_t
+ Address::getPort() const
+ {
+-    return ntohs(addr.sin_port);
++    // XXX quick hack to get it working until get full ss support
++    // TODO: make a real port conversion function
++    return ntohs(((struct sockaddr_in &amp;)ss).sin_port);
+ }
+ 
+ Address
+ Address::resolve(const std::string&amp; name, uint16_t port)
+ {
++    // TODO: make a better resolver (ex: getaddrinfo)
+     Address result;
+-    result.addr.sin_port = htons(port);
++    // XXX quick hack to get it working until get full ss support
++    ((struct sockaddr_in &amp;)result.ss).sin_port = htons(port);
+     
+     if(name == &quot;&quot;) {
+         return result;
+@@ -94,9 +99,9 @@
+         throw std::runtime_error(msg.str());
+ #endif
+     }
++    // XXX quick hack to get it working until get full ss support
++    ((struct sockaddr_in &amp;)result.ss).sin_addr.s_addr = ((struct in_addr*) hentry-&gt;h_addr)-&gt;s_addr;
+ 
+-    result.addr.sin_addr.s_addr = ((struct in_addr*) hentry-&gt;h_addr)-&gt;s_addr;
+-
+     return result;
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.hpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/Address.hpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -44,13 +44,15 @@
+     void operator=(const Address&amp; other);
+     bool operator==(const Address&amp; other) const;
+ 
++    struct sockaddr * getSockaddr() const { return (struct sockaddr *)&ss; };
++    socklen_t getSockaddrLen() const { return ss_len; };
++    socklen_t * getSockaddrLenPointer() { return &amp;ss_len; };
++    
+     static Address ANY;
+ 
+ private:
+-    friend class TCPSocket;
+-    friend class TCPListenSocket;
+-    friend class UDPSocket;
+-    struct sockaddr_in addr;
++    socklen_t ss_len;
++    struct sockaddr_storage ss;
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -56,12 +56,12 @@
+ }
+ 
+ void
+-SocketBase::printError(std::ostream&amp; out)
++SocketBase::printError(std::ostream&amp; out, int e)
+ {
+ #ifdef USE_WINSOCK
+-    out &lt;&lt; &quot;Winsock error &quot; &lt;&lt; WSAGetLastError();
++    out &lt;&lt; &quot;Winsock error &quot; &lt;&lt; e;
+ #else
+-    out &lt;&lt; strerror(errno);
++    out &lt;&lt; strerror(e);
+ #endif
+ }
+ 
+@@ -73,14 +73,11 @@
+     else
+         sockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+ 
+-#ifdef USE_WINSOCK
+     if(sockfd == INVALID_SOCKET) {
+-#else
+-    if(sockfd &lt; 0) {
+-#endif
++        int error = GET_NET_ERROR();
+ 	std::stringstream msg;
+ 	msg &lt;&lt; &quot;Couldn't create socket: &quot;;
+-        printError(msg);
++        printError(msg,error);
+ 	throw std::runtime_error(msg.str());
+     }
+ }
+@@ -88,32 +85,26 @@
+ void
+ SocketBase::setNonBlocking()
+ {
++    int res;
+ #ifdef USE_WINSOCK
+     unsigned long mode = 1;
+-    if(ioctlsocket(sockfd, FIONBIO, &amp;mode) != 0) {
++    res = ioctlsocket(sockfd, FIONBIO, &amp;mode);
++#else
++    res = fcntl(sockfd, F_SETFL, O_NONBLOCK);
++#endif
++    if ( res == SOCKET_ERROR ) {
++        int error = GET_NET_ERROR();
+ 	std::stringstream msg;
+ 	msg &lt;&lt; &quot;Couldn't set socket to nonblocking mode: &quot;;
+-        printError(msg);
++        printError(msg,error);
+ 	throw std::runtime_error(msg.str());
+     }
+-#else
+-    if(fcntl(sockfd, F_SETFL, O_NONBLOCK) &lt; 0) {
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't set socket to nonblocking mode: &quot;;
+-        printError(msg);
+-        throw std::runtime_error(msg.str());
+-    }
+-#endif
+ }
+ 
+ void
+ SocketBase::close()
+ {
+-#ifdef USE_WINSOCK
+     closesocket(sockfd);
+-#else
+-    ::close(sockfd);
+-#endif
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -37,7 +37,7 @@
+     void create(bool tcp);
+     void setNonBlocking();
+     void close();
+-    void printError(std::ostream&amp; out);
++    void printError(std::ostream&amp; out, int e);
+ 
+     SOCKET sockfd;
+ };
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -20,6 +20,10 @@
+ 
+ #ifdef USE_WINSOCK
+ #include &lt;winsock2.h&gt;
++
++#define GET_NET_ERROR() WSAGetLastError()
++#define NETERROR_WOULDBLOCK WSAEWOULDBLOCK
++
+ #else
+ #include &lt;unistd.h&gt;
+ #include &lt;errno.h&gt;
+@@ -31,6 +35,12 @@
+ #include &lt;fcntl.h&gt;
+ 
+ typedef int SOCKET;
++#define SOCKET_ERROR -1
++#define INVALID_SOCKET -1
++#define closesocket(s) ::close(s)
++#define GET_NET_ERROR() errno
++#define NETERROR_WOULDBLOCK EWOULDBLOCK
++
+ #endif
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -46,44 +46,33 @@
+ void
+ TCPListenSocket::createBind(bool blocking)
+ {
+-#ifdef USE_WINSOCK
+-    char val = 1;
+-    int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
+-    if(res == SOCKET_ERROR) {
+-#else
+     int val = 1;
+     int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
+-    if(res &lt; 0) {
+-#endif
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't set SO_REUSEADDR: &quot;;
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+     
+-    res = bind(sockfd, (struct sockaddr*) &amp;addr.addr, sizeof(addr.addr));
+-#ifdef USE_WINSOCK
++    res = bind(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+     if(res == SOCKET_ERROR) {
+-#else
+-    if(res &lt; 0) {
+-#endif
++        int error = GET_NET_ERROR();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+             &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; addr.getPort()
+             &lt;&lt; &quot;: &quot;;
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+ 
+     res = listen(sockfd, 20);
+-#ifdef USE_WINSOCK
+     if(res == SOCKET_ERROR) {
+-#else
+-    if(res &lt; 0) {
+-#endif
++        int error = GET_NET_ERROR();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't listen on socket: &quot;;
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+ 
+@@ -95,31 +84,21 @@
+ TCPListenSocket::accept()
+ {
+     Address addr;
+-    socklen_t socklen = sizeof(addr.addr);
+-    SOCKET clientsockfd 
+-        = ::accept(sockfd, (struct sockaddr*) &amp;addr.addr, &amp;socklen);
+-#ifdef USE_WINSOCK
+-    if(clientsockfd == INVALID_SOCKET) {
+-#else
+-    if(clientsockfd &lt; 0) {
+-#endif
+-
+-#ifdef USE_WINSOCK
+-        if(WSAGetLastError() == WSAEWOULDBLOCK)
++    SOCKET newsock;
++    newsock= ::accept(sockfd, addr.getSockaddr(), addr.getSockaddrLenPointer());
++    if (newsock == INVALID_SOCKET) {
++        int error = GET_NET_ERROR();
++        if ( error == NETERROR_WOULDBLOCK )
+             return 0;
+-#else
+-        if(errno == EWOULDBLOCK)
+-            return 0;
+-#endif
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Accept error: &quot;;
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+ 
+     TCPSocket* result;
+     try {
+-        result = new TCPSocket(clientsockfd, addr);
++        result = new TCPSocket(newsock, addr);
+     } catch(...) {
+         close();
+         throw;
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -45,32 +45,24 @@
+     create(true);
+ 
+     try {
+-        int res = bind(sockfd, (struct sockaddr*) &amp;bindaddr.addr,
+-                sizeof(bindaddr.addr));
+-#ifdef USE_WINSOCK
++        int res = bind(sockfd, bindaddr.getSockaddr(), bindaddr.getSockaddrLen());
+         if(res == SOCKET_ERROR) {
+-#else
+-        if(res &lt; 0) {
+-#endif
++            int error = GET_NET_ERROR();
+             std::stringstream msg;
+             msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+                 &lt;&lt; bindaddr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; bindaddr.getPort()
+                 &lt;&lt; &quot;: &quot;;
+-            printError(msg);
++            printError(msg,error);
+             throw std::runtime_error(msg.str());           
+         }
+         
+-        res = connect(sockfd, (struct sockaddr*) &amp;addr.addr,
+-                sizeof(addr.addr));
+-#ifdef USE_WINSOCK
++        res = connect(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+         if(res == SOCKET_ERROR) {
+-#else
+-        if(res &lt; 0) {
+-#endif
++            int error = GET_NET_ERROR();
+             std::stringstream msg;
+             msg &lt;&lt; &quot;Couldn't connect to '&quot; &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot;
+                 &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot;;
+-            printError(msg);
++            printError(msg,error);
+             throw std::runtime_error(msg.str());
+         }
+ 
+@@ -90,10 +82,11 @@
+ TCPSocket::send(const void* data, size_t size)
+ {
+     int res = ::send(sockfd, (const char*) data, size, 0);
+-    if(res &lt; 0) {
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: &quot;;
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+     if(res != (int) size) {
+@@ -108,17 +101,13 @@
+ {
+     int res = ::recv(sockfd, (char*) buffer, size, 0);
+ 
+-    if(res &lt; 0) {
+-#ifdef USE_WINSOCK
+-        if(WSAGetLastError() == WSAEWOULDBLOCK)
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        if ( error == NETERROR_WOULDBLOCK)
+             return 0;
+-#else
+-        if(errno == EWOULDBLOCK)
+-            return 0;
+-#endif
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Read error: &quot;;
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-02-03 13:21:37 UTC (rev 957)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-03-15 13:23:47 UTC (rev 958)
+@@ -43,14 +43,14 @@
+     create(false);
+ 
+     try {
+-        int res = bind(sockfd, (struct sockaddr*) &amp;addr.addr,
+-                sizeof(addr.addr));
+-        if(res &lt; 0) {
++        int res = bind(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
++        if(res == SOCKET_ERROR) {
++            int error = GET_NET_ERROR();
+             std::stringstream msg;
+             msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+                 &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; addr.getPort()
+                 &lt;&lt; &quot;: &quot;;
+-            printError(msg);
++            printError(msg,error);
+             throw std::runtime_error(msg.str());
+         }
+ 
+@@ -70,11 +70,12 @@
+ UDPSocket::send(const Address&amp; addr, const void* data, size_t datasize)
+ {
+     int res = sendto(sockfd, (const char*) data, datasize, 0,
+-            (struct sockaddr*) &amp;addr.addr, sizeof(addr.addr));
+-    if(res &lt; 0) {
++                addr.getSockaddr(), addr.getSockaddrLen());
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: &quot;;
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+     if(res != (int) datasize) {
+@@ -87,20 +88,15 @@
+ size_t
+ UDPSocket::recv(Address&amp; addr, void* buffer, size_t bufsize)
+ {
+-    socklen_t socklen = sizeof(addr.addr);
+     int res = recvfrom(sockfd, (char*) buffer, bufsize, 0,
+-            (struct sockaddr*) &amp;addr.addr, &amp;socklen);
+-    if(res &lt; 0) {
+-#ifdef USE_WINSOCK
+-        if(WSAGetLastError() == WSAEWOULDBLOCK)
++            addr.getSockaddr(), addr.getSockaddrLenPointer());
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        if ( error == NETERROR_WOULDBLOCK)
+             return 0;
+-#else
+-        if(errno == EWOULDBLOCK)
+-            return 0;
+-#endif
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Receive error: &quot; &lt;&lt; strerror(errno);
+-        printError(msg);
++        printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000006.html">[Netpanzer-cvs] r959 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

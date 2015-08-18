@@ -1,0 +1,1879 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1184 - in trunk/netpanzer: scripts src/Lib/2D	src/Lib/Util src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1184%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/Lib/Util%20src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts&In-Reply-To=%3C201001201526.o0KFQccW024537%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000209.html">
+   <LINK REL="Next"  HREF="000211.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1184 - in trunk/netpanzer: scripts src/Lib/2D	src/Lib/Util src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1184%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/Lib/Util%20src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts&In-Reply-To=%3C201001201526.o0KFQccW024537%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1184 - in trunk/netpanzer: scripts src/Lib/2D	src/Lib/Util src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jan 20 16:26:38 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000209.html">[Netpanzer-cvs] r1183 - in trunk/netpanzer/src/NetPanzer: Classes	Core Interfaces Particles System Views/MainMenu
+</A></li>
+        <LI>Next message: <A HREF="000211.html">[Netpanzer-cvs] r1185 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#210">[ date ]</a>
+              <a href="thread.html#210">[ thread ]</a>
+              <a href="subject.html#210">[ subject ]</a>
+              <a href="author.html#210">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-20 16:26:20 +0100 (Wed, 20 Jan 2010)
+New Revision: 1184
+
+Modified:
+   trunk/netpanzer/scripts/initcolors.lua
+   trunk/netpanzer/src/Lib/2D/Color.cpp
+   trunk/netpanzer/src/Lib/2D/Color.hpp
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/Lib/2D/Palette.hpp
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+Log:
+- Bring back the classes needed for scripting.
+- Re-added the fix to load maps ignoring case in linux.
+
+
+Modified: trunk/netpanzer/scripts/initcolors.lua
+===================================================================
+--- trunk/netpanzer/scripts/initcolors.lua	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/scripts/initcolors.lua	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -1,77 +1,75 @@
+-print(&quot;Setting colors&quot;);
+-    Color.unitAqua        = ColorUtil.makeColor(  0, 204, 255);
+-print(&quot;unitAqua is &quot; .. Color.unitAqua);
+-    Color.unitYellow      = ColorUtil.makeColor(255, 255,   0);
+-    Color.unitRed         = ColorUtil.makeColor(255,   0,   0);
+-    Color.unitBlue        = ColorUtil.makeColor(  3,   3, 255);
+-    Color.unitDarkBlue    = ColorUtil.makeColor(  0,   0, 128);
+-    Color.unitLightGreen  = ColorUtil.makeColor(163, 214, 159);
+-    Color.unitGreen       = ColorUtil.makeColor( 31, 166,  36);
+-    Color.unitBlueGray    = ColorUtil.makeColor( 43,  85, 131);
+-    Color.unitDarkRed     = ColorUtil.makeColor(150,   0,   0);
+-    Color.unitBlack       = ColorUtil.makeColor(  6,   2,   2);
+-    Color.unitDarkGreen   = ColorUtil.makeColor( 26,  88,  36);
+-    Color.unitWhite       = ColorUtil.makeColor(250, 253, 248);
+-    Color.unitLightOrange = ColorUtil.makeColor(246, 210,  99);
+-    Color.unitOrange      = ColorUtil.makeColor(205, 144,   9);
+-    Color.unitGray        = ColorUtil.makeColor(186, 186, 186);
+-    Color.unitDarkGray    = ColorUtil.makeColor( 99, 100, 102);
++unitAqua        = rgb(  0, 204, 255)
++unitYellow      = rgb(255, 255,   0)
++unitRed         = rgb(255,   0,   0)
++unitBlue        = rgb(  3,   3, 255)
++unitDarkBlue    = rgb(  0,   0, 128)
++unitLightGreen  = rgb(163, 214, 159)
++unitGreen       = rgb( 31, 166,  36)
++unitBlueGray    = rgb( 43,  85, 131)
++unitDarkRed     = rgb(150,   0,   0)
++unitBlack       = rgb(  6,   2,   2)
++unitDarkGreen   = rgb( 26,  88,  36)
++unitWhite       = rgb(250, 253, 248)
++unitLightOrange = rgb(246, 210,  99)
++unitOrange      = rgb(205, 144,   9)
++unitGray        = rgb(186, 186, 186)
++unitDarkGray    = rgb( 99, 100, 102)
+ 
+-    -- Grays
+-    Color.black   = ColorUtil.makeColor(  0,   0,   0, true);
+-    Color.gray32  = ColorUtil.makeColor( 32,  32,  32);
+-    Color.gray64  = ColorUtil.makeColor( 64,  64,  64);
+-    Color.gray96  = ColorUtil.makeColor( 96,  96,  96);
+-    Color.gray128 = ColorUtil.makeColor(128, 128, 128);
+-    Color.gray160 = ColorUtil.makeColor(160, 160, 160);
+-    Color.gray192 = ColorUtil.makeColor(192, 192, 192);
+-    Color.gray224 = ColorUtil.makeColor(224, 224, 224);
+-    Color.white   = ColorUtil.makeColor(255, 255, 255);
+-print(&quot;white is &quot; .. Color.white);
+-    -- Dark Colors !FIXME!
+-    Color.darkGray    = Color.gray64;
+-    Color.darkRed     = ColorUtil.makeColor(128,   0,   0); -- fixed
+-    Color.darkGreen   = ColorUtil.makeColor(  0, 128,   0); -- fixed
+-    Color.darkBlue    = ColorUtil.makeColor(  0,   0, 128); -- fixed
+-    Color.darkYellow  = ColorUtil.makeColor(255, 168,  18); -- fixed
+-    Color.darkOrange  = ColorUtil.makeColor(255, 140,   0); -- fixed
+-    Color.darkMagenta = ColorUtil.makeColor(148,   0, 211); -- fixed
+-    Color.darkCyan    = ColorUtil.makeColor(  0, 206, 209); -- fixed
++-- Grays
++black   = rgb(  0,   0,   0, true)
++gray32  = rgb( 32,  32,  32)
++gray64  = rgb( 64,  64,  64)
++gray96  = rgb( 96,  96,  96)
++gray128 = rgb(128, 128, 128)
++gray160 = rgb(160, 160, 160)
++gray192 = rgb(192, 192, 192)
++gray224 = rgb(224, 224, 224)
++white   = rgb(255, 255, 255)
+ 
+-    -- Normal Colors
+-    Color.gray    = Color.gray128;
+-    Color.red     = ColorUtil.makeColor(255,   0,   0); -- fixed
+-    Color.green   = ColorUtil.makeColor(  0, 255,   0); -- fixed
+-    Color.blue    = ColorUtil.makeColor(  0,   0, 255); -- fixed
+-    Color.yellow  = ColorUtil.makeColor(255, 255,   0); -- fixed
+-    Color.orange  = ColorUtil.makeColor(255, 128,   0); -- fixed
+-    Color.magenta = ColorUtil.makeColor(255,   0, 255); -- fixed
+-    Color.cyan    = ColorUtil.makeColor(  0, 255, 255); -- fixed
+-    --Color.brown   = ColorUtil.makeColor(128,  42,  42); -- fixed
+-    Color.brown   = ColorUtil.makeColor(200,  80,  80); -- new brown is lighter
+-    
+-    --tan                   210 180 140   0.8235 0.7059 0.5490
+-    Color.tan            = ColorUtil.makeColor(210, 180, 140); -- fixed
+-    --chartreuse            127 255   0   0.4980 1.0000 0.0000
+-    Color.chartreuse     = ColorUtil.makeColor(127, 255,   0); -- fixed
+-    --cobalt_green           61 145  64   0.2400 0.5700 0.2500
+-    Color.cobaltGreen    = ColorUtil.makeColor( 61, 145,  64); -- fixed
+-    --emerald_green           0 201  87   0.0000 0.7900 0.3400
+-    Color.emeraldGreen   = ColorUtil.makeColor(  0, 201,  87); -- fixed
+-    --forest_green           34 139  34   0.1333 0.5451 0.1333
+-    Color.forestGreen    = ColorUtil.makeColor( 34, 139,  34); -- fixed
+-    --olive_green_dark       85 107  47   0.3333 0.4196 0.1843
+-    Color.darkOliveGreen = ColorUtil.makeColor( 85, 107,  47); -- fixed
+-    --terre_verte            56  94  15   0.2200 0.3700 0.0600
+-    Color.terreVerte     = ColorUtil.makeColor( 56,  94,  15); -- fixed
++-- Dark Colors !FIXME!
++darkGray    = gray64
++darkRed     = rgb(128,   0,   0) -- fixed
++darkGreen   = rgb(  0, 128,   0) -- fixed
++darkBlue    = rgb(  0,   0, 128) -- fixed
++darkYellow  = rgb(255, 168,  18) -- fixed
++darkOrange  = rgb(255, 140,   0) -- fixed
++darkMagenta = rgb(148,   0, 211) -- fixed
++darkCyan    = rgb(  0, 206, 209) -- fixed
+ 
+-    -- Normal Colors !FIXME!
+-    Color.lightGray    = Color.gray192;
+-    Color.lightRed     = ColorUtil.makeColor(255, 160, 122); -- fixed
+-    Color.lightGreen   = ColorUtil.makeColor( 50, 205,  50); -- fixed
+-    Color.lightBlue    = ColorUtil.makeColor(135, 206, 250); -- fixed
+-    Color.lightYellow  = ColorUtil.makeColor(255, 255, 224); -- fixed
+-    Color.lightOrange  = ColorUtil.makeColor(237, 145,  33); -- fixed
+-    Color.lightMagenta = ColorUtil.makeColor(  0, 255, 255);
+-    Color.lightCyan    = ColorUtil.makeColor(224, 255, 255); -- fixed
++-- Normal Colors
++gray    = gray128
++red     = rgb(255,   0,   0) -- fixed
++green   = rgb(  0, 255,   0) -- fixed
++blue    = rgb(  0,   0, 255) -- fixed
++yellow  = rgb(255, 255,   0) -- fixed
++orange  = rgb(255, 128,   0) -- fixed
++magenta = rgb(255,   0, 255) -- fixed
++cyan    = rgb(  0, 255, 255) -- fixed
++--brown   = rgb(128,  42,  42) -- fixed
++brown   = rgb(200,  80,  80) -- new brown is lighter
+ 
++--tan                   210 180 140   0.8235 0.7059 0.5490
++tan            = rgb(210, 180, 140) -- fixed
++--chartreuse            127 255   0   0.4980 1.0000 0.0000
++chartreuse     = rgb(127, 255,   0) -- fixed
++--cobalt_green           61 145  64   0.2400 0.5700 0.2500
++cobaltGreen    = rgb( 61, 145,  64) -- fixed
++--emerald_green           0 201  87   0.0000 0.7900 0.3400
++emeraldGreen   = rgb(  0, 201,  87) -- fixed
++--forest_green           34 139  34   0.1333 0.5451 0.1333
++forestGreen    = rgb( 34, 139,  34) -- fixed
++--olive_green_dark       85 107  47   0.3333 0.4196 0.1843
++darkOliveGreen = rgb( 85, 107,  47) -- fixed
++--terre_verte            56  94  15   0.2200 0.3700 0.0600
++terreVerte     = rgb( 56,  94,  15) -- fixed
++
++-- Normal Colors !FIXME!
++lightGray    = gray192
++lightRed     = rgb(255, 160, 122) -- fixed
++lightGreen   = rgb( 50, 205,  50) -- fixed
++lightBlue    = rgb(135, 206, 250) -- fixed
++lightYellow  = rgb(255, 255, 224) -- fixed
++lightOrange  = rgb(237, 145,  33) -- fixed
++lightMagenta = rgb(  0, 255, 255)
++lightCyan    = rgb(224, 255, 255) -- fixed
++
+
+Modified: trunk/netpanzer/src/Lib/2D/Color.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Color.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/Lib/2D/Color.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -16,9 +16,10 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+-
+ #include &quot;Color.hpp&quot;
++#include &quot;Palette.hpp&quot;
++#include &quot;Scripts/ScriptManager.hpp&quot;
++#include &quot;Scripts/ScriptHelper.hpp&quot;
+ 
+ // Here is some preprocessor abuse
+ 
+@@ -98,15 +99,42 @@
+ GEN_COLORS(GEN_VAR)
+ 
+ // This generates the tables needed for script binding
+-const ScriptVarBindRecord Color::colorGetters[] =
++static const ScriptVarBindRecord color_getters[] =
+ {
+     GEN_COLORS(GEN_GETSTRUCT)
+     {0,0}
+ };
+         
+-const ScriptVarBindRecord Color::colorSetters[] =
++static const ScriptVarBindRecord color_setters[] =
+ {
+     GEN_COLORS(GEN_SETSTRUCT)
+     {0,0}
+ };
++
++static int color_rgb(lua_State *L)
++{
++    int r = luaL_checkint(L,1); // r
++    int g = luaL_checkint(L,2); // g
++    int b = luaL_checkint(L,3); // b
++
++    int color = Palette::findNearestColor(r,g,b, true);
++
++    lua_pushinteger(L, color);
++    return 1;
++}
++
++static const luaL_Reg color_methods[] =
++{
++    { &quot;rgb&quot;, color_rgb },
++    { 0, 0}
++};
++
++void
++Color::registerScript(const char *table_name)
++{
++    ScriptManager::registerLib( table_name, color_methods);
++    ScriptManager::bindStaticVariables(table_name, 0, &quot;ColorMetaTable&quot;,
++                                       color_getters, color_setters);
++}
++
+         
+
+Modified: trunk/netpanzer/src/Lib/2D/Color.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Color.hpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/Lib/2D/Color.hpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -19,14 +19,11 @@
+ #define __Color_hpp__
+ 
+ #include &quot;SDL.h&quot;
+-#include &quot;Scripts/ScriptManager.hpp&quot;
+ 
+ //---------------------------------------------------------------------------
+ class Color
+ {
+ public:
+-    static const ScriptVarBindRecord colorGetters[];
+-    static const ScriptVarBindRecord colorSetters[];
+     // Color for netPanzer players.
+     static Uint8 unitAqua;
+     static Uint8 unitYellow;
+@@ -101,6 +98,9 @@
+     static Uint8 gray192;
+     static Uint8 gray224;
+ 
++private:
++    friend class ScriptManager;
++    static void registerScript(const char *table_name);
+ }
+ ; // end Color
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -22,7 +22,6 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &lt;math.h&gt;
+ #include &lt;memory&gt;
+ 
+@@ -31,6 +30,8 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/UtilInterface.hpp&quot;
+ 
++#include &quot;lua/lua.hpp&quot;
++
+ float Palette::brightness = 1.0f;
+ 
+ std::string Palette::name;
+@@ -68,39 +69,11 @@
+ {
+ } // end Palette::Palette
+ 
+-int
+-Palette::makeColor(lua_State *L)
+-{
+-    int r = luaL_checkint(L,1); // r
+-    int g = luaL_checkint(L,2); // g
+-    int b = luaL_checkint(L,3); // b
+-    
+-    int color = findNearestColor(r,g,b,true);
+-    
+-    lua_pushinteger(L, color);
+-    return 1;
+-}
+-
+-static const luaL_reg colorUtilLib[] =
+-{
+-    {&quot;makeColor&quot;,   Palette::makeColor},
+-    {0,0}
+-};
+-
+-void
+-Palette::registerScript()
+-{
+-    ScriptManager::registerLib( &quot;ColorUtil&quot;, colorUtilLib);
+-    ScriptManager::bindStaticVariables( &quot;Color&quot;, &quot;ColorMetaTable&quot;,
+-                                       Color::colorGetters,
+-                                       Color::colorSetters);
+-}
+-
+ // setColors
+ //---------------------------------------------------------------------------
+ void Palette::setColors()
+ {
+-    ScriptManager::runFile(&quot;loadcolors&quot;,&quot;scripts/initcolors.lua&quot;);
++    ScriptManager::runFileInTable(&quot;scripts/initcolors.lua&quot;, &quot;Color&quot;);
+ } // end Palette::setColors
+ 
+ // setColorTables
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.hpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/Lib/2D/Palette.hpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -23,7 +23,6 @@
+ 
+ #include &quot;Color.hpp&quot;
+ #include &quot;ColorTable.hpp&quot;
+-#include &quot;Scripts/ScriptManager.hpp&quot;
+ 
+ const size_t PALETTE_LENGTH = 256;
+ 
+@@ -37,7 +36,6 @@
+ public:
+     Palette();
+ 
+-
+     // Best color match blending tables.
+     static ColorTable	colorTable2080;
+     static ColorTable	colorTable4060;
+@@ -105,8 +103,6 @@
+     }
+     static void setColors();
+     static void setColorTables();
+-    static int makeColor(lua_State *L);
+-    static void registerScript();
+ 
+     static void setBrightnessAbsolute(float brightness);
+ };
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -149,9 +149,48 @@
+ {
+     PHYSFS_file* file = PHYSFS_openRead(filename);
+     if(!file)
+-        throw Exception(&quot;couldn't open file '%s' for reading: %s&quot;, filename,
+-                        PHYSFS_getLastError());
++    {
++		int fn_length = strlen(filename)+1;
++		char fn[fn_length];
++		memcpy(fn, filename, fn_length); // includes \0;
+ 
++		char * folder_sep = strrchr(fn, '/');
++		char * fn_start = fn;
++		char ** filelist = 0;
++		if ( folder_sep )
++		{
++			*folder_sep = 0;
++			filelist = enumerateFiles(fn);
++			*folder_sep = '/';
++			fn_start = folder_sep+1;
++		}
++		else
++		{
++			filelist = enumerateFiles(&quot;.&quot;);
++			folder_sep = fn;
++		}
++
++		if ( filelist )
++		{
++			for(char** curfile = filelist; *curfile != 0; curfile++)
++			{
++				if ( strcasecmp(*curfile, fn_start) == 0 )
++				{
++					memcpy(fn_start, *curfile, fn_length-(folder_sep-fn));
++					file = PHYSFS_openRead(fn);
++					break;
++				}
++			}
++			freeList(filelist);
++		}
++
++		if ( !file )
++		{
++			throw Exception(&quot;couldn't open file '%s' for reading: %s&quot;, filename,
++						PHYSFS_getLastError());
++		}
++	}
++
+     return new ReadFile(file);
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -195,12 +195,7 @@
+ 
+     if ( ((std::string)gameconfig-&gt;motd).length() &gt; 0 )
+     {
+-        ChatMesg chat_mesg;
+-        chat_mesg.message_scope=_chat_mesg_scope_server;
+-        chat_mesg.setSourcePlayerIndex(0);
+-        snprintf(chat_mesg.message_text, sizeof(chat_mesg.message_text), &quot;%s&quot;,gameconfig-&gt;motd.c_str());
+-        chat_mesg.setSize(sizeof(ChatMesg));
+-        client-&gt;sendMessage( &amp;chat_mesg, sizeof(chat_mesg));
++    	ChatInterface::serversayTo(client-&gt;getPlayerIndex(), gameconfig-&gt;motd.c_str());
+     }
+ 
+     SERVER-&gt;broadcastMessage( &amp;connect_alert, sizeof(SystemConnectAlert));
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -307,7 +307,6 @@
+         
+     BaseGameManager *manager = initialise(argc, argv);
+ 
+-    Palette::registerScript(); // here for the moment;
+     ScriptManager::runFile(&quot;unused&quot;,&quot;scripts/initialize.lua&quot;);
+     
+     // we'll catch every exception here, to be sure the user gets at least
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -1,22 +1,21 @@
+ /*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
++ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+  
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
++ This program is free software; you can redistribute it and/or modify
++ it under the terms of the GNU General Public License as published by
++ the Free Software Foundation; either version 2 of the License, or
++ (at your option) any later version.
+  
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
++ This program is distributed in the hope that it will be useful,
++ but WITHOUT ANY WARRANTY; without even the implied warranty of
++ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ GNU General Public License for more details.
+  
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
++ You should have received a copy of the GNU General Public License
++ along with this program; if not, write to the Free Software
++ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
+ 
+-
+ #include &quot;2D/Color.hpp&quot;
+ 
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+@@ -25,229 +24,420 @@
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+-#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
++//#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
++void (* ChatInterface::addChatString)(const char *message_text) = 0;
+ 
+-ChatMesgRequest ChatInterface::current_chat_mesg;
+-void (* ChatInterface::addChatString)( const char *message_text ) = 0;
++enum { _net_message_id_chat_mesg_req,
++       _net_message_id_chat_mesg
++};
+ 
+-void ChatInterface::chatMessageRequest(const NetMessage* message)
++enum { _chat_mesg_scope_player_set,
++       _chat_mesg_scope_alliance,
++       _chat_mesg_scope_enemies,
++       _chat_mesg_scope_all,
++       _chat_mesg_scope_server
++};
++
++#define CHATREQUEST_HEADER_LEN (sizeof(NetMessage) + sizeof(Uint8))
++#define CHATMESG_HEADER_LEN (sizeof(NetMessage) + sizeof(Uint8) + sizeof(Uint16))
++#define MAX_CHAT_MSG_LEN (_MAX_NET_PACKET_SIZE - CHATMESG_HEADER_LEN)
++
++class ChatMesgRequest : public NetMessage
+ {
+-    bool post_on_server = false;
+-    ChatMesg chat_mesg;
+-    const ChatMesgRequest* chat_request = (const ChatMesgRequest*) message;
++public:
++    Uint8 message_scope;
++    char player_set[32];
+ 
+-    if(chat_request-&gt;message_scope != _chat_mesg_scope_server
+-            &amp;&amp; chat_request-&gt;getSourcePlayerIndex() 
+-            &gt;= PlayerInterface::getMaxPlayers())
++private:
++    Uint16 source_player_index;
++public:
++    char message_text[150];
++
++// XPROTO
++//public:
++//    Uint8 message_scope;
++//    char message_text[MAX_CHAT_MSG_LEN];
++
++    ChatMesgRequest()
+     {
+-        LOGGER.warning(&quot;Invalid chatMessageRequest&quot;);
+-        return;
++        reset();
+     }
+ 
+-    chat_mesg.setSourcePlayerIndex(chat_request-&gt;getSourcePlayerIndex());
+-    chat_mesg.message_scope = chat_request-&gt;message_scope;
+-    snprintf(chat_mesg.message_text, sizeof(chat_mesg.message_text), &quot;%s&quot;,
+-             chat_request-&gt;message_text);
++    void reset()
++    {
++        message_class = _net_message_class_chat;
++        message_id = _net_message_id_chat_mesg_req;
++        message_scope = _chat_mesg_scope_all;
++    }
+ 
+-    if( chat_request-&gt;message_scope == _chat_mesg_scope_all )
++    int getTextLen() const
+     {
+-        SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-        post_on_server = true;
++        return getSize() - CHATREQUEST_HEADER_LEN;
+     }
+-    else if( chat_request-&gt;message_scope == _chat_mesg_scope_alliance )
+-    {
+-        unsigned long max_players;
+-        unsigned short local_player_index;
+-        PlayerState * player = 0;
+ 
+-        local_player_index = PlayerInterface::getLocalPlayerIndex();
++    Uint16 getSourcePlayerIndex() const
++	{
++		return SDL_SwapLE16(source_player_index);
++	}
+ 
+-        max_players = PlayerInterface::getMaxPlayers();
+-        for( unsigned long i = 0; i &lt; max_players; i++ )
+-        {
+-            player = PlayerInterface::getPlayer( (unsigned short)i );
++    void setSourcePlayerIndex(Uint16 playerIndex)
++	{
++		source_player_index = SDL_SwapLE16(playerIndex);
++	}
++} __attribute__((packed));
+ 
+-            if ( player-&gt;getStatus() == _player_state_active )
+-            {
+-                if( PlayerInterface::isAllied( chat_request-&gt;getSourcePlayerIndex(), i ) == true )
+-                {
+-                    if ( local_player_index != i )
+-                    {
+-                        SERVER-&gt;sendMessage((unsigned short)i, &amp;chat_mesg,
+-                                sizeof(ChatMesg));
+-                    }
+-                    else
+-                    {
+-                        post_on_server = true;
+-                    }
+-                }
+-            }
+-        }
+ 
+-        if( chat_request-&gt;getSourcePlayerIndex() == PlayerInterface::getLocalPlayerIndex() )
+-        {
+-            post_on_server = true;
+-        }
+-        else
+-        {
+-            SERVER-&gt;sendMessage( chat_request-&gt;getSourcePlayerIndex(),
+-                                 &amp;chat_mesg, sizeof(ChatMesg));
+-        }
++class ChatMesg: public NetMessage
++{
++public:
++    Uint8  message_scope;
++private:
++    Uint16 source_player_index;
++public:
++//    char message_text[MAX_CHAT_MSG_LEN]; // XPROTO
++    char message_text[150];
++
++    ChatMesg()
++    {
++        message_class = _net_message_class_chat;
++        message_id = _net_message_id_chat_mesg;
++        memset(message_text, 0, sizeof(message_text));
+     }
+-    else if( chat_request-&gt;message_scope == _chat_mesg_scope_server )
++
++    int getTextLen() const
+     {
+-        SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+-                chat_mesg.message_text );
+-        return;
++        return getSize() - CHATMESG_HEADER_LEN;
+     }
+ 
+-    if (post_on_server == true)
++    Uint16 getSourcePlayerIndex() const
+     {
+-        PlayerState *player_state;
++        return SDL_SwapLE16(source_player_index);
++    }
+ 
+-        player_state = PlayerInterface::getPlayer(chat_mesg.getSourcePlayerIndex() );
++    void setSourcePlayerIndex(Uint16 playerIndex)
++    {
++        source_player_index = SDL_SwapLE16(playerIndex);
++    }
++} __attribute__((packed));
+ 
+-        if( (addChatString != 0) ) {
+-            char mesg_str[256];
+-            sprintf( mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str() );
++static ChatMesgRequest current_chat_mesg;
+ 
+-            addChatString( mesg_str );
+-            addChatString( chat_mesg.message_text );
+-        }
++void ChatInterface::chatMessageRequest(const NetMessage* message) {
++	bool post_on_server = false;
++	ChatMesg chat_mesg;
++	const ChatMesgRequest* chat_request = (const ChatMesgRequest*) message;
+ 
+-        PIX color = Color::white;
++	if (chat_request-&gt;message_scope != _chat_mesg_scope_server
++			&amp;&amp; chat_request-&gt;getSourcePlayerIndex()
++					&gt;= PlayerInterface::getMaxPlayers()) {
++		LOGGER.warning(&quot;Invalid chatMessageRequest&quot;);
++		return;
++	}
+ 
+-        switch ( chat_request-&gt;message_scope ) {
+-        case _chat_mesg_scope_all :
+-            color = Color::white;
+-            break;
++	chat_mesg.setSourcePlayerIndex(chat_request-&gt;getSourcePlayerIndex());
++	chat_mesg.message_scope = chat_request-&gt;message_scope;
++	snprintf(chat_mesg.message_text, sizeof(chat_mesg.message_text), &quot;%s&quot;,
++			chat_request-&gt;message_text);
+ 
+-        case _chat_mesg_scope_alliance :
+-            color = Color::orange;
+-            break;
++	if (chat_request-&gt;message_scope == _chat_mesg_scope_all) {
++		SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
++		post_on_server = true;
++	} else if (chat_request-&gt;message_scope == _chat_mesg_scope_alliance) {
++		unsigned long max_players;
++		unsigned short local_player_index;
++		PlayerState * player = 0;
+ 
+-        case _chat_mesg_scope_server :
+-            color = Color::unitAqua;
+-            break;
++		local_player_index = PlayerInterface::getLocalPlayerIndex();
+ 
+-        } // ** switch
++		max_players = PlayerInterface::getMaxPlayers();
++		for (unsigned long i = 0; i &lt; max_players; i++) {
++			player = PlayerInterface::getPlayer((unsigned short) i);
+ 
+-        // TODO add unitcolor
+-        ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(), &quot;%s: %s&quot;,
+-                player_state-&gt;getName().c_str(), chat_mesg.message_text );
+-    }
++			if (player-&gt;getStatus() == _player_state_active) {
++				if (PlayerInterface::isAllied(
++						chat_request-&gt;getSourcePlayerIndex(), i) == true) {
++					if (local_player_index != i) {
++						SERVER-&gt;sendMessage((unsigned short) i, &amp;chat_mesg,
++								sizeof(ChatMesg));
++					} else {
++						post_on_server = true;
++					}
++				}
++			}
++		}
++
++		if (chat_request-&gt;getSourcePlayerIndex()
++				== PlayerInterface::getLocalPlayerIndex()) {
++			post_on_server = true;
++		} else {
++			SERVER-&gt;sendMessage(chat_request-&gt;getSourcePlayerIndex(),
++					&amp;chat_mesg, sizeof(ChatMesg));
++		}
++	} else if (chat_request-&gt;message_scope == _chat_mesg_scope_server) {
++		SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
++		ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
++				chat_mesg.message_text);
++		return;
++	}
++
++	if (post_on_server == true) {
++		PlayerState *player_state;
++
++		player_state = PlayerInterface::getPlayer(
++				chat_mesg.getSourcePlayerIndex());
++
++		if ((addChatString != 0)) {
++			char mesg_str[256];
++			sprintf(mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str());
++
++			addChatString(mesg_str);
++			addChatString(chat_mesg.message_text);
++		}
++
++		PIX color = Color::white;
++
++		switch (chat_request-&gt;message_scope) {
++		case _chat_mesg_scope_all:
++			color = Color::white;
++			break;
++
++		case _chat_mesg_scope_alliance:
++			color = Color::orange;
++			break;
++
++		case _chat_mesg_scope_server:
++			color = Color::unitAqua;
++			break;
++
++		} // ** switch
++
++		// TODO add unitcolor
++		ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(),
++				&quot;%s: %s&quot;, player_state-&gt;getName().c_str(),
++				chat_mesg.message_text);
++	}
+ }
+ 
+-void ChatInterface::chatMessage(const NetMessage* message)
+-{
+-    unsigned short local_player_index;
+-    const ChatMesg *chat_mesg = (const ChatMesg*) message;
++void ChatInterface::chatMessage(const NetMessage* message) {
++	unsigned short local_player_index;
++	const ChatMesg *chat_mesg = (const ChatMesg*) message;
+ 
+-    if(chat_mesg-&gt;message_scope != _chat_mesg_scope_server 
+-            &amp;&amp; chat_mesg-&gt;getSourcePlayerIndex() 
+-            &gt;= PlayerInterface::getMaxPlayers()) {
+-        LOGGER.warning(&quot;malformed chatmessage packet.&quot;);
+-        return;
+-    }
++	if (chat_mesg-&gt;message_scope != _chat_mesg_scope_server
++			&amp;&amp; chat_mesg-&gt;getSourcePlayerIndex()
++					&gt;= PlayerInterface::getMaxPlayers()) {
++		LOGGER.warning(&quot;malformed chatmessage packet.&quot;);
++		return;
++	}
+ 
+-    if( chat_mesg-&gt;message_scope == _chat_mesg_scope_server ) {
+-        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;, chat_mesg-&gt;message_text );
+-        return;
+-    }
++	if (chat_mesg-&gt;message_scope == _chat_mesg_scope_server) {
++		ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
++				chat_mesg-&gt;message_text);
++		return;
++	}
+ 
+-    local_player_index = PlayerInterface::getLocalPlayerIndex();
++	local_player_index = PlayerInterface::getLocalPlayerIndex();
+ 
+-    PlayerState *player_state;
++	PlayerState *player_state;
+ 
+-    player_state = PlayerInterface::getPlayer( chat_mesg-&gt;getSourcePlayerIndex() );
++	player_state
++			= PlayerInterface::getPlayer(chat_mesg-&gt;getSourcePlayerIndex());
+ 
+-    if ( (addChatString != 0) ) {
+-        char mesg_str[144];
+-        sprintf( mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str() );
++	if ((addChatString != 0)) {
++		char mesg_str[144];
++		sprintf(mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str());
+ 
+-        addChatString( mesg_str );
+-        addChatString( chat_mesg-&gt;message_text );
+-    } // ** if
++		addChatString(mesg_str);
++		addChatString(chat_mesg-&gt;message_text);
++	} // ** if
+ 
+-    PIX color = Color::white;
++	PIX color = Color::white;
+ 
+-    switch ( chat_mesg-&gt;message_scope ) {
+-    case _chat_mesg_scope_all :
+-        color = Color::white;
+-        break;
++	switch (chat_mesg-&gt;message_scope) {
++	case _chat_mesg_scope_all:
++		color = Color::white;
++		break;
+ 
+-    case _chat_mesg_scope_alliance :
+-        color = Color::orange;
+-        break;
++	case _chat_mesg_scope_alliance:
++		color = Color::orange;
++		break;
+ 
+-    case _chat_mesg_scope_server :
+-        color = Color::unitAqua;
+-        break;
++	case _chat_mesg_scope_server:
++		color = Color::unitAqua;
++		break;
+ 
+-    } // ** switch
++	} // ** switch
+ 
+-    ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(), &quot;%s: %s&quot;,
+-            player_state-&gt;getName().c_str(), chat_mesg-&gt;message_text );
++	ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(),
++			&quot;%s: %s&quot;, player_state-&gt;getName().c_str(), chat_mesg-&gt;message_text);
+ }
+ 
+-void ChatInterface::processChatMessages(const NetMessage* message)
+-{
+-    switch(message-&gt;message_id) {
+-        case _net_message_id_chat_mesg_req:
+-            chatMessageRequest(message);
+-            break;
++void ChatInterface::processChatMessages(const NetMessage* message) {
++	switch (message-&gt;message_id) {
++	case _net_message_id_chat_mesg_req:
++		chatMessageRequest(message);
++		break;
+ 
+-        case _net_message_id_chat_mesg:
+-            chatMessage(message);
+-            break;
++	case _net_message_id_chat_mesg:
++		chatMessage(message);
++		break;
+ 
+-        default:
+-            LOGGER.warning(&quot;Received unknown chat message (id %d-%d)&quot;,
+-                    message-&gt;message_class, message-&gt;message_id);
+-    }
++	default:
++		LOGGER.warning(&quot;Received unknown chat message (id %d-%d)&quot;,
++				message-&gt;message_class, message-&gt;message_id);
++	}
+ }
+ 
++void ChatInterface::setNewMessageCallBack(void(* addStringCallBack)(
++		const char *message_text)) {
++	addChatString = addStringCallBack;
++}
+ 
+-void ChatInterface::setNewMessageCallBack( void (* addStringCallBack )( const char *message_text ) )
+-{
+-    addChatString = addStringCallBack;
++void ChatInterface::setMessageScopeAll() {
++	current_chat_mesg.message_scope = _chat_mesg_scope_all;
+ }
+ 
+-void ChatInterface::setMessageScopeAll()
+-{
+-    current_chat_mesg.message_scope =  _chat_mesg_scope_all;
++void ChatInterface::setMessageScopeAllies() {
++	current_chat_mesg.message_scope = _chat_mesg_scope_alliance;
+ }
+ 
+-void ChatInterface::setMessageScopeAllies()
++void ChatInterface::setMessageScopeEnemies() {
++	current_chat_mesg.message_scope = _chat_mesg_scope_enemies;
++}
++
++void ChatInterface::setMessageScopeServer() {
++	current_chat_mesg.message_scope = _chat_mesg_scope_server;
++}
++
++void ChatInterface::sendCurrentMessage(const char *message_text) {
++	current_chat_mesg.setSourcePlayerIndex(
++			PlayerInterface::getLocalPlayerIndex());
++	strncpy(current_chat_mesg.message_text, message_text, 149);
++	current_chat_mesg.message_text[149] = 0;
++
++	if (NetworkState::status == _network_state_client) {
++		CLIENT-&gt;sendMessage(&amp;current_chat_mesg, sizeof(ChatMesgRequest));
++	} else {
++		processChatMessages(&amp;current_chat_mesg);
++	}
++
++	current_chat_mesg.reset();
++}
++
++void ChatInterface::say(const char *message)
+ {
+-    current_chat_mesg.message_scope = _chat_mesg_scope_alliance;
++	unsigned int text_len = strlen(message);
++	ChatMesgRequest cmsg;
++
++	if ( text_len &gt;= sizeof(cmsg.message_text) )
++	{
++		text_len = sizeof(cmsg.message_text);
++	}
++	memcpy(cmsg.message_text, message, text_len);
++	cmsg.message_text[sizeof(cmsg.message_text)-1] = 0;
++
++	cmsg.message_scope = _chat_mesg_scope_all;
++
++	cmsg.setSourcePlayerIndex( PlayerInterface::getLocalPlayerIndex() );
++
++	if (NetworkState::status == _network_state_client)
++	{
++		CLIENT-&gt;sendMessage(&amp;cmsg, sizeof(cmsg));
++	}
++	else
++	{
++		processChatMessages(&amp;cmsg);
++	}
++
++	// XPROTO
++//	NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
+ }
+ 
+-void ChatInterface::setMessageScopeEnemies()
++void ChatInterface::teamsay(const char* message)
+ {
+-    current_chat_mesg.message_scope = _chat_mesg_scope_enemies;
++	unsigned int text_len = strlen(message);
++	ChatMesgRequest cmsg;
++
++	if ( text_len &gt;= sizeof(cmsg.message_text) )
++	{
++		text_len = sizeof(cmsg.message_text);
++	}
++	memcpy(cmsg.message_text, message, text_len);
++	cmsg.message_text[sizeof(cmsg.message_text)-1] = 0;
++
++	cmsg.message_scope = _chat_mesg_scope_alliance;
++
++	cmsg.setSourcePlayerIndex( PlayerInterface::getLocalPlayerIndex() );
++
++	if (NetworkState::status == _network_state_client)
++	{
++		CLIENT-&gt;sendMessage(&amp;cmsg, sizeof(cmsg));
++	}
++	else
++	{
++		processChatMessages(&amp;cmsg);
++	}
++
++	// XPROTO
++//	NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
+ }
+ 
+-void ChatInterface::setMessageScopeServer()
++void ChatInterface::serversay(const char* message)
+ {
+-    current_chat_mesg.message_scope = _chat_mesg_scope_server;
++	unsigned int text_len = strlen(message);
++	ChatMesgRequest cmsg;
++
++	if ( text_len &gt;= sizeof(cmsg.message_text) )
++	{
++		text_len = sizeof(cmsg.message_text);
++	}
++	memcpy(cmsg.message_text, message, text_len);
++	cmsg.message_text[sizeof(cmsg.message_text)-1] = 0;
++
++	cmsg.message_scope = _chat_mesg_scope_server;
++
++	cmsg.setSourcePlayerIndex( PlayerInterface::getLocalPlayerIndex() );
++
++	if (NetworkState::status == _network_state_client)
++	{
++		CLIENT-&gt;sendMessage(&amp;cmsg, sizeof(cmsg));
++	}
++	else
++	{
++		processChatMessages(&amp;cmsg);
++	}
++
++	// XPROTO
++	// unused    NetworkServer::broadcastMessage(&amp;cmsg, sizeof(cmsg));
++//	NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
+ }
+ 
+-void ChatInterface::sendCurrentMessage( const char *message_text )
++void ChatInterface::serversayTo(const int player, const char* message)
+ {
+-    current_chat_mesg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-    strncpy( current_chat_mesg.message_text, message_text, 149 );
+-    current_chat_mesg.message_text[ 149 ] = 0;
++	if (player == PlayerInterface::getLocalPlayerIndex())
++	{
++		ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
++				message);
++	}
++	else
++	{
++		unsigned int text_len = strlen(message);
++		ChatMesg cmsg;
++		cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
++		if ( text_len &gt;= sizeof(cmsg.message_text) )
++		{
++			text_len = sizeof(cmsg.message_text);
++		}
++		memcpy(cmsg.message_text, message, text_len);
++		cmsg.message_text[sizeof(cmsg.message_text)-1] = 0;
+ 
+-    if ( NetworkState::status == _network_state_client ) {
+-        CLIENT-&gt;sendMessage(&amp;current_chat_mesg, sizeof(ChatMesgRequest));
+-    } else {
+-        processChatMessages(&amp;current_chat_mesg);
+-    }
++		cmsg.message_scope = _chat_mesg_scope_server;
+ 
+-    current_chat_mesg.reset();
++		SERVER-&gt;sendMessage(player, &amp;cmsg, sizeof(cmsg));
++
++//		NetworkServer::sendMessage(player, &amp;cmsg, CHATMESG_HEADER_LEN
++//				+ text_len);
++	}
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -18,12 +18,14 @@
+ #ifndef _CHATINTERFACE_HPP
+ #define _CHATINTERFACE_HPP
+ 
+-#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
++//#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
+ 
++class NetMessage;
++
+ class ChatInterface
+ {
+ protected:
+-    static ChatMesgRequest current_chat_mesg;
++//    static ChatMesgRequest current_chat_mesg;
+     static void (* addChatString)( const char *message_text );
+ 
+     static void chatMessageRequest(const NetMessage* message);
+@@ -32,6 +34,12 @@
+ public:
+     static void processChatMessages(const NetMessage* message);
+ 
++    static void say(const char * message);
++    static void teamsay(const char * message);
++    static void serversay(const char * message);
++    static void serversayTo(const int player, const char * message);
++
++
+     // ** ChatView Interface Methods
+     static void setNewMessageCallBack( void (* addStringCallBack)( const char *message_text ) );
+     static void setMessageScopeAll();
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -18,9 +18,36 @@
+  * Created on October 8, 2008, 10:53 PM
+  */
+ 
++#include &lt;iostream&gt;
++#include &lt;stdio.h&gt;
++#include &lt;string.h&gt;
++
+ #include &quot;ScriptHelper.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
++static void notExistsError(lua_State *L )
++{
++    lua_Debug ar;
++    lua_getstack(L,1,&amp;ar);
++    lua_getinfo(L, &quot;Sl&quot;, &amp;ar);
++    LOGGER.warning(&quot;ERROR in '%s':%d: member '%s' doesn't exists.&quot;,
++                   ar.source,
++                   ar.currentline,
++                   lua_tostring(L,2));
++}
++
++static void notModifiedError(lua_State *L, const char *what)
++{
++    lua_Debug ar;
++    lua_getstack(L,1,&amp;ar);
++    lua_getinfo(L, &quot;Sl&quot;, &amp;ar);
++    LOGGER.warning(&quot;ERROR in '%s':%d: '%s' not modified, value is not a %s.&quot;,
++                   ar.source,
++                   ar.currentline,
++                   lua_tostring(L,2),
++                   what);
++}
++
+ int
+ ScriptHelper::get_byte (lua_State *L, void *v)
+ {
+@@ -31,7 +58,15 @@
+ int
+ ScriptHelper::set_byte (lua_State *L, void *v)
+ {
+-    *(unsigned char*)v = luaL_checkint(L, 3);
++    unsigned char c = lua_tonumber(L, 3);
++    if ( !c &amp;&amp; ! lua_isnumber(L, 3) )
++    {
++        notModifiedError(L,&quot;number (byte)&quot;);
++    }
++    else
++    {
++        *(unsigned char*)v = c;
++    }
+     return 0;
+ }
+ 
+@@ -45,7 +80,15 @@
+ int
+ ScriptHelper::set_int (lua_State *L, void *v)
+ {
+-    *(int*)v = luaL_checkint(L, 3);
++    int n = lua_tonumber(L, 3);
++    if ( !n &amp;&amp; ! lua_isnumber(L, 3) )
++    {
++        notModifiedError(L,&quot;number (int)&quot;);
++    }
++    else
++    {
++        *(int*)v = n;
++    }
+     return 0;
+ }
+ 
+@@ -59,7 +102,15 @@
+ int
+ ScriptHelper::set_number (lua_State *L, void *v)
+ {
+-    *(lua_Number*)v = luaL_checknumber(L, 3);
++    lua_Number n = lua_tonumber(L, 3);
++    if ( !n &amp;&amp; ! lua_isnumber(L, 3) )
++    {
++        notModifiedError(L,&quot;number (lua)&quot;);
++    }
++    else
++    {
++        *(lua_Number*)v = n;
++    }
+     return 0;
+ }
+ 
+@@ -69,32 +120,45 @@
+     lua_pushstring(L, (char*)v );
+     return 1;
+ }
+-    
++
+ int
++ScriptHelper::get_boolean (lua_State *L, void *v)
++{
++    lua_pushboolean(L, *(bool*)v);
++    return 1;
++}
++
++int
++ScriptHelper::set_boolean (lua_State *L, void *v)
++{
++    *(bool*)v = lua_toboolean(L, 3);
++    return 0;
++}
++
++int
+ ScriptHelper::staticVarCall(lua_State *L)
+ {
+     /* for get: stack has userdata, index, lightuserdata */
+     /* for set: stack has userdata, index, value, lightuserdata */
+     ScriptVarBindRecord * m = (ScriptVarBindRecord *)lua_touserdata(L, -1);  /* member info */
+     lua_pop(L, 1);                               /* drop lightuserdata */
+-    luaL_checktype(L, 1, LUA_TUSERDATA);
+     return m-&gt;func(L, (void *)(m-&gt;data));
+ }
+ 
+ int
+ ScriptHelper::index_handler (lua_State *L)
+ {
+-    /* stack has userdata, index */
++    /* stack has table, index */
+     lua_pushvalue(L, 2);                     /* dup index */
+     lua_rawget(L, lua_upvalueindex(1));      /* lookup member by name */
+     if (!lua_islightuserdata(L, -1))
+     {
+         lua_pop(L, 1);                         /* drop value */
+         lua_pushvalue(L, 2);                   /* dup index */
+-        lua_gettable(L, lua_upvalueindex(2));  /* else try methods */
++        lua_gettable(L, lua_upvalueindex(1));  /* else try methods */
+         if (lua_isnil(L, -1))                  /* invalid member */
+         {
+-            luaL_error(L, &quot;cannot get member '%s'&quot;, lua_tostring(L, 2));
++            notExistsError(L);
+         }
+         return 1;
+     }
+@@ -104,12 +168,80 @@
+ int
+ ScriptHelper::newindex_handler (lua_State *L)
+ {
+-    /* stack has userdata, index, value */
++    /* stack has table, index, value */
+     lua_pushvalue(L, 2);                     /* dup index */
+     lua_rawget(L, lua_upvalueindex(1));      /* lookup member by name */
+     if (!lua_islightuserdata(L, -1))         /* invalid member */
+     {
+-        luaL_error(L, &quot;cannot set member '%s'&quot;, lua_tostring(L, 2));
++        notExistsError(L);
++        return 0;
+     }
+     return staticVarCall(L);                      /* call set function */
+ }
++
++int
++ScriptHelper::next_handler(lua_State* L)
++{
++    /* stack has table, key */
++    ScriptVarBindRecord * record = (ScriptVarBindRecord *)lua_topointer(L, lua_upvalueindex(1));
++    if ( ! lua_isnil(L,2) )
++    {
++        // find this key
++        const char * key = lua_tostring(L, 2);
++
++        while ( record-&gt;name &amp;&amp; strcmp(record-&gt;name, key) )
++        {
++            ++record;
++        }
++
++        // want next key
++        if ( record-&gt;name )
++        {
++            ++record;
++        }
++    }
++
++    if ( record-&gt;name )
++    {
++        lua_pushstring(L, record-&gt;name);
++
++        record-&gt;func(L, (void *)(record-&gt;data));
++
++        return 2;
++    }
++
++    lua_pushnil(L);
++    return 1;
++}
++
++int
++ScriptHelper::autotable_indexhandler(lua_State* L)
++{
++    // stack has mtable, index
++    lua_pushvalue(L, 2);
++    // stack has mtable, index, index
++    lua_rawget(L, 1);
++    // stack has mtable, index, result
++    if ( lua_isnil(L, -1) )
++    {
++        lua_pop(L, 1);
++        // stack has mtable, index
++        lua_createtable(L,0,0);
++        // stack has mtable, index, ntable
++        lua_pushvalue(L, -1);
++        // stack has mtable, index, ntable, ntable
++        lua_insert(L, 2);
++        // stack has mtable, ntable, index, ntable
++        lua_rawset(L, 1);
++        // stack has mtable, ntable
++        lua_createtable(L, 0, 1);
++        // stack has mtable, ntable, meta
++        lua_pushliteral(L, &quot;__index&quot;);
++        lua_pushcfunction(L, autotable_indexhandler);
++        lua_rawset(L, -3);
++        // stack has mtable, ntable, meta
++        lua_setmetatable(L, -2);
++        // stack has mtable, ntable
++    }
++    return 1;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -31,6 +31,8 @@
+ #define SETSVTYPE_NUMBER ScriptHelper::set_number
+ #define GETSVTYPE_STRING ScriptHelper::get_string
+ //#define SETSVTYPE_STRING ScriptHelper::set_string
++#define GETSVTYPE_BOOLEAN ScriptHelper::get_boolean
++#define SETSVTYPE_BOOLEAN ScriptHelper::set_boolean
+ 
+ typedef int (*ScriptBindFunction) (lua_State *L, void *v);
+ 
+@@ -55,13 +57,18 @@
+     static int set_number (lua_State *L, void *v);
+ 
+     static int get_string (lua_State *L, void *v);
+-    
++
++    static int get_boolean (lua_State *L, void *v);
++    static int set_boolean (lua_State *L, void *v);
++
+ private:
+     friend class ScriptManager;
+     
+     static int staticVarCall(lua_State *L);
+     static int index_handler (lua_State *L);
+     static int newindex_handler (lua_State *L);
++    static int next_handler(lua_State *L);
++    static int autotable_indexhandler(lua_State *L);
+ };
+ 
+ #endif	/* _SCRIPTHELPER_HPP */
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -20,8 +20,15 @@
+ 
+ #include &lt;cstring&gt;
+ #include &quot;ScriptManager.hpp&quot;
++#include &quot;ScriptHelper.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+ 
++#include &quot;2D/Color.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++#include &quot;Interfaces/ChatInterface.hpp&quot;
++#include &quot;Interfaces/ConsoleInterface.hpp&quot;
++
+ lua_State * ScriptManager::luavm = 0;
+ 
+ void
+@@ -34,7 +41,12 @@
+         {
+             luaL_openlibs(luavm);
+         }
++        Color::registerScript(&quot;Color&quot;);
++//        ParticleInterface::registerScript(&quot;particles&quot;);
++//        GameConfig::registerScript(&quot;config&quot;);
++
+     }
++
+ }
+     
+ void
+@@ -48,46 +60,158 @@
+ }
+     
+ void
+-ScriptManager::registerLib(const char * libname, const luaL_reg * functions)
++ScriptManager::registerLib(const char * libname, const luaL_Reg * functions)
+ {
+-    luaL_openlib(luavm, libname, functions, 0);   
++    luaL_register(luavm, libname, functions);
+ }
+     
+ void
+-ScriptManager::bindStaticVariables(const char * objectName,
+-                                   const char * metaName,
+-                                   ScriptVarBindRecord * getters,
+-                                   ScriptVarBindRecord * setters)
++ScriptManager::runStr(const char * runname, const char * str)
+ {
+-    luaL_newmetatable(luavm, metaName);
+-    int metatable = lua_gettop(luavm);
++    luaL_loadbuffer(luavm,str,strlen(str), runname);
++    int error=lua_pcall(luavm,0,0,0);
++    if (error)
++    {
++        printf(&quot;Error is: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,1);
++    }
++}
+ 
+-    lua_pushliteral(luavm, &quot;__index&quot;);
+-    lua_pushvalue(luavm, metatable);  /* upvalue index 1 */
+-    bindStaticVars(getters);     /* fill metatable with getters */
+-    lua_pushcclosure(luavm, ScriptHelper::index_handler, 1);
+-    lua_rawset(luavm, metatable);     /* metatable.__index = index_handler */
++bool
++ScriptManager::runUserCommand(const char* str)
++{
++    int luatop = lua_gettop(luavm);
+ 
+-    lua_pushliteral(luavm, &quot;__newindex&quot;);
+-    lua_newtable(luavm);              /* table for members you can set */
+-    bindStaticVars(setters);     /* fill with setters */
+-    lua_pushcclosure(luavm, ScriptHelper::newindex_handler, 1);
+-    lua_rawset(luavm, metatable);     /* metatable.__newindex = newindex_handler */
++    lua_getglobal(luavm, &quot;UserCommands&quot;);
++    if ( lua_istable(luavm, -1) )
++    {
++        char cmd[128];
++        unsigned int cmdpos = 0;
++        unsigned int strpos = 0;
+ 
+-    lua_pop(luavm, 1);                /* drop metatable */
++        while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
++        {
++            cmd[cmdpos++] = str[strpos++];
++        }
+ 
+-    // we don't save the address of new data
+-    void * t = lua_newuserdata(luavm,sizeof(void*));
+-    luaL_getmetatable(luavm, metaName);
+-    lua_setmetatable(luavm,-2);
+-    lua_setglobal(luavm,objectName);
++        if ( cmdpos == 0 )
++        {
++            lua_settop(luavm, luatop);
++            return false;
++        }
++
++        if ( cmdpos == sizeof(cmd) )
++        {
++            cmd[sizeof(cmd)-1] = 0;
++        }
++        else
++        {
++            cmd[cmdpos] = 0;
++        }
++
++        lua_getfield(luavm, -1, cmd);
++        if ( lua_isfunction(luavm, -1) )
++        {
++            while ( str[strpos] &amp;&amp; isspace(str[strpos]) )
++            {
++                strpos++;
++            }
++
++            lua_pushstring(luavm, &amp;str[strpos]);
++            
++            if ( lua_pcall(luavm, 1, 0, 0) != 0 )
++            {
++                ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;Error running user command '%s': %s&quot;, str, lua_tostring(luavm, -1));
++            }
++        }
++        else
++        {
++            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;User command '%s' not found&quot;, str);
++        }
++    }
++    else
++    {
++        ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;There is no defined UserCommands&quot;);
++    }
++
++    lua_settop(luavm, luatop);
++    return true;
+ }
+-    
++
++bool
++ScriptManager::runServerCommand(const char* str, Uint16 runPlayer)
++{
++    int luatop = lua_gettop(luavm);
++
++    lua_getglobal(luavm, &quot;ServerCommands&quot;);
++    if ( lua_istable(luavm, -1) )
++    {
++        char cmd[128];
++        unsigned int cmdpos = 0;
++        unsigned int strpos = 0;
++
++        while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
++        {
++            cmd[cmdpos++] = str[strpos++];
++        }
++
++        if ( cmdpos == 0 )
++        {
++            lua_settop(luavm, luatop);
++            return false;
++        }
++
++        if ( cmdpos == sizeof(cmd) )
++        {
++            cmd[sizeof(cmd)-1] = 0;
++        }
++        else
++        {
++            cmd[cmdpos] = 0;
++        }
++
++        lua_getfield(luavm, -1, cmd);
++        if ( lua_isfunction(luavm, -1) )
++        {
++            while ( str[strpos] &amp;&amp; isspace(str[strpos]) )
++            {
++                strpos++;
++            }
++
++            lua_pushstring(luavm, &amp;str[strpos]);
++            lua_pushnumber(luavm, runPlayer);
++            
++            if ( lua_pcall(luavm, 2, 0, 0) != 0 )
++            {
++                char errormsg[512];
++                snprintf(errormsg,sizeof(errormsg),
++                        &quot;Error running server command '%s': %s&quot;,
++                        str, lua_tostring(luavm, -1));
++                errormsg[sizeof(errormsg)-1] = 0;
++                ChatInterface::serversayTo(runPlayer, errormsg);
++            }
++        }
++        else
++        {
++            char errormsg[512];
++            snprintf(errormsg,sizeof(errormsg), &quot;Server command '%s' not found&quot;, str);
++            errormsg[sizeof(errormsg)-1] = 0;
++            ChatInterface::serversayTo(runPlayer, errormsg);
++        }
++    }
++    else
++    {
++        ChatInterface::serversayTo(runPlayer, &quot;There is no defined ServerCommands&quot;);
++    }
++
++    lua_settop(luavm, luatop);
++    return true;
++}
++
+ void
+-ScriptManager::runStr(const char * runname, const char * str)
++ScriptManager::runFile(const char * runname, const char * filename)
+ {
+-    luaL_loadbuffer(luavm,str,strlen(str), runname);
+-    int error=lua_pcall(luavm,0,0,0);
++    int error = luaL_dofile(luavm, filesystem::getRealName(filename).c_str());
+     if (error)
+     {
+         printf(&quot;error is: %s\n&quot;,lua_tostring(luavm,-1));
+@@ -96,24 +220,165 @@
+ }
+ 
+ void
+-ScriptManager::runFile(const char * runname, const char * filename)
++ScriptManager::runFileInTable(const char * filename, const char * table)
+ {
+-    luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
+-    int error=lua_pcall(luavm,0,0,0);
+-    if (error)
++    int r = luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
++    if ( r )
+     {
+-        printf(&quot;error is: %s\n&quot;,lua_tostring(luavm,-1));
++        LOGGER.warning(&quot;Error in runFileInTable: %s\n&quot;,lua_tostring(luavm,-1));
+         lua_pop(luavm,1);
++        return;
+     }
++
++    lua_getglobal(luavm, table);
++    if ( ! lua_istable(luavm, -1) )
++    {
++        lua_pop(luavm,1);
++        lua_createtable(luavm, 6, 0);
++        lua_pushvalue(luavm, -1);
++        lua_setglobal(luavm, table);
++    }
++
++    if ( ! lua_setfenv(luavm, -2) )
++    {
++        LOGGER.warning(&quot;Error in runFileInTable: can't set environment.&quot;);
++        lua_pop(luavm,2);
++        return;
++    }
++
++    if ( lua_pcall(luavm, 0, 0, 0) )
++    {
++        LOGGER.warning(&quot;Error in runFileInTable: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,1);
++    }
+ }
++
++void
++ScriptManager::loadConfigFile(const char * filename, const char * table)
++{
++    int r = luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
++    if ( r )
++    {
++        LOGGER.warning(&quot;Error in loadConfigFile: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,1);
++        return;
++    }
++
++    lua_getglobal(luavm, table);
++    if ( ! lua_istable(luavm, -1) )
++    {
++        lua_pop(luavm,1);
++        lua_createtable(luavm, 6, 0);
++        lua_pushvalue(luavm, -1);
++        lua_setglobal(luavm, table);
++    }
++
++    // stack: file, table
++
++    if ( ! lua_getmetatable(luavm, -1) )
++    {
++        lua_createtable(luavm, 0, 1);
++    }
++
++    // stack: file, table, metatable
++
++    lua_pushliteral(luavm, &quot;__index&quot;);
++    lua_pushcfunction(luavm, ScriptHelper::autotable_indexhandler);
++    lua_rawset(luavm, -3);
++
++    // stack: file, table, metatable(with __index)
++
++    lua_setmetatable(luavm, -2);
++
++    // stack: file, table
++
++    if ( ! lua_setfenv(luavm, -2) )
++    {
++        LOGGER.warning(&quot;Error in loadConfigFile: can't set environment.&quot;);
++        lua_pop(luavm,2);
++        return;
++    }
++
++    // stack: file
++
++    if ( lua_pcall(luavm, 0, 0, 0) )
++    {
++        LOGGER.warning(&quot;Error in loadConfigFile: %s\n&quot;,lua_tostring(luavm,-1));
++        lua_pop(luavm,1);
++    }
++}
++
++void
++ScriptManager::bindStaticVariables(const char * objectName,
++                                   const char * fieldName,
++                                   const char * metaName,
++                                   ScriptVarBindRecord * getters,
++                                   ScriptVarBindRecord * setters)
++{                                                               // stack change
++    luaL_newmetatable(luavm, metaName);                         // +1
++    int metatable = lua_gettop(luavm);
++
++    lua_pushliteral(luavm, &quot;__index&quot;);                          // +1
++    lua_pushvalue(luavm, metatable);                            // +1
++    bindStaticVars(getters);                                    // 0
++    lua_pushcclosure(luavm, ScriptHelper::index_handler, 1);    // 0 = -1 +1
++    /* metatable.__index = index_handler */
++    lua_rawset(luavm, metatable);                               // -2
++
++    // metatable still in stack (1)
++
++    lua_pushliteral(luavm, &quot;__newindex&quot;);                       // +1
++    lua_newtable(luavm);   /* table for members you can set */  // +1
++    bindStaticVars(setters);     /* fill with setters */        // 0
++    lua_pushcclosure(luavm, ScriptHelper::newindex_handler, 1); // 0 = -1 +1
++    /* metatable.__newindex = newindex_handler */
++    lua_rawset(luavm, metatable);                               // -2
++
++    lua_pushliteral(luavm, &quot;__next&quot;);                           // +1
++    lua_pushlightuserdata(luavm, (void*)getters);                      // +1
++    lua_pushcclosure(luavm, ScriptHelper::next_handler, 1);     // 0 = -1 +1
++    /* metatable.__next = next_handler */
++    lua_rawset(luavm, metatable);                               // -2 (clean)
++
++//    lua_pop(luavm, 1);                /* drop metatable */      // -1 (clean)
++
++    lua_getglobal(luavm, objectName);                           // +1
+     
++    bool isRegistered = !lua_isnil(luavm, -1);                  // 0
++    if ( ! isRegistered )
++    {
++        // pop nil
++        lua_pop(luavm,1);                                       // -1 (clean)
++        lua_createtable(luavm, 0, 0);                           // +1
++        lua_pushvalue(luavm, -1);                               // +1
++        lua_setglobal(luavm, objectName);                       // -1
++    }
++
++    // we have the global object on stack
++
++    int fields_to_pop = 1;
++
++    if ( fieldName )
++    {
++        ++fields_to_pop;
++        lua_createtable(luavm, 0, 0);                           // +1
++        lua_pushvalue(luavm, -1);                               // +1
++        lua_setfield(luavm, -3, fieldName);                     // -1
++    }
++
++    luaL_getmetatable(luavm, metaName);                         // +1
++    lua_setmetatable(luavm,-2);                                 // -1
++
++    lua_pop(luavm, fields_to_pop);
++}
++
+ void
+ ScriptManager::bindStaticVars (ScriptVarBindRecord * recordlist)
+ {
+     for (; recordlist-&gt;name; recordlist++)
+     {
+-        lua_pushstring(luavm, recordlist-&gt;name);
+-        lua_pushlightuserdata(luavm, (void*)recordlist);
+-        lua_settable(luavm, -3);
++        lua_pushstring(luavm, recordlist-&gt;name);            // +1
++        lua_pushlightuserdata(luavm, (void*)recordlist);    // +1
++        lua_settable(luavm, -3);                            // -2
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-01-20 10:56:11 UTC (rev 1183)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-01-20 15:26:20 UTC (rev 1184)
+@@ -21,29 +21,41 @@
+ #ifndef _SCRIPTMANAGER_HPP
+ #define	_SCRIPTMANAGER_HPP
+ 
+-#include &quot;ScriptHelper.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
++typedef const struct s_ScriptVarBindRecord ScriptVarBindRecord;
++struct lua_State;
++struct luaL_Reg;
++
+ class ScriptManager
+ {
+ public:
+     static void initialize();
+     static void close();
+     
+-    static void registerLib(const char * libname, const luaL_reg * functions);
++    static void registerLib(const char * libname, const luaL_Reg * functions);
++        
++    static void runStr(const char * runname, const char * str);
++    static bool runUserCommand(const char * str);
++    static bool runServerCommand(const char * str, Uint16 runPlayer);
+     
++    // NOTE: runFile has to run after FileSystem has been initialized.
++    static void runFile(const char * runname, const char * filename);
++
++    static void runFileInTable(const char * filename, const char * table);
++    static void loadConfigFile(const char * filename, const char * table);
++
++    static lua_State* getLuavm() { return luavm; }
++
+     static void bindStaticVariables(const char * objectName,
++                                    const char * fieldName,
+                                     const char * metaName,
+                                     ScriptVarBindRecord * getters,
+                                     ScriptVarBindRecord * setters);
++
++    static void bindStaticVars(ScriptVarBindRecord * recordlist);
+     
+-    static void runStr(const char * runname, const char * str);
+-    
+-    // NOTE: runFile has to run after FileSystem has been initialized.
+-    static void runFile(const char * runname, const char * filename);
+-    
+-private:
+-    static void bindStaticVars (ScriptVarBindRecord * recordlist);
+-        
++private:        
+     static lua_State *luavm;
+ };
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000209.html">[Netpanzer-cvs] r1183 - in trunk/netpanzer/src/NetPanzer: Classes	Core Interfaces Particles System Views/MainMenu
+</A></li>
+	<LI>Next message: <A HREF="000211.html">[Netpanzer-cvs] r1185 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#210">[ date ]</a>
+              <a href="thread.html#210">[ thread ]</a>
+              <a href="subject.html#210">[ subject ]</a>
+              <a href="author.html#210">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

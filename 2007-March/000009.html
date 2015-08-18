@@ -1,0 +1,366 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r962 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/AI NetPanzer/Interfaces	NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r962%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Classes/AI%20NetPanzer/Interfaces%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200703201812.l2KICYVo032647%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000008.html">
+   <LINK REL="Next"  HREF="000010.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r962 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/AI NetPanzer/Interfaces	NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r962%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Classes/AI%20NetPanzer/Interfaces%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200703201812.l2KICYVo032647%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r962 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/AI NetPanzer/Interfaces	NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Mar 20 19:12:34 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000008.html">[Netpanzer-cvs] r961 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Interfaces NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+        <LI>Next message: <A HREF="000010.html">[Netpanzer-cvs] r963 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-03-20 19:12:31 +0100 (Tue, 20 Mar 2007)
+New Revision: 962
+
+Modified:
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+Log:
+Networking:
+- Set the correct type for setsockopt parameter for windows and linux (fixes windows compilation problem)
+
+Player and server names:
+- Don't allow to put slash(\) in the player/server name. Now it is not possible to write it in the player name field and if it is writen in the config files (because you cannot write in the game doesn't mean you can't doit directly in the file) it will be removed from the name too.
+
+- If the player/server name is empty it will get a new random name :)
+
+Pathing:
+- Modified some values of the heuristic calculation for the path generation of the tanks, still the paths could be better, but at least now it seems the tanks don't go to random directions, some players agreed that it seems better now.
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -100,7 +100,7 @@
+ void
+ SocketBase::setReuseAddr()
+ {
+-    int val = 1;
++    SETSOCKOPT_PARAMTYPE val = 1;
+     int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -23,6 +23,7 @@
+ 
+ #define GET_NET_ERROR() WSAGetLastError()
+ #define NETERROR_WOULDBLOCK WSAEWOULDBLOCK
++#define SETSOCKOPT_PARAMTYPE char
+ 
+ #else
+ #include &lt;unistd.h&gt;
+@@ -40,6 +41,7 @@
+ #define closesocket(s) ::close(s)
+ #define GET_NET_ERROR() errno
+ #define NETERROR_WOULDBLOCK EWOULDBLOCK
++#define SETSOCKOPT_PARAMTYPE int
+ 
+ #endif
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -194,28 +194,28 @@
+ 
+     switch(direction) {
+         case 0:
+-            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  0; succ-&gt;g = 0;
++            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  0; succ-&gt;g = 7;
+             break;
+         case 1:
+-            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y = -1; succ-&gt;g = 1;
++            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y = -1; succ-&gt;g = 8;
+             break;
+         case 2:
+-            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y = -1; succ-&gt;g = 0;
++            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y = -1; succ-&gt;g = 7;
+             break;
+         case 3:
+-            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y = -1; succ-&gt;g = 1;
++            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y = -1; succ-&gt;g = 8;
+             break;
+         case 4:
+-            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  0; succ-&gt;g = 0;
++            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  0; succ-&gt;g = 7;
+             break;
+         case 5:
+-            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  1; succ-&gt;g = 1;
++            succ-&gt;map_loc.x = -1; succ-&gt;map_loc.y =  1; succ-&gt;g = 8;
+             break;
+         case 6:
+-            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y =  1; succ-&gt;g = 0;
++            succ-&gt;map_loc.x =  0; succ-&gt;map_loc.y =  1; succ-&gt;g = 7;
+             break;
+         case 7:
+-            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  1; succ-&gt;g = 1;
++            succ-&gt;map_loc.x =  1; succ-&gt;map_loc.y =  1; succ-&gt;g = 8;
+             break;
+     }
+ 
+@@ -227,7 +227,7 @@
+         if ( ( (UnitBlackBoard::unitOccupiesLoc( succ-&gt;map_loc ) == true ) &amp;&amp;
+                 (succ-&gt;map_loc != goal_node.map_loc) )
+            ) {
+-            movement_val = 200;
++            movement_val += 10;
+         }
+ 
+     succ-&gt;g += node-&gt;g + movement_val;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -49,6 +49,7 @@
+                 getName().c_str(), newvalue, min, max);
+ 
+     value = newvalue;
++    setNonDefaultValue();
+     return value;
+ }
+ 
+@@ -65,6 +66,7 @@
+ const iXY&amp; ConfigXY::operator = (const iXY&amp; newvalue)
+ {
+     value = newvalue;
++    setNonDefaultValue();
+     return value;
+ }
+ //---------------------------------------------------------------------------
+@@ -81,6 +83,7 @@
+ bool ConfigBool::operator = (bool newvalue)
+ {
+     value = newvalue;
++    setNonDefaultValue();
+     return value;
+ }
+ 
+@@ -99,6 +102,7 @@
+ const std::string&amp; ConfigString::operator= (const std::string&amp; newvalue)
+ {
+     value = newvalue;
++    setNonDefaultValue();
+     return value;
+ }
+ 
+@@ -106,3 +110,38 @@
+ {
+     return o &lt;&lt; ( (const std::string&amp;) string);
+ }
++
++//---------------------------------------------------------------------------
++
++ConfigStringSpecialChars::ConfigStringSpecialChars(const std::string&amp; newname,
++                           const std::string&amp; newvalue)
++    : ConfigString(newname,newvalue)
++{
++    removeSpecialChars();
++}
++
++ConfigStringSpecialChars::~ConfigStringSpecialChars()
++{
++}
++
++const std::string&amp; ConfigStringSpecialChars::operator= (const std::string&amp; newvalue)
++{
++    value = newvalue;
++    removeSpecialChars();
++    setNonDefaultValue();
++    return value;
++}
++
++std::ostream&amp; operator&lt;&lt; (std::ostream&amp; o, const ConfigStringSpecialChars&amp; string)
++{
++    return o &lt;&lt; ( (const std::string&amp;) string);
++}
++
++void
++ConfigStringSpecialChars::removeSpecialChars()
++{
++    std::string::size_type p;
++    while((p=value.find('\\')) != std::string::npos)
++        value.erase(p,1);
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.hpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -122,11 +122,24 @@
+ 
+     const std::string&amp; operator= (const std::string&amp; newvalue);
+ 
+-private:
++protected:
+     std::string value;
+ };
+ 
+ std::ostream&amp; operator&lt;&lt; (std::ostream&amp; o, const ConfigString&amp; string);
+ 
++class ConfigStringSpecialChars : public ConfigString
++{
++public:
++    ConfigStringSpecialChars(const std::string&amp; name, const std::string&amp; value=&quot;&quot;);
++    ~ConfigStringSpecialChars();
++
++    const std::string&amp; operator= (const std::string&amp; newvalue);
++protected:
++    void removeSpecialChars();
++};
++
++std::ostream&amp; operator&lt;&lt; (std::ostream&amp; o, const ConfigStringSpecialChars&amp; string);
++
+ #endif
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -212,6 +212,11 @@
+ 
+     loadSettings(inifile.getSection(&quot;game&quot;), gamesettings);
+     loadSettings(inifile.getSection(&quot;player&quot;), playersettings);
++    if (playername.c_str()[0]==0) {
++        std::stringstream default_player;
++        default_player &lt;&lt; &quot;Player&quot; &lt;&lt; (rand()%1000);
++        playername=default_player.str();
++    }
+     loadSettings(inifile.getSection(&quot;visuals&quot;), visualssettings);
+     loadSettings(inifile.getSection(&quot;sound&quot;), soundsettings);
+     loadSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+@@ -229,13 +234,16 @@
+ 
+             try {
+                 ConfigInt* confint = dynamic_cast&lt;ConfigInt*&gt; (var);
+-                if(confint)
++                if(confint) {
+                     *confint = section.getIntValue(confint-&gt;getName());
++                    continue;
++                }
+ 
+                 ConfigXY* confxy = dynamic_cast&lt;ConfigXY*&gt; (var);
+                 if(confxy) {
+                     confxy-&gt;set(section.getIntValue(confxy-&gt;getName() + &quot;_x&quot;),
+                             section.getIntValue(confxy-&gt;getName() + &quot;_y&quot;));
++                    continue;
+                 }
+ 
+                 ConfigBool* confbool = dynamic_cast&lt;ConfigBool*&gt; (var);
+@@ -249,14 +257,23 @@
+                     else
+                         throw Exception(&quot;No boolean value for setting '%s'.&quot;,
+                                         confbool-&gt;getName().c_str());
++                    continue;
+                 }
+ 
++                ConfigStringSpecialChars* confstringspecial = dynamic_cast&lt;ConfigStringSpecialChars*&gt; (var);
++                if(confstringspecial) {
++                    *confstringspecial = section.getValue(confstringspecial-&gt;getName());
++                    continue;
++                }
++                
+                 ConfigString* confstring = dynamic_cast&lt;ConfigString*&gt; (var);
+                 if(confstring)
+                     *confstring = section.getValue(confstring-&gt;getName());
+ 
++
+                 // we have a value from config file in the variable now
+-                var-&gt;setNonDefaultValue();
++                //var-&gt;setNonDefaultValue();
++                // now each subclass changethis if the value has been changed
+             } catch(std::exception&amp; e) {
+                 LOG((&quot;Skipping config '%s': %s&quot;, var-&gt;getName().c_str(),
+                             e.what()));
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -114,7 +114,7 @@
+     ConfigString    serverConnect;      // server to connect to
+ 
+     // player settings
+-    ConfigString playername;
++    ConfigStringSpecialChars playername;
+     ConfigString masterservers;
+ 
+     // server settings
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2007-03-19 15:12:22 UTC (rev 961)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2007-03-20 18:12:31 UTC (rev 962)
+@@ -57,6 +57,7 @@
+     cInputField* input 
+         = addInputField(iXY(BORDER_SPACE, BORDER_SPACE), &amp;playerName, &quot;&quot;, true);
+     input-&gt;setTextAction(textChanged);
++    input-&gt;setExcludedCharacters(&quot;\\&quot;);
+ } // end PlayerNameView::init
+ 
+ // doDraw
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000008.html">[Netpanzer-cvs] r961 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Interfaces NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+	<LI>Next message: <A HREF="000010.html">[Netpanzer-cvs] r963 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

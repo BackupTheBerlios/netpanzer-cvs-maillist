@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1195 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1195%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game&In-Reply-To=%3C201001230842.o0N8gjLn031096%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000220.html">
+   <LINK REL="Next"  HREF="000222.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1195 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1195%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game&In-Reply-To=%3C201001230842.o0N8gjLn031096%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1195 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan 23 09:42:45 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000220.html">[Netpanzer-cvs] r1194 - in trunk/netpanzer: pics pics/default	src/Lib/Network src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000222.html">[Netpanzer-cvs] r1196 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#221">[ date ]</a>
+              <a href="thread.html#221">[ thread ]</a>
+              <a href="subject.html#221">[ subject ]</a>
+              <a href="author.html#221">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-23 09:42:37 +0100 (Sat, 23 Jan 2010)
+New Revision: 1195
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+Log:
+- on rank view all players has white color, moving the mouse over player highlights the line for clear view of points
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2010-01-23 05:41:07 UTC (rev 1194)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2010-01-23 08:42:37 UTC (rev 1195)
+@@ -309,7 +309,6 @@
+ void Desktop::add(View *view, bool autoActivate)
+ {
+     assert(view != 0);
+-    LOGGER.warning(&quot;Desktop:add(%p) name=%s&quot;, view, view-&gt;searchName);
+     views.push_back(view);
+     if (autoActivate)
+         activate(view);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-23 05:41:07 UTC (rev 1194)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-23 08:42:37 UTC (rev 1195)
+@@ -57,10 +57,10 @@
+     // hardcoded for now
+     int CHAR_XPIX = 8;
+ 
+-    unsigned xOffset = 0;
++    unsigned xOffset = 8;
+     unsigned yOffset = 16;
+-    add( new Label( xOffset, yOffset, &quot;Flag&quot;, Color::red, Color::gray64, true) );
+-    xOffset += MAX_ALLY_CHARS*CHAR_XPIX;
++    add( new Label( xOffset, yOffset, &quot;* Flag&quot;, Color::red, Color::gray64, true) );
++    xOffset += (MAX_ALLY_CHARS*CHAR_XPIX) + 8 ;
+     add( new Label( xOffset, yOffset, &quot;Name&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_NAME_CHARS*CHAR_XPIX;
+     add( new Label( xOffset, yOffset, &quot;Kills&quot;, Color::red, Color::gray64, true) );
+@@ -83,6 +83,8 @@
+     allyOtherImage.loadBMP(&quot;pics/default/allyOther.bmp&quot;);
+     noAllyImage.loadBMP(&quot;pics/default/noAlly.bmp&quot;);
+ 
++    selected_line = -1;
++
+ } // end RankView::RankView
+ 
+ // doDraw
+@@ -162,19 +164,21 @@
+ 
+     unsigned int CHAR_YPIX = Surface::getFontHeight();
+     unsigned int entryHeight = std::max(CHAR_YPIX, flagHeight) + 2;
+-    iXY offset(6*8, 40);
+-    iXY flagOffset(26, 40 + (int(CHAR_YPIX - flagHeight))/2);
++    iXY offset(64, 40);
++    iXY flagOffset(30, 40 + (int(CHAR_YPIX - flagHeight))/2);
+     Surface * flag = 0;
+-
++    int cur_state = 0;
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i) {
+         const PlayerState* state = *i;
+ 
+         snprintf(statBuf, sizeof(statBuf),
+-                &quot;%-20s%5i%7i%6i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
++                &quot;%-20s%5i%7i%7i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+-        dest.bltStringShadowed(offset.x, offset.y, statBuf, state-&gt;getColor(), Color::gray64);
++        dest.bltStringShadowed(offset.x, offset.y, statBuf,
++                               (cur_state == selected_line)?Color::darkOrange:Color::gray224,
++                               Color::gray64);
+         
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         flag-&gt;blt( dest, flagOffset.x, flagOffset.y );
+@@ -200,7 +204,8 @@
+             }
+         }
+         offset.y += entryHeight;
+-        flagOffset.y += entryHeight;        
++        flagOffset.y += entryHeight;
++        ++cur_state;
+     }
+ 
+ } // end RankView::drawPlayerStats
+@@ -242,3 +247,25 @@
+         }
+     }
+ }
++
++void RankView::mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos)
++{
++    GameTemplateView::mouseMove(prevPos, newPos);
++    selected_line = -1;
++    unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
++    unsigned int entryHeight = std::max(Surface::getFontHeight(), flagHeight)+2;
++    if ( newPos.y &gt;= 40 )
++    {
++        selected_line = (newPos.y-40) / entryHeight;
++    }
++}
++
++void RankView::doActivate()
++{
++    selected_line = -1;
++}
++
++void RankView::doDeactivate()
++{
++    selected_line = -1;
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2010-01-23 05:41:07 UTC (rev 1194)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2010-01-23 08:42:37 UTC (rev 1195)
+@@ -42,6 +42,7 @@
+     Surface allyOtherImage;
+     Surface noAllyImage;
+     std::vector&lt;const PlayerState*&gt; states;
++    int selected_line;
+ 
+ public:
+     RankView();
+@@ -55,6 +56,9 @@
+ 
+ protected:
+     virtual void lMouseDown(const iXY &amp;pos);
++    virtual void mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos);
++    virtual void doActivate();
++    virtual void doDeactivate();
+ //    virtual void processEvents();
+ }
+ ; // end _WIN
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000220.html">[Netpanzer-cvs] r1194 - in trunk/netpanzer: pics pics/default	src/Lib/Network src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000222.html">[Netpanzer-cvs] r1196 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#221">[ date ]</a>
+              <a href="thread.html#221">[ thread ]</a>
+              <a href="subject.html#221">[ subject ]</a>
+              <a href="author.html#221">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

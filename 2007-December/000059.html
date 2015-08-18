@@ -1,0 +1,916 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1017 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1017%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu&In-Reply-To=%3C200712251504.lBPF4dVE017592%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000058.html">
+   <LINK REL="Next"  HREF="000060.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1017 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1017%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu&In-Reply-To=%3C200712251504.lBPF4dVE017592%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1017 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 25 16:04:39 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000058.html">[Netpanzer-cvs] r1016 - in trunk/netpanzer: .	src/NetPanzer/Views/Components src/NetPanzer/Views/MainMenu
+</A></li>
+        <LI>Next message: <A HREF="000060.html">[Netpanzer-cvs] r1018 - in trunk/netpanzer: . src/Lib src/NetPanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-12-25 16:04:37 +0100 (Tue, 25 Dec 2007)
+New Revision: 1017
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.hpp
+Modified:
+   trunk/netpanzer/NetPanzer-windows.cbp
+   trunk/netpanzer/NetPanzer.cbp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp
+Log:
+- removed class cMouse, MouseInterface is enough
+- mouse position is updated automatically using the SDL events
+- added names for mouse wheel (not in use now)
+- some cleanups
+
+Modified: trunk/netpanzer/NetPanzer-windows.cbp
+===================================================================
+--- trunk/netpanzer/NetPanzer-windows.cbp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/NetPanzer-windows.cbp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -727,8 +727,6 @@
+ 		&lt;Unit filename=&quot;src\NetPanzer\Views\Components\cButton.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\NetPanzer\Views\Components\cInputField.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\NetPanzer\Views\Components\cInputField.hpp&quot; /&gt;
+-		&lt;Unit filename=&quot;src\NetPanzer\Views\Components\cMouse.cpp&quot; /&gt;
+-		&lt;Unit filename=&quot;src\NetPanzer\Views\Components\cMouse.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\NetPanzer\Views\GameViewGlobals.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\NetPanzer\Views\GameViewGlobals.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\NetPanzer\Views\Game\AreYouSureExitView.cpp&quot; /&gt;
+
+Modified: trunk/netpanzer/NetPanzer.cbp
+===================================================================
+--- trunk/netpanzer/NetPanzer.cbp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/NetPanzer.cbp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -722,8 +722,6 @@
+ 		&lt;Unit filename=&quot;src/NetPanzer/Views/Components/cButton.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/NetPanzer/Views/Components/cInputField.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/NetPanzer/Views/Components/cInputField.hpp&quot; /&gt;
+-		&lt;Unit filename=&quot;src/NetPanzer/Views/Components/cMouse.cpp&quot; /&gt;
+-		&lt;Unit filename=&quot;src/NetPanzer/Views/Components/cMouse.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/NetPanzer/Views/Game/AreYouSureExitView.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/NetPanzer/Views/Game/AreYouSureExitView.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/NetPanzer/Views/Game/AreYouSureResignView.cpp&quot; /&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -576,9 +576,6 @@
+         }
+         
+         if (outpost_goal_selection != -1 ){
+-            iXY temp;
+-            MouseInterface::getMousePosition( &amp;temp.x, &amp;temp.y );
+-            
+             Objective *objective = 0;
+             int cs = ObjectiveInterface::quearyObjectiveLocationStatus(
+                     world_pos, PlayerInterface::getLocalPlayerIndex(),
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -68,7 +68,6 @@
+ #include &quot;Classes/Units/UnitGlobals.hpp&quot;
+ 
+ #include &quot;2D/Palette.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Views/MainMenu/MainMenuView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -23,28 +23,17 @@
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ 
+ unsigned char MouseInterface::cursor_x_size;
+ unsigned char MouseInterface::cursor_y_size;
+ 
+ iXY MouseInterface::mouse_pos;
+ 
+-float    MouseInterface::button_hold_threshold = (const float) .10;
+-
+-bool   MouseInterface::left_button_down = false;
+-bool   MouseInterface::left_button_up = false;
+-
+-bool   MouseInterface::right_button_down = false;
+-bool   MouseInterface::right_button_up = false;
+-
+-bool   MouseInterface::middle_button_down = false;
+-bool   MouseInterface::middle_button_up = false;
+-
+ unsigned char MouseInterface::button_mask;
+ 
+ MouseEventQueue MouseInterface::event_queue;
+ MouseInterface::cursors_t MouseInterface::cursors;
++Surface * MouseInterface::cursor;
+ 
+ void MouseInterface::initialize()
+ {
+@@ -78,105 +67,37 @@
+     }
+ }
+ 
+-void MouseInterface::setLeftButtonDown()
++void
++MouseInterface::onMouseButtonDown(SDL_MouseButtonEvent *e)
+ {
+     MouseEvent event;
+-
+-    //assert( left_button_down == false );
+-    left_button_down = true;
+-    left_button_up = false;
+-    button_mask = button_mask | 0x01;
+-
+-    event.button = left_button;
++    button_mask |= SDL_BUTTON(e-&gt;button);
++    event.button = e-&gt;button;
+     event.event = MouseEvent::EVENT_DOWN;
+-    event.pos = mouse_pos;
++    event.pos.x = e-&gt;x;
++    event.pos.y = e-&gt;y;
+     event_queue.push_back(event);
+ }
+ 
+-void MouseInterface::setLeftButtonUp()
++void
++MouseInterface::onMouseButtonUp(SDL_MouseButtonEvent *e)
+ {
+     MouseEvent event;
+-
+-    left_button_down = false;
+-    left_button_up = true;
+-    button_mask = button_mask &amp; (~0x01);
+-
++    button_mask &amp;= ~(SDL_BUTTON(e-&gt;button));
++    event.button = e-&gt;button;
+     event.event = MouseEvent::EVENT_UP;
+-    event.button = left_button;
+-    event.pos = mouse_pos;
++    event.pos.x = e-&gt;x;
++    event.pos.y = e-&gt;y;
+     event_queue.push_back(event);
+ }
+ 
+-void MouseInterface::setRightButtonDown()
+-{
+-    MouseEvent event;
+-
+-    right_button_down = true;
+-    right_button_up = false;
+-    button_mask = button_mask | 0x04;
+-
+-    event.button = right_button;
+-    event.event = MouseEvent::EVENT_DOWN;
+-    event.pos = mouse_pos;
+-    event_queue.push_back( event );
+-}
+-
+-void MouseInterface::setRightButtonUp( void )
+-{
+-    MouseEvent event;
+-
+-    right_button_down = false;
+-    right_button_up = true;
+-    button_mask = button_mask &amp; (~0x04);
+-
+-    event.button = right_button;
+-    event.pos = mouse_pos;
+-    event.event = MouseEvent::EVENT_UP;
+-    event_queue.push_back( event );
+-}
+-
+-void MouseInterface::setMiddleButtonDown()
+-{
+-    MouseEvent event;
+-
+-    middle_button_down = true;
+-    middle_button_up = false;
+-    button_mask = button_mask | 0x02;
+-
+-    event.button = middle_button;
+-    event.event = MouseEvent::EVENT_DOWN;
+-    event.pos = mouse_pos;
+-    event_queue.push_back( event );
+-}
+-
+-void MouseInterface::setMiddleButtonUp()
+-{
+-    MouseEvent event;
+-
+-    middle_button_down = false;
+-    middle_button_up = true;
+-    button_mask = button_mask &amp; (~0x02);
+-
+-    event.button = middle_button;
+-    event.pos = mouse_pos;
+-    event.event = MouseEvent::EVENT_UP;
+-    event_queue.push_back( event );
+-}
+-
+ void MouseInterface::setCursor(const char* cursorname)
+ {
+     cursors_t::iterator i = cursors.find(cursorname);
+-    if(i == cursors.end())
+-        throw Exception(&quot;mouse cursor '%s' not found.&quot;, cursorname);
+-
+-    mouse.setPointer(i-&gt;second);
++    if(i == cursors.end()) {
++        LOGGER.warning(&quot;WARNING: Mouse '%s' not found&quot;, cursorname);
++        cursor = 0;
++    } else {
++        cursor = i-&gt;second;
++    }
+ }
+-
+-void MouseInterface::updateCursor()
+-{
+-    int x, y;
+-    SDL_GetMouseState(&amp;x, &amp;y);
+-    mouse_pos.x = x;
+-    mouse_pos.y = y;
+-}
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -22,20 +22,15 @@
+ #include &lt;map&gt;
+ #include &lt;deque&gt;
+ 
++#include &quot;SDL.h&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ 
+-#include &quot;Util/TimeStamp.hpp&quot;
+-
+-#define _LEFT_BUTTON_MASK    0x01
+-#define _MIDDLE_BUTTON_MASK  0x02
+-#define _RIGHT_BUTTON_MASK   0x04
+-
+ class MouseEvent
+ {
+ public:
+     enum {
+-        EVENT_DOWN = 0x04,
+-        EVENT_UP = 0x08
++        EVENT_DOWN = SDL_MOUSEBUTTONDOWN,
++        EVENT_UP = SDL_MOUSEBUTTONUP
+     };
+     unsigned char button;
+     unsigned char event;
+@@ -47,7 +42,7 @@
+ class MouseInterface
+ {
+ private:
+-    static Surface mouse_cursor;
++    static Surface * cursor;
+     static unsigned char cursor_x_size;
+     static unsigned char cursor_y_size;
+ 
+@@ -57,25 +52,22 @@
+ protected:
+     static iXY mouse_pos;
+ 
+-    static float    button_hold_threshold;
+-
+-    static bool  left_button_down;
+-    static bool  left_button_up;
+-
+-    static bool right_button_down;
+-    static bool right_button_up;
+-
+-    static bool middle_button_down;
+-    static bool middle_button_up;
+-
+     static unsigned char button_mask;
+ 
+ public:
+     enum {
+-        left_button = 0x01,
+-        middle_button = 0x02,
+-        right_button = 0x04
++        left_button   = SDL_BUTTON_LEFT,
++        middle_button = SDL_BUTTON_MIDDLE,
++        right_button  = SDL_BUTTON_RIGHT,
++        wheel_up      = SDL_BUTTON_WHEELUP,
++        wheel_down    = SDL_BUTTON_WHEELDOWN
+     };
++    
++    enum {
++        left_button_mask   = SDL_BUTTON_LMASK,
++        middle_button_mask = SDL_BUTTON_MMASK,
++        right_button_mask  = SDL_BUTTON_RMASK
++    };
+ 
+     enum CursorType {
+         defaultcursor, noentry, move, select, target, allie, break_allie
+@@ -85,6 +77,14 @@
+ 
+     static void initialize();
+     static void shutdown();
++    
++    static void draw(Surface &amp;dest)
++    {
++        if (cursor) {
++            cursor-&gt;nextFrame();
++            cursor-&gt;bltTrans(dest, mouse_pos.x, mouse_pos.y);
++        }
++    }
+ 
+     static inline void getMousePosition( int *x, int *y )
+     {
+@@ -97,17 +97,21 @@
+         return( button_mask );
+     }
+ 
+-    static void setLeftButtonDown();
+-    static void setLeftButtonUp();
++    static void onMouseButtonDown(SDL_MouseButtonEvent *e);
++    static void onMouseButtonUp(SDL_MouseButtonEvent *e);
+ 
+-    static void setRightButtonDown();
+-    static void setRightButtonUp();
+-
+-    static void setMiddleButtonDown();
+-    static void setMiddleButtonUp();
+-
+     static void setCursor(const char* cursorname);
+-    static void updateCursor();
++    static inline void onMouseMoved(SDL_MouseMotionEvent *e)
++    {
++        mouse_pos.x = e-&gt;x;
++        mouse_pos.y = e-&gt;y;
++    }
++    
++    static inline iXY getMousePosition()   { return mouse_pos; }
++    
++    static inline unsigned int getMouseX() { return mouse_pos.x; }
++    static inline unsigned int getMouseY() { return mouse_pos.y; }
++    
+ };
+ 
+ #endif // ** _MOUSEINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -63,7 +63,6 @@
+ #include &quot;Classes/Units/UnitGlobals.hpp&quot;
+ 
+ #include &quot;2D/Palette.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Views/MainMenu/MainMenuView.hpp&quot;
+@@ -240,18 +239,10 @@
+ void PlayerGameManager::inputLoop()
+ {
+     processSystemKeys();
++    Desktop::manage(MouseInterface::getMouseX(),
++               MouseInterface::getMouseY(), MouseInterface::getButtonMask());
+ 
+-#if 0
+-    if(showNewPanel &amp;&amp; Desktop::getVisible(&quot;GameView&quot;) &amp;&amp; testpanel-&gt;contains(mouse.getScreenPos()))
+-    {
+-        //Game started, draw interface
+-        testpanel-&gt;processEvents(mouse.getScreenPos(), mouse.getButtonMask(), KMOD_NONE);
+-    }else
+-#endif
+-       Desktop::manage(mouse.getScreenPos().x,
+-               mouse.getScreenPos().y, mouse.getButtonMask());
+-
+-    COMMAND_PROCESSOR.updateScrollStatus( mouse.getScreenPos() );
++    COMMAND_PROCESSOR.updateScrollStatus( MouseInterface::getMousePosition() );
+ }
+ //-----------------------------------------------------------------
+ void PlayerGameManager::graphicsLoop()
+@@ -260,23 +251,11 @@
+ 
+     Desktop::draw(*screen);
+ 
+-#if 0
+-    //TODO : clean this ugly test :)
+-    if(showNewPanel &amp;&amp; Desktop::getVisible(&quot;GameView&quot;))
+-    {
+-        UI::Painter painter(Screen-&gt;getSurface(), &amp;fontManager);
+-
+-        //Game started, draw interface
+-        testpanel-&gt;draw(painter);
+-    }
+-#endif
+-
+     if (Desktop::getVisible(&quot;GameView&quot;)) {
+         ConsoleInterface::update(*screen);
+     }
+ 
+-    mouse.draw(*screen);
+-    MouseInterface::updateCursor();     
++    MouseInterface::draw(*screen);
+ 
+     screen-&gt;unlock();
+     screen-&gt;copyToVideoFlip();
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -21,7 +21,6 @@
+ #include &quot;SDL.h&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+ #include &quot;Interfaces/MouseInterface.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;SDLVideo.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+@@ -37,37 +36,14 @@
+             return true;
+             break;
+         case SDL_MOUSEBUTTONDOWN:
+-            switch(event.button.button) {
+-            case 1:
+-                MouseInterface::setLeftButtonDown();
+-                mouse.setButtonMask(LMOUSE_BUTTON_MASK);
+-                break;
+-            case 3:
+-                MouseInterface::setRightButtonDown();
+-                mouse.setButtonMask(RMOUSE_BUTTON_MASK);
+-                break;
+-            case 2:
+-                MouseInterface::setMiddleButtonDown();
+-                mouse.setButtonMask(MMOUSE_BUTTON_MASK);
+-                break;
+-            }
++            MouseInterface::onMouseButtonDown(&amp;event.button);
+             break;
+         case SDL_MOUSEBUTTONUP:
+-            switch(event.button.button) {
+-            case 1:
+-                MouseInterface::setLeftButtonUp();
+-                mouse.clearButtonMask(!LMOUSE_BUTTON_MASK);
+-                break;
+-            case 3:
+-                MouseInterface::setRightButtonUp();
+-                mouse.clearButtonMask(!RMOUSE_BUTTON_MASK);
+-                break;
+-            case 2:
+-                MouseInterface::setMiddleButtonUp();
+-                mouse.clearButtonMask(!MMOUSE_BUTTON_MASK);
+-                break;
+-            }
++            MouseInterface::onMouseButtonUp(&amp;event.button);
+             break;
++        case SDL_MOUSEMOTION:
++            MouseInterface::onMouseMoved(&amp;event.motion);
++            break;
+         case SDL_KEYDOWN: {
+                 KeyboardInterface::keyPressed(event.key.keysym.sym);
+                 char c = event.key.keysym.unicode &amp; 0x7F;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -101,10 +101,10 @@
+     //
+     //////////////////////////////////////////////////////////////////////////
+ 
+-    if (curButton &amp; LMOUSE_BUTTON_MASK) {
++    if (curButton &amp; MouseInterface::left_button_mask) {
+         // The button is down.  See if it just got pressed, or if it was pressed
+         // before and is being dragged.
+-        if (!(prevButton &amp; LMOUSE_BUTTON_MASK)) {
++        if (!(prevButton &amp; MouseInterface::left_button_mask)) {
+             // The mouse button just got pressed. Remember the initial place
+             // where it got pressed.
+             lMouseDownPos = mousePos;
+@@ -202,7 +202,7 @@
+     } else {
+         // The mouse button is up.
+         //See if it just got released, or if it was up before.
+-        if (prevButton &amp; LMOUSE_BUTTON_MASK) {
++        if (prevButton &amp; MouseInterface::left_button_mask) {
+             // The mouse button just got released.  If it was on top of a window
+             // before, then tell the window that the button was released
+             if (lMouseView != 0) {
+@@ -223,10 +223,10 @@
+     //
+     //////////////////////////////////////////////////////////////////////////
+ 
+-    if (curButton &amp; RMOUSE_BUTTON_MASK) {
++    if (curButton &amp; MouseInterface::right_button_mask) {
+         // The button is down.  See if it just got pressed, or if it was pressed
+         // before and is being dragged.
+-        if (!(prevButton &amp; RMOUSE_BUTTON_MASK)) {
++        if (!(prevButton &amp; MouseInterface::right_button_mask)) {
+             // The mouse button just got pressed. Remember the initial place
+             // where it got pressed.
+             rMouseDownPos = mousePos;
+@@ -259,7 +259,7 @@
+     } else {
+         // The mouse button is up.
+         //See if it just got released, or if it was up before.
+-        if (prevButton &amp; RMOUSE_BUTTON_MASK) {
++        if (prevButton &amp; MouseInterface::right_button_mask) {
+             // The mouse button just got released.  If it was on top of a window
+             // before, then tell the window that the button was released
+             if (rMouseView != 0) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -450,8 +450,10 @@
+     for (int i = 0; i &lt; componentsUsedCount; i++) {
+         assert(componentList[i] != 0);
+ 
+-        if (componentList[i]-&gt;contains(mouse.getScreenPos())) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, mouse.getScreenX(), mouse.getScreenY(), 0, false);
++        if (componentList[i]-&gt;contains(MouseInterface::getMousePosition())) {
++            mMouseEvent me(componentList[i],
++                mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, 
++                MouseInterface::getMouseX(), MouseInterface::getMouseY(), 0, false);
+ 
+             componentList[i]-&gt;actionPerformed(me);
+ 
+@@ -470,7 +472,9 @@
+ 
+     // Tell all the components the mouse exited the view.
+     for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_EXITED, now(), 0, mouse.getScreenX(), mouse.getScreenY(), 0, false);
++        mMouseEvent me(componentList[i],
++            mMouseEvent::MOUSE_EVENT_EXITED, now(), 0, 
++            MouseInterface::getMouseX(), MouseInterface::getMouseY(), 0, false);
+ 
+         componentList[i]-&gt;actionPerformed(me);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -19,7 +19,6 @@
+ #ifndef __View_hpp__
+ #define __View_hpp__
+ 
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;cButton.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -1,47 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+-
+-cMouse mouse;
+-
+-// draw
+-//---------------------------------------------------------------------------
+-// Purpose: Draws the graphical mouse cursor.
+-//---------------------------------------------------------------------------
+-void cMouse::draw(Surface &amp;dest)
+-{
+-    assert(pointer != 0);
+-
+-    if (pointer) {
+-        pointer-&gt;nextFrame();
+-        pointer-&gt;bltTrans(dest, getScreenPos().x, getScreenPos().y);
+-    }
+-} // end draw
+-
+-// setPointer
+-//---------------------------------------------------------------------------
+-// Purpose: Change the current image used for the mouse pointer.
+-//---------------------------------------------------------------------------
+-void cMouse::setPointer(Surface *pointer)
+-{
+-    assert(pointer != 0);
+-
+-    cMouse::pointer = pointer;
+-} // end setPointer
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.hpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cMouse.hpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -1,88 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __cMouse_hpp__
+-#define __cMouse_hpp__
+-
+-#include &quot;SDL.h&quot;
+-
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Types/iXY.hpp&quot;
+-
+-#define LMOUSE_BUTTON_MASK 0x01
+-#define MMOUSE_BUTTON_MASK 0x02
+-#define RMOUSE_BUTTON_MASK 0x04
+-
+-class cMouse
+-{
+-private:
+-    Surface *pointer;
+-    unsigned char button_mask;
+-
+-public:
+-    cMouse()
+-        : pointer(0), button_mask(0)
+-    {}
+-    ~cMouse()
+-    {}
+-
+-    // cMouse Operation Functions
+-    void draw(Surface &amp;dest); // Handles the drawing of the cMouse cursor
+-
+-    const Surface* getCurPointer() const
+-    {
+-        return pointer;
+-    }
+-
+-    iXY getScreenPos() const
+-    {
+-        int x, y;
+-        SDL_GetMouseState(&amp;x, &amp;y);
+-        return iXY(x, y);
+-    }
+-
+-    int getScreenX() const
+-    {
+-        return getScreenPos().x;
+-    }
+-
+-    int getScreenY() const
+-    {
+-        return getScreenPos().y;
+-    }
+-
+-    void setButtonMask(unsigned char mask)
+-    {
+-        button_mask = button_mask | mask;
+-    }
+-
+-    void clearButtonMask(unsigned char mask)
+-    {
+-        button_mask = button_mask &amp; mask;
+-    }
+-
+-    unsigned char getButtonMask() const
+-    {
+-        return button_mask;
+-    }
+-
+-    void setPointer(Surface *pointer);
+-}; // end cMouse
+-
+-extern cMouse mouse;
+-
+-#endif // end __cMouse_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -83,7 +83,7 @@
+ {
+     View::mouseMove(prevPos, newPos);
+ 
+-    if (!mouse.getButtonMask() &amp;&amp; Desktop::getFocus() != this) {
++    if (!MouseInterface::getButtonMask() &amp;&amp; Desktop::getFocus() != this) {
+         Desktop::setFocusView(this);
+ 
+         COMMAND_PROCESSOR.closeSelectionBox();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -30,7 +30,6 @@
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Particles/Particle2D.hpp&quot;
+ #include &quot;Particles/ParticleSystem2D.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+@@ -147,7 +146,7 @@
+ {
+     View::mouseMove(prevPos, newPos);
+ 
+-    if (!mouse.getButtonMask() &amp;&amp; Desktop::getFocus() != this) {
++    if (!MouseInterface::getButtonMask() &amp;&amp; Desktop::getFocus() != this) {
+         Desktop::setFocusView(this);
+         //Desktop::setActiveView(this);
+         MouseInterface::setCursor(&quot;default.bmp&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -19,7 +19,6 @@
+ 
+ #include &lt;algorithm&gt;
+ #include &quot;MiniMapView.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;Interfaces/MiniMapInterface.hpp&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+@@ -178,7 +177,7 @@
+     clientArea.drawBoxCorners(boxpos, 5, Color::white);
+ 
+     // If the mouse is over the client area, then change the cursor.
+-    if (getClientRect().contains(getScreenToClientPos(mouse.getScreenPos()))) {
++    if (getClientRect().contains(getScreenToClientPos(MouseInterface::getMousePosition()))) {
+         if (selectionAnchor) {
+             // Since we are selecting units, draw the selection box.
+             clientArea.drawRect(iRect(selectionAnchorDownPos, selectionAnchorCurPos), Color::white);
+@@ -220,7 +219,7 @@
+ 
+     iRect r(MiniMapInterface::getWorldWindow());
+     iXY   size(r.getSize() / 2);
+-    iXY   pos(getScreenToClientPos(mouse.getScreenPos()));
++    iXY   pos(getScreenToClientPos(MouseInterface::getMousePosition()));
+ 
+     //dest.drawRect(pos - size - 1, pos + size - 1, Color::yellow);
+     dest.drawBoxCorners(pos - size - iXY(1,1), iXY(pos.x + size.x - 1, pos.y + size.y), 5, Color::red);
+@@ -236,7 +235,7 @@
+ {
+     assert(this != 0);
+ 
+-    if (getClientRect().contains(getScreenToClientPos(mouse.getScreenPos()))) {
++    if (getClientRect().contains(getScreenToClientPos(MouseInterface::getMousePosition()))) {
+         if (!selectionAnchor) {
+             setViewWindow(pos);
+         }
+@@ -409,7 +408,7 @@
+ //--------------------------------------------------------------------------
+ void MiniMapView::mouseMove(const iXY &amp;prevPos, const iXY &amp;newPos)
+ {
+-    if (getClientRect().contains(getScreenToClientPos(mouse.getScreenPos()))) {
++    if (getClientRect().contains(getScreenToClientPos(MouseInterface::getMousePosition()))) {
+         if (	(KeyboardInterface::getKeyState(SDLK_LCTRL) ||
+                 KeyboardInterface::getKeyState(SDLK_RCTRL))) {
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -22,7 +22,6 @@
+ #include &quot;Structs/UnitTypes.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
+ #include &quot;Interfaces/Client.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+@@ -832,7 +831,7 @@
+     if (Desktop::getFocus() != this) {
+         iXY pos;
+ 
+-        pos = mouse.getScreenPos() - getSize() / 2;
++        pos = MouseInterface::getMousePosition() - getSize() / 2;
+ 
+         moveTo(pos);
+         checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -23,7 +23,6 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
+-#include &quot;Views/Components/cMouse.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Particles/RadarPingParticle2D.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp	2007-12-24 17:50:34 UTC (rev 1016)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp	2007-12-25 15:04:37 UTC (rev 1017)
+@@ -54,7 +54,7 @@
+ {
+     RMouseHackView::mouseMove(prevPos, newPos);
+ 
+-    if (!mouse.getButtonMask() &amp;&amp; Desktop::getFocus() != this) {
++    if (!MouseInterface::getButtonMask() &amp;&amp; Desktop::getFocus() != this) {
+         Desktop::setFocusView(this);
+ 
+         COMMAND_PROCESSOR.closeSelectionBox();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000058.html">[Netpanzer-cvs] r1016 - in trunk/netpanzer: .	src/NetPanzer/Views/Components src/NetPanzer/Views/MainMenu
+</A></li>
+	<LI>Next message: <A HREF="000060.html">[Netpanzer-cvs] r1018 - in trunk/netpanzer: . src/Lib src/NetPanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

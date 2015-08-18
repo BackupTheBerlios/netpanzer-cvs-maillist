@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1029 - in trunk/netpanzer: . src/Lib/2D	src/Lib/physfs src/NetPanzer/Views/Components
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1029%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/Lib/physfs%20src/NetPanzer/Views/Components&In-Reply-To=%3C200805071541.m47Ffwp2029531%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000070.html">
+   <LINK REL="Next"  HREF="000072.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1029 - in trunk/netpanzer: . src/Lib/2D	src/Lib/physfs src/NetPanzer/Views/Components</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1029%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/Lib/physfs%20src/NetPanzer/Views/Components&In-Reply-To=%3C200805071541.m47Ffwp2029531%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1029 - in trunk/netpanzer: . src/Lib/2D	src/Lib/physfs src/NetPanzer/Views/Components">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed May  7 17:41:58 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000070.html">[Netpanzer-cvs] r1028 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+        <LI>Next message: <A HREF="000072.html">[Netpanzer-cvs] r1030 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#71">[ date ]</a>
+              <a href="thread.html#71">[ thread ]</a>
+              <a href="subject.html#71">[ subject ]</a>
+              <a href="author.html#71">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-05-07 17:41:22 +0200 (Wed, 07 May 2008)
+New Revision: 1029
+
+Modified:
+   trunk/netpanzer/Jamrules
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/physfs/Jamfile
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+Log:
+- fix crash on 64bit machines
+- fix compiling with included zlib
+- fix warning on printf
+- removed cflag -Werror when compiling in debug mode
+notes:
+- Compiling on 64 bit version cannot see the explosions
+
+
+Modified: trunk/netpanzer/Jamrules
+===================================================================
+--- trunk/netpanzer/Jamrules	2008-05-05 12:34:12 UTC (rev 1028)
++++ trunk/netpanzer/Jamrules	2008-05-07 15:41:22 UTC (rev 1029)
+@@ -23,8 +23,8 @@
+ COMPILER_CFLAGS_optimize += -O3 -g3 ;
+ COMPILER_C++FLAGS_optimize += -O3 -g3 ;
+ COMPILER_LFLAGS_optimize += -O3 -g3 ;
+-COMPILER_CFLAGS_debug += -DDEBUG -Werror -g3 ;
+-COMPILER_CXXFLAGS_debug += -DDEBUG -Werror -g3 ;
++COMPILER_CFLAGS_debug += -DDEBUG -g3 ;
++COMPILER_CXXFLAGS_debug += -DDEBUG -g3 ;
+ COMPILER_LFLAGS_debug += -g3 ;
+ COMPILER_CFLAGS_profile += -O2 -g3 -pg ;
+ COMPILER_CXXFLAGS_profile += -O2 -g3 -pg ;
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2008-05-05 12:34:12 UTC (rev 1028)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2008-05-07 15:41:22 UTC (rev 1029)
+@@ -409,9 +409,9 @@
+     // CLIP TOP
+     if (y &lt; 0) {
+         numRows += y;
+-        sPtr    -= y * getPitch();
++        sPtr    -= y * (int)getPitch();
+     } else {
+-        dPtr += y * dest.getPitch();
++        dPtr += y * (int)dest.getPitch();
+     }
+ 
+     // CLIP BOTTOM
+@@ -494,9 +494,9 @@
+     // CLIP TOP
+     if (y &lt; 0) {
+         numRows += y;
+-        sPtr    -= y * getPitch();
++        sPtr    -= y * (int)getPitch();
+     } else {
+-        dPtr += y * dest.getPitch();
++        dPtr += y * (int)dest.getPitch();
+     }
+ 
+     // CLIP BOTTOM
+@@ -583,9 +583,9 @@
+     // CLIP TOP
+     if (y &lt; 0) {
+         numRows += y;
+-        sPtr    -= y * getPitch();
++        sPtr    -= y * (int)getPitch();
+     } else {
+-        dPtr += y * dest.getPitch();
++        dPtr += y * (int)dest.getPitch();
+     }
+ 
+     // CLIP BOTTOM
+@@ -638,7 +638,7 @@
+     orderCoords(x1, x2);
+ 
+     unsigned length = x2 - x1;
+-    PIX *ptr = mem + y * getPitch();
++    PIX *ptr = mem + y * (int)getPitch();
+ 
+     // CLIP LEFT
+     if (x1 &lt; 0) {
+@@ -680,7 +680,7 @@
+     // CLIP BOTTOM
+     if (y2 &gt;= (int)getHeight()) y2 = getHeight()-1;
+ 
+-    PIX	*ptr	= mem+y1*getPitch()+x;
++    PIX	*ptr	= mem+y1*(int)getPitch()+x;
+ 
+     int	width	= y2 - y1;
+ 
+@@ -746,7 +746,7 @@
+     diff = (bounds.max - bounds.min);
+ 
+     // Set memory to the top-left pixel of the rectangle.
+-    PIX	*ptr = mem + bounds.min.y * getPitch() + bounds.min.x;
++    PIX	*ptr = mem + bounds.min.y * (int)getPitch() + bounds.min.x;
+ 
+     for (int y = 0; y &lt; diff.y; y++) {
+         // Lay the horizontal strip.
+@@ -1064,7 +1064,7 @@
+     size_t pixelsPerRow = max.x - min.x;
+     size_t numRows      = max.y - min.y;
+ 
+-    PIX *dRow = mem + min.y*getPitch() + min.x;
++    PIX *dRow = mem + min.y*(int)getPitch() + min.x;
+ 
+     for (size_t yCount = 0 ; yCount &lt; numRows ; yCount++) {
+         for(size_t x=0; x&lt;pixelsPerRow; x++)
+@@ -1124,7 +1124,7 @@
+         numRows += min.y;
+         srcY   -= min.y*ySrcDelta;
+     }	else {
+-        dRow += (min.y*getPitch());
++        dRow += (min.y*(int)getPitch());
+     }
+ 
+     // CLIP BOTTOM
+@@ -1401,7 +1401,7 @@
+     }
+     
+     for ( int line = 0; line &lt; FONT_HEIGHT; ++line) {
+-        PIX * dptr = getFrame0() + (line * getPitch());
++        PIX * dptr = getFrame0() + (line * (int)getPitch());
+         const char * pstr = str;
+         for ( unsigned char c = *pstr; c; c= *(++pstr)) {
+             if ( c &gt;=128 ) c = ' ';
+
+Modified: trunk/netpanzer/src/Lib/physfs/Jamfile
+===================================================================
+--- trunk/netpanzer/src/Lib/physfs/Jamfile	2008-05-05 12:34:12 UTC (rev 1028)
++++ trunk/netpanzer/src/Lib/physfs/Jamfile	2008-05-07 15:41:22 UTC (rev 1029)
+@@ -1,6 +1,6 @@
+ SubDir TOP src Lib physfs ;
+ 
+-IncludeDir . ;
++IncludeDir . zlib123 ;
+ 
+ SOURCES = [ Wildcard *.c *.h ] ;
+ SOURCES += [ Wildcard archivers : *.c ] ;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2008-05-05 12:34:12 UTC (rev 1028)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2008-05-07 15:41:22 UTC (rev 1029)
+@@ -309,7 +309,7 @@
+ void Desktop::add(View *view, bool autoActivate)
+ {
+     assert(view != 0);
+-    LOGGER.warning(&quot;Desktop:add(%x) name=%s&quot;, (unsigned int)view, view-&gt;searchName);
++    LOGGER.warning(&quot;Desktop:add(%p) name=%s&quot;, view, view-&gt;searchName);
+     views.push_back(view);
+     if (autoActivate)
+         activate(view);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000070.html">[Netpanzer-cvs] r1028 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+	<LI>Next message: <A HREF="000072.html">[Netpanzer-cvs] r1030 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#71">[ date ]</a>
+              <a href="thread.html#71">[ thread ]</a>
+              <a href="subject.html#71">[ subject ]</a>
+              <a href="author.html#71">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

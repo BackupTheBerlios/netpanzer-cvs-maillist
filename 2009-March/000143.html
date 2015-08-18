@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1114 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1114%20-%20trunk/netpanzer&In-Reply-To=%3C200903250032.n2P0WvsA014284%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000142.html">
+   <LINK REL="Next"  HREF="000144.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1114 - trunk/netpanzer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1114%20-%20trunk/netpanzer&In-Reply-To=%3C200903250032.n2P0WvsA014284%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1114 - trunk/netpanzer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Mar 25 01:32:57 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000142.html">[Netpanzer-cvs] r1113 - in trunk/netpanzer: . src/Lib/Network
+</A></li>
+        <LI>Next message: <A HREF="000144.html">[Netpanzer-cvs] r1115 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#143">[ date ]</a>
+              <a href="thread.html#143">[ thread ]</a>
+              <a href="subject.html#143">[ subject ]</a>
+              <a href="author.html#143">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-03-25 01:32:51 +0100 (Wed, 25 Mar 2009)
+New Revision: 1114
+
+Modified:
+   trunk/netpanzer/SConstruct
+Log:
+- Added initial support for linux cross compilation using scons
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-03-24 13:40:59 UTC (rev 1113)
++++ trunk/netpanzer/SConstruct	2009-03-25 00:32:51 UTC (rev 1114)
+@@ -1,5 +1,6 @@
+ import os
+ import glob
++import sys
+ 
+ # Modified copy from BosWars of globSources
+ def globSources(localenv, sourcePrefix, sourceDirs, pattern):
+@@ -27,6 +28,7 @@
+ )
+ 
+ env = Environment(ENV = {'PATH' : os.environ['PATH']}, options = opts)
++Help(opts.GenerateHelpText(env))
+ 
+ if env['crosstarget'] == 'mingw':
+     if env['compilerprefix'] == '':
+@@ -47,11 +49,28 @@
+     env.Append( LDFLAGS = [ '-mwindows' ] )
+     env.Append( LIBS = [ 'ws2_32', 'mingw32' ] )
+     env['PROGSUFFIX'] = '.exe'
++elif env['crosstarget'] == 'linux':
++    if env['compilerprefix'] == '':
++        print 'You need to set a compiler prefix for cross compilation'
++        Exit(1)
+ 
++    if env['sdlconfig'] == 'sdl-config':
++        print 'You need to set the full path of sdl-config for cross compilation'
++        Exit(1)
++
++    finalplatform = 'linux'
++    env = DefaultEnvironment(ENV = {'PATH' : os.environ['PATH']},tools = ['gcc','g++','ar','gnulink'], options=opts )
++    env.Replace( CXX = env['compilerprefix'] + env['CXX'] )
++    env.Replace( CC = env['compilerprefix'] + env['CC'] )
++    env.Replace( AR = env['compilerprefix'] + env['AR'] )
++    env.Replace( RANLIB = env['compilerprefix'] + env['RANLIB'] )
++    env.Command('libstdc++.a', None, Action('ln -sf `%s -print-file-name=libstdc++.a` build/linux/' % env['CXX'] ) )
++    env.Append( LIBS = [ 'libstdc++.a' ] )
++    
+ else:
+     finalplatform = env['PLATFORM']
+ 
+-Help(opts.GenerateHelpText(env))
++print sys.platform
+ 
+ if not (env['mode'] in ['debug', 'release']):
+     print &quot;Error: mode can only be 'debug' or 'release', found: &quot; + env['mode']
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000142.html">[Netpanzer-cvs] r1113 - in trunk/netpanzer: . src/Lib/Network
+</A></li>
+	<LI>Next message: <A HREF="000144.html">[Netpanzer-cvs] r1115 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#143">[ date ]</a>
+              <a href="thread.html#143">[ thread ]</a>
+              <a href="subject.html#143">[ subject ]</a>
+              <a href="author.html#143">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

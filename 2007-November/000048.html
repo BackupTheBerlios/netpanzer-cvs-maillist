@@ -1,0 +1,501 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1005 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Particles
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1005%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Particles&In-Reply-To=%3C200711170341.lAH3fO4Z005330%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000047.html">
+   <LINK REL="Next"  HREF="000049.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1005 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Particles</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1005%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Particles&In-Reply-To=%3C200711170341.lAH3fO4Z005330%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1005 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Particles">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Nov 17 04:41:24 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000047.html">[Netpanzer-cvs] r1003 - in trunk/netpanzer: . src/Lib/Network	src/Lib/Util src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+        <LI>Next message: <A HREF="000049.html">[Netpanzer-cvs] r1006 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-11-17 04:41:22 +0100 (Sat, 17 Nov 2007)
+New Revision: 1005
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+Log:
+- added colors to messages in chat
+- changed the message timeout from 8 seconds to 30
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -91,7 +91,7 @@
+     powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+     if(unit-&gt;player == PlayerInterface::getLocalPlayer()) {
+-        ConsoleInterface::postMessage( &quot;YOU GOT A BONUS UNITS POWERUP&quot; );
++        ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT A BONUS UNITS POWERUP&quot; );
+     }
+ }
+ 
+@@ -127,7 +127,7 @@
+     local_player_id = PlayerInterface::getLocalPlayerID();
+ 
+     if( local_player_id.getIndex() == message-&gt;getPlayerID() ) {
+-        ConsoleInterface::postMessage( &quot;YOU GOT A BONUS UNITS POWERUP&quot; );
++        ConsoleInterface::postMessage( Color::unitAqua, &quot;YOU GOT A BONUS UNITS POWERUP&quot; );
+     }
+ 
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -59,7 +59,7 @@
+ 
+     if(unit-&gt;player == PlayerInterface::getLocalPlayer()) {
+         MiniMapInterface::setShowEnemyRadar( 180 );
+-        ConsoleInterface::postMessage( &quot;YOU GOT AN ENEMY RADAR POWERUP&quot; );
++        ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT AN ENEMY RADAR POWERUP&quot; );
+     }
+ 
+     PowerUpHitMesg hit_mesg;
+@@ -104,7 +104,7 @@
+ 
+     if( local_player_id.getIndex() == message-&gt;getPlayerID() ) {
+         MiniMapInterface::setShowEnemyRadar( 180 );
+-        ConsoleInterface::postMessage( &quot;YOU GOT AN ENEMY RADAR POWERUP&quot; );
++        ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT AN ENEMY RADAR POWERUP&quot; );
+     }
+ 
+     powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -180,7 +180,7 @@
+ 
+ void ClientConnectDaemon::netMessageConnectServerDisconnect(const NetMessage* )
+ {
+-    ConsoleInterface::postMessage(&quot;Server has terminated the game&quot; );
++    ConsoleInterface::postMessage(Color::unitAqua, &quot;Server has terminated the game&quot; );
+ }
+ 
+ void ClientConnectDaemon::processNetMessage(const NetMessage* message)
+@@ -215,7 +215,7 @@
+ 
+ void ClientConnectDaemon::serverConnectionBroken()
+ {
+-    ConsoleInterface::postMessage( &quot;CONNECTION TO SERVER HAS BEEN UNEXPECTEDLY BROKEN.&quot; );
++    ConsoleInterface::postMessage(Color::unitRed, &quot;CONNECTION TO SERVER HAS BEEN UNEXPECTEDLY BROKEN.&quot; );
+ }
+ 
+ void ClientConnectDaemon::connectFailureResult( unsigned char result_code )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -195,7 +195,7 @@
+     switch( alert_enum ) {
+     case _connect_alert_mesg_connect : {
+             connect_alert.set( player_id, _connect_alert_mesg_connect );
+-            ConsoleInterface::postMessage( &quot;'%s' has joined the game.&quot;,
++            ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has joined the game.&quot;,
+                     player_state-&gt;getName().c_str() );
+            const char* motd=gameconfig-&gt;motd.c_str();
+            if (*motd!='\0'){
+@@ -211,14 +211,14 @@
+ 
+     case _connect_alert_mesg_disconnect : {
+             connect_alert.set( player_id, _connect_alert_mesg_disconnect );
+-            ConsoleInterface::postMessage( &quot;'%s' has left the game.&quot;,
++            ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has left the game.&quot;,
+                     player_state-&gt;getName().c_str() );
+         }
+         break;
+ 
+     case _connect_alert_mesg_client_drop : {
+             connect_alert.set( player_id, _connect_alert_mesg_client_drop );
+-            ConsoleInterface::postMessage( &quot;'%s' has left the game for some reason.&quot;,
++            ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has left the game for some reason.&quot;,
+                     player_state-&gt;getName().c_str() );
+         }
+         break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -59,7 +59,7 @@
+     if( objective_state.occupation_status != _occupation_status_unoccupied ) {
+         PlayerState *player_state = objective_state.occupying_player;
+         
+-        ConsoleInterface::postMessage( &quot;'%s' has been occupied by '%s'&quot;,
++        ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has been occupied by '%s'&quot;,
+                 objective_state.name, player_state-&gt;getName().c_str() );
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -78,7 +78,7 @@
+             SERVER-&gt;sendMessage(&amp;update_mesg, sizeof(ObjectiveOccupationUpdate));
+ 
+             const PlayerState *player_state = objective_state.occupying_player;
+-            ConsoleInterface::postMessage( &quot;'%s' has been occupied by '%s'&quot;,
++            ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has been occupied by '%s'&quot;,
+                     objective_state.name, player_state-&gt;getName().c_str() );
+         }
+     } else {
+@@ -96,7 +96,7 @@
+                 SERVER-&gt;sendMessage(&amp;update_mesg,
+                         sizeof(ObjectiveOccupationUpdate));
+                 const PlayerState *player = objective_state.occupying_player;
+-                ConsoleInterface::postMessage(&quot;'%s' has been occupied by '%s'&quot;,
++                ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has been occupied by '%s'&quot;,
+                         objective_state.name, player-&gt;getName().c_str() );
+             }
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -173,7 +173,7 @@
+     powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+     if(unit-&gt;player == PlayerInterface::getLocalPlayer()) {
+-        ConsoleInterface::postMessage( &quot;YOU GOT A %s POWERUP&quot;, powerupTypeToString( unit_powerup_type ) );
++        ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT A %s POWERUP&quot;, powerupTypeToString( unit_powerup_type ) );
+     }
+ }
+ 
+@@ -238,7 +238,7 @@
+     local_player_id = PlayerInterface::getLocalPlayerID();
+ 
+     if( local_player_id.getIndex() == message-&gt;getPlayerID() ) {
+-        ConsoleInterface::postMessage( &quot;YOU GOT A %s POWERUP&quot;, powerupTypeToString( message-&gt;getUnitPowerupType() ) );
++        ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT A %s POWERUP&quot;, powerupTypeToString( message-&gt;getUnitPowerupType() ) );
+     }
+ 
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -359,7 +359,7 @@
+                 setSelectionList(n);
+                 std::stringstream s;
+                 s &lt;&lt; &quot;Group &quot; &lt;&lt; n &lt;&lt; &quot; Created&quot;;
+-                ConsoleInterface::postMessage( s.str().c_str() );
++                ConsoleInterface::postMessage(Color::brown, s.str().c_str() );
+                 continue;
+             }
+             if(alt_status == true) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -88,7 +88,7 @@
+         }
+     } else if( chat_request-&gt;message_scope == _chat_mesg_scope_server ) {
+         SERVER-&gt;sendMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-        ConsoleInterface::postMessage(&quot;Server: %s&quot;,
++        ConsoleInterface::postMessage(Color::unitAqua, &quot;Server: %s&quot;,
+                 chat_mesg.message_text );
+         return;
+     }
+@@ -124,7 +124,7 @@
+         } // ** switch
+ 
+         // TODO add unitcolor
+-        ConsoleInterface::postMessage(&quot;%s: %s&quot;,
++        ConsoleInterface::postMessage(color, &quot;%s: %s&quot;,
+                 player_state-&gt;getName().c_str(), chat_mesg.message_text );
+     }
+ }
+@@ -142,7 +142,7 @@
+     }
+ 
+     if( chat_mesg-&gt;message_scope == _chat_mesg_scope_server ) {
+-        ConsoleInterface::postMessage(&quot;Server: %s&quot;, chat_mesg-&gt;message_text );
++        ConsoleInterface::postMessage(Color::unitAqua, &quot;Server: %s&quot;, chat_mesg-&gt;message_text );
+         return;
+     }
+ 
+@@ -177,7 +177,7 @@
+ 
+     } // ** switch
+ 
+-    ConsoleInterface::postMessage(&quot;%s: %s&quot;,
++    ConsoleInterface::postMessage(color, &quot;%s: %s&quot;,
+             player_state-&gt;getName().c_str(), chat_mesg-&gt;message_text );
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -71,7 +71,7 @@
+     for ( line_loop = 0; line_loop &lt; console_size; line_loop++ ) {
+         line_list[ line_loop ].color = Color::white;
+         line_list[ line_loop ].string[0] = 0;
+-        line_list[ line_loop ].life_timer.changePeriod( 8 );
++        line_list[ line_loop ].life_timer.changePeriod( 30 );
+     }
+ 
+     stdout_pipe = false;
+@@ -99,7 +99,7 @@
+     update_overlap( surface );
+ }
+ 
+-void ConsoleInterface::postMessage(const char *format, ...)
++void ConsoleInterface::postMessage(PIX msgcolor, const char *format, ...)
+ {
+     char temp_str[256];
+     char *temp_str_ptr;
+@@ -131,7 +131,7 @@
+             strncpy( line_list[ line_index ].string, temp_str_ptr, max_char_per_line);
+             line_list[ line_index ].string[ max_char_per_line ] = 0;
+ 
+-            line_list[ line_index ].color = Color::white;
++            line_list[ line_index ].color = msgcolor;
+             line_list[ line_index ].visible = true;
+             line_list[ line_index ].life_timer.reset();
+ 
+@@ -147,7 +147,7 @@
+ 
+     strcpy( line_list[ line_index ].string, temp_str_ptr );
+ 
+-    line_list[ line_index ].color = Color::white;
++    line_list[ line_index ].color = msgcolor;
+     line_list[ line_index ].visible = true;
+     line_list[ line_index ].life_timer.reset();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -72,8 +72,8 @@
+     static void update( Surface &amp;surface );
+     static void update_overlap( Surface &amp;surface );
+ 
+-    static void postMessage( const char *format, ... )
+-        __attribute__(( format(printf, 1, 2) ));
++    static void postMessage( PIX msgColor, const char *format, ... )
++        __attribute__(( format(printf, 2, 3) ));
+ 
+     /* Input String Methods */
+     static void setInputStringStatus( bool on_off );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -207,7 +207,7 @@
+                             = MapsManager::getNextMap(gameconfig-&gt;map);
+                     }
+                     
+-                    ConsoleInterface::postMessage(&quot;loading map '%s'.&quot;,
++                    ConsoleInterface::postMessage(Color::white, &quot;loading map '%s'.&quot;,
+                             gameconfig-&gt;map.c_str());
+ 
+                     GameControlCycleMap cycle_map_mesg;
+@@ -267,7 +267,7 @@
+ 
+         case _map_cycle_server_state_wait_for_client_map_load : {
+                 if ( map_cycle_fsm_server_map_load_timer.count() ) {
+-                    ConsoleInterface::postMessage(&quot;game started.&quot;);
++                    ConsoleInterface::postMessage(Color::white, &quot;game started.&quot;);
+                     map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
+                 }
+             }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -422,18 +422,18 @@
+ 
+     switch (connect_alert-&gt;alert_enum) {
+         case _connect_alert_mesg_connect:
+-            ConsoleInterface::postMessage(&quot;%s has joined the game.&quot;,
++            ConsoleInterface::postMessage(Color::cyan, &quot;%s has joined the game.&quot;,
+                     player_state-&gt;getName().c_str());
+ 
+             break;
+ 
+         case _connect_alert_mesg_disconnect: 
+-            ConsoleInterface::postMessage(&quot;%s has left the game.&quot;,
++            ConsoleInterface::postMessage(Color::cyan, &quot;%s has left the game.&quot;,
+                     player_state-&gt;getName().c_str());
+             break;
+ 
+         case _connect_alert_mesg_client_drop:
+-            ConsoleInterface::postMessage(
++            ConsoleInterface::postMessage(Color::cyan,
+                     &quot;Connection to %s has been unexpectedly broken.&quot;,
+                     player_state-&gt;getName().c_str());
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -478,13 +478,13 @@
+         if( (allie_request-&gt;getAllieByPlayerIndex() == local_player_index) ) {
+             player_state = getPlayerState(
+                     allie_request-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage( &quot;Alliance created with %s.&quot;,
++            ConsoleInterface::postMessage(Color::yellow, &quot;Alliance created with %s.&quot;,
+                     player_state-&gt;getName().c_str() );
+         } else
+             if( (allie_request-&gt;getAllieWithPlayerIndex() == local_player_index) ) {
+                 player_state = getPlayerState(
+                         allie_request-&gt;getAllieByPlayerIndex());
+-                ConsoleInterface::postMessage( &quot;%s has allied with you.&quot;,
++                ConsoleInterface::postMessage(Color::yellow, &quot;%s has allied with you.&quot;,
+                         player_state-&gt;getName().c_str() );
+             }
+     } else {
+@@ -494,14 +494,14 @@
+         if( (allie_request-&gt;getAllieByPlayerIndex() == local_player_index) ) {
+             player_state = getPlayerState(
+                     allie_request-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage( &quot;Alliance broken with %s.&quot;,
++            ConsoleInterface::postMessage(Color::yellow, &quot;Alliance broken with %s.&quot;,
+                     player_state-&gt;getName().c_str() );
+         } else
+             if( (allie_request-&gt;getAllieWithPlayerIndex()
+                         == local_player_index) ) {
+                 player_state = getPlayerState(
+                         allie_request-&gt;getAllieByPlayerIndex());
+-                ConsoleInterface::postMessage(
++                ConsoleInterface::postMessage(Color::yellow,
+                         &quot;%s has broken their alliance with you.&quot;,
+                         player_state-&gt;getName().c_str() );
+             }
+@@ -538,13 +538,13 @@
+         if( (allie_update-&gt;getAllieByPlayerIndex() == local_player_index) ) {
+             player_state =
+                 getPlayerState(allie_update-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage( &quot;Alliance created with %s.&quot;,
++            ConsoleInterface::postMessage(Color::yellow, &quot;Alliance created with %s.&quot;,
+                     player_state-&gt;getName().c_str() );
+         } else
+             if( (allie_update-&gt;getAllieWithPlayerIndex() == local_player_index) ) {
+                 player_state = getPlayerState(
+                         allie_update-&gt;getAllieByPlayerIndex());
+-                ConsoleInterface::postMessage( &quot;%s has allied with you.&quot;,
++                ConsoleInterface::postMessage(Color::yellow, &quot;%s has allied with you.&quot;,
+                         player_state-&gt;getName().c_str() );
+             }
+     } else {
+@@ -554,13 +554,13 @@
+         if( (allie_update-&gt;getAllieByPlayerIndex() == local_player_index) ) {
+             player_state = getPlayerState(
+                     allie_update-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage( &quot;Alliance broken with %s.&quot;,
++            ConsoleInterface::postMessage(Color::yellow, &quot;Alliance broken with %s.&quot;,
+                     player_state-&gt;getName().c_str() );
+         } else
+             if( (allie_update-&gt;getAllieWithPlayerIndex() == local_player_index) ) {
+                 player_state = getPlayerState(
+                         allie_update-&gt;getAllieByPlayerIndex());
+-                ConsoleInterface::postMessage(
++                ConsoleInterface::postMessage(Color::yellow,
+                         &quot;%s has broken their alliance with you.&quot;,
+                         player_state-&gt;getName().c_str() );
+             }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2007-11-16 18:27:17 UTC (rev 1004)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2007-11-17 03:41:22 UTC (rev 1005)
+@@ -543,7 +543,7 @@
+     if (gDrawExplosionParticleCount) {
+         char strBuf[256];
+         sprintf(strBuf, &quot;%d&quot;, e.particleCount);
+-        ConsoleInterface::postMessage(strBuf);
++        ConsoleInterface::postMessage(Color::white, strBuf);
+     }
+ 
+     float hitPointScale = 1.0f;
+@@ -703,7 +703,7 @@
+     if (gDrawExplosionParticleCount) {
+         char strBuf[256];
+         sprintf(strBuf, &quot;%d&quot;, e.particleCount);
+-        ConsoleInterface::postMessage(strBuf);
++        ConsoleInterface::postMessage(Color::white, strBuf);
+     }
+ 
+     float attackScale = 1.0f;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000047.html">[Netpanzer-cvs] r1003 - in trunk/netpanzer: . src/Lib/Network	src/Lib/Util src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+	<LI>Next message: <A HREF="000049.html">[Netpanzer-cvs] r1006 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

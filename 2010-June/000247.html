@@ -1,0 +1,1304 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1221 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1221%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20src/NetPanzer/Views/Components&In-Reply-To=%3C201006081354.o58DsnvF011656%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000246.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1221 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1221%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Bot%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20src/NetPanzer/Views/Components&In-Reply-To=%3C201006081354.o58DsnvF011656%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1221 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jun  8 15:54:49 CEST 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000246.html">[Netpanzer-cvs] r1220 - in trunk/netpanzer/src: Lib/2D Lib/optionmm	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Core NetPanzer/Interfaces NetPanzer/Network	NetPanzer/Objectives NetPanzer/Scripts NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#247">[ date ]</a>
+              <a href="thread.html#247">[ thread ]</a>
+              <a href="subject.html#247">[ subject ]</a>
+              <a href="author.html#247">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-06-08 15:54:09 +0200 (Tue, 08 Jun 2010)
+New Revision: 1221
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/scripts/usercommands.lua
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+Log:
+- added some scripting back
+- added some teaming code, this will be removed, but i'm changing operating system right now.
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/scripts/servercommands.lua	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -3,7 +3,7 @@
+     say_help = &quot;Says something to all players as server.&quot;,
+     say = function(param, player)
+         if param then
+-            ChatInterface:serversay(param);
++            netpanzer.serversay(param);
+         end
+     end,
+ 
+@@ -14,23 +14,13 @@
+         end
+     end,
+ 
+-    addbot_help = &quot;Adds a new bot to the server.&quot;,
+-    addbot = function(param, player)
+-        GameManager:addBot();
+-    end,
+-
+-    removebots_help = &quot;Removes all bots from server&quot;,
+-    removebots = function(param, player)
+-        GameManager:removeAllBots();
+-    end,
+-
+     map_help = &quot;Change the map&quot;,
+     map = function(param, player)
+         local ok = GameManager:changeMap(param);
+         if ok then
+-            ChatInterface:serversayTo(player, 'Switching map to &quot;' .. param .. '&quot;');
++            netpanzer.serversayto(player, 'Switching map to &quot;' .. param .. '&quot;');
+         else
+-            ChatInterface:serversayTo(player, 'Map &quot;' .. param .. '&quot; doesn\'t exists');
++            netpanzer.serversayto(player, 'Map &quot;' .. param .. '&quot; doesn\'t exists');
+         end
+     end,
+ 
+@@ -46,7 +36,7 @@
+                 end
+             end
+         end
+-        ChatInterface:serversayTo(player, out);
++        netpanzer.serversayto(player, out);
+     end,
+ 
+     _help = &quot;Type /server help &lt;wanted_command&gt; or /server listcommands&quot;,
+@@ -54,9 +44,9 @@
+     help = function(param, player)
+         local ht = ServerCommands[param .. &quot;_help&quot;];
+         if ht then
+-            ChatInterface:serversayTo( player, param .. &quot;: &quot; .. ht);
++            netpanzer.serversayto( player, param .. &quot;: &quot; .. ht);
+         else
+-            ChatInterface:serversayTo( player, &quot;Help not found for &quot; .. param .. &quot;. Use /server listcommands&quot;);
++            netpanzer.serversayto( player, &quot;Help not found for &quot; .. param .. &quot;. Use /server listcommands&quot;);
+         end
+     end,
+ 
+@@ -80,7 +70,7 @@
+                 end
+             end
+         end
+-        ChatInterface:serversayTo(player, out);
++        netpanzer.serversayto(player, out);
+     end,
+ 
+     testrules = function(param)
+
+Modified: trunk/netpanzer/scripts/usercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/usercommands.lua	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/scripts/usercommands.lua	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -3,21 +3,21 @@
+     say_help = &quot;Says something to all players&quot;,
+     say = function(param)
+         if param then
+-            ChatInterface:say(param);
++            netpanzer.say(param);
+         end
+     end,
+ 
+     teamsay_help = &quot;Says something to team players&quot;,
+     teamsay = function(param)
+         if param then
+-            ChatInterface:teamsay(param);
++            netpanzer.teamsay(param);
+         end
+     end,
+ 
+     server_help = &quot;Sends the command to the server, no need to add '/' in command&quot;;
+     server = function(param)
+         if param then
+-            ChatInterface:say('/' .. param);
++            netpanzer.say('/' .. param);
+         end
+     end,
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -125,7 +125,7 @@
+         if (PlayerInterface::getPlayer(player_index)-&gt;getStatus() ==
+                 _player_state_active
+                 &amp;&amp; localIndex != player_index
+-//                &amp;&amp; !PlayerInterface::isAllied(localIndex, player_index) // XXX ALLY
++                &amp;&amp; !PlayerInterface::isAllied(localIndex, player_index) // XXX ALLY
+             )
+         {
+             players.push_back(player_index);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -72,7 +72,7 @@
+             break;
+ 
+         case _net_message_class_chat:
+-            ChatInterface::processChatMessages(message);
++            ChatInterface::clientHandleChatMessage(message);
+             break;
+ 
+         case _net_message_class_connect:
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -75,7 +75,7 @@
+             break;
+             
+         case _net_message_class_chat:
+-            ChatInterface::processChatMessages(message);
++            ChatInterface::processChatMessages(packet);
+             break;
+ 
+         case _net_message_class_connect:
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -108,24 +108,31 @@
+ }
+ 
+ PlayerState::PlayerState()
+-    : flag(0), status(0), kills(0), kill_points(0), losses(0),
++    : team_id(NO_TEAM_ID), flag(0), status(0), kills(0), kill_points(0), losses(0),
+       loss_points(0), total(0), objectives_held(0), stats_locked(false),
+       colorIndex(0)
+ {
++    team_name[0]=0;
+ }
+ 
+ PlayerState::PlayerState(const PlayerState&amp; other)
+-    : name(other.name), flag(other.flag), id(other.id),
++    :  id(other.id), name(other.name), team_id(other.team_id), flag(other.flag),
+       status(other.status), kills(other.kills), kill_points(other.kill_points),
+       losses(other.losses), loss_points(other.loss_points),
+       total(other.total), objectives_held(other.objectives_held),
+       stats_locked(other.stats_locked), unit_config(other.unit_config)
+ {
++    memcpy(team_name, other.team_name, MAX_TEAM_NAME_LEN+1);
+ }
+ 
+ void PlayerState::operator= (const PlayerState&amp; other)
+ {
++    id = other.id;
+     name = other.name;
++
++    team_id = other.team_id;
++    memcpy(team_name, other.team_name, MAX_TEAM_NAME_LEN+1);
++    
+     flag = other.flag;
+     status = other.status;
+     kills = other.kills;
+@@ -136,7 +143,6 @@
+     objectives_held = other.objectives_held;
+     stats_locked = other.stats_locked;
+     unit_config = other.unit_config;
+-    id = other.id;
+ }
+ 
+ void PlayerState::setName(const std::string&amp; newname)
+@@ -185,6 +191,26 @@
+     } while (recheck);
+ }
+ 
++void
++PlayerState::setTeamName(const char * team_name)
++{
++    int len = strlen(team_name);
++    if ( len &gt; 0 )
++    {
++        if ( len &gt; MAX_TEAM_NAME_LEN )
++        {
++            len = MAX_TEAM_NAME_LEN;
++        }
++
++        memcpy(this-&gt;team_name, team_name, len);
++        this-&gt;team_name[len] = 0;
++    }
++    else
++    {
++        this-&gt;team_name[0] = 0;
++    }
++}
++
+ void PlayerState::resetStats()
+ {
+     kills  = 0;
+@@ -354,6 +380,8 @@
+     strncpy(state.name, name.c_str(), sizeof(state.name)-1);
+     state.flag = flag;
+     state.id = id;
++    state.team_id = team_id;
++    memcpy(state.team_name, team_name, MAX_TEAM_NAME_LEN+1);
+     state.status = status;
+     state.kills = htol16(kills);
+     state.kill_points = htol16(kill_points);
+@@ -372,6 +400,10 @@
+     memcpy(tmp, state-&gt;name, 64); 
+     tmp[63] = 0;
+     name = tmp;
++
++    memcpy(team_name, state-&gt;team_name, MAX_TEAM_NAME_LEN);
++    team_name[MAX_TEAM_NAME_LEN] = 0;
++
+     flag = state-&gt;flag;
+     if ( ! ResourceManager::isFlagActive(flag) ) 
+     {
+@@ -379,6 +411,7 @@
+     }
+     
+     id = state-&gt;id;
++    team_id = state-&gt;team_id;
+     status = state-&gt;status;
+     kills = ltoh16(state-&gt;kills);
+     kill_points = ltoh16(state-&gt;kill_points);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -45,9 +45,11 @@
+     friend class PlayerState;    
+     friend class PlayerStateSync;
+     
++    PlayerID id;
+     char name[64];
++    TeamID team_id;
++    char team_name[MAX_TEAM_NAME_LEN+1];
+     FlagID flag;
+-    PlayerID id;
+     Uint8 status;
+     Sint16 kills;
+     Sint16 kill_points;
+@@ -65,9 +67,13 @@
+ class PlayerState
+ {
+ private:
++    PlayerID id;
+     std::string name;
++
++    TeamID  team_id;
++    char team_name[MAX_TEAM_NAME_LEN+1];
++
+     FlagID flag;
+-    PlayerID id;
+     unsigned char status;
+     short kills;
+     short kill_points;
+@@ -88,11 +94,14 @@
+ 
+     void setName(const std::string&amp; newname);
+ 
+-    PlayerID getID() const
+-    {
+-        return id;
+-    }
++    PlayerID getID() const { return id; }
+ 
++    TeamID getTeamID() const               { return team_id; }
++    void   setTeamID(const TeamID team_id) { this-&gt;team_id = team_id; }
++
++    const char * getTeamName() const { return team_name; }
++    void setTeamName(const char * team_name);
++
+     void resetStats();
+     const std::string&amp; getName() const;
+     void lockStats();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -203,13 +203,9 @@
+         {
+             return _cursor_player_unit;
+         }
+-        else if ( working_list.isSelected() )
+-        {
+-            return _cursor_enemy_unit;
+-        }
+         // XXX ALLY
+-//        if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
+-//        {
++        if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
++        {
+ //            if ( KeyboardInterface::getKeyState(SDLK_a) )
+ //            {
+ //                if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
+@@ -219,18 +215,18 @@
+ //
+ //                return _cursor_make_allie;
+ //            }
+-//            else if ( working_list.isSelected() )
+-//            {
+-//                return _cursor_enemy_unit;
+-//            }
+-//        }
+-//        else
+-//        {
++            if ( working_list.isSelected() )
++            {
++                return _cursor_enemy_unit;
++            }
++        }
++        else
++        {
+ //            if ( KeyboardInterface::getKeyState(SDLK_a) )
+ //            {
+ //                return _cursor_break_allie;
+ //            }
+-//        }
++        }
+         return _cursor_regular;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -41,6 +41,13 @@
+ 
+ typedef Uint8 FlagID;
+ 
++typedef Uint8 TeamID;
++#define NO_TEAM_ID (0)
++#define MIN_TEAM_ID (1)
++#define MAX_TEAM_ID (0xfe)
++#define INVALID_TEAM_ID (0xff)
++#define MAX_TEAM_NAME_LEN (20)
++
+ #ifndef __TEST_PLAYERID__
+     typedef Uint8 PlayerID;
+     #define MIN_PLAYER_ID (0)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -24,9 +24,10 @@
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+-//#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
++#include &quot;Scripts/ScriptManager.hpp&quot;
++
+ enum { _net_message_id_chat_mesg_req,
+        _net_message_id_chat_mesg
+ };
+@@ -46,18 +47,8 @@
+ {
+ public:
+     Uint8 message_scope;
+-    char player_set[32];
++    char message_text[MAX_CHAT_MSG_LEN];
+ 
+-private:
+-    PlayerID source_player_index;
+-public:
+-    char message_text[150];
+-
+-// XPROTO
+-//public:
+-//    Uint8 message_scope;
+-//    char message_text[MAX_CHAT_MSG_LEN];
+-
+     ChatMesgRequest()
+     {
+         reset();
+@@ -75,15 +66,6 @@
+         return getSize() - CHATREQUEST_HEADER_LEN;
+     }
+ 
+-    PlayerID getSourcePlayerIndex() const
+-	{
+-		return source_player_index;
+-	}
+-
+-    void setSourcePlayerIndex(PlayerID playerIndex)
+-	{
+-		source_player_index = playerIndex;
+-	}
+ } __attribute__((packed));
+ 
+ 
+@@ -94,8 +76,7 @@
+ private:
+     PlayerID source_player_index;
+ public:
+-//    char message_text[MAX_CHAT_MSG_LEN]; // XPROTO
+-    char message_text[150];
++    char message_text[MAX_CHAT_MSG_LEN];
+ 
+     ChatMesg()
+     {
+@@ -120,269 +101,259 @@
+     }
+ } __attribute__((packed));
+ 
+-static void chatMessageRequest(const NetMessage* message) {
+-	bool post_on_server = false;
+-	ChatMesg chat_mesg;
+-	const ChatMesgRequest* chat_request = (const ChatMesgRequest*) message;
++static void chatMessageRequest(const NetPacket* packet)
++{
++    const ChatMesgRequest* chat_request = (const ChatMesgRequest*) packet-&gt;getNetMessage();
+ 
+-	if (chat_request-&gt;message_scope != _chat_mesg_scope_server
+-			&amp;&amp; chat_request-&gt;getSourcePlayerIndex()
+-					&gt;= PlayerInterface::getMaxPlayers()) {
+-		LOGGER.warning(&quot;Invalid chatMessageRequest&quot;);
+-		return;
+-	}
++    if (   chat_request-&gt;message_scope == _chat_mesg_scope_server
++        &amp;&amp; NetworkState::getNetworkStatus() == _network_state_server
++        &amp;&amp; packet-&gt;fromClient )
++    {
++        LOGGER.warning(&quot;CI_CMR CHEAT Player %u tried to chat as server&quot;, packet-&gt;fromPlayer);
++        return;
++    }
+ 
+-	chat_mesg.setSourcePlayerIndex(chat_request-&gt;getSourcePlayerIndex());
+-	chat_mesg.message_scope = chat_request-&gt;message_scope;
+-	snprintf(chat_mesg.message_text, sizeof(chat_mesg.message_text), &quot;%s&quot;,
+-			chat_request-&gt;message_text);
++    bool post_on_server = false;
++    ChatMesg chat_mesg;
++    char text[MAX_CHAT_MSG_LEN+1];
++    int text_len = chat_request-&gt;getTextLen();
+ 
+-	if (chat_request-&gt;message_scope == _chat_mesg_scope_all) {
+-		SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-		post_on_server = true;
+-	}
++    chat_mesg.setSourcePlayerIndex(packet-&gt;fromPlayer);
++    chat_mesg.message_scope = chat_request-&gt;message_scope;
++    memcpy(chat_mesg.message_text, chat_request-&gt;message_text, text_len);
++    memcpy(text, chat_request-&gt;message_text, text_len);
++    text[text_len] = 0;
++
++    if ( chat_request-&gt;message_scope == _chat_mesg_scope_all )
++    {
++        if ( text[0] != '/' || ! ScriptManager::runServerCommand(&amp;text[1], packet-&gt;fromPlayer) )
++        {
++            SERVER-&gt;broadcastMessage(&amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
++            post_on_server = true;
++        }
++    }
+         // XXX ALLY
+-//        else if (chat_request-&gt;message_scope == _chat_mesg_scope_alliance)
+-//        {
+-//		unsigned long max_players;
+-//		unsigned short local_player_index;
+-//		PlayerState * player = 0;
+-//
+-//		local_player_index = PlayerInterface::getLocalPlayerIndex();
+-//
+-//		max_players = PlayerInterface::getMaxPlayers();
+-//		for (unsigned long i = 0; i &lt; max_players; i++) {
+-//			player = PlayerInterface::getPlayer((unsigned short) i);
+-//
+-//			if (player-&gt;getStatus() == _player_state_active) {
+-//				if (PlayerInterface::isAllied(
+-//						chat_request-&gt;getSourcePlayerIndex(), i) == true) {
+-//					if (local_player_index != i) {
+-//						SERVER-&gt;sendMessage((unsigned short) i, &amp;chat_mesg,
+-//								sizeof(ChatMesg));
+-//					} else {
+-//						post_on_server = true;
+-//					}
+-//				}
+-//			}
+-//		}
+-//
+-//		if (chat_request-&gt;getSourcePlayerIndex()
+-//				== PlayerInterface::getLocalPlayerIndex()) {
+-//			post_on_server = true;
+-//		} else {
+-//			SERVER-&gt;sendMessage(chat_request-&gt;getSourcePlayerIndex(),
+-//					&amp;chat_mesg, sizeof(ChatMesg));
+-//		}
+-//	}
+-        else if (chat_request-&gt;message_scope == _chat_mesg_scope_server)
++    else if (chat_request-&gt;message_scope == _chat_mesg_scope_alliance)
++    {
++        PlayerID max_players;
++        PlayerID local_player_index;
++        PlayerState * player = 0;
++
++        local_player_index = PlayerInterface::getLocalPlayerIndex();
++
++        max_players = PlayerInterface::getMaxPlayers();
++        for (PlayerID i = 0; i &lt; max_players; ++i)
+         {
+-		SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+-		ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+-				chat_mesg.message_text);
+-		return;
+-	}
++            player = PlayerInterface::getPlayer(i);
+ 
+-	if (post_on_server == true) {
+-		PlayerState *player_state;
++            if (player-&gt;getStatus() == _player_state_active)
++            {
++                if ( PlayerInterface::isAllied( packet-&gt;fromPlayer, i) == true )
++                {
++                    if (local_player_index != i)
++                    {
++                        SERVER-&gt;sendMessage(i, &amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
++                    }
++                    else
++                    {
++                        post_on_server = true;
++                    }
++                }
++            }
++        }
+ 
+-		player_state = PlayerInterface::getPlayer(
+-				chat_mesg.getSourcePlayerIndex());
++        if ( packet-&gt;fromPlayer == PlayerInterface::getLocalPlayerIndex() )
++        {
++            post_on_server = true;
++        }
++        else
++        {
++            SERVER-&gt;sendMessage(packet-&gt;fromPlayer,
++                                &amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
++        }
++    }
++    else if ( chat_request-&gt;message_scope == _chat_mesg_scope_server )
++    {
++        SERVER-&gt;broadcastMessage(&amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
++        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;, text);
++        return;
++    }
+ 
+-		PIX color = Color::white;
++    if ( post_on_server == true )
++    {
++        PlayerState *player_state;
+ 
+-		switch (chat_request-&gt;message_scope) {
+-		case _chat_mesg_scope_all:
+-			color = Color::white;
+-			break;
++        player_state = PlayerInterface::getPlayer(packet-&gt;fromPlayer);
+ 
+-		case _chat_mesg_scope_alliance:
+-			color = Color::orange;
+-			break;
++        PIX color = Color::white;
+ 
+-		case _chat_mesg_scope_server:
+-			color = Color::unitAqua;
+-			break;
++        switch (chat_request-&gt;message_scope)
++        {
++        case _chat_mesg_scope_all:
++                color = Color::white;
++                break;
+ 
+-		} // ** switch
++        case _chat_mesg_scope_alliance:
++                color = Color::orange;
++                break;
+ 
+-		// TODO add unitcolor
+-		ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(),
+-				&quot;%s: %s&quot;, player_state-&gt;getName().c_str(),
+-				chat_mesg.message_text);
+-	}
++        case _chat_mesg_scope_server:
++                color = Color::unitAqua;
++                break;
++
++        } // ** switch
++
++        // TODO add unitcolor
++        ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(),
++                        &quot;%s: %s&quot;, player_state-&gt;getName().c_str(), text);
++    }
+ }
+ 
+-static void chatMessage(const NetMessage* message)
++void ChatInterface::clientHandleChatMessage(const NetMessage* message)
+ {
+-	const ChatMesg *chat_mesg = (const ChatMesg*) message;
++    if ( message-&gt;message_id != _net_message_id_chat_mesg )
++    {
++        LOGGER.warning(&quot;CI_CHCM Received wrong message type: %u&quot;,
++                       message-&gt;message_id);
++        return;
++    }
++    const ChatMesg *chat_mesg = (const ChatMesg*) message;
+ 
+-	if (chat_mesg-&gt;message_scope != _chat_mesg_scope_server
+-			&amp;&amp; chat_mesg-&gt;getSourcePlayerIndex()
+-					&gt;= PlayerInterface::getMaxPlayers()) {
+-		LOGGER.warning(&quot;malformed chatmessage packet.&quot;);
+-		return;
+-	}
++    if ( chat_mesg-&gt;message_scope != _chat_mesg_scope_server
++        &amp;&amp; chat_mesg-&gt;getSourcePlayerIndex() &gt;= PlayerInterface::getMaxPlayers())
++    {
++            LOGGER.warning(&quot;CI_CHCM Received message, incorrect player value: %u, max is %u.&quot;,
++                            chat_mesg-&gt;getSourcePlayerIndex(),
++                            PlayerInterface::getMaxPlayers());
++            return;
++    }
+ 
+-	if (chat_mesg-&gt;message_scope == _chat_mesg_scope_server) {
+-		ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+-				chat_mesg-&gt;message_text);
+-		return;
+-	}
++    unsigned char text[MAX_CHAT_MSG_LEN+1];
++    int text_len = chat_mesg-&gt;getTextLen();
++    memcpy(text, chat_mesg-&gt;message_text, text_len);
++    text[text_len] = 0;
+ 
+-	PlayerState *player_state;
+-	player_state = PlayerInterface::getPlayer(chat_mesg-&gt;getSourcePlayerIndex());
++    if ( chat_mesg-&gt;message_scope == _chat_mesg_scope_server )
++    {
++        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
++                                      text);
++        return;
++    }
+ 
+-	PIX color = Color::white;
++    PlayerState *player_state;
++    player_state = PlayerInterface::getPlayer(chat_mesg-&gt;getSourcePlayerIndex());
+ 
+-	switch (chat_mesg-&gt;message_scope) {
+-	case _chat_mesg_scope_all:
+-		color = Color::white;
+-		break;
++    PIX color = Color::white;
+ 
+-	case _chat_mesg_scope_alliance:
+-		color = Color::orange;
+-		break;
++    switch (chat_mesg-&gt;message_scope)
++    {
++    case _chat_mesg_scope_all:
++            color = Color::white;
++            break;
+ 
+-	case _chat_mesg_scope_server:
+-		color = Color::unitAqua;
+-		break;
++    case _chat_mesg_scope_alliance:
++            color = Color::orange;
++            break;
+ 
+-	} // ** switch
++    case _chat_mesg_scope_server:
++            color = Color::unitAqua;
++            break;
+ 
+-	ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(),
+-			&quot;%s: %s&quot;, player_state-&gt;getName().c_str(), chat_mesg-&gt;message_text);
++    } // ** switch
++
++    ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(), &quot;%s: %s&quot;,
++                                  player_state-&gt;getName().c_str(), text);
+ }
+ 
+-void ChatInterface::processChatMessages(const NetMessage* message) {
+-	switch (message-&gt;message_id) {
+-	case _net_message_id_chat_mesg_req:
+-		chatMessageRequest(message);
+-		break;
++void ChatInterface::processChatMessages(const NetPacket* packet)
++{
++    switch (packet-&gt;getNetMessage()-&gt;message_id)
++    {
++        case _net_message_id_chat_mesg_req:
++            chatMessageRequest(packet);
++            break;
+ 
+-	case _net_message_id_chat_mesg:
+-		chatMessage(message);
+-		break;
+-
+-	default:
+-		LOGGER.warning(&quot;Received unknown chat message (id %d-%d)&quot;,
+-				message-&gt;message_class, message-&gt;message_id);
+-	}
++        default:
++            LOGGER.warning(&quot;CI_PCM Received unknown chat message (id %d-%d)&quot;,
++                            packet-&gt;getNetMessage()-&gt;message_class,
++                            packet-&gt;getNetMessage()-&gt;message_id);
++    }
+ }
+ 
+-void ChatInterface::say(const char *message)
++static void sendScopedMessage(const char *message, Uint8 scope)
+ {
+-	unsigned int text_len = strlen(message);
+-	ChatMesgRequest cmsg;
++    unsigned int text_len = strlen(message);
++    ChatMesgRequest cmsg;
+ 
+-	if ( text_len &gt;= sizeof(cmsg.message_text) )
+-	{
+-		text_len = sizeof(cmsg.message_text)-1;
+-	}
+-	memcpy(cmsg.message_text, message, text_len);
+-	cmsg.message_text[text_len] = 0;
++    if ( text_len &gt;= sizeof(cmsg.message_text) )
++    {
++        text_len = sizeof(cmsg.message_text);
++    }
+ 
+-	cmsg.message_scope = _chat_mesg_scope_all;
++    memcpy(cmsg.message_text, message, text_len);
++    cmsg.message_scope = scope;
+ 
+-	cmsg.setSourcePlayerIndex( PlayerInterface::getLocalPlayerIndex() );
++    if (NetworkState::status == _network_state_client)
++    {
++        CLIENT-&gt;sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
++    }
++    else
++    {
++        cmsg.setSize(CHATREQUEST_HEADER_LEN + text_len);
++        EnqueueIncomingPacket(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len,
++                              PlayerInterface::getLocalPlayerIndex(), 0);
++    }
++}
+ 
+-	if (NetworkState::status == _network_state_client)
+-	{
+-		CLIENT-&gt;sendMessage(&amp;cmsg, sizeof(cmsg));
+-	}
+-	else
+-	{
+-		processChatMessages(&amp;cmsg);
+-	}
+-
+-	// XPROTO
+-//	NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
++void ChatInterface::say(const char *message)
++{
++    sendScopedMessage(message, _chat_mesg_scope_all);
+ }
+ 
+ void ChatInterface::teamsay(const char* message)
+ {
+-	unsigned int text_len = strlen(message);
+-	ChatMesgRequest cmsg;
+-
+-	if ( text_len &gt;= sizeof(cmsg.message_text) )
+-	{
+-		text_len = sizeof(cmsg.message_text)-1;
+-	}
+-	memcpy(cmsg.message_text, message, text_len);
+-	cmsg.message_text[text_len] = 0;
+-
+-	cmsg.message_scope = _chat_mesg_scope_alliance;
+-
+-	cmsg.setSourcePlayerIndex( PlayerInterface::getLocalPlayerIndex() );
+-
+-	if (NetworkState::status == _network_state_client)
+-	{
+-		CLIENT-&gt;sendMessage(&amp;cmsg, sizeof(cmsg));
+-	}
+-	else
+-	{
+-		processChatMessages(&amp;cmsg);
+-	}
+-
+-	// XPROTO
+-//	NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
++    sendScopedMessage(message, _chat_mesg_scope_alliance);
+ }
+ 
+ void ChatInterface::serversay(const char* message)
+ {
+-	unsigned int text_len = strlen(message);
+-	ChatMesgRequest cmsg;
+-
+-	if ( text_len &gt;= sizeof(cmsg.message_text) )
+-	{
+-		text_len = sizeof(cmsg.message_text)-1;
+-	}
+-	memcpy(cmsg.message_text, message, text_len);
+-	cmsg.message_text[text_len] = 0;
+-
+-	cmsg.message_scope = _chat_mesg_scope_server;
+-
+-	cmsg.setSourcePlayerIndex( PlayerInterface::getLocalPlayerIndex() );
+-
+-	if (NetworkState::status == _network_state_client)
+-	{
+-		CLIENT-&gt;sendMessage(&amp;cmsg, sizeof(cmsg));
+-	}
+-	else
+-	{
+-		processChatMessages(&amp;cmsg);
+-	}
+-
+-	// XPROTO
+-	// unused    NetworkServer::broadcastMessage(&amp;cmsg, sizeof(cmsg));
+-//	NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
++    sendScopedMessage(message, _chat_mesg_scope_server);
+ }
+ 
+ void ChatInterface::serversayTo(const PlayerID player, const char* message)
+ {
+-	if (player == PlayerInterface::getLocalPlayerIndex())
+-	{
+-		ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+-				message);
+-	}
+-	else
+-	{
+-		unsigned int text_len = strlen(message);
+-		ChatMesg cmsg;
+-		cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-		if ( text_len &gt;= sizeof(cmsg.message_text) )
+-		{
+-			text_len = sizeof(cmsg.message_text)-1;
+-		}
+-		memcpy(cmsg.message_text, message, text_len);
+-		cmsg.message_text[text_len] = 0;
++    if ( player &gt;= PlayerInterface::getMaxPlayers() || player == INVALID_PLAYER_ID )
++    {
++        LOGGER.warning(&quot;CI_SST CHEAT Try to say something to unexisting player: %u&quot;,
++                       player);
++    }
+ 
+-		cmsg.message_scope = _chat_mesg_scope_server;
++    if ( PlayerInterface::getPlayer(player)-&gt;getStatus() != _player_state_active )
++    {
++        LOGGER.warning(&quot;CI_SST CHEAT Try to say something to inactive player: %u&quot;,
++                       player);
++    }
+ 
+-		SERVER-&gt;sendMessage(player, &amp;cmsg, sizeof(cmsg));
++    if (player == PlayerInterface::getLocalPlayerIndex())
++    {
++        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
++                                      message);
++    }
++    else
++    {
++        unsigned int text_len = strlen(message);
++        ChatMesg cmsg;
+ 
+-//		NetworkServer::sendMessage(player, &amp;cmsg, CHATMESG_HEADER_LEN
+-//				+ text_len);
+-	}
++        cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
++
++        if ( text_len &gt;= sizeof(cmsg.message_text) )
++        {
++                text_len = sizeof(cmsg.message_text);
++        }
++        memcpy(cmsg.message_text, message, text_len);
++        cmsg.message_scope = _chat_mesg_scope_server;
++
++        SERVER-&gt;sendMessage(player, &amp;cmsg, CHATMESG_HEADER_LEN + text_len);
++    }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -20,12 +20,14 @@
+ 
+ #include &quot;Core/CoreTypes.hpp&quot;
+ 
++class NetPacket;
+ class NetMessage;
+ 
+ class ChatInterface
+ {
+ public:
+-    static void processChatMessages(const NetMessage* message);
++    static void processChatMessages(const NetPacket* packet);
++    static void clientHandleChatMessage(const NetMessage* message);
+ 
+     static void say(const char * message);
+     static void teamsay(const char * message);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -46,6 +46,8 @@
+ 
+ #include &quot;Util/Log.hpp&quot;
+ 
++#include &quot;Scripts/ScriptManager.hpp&quot;
++
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+ #endif
+@@ -198,6 +200,9 @@
+ {
+     *Console::server &lt;&lt; &quot;starting dedicated netPanzer server\n&quot;;
+ 
++    ScriptManager::runFile(&quot;server_commands_load&quot;,&quot;scripts/servercommands.lua&quot;);
++    ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
++
+     gameconfig-&gt;map = MapsManager::getNextMap(&quot;&quot;);
+ 
+     GameManager::dedicatedLoadGameMap(gameconfig-&gt;map.c_str());
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -113,6 +113,8 @@
+ 
+ #include &quot;Bot/Bot.hpp&quot;
+ 
++#include &quot;Scripts/ScriptManager.hpp&quot;
++
+ PlayerGameManager::PlayerGameManager()
+     : sdlVideo(0), heartbeat(0), infosocket(0)
+ {
+@@ -279,6 +281,10 @@
+     LoadingView::show();
+     // refresh the view in each append
+     LoadingView::append( &quot;Launching Server ...&quot; );
++    
++    ScriptManager::runFile(&quot;server_commands_load&quot;,&quot;scripts/servercommands.lua&quot;);
++    ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
++
+     try {
+     	if (CLIENT) {
+ 		delete CLIENT;
+@@ -419,6 +425,7 @@
+ 
+     CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect);
+     LoadingView::show();
++    ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
+ 
+     ClientConnectDaemon::startConnectionProcess();
+     sound-&gt;playTankIdle();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -66,16 +66,16 @@
+ //    }
+ //}
+ 
+-//bool PlayerInterface::isAllied( unsigned short player, unsigned short with_player )
+-//{
+-//    if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
+-//            &amp;&amp; *(alliance_matrix + (with_player * max_players) + player)
+-//            &amp;&amp; *(alliance_matrix + (player * max_players) + with_player) )
+-//    {
+-//        return true;
+-//    }
+-//    return false;
+-//}
++bool PlayerInterface::isAllied( PlayerID player, PlayerID with_player )
++{
++    if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
++        &amp;&amp; player_lists[player].getTeamID() &gt; 0
++        &amp;&amp; player_lists[player].getTeamID() == player_lists[with_player].getTeamID() )
++    {
++        return true;
++    }
++    return false;
++}
+ //
+ //bool PlayerInterface::isSingleAllied( unsigned short player, unsigned short with_player )
+ //{
+@@ -342,6 +342,8 @@
+             player_lists[ player_id ].resetStats();
+             player_lists[ player_id ].setColor( player_id );
+             player_lists[ player_id ].setID(player_id);
++            player_lists[ player_id ].setTeamID(NO_TEAM_ID);
++            player_lists[ player_id ].setTeamName(&quot;&quot;);
+             SDL_mutexV(mutex);
+             return( &amp;player_lists[ player_id ] );
+         } // ** if
+@@ -412,11 +414,10 @@
+                 occupied++;
+             }
+             // XXX ALLY
+-//            else if ( PlayerInterface::isAllied(occuping_player_index, player_index)
+-//                      &amp;&amp; PlayerInterface::isAllied(player_index, occuping_player_index) )
+-//            {
+-//                occupied++;
+-//            }
++            else if ( PlayerInterface::isAllied(occuping_player_id, player_id) )
++            {
++                occupied++;
++            }
+         }
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -46,7 +46,7 @@
+     static void setKill(PlayerState* by_player, PlayerState* on_player,
+             UnitType unit_type );
+ 
+-    //static bool isAllied(unsigned short player, unsigned short with_player);
++    static bool isAllied(PlayerID player, PlayerID with_player);
+     //static bool isSingleAllied(unsigned short player, unsigned short with_player);
+ 
+     static void lockPlayerStats();
+
+Added: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -0,0 +1,71 @@
++/*
++Copyright (C) 2010 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * Created on June 6, 2010, 08:58 AM
++ */
++
++#include &quot;ScriptManager.hpp&quot;
++#include &quot;ScriptHelper.hpp&quot;
++
++#include &quot;Interfaces/ChatInterface.hpp&quot;
++
++static int npmodule_say (lua_State *L)
++{
++    ChatInterface::say(lua_tolstring(L,1,0));
++    return 0;
++}
++
++static int npmodule_teamsay (lua_State *L)
++{
++    ChatInterface::teamsay(lua_tolstring(L,1,0));
++    return 0;
++}
++
++static int npmodule_serversay (lua_State *L)
++{
++    ChatInterface::serversay(lua_tolstring(L,1,0));
++    return 0;
++}
++
++static int npmodule_serversayto (lua_State *L)
++{
++    int n = lua_tonumber(L, 1);
++    if ( !n &amp;&amp; ! lua_isnumber(L, 1) )
++    {
++        // TODO it is missing a parameter or it is not a number, do something
++    }
++    else
++    {
++        ChatInterface::serversayTo(n, lua_tolstring(L,2,0));
++    }
++    return 0;
++}
++
++static const luaL_Reg npmodule[] =
++{
++    {&quot;say&quot;,         npmodule_say},
++    {&quot;teamsay&quot;,     npmodule_teamsay},
++    {&quot;serversay&quot;,   npmodule_serversay},
++    {&quot;serversayto&quot;, npmodule_serversayto},
++    {NULL, NULL}
++};
++
++int npmodule_load (lua_State *L)
++{
++  luaL_register(L, &quot;netpanzer&quot;, npmodule);
++  return 1;
++}
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -32,6 +32,8 @@
+ 
+ lua_State * ScriptManager::luavm = 0;
+ 
++int npmodule_load (lua_State *L);
++
+ void
+ ScriptManager::initialize()
+ {
+@@ -45,9 +47,8 @@
+         Color::registerScript(&quot;Color&quot;);
+ //        ParticleInterface::registerScript(&quot;particles&quot;);
+         GameConfig::registerScript(&quot;config&quot;);
+-
++        npmodule_load(luavm);
+     }
+-
+ }
+     
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -587,7 +587,7 @@
+         PlayerID unitPlayerID = unit-&gt;player-&gt;getID();
+         
+         if(unitPlayerID == player_index
+-//                || PlayerInterface::isAllied(player_index, unitPlayerID) // XXX ALLY
++                || PlayerInterface::isAllied(player_index, unitPlayerID) // XXX ALLY
+                 )
+             continue;
+ 
+@@ -639,9 +639,9 @@
+         return _unit_player;
+     }
+     // XXX ALLY
+-//    if(PlayerInterface::isAllied(player_id, unit-&gt;player-&gt;getID())) {
+-//        return _unit_allied;
+-//    }
++    if(PlayerInterface::isAllied(player_id, unit-&gt;player-&gt;getID())) {
++        return _unit_allied;
++    }
+ 
+     return _unit_enemy;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-06-05 14:54:18 UTC (rev 1220)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-06-08 13:54:09 UTC (rev 1221)
+@@ -167,11 +167,11 @@
+                 color = gameconfig-&gt;getPlayerOutpostRadarColor();
+             }
+             // XXX ALLY
+-//            else if ( PlayerInterface::isAllied(obj-&gt;occupying_player-&gt;getID(),
+-//                                                PlayerInterface::getLocalPlayerIndex()) )
+-//            {
+-//                color = gameconfig-&gt;getAlliedOutpostRadarColor();
+-//            }
++            else if ( PlayerInterface::isAllied(obj-&gt;occupying_player-&gt;getID(),
++                                                PlayerInterface::getLocalPlayerIndex()) )
++            {
++                color = gameconfig-&gt;getAlliedOutpostRadarColor();
++            }
+             else
+             {
+                 color = obj-&gt;occupying_player-&gt;getColor();
+@@ -263,10 +263,10 @@
+             }
+         }
+         // XXX ALLY
+-//        else if (PlayerInterface::isAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID()))
+-//        {
+-//            color = gameconfig-&gt;getAlliedRadarUnitColor();
+-//        }
++        else if (PlayerInterface::isAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID()))
++        {
++            color = gameconfig-&gt;getAlliedRadarUnitColor();
++        }
+         else if ( EnemyRadarPowerUp::isRadarActive() )
+         {
+             color = unit-&gt;player-&gt;getColor();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000246.html">[Netpanzer-cvs] r1220 - in trunk/netpanzer/src: Lib/2D Lib/optionmm	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Core NetPanzer/Interfaces NetPanzer/Network	NetPanzer/Objectives NetPanzer/Scripts NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#247">[ date ]</a>
+              <a href="thread.html#247">[ thread ]</a>
+              <a href="subject.html#247">[ subject ]</a>
+              <a href="author.html#247">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

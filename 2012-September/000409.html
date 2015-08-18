@@ -1,0 +1,1082 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1385 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1385%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game%20MainMenu%20MainMenu/Multi&In-Reply-To=%3C20120902082358.007FA55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000408.html">
+   <LINK REL="Next"  HREF="000410.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1385 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1385%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game%20MainMenu%20MainMenu/Multi&In-Reply-To=%3C20120902082358.007FA55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1385 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sun Sep  2 10:23:57 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000408.html">[Netpanzer-cvs] r1384 - in trunk/netpanzer/src/NetPanzer: Actions	Interfaces Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000410.html">[Netpanzer-cvs] r1386 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#409">[ date ]</a>
+              <a href="thread.html#409">[ thread ]</a>
+              <a href="subject.html#409">[ subject ]</a>
+              <a href="author.html#409">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-02 10:23:57 +0200 (Sun, 02 Sep 2012)
+New Revision: 1385
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+Log:
+Removed component names...
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -25,8 +25,7 @@
+ #include &quot;MouseEvent.hpp&quot;
+ #include &quot;Actions/Action.hpp&quot;
+ 
+-Button::Button(const std::string &amp;cname)
+-        : Component(&quot;Button.&quot; + cname)
++Button::Button()
+ {
+     setTextColors(Color::white, Color::red, Color::yellow, Color::darkGray);
+     position.zero();
+@@ -134,12 +133,12 @@
+ } // end Button::actionPerformed
+ 
+ Button *
+-Button::createTextButton( const iXY&amp; loc,
++Button::createTextButton( const NPString&amp; label,
++                            const iXY&amp; loc,
+                             const int bwidth,
+-                            std::string label,
+                             Action * action)
+ {
+-    Button * b = new Button(&quot;&quot;);
++    Button * b = new Button();
+     b-&gt;setLabel(label);
+     b-&gt;setLocation(loc);
+     b-&gt;setTextButtonSize(bwidth);
+@@ -151,44 +150,10 @@
+ }
+ 
+ Button *
+-Button::createSpecialButton( std::string cname,
+-                             std::string label,
+-                             iXY loc)
++Button::createNewSpecialButton(    const NPString&amp; label,
++                                   const iXY&amp; loc,
++                                   int width)
+ {
+-    Surface bnormal;
+-    bnormal.loadBMP(&quot;pics/backgrounds/menus/buttons/default/button.bmp&quot;);
+-    
+-    Surface bhover;
+-    bhover.loadBMP(&quot;pics/backgrounds/menus/buttons/default/button1.bmp&quot;);
+-    
+-    Surface bclick;
+-    bclick.loadBMP(&quot;pics/backgrounds/menus/buttons/default/button2.bmp&quot;);
+-    
+-    Surface spbutton(bnormal.getWidth(), bnormal.getHeight(), 3);
+-
+-    spbutton.setFrame(0);
+-    bnormal.blt(spbutton,0,0);
+-    spbutton.setFrame(1);
+-    bhover.blt(spbutton,0,0);
+-    spbutton.setFrame(2);
+-    bclick.blt(spbutton,0,0);
+-    spbutton.setFrame(0);
+-
+-    Button *b = new Button(cname);
+-    b-&gt;setImage(spbutton);
+-    b-&gt;setLabel(label);
+-    b-&gt;setLocation(loc);
+-    b-&gt;setTextColors(Color::yellow, Color::white, Color::white, Color::darkGray);
+-
+-    return b;
+-}
+-
+-Button *
+-Button::createNewSpecialButton(  std::string cname,
+-                                    std::string label,
+-                                    iXY loc,
+-                                    int width)
+-{
+     Surface bitmap;
+     bitmap.loadBMP(itButton);
+     
+@@ -210,7 +175,7 @@
+     }
+     bend.blt(spbutton,spbutton.getWidth()-15,0);
+     
+-    Button *b = new Button(cname);
++    Button *b = new Button();
+     b-&gt;setImage(spbutton);
+     b-&gt;setLabel(label);
+     b-&gt;setLocation(loc);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -70,23 +70,18 @@
+ public:
+     PIX borders[BMAX_STATE][BORDER_COLOR_MAX];
+     
+-    Button(const std::string &amp;cname);
++    Button();
+ 
+     virtual ~Button();
+ 
+-    static Button * createTextButton( const iXY&amp; loc,
++    static Button * createTextButton(   const NPString&amp; label,
++                                        const iXY&amp; loc,
+                                         const int bwidth,
+-                                        std::string label,
+                                         Action * action);
+ 
+-    static Button * createSpecialButton( std::string cname,
+-                                            std::string label,
+-                                            iXY loc);
+-    
+-    static Button * createNewSpecialButton(  std::string cname,
+-                                                std::string label,
+-                                                iXY loc,
+-                                                int with);
++    static Button * createNewSpecialButton(     const NPString&amp; label,
++                                                const iXY&amp; loc,
++                                                int width);
+ 
+     void setAction( Action * action );
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -178,7 +178,7 @@
+ 
+     // Draw the name of the choice.
+     dest.bltStringShadowed( position.x, pos.y + adjustedY,
+-                            componentName.c_str(), componentActiveTextColor, Color::black);
++                            label.c_str(), componentActiveTextColor, Color::black);
+ 
+     getBounds(r);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -39,6 +39,8 @@
+     StateChangedCallback* callback;
+ 
+     enum { ChoiceItemHeight = 14 };
++    
++    NPString label;
+ 
+ public:
+     Choice(StateChangedCallback* newcallback = 0)
+@@ -64,6 +66,8 @@
+     void   select(size_t index);
+     void   setMinWidth(int minWidth);
+ 
++    void   setLabel(const NPString&amp; label) { this-&gt;label = label; }
++    
+     void setStateChangedCallback(StateChangedCallback* newcallback)
+     {
+         callback = newcallback;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -24,13 +24,12 @@
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;Types/iXY.hpp&quot;
+ #include &quot;Types/iRect.hpp&quot;
+-#include &quot;Util/NoCopy.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ class mMouseEvent;
+ 
+ //--------------------------------------------------------------------------
+-class Component : public NoCopy
++class Component
+ {
+ protected:
+     PIX    background;
+@@ -38,7 +37,6 @@
+     iXY     size;
+     iXY    position;
+     Surface surface;
+-    std::string componentName;
+     bool    enabled;
+     bool    visible;
+     bool    dirty;
+@@ -69,11 +67,6 @@
+         reset();
+     }
+     
+-    Component(const std::string &amp;cname) : componentName(cname)
+-    {
+-        reset();
+-    }
+-    
+     virtual ~Component()
+     {
+     }
+@@ -86,14 +79,6 @@
+     }
+     bool contains(int x, int y) const;
+     bool contains(iXY p) const { return contains(p.x, p.y); }
+-//    Uint8 getBackground() const { return background; }
+-//    Uint8 getForeground() const { return foreground; }
+-//    const std::string&amp; getName() const { return name; }
+-//    const iXY &amp;getSize() const { return size; }
+-//    int getSizeX() const { return size.x; }
+-//    int getSizeY() const { return size.y; }
+-//    bool isEnabled() const { return enabled; }
+-//    bool isVisible() const { return visible; }
+ 
+     void setBounds(const iRect &amp;r)
+     {
+@@ -111,12 +96,8 @@
+         dirty=true;
+     }
+ 
+-//    void setEnabled(bool _enabled) { enabled = _enabled; }
+-//    void setForeground(PIX _foreground) { foreground = _foreground; }
+     void setLocation(int x, int y);
+     void setLocation(const iXY &amp;p) { setLocation(p.x, p.y); }
+-    void setName(const std::string&amp; name) { Component::componentName = name; }
+-    std::string getName() { return componentName; }
+     
+     virtual void draw(Surface &amp;dest)
+     {
+@@ -131,6 +112,9 @@
+     
+     virtual void render() = 0;
+     virtual void actionPerformed(const mMouseEvent &amp;me) = 0;
++private:
++    Component(const Component&amp;);
++    void operator=(const Component&amp;);
+ }; // end Component
+ 
+ #endif // end __Component_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -24,10 +24,10 @@
+ ScrollBar::ScrollBar() : Component()
+ {
+     reset();
+-    decrease = new Button( &quot;decreaseButton&quot;);
++    decrease = new Button();
+     decrease-&gt;setLabel(&quot;-&quot;);
+     
+-    increase = new Button( &quot;increaseButton&quot;);
++    increase = new Button();
+     increase-&gt;setLabel(&quot;+&quot;);
+ 
+ 
+@@ -40,10 +40,10 @@
+     reset();
+ 
+     ScrollBar::orientation = orientation;
+-    decrease = new Button( &quot;decreaseButton&quot;);
++    decrease = new Button();
+     decrease-&gt;setLabel(&quot;-&quot;);
+     
+-    increase = new Button( &quot;increaseButton&quot;);
++    increase = new Button();
+     increase-&gt;setLabel(&quot;+&quot;);
+ 
+ } // end ScrollBar::ScrollBar
+@@ -60,10 +60,10 @@
+     ScrollBar::minimum     = minimum;
+     ScrollBar::maximum     = maximum;
+  
+-    decrease = new Button( &quot;decreaseButton&quot;);
++    decrease = new Button();
+     decrease-&gt;setLabel(&quot;-&quot;);
+     
+-    increase = new Button( &quot;increaseButton&quot;);
++    increase = new Button();
+     increase-&gt;setLabel(&quot;+&quot;);
+     
+     decrease-&gt;setSize(MINOR_AXIS_SIZE, MINOR_AXIS_SIZE);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -24,20 +24,31 @@
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ 
+-//---------------------------------------------------------------------------
+-static void bYES()
+-{
+-    GameManager::drawTextCenteredOnScreen(&quot;Exiting&quot;, Color::white);
++#include &quot;Actions/Action.hpp&quot;
+ 
+-    GameManager::exitNetPanzer();
+-}
+ 
+-//---------------------------------------------------------------------------
+-static void bNO()
++class ExitNetPanzerAction : public Action
+ {
+-    Desktop::setVisibility(&quot;AreYouSureExitView&quot;, false);
+-}
++public:
++    ExitNetPanzerAction() : Action(false) {}
++    void execute()
++    {
++        GameManager::drawTextCenteredOnScreen(&quot;Exiting&quot;, Color::white);
++        GameManager::exitNetPanzer();
++    }
++};
+ 
++class HideView : public Action
++{
++public:
++    View * view;
++    HideView(View * view) : Action(false), view(view) {}
++    void execute()
++    {
++        Desktop::setVisibility(view-&gt;getSearchName(), false);
++    }
++};
++
+ // AreYouSureExitView
+ //---------------------------------------------------------------------------
+ AreYouSureExitView::AreYouSureExitView() : SpecialButtonView()
+@@ -61,9 +72,9 @@
+ 
+     int x = (getClientRect().getSize().x - (141 * 2 + 20)) / 2;
+     int y = getClientRect().getSize().y/2 + 30;
+-    add( Button::createSpecialButton( &quot;YES&quot;, &quot;YES&quot;, iXY(x, y)) );
++    add( Button::createTextButton( &quot;YES&quot;, iXY(x, y), 137, new ExitNetPanzerAction()));
+     x += 141 + 10;
+-    add( Button::createSpecialButton( &quot;NO&quot;, &quot;NO&quot;, iXY(x, y)) );
++    add( Button::createTextButton( &quot;NO&quot;, iXY(x, y), 137, new HideView(this)));
+     loaded = true;
+ } // end AreYouSureExitView::init
+ 
+@@ -90,16 +101,3 @@
+     Desktop::setActiveView(this);
+ 
+ } // end AreYouSureExitView::doActivate
+-
+-void AreYouSureExitView::onComponentClicked(Component* c)
+-{
+-    string cname = c-&gt;getName();
+-    if ( !cname.compare(&quot;Button.YES&quot;) )
+-    {
+-        bYES();
+-    }
+-    else if ( !cname.compare(&quot;Button.NO&quot;) )
+-    {
+-        bNO();
+-    }
+-}
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -33,7 +33,6 @@
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void doActivate();
+-    void onComponentClicked(Component* c);
+ }; // end AreYouSureExitView
+ 
+ #endif // end __AreYouSureExitView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -30,48 +30,59 @@
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ 
+-//---------------------------------------------------------------------------
+-static void bYES()
++#include &quot;Actions/Action.hpp&quot;
++
++class ResignGameAction : public Action
+ {
+-    if(gameconfig-&gt;quickConnect == true) {
+-        GameManager::exitNetPanzer();
+-        return;
+-    }
++public:
++    ResignGameAction() : Action(false) {}
++    void execute()
++    {
++        if(gameconfig-&gt;quickConnect == true) {
++            GameManager::exitNetPanzer();
++            return;
++        }
+ 
+-    GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
++        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+ 
+-    // Vlad put all code in here for shutdown.
+-    //----------------------
+-    GameManager::quitNetPanzerGame();
+-    //----------------------
++        // Vlad put all code in here for shutdown.
++        //----------------------
++        GameManager::quitNetPanzerGame();
++        //----------------------
+ 
+-    // Swap to the menu resolution.
+-    //GameManager::setVideoMode(iXY(640, 480), false);
++        // Swap to the menu resolution.
++        //GameManager::setVideoMode(iXY(640, 480), false);
+ 
+-    GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
++        GameManager::drawTextCenteredOnScreen(&quot;Loading Main View...&quot;, Color::white);
+ 
+-    // Must remove the gameView first so that the initButtons detects that
+-    // and loads the correct buttons.
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-    Desktop::setVisibility(&quot;MainView&quot;, true);
+-    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
++        // Must remove the gameView first so that the initButtons detects that
++        // and loads the correct buttons.
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++        Desktop::setVisibility(&quot;MainView&quot;, true);
++        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+ 
+-    View *v = Desktop::getView(&quot;OptionsView&quot;);
++        View *v = Desktop::getView(&quot;OptionsView&quot;);
+ 
+-    if (v != 0) 
+-    {
+-        ((OptionsTemplateView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++        if (v != 0) 
++        {
++            ((OptionsTemplateView *)v)-&gt;initButtons();
++            ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++        }
++
+     }
++};
+ 
+-}
+-
+-//---------------------------------------------------------------------------
+-static void bNO()
++class HideView : public Action
+ {
+-    Desktop::setVisibility(&quot;AreYouSureResignView&quot;, false);
+-}
++public:
++    View * view;
++    HideView(View * view) : Action(false), view(view) {}
++    void execute()
++    {
++        Desktop::setVisibility(view-&gt;getSearchName(), false);
++    }
++};
+ 
+ // AreYouSureResignView
+ //---------------------------------------------------------------------------
+@@ -96,9 +107,9 @@
+ 
+     int x = (getClientRect().getSize().x - (141 * 2 + 20)) / 2;
+     int y = getClientRect().getSize().y/2 + 30;
+-    add( Button::createSpecialButton( &quot;YES&quot;, &quot;YES&quot;, iXY(x, y)) );
++    add( Button::createTextButton( &quot;YES&quot;, iXY(x, y), 137, new ResignGameAction()));
+     x += 141 + 10;
+-    add( Button::createSpecialButton( &quot;NO&quot;, &quot;NO&quot;, iXY(x, y)) );
++    add( Button::createTextButton( &quot;NO&quot;, iXY(x, y), 137, new HideView(this)));
+     loaded = true;
+ } // end AreYouSureResignView::init
+ 
+@@ -124,16 +135,3 @@
+     }
+     Desktop::setActiveView(this);
+ } // end AreYouSureResignView::doActivate
+-
+-void AreYouSureResignView::onComponentClicked(Component* c)
+-{
+-    string cname = c-&gt;getName();
+-    if ( !cname.compare(&quot;Button.YES&quot;) )
+-    {
+-        bYES();
+-    }
+-    else if ( !cname.compare(&quot;Button.NO&quot;) )
+-    {
+-        bNO();
+-    }
+-}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -33,7 +33,6 @@
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void doActivate();
+-    void onComponentClicked(Component* c);
+ }; // end AreYouSureResignView
+ 
+ #endif // end __AreYouSureResignView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -29,7 +29,7 @@
+ #include &lt;windows.h&gt;
+ #endif
+ 
+-static Button* createTitlebarButton(const NPString&amp; name, int x, int y, const Surface&amp; button_images)
++static Button* createTitlebarButton(int x, int y, const Surface&amp; button_images)
+ {
+     Surface bimage(15,15,4);
+     
+@@ -48,7 +48,7 @@
+     button_images.blt(bimage, 0, 0);
+     bimage.bltLookup(bimage.getRect(), Palette::darkGray256.getColorArray());
+     
+-    Button *b = new Button(name);
++    Button *b = new Button();
+     b-&gt;setImage(bimage);
+     b-&gt;setLocation( x, y);
+     b-&gt;setStateOffset(Button::BPRESSED, 1, 1);
+@@ -73,11 +73,11 @@
+     Surface button_images;
+     button_images.loadBMP(itScroll);
+     
+-    bHideWindow = createTitlebarButton(&quot;HideWindow&quot;, 0, 0, button_images);
++    bHideWindow = createTitlebarButton( 0, 0, button_images);
+     add(bHideWindow);
+     
+     button_images.setOffsetX(-30);
+-    bShowWindow = createTitlebarButton(&quot;ShowWindow&quot;, 15, 0, button_images);
++    bShowWindow = createTitlebarButton( 15, 0, button_images);
+     bShowWindow-&gt;disable();
+     add(bShowWindow);
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -81,16 +81,16 @@
+     resizeClientArea(area_size);
+ 
+     bXOffset = area_size.x / 3;
+-    add( Button::createTextButton(iXY(0, INFO_AREA_Y_OFFSET),               bXOffset-3,  &quot;Net&quot;,    new SetDisplayModeAction(_display_mode_network_stats)));
+-    add( Button::createTextButton(iXY(bXOffset+1, INFO_AREA_Y_OFFSET),      bXOffset-4,  &quot;Sprite&quot;, new SetDisplayModeAction(_display_mode_sorter_stats)));
+-    add( Button::createTextButton(iXY((bXOffset*2)+1, INFO_AREA_Y_OFFSET),  bXOffset-2,  &quot;Unit&quot;,   new SetDisplayModeAction(_display_mode_unit_stats)));
++    add( Button::createTextButton(&quot;Net&quot;,    iXY(0, INFO_AREA_Y_OFFSET),              bXOffset-3,    new SetDisplayModeAction(_display_mode_network_stats)));
++    add( Button::createTextButton(&quot;Sprite&quot;, iXY(bXOffset+1, INFO_AREA_Y_OFFSET),     bXOffset-4,    new SetDisplayModeAction(_display_mode_sorter_stats)));
++    add( Button::createTextButton(&quot;Unit&quot;,   iXY((bXOffset*2)+1, INFO_AREA_Y_OFFSET), bXOffset-2,    new SetDisplayModeAction(_display_mode_unit_stats)));
+ 
+     INFO_AREA_Y_OFFSET += 18;
+-    add( Button::createTextButton(iXY(0, INFO_AREA_Y_OFFSET),               area_size.x-2,&quot;Path&quot;,  new SetDisplayModeAction(_display_mode_pathing_stats)));
++    add( Button::createTextButton(&quot;Path&quot;,   iXY(0, INFO_AREA_Y_OFFSET),              area_size.x-2, new SetDisplayModeAction(_display_mode_pathing_stats)));
+ 
+     INFO_AREA_Y_OFFSET += 18;
+     bXOffset = area_size.x / 3;
+-    add( Button::createTextButton(iXY((bXOffset*2)+1, INFO_AREA_Y_OFFSET),  bXOffset-2,  &quot;NetLog&quot;, new UpdateNetworkStatsAction()));
++    add( Button::createTextButton(&quot;NetLog&quot;, iXY((bXOffset*2)+1, INFO_AREA_Y_OFFSET), bXOffset-2,    new UpdateNetworkStatsAction()));
+ 
+     INFO_AREA_Y_OFFSET += 18;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -90,8 +90,8 @@
+     moveTo(0,0);
+ 
+     int bsize = Surface::getTextLength(&quot; &quot;) * 8;
+-    add( Button::createTextButton(iXY((getClientRect().getSizeX()/2)-(bsize/2), (getClientRect().getSizeY()/2)+(Surface::getFontHeight() * 2)),
+-                                  bsize, &quot;Ok&quot;, new DisconnectConfirmedAction()));
++    add( Button::createTextButton(&quot;Ok&quot;, iXY((getClientRect().getSizeX()/2)-(bsize/2), (getClientRect().getSizeY()/2)+(Surface::getFontHeight() * 2)),
++                                  bsize, new DisconnectConfirmedAction()));
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GFlagSelectionView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -42,7 +42,6 @@
+ {
+ public:
+     GFlagButton( int x, int y, Surface &amp;s )
+-        : Button(&quot;gflag&quot;)
+     {
+         setLocation(x, y);
+         setSize(s.getWidth(), s.getHeight());
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -63,7 +63,7 @@
+     secondrect.max.x = secondrect.min.x + 350;
+     secondrect.max.y = firstrect.max.y;
+  
+-   changebutton = Button::createNewSpecialButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, 
++   changebutton = Button::createNewSpecialButton( &quot; &gt;&gt; &quot;, 
+                                                   iXY(firstrect.max.x+1, firstrect.min.y+((firstrect.getSizeY()/2)-10)), 
+                                                   secondrect.min.x-firstrect.max.x);
+     add(changebutton);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -67,9 +67,9 @@
+     moveTo(0, 0);
+     resize(325, 375);
+ 
+-    add( Button::createTextButton(iXY((getClientRect().getSize().x / 3) * 0, 0),       (getClientRect().getSize().x / 3) - 3, &quot;Surface&quot;, new SetDisplayModeAction(LIBVIEW_MODE_SURFACE_INFO)));
+-    add( Button::createTextButton(iXY(((getClientRect().getSize().x / 3) * 1) + 1, 0), (getClientRect().getSize().x / 3) - 4, &quot;Particles&quot;, new SetDisplayModeAction(LIBVIEW_MODE_PARTICLE_INFO)));
+-    add( Button::createTextButton(iXY(((getClientRect().getSize().x / 3) * 2) + 1, 0), (getClientRect().getSize().x / 3) - 2, &quot;Environment&quot;,  new SetDisplayModeAction(LIBVIEW_MODE_ENVIRONMENT_INFO)));
++    add( Button::createTextButton(&quot;Surface&quot;,    iXY((getClientRect().getSize().x / 3) * 0, 0),       (getClientRect().getSize().x / 3) - 3, new SetDisplayModeAction(LIBVIEW_MODE_SURFACE_INFO)));
++    add( Button::createTextButton(&quot;Particles&quot;,  iXY(((getClientRect().getSize().x / 3) * 1) + 1, 0), (getClientRect().getSize().x / 3) - 4, new SetDisplayModeAction(LIBVIEW_MODE_PARTICLE_INFO)));
++    add( Button::createTextButton(&quot;Environment&quot;,iXY(((getClientRect().getSize().x / 3) * 2) + 1, 0), (getClientRect().getSize().x / 3) - 2, new SetDisplayModeAction(LIBVIEW_MODE_ENVIRONMENT_INFO)));
+ 
+     checkBoxAllowParticleGeneration = new CheckBox();
+     checkBoxAllowParticleGeneration-&gt;setLabel(&quot;Allow Particle Generation&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -47,6 +47,20 @@
+         ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+     }
+ };
++
++class BeginPasswordConnectAction : public Action
++{
++public:
++    LoadingView * view;
++    BeginPasswordConnectAction(LoadingView * view) : Action(false), view(view) {}
++    void execute()
++    {
++        CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect, NPString(view-&gt;getPassword()));
++        ClientConnectDaemon::startConnectionProcess();
++        view-&gt;setNeedPassword(false);
++    }
++};
++        
+ void
+ LoadingView::init()
+ {
+@@ -64,10 +78,11 @@
+ 
+     resize(800, 600);
+ 
+-    add( Button::createTextButton(iXY(340, 15), 100, &quot;Abort&quot;, new AbortLoadingAction()));
++    add( Button::createTextButton(&quot;Abort&quot;, iXY(340, 15), 100, new AbortLoadingAction()));
+ 
+ 
+-    okButton = Button::createTextButton(iXY(340,100), 100, &quot;Enter&quot;, 0);
++    okButton = Button::createTextButton(&quot;Enter&quot;, iXY(340,100), 100, new BeginPasswordConnectAction(this));
++    
+     passwordLabel = new Label(340, 68, &quot;Game Password&quot;, Color::white);
+ 
+ }
+@@ -145,22 +160,6 @@
+ }
+ 
+ void
+-LoadingView::onComponentClicked(Component* c)
+-{
+-    string cname = c-&gt;getName();
+-    if ( !cname.compare(&quot;Button.OK&quot;) )
+-    {
+-        CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect, NPString(password_str.getString()));
+-        ClientConnectDaemon::startConnectionProcess();
+-        setNeedPassword(false);
+-    }
+-    else
+-    {
+-        View::onComponentClicked(c);
+-    }
+-}
+-
+-void
+ LoadingView::update(const NPString&amp; text)
+ {
+     LOGGER.info(&quot;Loading: %s&quot;, text.c_str());
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -55,9 +55,9 @@
+ 
+     void setNeedPassword(bool need_password);
+     bool doesNeedPassword() const { return need_password; }
++    
++    const char * getPassword() { return password_str.getString(); }
+ 
+-    void onComponentClicked(Component* c);
+-
+ private:
+     static std::list&lt;NPString&gt; lines;
+     static bool dirty;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -66,9 +66,9 @@
+     secondrect.max.x = rect.max.x-20;
+     secondrect.max.y = firstrect.max.y;
+     
+-    changebutton = Button::createNewSpecialButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+29, (firstrect.min.y+50)), (secondrect.min.x-firstrect.max.x)-39);
++    changebutton = Button::createNewSpecialButton( &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+29, (firstrect.min.y+50)), (secondrect.min.x-firstrect.max.x)-39);
+     add(changebutton);
+-    readybutton = Button::createNewSpecialButton( &quot;ready&quot;, &quot;Ready&quot;, iXY(firstrect.max.x+29, (firstrect.min.y+85)), (secondrect.min.x-firstrect.max.x)-39);
++    readybutton = Button::createNewSpecialButton( &quot;Ready&quot;, iXY(firstrect.max.x+29, (firstrect.min.y+85)), (secondrect.min.x-firstrect.max.x)-39);
+     add(readybutton);
+ 
+     scTeam1 = new tVScrollBar();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -81,8 +81,8 @@
+     unsigned short unitType;
+     VehicleSelectionView * p;
+ public:
+-    UnitSelectionButton(VehicleSelectionView * vsv, const char *cname, int unit_type, int x, int y, const Surface &amp;s)
+-        : Button(cname), unitType(unit_type), p(vsv)
++    UnitSelectionButton(VehicleSelectionView * vsv, int unit_type, int x, int y, const Surface &amp;s)
++        : unitType(unit_type), p(vsv)
+     {
+         bimage.copy(s);
+         setSize( bimage.getWidth()-1, bimage.getHeight()-1);
+@@ -181,7 +181,7 @@
+ 
+     pos.x = getClientRect().getSizeX() - 102;
+     if ( !buttonStaticDisplay )
+-        buttonStaticDisplay = new Button( &quot;ButtonStaticDisplay&quot;);
++        buttonStaticDisplay = new Button();
+     buttonStaticDisplay-&gt;setLabel(&quot;On&quot;);
+     buttonStaticDisplay-&gt;setLocation(pos.x, pos.y);
+     buttonStaticDisplay-&gt;setSize( 100, 14);
+@@ -194,7 +194,7 @@
+ 
+     pos.x = getClientRect().getSizeX() - 102;
+     if ( !buttonPower )
+-        buttonPower = new Button( &quot;ButtonPower&quot;);
++        buttonPower = new Button();
+     
+     buttonPower-&gt;setLabel(&quot;Off&quot;);
+     buttonPower-&gt;setLocation(pos.x,pos.y);
+@@ -240,8 +240,7 @@
+         unitImages.setFrame(ut);
+         tempSurface.blt(unitImages, 0, 0);
+         
+-        usb = new UnitSelectionButton(this, uprofile-&gt;unitname.c_str(),
+-                                      ut, pos.x, pos.y, tempSurface);
++        usb = new UnitSelectionButton(this, ut, pos.x, pos.y, tempSurface);
+         
+         add(usb);
+         
+@@ -273,7 +272,7 @@
+ 
+     pos.x = (getClientRect().getSizeX() - 100) / 2;
+     if ( !buttonOk )
+-        buttonOk = new Button( &quot;buttonClose&quot;);
++        buttonOk = new Button();
+     
+     buttonOk-&gt;setLabel(&quot;Close&quot;);
+     buttonOk-&gt;setLocation(pos.x,pos.y);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -223,8 +223,7 @@
+     }
+ };
+ 
+-static Button * createMenuButton( std::string cname,
+-                                    std::string label,
++static Button * createMenuButton(   const NPString&amp; label,
+                                     iXY loc,
+                                     bool inverted,
+                                     Action * action)
+@@ -236,7 +235,7 @@
+         bitmap.flipVertical();
+     }
+     
+-    Button *b = new Button(cname);
++    Button *b = new Button();
+     b-&gt;setLocation(loc);
+     b-&gt;setLabel(label);
+     b-&gt;setSize(Surface::getTextLength(label)+20, 25);
+@@ -297,14 +296,14 @@
+ // initPreGameOptionButtons
+ void MenuTemplateView::initPreGameOptionButtons()
+ {
+-    add( createMenuButton(&quot;MAIN&quot;, &quot;Main&quot;,           mainPos,    false, new ShowMainViewAction()) );
+-    add( createMenuButton(&quot;JOIN&quot;, &quot;Join&quot;,           joinPos,    false, new ShowJoinViewAction()) );
+-    add( createMenuButton(&quot;HOST&quot;, &quot;Host&quot;,           hostPos,    false, new ShowHostViewAction()) );
+-    add( createMenuButton(&quot;OPTS&quot;, &quot;Options&quot;,        optionsPos, false, new ShowOptionsViewAction()) );
+-    add( createMenuButton(&quot;HELP&quot;, &quot;Help&quot;,           helpPos,    false, new ShowHelpViewAction()) );
+-    add( createMenuButton(&quot;EXNP&quot;, &quot;Exit netPanzer&quot;, exitPos,    false, new ExitNetPanzerAction()) );
++    add( createMenuButton( &quot;Main&quot;,           mainPos,    false, new ShowMainViewAction()) );
++    add( createMenuButton( &quot;Join&quot;,           joinPos,    false, new ShowJoinViewAction()) );
++    add( createMenuButton( &quot;Host&quot;,           hostPos,    false, new ShowHostViewAction()) );
++    add( createMenuButton( &quot;Options&quot;,        optionsPos, false, new ShowOptionsViewAction()) );
++    add( createMenuButton( &quot;Help&quot;,           helpPos,    false, new ShowHelpViewAction()) );
++    add( createMenuButton( &quot;Exit netPanzer&quot;, exitPos,    false, new ExitNetPanzerAction()) );
+     
+-    playButton = createMenuButton(&quot;PLAY&quot;, &quot;Play&quot;, iXY(-100, 0), true, new PlayButtonClickedAction());
++    playButton = createMenuButton( &quot;Play&quot;, iXY(-100, 0), true, new PlayButtonClickedAction());
+     add( playButton );
+ } // end MenuTemplateView::initPreGameOptionButtons
+ 
+@@ -314,15 +313,15 @@
+ {
+     if(!gameconfig-&gt;quickConnect)
+     {
+-        add( createMenuButton( &quot;RESIGN&quot;, &quot;Resign&quot;,          resignPos, false, new OpenResignGameViewAction()) );
+-        add( createMenuButton( &quot;EXITNP&quot;, &quot;Exit netPanzer&quot;,  exitPos,   false, new OpenExitConfirmWindowAction()) );
++        add( createMenuButton( &quot;Resign&quot;,          resignPos, false, new OpenResignGameViewAction()) );
++        add( createMenuButton( &quot;Exit netPanzer&quot;,  exitPos,   false, new OpenExitConfirmWindowAction()) );
+     }
+     else
+     {
+-        add( createMenuButton( &quot;RESIGN&quot;, &quot;Resign&quot;,          exitPos,   false, new OpenResignGameViewAction()) );
++        add( createMenuButton( &quot;Resign&quot;,          exitPos,   false, new OpenResignGameViewAction()) );
+     }
+ 
+-    add( createMenuButton( &quot;CLOSEOPT&quot;, &quot;Close Options&quot;, returnToGamePos, false, new CloseOptionsWindowAction()) );
++    add( createMenuButton( &quot;Close Options&quot;, returnToGamePos, false, new CloseOptionsWindowAction()) );
+ } // end MenuTemplateView::initInGameOptionButtons
+ 
+ // initButtons
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -228,9 +228,9 @@
+     iXY p(pos);
+     add( new Label(p.x, p.y, label, windowTextColor, windowTextColorShadow, true) );
+     p.x += xControlStart - 1;
+-    add( Button::createTextButton(p, arrowButtonWidth-2, &quot;&lt;&quot;, decreaseAction));
++    add( Button::createTextButton( &quot;&lt;&quot;, p, arrowButtonWidth-2, decreaseAction));
+     p.x += arrowButtonWidth + meterWidth + 3; // 3 = 1 space + 2 of the border
+-    add( Button::createTextButton(p, arrowButtonWidth-2, &quot;&gt;&quot;, increaseAction));
++    add( Button::createTextButton( &quot;&gt;&quot;, p, arrowButtonWidth-2, increaseAction));
+ }
+ 
+ // addMeterButtons
+@@ -281,7 +281,7 @@
+     const int minWidth = 150;
+     int xChoiceOffset = 2;
+ 
+-    choiceGameType.setName(&quot;Game Type&quot;);
++    choiceGameType.setLabel(&quot;Game Type&quot;);
+     choiceGameType.addItem(&quot;Objective&quot;);
+     choiceGameType.addItem(&quot;Frag Limit&quot;);
+     choiceGameType.addItem(&quot;Time Limit&quot;);
+@@ -291,7 +291,7 @@
+     add(&amp;choiceGameType);
+     xChoiceOffset += minWidth + 123;
+ 
+-    choiceCloudCoverage.setName(&quot;Cloud Coverage&quot;);
++    choiceCloudCoverage.setLabel(&quot;Cloud Coverage&quot;);
+     choiceCloudCoverage.addItem(&quot;Clear&quot;);
+     choiceCloudCoverage.addItem(&quot;Broken&quot;);
+     choiceCloudCoverage.addItem(&quot;Partly Cloudy&quot;);
+@@ -303,7 +303,7 @@
+     add(&amp;choiceCloudCoverage);
+     xChoiceOffset += minWidth + 13;
+ 
+-    choiceWindSpeed.setName(&quot;Wind Speed&quot;);
++    choiceWindSpeed.setLabel(&quot;Wind Speed&quot;);
+     choiceWindSpeed.addItem(&quot;Calm&quot;);
+     choiceWindSpeed.addItem(&quot;Breezy&quot;);
+     choiceWindSpeed.addItem(&quot;Brisk&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -98,9 +98,9 @@
+ 
+     iXY pos(MAP_SIZE + BORDER_SPACE * 2, getClientRect().getSizeY() - 14 - BORDER_SPACE);
+ 
+-    add( Button::createTextButton(pos, arrowButtonWidth - 1, &quot;&lt;&quot;, new ChangeSelectedMapAction(this, -1)));
++    add( Button::createTextButton( &quot;&lt;&quot;, pos, arrowButtonWidth - 1, new ChangeSelectedMapAction(this, -1)));
+     pos.x += arrowButtonWidth + 2;
+-    add( Button::createTextButton(pos, arrowButtonWidth - 1, &quot;&gt;&quot;, new ChangeSelectedMapAction(this, 1)));
++    add( Button::createTextButton( &quot;&lt;&quot;, pos, arrowButtonWidth - 1, new ChangeSelectedMapAction(this, 1)));
+ 
+     loadMaps();
+     HostOptionsView::updateWindSpeedString();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -58,8 +58,9 @@
+     setAllowMove(false);
+     setVisible(false);
+ 
+-    add( Button::createTextButton(iXY(getClientRect().getSizeX()-82, getClientRect().getSizeY() - Surface::getFontHeight() * 2),
+-                                  80, &quot;Refresh&quot;, new RefreshServerListAction()));
++    add( Button::createTextButton( &quot;Refresh&quot;,
++                                   iXY(getClientRect().getSizeX()-82, getClientRect().getSizeY() - Surface::getFontHeight() * 2),
++                                   80,  new RefreshServerListAction()));
+     
+     // XXX ugly
+     serverlistview = this;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2012-09-02 07:06:15 UTC (rev 1384)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2012-09-02 08:23:57 UTC (rev 1385)
+@@ -168,7 +168,7 @@
+     x = xTextStart;
+     char res_str[20];
+     choiceResolution = new Choice();
+-    choiceResolution-&gt;setName(&quot;Resolution&quot;);
++    choiceResolution-&gt;setLabel(&quot;Resolution&quot;);
+     choiceResolution-&gt;addItem(&quot;current&quot;);
+     SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
+     int cur_mode = 0;
+@@ -216,7 +216,7 @@
+ 
+     x = xTextStart;
+     choiceMiniMapUnitSize = new Choice();
+-    choiceMiniMapUnitSize-&gt;setName(&quot;Mini Map Unit Size&quot;);
++    choiceMiniMapUnitSize-&gt;setLabel(&quot;Mini Map Unit Size&quot;);
+     choiceMiniMapUnitSize-&gt;addItem(&quot;Small&quot;);
+     choiceMiniMapUnitSize-&gt;addItem(&quot;Large&quot;);
+     choiceMiniMapUnitSize-&gt;setLocation(x, y);
+@@ -233,9 +233,9 @@
+     x = xTextStart;
+     add( new Label( x, y+3, &quot;Scroll Rate:&quot;, windowTextColor) );
+     x += optionsMeterStartX;
+-    add( Button::createTextButton(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, new ChangeIntVarAction&lt;GameConfig::interface_scrollrate, 500, 1000&gt;(-100)) );
++    add( Button::createTextButton( &quot;&lt;&quot;, iXY(x - 1, y), arrowButtonWidth, new ChangeIntVarAction&lt;GameConfig::interface_scrollrate, 500, 1000&gt;(-100)) );
+     x += optionsMeterWidth + arrowButtonWidth;
+-    add( Button::createTextButton(iXY(x - 1, y), arrowButtonWidth, &quot;&gt;&quot;, new ChangeIntVarAction&lt;GameConfig::interface_scrollrate, 500, 1000&gt;(100)) );
++    add( Button::createTextButton( &quot;&gt;&quot;, iXY(x - 1, y), arrowButtonWidth, new ChangeIntVarAction&lt;GameConfig::interface_scrollrate, 500, 1000&gt;(100)) );
+     y += yOffset*3;
+ 
+ // SOUND OPTIONS
+@@ -257,9 +257,9 @@
+     x = xTextStart;
+     add( new Label( x, y+3, &quot;Sound Volume:&quot;, windowTextColor) );
+     x += optionsMeterStartX;
+-    add( Button::createTextButton(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, new ChangeSoundVolumeAction(-1)));
++    add( Button::createTextButton( &quot;&lt;&quot;, iXY(x - 1, y), arrowButtonWidth, new ChangeSoundVolumeAction(-1)));
+     x += optionsMeterWidth + arrowButtonWidth;
+-    add( Button::createTextButton(iXY(x - 1, y), arrowButtonWidth, &quot;&gt;&quot;, new ChangeSoundVolumeAction(1)));
++    add( Button::createTextButton( &quot;&gt;&quot;, iXY(x - 1, y), arrowButtonWidth, new ChangeSoundVolumeAction(1)));
+     y += yOffset;
+ 
+     y += yOffset; 
+@@ -277,9 +277,9 @@
+     x = xTextStart;
+     add( new Label( x, y+3, &quot;Music Volume:&quot;, windowTextColor) );
+     x += optionsMeterStartX;
+-    add( Button::createTextButton(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, new ChangeMusicVolumeAction(-1)));
++    add( Button::createTextButton( &quot;&lt;&quot;, iXY(x - 1, y), arrowButtonWidth, new ChangeMusicVolumeAction(-1)));
+     x += optionsMeterWidth + arrowButtonWidth;
+-    add( Button::createTextButton(iXY(x - 1, y), arrowButtonWidth, &quot;&gt;&quot;, new ChangeMusicVolumeAction(1)));
++    add( Button::createTextButton( &quot;&gt;&quot;, iXY(x - 1, y), arrowButtonWidth, new ChangeMusicVolumeAction(1)));
+     y += yOffset;
+ } // end OptionsTemplateView::initButtons
+ 
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000408.html">[Netpanzer-cvs] r1384 - in trunk/netpanzer/src/NetPanzer: Actions	Interfaces Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000410.html">[Netpanzer-cvs] r1386 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#409">[ date ]</a>
+              <a href="thread.html#409">[ thread ]</a>
+              <a href="subject.html#409">[ subject ]</a>
+              <a href="author.html#409">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

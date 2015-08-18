@@ -1,0 +1,1272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1225 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Network Objectives Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1225%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Network%20Objectives%20Units&In-Reply-To=%3C20101111100705.521D9480EF3%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000250.html">
+   <LINK REL="Next"  HREF="000252.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1225 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Network Objectives Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1225%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Network%20Objectives%20Units&In-Reply-To=%3C20101111100705.521D9480EF3%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1225 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Network Objectives Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 11 11:07:05 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000250.html">[Netpanzer-cvs] r1224 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core
+</A></li>
+        <LI>Next message: <A HREF="000252.html">[Netpanzer-cvs] r1226 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#251">[ date ]</a>
+              <a href="thread.html#251">[ thread ]</a>
+              <a href="subject.html#251">[ subject ]</a>
+              <a href="author.html#251">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-11-11 11:07:04 +0100 (Thu, 11 Nov 2010)
+New Revision: 1225
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitOpcodes.hpp
+Log:
+-split network messages header and content (header currently being only the size)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -35,9 +35,6 @@
+ 
+ enum { _connect_state_idle,
+        _connect_state_waiting_link,
+-
+-
+-
+        _connect_state_waiting_connect_start,
+        _connect_state_waiting_connect_result,
+        _connect_state_wait_for_server_game_setup,
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -38,25 +38,22 @@
+ 
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ 
+-NetMessage * ClientMessageRouter::temp_message;
+-NetMessageDecoder ClientMessageRouter::message_decoder;
+-
+ void ClientMessageRouter::initialize()
+ {
+-    temp_message = (NetMessage *) malloc( sizeof( NetMessageStruct ) );
++    // nothing
+ }
+ 
+ void ClientMessageRouter::cleanUp()
+ {
+-    free(temp_message);
++    // nothing
+ }
+ 
+ void
+-ClientMessageRouter::routeMessage(const NetMessage* message)
++ClientMessageRouter::routeMessage(const NetMessage* message, size_t size)
+ {
+     switch (message-&gt;message_class) {
+         case _net_message_class_unit:
+-            UnitInterface::processNetMessage(message);
++            UnitInterface::processNetMessage(message, size);
+             break;
+ 
+         case _net_message_class_player:
+@@ -68,7 +65,7 @@
+             break;
+ 
+         case _net_message_class_chat:
+-            ChatInterface::clientHandleChatMessage(message);
++            ChatInterface::clientHandleChatMessage(message, size);
+             break;
+ 
+         case _net_message_class_connect:
+@@ -104,16 +101,23 @@
+         //GameManager::requestNetworkPing();
+     }
+ 
+-    while(CLIENT-&gt;getMessage(temp_message) == true) {
+-        if (temp_message-&gt;message_class == _net_message_class_multi) {
++    NetPacket packet;
++    size_t size;
++
++    while ( CLIENT-&gt;getPacket(&amp;packet) )
++    {
++        if (packet.getNetMessage()-&gt;message_class == _net_message_class_multi)
++        {
++            NetMessageDecoder message_decoder;
+             NetMessage *message;
+-            message_decoder.setDecodeMessage( (MultiMessage *) temp_message );
++            message_decoder.setDecodeMessage( (MultiMessage *) packet.getNetMessage(), packet.size );
+ 
+-            while(message_decoder.decodeMessage(&amp;message)) {
+-                routeMessage(message);
++            while( (size = message_decoder.decodeMessage(&amp;message)) )
++            {
++                routeMessage(message, size);
+             }
+         } else {
+-            routeMessage(temp_message);
++            routeMessage(packet.getNetMessage(), packet.size);
+         }
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -23,14 +23,10 @@
+ 
+ class ClientMessageRouter
+ {
+-protected:
+-    static NetMessage *temp_message;
+-    static NetMessageDecoder message_decoder;
+-
+ public:
+     static void initialize();
+     static void cleanUp();
+-    static void routeMessage(const NetMessage* message);
++    static void routeMessage(const NetMessage* message, size_t size);
+     static void routeMessages();
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -19,6 +19,7 @@
+ #define __NETMESSAGE_HPP__
+ 
+ #include &quot;Util/Endian.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+ enum { _net_message_class_multi = 0,
+        _net_message_class_system,
+@@ -38,22 +39,9 @@
+ 
+ class NetMessage
+ {
+-private:
+-    Uint16 size;
+-
+ public:
+     Uint8  message_class;
+     Uint8  message_id;
+-
+-    Uint16 getSize() const
+-    {
+-        return ltoh16(size);
+-    }
+-
+-    void setSize(Uint16 newsize)
+-    {
+-        size = htol16(newsize);
+-    }
+ } __attribute__((packed));
+ 
+ #ifdef MSVC
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -31,41 +31,41 @@
+ }
+ 
+ void
+-NetMessageDecoder::setDecodeMessage(const NetMessage* message)
++NetMessageDecoder::setDecodeMessage(const NetMessage* message, const size_t size)
+ {
+-    if(message-&gt;getSize() &gt; sizeof(decode_message)) {
++    if ( size &gt; sizeof(decode_message) )
++    {
+         LOGGER.warning(&quot;Multimessage with wrong size!&quot;);
+         memset(&amp;decode_message, 0, sizeof(decode_message));
+         return;
+     }
+-    memcpy(&amp;decode_message, message, message-&gt;getSize());
+-    decode_message_index = 0;
+-    decode_current_count = 0;
++
++    memcpy(&amp;decode_message, message, size);
++    this-&gt;size = size;
++    offset = 0;
+ }
+ 
+-bool
++Uint16
+ NetMessageDecoder::decodeMessage(NetMessage **message)
+ {
+-    if(decode_message.getHeaderSize() + decode_message_index
+-            &gt; decode_message.getSize()) {
+-        LOGGER.warning(&quot;Malformed Multimessage!&quot;);
+-        return false;
++    if ( sizeof(NetMessage) + offset &gt;= size )
++    {
++        return 0; // no more messages
+     }
+-    if(decode_current_count &gt;= decode_message.message_count
+-            || decode_message.getHeaderSize() + decode_message_index
+-                    &gt;= decode_message.getSize())
+-        return false;
+ 
+-    *message = (NetMessage *) (decode_message.data + decode_message_index);
+-    if( (*message)-&gt;getSize() &gt;
+-            decode_message.getSize() - decode_message.getHeaderSize() -
+-            decode_message_index) {
+-        LOGGER.warning(&quot;Malformed Multimessage!&quot;);
++    Uint16* mlen = (Uint16*)(decode_message.data + offset);
++    int msg_len = ltoh16(*mlen);
++
++    if( msg_len &gt; size - sizeof(NetMessage) - offset)
++    {
++        LOGGER.warning(&quot;Malformed Multimessage!!&quot;);
+         return false;
+     }
+-    decode_message_index += (*message)-&gt;getSize();
+-    decode_current_count++;
+ 
+-    return true;
++    *message = (NetMessage *)(mlen+1);
++
++    offset += msg_len + 2;
++
++    return msg_len;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -24,15 +24,15 @@
+ {
+ private:
+     MultiMessage decode_message;
+-    unsigned long decode_message_index;
+-    unsigned char decode_current_count;
++    size_t size;
++    size_t offset;
+ 
+ public:
+     NetMessageDecoder();
+     ~NetMessageDecoder();
+ 
+-    void setDecodeMessage(const NetMessage* message);
+-    bool decodeMessage(NetMessage** message);
++    void setDecodeMessage(const NetMessage* message, const size_t size);
++    Uint16 decodeMessage(NetMessage** message);
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -47,38 +47,46 @@
+ {
+     encode_message.message_class = _net_message_class_multi ;
+     encode_message.message_id = 0;
+-    encode_message.message_count = 0;
+-    memset(encode_message.data, 0, _MULTI_PACKET_LIMIT);
+-    encode_message_index = 0;
++    memset(encode_message.data, 0, sizeof(encode_message.data));
++    offset = 0;
+ }
+ 
+ void NetMessageEncoder::encodeMessage(NetMessage *message, size_t size)
+ {
+-    if(encode_message_index + size &gt; _MULTI_PACKET_LIMIT
+-            || encode_message.message_count == 255) {
++    if (offset &gt;= _MULTI_PACKET_LIMIT )
++    {
+         sendEncodedMessage();
+ 
+         resetEncoder();
+     }
+ 
+-    message-&gt;setSize(size);
+-    memcpy(encode_message.data + encode_message_index, message, size);
++    Uint16* mlen = (Uint16*)(encode_message.data + offset);
++    *mlen = htol16(size);
+ 
+-    encode_message_index += size;
+-    encode_message.message_count++;
++    memcpy(mlen+1, message, size);
++
++    offset += size + 2;
+ }
+ 
+ void NetMessageEncoder::sendEncodedMessage()
+ {
+-    if (encode_message.message_count &gt; 0) {
+-        size_t size = encode_message_index + encode_message.getHeaderSize();
+-        if(usePlayerID) {
++    if ( offset )
++    {
++        size_t size = offset + sizeof(NetMessage);
++        if(usePlayerID)
++        {
+             SERVER-&gt;sendMessage(player, &amp;encode_message, size);
+-        } else if(sendAsClient) {
++        }
++        else if(sendAsClient)
++        {
+             CLIENT-&gt;sendMessage(&amp;encode_message, size);
+-        } else if(NetworkState::status == _network_state_server) {
++        }
++        else if(NetworkState::status == _network_state_server)
++        {
+             SERVER-&gt;broadcastMessage(&amp;encode_message, size);
+-        } else {
++        }
++        else
++        {
+             CLIENT-&gt;sendMessage(&amp;encode_message, size);
+         }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -27,7 +27,7 @@
+     bool usePlayerID;
+     PlayerID player;
+     MultiMessage encode_message;
+-    unsigned long encode_message_index;
++    size_t offset;
+ 
+ public:
+     NetMessageEncoder(bool sendAsClient = false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -35,6 +35,7 @@
+ public:
+     PlayerID fromPlayer;
+     ClientSocket *fromClient;
++    int size;
+ 
+     Uint8  data[ _MAX_NET_PACKET_SIZE ];
+ 
+@@ -46,36 +47,19 @@
+     size_t getSize() const
+     {
+         return sizeof(ClientSocket *) 
+-                + sizeof(fromPlayer)
+-                + getNetMessage()-&gt;getSize();
++                + sizeof(PlayerID)
++                + sizeof(int)
++                + size;
+     }
+ }
+ __attribute__((packed));
+ 
+-struct NetMessageStruct
+-{
+-    Uint16 size;
+-    Uint8  message_class;
+-    Uint8  message_id;
++#define _MULTI_PACKET_LIMIT (_MAX_NET_PACKET_SIZE - sizeof(NetMessage))
+ 
+-    Uint8  data[ _MAX_NET_PACKET_SIZE - 4 ];
+-}
+-__attribute__((packed));
+-
+-#define _MULTI_PACKET_LIMIT (_MAX_NET_PACKET_SIZE - 9)
+-
+ class MultiMessage : public NetMessage
+ {
+ public:
+-    /* header part */
+-    Uint8  message_count;
+-    /* data */
+     Uint8  data[ _MULTI_PACKET_LIMIT ];
+-
+-    static size_t getHeaderSize()
+-    {
+-        return sizeof(NetMessage) + sizeof(Uint8);
+-    }
+ } __attribute__((packed));
+ 
+ #ifdef MSVC
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -105,12 +105,12 @@
+     log-&gt;flags(std::ios::hex);
+     log-&gt;fill('0');
+     Uint8* data = (Uint8 *) message;
+-    for (size_t i=sizeof(NetMessage); i&lt;message-&gt;getSize(); ++i) {
+-        if ((i%4) == 0)
+-            *log &lt;&lt; &quot; &quot;;
+-        log-&gt;width(2);
+-        *log &lt;&lt; (int) data[i];
+-    }
++//    for (size_t i=sizeof(NetMessage); i&lt;message-&gt;getSize(); ++i) {
++//        if ((i%4) == 0)
++//            *log &lt;&lt; &quot; &quot;;
++//        log-&gt;width(2);
++//        *log &lt;&lt; (int) data[i];
++//    }
+     log-&gt;flags(std::ios::dec);
+     *log &lt;&lt; std::endl;
+ }
+@@ -122,19 +122,19 @@
+     
+     log &lt;&lt; &quot;multimessage:\n&quot;;
+     size_t index = 0;
+-    for(int i=0; i&lt;mmessage-&gt;message_count; i++) {
+-        if(index + mmessage-&gt;getHeaderSize() &gt;= message-&gt;getSize()) {
+-            log &lt;&lt; &quot;****Incorrect multi message!!!\n&quot;;
+-            log &lt;&lt; &quot;Index: &quot; &lt;&lt; index &lt;&lt; &quot; HeaderSize: &quot;
+-                &lt;&lt; mmessage-&gt;getHeaderSize() &lt;&lt; &quot; MessageSize: &quot;
+-                &lt;&lt; message-&gt;getSize() &lt;&lt; std::endl;
+-            return;
+-        }
+-        NetMessage* submessage = (NetMessage*) (mmessage-&gt;data + index);
+-        index += submessage-&gt;getSize();
++//    for(int i=0; i&lt;mmessage-&gt;message_count; i++) {
++//        if(index + mmessage-&gt;getHeaderSize() &gt;= message-&gt;getSize()) {
++//            log &lt;&lt; &quot;****Incorrect multi message!!!\n&quot;;
++//            log &lt;&lt; &quot;Index: &quot; &lt;&lt; index &lt;&lt; &quot; HeaderSize: &quot;
++//                &lt;&lt; mmessage-&gt;getHeaderSize() &lt;&lt; &quot; MessageSize: &quot;
++//                &lt;&lt; message-&gt;getSize() &lt;&lt; std::endl;
++//            return;
++//        }
++//        NetMessage* submessage = (NetMessage*) (mmessage-&gt;data + index);
++//        index += submessage-&gt;getSize();
+ 
+-        logMessage(&quot;  M&quot;, submessage);
+-    }
++//        logMessage(&quot;  M&quot;, submessage);
++//    }
+ }
+ 
+ void NetPacketDebugger::logConnectMessage(std::ostream&amp; log,
+@@ -292,14 +292,14 @@
+ void NetPacketDebugger::logUnitOpcodeMessage(std::ostream&amp; log,
+         const NetMessage* message)
+ {
+-    UnitOpcodeMessage* opcodes = (UnitOpcodeMessage*) message;
+-    Uint8* dataptr = opcodes-&gt;data;
+-    Uint8* dataend 
+-        = dataptr + (message-&gt;getSize() - UnitOpcodeMessage::getHeaderSize());
+-    while(dataptr &lt; dataend) {
+-        log &lt;&lt; &quot;\n  &quot;;
+-        OpcodeDebugger::logOpcode(log, (UnitOpcode*) dataptr);
+-        dataptr += sizeof(UnitOpcodeStruct);
+-    }
++//    UnitOpcodeMessage* opcodes = (UnitOpcodeMessage*) message;
++//    Uint8* dataptr = opcodes-&gt;data;
++//    Uint8* dataend
++//        = dataptr + (message-&gt;getSize() - UnitOpcodeMessage::getHeaderSize());
++//    while(dataptr &lt; dataend) {
++//        log &lt;&lt; &quot;\n  &quot;;
++//        OpcodeDebugger::logOpcode(log, (UnitOpcode*) dataptr);
++//        dataptr += sizeof(UnitOpcodeStruct);
++//    }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -107,8 +107,6 @@
+ 
+ void NetworkClient::sendMessage(NetMessage* message, size_t size)
+ {
+-    message-&gt;setSize(size);
+-    
+     if ( !clientsocket )
+     {
+         EnqueueIncomingPacket( message, size, PlayerInterface::getLocalPlayerIndex(), 0);
+@@ -124,24 +122,20 @@
+ #endif
+ }
+ 
+-bool NetworkClient::getMessage(NetMessage *message)
++bool NetworkClient::getPacket(NetPacket *packet)
+ {
+-    if(clientsocket == 0)
+-        return false;
+-    
+-    if(!receive_queue.isReady())
+-        return false;
+-    
+-    receive_queue.dequeue( &amp;net_packet );
+-    memcpy(message, net_packet.data, net_packet.getSize());
++    if ( clientsocket &amp;&amp; receive_queue.isReady() )
++    {
++        receive_queue.dequeue( packet );
+ 
+ #ifdef NETWORKDEBUG
+-    NetPacketDebugger::logMessage(&quot;R&quot;, message);
++        NetPacketDebugger::logMessage(&quot;R&quot;, packet-&gt;getNetMessage());
+ #endif
+ 
+-    NetworkState::incPacketsReceived(net_packet.getSize());
+-
+-    return true;
++        NetworkState::incPacketsReceived(packet-&gt;size);
++        return true;
++    }
++    return false;
+ }
+ 
+ void NetworkClient::checkIncoming()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -38,7 +38,6 @@
+ class NetworkClient : public NetworkInterface, ClientSocketObserver
+ {
+ protected:
+-    NetPacket net_packet;
+     unsigned short connection_status;
+ 
+     void onClientConnected(ClientSocket *s);
+@@ -54,7 +53,7 @@
+     void sendMessage(NetMessage* message, size_t size);
+     void sendRemaining();
+ 
+-    bool getMessage(NetMessage *message);
++    bool getPacket(NetPacket *packet);
+ 
+ 
+     void checkIncoming();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -28,6 +28,7 @@
+ 
+     TEMP_PACKET.fromPlayer = fromPlayer;
+     TEMP_PACKET.fromClient = fromClient;
++    TEMP_PACKET.size = size;
+     assert(size &lt;= _MAX_NET_PACKET_SIZE);
+ 
+     memcpy(TEMP_PACKET.data, data, size);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -139,7 +139,6 @@
+         {
+             try
+             {
+-                message-&gt;setSize(size);
+                 (*i)-&gt;client_socket-&gt;sendMessage( message, size);
+             }
+             catch(std::exception&amp; e)
+@@ -168,7 +167,6 @@
+         {
+             try
+             {
+-                message-&gt;setSize(size);
+                 (*i)-&gt;client_socket-&gt;sendMessage( message, size);
+ 
+                 NetworkState::incPacketsSent(size);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -44,7 +44,6 @@
+     {
+         message_class = _net_message_class_powerup;
+         message_id = _net_message_id_powerup_create;
+-        setSize(sizeof(*this));
+     }
+     void set(iXY map_loc, PowerUpID ID, int type)
+     {
+@@ -83,7 +82,6 @@
+     {
+         message_class = _net_message_class_powerup;
+         message_id = _net_message_id_powerup_hit;
+-        setSize(sizeof(*this));
+     }
+     void set(PowerUpID ID, PlayerID player_id, int type=0)
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -106,7 +106,6 @@
+ {
+     unsigned long queue_position = 1;
+     ConnectProcessUpdate process_update;
+-    process_update.setSize(sizeof(ConnectProcessUpdate));
+ 
+     ConnectQueueIterator i;
+     for(i = connect_queue.begin(); i != connect_queue.end(); ++i)
+@@ -153,7 +152,6 @@
+     }
+ 
+     join_request_ack.setServerProtocolVersion(NETPANZER_PROTOCOL_VERSION);
+-    join_request_ack.setSize(sizeof(ClientConnectJoinRequestAck));
+     packet-&gt;fromClient-&gt;sendMessage(&amp;join_request_ack,
+                          sizeof(ClientConnectJoinRequestAck));
+     packet-&gt;fromClient-&gt;sendRemaining();
+@@ -218,7 +216,6 @@
+         connection_state  = connect_state_wait_for_connect_request;
+ 
+         ClientConnectStartConnect start_connect;
+-        start_connect.setSize(sizeof(ClientConnectStartConnect));
+         
+         connect_client-&gt;sendMessage( &amp;start_connect,
+                                      sizeof(ClientConnectStartConnect));
+@@ -254,7 +251,6 @@
+             time_out_timer.reset();
+             connect_client-&gt;player_id = player-&gt;getID();
+         }
+-        connect_result.setSize(sizeof(ClientConnectResult));
+         connect_client-&gt;sendMessage( &amp;connect_result,
+                                      sizeof(ClientConnectResult));
+         connect_client-&gt;sendRemaining();
+@@ -288,7 +284,6 @@
+             // ** send server game setting map, units, player, etc.
+             ConnectMesgServerGameSettings* server_game_setup
+                 = GameManager::getServerGameSetup();
+-            server_game_setup-&gt;setSize(sizeof(ConnectMesgServerGameSettings));
+             connect_client-&gt;sendMessage( server_game_setup,
+                                          sizeof(ConnectMesgServerGameSettings));
+             connect_client-&gt;sendRemaining();
+@@ -320,7 +315,6 @@
+         if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ack )
+         {
+             PlayerConnectID player_connect_mesg(connect_client-&gt;getPlayerIndex());
+-            player_connect_mesg.setSize(sizeof(PlayerConnectID));
+             connect_client-&gt;sendMessage( &amp;player_connect_mesg,
+                                          sizeof(PlayerConnectID));
+             
+@@ -329,7 +323,6 @@
+             ConnectProcessStateMessage state_mesg;
+             state_mesg.setMessageEnum(_connect_state_message_sync_player_info);
+             state_mesg.setPercentComplete(0);
+-            state_mesg.setSize(sizeof(ConnectProcessStateMessage));
+             connect_client-&gt;sendMessage( &amp;state_mesg,
+                                          sizeof(ConnectProcessStateMessage));
+             connect_client-&gt;sendRemaining();
+@@ -364,7 +357,6 @@
+     unsigned char buffer[_MAX_NET_PACKET_SIZE];
+     unsigned int buffer_pos = 0;
+     PlayerStateSync msg;
+-    msg.setSize(sizeof(PlayerStateSync));
+     while ( buffer_pos+sizeof(PlayerStateSync) &lt; _MAX_NET_PACKET_SIZE
+             &amp;&amp; percent_complete != 100)
+     {
+@@ -382,7 +374,6 @@
+     
+     state_mesg.setMessageEnum(_connect_state_message_sync_player_info_percent);
+     state_mesg.setPercentComplete(percent_complete);
+-    state_mesg.setSize(sizeof(ConnectProcessStateMessage));
+     connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(ConnectProcessStateMessage));
+     connect_client-&gt;sendRemaining();
+ 
+@@ -402,7 +393,6 @@
+ 
+         PlayerState *p = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+         PlayerStateSync player_state_update( p-&gt;getNetworkPlayerState() );
+-        player_state_update.setSize(sizeof(PlayerStateSync));
+         SERVER-&gt;broadcastMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+         
+         if(connection_state != connect_state_idle)
+@@ -417,7 +407,6 @@
+ bool ServerConnectDaemon::connectStateUnitSync()
+ {
+     ConnectProcessStateMessage state_mesg;
+-    state_mesg.setSize(sizeof(ConnectProcessStateMessage));
+     
+     int percent_complete = connect_unit_sync-&gt;getPercentComplete();
+ 
+@@ -444,7 +433,6 @@
+                                  sizeof(ConnectProcessStateMessage));
+ 
+     UnitSyncIntegrityCheck unit_integrity_check_mesg;
+-    unit_integrity_check_mesg.setSize(sizeof(UnitSyncIntegrityCheck));
+     connect_client-&gt;sendMessage( &amp;unit_integrity_check_mesg,
+                                  sizeof(UnitSyncIntegrityCheck));
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -95,22 +95,23 @@
+ void ServerMessageRouter::routeMessages()
+ {
+     ServerConnectDaemon::connectProcess();
++    Uint16 msg_len;
++    NetMessage* mmessage;
+ 
+     while(SERVER-&gt;getPacket(&amp;temp_packet) == true)
+     {
+         const NetMessage* message = temp_packet.getNetMessage();
+         if (message-&gt;message_class == _net_message_class_multi)
+         {
+-            message_decoder.setDecodeMessage((const MultiMessage *) message);
++            message_decoder.setDecodeMessage((const MultiMessage *) message, temp_packet.size);
+ 
+             NetPacket packet;
+             packet.fromPlayer = temp_packet.fromPlayer;
+             packet.fromClient = temp_packet.fromClient;
+             
+-            NetMessage* mmessage;
+-            while(message_decoder.decodeMessage(&amp;mmessage))
++            while ( (msg_len = message_decoder.decodeMessage(&amp;mmessage)) )
+             {
+-                memcpy(packet.data, mmessage, mmessage-&gt;getSize());
++                memcpy(packet.data, mmessage, msg_len);
+                 routePacket(&amp;packet);
+             }
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -66,8 +66,8 @@
+                                     unit_map_loc.x,
+                                     unit_map_loc.y,
+                                     unit-&gt;unit_state.unit_type);
+-    create_message.setSize(sizeof(UnitRemoteCreate));
+-    client-&gt;sendMessage( &amp;create_message, sizeof(create_message));
++
++    client-&gt;sendMessage( &amp;create_message, sizeof(UnitRemoteCreate));
+     
+     // XXX when send units to new players it also send sync command to all players
+     // This will change in future
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -61,9 +61,9 @@
+         message_scope = _chat_mesg_scope_all;
+     }
+ 
+-    int getTextLen() const
++    int getTextLen(size_t size) const
+     {
+-        return getSize() - CHATREQUEST_HEADER_LEN;
++        return size - CHATREQUEST_HEADER_LEN;
+     }
+ 
+ } __attribute__((packed));
+@@ -85,9 +85,9 @@
+         memset(message_text, 0, sizeof(message_text));
+     }
+ 
+-    int getTextLen() const
++    int getTextLen(size_t size) const
+     {
+-        return getSize() - CHATMESG_HEADER_LEN;
++        return size - CHATMESG_HEADER_LEN;
+     }
+ 
+     PlayerID getSourcePlayerIndex() const
+@@ -116,7 +116,7 @@
+     bool post_on_server = false;
+     ChatMesg chat_mesg;
+     char text[MAX_CHAT_MSG_LEN+1];
+-    int text_len = chat_request-&gt;getTextLen();
++    int text_len = chat_request-&gt;getTextLen(packet-&gt;size);
+ 
+     chat_mesg.setSourcePlayerIndex(packet-&gt;fromPlayer);
+     chat_mesg.message_scope = chat_request-&gt;message_scope;
+@@ -209,7 +209,7 @@
+     }
+ }
+ 
+-void ChatInterface::clientHandleChatMessage(const NetMessage* message)
++void ChatInterface::clientHandleChatMessage(const NetMessage* message, size_t size)
+ {
+     if ( message-&gt;message_id != _net_message_id_chat_mesg )
+     {
+@@ -229,7 +229,7 @@
+     }
+ 
+     unsigned char text[MAX_CHAT_MSG_LEN+1];
+-    int text_len = chat_mesg-&gt;getTextLen();
++    int text_len = chat_mesg-&gt;getTextLen(size);
+     memcpy(text, chat_mesg-&gt;message_text, text_len);
+     text[text_len] = 0;
+ 
+@@ -299,7 +299,6 @@
+     }
+     else
+     {
+-        cmsg.setSize(CHATREQUEST_HEADER_LEN + text_len);
+         EnqueueIncomingPacket(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len,
+                               PlayerInterface::getLocalPlayerIndex(), 0);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -27,7 +27,7 @@
+ {
+ public:
+     static void processChatMessages(const NetPacket* packet);
+-    static void clientHandleChatMessage(const NetMessage* message);
++    static void clientHandleChatMessage(const NetMessage* message, size_t size);
+ 
+     static void say(const char * message);
+     static void teamsay(const char * message);
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -94,47 +94,42 @@
+ {
+     if ( socket )
+     {
+-        if ( sendpos )
++        if ( sendpos+size &gt; sizeof(sendbuffer) )
+         {
+-            if ( sendpos+size &gt; sizeof(sendbuffer) )
+-            {
+-                observer-&gt;onClientDisconected(this, &quot;Send buffer full, need to disconnect&quot;);
+-                return;
+-            }
+-            memcpy(sendbuffer+sendpos, data, size);
+-            sendpos += size;
+-//            sendRemaining(); // lets send later
++            observer-&gt;onClientDisconected(this, sendpos
++                                                ?&quot;Send buffer full, need to disconnect&quot;
++                                                :&quot;Send data bigger than buffer, need to disconnect&quot;);
++            return;
+         }
+-        else
+-        {
+-//            size_t s = socket-&gt;send(data, size); // lets send later
+-//            if ( s != size )
+-//            {
+-//                size_t remain = size-s;
+-                if ( size &gt; sizeof(sendbuffer) )
+-                {
+-                    observer-&gt;onClientDisconected(this, &quot;Send data bigger than buffer, need to disconnect&quot;);
+-                    return;
+-                }
+-                memcpy(sendbuffer, (char *)data, size);
+-                sendpos = size;
+-//            }
+-        }
++
++        Uint16 *buf = (Uint16*)(sendbuffer+sendpos);
++        *buf = htol16(size);
++        memcpy(buf+1, data, size);
++        sendpos += size+2;
++//        sendRemaining(); // lets send later
+     }
+ }
+ 
+ void
+ ClientSocket::sendRemaining()
+ {
+-    if ( socket &amp;&amp; sendpos ) {
++    if ( socket &amp;&amp; sendpos )
++    {
+         size_t s = socket-&gt;send(sendbuffer, sendpos);
+         if ( !s )
+-            return;
+-        if ( s != sendpos ) {
++        {
++            return; // early bail out
++        }
++
++        if ( s != sendpos )
++        {
+             memmove(sendbuffer, sendbuffer+s, sendpos-s);
+             sendpos -= s;
+-        } else
++        }
++        else
++        {
+             sendpos = 0;
++        }
+     }
+ }
+ 
+@@ -145,81 +140,55 @@
+     int dataptr = 0;
+     unsigned int remaining = len;
+     Uint16 packetsize=0;
+-    while ( remaining ) {
+-        if ( !tempoffset ) {
+-            if ( remaining &lt; sizeof(NetMessage) ) {
+-                memcpy(tempbuffer, data+dataptr, remaining);
+-                tempoffset = remaining;
+-                break; // no more data
+-            }
+-            
+-            packetsize=htol16(*((Uint16*)(data+dataptr)));;
+-            
+-            if ( packetsize &lt; sizeof(NetMessage) ) {
+-                LOGGER.debug(&quot;Received wrong packetsize: less than required [%d]&quot;, packetsize);
+-                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (less than required)&quot;);
+-                break; // we are deleted
+-            }
+-            
+-            if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+-                LOGGER.debug(&quot;Received wrong packetsize: more than limit [%d]&quot;, packetsize);
+-                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (more than limit)&quot;);
+-                break; // we are deleted
+-            }
+-            
+-            if ( remaining &gt;= packetsize ) {
+-                EnqueueIncomingPacket(data+dataptr, packetsize, player_id, this);
+-                remaining -= packetsize;
+-                dataptr   += packetsize;
+-            } else {
+-                memcpy(tempbuffer, data+dataptr, remaining);
+-                tempoffset = remaining;
+-                remaining=0;
+-            }
+-        } else {
+-            if ( tempoffset &lt; sizeof(NetMessage) ) {
+-                // copy the needed until netMessage
+-                LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more for head&quot;, id);
+-                unsigned int needsize = sizeof(NetMessage)-tempoffset;
+-                unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
+-                memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+-                remaining  -= tocopy;
+-                tempoffset += tocopy;
+-                dataptr    += tocopy;
+-            }
+-            
+-            if ( tempoffset &lt; sizeof(NetMessage) )
+-                break; // no more data
+-                
+-            packetsize=htol16(*((Uint16*)tempbuffer));;
+-            
+-            if ( packetsize &lt; sizeof(NetMessage) ) {
+-                LOGGER.debug(&quot;Received wrong packetsize(half): less than required [%d]&quot;, packetsize);
+-                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (less than required(half))&quot;);
+-                break; // we are deleted
+-            }
+-            
+-            if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+-                LOGGER.debug(&quot;Received wrong packetsize(half): more than limit [%d]&quot;, packetsize);
+-                observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (more than limit(half))&quot;);
+-                break; // we are deleted
+-            }
+-                
+-            if ( (tempoffset &lt; packetsize) &amp;&amp; remaining ) {
+-                LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more data&quot;, id);
+-                unsigned int needsize = packetsize-tempoffset;
+-                unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
+-                memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+-                remaining  -= tocopy;
+-                tempoffset += tocopy;
+-                dataptr    += tocopy;
+-            }
+-            
+-            if ( tempoffset == packetsize ) {
+-                EnqueueIncomingPacket(tempbuffer, packetsize, player_id, this);
+-                tempoffset = 0;
+-            }
++    while ( remaining )
++    {
++        if ( tempoffset &lt; sizeof(Uint16) )
++        {
++            // copy the needed until netMessage
++            LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more for head&quot;, id);
++            unsigned int needsize = sizeof(Uint16)-tempoffset;
++            unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
++            memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
++            remaining  -= tocopy;
++            tempoffset += tocopy;
++            dataptr    += tocopy;
+         }
++
++        if ( tempoffset &lt; sizeof(Uint16) )
++            break; // no more data
++
++        packetsize=ltoh16(*((Uint16*)tempbuffer));;
++
++        if ( packetsize &lt; sizeof(NetMessage) )
++        {
++            LOGGER.debug(&quot;Received buggy packet size (&lt; min) [%d]&quot;, packetsize);
++            observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (&lt; min)&quot;);
++            break; // we are deleted
++        }
++
++        if ( packetsize &gt; _MAX_NET_PACKET_SIZE )
++        {
++            LOGGER.debug(&quot;Received buggy packet size (&gt; max) [%d]&quot;, packetsize);
++            observer-&gt;onClientDisconected(this, &quot;Received buggy packet size (&gt; max)&quot;);
++            break; // we are deleted
++        }
++
++        if ( (tempoffset-2 &lt; packetsize) &amp;&amp; remaining )
++        {
++            LOGGER.debug(&quot;ClientSocket::onDataReceived(%d) Reading more data&quot;, id);
++            unsigned int needsize = packetsize-(tempoffset-2);
++            unsigned int tocopy   = (remaining&gt;needsize)?needsize:remaining;
++            memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
++            remaining  -= tocopy;
++            tempoffset += tocopy;
++            dataptr    += tocopy;
++        }
++
++        if ( tempoffset-2 == packetsize )
++        {
++            EnqueueIncomingPacket(tempbuffer+sizeof(Uint16), packetsize, player_id, this);
++            tempoffset = 0;
++        }
+     } // while
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -231,7 +231,7 @@
+ 
+             if ( packet-&gt;fromClient )
+             {
+-                packet-&gt;fromClient-&gt;sendMessage(msg, msg-&gt;getSize());
++                packet-&gt;fromClient-&gt;sendMessage(msg, sizeof(ObjectiveChangeGeneratingUnit));
+             }
+ 
+             break;
+@@ -269,7 +269,7 @@
+ 
+             if ( packet-&gt;fromClient )
+             {
+-                packet-&gt;fromClient-&gt;sendMessage(msg, msg-&gt;getSize());
++                packet-&gt;fromClient-&gt;sendMessage(msg, sizeof(ObjectiveChangeOutputLocation));
+             }
+ 
+             break;
+@@ -477,7 +477,6 @@
+     unsigned char buffer[_MAX_NET_PACKET_SIZE];
+     unsigned int buffer_pos = 0;
+     ObjectiveSyncMesg msg;
+-    msg.setSize(sizeof(ObjectiveSyncMesg));
+     for(int i = 0; i &lt; num_objectives; ++i )
+     {
+         if ( buffer_pos+sizeof(ObjectiveSyncMesg) &gt; sizeof(buffer) )
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -753,10 +753,10 @@
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::unitOpcodeMessage(const NetMessage *net_message)
++void UnitInterface::unitOpcodeMessage(const NetMessage *net_message, size_t size)
+ {
+     UnitOpcodeDecoder decoder;
+-    decoder.setMessage(net_message);
++    decoder.setMessage(net_message, size);
+ 
+     UnitOpcode* opcode;
+     while(decoder.decode(&amp;opcode)) {
+@@ -820,7 +820,7 @@
+ }
+ 
+ // ******************************************************************
+-void UnitInterface::processNetMessage(const NetMessage* net_message)
++void UnitInterface::processNetMessage(const NetMessage* net_message, size_t size)
+ {
+     switch(net_message-&gt;message_id)  {
+         case _net_message_id_ini_sync_mesg:
+@@ -828,7 +828,7 @@
+             break;
+ 
+         case _net_message_id_opcode_mesg:
+-            unitOpcodeMessage(net_message);
++            unitOpcodeMessage(net_message, size);
+             break;
+ 
+         case _net_message_id_destroy_unit:
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -165,7 +165,7 @@
+     }
+ 
+     static void unitSyncMessage(const NetMessage *net_message );
+-    static void unitOpcodeMessage(const NetMessage *net_message );
++    static void unitOpcodeMessage(const NetMessage *net_message, size_t size);
+     static void unitDestroyMessage(const NetMessage *net_message );
+     static void unitCreateMessage(const NetMessage *net_message );
+     static void unitSyncIntegrityCheckMessage(const NetMessage *net_message );
+@@ -180,7 +180,7 @@
+     static unsigned long  sync_units_total_units;
+ 
+ public:
+-    static void processNetMessage(const NetMessage *net_message );
++    static void processNetMessage(const NetMessage *net_message, size_t size);
+     static void destroyPlayerUnits(PlayerID player_id);
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -37,24 +37,24 @@
+ }
+ 
+ void
+-UnitOpcodeDecoder::setMessage(const NetMessage* message)
++UnitOpcodeDecoder::setMessage(const NetMessage* message, size_t size)
+ {
+-    if(message-&gt;getSize() &gt; sizeof(opcode_message)) {
++    if(size &gt; sizeof(opcode_message)) {
+         LOGGER.warning(&quot;Opcodemessage too big.&quot;);
+         memset(&amp;opcode_message, 0, sizeof(opcode_message));
+         reset();
+         return;
+     }
+ 
+-    memcpy(&amp;opcode_message, message, message-&gt;getSize());
++    memcpy(&amp;opcode_message, message, size);
++    message_size = size;
+     reset();
+ }
+ 
+ bool
+ UnitOpcodeDecoder::decode(UnitOpcode** opcode)
+ {
+-    if(opcode_index + opcode_message.getHeaderSize() &gt;=
+-            opcode_message.getSize())
++    if(opcode_index + opcode_message.getHeaderSize() &gt;= message_size)
+         return false;
+     
+     *opcode = (UnitOpcode*) (opcode_message.data + opcode_index);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -25,6 +25,7 @@
+ {
+ private:
+     UnitOpcodeMessage opcode_message;
++    size_t message_size;
+     size_t opcode_index;
+ 
+     void reset();
+@@ -33,7 +34,7 @@
+     UnitOpcodeDecoder();
+     ~UnitOpcodeDecoder();
+     
+-    void setMessage(const NetMessage* message);
++    void setMessage(const NetMessage* message, size_t size);
+     bool decode(UnitOpcode** opcode);
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitOpcodes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitOpcodes.hpp	2010-11-10 13:29:18 UTC (rev 1224)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitOpcodes.hpp	2010-11-11 10:07:04 UTC (rev 1225)
+@@ -18,7 +18,8 @@
+ #ifndef _UNITOPCODES_HPP
+ #define _UNITOPCODES_HPP
+ 
+-#include &quot;Units/UnitBase.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
++#include &quot;Types/iXY.hpp&quot;
+ #include &lt;queue&gt;
+ 
+ enum { _unit_opcode_flag_sync = 0x01 };
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000250.html">[Netpanzer-cvs] r1224 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core
+</A></li>
+	<LI>Next message: <A HREF="000252.html">[Netpanzer-cvs] r1226 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#251">[ date ]</a>
+              <a href="thread.html#251">[ thread ]</a>
+              <a href="subject.html#251">[ subject ]</a>
+              <a href="author.html#251">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

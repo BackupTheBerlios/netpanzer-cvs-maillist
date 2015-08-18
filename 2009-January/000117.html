@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1085 - in trunk/netpanzer: . mk/jam support/icon
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1085%20-%20in%20trunk/netpanzer%3A%20.%20mk/jam%20support/icon&In-Reply-To=%3C200901131532.n0DFW6eQ003214%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000118.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1085 - in trunk/netpanzer: . mk/jam support/icon</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1085%20-%20in%20trunk/netpanzer%3A%20.%20mk/jam%20support/icon&In-Reply-To=%3C200901131532.n0DFW6eQ003214%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1085 - in trunk/netpanzer: . mk/jam support/icon">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 13 16:32:06 CET 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000118.html">[Netpanzer-cvs] r1086 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Interfaces NetPanzer/Resources NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#117">[ date ]</a>
+              <a href="thread.html#117">[ thread ]</a>
+              <a href="subject.html#117">[ subject ]</a>
+              <a href="author.html#117">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-01-13 16:31:51 +0100 (Tue, 13 Jan 2009)
+New Revision: 1085
+
+Added:
+   trunk/netpanzer/Jamconfig.in
+   trunk/netpanzer/support/icon/npicon.rc
+Modified:
+   trunk/netpanzer/
+   trunk/netpanzer/Jamfile
+   trunk/netpanzer/autogen.sh
+   trunk/netpanzer/configure.ac
+   trunk/netpanzer/mk/jam/win32.jam
+Log:
+- Jamconfig.in not generated anymore
+- added compilation option to make generic linux binaries (--enable-linuxbin)
+- added missing check of linker for target (AC_PROG_LIBTOOL) in configure.ac
+- added generation of icon for the netpanzer.exe (windows)
+
+
+
+Property changes on: trunk/netpanzer
+___________________________________________________________________
+Name: svn:ignore
+   - netpanzerbrowser
+SDL.dll
+smpeg.dll
+libvorbisfile-3.dll
+packets_*.txt
+config.h.in
+build
+libvorbis-0.dll
+SDL_mixer.dll
+netpanzer
+netpanzer-debug.exe
+config.log
+log.txt
+config.h
+configure
+stderr.txt
+autom4te.cache
+.emacs
+NetworkStats.log
+config.status
+stamp-h1
+Jamconfig.in
+Jamconfig
+SDLMain.h
+aclocal.m4
+libogg-0.dll
+SDLMain.m
+stdout.txt
+stamp-h.in
+stuff
+Makefile.in
+netpanzeredit
+release
+netpanzer-debug
+out
+dist
+.dep.inc
+
+   + netpanzerbrowser
+SDL.dll
+smpeg.dll
+libvorbisfile-3.dll
+packets_*.txt
+config.h.in
+build
+libvorbis-0.dll
+SDL_mixer.dll
+netpanzer
+netpanzer-debug.exe
+config.log
+log.txt
+config.h
+configure
+stderr.txt
+autom4te.cache
+.emacs
+NetworkStats.log
+config.status
+stamp-h1
+Jamconfig
+SDLMain.h
+aclocal.m4
+libogg-0.dll
+SDLMain.m
+stdout.txt
+stamp-h.in
+stuff
+Makefile.in
+netpanzeredit
+release
+netpanzer-debug
+out
+dist
+.dep.inc
+
+
+Added: trunk/netpanzer/Jamconfig.in
+===================================================================
+--- trunk/netpanzer/Jamconfig.in	2008-12-14 14:08:26 UTC (rev 1084)
++++ trunk/netpanzer/Jamconfig.in	2009-01-13 15:31:51 UTC (rev 1085)
+@@ -0,0 +1,95 @@
++SHELL = &quot;@SHELL@&quot; ;
++
++PATH_SEPARATOR = &quot;@PATH_SEPARATOR@&quot; ;
++PACKAGE_NAME = &quot;@PACKAGE_NAME@&quot; ;
++PACKAGE_TARNAME = &quot;@PACKAGE_TARNAME@&quot; ;
++PACKAGE_VERSION = &quot;@PACKAGE_VERSION@&quot; ;
++PACKAGE_STRING = &quot;@PACKAGE_STRING@&quot; ;
++PACKAGE_BUGREPORT = &quot;@PACKAGE_BUGREPORT@&quot; ;
++
++DEFS = &quot;@DEFS@&quot; ;
++ECHO_C = &quot;@ECHO_C@&quot; ;
++ECHO_N = &quot;@ECHO_N@&quot; ;
++ECHO_T = &quot;@ECHO_T@&quot; ;
++
++LIBS = &quot;@LIBS@&quot; ;
++
++build_alias = &quot;@build_alias@&quot; ;
++host_alias = &quot;@host_alias@&quot; ;
++target_alias = &quot;@target_alias@&quot; ;
++
++build = &quot;@build@&quot; ;
++build_cpu = &quot;@build_cpu@&quot; ;
++build_vendor = &quot;@build_vendor@&quot; ;
++build_os = &quot;@build_os@&quot; ;
++
++host = &quot;@host@&quot; ;
++host_cpu = &quot;@host_cpu@&quot; ;
++host_vendor = &quot;@host_vendor@&quot; ;
++host_os = &quot;@host_os@&quot; ;
++
++target = &quot;@target@&quot; ;
++target_cpu = &quot;@target_cpu@&quot; ;
++target_vendor = &quot;@target_vendor@&quot; ;
++target_os = &quot;@target_os@&quot; ;
++
++ac_ct_CC = &quot;@ac_ct_CC@&quot; ;
++ac_ct_CXX = &quot;@ac_ct_CXX@&quot; ;
++CC = &quot;@CC@&quot; ;
++CPP = &quot;@CPP@&quot; ;
++CXX = &quot;@CXX@&quot; ;
++CXXCPP = &quot;@CXXCPP@&quot; ;
++AR = &quot;@AR@ -r&quot; ;
++RANLIB = &quot;@RANLIB@&quot; ;
++LIBTOOL = &quot;@LIBTOOL@&quot; ;
++STRIP = &quot;@STRIP@&quot; ;
++INSTALL = &quot;@INSTALL@&quot; ;
++WINDRES = &quot;@WINDRES@&quot; ;
++
++CFLAGS = &quot;@CFLAGS@&quot; ;
++CPPFLAGS = &quot;@CPPFLAGS@&quot; ;
++CXXFLAGS = &quot;@CXXFLAGS@&quot; ;
++LDFLAGS = &quot;@LDFLAGS@&quot; ;
++
++LIBS = &quot;@LIBS@&quot; ;
++LIBOBJS = &quot;@LIBOBJS@&quot; ;
++
++EXEEXT = &quot;@EXEEXT@&quot; ;
++OBJEXT = &quot;@OBJEXT@&quot; ;
++ECHO = &quot;@ECHO@&quot; ;
++GREP = &quot;@GREP@&quot; ;
++EGREP = &quot;@EGREP@&quot; ;
++LN_S = &quot;@LN_S@&quot; ;
++VARIANT = &quot;@VARIANT@&quot; ;
++
++INSTALL_PROGRAM = &quot;@INSTALL_PROGRAM@&quot; ;
++INSTALL_SCRIPT = &quot;@INSTALL_SCRIPT@&quot; ;
++INSTALL_DATA = &quot;@INSTALL_DATA@&quot; ;
++
++DOXYGEN = &quot;@DOXYGEN@&quot; ;
++
++SDL_CONFIG = &quot;@SDL_CONFIG@&quot; ;
++SDL_CFLAGS = &quot;@SDL_CFLAGS@&quot; ;
++SDL_LIBS = &quot;@SDL_LIBS@&quot; ;
++
++SDLMIXER_AVAILABLE = &quot;@SDLMIXER_AVAILABLE@&quot; ;
++SDLMIXER_CFLAGS = &quot;@SDLMIXER_CFLAGS@&quot; ;
++SDLMIXER_LIBS = &quot;@SDLMIXER_LIBS@&quot; ;
++
++prefix ?= &quot;@prefix@&quot; ;
++exec_prefix ?= &quot;@exec_prefix@&quot; ;
++bindir ?= &quot;@bindir@&quot; ;
++sbindir ?= &quot;@sbindir@&quot; ;
++libexecdir ?= &quot;@libexecdir@&quot; ;
++datarootdir ?= &quot;@datarootdir@&quot; ;
++datadir ?= &quot;@datadir@&quot; ;
++sysconfdir ?= &quot;@sysconfdir@&quot; ;
++sharedstatedir ?= &quot;@sharedstatedir@&quot; ;
++localstatedir ?= &quot;@localstatedir@&quot; ;
++libdir ?= &quot;@libdir@&quot; ;
++includedir ?= &quot;@includedir@&quot; ;
++oldincludedir ?= &quot;@oldincludedir@&quot; ;
++infodir ?= &quot;@infodir@&quot; ;
++mandir ?= &quot;@mandir@&quot; ;
++
++JAMCONFIG_READ = yes ;
+
+Modified: trunk/netpanzer/Jamfile
+===================================================================
+--- trunk/netpanzer/Jamfile	2008-12-14 14:08:26 UTC (rev 1084)
++++ trunk/netpanzer/Jamfile	2009-01-13 15:31:51 UTC (rev 1085)
+@@ -26,3 +26,6 @@
+     InstallDesktop netpanzer.desktop ;
+     InstallDoc ChangeLog README TODO RELNOTES docs/tipofday.txt docs/serverhowto.html ;
+ }
++
++Win32Resource netpanzer : support/icon/npicon.rc ;
++
+
+Modified: trunk/netpanzer/autogen.sh
+===================================================================
+--- trunk/netpanzer/autogen.sh	2008-12-14 14:08:26 UTC (rev 1084)
++++ trunk/netpanzer/autogen.sh	2009-01-13 15:31:51 UTC (rev 1085)
+@@ -10,12 +10,12 @@
+ aclocal -I $MACRODIR
+ 
+ # generate a Jamconfig.in
+-autoconf --trace=AC_SUBST \
+-  | sed -e 's/configure.ac:[0-9]*:AC_SUBST:\([^:]*\).*/\1 ?= &quot;@\1@&quot; ;/g' \
+-  &gt; Jamconfig.in
++#autoconf --trace=AC_SUBST \
++#  | sed -e 's/configure.ac:[0-9]*:AC_SUBST:\([^:]*\).*/\1 = &quot;@\1@&quot; ;/g' \
++#  &gt; Jamconfig.in
+ # seems autoconf --trace misses some things :-/
+-echo 'INSTALL ?= &quot;@INSTALL@&quot; ;' &gt;&gt; Jamconfig.in
+-echo 'JAMCONFIG_READ = yes ;' &gt;&gt; Jamconfig.in
++#echo 'INSTALL = &quot;@INSTALL@&quot; ;' &gt;&gt; Jamconfig.in
++#echo 'JAMCONFIG_READ = yes ;' &gt;&gt; Jamconfig.in
+ 
+ autoheader
+ autoconf
+
+Modified: trunk/netpanzer/configure.ac
+===================================================================
+--- trunk/netpanzer/configure.ac	2008-12-14 14:08:26 UTC (rev 1084)
++++ trunk/netpanzer/configure.ac	2009-01-13 15:31:51 UTC (rev 1085)
+@@ -49,6 +49,22 @@
+ # find applications
+ #----------------------------------------------------------------------------
+ AC_PROG_CXX
++
++AC_CHECK_TOOL(WINDRES, windres, no)
++
++AC_ARG_ENABLE([linuxbin],[AC_HELP_STRING([--enable-linuxbin],
++	[build binary for multiple distributions (default NO)])],
++	[
++		if test &quot;x$enableval&quot; = &quot;xyes&quot; ; then
++			rm -rf build/static-libs
++			mkdir build
++			mkdir build/static-libs
++			ln -s `$CXX -print-file-name=libstdc++.a` build/static-libs/libstdc++.a
++			LDFLAGS=&quot;$LDFLAGS -static-libgcc -L build/static-libs&quot;
++		fi
++	])
++
++AC_PROG_LIBTOOL
+ AC_PROG_INSTALL
+ 
+ # check if our c++ compiler is gcc3.2 or newer
+
+Modified: trunk/netpanzer/mk/jam/win32.jam
+===================================================================
+--- trunk/netpanzer/mk/jam/win32.jam	2008-12-14 14:08:26 UTC (rev 1084)
++++ trunk/netpanzer/mk/jam/win32.jam	2009-01-13 15:31:51 UTC (rev 1085)
+@@ -22,7 +22,7 @@
+ rule Win32Resource
+ {
+     local target = $($(&lt;)_TARGET) ;
+-    local rcobject = [ DoObjectGrist _resource.o ] ;
++    local rcobject = [ DoObjectGrist $(&gt;:B)_resource.o ] ;
+     LOCATE on $(rcobject) = $(LOCATE_TARGET) ;
+     SEARCH on $(rcobject) = $(LOCATE_TARGET) ;
+     
+
+Added: trunk/netpanzer/support/icon/npicon.rc
+===================================================================
+--- trunk/netpanzer/support/icon/npicon.rc	2008-12-14 14:08:26 UTC (rev 1084)
++++ trunk/netpanzer/support/icon/npicon.rc	2009-01-13 15:31:51 UTC (rev 1085)
+@@ -0,0 +1,2 @@
++MAINICON ICON &quot;netpanzer.ico&quot;
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000118.html">[Netpanzer-cvs] r1086 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Interfaces NetPanzer/Resources NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#117">[ date ]</a>
+              <a href="thread.html#117">[ thread ]</a>
+              <a href="subject.html#117">[ subject ]</a>
+              <a href="author.html#117">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,2113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1248 - in trunk/netpanzer: scripts	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Objectives	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1248%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Network%20src/NetPanzer/Objectives%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20src/NetPanzer/Views/Game&In-Reply-To=%3C20111010131347.AE382481390%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000273.html">
+   <LINK REL="Next"  HREF="000275.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1248 - in trunk/netpanzer: scripts	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Objectives	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1248%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Network%20src/NetPanzer/Objectives%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20src/NetPanzer/Views/Game&In-Reply-To=%3C20111010131347.AE382481390%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1248 - in trunk/netpanzer: scripts	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Objectives	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct 10 15:13:47 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000273.html">[Netpanzer-cvs] r1247 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+        <LI>Next message: <A HREF="000275.html">[Netpanzer-cvs] r1249 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#274">[ date ]</a>
+              <a href="thread.html#274">[ thread ]</a>
+              <a href="subject.html#274">[ subject ]</a>
+              <a href="author.html#274">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-10 15:13:47 +0200 (Mon, 10 Oct 2011)
+New Revision: 1248
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/scripts/usercommands.lua
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+Log:
+Added unit profile usage configuration and synchronization
+- added config.unit_profiles in scripts, it can be edited in config.cfg or using commands &quot;/server unitprofiles&quot; to list them and &quot;/server unitprofiles a b c d&quot; to set the profiles to load to a b c d.
+- The profiles are loaded when the game starts only, ideally should reload them every time the map is switched.
+- doesn't check for many possible errors, prepare to die.
+- Fix Crash when exiting game while the VehicleSelectionView is active
+- Fix problem in ChatInterface not sending messages......
+
+Very important: The script facilities doesn't have security, ANYONE connecting to the server can do a &quot;/server anything&quot; and it will be run in server, this could allow anyone to do bad things, at least there are not so many commands defined. I'll work on this next.
+ 
+
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -83,6 +83,16 @@
+         end
+     end,
+ 
++    unitprofiles_help = &quot;sets or get list of unit profiles loaded&quot;,
++    unitprofiles = function(param, player)
++        if ( param == &quot;&quot; ) then
++            netpanzer.serversayto( player, &quot;Unit profile list: &quot; .. config.game.unit_profiles);
++        else
++            config.game.unit_profiles = param;
++            netpanzer.serversayto( player, &quot;Unit profile list set to: &quot; .. config.game.unit_profiles);
++        end
++    end,
++
+     countdown_help = &quot;Do a countdown, use 'countdown &lt;time&gt; &lt;message&gt;'&quot;,
+     countdown = function(param, player)
+         local counttime, message = string.match(param, &quot;(%d+) *(.*)&quot;);
+
+Modified: trunk/netpanzer/scripts/usercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/usercommands.lua	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/scripts/usercommands.lua	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -70,7 +70,7 @@
+     end,
+ 
+     test = function(param)
+-        netpanzer.scriptmessage(&quot;The value of the thing is: &quot; .. game.frametime);
++        netpanzer.scriptmessage(&quot;the thing is: &quot; .. config.game.unit_profiles);
+     end,
+     
+     countdown_help = &quot;Do a countdown.&quot;,
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -25,6 +25,7 @@
+ #include &quot;NetworkClient.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Units/UnitProfileInterface.hpp&quot;
+ 
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+@@ -160,6 +161,11 @@
+         }
+         break;
+ 
++    case _connect_state_message_sync_unit_profiles:
++        LoadingView::append(&quot;Synchronizing unit profiles...&quot;);
++        UnitProfileInterface::clearProfiles();
++        break;
++
+     case  _connect_state_message_sync_units : {
+             LoadingView::append( &quot;Synchronizing Game Elements ...&quot; );
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -19,6 +19,7 @@
+ #include &quot;ClientMessageRouter.hpp&quot;
+ 
+ #include &quot;NetworkClient.hpp&quot;
++
+ #include &quot;Classes/Network/ClientConnectDaemon.hpp&quot;
+ 
+ #include &quot;Interfaces/GameManager.hpp&quot;
+@@ -30,6 +31,7 @@
+ 
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
++#include &quot;Units/UnitProfileInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+@@ -51,27 +53,33 @@
+ void
+ ClientMessageRouter::routeMessage(const NetMessage* message, size_t size)
+ {
+-    switch (message-&gt;message_class) {
+-        case _net_message_class_unit:
+-            UnitInterface::processNetMessage(message, size);
++    switch (message-&gt;message_class)
++    {
++        case _net_message_class_system:
++            GameManager::processSystemMessage(message);
+             break;
+ 
++        case _net_message_class_connect:
++            ClientConnectDaemon::processNetMessage(message);
++            break;
++
+         case _net_message_class_player:
+             PlayerInterface::processNetMessage(message);
+             break;
+ 
+-        case _net_message_class_system:
+-            GameManager::processSystemMessage(message);
++        case _net_message_class_unit:
++            UnitInterface::processNetMessage(message, size);
+             break;
+ 
+-        case _net_message_class_chat:
+-            ChatInterface::clientHandleChatMessage(message, size);
++        case _net_message_class_unit_profile:
++            {
++                UnitProfileInterface::processNetMessage(message, size);
++                ConnectMesgClientSendNextUnit msg;
++                CLIENT-&gt;sendMessage(&amp;msg, sizeof(msg));
++//                CLIENT-&gt;sendRemaining();
++            }
+             break;
+ 
+-        case _net_message_class_connect:
+-            ClientConnectDaemon::processNetMessage(message);
+-            break;
+-
+         case _net_message_class_objective:
+             ObjectiveInterface::clientHandleNetMessage(message);
+             break;
+@@ -84,6 +92,10 @@
+             PowerUpInterface::processNetMessages(message);
+             break;
+ 
++        case _net_message_class_chat:
++            ChatInterface::clientHandleChatMessage(message, size);
++            break;
++
+         default:
+             LOGGER.warning(&quot;Message has unknown message class %d.&quot;,
+                     message-&gt;message_class);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -37,6 +37,7 @@
+        _net_message_id_connect_server_game_setup,
+        _net_message_id_connect_client_game_setup_ping,
+        _net_message_id_connect_client_game_setup_ack,
++       _net_message_id_connect_client_send_next_unit_profile,
+        _net_message_id_connect_client_abort,
+        _net_message_id_connect_netPanzer_client_disconnect,
+        _net_message_id_connect_netPanzer_server_disconnect
+@@ -129,6 +130,7 @@
+ } __attribute__((packed));
+ 
+ enum { _connect_state_message_load_game_data,
++       _connect_state_message_sync_unit_profiles,
+        _connect_state_message_sync_player_info,
+        _connect_state_message_sync_player_info_percent,
+        _connect_state_message_sync_units,
+@@ -209,6 +211,18 @@
+     }
+ } __attribute__((packed));
+ 
++class ConnectMesgClientSendNextUnit : public NetMessage
++{
++public:
++    ConnectMesgClientSendNextUnit()
++    {
++        message_class = _net_message_class_connect;
++        message_id = _net_message_id_connect_client_send_next_unit_profile;
++    }
++} __attribute__((packed));
++
++
++
+ class ConnectMesgClientGameSetupPing : public NetMessage
+ {
+ public:
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessage.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -26,6 +26,7 @@
+        _net_message_class_connect,
+        _net_message_class_player,
+        _net_message_class_unit,
++       _net_message_class_unit_profile,
+        _net_message_class_terminal,
+        _net_message_class_objective,
+        _net_message_class_game_control,
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -104,7 +104,7 @@
+ 
+     log-&gt;flags(std::ios::hex);
+     log-&gt;fill('0');
+-    Uint8* data = (Uint8 *) message;
++//    Uint8* data = (Uint8 *) message;
+ //    for (size_t i=sizeof(NetMessage); i&lt;message-&gt;getSize(); ++i) {
+ //        if ((i%4) == 0)
+ //            *log &lt;&lt; &quot; &quot;;
+@@ -118,10 +118,10 @@
+ void NetPacketDebugger::logMultiMessage(std::ostream&amp; log,
+         const NetMessage* message)
+ {
+-    MultiMessage* mmessage = (MultiMessage*) message;
++//    MultiMessage* mmessage = (MultiMessage*) message;
+     
+     log &lt;&lt; &quot;multimessage:\n&quot;;
+-    size_t index = 0;
++//    size_t index = 0;
+ //    for(int i=0; i&lt;mmessage-&gt;message_count; i++) {
+ //        if(index + mmessage-&gt;getHeaderSize() &gt;= message-&gt;getSize()) {
+ //            log &lt;&lt; &quot;****Incorrect multi message!!!\n&quot;;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -29,6 +29,7 @@
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
++#include &quot;Units/UnitProfileInterface.hpp&quot;
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+@@ -45,6 +46,7 @@
+     connect_state_wait_for_connect_request,
+     connect_state_wait_for_client_settings,
+     connect_state_wait_for_client_game_setup_ack,
++    connect_state_unit_profile_sync,
+     connect_state_player_state_sync,
+     connect_state_sync_flags,
+     connect_state_unit_sync
+@@ -323,17 +325,55 @@
+             connect_client-&gt;sendMessage( &amp;player_connect_mesg,
+                                          sizeof(PlayerConnectID));
+             
+-            sync_count = 0;
+-            sync_end = PlayerInterface::getMaxPlayers();
+-
+             ConnectProcessStateMessage state_mesg;
+-            state_mesg.setMessageEnum(_connect_state_message_sync_player_info);
++            state_mesg.setMessageEnum(_connect_state_message_sync_unit_profiles);
+             state_mesg.setPercentComplete(0);
+             connect_client-&gt;sendMessage( &amp;state_mesg,
+                                          sizeof(ConnectProcessStateMessage));
+             connect_client-&gt;sendRemaining();
+             if(connection_state != connect_state_idle)
+             {
++                sync_count = 0;
++                sync_end = UnitProfileInterface::getNumUnitTypes();
++                connection_state = connect_state_unit_profile_sync;
++            }
++        }
++        else if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
++        {
++            time_out_timer.reset();
++        }
++    }
++    else if ( time_out_timer.count() )
++    {
++        player-&gt;setStatus( _player_state_free );
++        resetConnectFsm();
++    }
++}
++
++void ServerConnectDaemon::connectStateUnitProfileSync( const NetMessage* message )
++{
++    PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
++    if ( message != 0 || sync_count == 0)
++    {
++        if ( sync_count == 0 || message-&gt;message_id == _net_message_id_connect_client_send_next_unit_profile )
++        {
++            Uint8 data[ _MAX_NET_PACKET_SIZE ];
++            NetMessage *pmsg = (NetMessage*)&data;
++            int len = UnitProfileInterface::fillProfileSyncMessage(pmsg, sync_count++);
++            connect_client-&gt;sendMessage(data, len);
++            connect_client-&gt;sendRemaining();
++
++            if ( sync_count == sync_end &amp;&amp; connection_state != connect_state_idle )
++            {
++                ConnectProcessStateMessage state_mesg;
++                state_mesg.setMessageEnum(_connect_state_message_sync_player_info);
++                state_mesg.setPercentComplete(0);
++                connect_client-&gt;sendMessage( &amp;state_mesg,
++                                             sizeof(ConnectProcessStateMessage));
++                connect_client-&gt;sendRemaining();
++
++                sync_count = 0;
++                sync_end = PlayerInterface::getMaxPlayers();
+                 connection_state = connect_state_player_state_sync;
+             }
+         }
+@@ -553,6 +593,10 @@
+             connectStateWaitForClientGameSetupAck( message );
+             break;
+ 
++        case connect_state_unit_profile_sync:
++            connectStateUnitProfileSync( message );
++            break;
++
+         case connect_state_player_state_sync:
+             connectStatePlayerStateSync();
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -61,6 +61,7 @@
+     static void connectStateWaitForConnectRequest(const NetMessage* message);
+     static void connectStateWaitForClientSettings(const NetMessage* message);
+     static void connectStateWaitForClientGameSetupAck(const NetMessage* message);
++    static void connectStateUnitProfileSync( const NetMessage* message);
+     static void connectStatePlayerStateSync();
+     static void connectStateSyncFlags();
+     static void connectStateUnitSync();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -117,8 +117,6 @@
+ //-----------------------------------------------------------------
+ void BaseGameManager::initializeGameObjects()
+ {
+-    loadGameData();
+-
+     Physics::init();
+     Weapon::init();
+ 
+@@ -133,7 +131,7 @@
+ //-----------------------------------------------------------------
+ void BaseGameManager::loadGameData()
+ {
+-    UnitProfileInterface::loadUnitProfiles();
++//    UnitProfileInterface::loadUnitProfiles();
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::initializeNetworkSubSystem()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -335,7 +335,7 @@
+         unsigned int text_len = std::min(message.length(), MAX_CHAT_MSG_LEN);
+         ChatMesg cmsg;
+ 
+-        message.copy(cmsg.message_text, 0, text_len);
++        message.copy(cmsg.message_text, text_len);
+         cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+         cmsg.message_scope = _chat_mesg_scope_server;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -37,6 +37,8 @@
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ 
++#include &quot;Units/UnitProfileInterface.hpp&quot;
++
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ 
+@@ -233,6 +235,9 @@
+ 
+     GameManager::dedicatedLoadGameMap(gameconfig-&gt;map.c_str());
+ 
++    UnitProfileInterface::loadUnitProfiles();
++    ParticleInterface::rebuildUnitParticleData();
++
+     GameManager::reinitializeGameLogic();
+ 
+     SERVER-&gt;openSession();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -48,10 +48,11 @@
+ bool GameConfig::interface_show_flags = true;
+ bool GameConfig::interface_show_names = true;
+ 
+-bool GameConfig::game_enable_bases = true;
+-int  GameConfig::game_base_capture_mode = 1; // normal capture;
+-int  GameConfig::game_autokicktime = 20; // minutes;
+-bool GameConfig::game_allowmultiip = true;
++bool      GameConfig::game_enable_bases = true;
++int       GameConfig::game_base_capture_mode = 1; // normal capture;
++int       GameConfig::game_autokicktime = 20; // minutes;
++bool      GameConfig::game_allowmultiip = true;
++NPString* GameConfig::game_unit_profiles = 0;
+ 
+ Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
+ 
+@@ -110,6 +111,7 @@
+     { &quot;base_capture_mode&quot;, GETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
+     { &quot;autokicktime&quot;,      GETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+     { &quot;allowmultiip&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
++    { &quot;unit_profiles&quot;,     GETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+     {0,0}
+ };
+ 
+@@ -119,12 +121,17 @@
+     { &quot;base_capture_mode&quot;, SETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
+     { &quot;autokicktime&quot;,      SETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+     { &quot;allowmultiip&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
++    { &quot;unit_profiles&quot;,     SETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+     {0,0}
+ };
+ 
+ void GameConfig::registerScript(const NPString&amp; table_name)
+ {
+-//    ScriptManager::registerLib( table_name, video_methods);
++    if ( ! game_unit_profiles )
++    {
++        game_unit_profiles = new NPString(&quot;Manta, Panther1, Titan, Stinger, Bobcat, Bear, Archer, Wolf, Drake, Spanzer&quot;);
++    }
++
+     ScriptManager::bindStaticVariables(table_name + &quot;.video&quot;,
+                                        &quot;ConfigVideoMetaTable&quot;,
+                                        video_getters, video_setters);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -125,10 +125,11 @@
+     static bool interface_show_flags;
+     static bool interface_show_names;
+ 
+-    static bool game_enable_bases;
+-    static int  game_base_capture_mode; // 0=no capture, 1=normal, 2=...
+-    static int  game_autokicktime; // in minutes
+-    static bool game_allowmultiip; // allow multi connect from same ip
++    static bool      game_enable_bases;
++    static int       game_base_capture_mode; // 0=no capture, 1=normal, 2=...
++    static int       game_autokicktime; // in minutes
++    static bool      game_allowmultiip; // allow multi connect from same ip
++    static NPString* game_unit_profiles; // &quot;,&quot; separated list of profiles to load
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -109,6 +109,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ #include &quot;Bot/Bot.hpp&quot;
+ 
+@@ -359,6 +360,36 @@
+         graphicsLoop();
+     }
+ 
++    UnitProfileInterface::loadUnitProfiles();
++    if ( UnitProfileInterface::getNumUnitTypes() == 0 )
++    {
++        LoadingView::append( &quot;ERROR loading unit profiles, check your configuration&quot; );
++        LoadingView::append( &quot;game.unit_profiles is: &quot; + *GameConfig::game_unit_profiles );
++        graphicsLoop();
++        SDL_Delay(5000);
++        if ( infosocket )
++        {
++            delete infosocket;
++            infosocket = 0;
++        }
++        if ( heartbeat )
++        {
++            delete heartbeat;
++            heartbeat = 0;
++        }
++        if (CLIENT)
++        {
++            delete CLIENT;
++            CLIENT=0;
++        }
++
++        SERVER-&gt;closeSession();
++
++        GameControlRulesDaemon::setStateServerIdle();
++        LoadingView::loadError();
++        return;
++    }
++
+     sprintf( strbuf, &quot;Loading Game Data ... (%d%%)&quot;, percent_complete);
+     LoadingView::update( strbuf );
+     graphicsLoop();
+@@ -367,6 +398,7 @@
+     LoadingView::append( &quot;Initializing Game Logic ...&quot; );
+     graphicsLoop();
+     GameManager::reinitializeGameLogic();
++
+     LoadingView::update( &quot;Initializing Game Logic ... (100%) &quot; );
+     graphicsLoop();
+     
+@@ -388,18 +420,7 @@
+ 
+     GameManager::startGameTimer();
+ 
+-    LoadingView::hide();
+-
+-    // Set the palette to the game palette.
+-    GameManager::loadPalette( &quot;netp&quot;);
+-
+-    GameManager::setNetPanzerGameOptions();
+-
+-    // Need to open at beginning of game until we are saving status of things.
+-    // when last played.
+-    Desktop::setVisibility(&quot;MiniMapView&quot;, true);
+-    Desktop::setVisibility(&quot;GameView&quot;, true);
+-    Desktop::setActiveView(&quot;GameView&quot;);
++    LoadingView::loadFinish();
+ }
+ 
+ void PlayerGameManager::quitGame()
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -76,7 +76,7 @@
+     char *b=buf;
+     int line=0;
+     while(1) {
+-        char ch;
++        char ch=0;
+         //XXX
+         //if(socket.recv(&amp;ch, 1)!=1)
+             //break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -54,7 +54,9 @@
+ 
+     static Objective* getObjective( ObjectiveID objective_id )
+     {
+-        return objective_list[objective_id];
++        return (objective_list &amp;&amp; objective_id &lt; num_objectives)
++                ? objective_list[objective_id]
++                : 0;
+     }
+     
+     static Objective* getObjectiveAtWorldXY( const iXY&amp; loc );
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -914,6 +914,11 @@
+     //MapInterface::getMapPointSize(&amp;shit);
+     //addCloudParticle(iXY(400, 400), iXY(shit.x, shit.y));
+ 
++    rebuildUnitParticleData();
++}
++
++void ParticleInterface::rebuildUnitParticleData()
++{
+     buildUnitTables();
+     getUnitParticleInfo();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -144,6 +144,7 @@
+     static void addMoveDirtPuff(const UnitState &amp;unitState);
+ 
+     static void initParticleSystems();
++    static void rebuildUnitParticleData();
+ 
+     static void addUnitDamagePuffParticle(const UnitState &amp;unitState);
+ }; // end ParticleInterface
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -25,6 +25,8 @@
+ #include &quot;ScriptHelper.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
++#include &quot;Core/CoreTypes.hpp&quot;
++
+ static void notExistsError(lua_State *L )
+ {
+     lua_Debug ar;
+@@ -117,11 +119,42 @@
+ int
+ ScriptHelper::get_string (lua_State *L, void *v)
+ {
+-    lua_pushstring(L, (char*)v );
++    NPString** strp = (NPString**)v;
++    if ( strp )
++    {
++        lua_pushstring(L, (*strp)-&gt;c_str() );
++    }
++    else
++    {
++        lua_pushstring(L, &quot;&quot; );
++    }
+     return 1;
+ }
+ 
+ int
++ScriptHelper::set_string (lua_State *L, void *v)
++{
++    const char * s = lua_tostring(L, 3);
++    if ( !s )
++    {
++        notModifiedError(L,&quot;string&quot;);
++    }
++    else
++    {
++        NPString** strp = (NPString**)v;
++        if ( ! *strp )
++        {
++            *strp = new NPString(s);
++        }
++        else
++        {
++            (*strp)-&gt;assign(s);
++        }
++    }
++    return 0;
++}
++
++int
+ ScriptHelper::get_boolean (lua_State *L, void *v)
+ {
+     lua_pushboolean(L, *(bool*)v);
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -30,7 +30,7 @@
+ #define GETSVTYPE_NUMBER ScriptHelper::get_number
+ #define SETSVTYPE_NUMBER ScriptHelper::set_number
+ #define GETSVTYPE_STRING ScriptHelper::get_string
+-//#define SETSVTYPE_STRING ScriptHelper::set_string
++#define SETSVTYPE_STRING ScriptHelper::set_string
+ #define GETSVTYPE_BOOLEAN ScriptHelper::get_boolean
+ #define SETSVTYPE_BOOLEAN ScriptHelper::set_boolean
+ 
+@@ -57,6 +57,7 @@
+     static int set_number (lua_State *L, void *v);
+ 
+     static int get_string (lua_State *L, void *v);
++    static int set_string (lua_State *L, void *v);
+ 
+     static int get_boolean (lua_State *L, void *v);
+     static int set_boolean (lua_State *L, void *v);
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -36,6 +36,7 @@
+ 
+ int npmodule_load (lua_State *L);
+ 
++#if 0
+ static void DumpStack (const NPString&amp; text, lua_State *L)
+ {
+     int i;
+@@ -66,6 +67,9 @@
+     }
+     printf(&quot;\n&quot;);  /* end the listing */
+ }
++
++#endif
++
+ /**
+   * Prepares the lua stack to be able to do an indexing operationg:
+   *     table[key]
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -18,279 +18,331 @@
+ 
+ 
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
++#include &quot;Util/FileStream.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ #include &lt;ctype.h&gt;
+ #include &lt;memory&gt;
+ #include &lt;string.h&gt;
+ 
+-typedef
+-struct
+-{
+-    char params[32][128];
+-    short param_count;
+-}
+-parameter_list;
++#include &lt;vector&gt;
+ 
+-#define _MAX_KEY_LENGTH 64
++#include &quot;Classes/Network/NetMessage.hpp&quot;
++#include &quot;Classes/Network/NetPacket.hpp&quot;
+ 
+-char field_headers[28][64] =
+-{ 
+-    &quot;[TURRET_PLACEMENT]&quot;, &quot;[MOVE_OFFSET]&quot;, &quot;HITPOINTS&quot;,
+-    &quot;ATTACK_FACTOR&quot;, &quot;RELOAD_TIME&quot;, &quot;RANGE_MAX&quot;, &quot;REGEN_TIME&quot;,
+-    &quot;DEFEND_RANGE&quot;, &quot;SPEED_RATE&quot;, &quot;SPEED_FACTOR&quot;,
+-    &quot;IMAGE&quot;,&quot;BODYSPRITE&quot;, &quot;BODYSHADOW&quot;, &quot;TURRETSPRITE&quot;, &quot;TURRETSHADOW&quot;, &quot;SOUNDSELECTED&quot;,
+-    &quot;FIRESOUND&quot;, &quot;WEAPON&quot;, &quot;BOUNDBOX&quot;, 
+-    &quot;END&quot;
+-};
+-
+ enum
+-{ 
+-    _turret_place, _move_offset, _hit_points, _attack_x, _reload_time,
+-    _range_max, _regen_time, _defend_range, _speed_rate, _speed_factor,
+-    _image, _bodysprite, _bodyshadow, _turretsprite, _turretshadow, _soundselected,
+-    _firesound, _weapontype, _boundbox,
+-    _end
++{
++    _profile_msg_profile_desc = 0
+ };
+ 
+-short max_field_key = 28;
++class ByteBufferWriter
++{
++private:
++    unsigned char * buffer;
++    size_t len;
++    size_t pos;
+ 
++public:
++    ByteBufferWriter(unsigned char * buffer, int len)
++    {
++        this-&gt;buffer = buffer;
++        this-&gt;len = len;
++        this-&gt;pos = 0;
++    }
+ 
+-//****************************************************************************************
++    int writedBytesCount() const { return pos; }
+ 
+-char * extract_spaces(char *string,int index)
++    bool writeInt8( Uint8 c )
++    {
++        if ( len &gt;= pos+1 )
++        {
++            buffer[pos++] = c;
++            return true;
++        }
++        return false;
++    }
+ 
+-{
+-    int i=0;
+-    char *stroffset;
++    bool writeInt16( Uint16 c )
++    {
++        if ( len &gt;= pos+2 )
++        {
++            buffer[pos++] = c &amp; 0xff;
++            buffer[pos++] = (c &gt;&gt; 8) &amp; 0xff;
++            return true;
++        }
++        return false;
++    }
+ 
+-    stroffset = string+index;
++    bool writeInt32( Uint32 c )
++    {
++        if ( len &gt;= pos+4 )
++        {
++            buffer[pos++] = c &amp; 0xff;
++            buffer[pos++] = (c &gt;&gt; 8) &amp; 0xff;
++            buffer[pos++] = (c &gt;&gt; 16) &amp; 0xff;
++            buffer[pos++] = (c &gt;&gt; 24) &amp; 0xff;
++            return true;
++        }
++        return false;
++    }
+ 
+-    while( *(stroffset+i) == ' ' )/* extract leading spaces just encase */
+-        i++;
++    bool writeString( const NPString&amp; str)
++    {
++        if ( len &gt;= pos + 2 + str.length() )
++        {
++            writeInt16(str.length());
++            str.copy((char *)&amp;buffer[pos], str.length());
++            pos += str.length();
++            return true;
++        }
++        return false;
++    }
++};
+ 
+-    return(stroffset+i);
+-}
+-
+-//****************************************************************************************
+-
+-void find_keyword(char *string, int *command, char *key_list, char max_key_list )
++class ByteBufferReader
+ {
+-    int comindex;    /* index to config commands */
+-    short int notfound=1;
+-    char *str;
++private:
++    const unsigned char * buffer;
++    size_t len;
++    size_t pos;
+ 
+-    str = extract_spaces(string,0);
+-
+-    for(comindex=0; ( (comindex &lt; max_key_list )  &amp;&amp; notfound); comindex++ ) {
+-        notfound = strncasecmp( str, &amp;key_list[ comindex * _MAX_KEY_LENGTH ], strlen( &amp;key_list[ comindex * _MAX_KEY_LENGTH ]) );
++public:
++    ByteBufferReader(const unsigned char * buffer, int len)
++    {
++        this-&gt;buffer = buffer;
++        this-&gt;len = len;
++        this-&gt;pos = 0;
+     }
+ 
+-    comindex = comindex-1;
++    int readedBytesCount() const { return pos; }
+ 
+-    if ( (comindex == max_key_list - 1 ) &amp;&amp; (notfound != 0) ) /* Checks if no commands found */
+-        *command = max_key_list;
+-    else
+-        *command = comindex;
++    bool readInt8( Uint8* c )
++    {
++        if ( pos &lt; len )
++        {
++            *c = buffer[pos++];
++            return true;
++        }
++        return false;
++    }
+ 
+-}
+-//****************************************************************************************
++    bool readInt16( Uint16* c )
++    {
++        if ( len &gt;= pos+2 )
++        {
++            *c = buffer[pos] | (buffer[pos+1] &lt;&lt; 8);
++            pos+=2;
++            return true;
++        }
++        return false;
++    }
+ 
+-short extract_token( char *token, char **string )
+-{
+-    char token_char = ' ';
+-    char *str;
+-    short index = 0;
+-    short token_index = 0;
++    bool readInt32( Uint32* c )
++    {
++        if ( len &gt;= pos+4 )
++        {
++            *c = buffer[pos]
++               | (buffer[pos+1] &lt;&lt; 8)
++               | (buffer[pos+2] &lt;&lt; 16)
++               | (buffer[pos+3] &lt;&lt; 24);
++            pos += 4;
++            return true;
++        }
++        return false;
++    }
+ 
+-    str = *string;
+-
+-    str = extract_spaces( str, 0 );
+-
+-    while( (str[index] != 0) &amp;&amp; (str[ index ] != token_char) ) {
+-        if (str[index] == '&quot;')
+-            token_char = '&quot;';
++    bool readString( NPString&amp; str)
++    {
++        Uint16 slen = 0;
++        if ( readInt16(&amp;slen) )
++        {
++            if ( len &gt;= pos+slen )
++            {
++                if ( slen &gt; 0 )
++                {
++                    str.assign((char *)&amp;buffer[pos], slen);
++                    pos += str.length();
++                }
++                else
++                {
++                    str.clear();
++                }
++                return true;
++            }
++            else
++            {
++                pos -= 2;
++            }
++        }
+         else
+-            if ( (str[index] != '\n') &amp;&amp; (str[index] != '\r') ) {
+-                token[ token_index ] = str[index];
+-                token_index++;
+-            }
+-
+-        index++;
++        {
++            pos -= 2;
++        }
++        return false;
+     }
++};
+ 
+-    token[ token_index ] = 0;
++void string_to_params( const NPString&amp; str, vector&lt;NPString&gt;&amp; parameters )
++{
++    parameters.clear();
+ 
+-    *string = (str+index);
++    static char* limiters[] = { &quot;, \t&quot;, &quot;\&quot;&quot; };
+ 
+-    if(str[index] == 0)
+-        *string = 0;
++    NPString::size_type start = 0;
++    NPString::size_type end = 0;
+ 
+-    if ( token_index == 0 )
+-        return (false);
++    do
++    {
++        start = str.find_first_not_of(&quot; \t&quot;, start);
++        if ( start != NPString::npos )
++        {
++            int limit_index = 0;
++            if ( str[start] == '&quot;' &amp;&amp; start &lt; str.length()-1 )
++            {
++                limit_index = 1;
++                ++start;
++            }
+ 
+-    return (true);
++            end = str.find_first_of(limiters[limit_index], start);
+ 
+-}
++            parameters.push_back( str.substr(start, end != NPString::npos ? end-start : end) );
+ 
+-void string_to_params( char *string, parameter_list *params )
+-{
+-    params-&gt;param_count = 0;
+-
+-    if( extract_token( params-&gt;params[ params-&gt;param_count ], &amp;string ) )
+-        params-&gt;param_count++;
+-
+-
+-    while ( string != 0 ) {
+-        if( extract_token( params-&gt;params[ params-&gt;param_count ], &amp;string ) )
+-            params-&gt;param_count++;
+-    }
+-
++            if ( end != NPString::npos )
++            {
++                start = str.find_first_not_of(limiters[limit_index], end);
++            }
++        }
++    } while ( start != NPString::npos &amp;&amp; end != NPString::npos );
+ }
+ 
+-
+-void read_vehicle_profile(const std::string&amp; unitName, UnitProfile *profile)
++bool read_vehicle_profile(const NPString&amp; unitName, UnitProfile *profile)
+ {
+-    int field;
+-    char temp_str[256];
+-    parameter_list param_list;
+     int temp_int;
+-    short not_done = true;
++    bool not_done = true;
+ 
+-    std::string file_path = &quot;units/profiles/&quot;;
++    NPString file_path = &quot;units/profiles/&quot;;
+     file_path += unitName;
+     file_path += &quot;.pfl&quot;;
+ 
+     profile-&gt;unitname = unitName;
+     
+-    try {
+-	std::auto_ptr&lt;filesystem::ReadFile&gt; file(
+-                filesystem::openRead(file_path));
++    try
++    {
++        IFileStream in(file_path);
++        NPString line;
++        std::vector&lt;NPString&gt; parameters;
+ 
+-	while( not_done ) {
+-	    for(int i=0; i&lt;256; i++)
++        while( not_done &amp;&amp; !in.eof() )
+         {
+-            file-&gt;read(&amp;(temp_str[i]), 1, 1);
+-            if(temp_str[i] == '\n')
++            std::getline(in,line);
++            string_to_params( line, parameters );
++
++            if ( parameters.size() == 0 )
+             {
+-                temp_str[i] = 0;
+-                break;
++                continue;
+             }
+-	    }
+-        
+-	    string_to_params( temp_str, &amp;param_list );
+-	    find_keyword( param_list.params[0], &amp;field, (char * ) field_headers, max_field_key );
+ 
+-	    switch(field) {
+-		case _hit_points:
+-		    {
+- 			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;hit_points = (short) temp_int;
+-		    }
+-		    break;
+-
+-		case _attack_x:
+-		    {
+-   			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;attack_factor = (short) temp_int;
+-		    }
+-		    break;
+-
+-		case _reload_time:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;reload_time = (char) temp_int;
+-		    }
+-		    break;
+-
+-		case _range_max : 
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-                        temp_int *= 32;         // adjust new values
+-                        temp_int *= temp_int;
+-			profile-&gt;attack_range = (long) temp_int;
+-		    }
+-		    break;
+-
+-		case _regen_time: 
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;regen_time = (short) temp_int;
+-		    }
+-		    break;
+-
+-		case _defend_range: 
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-                        temp_int *= 32;         // adjust new values
+-                        temp_int *= temp_int;
+-                        profile-&gt;defend_range = (long) temp_int;
+-		    }
+-		    break;
+-
+-		case _speed_rate: 
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;speed_rate = (char) temp_int;
+-		    }
+-		    break;
+-
+-		case _speed_factor:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;speed_factor = (char) temp_int;
+-		    }
+-		    break;
+-
+-        case _image:
+-            profile-&gt;imagefile = param_list.params[1];
+-            break;
+-        
+-        case _bodysprite:
+-            profile-&gt;bodySprite.load(param_list.params[1]);
+-            break;
+-
+-        case _bodyshadow:
+-            profile-&gt;bodyShadow.load(param_list.params[1]);
+-            break;
+-            
+-        case _turretsprite:
+-            profile-&gt;turretSprite.load(param_list.params[1]);
+-            break;
+-
+-        case _turretshadow:
+-            profile-&gt;turretShadow.load(param_list.params[1]);
+-            break;
+-                
+-        case _soundselected:
+-            profile-&gt;soundSelected = param_list.params[1];
+-            break;
+-
+-        case _firesound:
+-            profile-&gt;fireSound = param_list.params[1];
+-            break;
+-            
+-        case _weapontype:
+-            profile-&gt;weaponType = param_list.params[1];
+-            break;
+-                
+-        case _boundbox:
+-            sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-            profile-&gt;boundBox = (short) temp_int;
+-            break;
+-                
+-		case _end :
+-		    {
+-			not_done = false;
+-		    }
+-		    break;
+-	    } // ** switch
++            if ( parameters[0] == &quot;HITPOINTS&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;hit_points = (short) temp_int;
++            }
++            else if ( parameters[0] == &quot;ATTACK_FACTOR&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;attack_factor = (short) temp_int;
++            }
++            else if ( parameters[0] == &quot;RELOAD_TIME&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;reload_time = (char) temp_int;
++            }
++            else if ( parameters[0] == &quot;RANGE_MAX&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;cfg_attack_range = temp_int;
++                temp_int *= 32;         // adjust new values
++                temp_int *= temp_int;
++                profile-&gt;attack_range = (long) temp_int;
++            }
++            else if ( parameters[0] == &quot;REGEN_TIME&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;regen_time = (short) temp_int;
++            }
++            else if ( parameters[0] == &quot;DEFEND_RANGE&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;cfg_defend_range = temp_int;
++                temp_int *= 32;         // adjust new values
++                temp_int *= temp_int;
++                profile-&gt;defend_range = (long) temp_int;
++            }
++            else if ( parameters[0] == &quot;SPEED_RATE&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;speed_rate = (char) temp_int;
++            }
++            else if ( parameters[0] == &quot;SPEED_FACTOR&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;speed_factor = (char) temp_int;
++            }
++            else if ( parameters[0] == &quot;IMAGE&quot; )
++            {
++                profile-&gt;imagefile = parameters[1];
++            }
++            else if ( parameters[0] == &quot;BODYSPRITE&quot; )
++            {
++                profile-&gt;bodySprite_name = parameters[1];
++                profile-&gt;bodySprite.load(parameters[1]);
++            }
++            else if ( parameters[0] == &quot;BODYSHADOW&quot; )
++            {
++                profile-&gt;bodyShadow_name = parameters[1];
++                profile-&gt;bodyShadow.load(parameters[1]);
++            }
++            else if ( parameters[0] == &quot;TURRETSPRITE&quot; )
++            {
++                profile-&gt;turretSprite_name = parameters[1];
++                profile-&gt;turretSprite.load(parameters[1]);
++            }
++            else if ( parameters[0] == &quot;TURRETSHADOW&quot; )
++            {
++                profile-&gt;turretShadow_name = parameters[1];
++                profile-&gt;turretShadow.load(parameters[1]);
++            }
++            else if ( parameters[0] == &quot;SOUNDSELECTED&quot; )
++            {
++                profile-&gt;soundSelected = parameters[1];
++            }
++            else if ( parameters[0] == &quot;FIRESOUND&quot; )
++            {
++                profile-&gt;fireSound = parameters[1];
++            }
++            else if ( parameters[0] == &quot;WEAPON&quot; )
++            {
++                profile-&gt;weaponType = parameters[1];
++            }
++            else if ( parameters[0] == &quot;BOUNDBOX&quot; )
++            {
++                sscanf( parameters[1].c_str(), &quot;%d&quot;, &amp;temp_int );
++                profile-&gt;boundBox = (short) temp_int;
++            }
++            else if ( parameters[0] == &quot;END&quot; || parameters[0] == &quot;END;&quot; )
++            {
++                not_done = false;
++            }
+ 	} // ** while ( !feof )
+     } catch(std::exception&amp; e) {
+-	throw Exception(&quot;Error while reading unitprofile '%s': %s&quot;,
+-		file_path.c_str(), e.what());
++        LOGGER.warning(&quot;Error while reading unitprofile '%s': %s&quot;,
++                       file_path.c_str(), e.what() );
++        return false;
+     }
++
++    return true;
+ } // function
+ 
+ vector&lt;UnitProfile *&gt; UnitProfileInterface::profiles;
+@@ -310,57 +362,45 @@
+ void UnitProfileInterface::loadUnitProfiles( void )
+ {
+     clearProfiles();
+-    UnitProfile * p;
+-    
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Manta&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
+-    
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Panther1&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
+ 
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Titan&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
++    std::vector&lt;NPString&gt; plist;
++    NPString pl = *GameConfig::game_unit_profiles;
+ 
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Stinger&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
+-    
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Bobcat&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
+-    
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Bear&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
++    string_to_params(pl, plist);
+ 
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Archer&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
++    for ( int n = 0; n &lt; plist.size(); ++n )
++    {
++        addLocalProfile(plist[n]);
++    }
+ 
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Wolf&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
+-    
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;Drake&quot;, p);
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
++    if ( profiles.size() == 0 )
++    {
++        LOGGER.warning(&quot;Didn't load ANY PROFILE!!! I should die.&quot;);
++    }
++//    addLocalProfile(&quot;Manta&quot;);
++//    addLocalProfile(&quot;Panther1&quot;);
++//    addLocalProfile(&quot;Titan&quot;);
++//    addLocalProfile(&quot;Stinger&quot;);
++//    addLocalProfile(&quot;Bobcat&quot;);
++//    addLocalProfile(&quot;Bear&quot;);
++//    addLocalProfile(&quot;Archer&quot;);
++//    addLocalProfile(&quot;Wolf&quot;);
++//    addLocalProfile(&quot;Drake&quot;);
++//    addLocalProfile(&quot;Spanzer&quot;);
++}
+ 
+-    p = new UnitProfile();
+-    read_vehicle_profile(&quot;SPanzer&quot;, p); // should be scout or humvee?
+-    p-&gt;unit_type = profiles.size();
+-    profiles.push_back(p);
++bool UnitProfileInterface::addLocalProfile(const NPString&amp; name)
++{
++    UnitProfile * p = new UnitProfile();
++
++    bool isok = read_vehicle_profile(name, p);
++    if ( isok )
++    {
++        p-&gt;unit_type = profiles.size();
++        profiles.push_back(p);
++    }
++
++    return isok;
+ }
+ 
+ UnitProfile * UnitProfileInterface::getUnitProfile( unsigned short unit_type )
+@@ -371,7 +411,7 @@
+ }
+ 
+ UnitProfile *
+-UnitProfileInterface::getProfileByName( const std::string &amp;name )
++UnitProfileInterface::getProfileByName( const NPString&amp; name )
+ {
+     vector&lt;UnitProfile *&gt;::iterator i = profiles.begin();
+     while ( i != profiles.end() )
+@@ -396,3 +436,97 @@
+     }
+     return 0; // null pointer warning
+ }
++
++int
++UnitProfileInterface::fillProfileSyncMessage(NetMessage* message, int profile_id)
++{
++    UnitProfile *p = getUnitProfile(profile_id);
++    ByteBufferWriter bb((unsigned char *)message, _MAX_NET_PACKET_SIZE);
++
++    bb.writeInt8( _net_message_class_unit_profile );
++    bb.writeInt8( _profile_msg_profile_desc );
++
++    bb.writeString( p-&gt;unitname );
++    bb.writeInt16(  p-&gt;hit_points );
++    bb.writeInt16(  p-&gt;attack_factor );
++    bb.writeInt16(  p-&gt;cfg_attack_range );
++    bb.writeInt16(  p-&gt;cfg_defend_range );
++    bb.writeInt8(   p-&gt;speed_factor );
++    bb.writeInt8(   p-&gt;speed_rate );
++    bb.writeInt8(   p-&gt;reload_time );
++    bb.writeInt16(  p-&gt;regen_time );
++    bb.writeString( p-&gt;imagefile );
++    bb.writeString( p-&gt;bodySprite_name );
++    bb.writeString( p-&gt;bodyShadow_name );
++    bb.writeString( p-&gt;turretSprite_name );
++    bb.writeString( p-&gt;turretShadow_name );
++    bb.writeInt16(  p-&gt;boundBox );
++
++    return bb.writedBytesCount();
++}
++
++UnitProfile *
++UnitProfileInterface::loadProfileFromMessage(const NetMessage *message, size_t size)
++{
++    UnitProfile *p = new UnitProfile();
++    ByteBufferReader br((const unsigned char *)message, size);
++
++    Uint8 unused;
++    br.readInt8( &amp;unused );
++    br.readInt8( &amp;unused );
++
++    br.readString( p-&gt;unitname );
++    br.readInt16( &amp;p-&gt;hit_points );
++    br.readInt16( &amp;p-&gt;attack_factor );
++    br.readInt16( &amp;p-&gt;cfg_attack_range );
++    br.readInt16( &amp;p-&gt;cfg_defend_range );
++    br.readInt8(  &amp;p-&gt;speed_factor );
++    br.readInt8(  &amp;p-&gt;speed_rate );
++    br.readInt8(  &amp;p-&gt;reload_time );
++    br.readInt16( &amp;p-&gt;regen_time );
++    br.readString( p-&gt;imagefile );
++    br.readString( p-&gt;bodySprite_name );
++    br.readString( p-&gt;bodyShadow_name );
++    br.readString( p-&gt;turretSprite_name );
++    br.readString( p-&gt;turretShadow_name );
++    br.readInt16( &amp;p-&gt;boundBox );
++
++    p-&gt;bodySprite.load(p-&gt;bodySprite_name);
++    p-&gt;bodyShadow.load(p-&gt;bodyShadow_name);
++    p-&gt;turretSprite.load(p-&gt;turretSprite_name);
++    p-&gt;turretShadow.load(p-&gt;turretShadow_name);
++
++    Uint32 i = p-&gt;cfg_attack_range * 32;
++    p-&gt;attack_range = i*i;
++
++    i = p-&gt;cfg_defend_range * 32;
++    p-&gt;defend_range = i*i;
++
++    return p;
++}
++
++void
++UnitProfileInterface::processNetMessage(const NetMessage* net_message, size_t size)
++{
++    switch ( net_message-&gt;message_id )
++    {
++        case _profile_msg_profile_desc:
++            handleProfileDescMessage(net_message, size);
++            break;
++
++        default:
++            LOGGER.warning(&quot;Unknown message id in UnitProfileMessage (%d)&quot;,
++                           net_message-&gt;message_id);
++    }
++}
++
++void
++UnitProfileInterface::handleProfileDescMessage(const NetMessage *net_message, size_t size)
++{
++    UnitProfile* p = loadProfileFromMessage(net_message, size);
++    if ( p )
++    {
++        p-&gt;unit_type = profiles.size();
++        profiles.push_back(p);
++    }
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -27,45 +27,61 @@
+ #include &quot;Units/UnitState.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+ 
++#include &quot;Core/CoreTypes.hpp&quot;
++
++class NetMessage;
++
+ class UnitProfile
+ {
+ public:
+-    std::string unitname;
+-    unsigned short unit_type;
++    NPString unitname;
++    Uint16 unit_type;
+ 
+-    short hit_points;
+-    short attack_factor;
+-    long  attack_range;
+-    long  defend_range;
+-    char  speed_factor;
+-    char  speed_rate;
+-    char  reload_time;
+-    short regen_time;
+-    std::string imagefile;
++    Uint16 hit_points;
++    Uint16 attack_factor;
++    Uint32 attack_range;
++    Uint16 cfg_attack_range;
++    Uint32  defend_range;
++    Uint16 cfg_defend_range;
++    Uint8  speed_factor;
++    Uint8  speed_rate;
++    Uint8  reload_time;
++    Uint16 regen_time;
++    NPString imagefile;
++    NPString bodySprite_name;
++    NPString bodyShadow_name;
++    NPString turretSprite_name;
++    NPString turretShadow_name;
+     PackedSurface bodySprite;
+     PackedSurface bodyShadow;
+     PackedSurface turretSprite;
+     PackedSurface turretShadow;
+-    std::string soundSelected;
+-    std::string fireSound;
+-    std::string weaponType;
+-    short boundBox;
++    NPString soundSelected;
++    NPString fireSound;
++    NPString weaponType;
++    Uint16 boundBox;
+ };
+ 
+ class UnitProfileInterface
+ {
+ protected:
+     static vector&lt;UnitProfile *&gt; profiles;
+-    static void clearProfiles();
+     
+ public:
++    static void clearProfiles();
++    static bool addLocalProfile(const NPString&amp; name);
+     static void loadUnitProfiles( void );
+     static UnitProfile * getUnitProfile( unsigned short unit_type );
+-    static UnitProfile * getProfileByName( const std::string &amp;name );
+-    static unsigned short getNumUnitTypes()
++    static UnitProfile * getProfileByName( const NPString&amp; name );
++    static int getNumUnitTypes()
+     {
+         return profiles.size();
+     }
++
++    static int fillProfileSyncMessage(NetMessage* message, int profile_id);
++    static UnitProfile* loadProfileFromMessage(const NetMessage* message, size_t size);
++    static void processNetMessage(const NetMessage* net_message, size_t size);
++    static void handleProfileDescMessage(const NetMessage* net_message, size_t size);
+ };
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -40,6 +40,34 @@
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ 
++/*
++Unit speeds as the profiles says:
++  Archer   16 x 2 = 32 px/s (1.0   tile/second)
++  Bear     14 x 2 = 28 px/s (0.875 t/s)
++  Bobcat   20 x 4 = 80 px/s (2.5   t/s)
++  Drake    16 x 2 = 32 px/s (1.0   t/s)
++  Manta    20 x 4 = 80 px/s (2.5   t/s)
++  Panther1 18 x 2 = 36 px/s (1.125 t/s)
++  SPanzer  22 x 4 = 88 px/s (2.75  t/s)
++  Stinger  18 x 2 = 36 px/s (1.125 t/s)
++  Titan    16 x 2 = 32 px/s (1.0   t/s)
++  Wolf     20 x 4 = 80 px/s (2.5   t/s)
++
++UnitState timer ticks 10 times per second, so reload times are:
++  Archer   110 = 11.0 s
++  Bear      40 =  4.0 s
++  Bobcat    20 =  2.0 s
++  Drake     50 =  5.0 s
++  Manta     35 =  3.5 s
++  Panther1  50 =  5.0 s
++  SPanzer   20 =  2.0 s
++  Stinger  100 = 10.0 s
++  Titan     60 =  6.0 s
++  Wolf      40 =  4.0 s
++
++
++*/
++
+ #define MOVEWAIT_TIME 0.9f
+ 
+ enum{ _rotate_and_move, _rotate_stop_move };
+@@ -839,7 +867,7 @@
+ 
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -848,7 +876,7 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmMoveToLoc_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( path_generated == true )
+@@ -859,7 +887,7 @@
+                 }
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+             }
+@@ -881,7 +909,7 @@
+                     aiFsmMoveToLoc_OnExitCleanUp();
+                     setAiFsmDefendHold();
+ 
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -952,7 +980,7 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmMoveToLoc_prev_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -961,7 +989,7 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmMoveToLoc_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 } // NextSquareOccupied: does the next square contain a abstruction
+                 else if ( UnitBlackBoard::unitOccupiesLoc( aiFsmMoveToLoc_next_loc ) == true )
+@@ -999,7 +1027,7 @@
+                         aiFsmMoveToLoc_state = _aiFsmMoveToLoc_path_generate;
+                     }
+                     // can't move and has to wait, finish the loop.
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1031,7 +1059,7 @@
+                 }
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 } // ** else
+ 
+@@ -1050,7 +1078,7 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmMoveToLoc_next_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -1059,7 +1087,7 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmMoveToLoc_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1140,7 +1168,7 @@
+ 
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -1149,7 +1177,7 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( path_generated == true )
+@@ -1159,7 +1187,7 @@
+                 }
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+ 
+@@ -1180,7 +1208,7 @@
+                     MapInterface::pointXYtoMapXY( aiFsmAttackUnit_prev_loc, &amp;aiFsmAttackUnit_prev_loc );
+                     UnitBlackBoard::markUnitLoc( aiFsmAttackUnit_prev_loc );
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1220,7 +1248,7 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_prev_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -1229,14 +1257,14 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( range_vector.mag2() &lt; unit_state.weapon_range )
+                 {
+                     // Rule: RangeVector &lt; WeaponRange, unit is in range
+                     // Action: Remain in position
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1287,7 +1315,7 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_prev_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -1296,7 +1324,7 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( UnitBlackBoard::unitOccupiesLoc( aiFsmAttackUnit_next_loc ) == true )
+@@ -1323,7 +1351,7 @@
+                         aiFsmAttackUnit_state = _aiFsmAttackUnit_path_generate;
+                     }
+ 
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1344,7 +1372,7 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_prev_loc );
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_check_fsm_transition;
+                 }
+-                end_cycle = true;
++                end_cycle = true;
+                 return;
+             }
+             break;
+@@ -1361,21 +1389,21 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_next_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if (  aiFsmAttackUnit_target_destroyed == true )
+                 {
+                     setAiFsmDefendHold();
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1403,7 +1431,7 @@
+                     PathScheduler::requestPath( path_request );
+ 
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_path_generate;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1454,7 +1482,7 @@
+                     // Action : Exit fsm gracefully
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -1462,7 +1490,7 @@
+                     // External Event: A new AI command is pending
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( aiFsmDefendHold_search_timer.count() )
+@@ -1478,25 +1506,25 @@
+                             aiFsmDefendHold_target_ID = target_unit_ptr-&gt;id;
+                             setFsmGunneryTarget( aiFsmDefendHold_target_ID );
+                             aiFsmDefendHold_state = _aiFsmDefendHold_attack_enemy;
+-                            end_cycle = true;
++                            end_cycle = true;
+                             return;
+                         }
+                         else
+                         {
+-                            end_cycle = true;
++                            end_cycle = true;
+                             return;
+                         }
+                     } // **  quearyClosestEnemyUnit
+                     else
+                     {
+-                        end_cycle = true;
++                        end_cycle = true;
+                         return;
+                     }
+ 
+                 } // ** aiFsmDefendHold_search_timer.count()
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+             }
+@@ -1511,7 +1539,7 @@
+                     clearFsmGunneryTarget();
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+@@ -1520,7 +1548,7 @@
+                     // Action: Allow command transition to occur
+                     clearFsmGunneryTarget();
+                     ai_fsm_transition_complete = true;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1530,7 +1558,7 @@
+                     {
+                         clearFsmGunneryTarget();
+                         aiFsmDefendHold_state = _aiFsmDefendHold_search_for_enemy;
+-                        end_cycle = true;
++                        end_cycle = true;
+                         return;
+                     }
+                     else
+@@ -1540,7 +1568,7 @@
+                         {
+                             clearFsmGunneryTarget();
+                             aiFsmDefendHold_state = _aiFsmDefendHold_search_for_enemy;
+-                            end_cycle = true;
++                            end_cycle = true;
+                             return;
+                         } // ** if
+                         else
+@@ -1550,13 +1578,13 @@
+                             {
+                                 clearFsmGunneryTarget();
+                                 aiFsmDefendHold_state = _aiFsmDefendHold_search_for_enemy;
+-                                end_cycle = true;
++                                end_cycle = true;
+                                 return;
+                             }
+                         }
+                     }
+                 }
+-                end_cycle = true;
++                end_cycle = true;
+                 return;
+             }
+             break;
+@@ -1591,13 +1619,13 @@
+                 if ( MapInterface::getMovementValue( aiFsmManualMove_next_loc ) == 0xFF )
+                 {
+                     setAiFsmDefendHold();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if( UnitBlackBoard::unitOccupiesLoc( aiFsmManualMove_next_loc ) == true )
+                 {
+                     setAiFsmDefendHold();
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+@@ -1617,12 +1645,12 @@
+                 {
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmManualMove_prev_loc );
+                     aiFsmManualMove_state = _aiFsmManualMove_check_fsm_transition;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 } // ** else
+             }
+@@ -1639,13 +1667,13 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmManualMove_next_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+                     ai_fsm_transition_complete = true;
+-                    end_cycle = true;
++                    end_cycle = true;
+                     return;
+                 }
+                 else
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -23,6 +23,10 @@
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
++
++#include &quot;Particles/ParticleInterface.hpp&quot;
++#include &quot;Views/Game/VehicleSelectionView.hpp&quot;
++
+ #include &lt;list&gt;
+ #include &lt;string&gt;
+ 
+@@ -62,9 +66,20 @@
+     {
+         Desktop::setVisibilityAllWindows(false);
+         GameManager::loadPalette(&quot;netp&quot;);
++
++        // XXX rebuild the particle stuff here for units...
++        ParticleInterface::rebuildUnitParticleData();
++
++        // XXX this needed because has to create the special buttons for the
++        // defined units, has to be here because it has to be the &quot;netp&quot; palette
++        // and after loading the unit profiles
++        Desktop::remove(Desktop::getView(&quot;VehicleSelectionView&quot;));
++        Desktop::add(new VehicleSelectionView());
++
+         GameManager::setNetPanzerGameOptions();
+         Desktop::setVisibility(&quot;MiniMapView&quot;, true);
+         Desktop::setVisibility(&quot;GameView&quot;, true);
++        Desktop::setActiveView(&quot;GameView&quot;);
+     }
+ 
+     static void loadError()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-10-07 14:49:44 UTC (rev 1247)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-10-10 13:13:47 UTC (rev 1248)
+@@ -298,10 +298,12 @@
+ //--------------------------------------------------------------------------
+ void VehicleSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    if ( ObjectiveInterface::getObjective(CURRENT_SELECTED_OUTPOST_ID)-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
++    Objective* obj = ObjectiveInterface::getObjective(CURRENT_SELECTED_OUTPOST_ID);
++    if ( !obj || obj-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
+     {
+         Desktop::setVisibilityNoDoAnything(&quot;VehicleSelectionView&quot;, false);
+         changeMade = false;
++        return;
+     }
+     
+     char strBuf[256];
+@@ -376,8 +378,6 @@
+ 
+     bltViewBackground(viewArea);
+ 
+-    Objective* obj = ObjectiveInterface::getObjective(CURRENT_SELECTED_OUTPOST_ID);
+-
+     int remaining_time = 0;
+     int generation_time = 0;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000273.html">[Netpanzer-cvs] r1247 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+	<LI>Next message: <A HREF="000275.html">[Netpanzer-cvs] r1249 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#274">[ date ]</a>
+              <a href="thread.html#274">[ thread ]</a>
+              <a href="subject.html#274">[ subject ]</a>
+              <a href="author.html#274">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1342 - trunk/netpanzer/support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1342%20-%20trunk/netpanzer/support/scripts&In-Reply-To=%3C20120204150305.ACB8E48158A%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000367.html">
+   <LINK REL="Next"  HREF="000369.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1342 - trunk/netpanzer/support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1342%20-%20trunk/netpanzer/support/scripts&In-Reply-To=%3C20120204150305.ACB8E48158A%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1342 - trunk/netpanzer/support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb  4 16:03:05 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000367.html">[Netpanzer-cvs] r1341 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/System
+</A></li>
+        <LI>Next message: <A HREF="000369.html">[Netpanzer-cvs] r1343 - in trunk/netpanzer: . src/Lib/Util	support/scripts support/win32
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-02-04 16:03:05 +0100 (Sat, 04 Feb 2012)
+New Revision: 1342
+
+Modified:
+   trunk/netpanzer/support/scripts/make-windows-binary.sh
+Log:
+updated the cross windows compilation script
+
+Modified: trunk/netpanzer/support/scripts/make-windows-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-windows-binary.sh	2012-02-04 14:53:05 UTC (rev 1341)
++++ trunk/netpanzer/support/scripts/make-windows-binary.sh	2012-02-04 15:03:05 UTC (rev 1342)
+@@ -9,15 +9,15 @@
+ VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
+ NPDEST=/tmp/netpanzer
+ ZIPNAME=&quot;netpanzer-windows-${VERSION}.zip&quot;
+-EXENAME=&quot;build/crossmingw/release/netpanzer.exe&quot;
++EXENAME=&quot;build/mingw/release/netpanzer.exe&quot;
+ 
+ echo &quot;Making netPanzer windows version ${VERSION}&quot;
+ 
+-scons crossmingw \
+-      crossmingwcompilerprefix=i586-mingw32msvc-\
+-      crossmingwsdlconfig=/usr/local/bin/sdl-config-mingw
++scons cross=mingw \
++      sdlconfig=~/program/tools/crossmingw/bin/sdl-config
+ 
+-i586-mingw32msvc-strip &quot;${EXENAME}&quot;
++# with newer gcc seems stripping works as it should, doesn't need to strip again
++# i586-mingw32msvc-strip &quot;${EXENAME}&quot;
+ 
+ [ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
+ 
+@@ -27,10 +27,8 @@
+ support/scripts/copy_datafiles.sh &quot;${NPDEST}&quot;
+ support/scripts/copy_docfiles.sh &quot;${NPDEST}&quot;
+ 
+-cp /usr/local/bin/SDL.dll &quot;${NPDEST}&quot;
+-cp /usr/local/lib/*.dll &quot;${NPDEST}&quot;
+-cp /usr/local/bin/README-SDL.txt &quot;${NPDEST}&quot;
+-cp /usr/local/bin/README-SDL_mixer.txt &quot;${NPDEST}&quot;
++cp ~/program/tools/crossmingw/dll/SDL/* &quot;${NPDEST}&quot;
++cp ~/program/tools/crossmingw/dll/SDL_mixer/* &quot;${NPDEST}&quot;
+ 
+ [ ! -d &quot;${RELEASEDIR}&quot; ] &amp;&amp; mkdir &quot;${RELEASEDIR}&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000367.html">[Netpanzer-cvs] r1341 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/System
+</A></li>
+	<LI>Next message: <A HREF="000369.html">[Netpanzer-cvs] r1343 - in trunk/netpanzer: . src/Lib/Util	support/scripts support/win32
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

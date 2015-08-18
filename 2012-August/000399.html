@@ -1,0 +1,301 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1375 - trunk/netpanzer/src/NetPanzer/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-August/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1375%20-%20trunk/netpanzer/src/NetPanzer/Network&In-Reply-To=%3C20120829220155.C535855B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000400.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1375 - trunk/netpanzer/src/NetPanzer/Network</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1375%20-%20trunk/netpanzer/src/NetPanzer/Network&In-Reply-To=%3C20120829220155.C535855B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1375 - trunk/netpanzer/src/NetPanzer/Network">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Thu Aug 30 00:01:55 CEST 2012</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000400.html">[Netpanzer-cvs] r1376 - in trunk/netpanzer: . src/NetPanzer/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-08-30 00:01:55 +0200 (Thu, 30 Aug 2012)
+New Revision: 1375
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp
+Log:
+resolve crash on windows when crosscompil
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp	2012-07-05 13:43:05 UTC (rev 1374)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp	2012-08-29 22:01:55 UTC (rev 1375)
+@@ -71,7 +71,7 @@
+     try
+     {
+         socket = new network::TCPSocket(host, port , this);
+-        state = RESPONSE_PROTO;
++        state = sRESPONSE_PROTO;
+     }
+     catch (...)
+     {
+@@ -133,11 +133,11 @@
+ {
+     switch (state)
+     {
+-        case ERROR:
++        case sERROR:
+             break;
+-        case IDLE:
++        case sIDLE:
+             break;
+-        case RESPONSE_PROTO:
++        case sRESPONSE_PROTO:
+             if ( ! isspace(data) )
+             {
+                 token.append(1, tolower(data));
+@@ -152,10 +152,10 @@
+                 token.clear();
+                 content_length = 0;
+                 content.clear();
+-                state = RESPONSE_CODE;
++                state = sRESPONSE_CODE;
+             }
+             break;
+-        case RESPONSE_CODE:
++        case sRESPONSE_CODE:
+             if ( token.size() &lt; 3 )
+             {
+                 if ( isdigit(data) )
+@@ -165,7 +165,7 @@
+                 else
+                 {
+                     LOGGER.warning(&quot;Wrong response code, is not a digit&quot;);
+-                    state = ERROR;
++                    state = sERROR;
+                 }
+             }
+             else
+@@ -180,10 +180,10 @@
+                 ss &gt;&gt; response_code;
+ 
+                 token.clear();
+-                state = RESPONSE_TEXT;
++                state = sRESPONSE_TEXT;
+             }
+             break;
+-        case RESPONSE_TEXT:
++        case sRESPONSE_TEXT:
+             token.append(1, data); // actualy \r\n shouldn't be in the text
+             if ( data == '\n' )
+             {
+@@ -192,11 +192,11 @@
+                     token.resize(token.size()-1);
+                 }
+                 response_description = token;
+-                state = HEADER_BEGIN;
++                state = sHEADER_BEGIN;
+                 token.clear();
+             }
+             break;
+-        case HEADER_ENDING:
++        case sHEADER_ENDING:
+             if ( data == 10 )
+             {
+                 token.clear();
+@@ -204,39 +204,39 @@
+             }
+             else
+             {
+-                state = ERROR;
++                state = sERROR;
+             }
+             break;
+-        case HEADER_BEGIN:
++        case sHEADER_BEGIN:
+             if ( data == 13 )
+             {
+-                state = HEADER_ENDING;
++                state = sHEADER_ENDING;
+                 break;
+             }
+             token.clear();
+-            state = HEADER_NAME;
++            state = sHEADER_NAME;
+             // fall through, it is begin of name
+-        case HEADER_NAME:
++        case sHEADER_NAME:
+             if ( data == ':' )
+             {
+                 header_name = token;
+                 token.clear();
+-                state = HEADER_SKIP_SPACE;
++                state = sHEADER_SKIP_SPACE;
+             }
+             else
+             {
+                 token.append(1, tolower(data));
+             }
+             break;
+-        case HEADER_SKIP_SPACE:
++        case sHEADER_SKIP_SPACE:
+             if ( isspace(data) )
+             {
+                 break;
+             }
+-            state = HEADER_VALUE;
++            state = sHEADER_VALUE;
+             // fall through, it is not space
+ 
+-        case HEADER_VALUE:
++        case sHEADER_VALUE:
+             if ( data == '\n' )
+             {
+                 while ( !token.empty() &amp;&amp; isspace(*token.rbegin()) )
+@@ -245,20 +245,20 @@
+                 }
+                 response_headers[header_name] = token;
+                 // handle header here
+-                state = HEADER_BEGIN;
++                state = sHEADER_BEGIN;
+             }
+             else
+             {
+                 token.append(1,data);
+             }
+             break;
+-        case RECEIVING_DATA:
++        case sRECEIVING_DATA:
+             content.append(1,data);
+             if ( --content_length &lt;= 0 )
+             {
+                 onContentFinished();
+                 socket-&gt;destroy();
+-                state = IDLE;
++                state = sIDLE;
+             }
+             break;
+     }
+@@ -288,37 +288,37 @@
+ 
+     if ( response_code &lt; 100 )
+     {
+-        return ERROR; // this is bad server
++        return sERROR; // this is bad server
+     }
+     else if ( response_code &lt; 200 )
+     {
+-        return RESPONSE_PROTO;
++        return sRESPONSE_PROTO;
+     }
+     else if ( response_code &lt; 300 )
+     {
+         if ( response_code == 204 ) // no content
+-            return IDLE;
++            return sIDLE;
+ 
+         if ( content_length &gt; 0 )
+-            return RECEIVING_DATA;
++            return sRECEIVING_DATA;
+ 
+-        return IDLE;
++        return sIDLE;
+     }
+     else if ( response_code &lt; 400 )
+     {
+-        return IDLE; // this is a redirect
++        return sIDLE; // this is a redirect
+     }
+     else if ( response_code &lt; 500 )
+     {
+-        return ERROR; // this is client error
++        return sERROR; // this is client error
+     }
+     else if ( response_code &lt; 600 )
+     {
+-        return ERROR; // this is server error
++        return sERROR; // this is server error
+     }
+     else
+     {
+-        return ERROR; // this is bad server
++        return sERROR; // this is bad server
+     }
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp	2012-07-05 13:43:05 UTC (rev 1374)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp	2012-08-29 22:01:55 UTC (rev 1375)
+@@ -57,17 +57,17 @@
+ 
+     enum STATE
+     {
+-        ERROR,
+-        IDLE,
+-        RESPONSE_PROTO,
+-        RESPONSE_CODE,
+-        RESPONSE_TEXT,
+-        HEADER_ENDING,
+-        HEADER_BEGIN,
+-        HEADER_NAME,
+-        HEADER_SKIP_SPACE,
+-        HEADER_VALUE,
+-        RECEIVING_DATA
++        sERROR,
++        sIDLE,
++        sRESPONSE_PROTO,
++        sRESPONSE_CODE,
++        sRESPONSE_TEXT,
++        sHEADER_ENDING,
++        sHEADER_BEGIN,
++        sHEADER_NAME,
++        sHEADER_SKIP_SPACE,
++        sHEADER_VALUE,
++        sRECEIVING_DATA
+     } state;
+ 
+     std::string token;
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000400.html">[Netpanzer-cvs] r1376 - in trunk/netpanzer: . src/NetPanzer/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

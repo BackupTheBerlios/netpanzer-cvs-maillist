@@ -1,0 +1,1359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1389 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1389%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game%20MainMenu%20MainMenu/Multi&In-Reply-To=%3C20120902125828.BF21855B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000412.html">
+   <LINK REL="Next"  HREF="000414.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1389 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1389%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game%20MainMenu%20MainMenu/Multi&In-Reply-To=%3C20120902125828.BF21855B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1389 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game MainMenu MainMenu/Multi">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sun Sep  2 14:58:28 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000412.html">[Netpanzer-cvs] r1388 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000414.html">[Netpanzer-cvs] r1390 -	trunk/netpanzer/src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#413">[ date ]</a>
+              <a href="thread.html#413">[ thread ]</a>
+              <a href="subject.html#413">[ subject ]</a>
+              <a href="author.html#413">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-02 14:58:28 +0200 (Sun, 02 Sep 2012)
+New Revision: 1389
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+cButton is no more, all the input boxes uses InputField now.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -289,7 +289,9 @@
+         keyboardFocusComponent-&gt;handleKeyboard();
+         KeyboardInterface::flushCharBuffer();
+     }
+-    else if (focus != 0) {
++    
++    if (focus != 0)
++    {
+         focus-&gt;processEvents();
+         KeyboardInterface::flushCharBuffer();
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InputField.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -30,7 +30,6 @@
+     this-&gt;max_chars = 50;
+     this-&gt;text_display_start = 0;
+     this-&gt;cursor_pos = 0;
+-    this-&gt;text.clear();
+ 
+     this-&gt;last_pressed_key = 0;
+     this-&gt;was_special_key = false;
+@@ -127,7 +126,7 @@
+ 
+ void InputField::handleNormalKey(int key)
+ {
+-    if ( text.length() &lt; max_chars )
++    if ( text.length() &lt; max_chars &amp;&amp; excluded_chars.find(key) == std::string::npos )
+     {
+         text.insert(cursor_pos,1,key);
+         ++cursor_pos;
+@@ -193,11 +192,7 @@
+ 
+         case SDLK_END:
+             cursor_pos = text.length();
+-            text_display_start = 0;
+-            while ( (((cursor_pos - text_display_start) * 8) + 8) &gt; size.x -2 )
+-            {
+-                ++text_display_start;
+-            }
++            fixCursorPos();
+             break;
+ 
+         default:
+@@ -228,3 +223,16 @@
+         }
+     }
+ }
++
++void InputField::fixCursorPos()
++{
++    if ( cursor_pos &gt; this-&gt;text.length() )
++    {
++        cursor_pos = this-&gt;text.length();
++        text_display_start = 0;
++        while ( (((cursor_pos - text_display_start) * 8) + 8) &gt; size.x -2 )
++        {
++            ++text_display_start;
++        }
++    }
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InputField.hpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -42,6 +42,7 @@
+     void setText(const std::string&amp; text)
+     {
+         this-&gt;text = text;
++        fixCursorPos();
+     }
+ 
+     const std::string&amp; getText() const { return text; }
+@@ -53,6 +54,7 @@
+     }
+ 
+     void setMaxTextLength(int max_length) { max_chars = max_length; }
++    void setExcludedChars(const std::string&amp; excluded_chars) { this-&gt;excluded_chars = excluded_chars; }
+     
+     virtual void handleKeyboard();
+ 
+@@ -65,12 +67,14 @@
+     int max_chars;
+     int text_display_start;
+     std::string text;
++    std::string excluded_chars;
+ 
+     int last_pressed_key;
+     bool was_special_key;
+     NTimer key_repeat_timer;
+ 
+     void checkRepeatKey();
++    void fixCursorPos();
+ 
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -75,11 +75,6 @@
+ //---------------------------------------------------------------------------
+ View::~View()
+ {
+-    std::vector&lt;cInputField*&gt;::iterator f;
+-    for(f = inputFields.begin(); f != inputFields.end(); f++) {
+-        delete *f;
+-    }
+-    
+     free(title);
+     free(subTitle);
+     free(searchName);
+@@ -394,8 +389,6 @@
+         drawStatus(clientArea);
+     }
+ 
+-    drawInputFields(clientArea);
+-
+     // Draw all non-selected components.
+     ComponentsIterator i;
+     for ( i=components.begin(); i != components.end(); i++) {
+@@ -659,10 +652,6 @@
+ //---------------------------------------------------------------------------
+ void View::lMouseDown(const iXY &amp;pos)
+ {
+-    if (selectedInputField &lt; 0) {
+-        selectedInputField = findInputFieldContaining(pos);
+-    }
+-
+     focusComponent = 0;
+     Desktop::setKeyboardFocusComponent(0);
+ 
+@@ -915,22 +904,6 @@
+     //}
+ } // end scrollBarMove
+ 
+-
+-// drawInputFields
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-void View::drawInputFields(Surface &amp;clientArea)
+-{
+-    for (size_t num = 0; num &lt; inputFields.size(); num++) {
+-        if (num == (size_t) selectedInputField) {
+-            inputFields[num]-&gt;drawHighlighted(clientArea);
+-        } else {
+-            inputFields[num]-&gt;draw(clientArea);
+-        }
+-    }
+-} // end drawInputFields
+-
+ // setSearchName
+ //---------------------------------------------------------------------------
+ // Purpose: Sets the title of the window.
+@@ -1030,22 +1003,6 @@
+     }
+ } // end View::drawStatus
+ 
+-// findInputFieldContaining
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-int View::findInputFieldContaining(const iXY &amp;pos)
+-{
+-    assert(this != 0);
+-
+-    for(size_t num = 0; num &lt; inputFields.size(); num++) {
+-        if (inputFields[num]-&gt;contains(pos)) {
+-            return num;
+-        }
+-    }
+-    return -1;
+-} // end findInputFieldContaining
+-
+ // checkResolution
+ //---------------------------------------------------------------------------
+ // Purpose: Check position after resolution change
+@@ -1193,61 +1150,7 @@
+     else                   status &amp;= ~STATUS_ACTIVE;
+ } // end setActive
+ 
+-// processEvents
+ //---------------------------------------------------------------------------
+-void View::processEvents(void)
+-{
+-    if (selectedInputField &gt;= 0) {
+-        int shit;
+-        while (KeyboardInterface::getChar(shit)) {
+-            // Check for extended code.
+-            if (shit == 0) {
+-                if (KeyboardInterface::getChar(shit)) {
+-                    inputFields[selectedInputField]-&gt;addExtendedChar(shit);
+-                } else {
+-                    throw Exception(&quot;ERROR: Expecting extended char code.&quot;);
+-                }
+-            } else {
+-                inputFields[selectedInputField]-&gt;addChar(shit);
+-            }
+-        }
+-    }
+-} // end processEvents
+-
+-// addInputField
+-//---------------------------------------------------------------------------
+-cInputField* View::addInputField(
+-    const iXY &amp;pos,
+-    cInputFieldString *string,
+-    const char *excludedCharacters,
+-    const bool &amp;isSelected,
+-    const int maxCharCount)
+-{
+-    cInputField* inputfield = new cInputField;
+-
+-    inputfield-&gt;setPos(pos);
+-    inputfield-&gt;setInputFieldString(string);
+-    inputfield-&gt;setExcludedCharacters(excludedCharacters);
+-//    inputfield-&gt;setmaxChar(maxCharCount); wtf,  already assigned on string !!
+-    inputFields.push_back(inputfield);
+-
+-    if (isSelected) {
+-        selectedInputField = inputFields.size() - 1;
+-    }
+-
+-    return inputfield;
+-} // end addInputField
+-
+-void View::removeInputField(cInputField *cif)
+-{
+-    if ( cif )
+-    {
+-        inputFields.erase(std::remove(inputFields.begin(), inputFields.end(), cif), inputFields.end());
+-        delete cif;
+-    }
+-}
+-
+-//---------------------------------------------------------------------------
+ void View::add(DEFAULT_VIEW_BUTTON button)
+ {
+     if (button == CLOSE_VIEW_BUTTON) {}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -21,7 +21,6 @@
+ 
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+-#include &quot;cInputField.hpp&quot;
+ #include &quot;Types/iRect.hpp&quot;
+ #include &quot;Types/iXY.hpp&quot;
+ #include &quot;Component.hpp&quot;
+@@ -54,8 +53,6 @@
+     
+     Component *focusComponent;
+ 
+-    std::vector&lt;cInputField*&gt; inputFields;
+-
+     enum
+     {
+         MAX_WINDOW_CLIENT_XSIZE = 632
+@@ -127,13 +124,6 @@
+     void  setSubTitle(const char *subTitle);
+     void  drawTitle(Surface &amp;windowArea);
+ 
+-    // Input Field Functions
+-    cInputField* addInputField(const iXY &amp;pos, cInputFieldString *string, const char *excludedCharacters, const bool &amp;isSelected, const int maxCharCount);
+-    void removeInputField(cInputField * cif);
+-    int  findInputFieldContaining(const iXY &amp;pos);
+-    void drawInputFields(Surface &amp;clientArea);
+-
+-
+     /////////////////////////////////
+     void draw(Surface&amp; drawon);
+     void showStatus(const char *string);
+@@ -178,7 +168,7 @@
+         resizeClientArea(iXY(x, y));
+     }
+ 
+-    virtual void processEvents();
++    virtual void processEvents() {}
+ 
+     int moveAreaHeight;
+     int borderSize;
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -1,417 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &lt;string.h&gt;
+-#include &lt;ctype.h&gt;
+-#include &quot;2D/Color.hpp&quot;
+-#include &quot;Util/Exception.hpp&quot;
+-#include &quot;cInputField.hpp&quot;
+-#include &quot;Util/TimerInterface.hpp&quot;
+-#include &quot;Interfaces/KeyboardInterface.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;ViewGlobals.hpp&quot;
+-
+-////////////////////////////////////////////////////////////////////////////
+-// cInputFieldString definitions.
+-////////////////////////////////////////////////////////////////////////////
+-
+-// init
+-//--------------------------------------------------------------------------
+-void cInputFieldString::init(const char *string, int maxCharCount, int maxWidth)
+-{
+-    cInputFieldString::maxCharCount = maxCharCount;
+-    cInputFieldString::maxWidth = maxWidth;
+-    assert(maxCharCount &gt; 0);
+-    assert(maxWidth &gt; 0);
+-
+-    cInputFieldString::string = new char [maxCharCount + 1];
+-    memset(cInputFieldString::string, 0, maxCharCount+1);
+-
+-    if (strlen(string) &gt; 0 &amp;&amp; strlen(string) &lt; (size_t) maxCharCount) {
+-        strcpy(cInputFieldString::string, string);
+-    } else {
+-        cInputFieldString::string[0] = '\0';
+-    }
+-
+-} // end init
+-
+-// setString
+-void cInputFieldString::setString(const std::string&amp; string)
+-{
+-    // XXX notify cinputfield to resetString positions
+-    memset(cInputFieldString::string, 0, maxCharCount+1);
+-    strncpy(this-&gt;string, string.c_str(), maxCharCount);
+-} // end setString
+-
+-// reset
+-//--------------------------------------------------------------------------
+-void cInputFieldString::reset()
+-{
+-    string       = 0;
+-    maxCharCount = 0;
+-} // end reset
+-
+-
+-////////////////////////////////////////////////////////////////////////////
+-// cInputField definitions.
+-////////////////////////////////////////////////////////////////////////////
+-
+-cInputField::cInputField()
+-{
+-    reset();
+-}
+-
+-cInputField::cInputField(const cInputField&amp; other)
+-    : pos(other.pos), maxCharCount(other.maxCharCount),
+-    strDisplayStart(other.strDisplayStart), maxWidth(other.maxWidth),
+-    depressedKey(other.depressedKey),
+-    depressedKeyTimeNext(other.depressedKeyTimeNext),
+-    insertMode(other.insertMode), destString(other.destString),
+-    bounds(other.bounds),
+-    cursorPos(other.cursorPos), textaction(other.textaction)
+-{
+-    if(other.excludedCharacters) {
+-        excludedCharacters = new char[strlen(other.excludedCharacters)+1];
+-        strcpy(excludedCharacters, other.excludedCharacters);
+-    } else {
+-        excludedCharacters = 0;
+-    }
+-    inputFieldSurface.copy(other.inputFieldSurface);
+-}
+-
+-cInputField::~cInputField()
+-{
+-    delete[] excludedCharacters;
+-}
+-
+-void cInputField::operator= (const cInputField&amp; other)
+-{
+-    pos = other.pos;
+-    maxCharCount = other.maxCharCount;
+-    strDisplayStart = other.strDisplayStart;
+-    maxWidth = other.maxWidth;
+-    depressedKey = other.depressedKey;
+-    depressedKeyTimeNext = other.depressedKeyTimeNext;
+-    insertMode = other.insertMode;
+-    destString = other.destString;
+-    if(other.excludedCharacters) {
+-        excludedCharacters = new char[strlen(other.excludedCharacters) +1];
+-        strcpy(excludedCharacters, other.excludedCharacters);
+-    } else {
+-        excludedCharacters = 0;
+-    }
+-    destString = other.destString;
+-    bounds = other.bounds;
+-    cursorPos = other.cursorPos;
+-    textaction = other.textaction;
+-    inputFieldSurface.copy(other.inputFieldSurface);
+-}
+-
+-// reset
+-//--------------------------------------------------------------------------
+-void cInputField::reset()
+-{
+-    cursorPos          = 0;
+-    pos                = iXY(0, 0);
+-    maxCharCount       = 0;
+-    destString         = 0;
+-    excludedCharacters = 0;
+-    textaction         = 0;
+-    strDisplayStart    = 0;
+-    depressedKey       = 0;
+-    depressedKeyTimeNext = 0;
+-    insertMode         = true;
+-} // end reset
+-
+-void cInputField::resetString()
+-{
+-    strDisplayStart    = 0;
+-    cursorPos          = 0;
+-}
+-
+-void cInputField::clearString()
+-{
+-    cursorPos          = 0;
+-    destString[0]      = '\0';
+-    strDisplayStart    = 0;
+-}
+-
+-// setPos
+-//--------------------------------------------------------------------------
+-void cInputField::setPos(iXY pos)
+-{
+-    this-&gt;pos  = pos;
+-    bounds.min = pos;
+-} // end setPos
+-
+-// setInputFieldString
+-// Purpose: Make sure you call setPos before you call this so the
+-//          bounds get set correctly.
+-//--------------------------------------------------------------------------
+-void cInputField::setInputFieldString(cInputFieldString *string)
+-{
+-    //assert(string-&gt;string != 0);
+-    assert(string-&gt;maxCharCount &gt; 0);
+-
+-    this-&gt;destString   = string-&gt;string;
+-    this-&gt;maxCharCount = string-&gt;maxCharCount;
+-    this-&gt;maxWidth = string-&gt;maxWidth;
+-
+-    iXY size;
+-    // XXX (8 is hardcoded here...)
+-//    size.x = (string-&gt;maxWidth+1) * 8 + 8;
+-    size.x = (string-&gt;maxWidth+1);
+-    size.y = Surface::getFontHeight() + 6;
+-
+-    bounds.max = bounds.min + size;
+-
+-    inputFieldSurface.create(size.x, size.y, 1);
+-    inputFieldSurface.fill(Color::black);
+-
+-} // end setInputFieldString
+-
+-// setExcludedCharacters
+-//--------------------------------------------------------------------------
+-void cInputField::setExcludedCharacters(const char *exChars)
+-{
+-    if ( excludedCharacters ) {
+-        delete[] excludedCharacters;
+-        excludedCharacters = 0;
+-    }
+-    excludedCharacters = new char [strlen(exChars) + 1];
+-    if (excludedCharacters == 0) {
+-        throw Exception(&quot;ERROR: Unable to allocate cInputField excludedCharacters.&quot;);
+-    }
+-
+-    strcpy(excludedCharacters, exChars);
+-} // setExcludedCharacters
+-
+-// addChar
+-//--------------------------------------------------------------------------
+-void cInputField::addChar(int newChar)
+-{
+-    pressKey(newChar);
+-    // Check if the character should be excluded.
+-    if (strchr(excludedCharacters, newChar) == 0) {
+-        
+-        // Add the character.
+-        if(insertMode) {
+-            // ins, move stuff forward
+-            if((cursorPos+1)&lt;maxCharCount) {
+-                memmove(destString+cursorPos+1,destString+cursorPos,
+-                    maxCharCount-(cursorPos+1));
+-            }
+-        }
+-        int replacedChar=destString[cursorPos];
+-        destString[cursorPos] = newChar;
+-        if (cursorPos &lt;= maxCharCount) {
+-            if(replacedChar=='\0') destString[cursorPos+1] = '\0';
+-        } else {
+-            destString[maxCharCount] = '\0';
+-        }
+-
+-        assert(cursorPos &lt; maxCharCount);
+-
+-        if (cursorPos &lt; maxCharCount - 1) {
+-            cursorPos++;
+-        }
+-    }
+-
+-    if(textaction != 0)
+-        textaction(this);
+-} // addChar
+-
+-void cInputField::setTextAction(ACTION_FUNC_PTR action)
+-{
+-    textaction = action;
+-}
+-
+-// addExtendedChar
+-//--------------------------------------------------------------------------
+-void cInputField::addExtendedChar(int newExtendedChar)
+-{
+-    pressKey(newExtendedChar);
+-    // Process the extendedChar accordingly.
+-    switch (newExtendedChar) {
+-    case SDLK_HOME: {
+-            cursorPos = 0;
+-        }
+-        break;
+-
+-    case SDLK_LEFT: {
+-            if(cursorPos&gt;0)
+-                cursorPos--;
+-        }
+-        break;
+-
+-    case SDLK_RIGHT: {
+-            size_t length = strlen(destString);
+-            ++cursorPos;
+-            if ( cursorPos &gt;= maxCharCount ) {
+-                cursorPos = maxCharCount - 1;
+-            } else if ( cursorPos &gt; length ) {
+-                cursorPos = length;
+-            }
+-        }
+-        break;
+-
+-    case SDLK_END: {
+-            cursorPos = strlen(destString);
+-
+-            if (cursorPos &gt;= maxCharCount) {
+-                cursorPos = maxCharCount - 1;
+-            }
+-        }
+-        break;
+-
+-    case SDLK_INSERT: {
+-            insertMode^=1;
+-        }
+-        break;
+-
+-    case SDLK_DELETE: {
+-            if (cursorPos == strlen(destString)) {
+-                break;
+-            }
+-
+-            memcpy(destString + cursorPos, destString + cursorPos + 1, strlen(destString + cursorPos + 1) + 1);
+-        }
+-        break;
+-
+-    case SDLK_BACKSPACE: {
+-            if (cursorPos &gt;= 1) {
+-                int byteCount = strlen(destString + cursorPos);
+-
+-                // Only do this if we are not at the end of the string.
+-                if (byteCount &gt; 0) {
+-                    memcpy(destString + cursorPos - 1, destString + cursorPos, byteCount);
+-                }
+-
+-                cursorPos--;
+-                destString[cursorPos + byteCount] = '\0';
+-            }
+-
+-        }
+-        break;
+-
+-    case SDLK_KP_ENTER:
+-    case SDLK_RETURN:
+-        break;
+-
+-    default: break;
+-    }
+-
+-    if(textaction != 0)
+-        textaction(this);
+-} // addExtendedChar
+-
+-// draw
+-//--------------------------------------------------------------------------
+-void cInputField::draw(Surface &amp;dest)
+-{
+-    checkCursor();
+-    checkRepeat();
+-
+-    inputFieldSurface.fill(componentTextColor);
+-    inputFieldSurface.drawButtonBorder(topLeftBorderColor, Color::gray64);
+-    inputFieldSurface.bltString(4, 2, destString+strDisplayStart, componentActiveTextColor);
+-    inputFieldSurface.blt(dest, pos.x, pos.y);
+-} // draw
+-
+-// drawHighlighted
+-//--------------------------------------------------------------------------
+-void cInputField::drawHighlighted(Surface &amp;dest)
+-{
+-    checkCursor();
+-    checkRepeat();
+-
+-    inputFieldSurface.fill(Color::black);
+-    inputFieldSurface.drawButtonBorder(Color::darkGray, Color::white);
+-    inputFieldSurface.bltStringShadowed(4, 2,
+-                                        destString+strDisplayStart,
+-                                        Color::white,
+-                                        Color::black);
+-
+-    static float timeForBlink = 0.0f;
+-    if ((timeForBlink += TimerInterface::getTimeSlice()) &gt; 0.25f) {
+-        if (timeForBlink &gt; 0.50f) {
+-            timeForBlink = 0.0f;
+-        }
+-    } else {
+-        int cursorPos=cInputField::cursorPos-strDisplayStart;
+-        if ((size_t)cursorPos &gt;= maxCharCount) {
+-            // XXX hardcoded CHAR_PIXX (8)
+-            inputFieldSurface.bltString(((cursorPos - 1) * 8) + 4, 2, &quot;_&quot;, Color::red);
+-        } else {
+-            // XXX hardcoded CHAR_PIXX(8)
+-            inputFieldSurface.bltString(cursorPos * 8 + 4, 2, &quot;_&quot;, Color::red);
+-        }
+-    }
+-
+-    inputFieldSurface.blt(dest, pos.x, pos.y);
+-} // drawHighlighted
+-
+-// checkCursor
+-//--------------------------------------------------------------------------
+-// Purpose: Make sure the cursor stays at the end of the string if the cursor
+-//          is past the string.
+-//--------------------------------------------------------------------------
+-void cInputField::checkCursor()
+-{
+-    if (cursorPos &gt; strlen(destString)) {
+-        cursorPos = strlen(destString);
+-    }
+-    if(((size_t)strDisplayStart)&gt;cursorPos) {
+-        strDisplayStart=cursorPos;
+-    }
+-    else if(((size_t)(strDisplayStart+(maxWidth/9)))&lt;=cursorPos) {
+-        strDisplayStart=cursorPos-(maxWidth/9);
+-    }
+-} // end checkCursor
+-
+-void cInputField::pressKey(int ch)
+-{
+-    depressedKey=ch;
+-    depressedKeyTimeNext=SDL_GetTicks()+250;
+-}
+-
+-// check repeat and insert characters as needed
+-void cInputField::checkRepeat()
+-{
+-    return; // I disable this function, bug with shift and capslock keys
+-    
+-    if(depressedKey==0) { return; }
+-    Uint32 ticks=SDL_GetTicks();
+-    if(depressedKeyTimeNext&gt;ticks) {
+-        return;
+-    }
+-    if(KeyboardInterface::getKeyState(depressedKey)!=true) {
+-        // we've let go of this key.
+-        depressedKey=0;
+-        return;
+-    }
+-
+-    if(isprint(depressedKey)) {
+-        addChar(depressedKey);
+-    }
+-    else { addExtendedChar(depressedKey); }
+-
+-    depressedKeyTimeNext=ticks+50;
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -1,140 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef __cInputField_hpp__
+-#define __cInputField_hpp__
+-
+-#include &quot;Types/iXY.hpp&quot;
+-#include &quot;Types/iRect.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Util/NoCopy.hpp&quot;
+-
+-//--------------------------------------------------------------------------
+-class cInputFieldString : public NoCopy
+-{
+-    friend class cInputField;
+-
+-private:
+-    int   maxCharCount;
+-    int     maxWidth;         // max width in the gui
+-    char *string;
+-
+-public:
+-    cInputFieldString()
+-    {
+-        reset();
+-    }
+-
+-    ~cInputFieldString()
+-    {
+-        free();
+-    }
+-
+-    void free()
+-    {
+-        if (string != 0) {
+-            delete [] string;
+-            string = 0;
+-        }
+-    }
+-
+-    void init(const char *string, int maxCharCount,int maxWidth);
+-    void init(const char *string, int maxCharCount) {
+-        init(string,maxCharCount,maxCharCount);
+-    }
+-    void setString(const std::string&amp; string);
+-    void reset();
+-
+-    const char *getString()
+-    {
+-        return string;
+-    }
+-}
+-; // end cInputFieldString
+-
+-
+-//--------------------------------------------------------------------------
+-class cInputField
+-{
+-public:
+-    cInputField();
+-    cInputField(const cInputField&amp; other);
+-    ~cInputField();
+-
+-    void operator= (const cInputField&amp; other);
+-
+-    iXY    getPos() const
+-    {
+-        return pos;
+-    }
+-    int    getMaxCharCount() const
+-    {
+-        return maxCharCount;
+-    }
+-    char  *getDestString() const
+-    {
+-        return destString;
+-    }
+-    char  *getExcludedCharacters() const
+-    {
+-        return excludedCharacters;
+-    }
+-
+-    bool contains(const iXY &amp;pos) const
+-    {
+-        return bounds.contains(pos);
+-    }
+-
+-    typedef void (*ACTION_FUNC_PTR)(cInputField* inputfield);
+-
+-    void setPos(iXY pos);
+-    void setInputFieldString(cInputFieldString *string);
+-    void setTextAction(ACTION_FUNC_PTR func);
+-    void setExcludedCharacters(const char *exChars);
+-    void setmaxChar(const int maxChar)
+-    {
+-        maxCharCount = maxChar;
+-    }
+-    void addChar(int newChar);
+-    void addExtendedChar(int newExtendedChar);
+-    void draw(Surface &amp;dest);
+-    void drawHighlighted(Surface &amp;dest);
+-    void checkCursor();
+-    void resetString();     // reset string position
+-    void clearString();     // reset string
+-
+-private:
+-    iXY      pos;
+-    size_t   maxCharCount;
+-    int     strDisplayStart;  // which char to start displaying from
+-    int     maxWidth;         // max width in the gui
+-    int     depressedKey;     // currently depressed key
+-    unsigned int depressedKeyTimeNext;  // tick to repeat the key
+-    bool    insertMode;
+-    char    *destString;
+-    char    *excludedCharacters;
+-    iRect    bounds;
+-    size_t   cursorPos;
+-    Surface inputFieldSurface;
+-    ACTION_FUNC_PTR textaction;
+-
+-    void pressKey(int ch);
+-    void checkRepeat();
+-    void reset();
+-}; // end cInputField
+-
+-#endif // end __cInputField_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -120,9 +120,18 @@
+     ChatList-&gt;setColor(0);
+     ChatList-&gt;setAutoScroll(true);
+     add(ChatList);
+-    ChatString.init(&quot;&quot;, 100, getSizeX()-5);
+-    input = addInputField(iXY(2, getSizeY()-16), &amp;ChatString, &quot;&quot;, true, 100);
+-    input-&gt;setExcludedCharacters(&quot;\\&#65533;`&#65533;&quot;);
++    
++    input = new InputField();
++    input-&gt;setLocation(2,getSizeY()-16);
++    input-&gt;setSize(getSizeX()-5,16);
++    input-&gt;setMaxTextLength(100);
++    input-&gt;setExcludedChars(&quot;\\&#65533;`&#65533;&quot;);
++    
++    add(input);
++    
++    
++//    ChatString.init(&quot;&quot;, 100, getSizeX()-5);
++//    input = addInputField(iXY(2, getSizeY()-16), &amp;ChatString, &quot;&quot;, true, 100);
+ }
+ 
+ void ChatView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+@@ -137,9 +146,9 @@
+     if (KeyboardInterface::getKeyPressed(SDLK_RETURN)||
+             KeyboardInterface::getKeyPressed(SDLK_KP_ENTER))
+     {
+-        if (strlen(input-&gt;getDestString())!= 0)
++        if ( input-&gt;getText().length() != 0 )
+         {
+-            std::string msg = input-&gt;getDestString();
++            const NPString&amp; msg = input-&gt;getText();
+             if (msg[0] == '/')
+             {
+                 if (!msg.compare(0,5,&quot;/all &quot;))
+@@ -151,7 +160,7 @@
+             {
+                 ChatInterface::teamsay(msg);
+             }
+-            input-&gt;clearString();
++            input-&gt;setText(&quot;&quot;);
+         }
+     }
+ #ifdef WIN32
+@@ -170,7 +179,7 @@
+             {
+                 if (isprint(*pntchr))
+                 {
+-                    input-&gt;addChar(*pntchr);
++                    input-&gt;handleNormalKey(*pntchr);
+                     count++;
+                 }
+                 pntchr++;
+@@ -245,7 +254,7 @@
+ void ChatView::doActivate()
+ {
+     Desktop::setActiveView(this);
+-    View::selectedInputField = View::findInputFieldContaining(input-&gt;getPos());
++//    View::selectedInputField = View::findInputFieldContaining(input-&gt;getPos());
+ }
+ 
+ void ChatView::clear()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.hpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -20,7 +20,7 @@
+ #define __CHATVIEW_HPP__
+ 
+ #include &quot;Views/Components/tChatBox.hpp&quot;
+-#include &quot;Views/Components/cInputField.hpp&quot;
++#include &quot;Views/Components/InputField.hpp&quot;
+ #include &quot;Views/Components/tVScrollBar.hpp&quot;
+ #include &quot;Views/Components/tHScrollBar.hpp&quot;
+ #include &quot;Views/Game/GameTemplateView.hpp&quot;
+@@ -36,8 +36,7 @@
+     tHScrollBar * hsbChat;
+     Button * bHideWindow;
+     Button * bShowWindow;
+-    cInputField* input;
+-    cInputFieldString ChatString;
++    InputField * input;
+     bool HideWindow;
+     
+ public:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -25,6 +25,7 @@
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ 
+ #include &quot;Actions/Action.hpp&quot;
++#include &quot;Views/Components/InputField.hpp&quot;
+ 
+ list&lt;string&gt; LoadingView::lines;
+ bool LoadingView::dirty = true;
+@@ -74,7 +75,11 @@
+     setVisible(false);
+     setBordered(false);
+     need_password = false;
+-    password_str.init(&quot;&quot;, 31,31);
++    
++    password = new InputField();
++    password-&gt;setLocation(175+88, 80);
++    password-&gt;setSize(32 * 8, 16);
++    password-&gt;setMaxTextLength(31);
+ 
+     resize(800, 600);
+ 
+@@ -145,16 +150,16 @@
+         this-&gt;need_password = need_password;
+         if ( need_password )
+         {
+-            password_field = addInputField(iXY(175+88, 80), &amp;password_str, &quot;&quot;, true, 31);
++            password-&gt;setText(&quot;&quot;);
++            add(password);
+             add(okButton);
+             add(passwordLabel);
+         }
+         else
+         {
+-            removeInputField(password_field);
++            removeComponent(password);
+             removeComponent(okButton);
+             removeComponent(passwordLabel);
+-            password_field = 0;
+         }
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -21,6 +21,7 @@
+ #include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Components/Button.hpp&quot;
++#include &quot;Views/Components/InputField.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ #include &lt;list&gt;
+ 
+@@ -56,7 +57,7 @@
+     void setNeedPassword(bool need_password);
+     bool doesNeedPassword() const { return need_password; }
+     
+-    const char * getPassword() { return password_str.getString(); }
++    const char * getPassword() { return password-&gt;getText().c_str(); }
+ 
+ private:
+     static std::list&lt;NPString&gt; lines;
+@@ -65,8 +66,7 @@
+     Surface backgroundSurface;
+     Surface surface;
+     bool need_password;
+-    cInputFieldString password_str;
+-    cInputField * password_field;
++    InputField * password;
+     Button * okButton;
+     Label * passwordLabel;
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -41,6 +41,7 @@
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+ 
+ #include &quot;Actions/Action.hpp&quot;
++#include &quot;Multi/PlayerNameView.hpp&quot;
+ 
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+@@ -183,6 +184,8 @@
+     
+     void execute()
+     {
++        GameConfig::player_name-&gt;assign(((PlayerNameView*)Desktop::getView(&quot;PlayerNameView&quot;))-&gt;getSelectedName());
++        
+         if ( GameConfig::player_name-&gt;length() == 0 )
+             return;
+ 
+@@ -193,8 +196,9 @@
+             return;
+         }
+ 
+-        if (  gameconfig-&gt;hostorjoin == _game_session_join
+-           &amp;&amp; strcmp(IPAddressView::szServer.getString(), &quot;&quot;) == 0 )
++        const NPString&amp; serv_ip = ((IPAddressView*)Desktop::getView(&quot;IPAddressView&quot;))-&gt;getSelectedServerIp();
++        
++        if ( (gameconfig-&gt;hostorjoin == _game_session_join) &amp;&amp; (serv_ip.length() == 0) )
+         {
+             return;
+         }
+@@ -204,8 +208,7 @@
+ 
+         if ( gameconfig-&gt;hostorjoin == _game_session_join )
+         {
+-            gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
+-            IPAddressView::szServer.setString(&quot;&quot;);
++            gameconfig-&gt;serverConnect = serv_ip;
+         }
+ 
+         serverlistview-&gt;endQuery();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -21,8 +21,6 @@
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ 
+-cInputFieldString IPAddressView::szServer;
+-
+ // IPAddressView
+ //---------------------------------------------------------------------------
+ IPAddressView::IPAddressView() : View()
+@@ -40,21 +38,15 @@
+     iXY  area_size = iXY(
+             31 * 8 + 16,
+             Surface::getFontHeight() + 4 + 8);
++    
+     resizeClientArea(area_size);
+ 
+-    Init();
+-} // end IPAddressView constructor
++    serverIP = new InputField();
++    serverIP-&gt;setLocation(iXY(8, 3));
++    serverIP-&gt;setSize(255, 16);
++    serverIP-&gt;setMaxTextLength(255);
++    serverIP-&gt;setText(&quot;&quot;);
+ 
+-void IPAddressView::Init()
+-{
+-    szServer.init(&quot;&quot;, 256, getSizeX()-24);
+-    addInputField(iXY(8, 3), &amp;szServer, &quot;&quot;, true, 255);
+-} // end IPAddressView::init
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void IPAddressView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    View::doDraw(viewArea, clientArea);
+-} // end IPAddressView::doDraw
+-
++    add(serverIP);
++    
++} // end IPAddressView constructor
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -19,19 +19,21 @@
+ #define __IPAddressView_h__
+ 
+ #include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Components/InputField.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ 
+ //---------------------------------------------------------------------------
+ class IPAddressView : public View
+ {
+ public:
+- static cInputFieldString szServer;
+-	
+- IPAddressView();
++    IPAddressView();
+ 
+- void Init();
+-
+- virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea); 
++    const NPString&amp; getSelectedServerIp() const { return serverIP-&gt;getText(); }
++    void setSelectedServerIp(const NPString&amp; ip) { serverIP-&gt;setText(ip); }
++    
++private:
++    InputField * serverIP;
++    
+ }; // end IPAddressView
+ 
+ #endif // end __IPAddressView_h__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -24,6 +24,10 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/Components/InputField.hpp&quot;
+ 
++enum { BORDER_SPACE           =  4 };    
++// irc nick is 16 chars max, 2 = &quot;np&quot;, 1 spare for digit if nick is taken
++enum { INPUT_FIELD_CHARACTERS = 15 };
++
+ // PlayerNameView
+ //---------------------------------------------------------------------------
+ PlayerNameView::PlayerNameView() : View()
+@@ -46,10 +50,6 @@
+     init();
+ } // end PlayerNameView::PlayerNameView
+ 
+-PlayerNameView::~PlayerNameView()
+-{
+-}
+-
+ // init
+ //---------------------------------------------------------------------------
+ void PlayerNameView::init()
+@@ -58,30 +58,9 @@
+     playerName-&gt;setLocation(iXY(BORDER_SPACE, BORDER_SPACE));
+     playerName-&gt;setSize(getSizeX()-20, 16);
+     playerName-&gt;setMaxTextLength(INPUT_FIELD_CHARACTERS * 2); // XXX *2 for testing only
++    playerName-&gt;setExcludedChars(&quot;\\&quot;);
+     playerName-&gt;setText(*GameConfig::player_name);
+ 
+     add(playerName);
+     
+-//    playerName.init(GameConfig::player_name-&gt;c_str(), INPUT_FIELD_CHARACTERS, getSizeX()-16);
+-//    playerName.setString(*GameConfig::player_name);
+-//    cInputField* input 
+-//        = addInputField(iXY(BORDER_SPACE, BORDER_SPACE+2), &amp;playerName, &quot;&quot;, true, INPUT_FIELD_CHARACTERS);
+-//    input-&gt;setTextAction(textChanged);
+-//    input-&gt;setExcludedCharacters(&quot;\\&quot;);
+ } // end PlayerNameView::init
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+-void PlayerNameView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+-{
+-    //iRect r(getViewRect());
+-    //viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+-
+-    View::doDraw(viewArea, clientArea);
+-} // end PlayerNameView::doDraw
+-
+-void PlayerNameView::textChanged(cInputField* input)
+-{
+-//    GameConfig::player_name-&gt;assign( input-&gt;getDestString() );
+-}
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -19,28 +19,20 @@
+ #define __PlayerNameView_hpp__
+ 
+ #include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Components/InputField.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ 
+-class InputField;
+-
+ //---------------------------------------------------------------------------
+ class PlayerNameView : public View
+ {
+ public:
+     PlayerNameView();
+-    virtual ~PlayerNameView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-
+     void init();
+-
+-private:
+-    static void textChanged(cInputField* input);
+     
+-    enum { BORDER_SPACE           =  4 };    
+-    // irc nick is 16 chars max, 2 = &quot;np&quot;, 1 spare for digit if nick is taken
+-    enum { INPUT_FIELD_CHARACTERS = 15 };
++    const NPString&amp; getSelectedName() { return playerName-&gt;getText(); }
+ 
++private:
+     InputField* playerName;
+ }; // end PlayerNameView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2012-09-02 10:58:30 UTC (rev 1388)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2012-09-02 12:58:28 UTC (rev 1389)
+@@ -161,7 +161,7 @@
+             
+             Uint8 textcolor = Color::white;
+             
+-            if (servaddr.str()==IPAddressView::szServer.getString()) {
++            if (servaddr.str()==((IPAddressView*)Desktop::getView(&quot;IPAddressView&quot;))-&gt;getSelectedServerIp()) {
+                 textcolor = Color::yellow;
+                 clientArea.fillRect(
+                     iRect(0,y,clientArea.getWidth(),y+Surface::getFontHeight()),
+@@ -203,7 +203,7 @@
+     const masterserver::ServerInfo&amp; server = *(serverlist[listpos]);
+     std::stringstream addr;
+     addr &lt;&lt; server.address &lt;&lt; ':' &lt;&lt; server.port;
+-    IPAddressView::szServer.setString(addr.str());
++    ((IPAddressView*)Desktop::getView(&quot;IPAddressView&quot;))-&gt;setSelectedServerIp(addr.str());
+ 
+     LoadingView * lv = static_cast&lt;LoadingView*&gt;(Desktop::getView(&quot;LoadingView&quot;));
+     if ( lv )
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000412.html">[Netpanzer-cvs] r1388 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000414.html">[Netpanzer-cvs] r1390 -	trunk/netpanzer/src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#413">[ date ]</a>
+              <a href="thread.html#413">[ thread ]</a>
+              <a href="subject.html#413">[ subject ]</a>
+              <a href="author.html#413">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

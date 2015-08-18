@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1284 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1284%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/menu%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111116125950.A088B481446%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000309.html">
+   <LINK REL="Next"  HREF="000311.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1284 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1284%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/menu%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111116125950.A088B481446%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1284 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 16 13:59:50 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000309.html">[Netpanzer-cvs] r1283 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000311.html">[Netpanzer-cvs] r1285 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#310">[ date ]</a>
+              <a href="thread.html#310">[ thread ]</a>
+              <a href="subject.html#310">[ subject ]</a>
+              <a href="author.html#310">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-16 13:59:50 +0100 (Wed, 16 Nov 2011)
+New Revision: 1284
+
+Modified:
+   trunk/netpanzer/pics/backgrounds/menus/menu/defaultMB.bmp
+   trunk/netpanzer/src/NetPanzer/Views/Components/newButton.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+Log:
+Resolve old bug on resign/exit confirmation
+the resolution lower than 800x600 are no longer visible
+
+Modified: trunk/netpanzer/pics/backgrounds/menus/menu/defaultMB.bmp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/newButton.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/newButton.cpp	2011-11-15 12:22:06 UTC (rev 1283)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/newButton.cpp	2011-11-16 12:59:50 UTC (rev 1284)
+@@ -34,8 +34,6 @@
+         bimage.bltTrans(surface, 1, 1);
+     }
+     surface.RoundRect(surface.getRect(), 3, borders[bstate][0]);
+-    //surface.drawButtonBorder(borders[bstate][0], borders[bstate][1]);
+-    // blit centered and transparent
+     text.bltTrans(surface, (surface.getWidth()/2) - (text.getWidth()/2),
+                  (surface.getHeight()/2) - (text.getHeight()/2));        
+     dirty = false;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2011-11-15 12:22:06 UTC (rev 1283)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
+@@ -59,11 +59,11 @@
+     setAllowResize(false);
+     setDisplayStatusBar(false);
+ 
+-    resize(screen-&gt;getWidth(), screen-&gt;getHeight());
+-    moveTo(0,0);
++    moveTo(iXY(0, 0));
++    resize(iXY(800, 600));
+ 
+     int x = (getClientRect().getSize().x - (141 * 2 + 20)) / 2;
+-    int y = screen-&gt;getHeight()/2 + 30;
++    int y = getClientRect().getSize().y/2 + 30;
+     add( Button::createSpecialButton( &quot;YES&quot;, &quot;YES&quot;, iXY(x, y)) );
+     x += 141 + 10;
+     add( Button::createSpecialButton( &quot;NO&quot;, &quot;NO&quot;, iXY(x, y)) );
+@@ -74,9 +74,7 @@
+ //---------------------------------------------------------------------------
+ void AreYouSureExitView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    iRect r(min, max);
+-
+-    viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
++    viewArea.bltLookup(getClientRect(), Palette::darkGray256.getColorArray());
+     //viewArea.drawButtonBorder(r, Color::lightGreen, Color::darkGreen);
+ 
+     viewArea.bltStringCenter(&quot;Are you sure you wish to exit netPanzer?&quot;, Color::white);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2011-11-15 12:22:06 UTC (rev 1283)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
+@@ -95,8 +95,8 @@
+     setAllowResize(false);
+     setDisplayStatusBar(false);
+ 
+-    resize(screen-&gt;getWidth(), screen-&gt;getHeight());
+-    moveTo(0,0);
++    moveTo(iXY(0, 0));
++    resize(iXY(800, 600));
+ 
+     int x = (getClientRect().getSize().x - (141 * 2 + 20)) / 2;
+     int y = getClientRect().getSize().y/2 + 30;
+@@ -104,15 +104,13 @@
+     x += 141 + 10;
+     add( Button::createSpecialButton( &quot;NO&quot;, &quot;NO&quot;, iXY(x, y)) );
+     loaded = true;
+-	} // end AreYouSureResignView::init
++} // end AreYouSureResignView::init
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+ void AreYouSureResignView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    iRect r(min, max);
+-
+-    viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
++    viewArea.bltLookup(getClientRect(), Palette::darkGray256.getColorArray());
+     //viewArea.drawButtonBorder(r, Color::lightGreen, Color::darkGreen);
+ 
+     viewArea.bltStringCenter(&quot;Are you sure you wish to Resign?&quot;, Color::white);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-15 12:22:06 UTC (rev 1283)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
+@@ -89,18 +89,14 @@
+ 
+ static void bExit()
+ {
++    Desktop::setVisibilityAllWindows(false);
+     GameManager::exitNetPanzer();
+ }
+ 
+ //---------------------------------------------------------------------------
+ static void bResign()
+ {
+-    Desktop::setVisibility(&quot;ControlsView&quot;, false);
+-    Desktop::setVisibility(&quot;VisualsView&quot;, false);
+-    Desktop::setVisibility(&quot;InterfaceView&quot;, false);
+-    Desktop::setVisibility(&quot;SoundView&quot;, false);
+     Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-
+     Desktop::setVisibility(&quot;AreYouSureResignView&quot;, true);
+ }
+ 
+@@ -109,22 +105,13 @@
+ {
+     GameManager::setNetPanzerGameOptions();
+ 
+-    Desktop::setVisibility(&quot;ControlsView&quot;, false);
+-    Desktop::setVisibility(&quot;VisualsView&quot;, false);
+-    Desktop::setVisibility(&quot;InterfaceView&quot;, false);
+-    Desktop::setVisibility(&quot;SoundView&quot;, false);
+     Desktop::setVisibility(&quot;OptionsView&quot;, false);
+ }
+ 
+ //---------------------------------------------------------------------------
+ static void bExitNetPanzer()
+ {
+-    Desktop::setVisibility(&quot;ControlsView&quot;, false);
+-    Desktop::setVisibility(&quot;VisualsView&quot;, false);
+-    Desktop::setVisibility(&quot;InterfaceView&quot;, false);
+-    Desktop::setVisibility(&quot;SoundView&quot;, false);
+     Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-
+     Desktop::setVisibility(&quot;AreYouSureExitView&quot;, true);
+ }
+ 
+@@ -161,7 +148,7 @@
+     add( new newButton( &quot;HOST&quot;, &quot;Host&quot;, hostPos, 0) );
+     add( new newButton( &quot;OPTIONS&quot;, &quot;Options&quot;, optionsPos, 0) );
+     add( new newButton( &quot;HELP&quot;, &quot;Help&quot;, helpPos, 0) );
+-    add( new newButton( &quot;EXITNP&quot;, &quot;Exit netPanzer&quot;, exitPos, 1) );
++    add( new newButton( &quot;EXITNP&quot;, &quot;Exit netPanzer&quot;, exitPos, 0) );
+ } // end MenuTemplateView::initPreGameOptionButtons
+ 
+ // initInGameOptionButtons
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-11-15 12:22:06 UTC (rev 1283)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
+@@ -93,7 +93,7 @@
+     setSearchName(&quot;HostJoinTemplateView&quot;);
+     setTitle(&quot;&quot;);
+     setSubTitle(&quot;&quot;);
+-    add( new newButton( &quot;PLAY&quot;, &quot;Play&quot;, playPos, 0) );
++    add( new newButton( &quot;PLAY&quot;, &quot;Play&quot;, playPos, 1) );
+ } // end HostJoinTemplateView constructor
+ 
+ // doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-15 12:22:06 UTC (rev 1283)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-16 12:59:50 UTC (rev 1284)
+@@ -193,9 +193,12 @@
+     {
+         while ( modes[cur_mode] )
+         {
+-            snprintf(res_str,sizeof(res_str),&quot;%dx%d&quot;, modes[cur_mode]-&gt;w, modes[cur_mode]-&gt;h);
+-            res_str[sizeof(res_str)-1] = 0;
+-            choiceResolution-&gt;addItem(res_str);
++            if ((modes[cur_mode]-&gt;w &gt; 799) &amp;&amp; (modes[cur_mode]-&gt;h &gt; 599) ) 
++            {
++                snprintf(res_str,sizeof(res_str),&quot;%dx%d&quot;, modes[cur_mode]-&gt;w, modes[cur_mode]-&gt;h);
++                res_str[sizeof(res_str)-1] = 0;
++                choiceResolution-&gt;addItem(res_str);
++            }
+             ++cur_mode;
+         }
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000309.html">[Netpanzer-cvs] r1283 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000311.html">[Netpanzer-cvs] r1285 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#310">[ date ]</a>
+              <a href="thread.html#310">[ thread ]</a>
+              <a href="subject.html#310">[ subject ]</a>
+              <a href="author.html#310">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

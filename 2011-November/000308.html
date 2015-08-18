@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1282 - trunk/netpanzer/src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1282%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111112224534.E4064481582%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000307.html">
+   <LINK REL="Next"  HREF="000309.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1282 - trunk/netpanzer/src/NetPanzer/Views/Game</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1282%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111112224534.E4064481582%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1282 - trunk/netpanzer/src/NetPanzer/Views/Game">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Sat Nov 12 23:45:34 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000307.html">[Netpanzer-cvs] r1281 - trunk/netpanzer/pics/flags
+</A></li>
+        <LI>Next message: <A HREF="000309.html">[Netpanzer-cvs] r1283 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#308">[ date ]</a>
+              <a href="thread.html#308">[ thread ]</a>
+              <a href="subject.html#308">[ subject ]</a>
+              <a href="author.html#308">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-12 23:45:34 +0100 (Sat, 12 Nov 2011)
+New Revision: 1282
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+Log:
+Resolve bug in selection view (thx C-D)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-11-12 20:49:29 UTC (rev 1281)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-11-12 22:45:34 UTC (rev 1282)
+@@ -85,7 +85,7 @@
+         : Button(cname), unitType(unit_type), p(vsv)
+     {
+         bimage.copy(s);
+-        setSize( bimage.getWidth(), bimage.getHeight());
++        setSize( bimage.getWidth()-1, bimage.getHeight()-1);
+         setLocation(x, y);
+         setUnitSelectionBorder();
+     }
+@@ -168,40 +168,40 @@
+ 
+     moveTo(iXY(0, 0));
+ 
+-    const int yOffset  = 15;
++    const int yOffset  = 16;
+     const int gapSpace =  1;
+ 
+-    resizeClientArea(48 * 5 + gapSpace * 4, 198 + 84);
++    resizeClientArea(48 * 5 + gapSpace+1 * 4, 198 + 100);
+ 
+     // Power status.
+-    iXY pos(0 ,0);
++    iXY pos(0 ,2);
+ 
+     pos.x = 0;
+     add( new Label( pos.x+2, pos.y+2, &quot;Static Display:&quot;, Color::white) );
+ 
+-    pos.x = getClientRect().getSizeX() - 100;
++    pos.x = getClientRect().getSizeX() - 102;
+     if ( !buttonStaticDisplay )
+         buttonStaticDisplay = new Button( &quot;ButtonStaticDisplay&quot;);
+     buttonStaticDisplay-&gt;setLabel(&quot;On&quot;);
+     buttonStaticDisplay-&gt;setLocation(pos.x, pos.y);
+-    buttonStaticDisplay-&gt;setSize( 100, 15);
++    buttonStaticDisplay-&gt;setSize( 100, 14);
+     buttonStaticDisplay-&gt;setNormalBorder();
+     add(buttonStaticDisplay);
+-    pos.y += yOffset;
++    pos.y += yOffset+2;
+ 
+     pos.x = 0;
+     add( new Label( pos.x+2, pos.y+2, &quot;Power:&quot;, Color::white) );
+ 
+-    pos.x = getClientRect().getSizeX() - 100;
++    pos.x = getClientRect().getSizeX() - 102;
+     if ( !buttonPower )
+         buttonPower = new Button( &quot;ButtonPower&quot;);
+     
+     buttonPower-&gt;setLabel(&quot;Off&quot;);
+     buttonPower-&gt;setLocation(pos.x,pos.y);
+-    buttonPower-&gt;setSize( 100, 15);
++    buttonPower-&gt;setSize( 100, 14);
+     buttonPower-&gt;setNormalBorder();
+     add(buttonPower);
+-    pos.y += yOffset;
++    pos.y += yOffset+5;
+ 
+     // XXX hardcoded for now
+     int CHAR_XPIX = 8;
+@@ -264,7 +264,7 @@
+     }
+     
+     unitProfileDataY = pos.y;
+-    pos.y += 74;
++    pos.y += 73;
+ 
+     //addLabel(pos + 2, &quot;Time Remaining:&quot;, Color::white);
+     //timeRemainingPos.x = (strlen(&quot;Time Remaining: &quot;) + 1) * CHAR_XPIX + 2;
+@@ -277,7 +277,7 @@
+     
+     buttonOk-&gt;setLabel(&quot;Close&quot;);
+     buttonOk-&gt;setLocation(pos.x,pos.y);
+-    buttonOk-&gt;setSize(100, 15);
++    buttonOk-&gt;setSize(100, 14);
+     buttonOk-&gt;setNormalBorder();
+     add(buttonOk);
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000307.html">[Netpanzer-cvs] r1281 - trunk/netpanzer/pics/flags
+</A></li>
+	<LI>Next message: <A HREF="000309.html">[Netpanzer-cvs] r1283 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#308">[ date ]</a>
+              <a href="thread.html#308">[ thread ]</a>
+              <a href="subject.html#308">[ subject ]</a>
+              <a href="author.html#308">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

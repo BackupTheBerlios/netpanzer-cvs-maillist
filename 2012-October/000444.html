@@ -1,0 +1,516 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1420 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/Network NetPanzer/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1420%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Classes/Network%20NetPanzer/Network&In-Reply-To=%3C20121025132134.7CD4155B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000443.html">
+   <LINK REL="Next"  HREF="000445.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1420 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/Network NetPanzer/Network</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1420%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Classes/Network%20NetPanzer/Network&In-Reply-To=%3C20121025132134.7CD4155B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1420 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/Network NetPanzer/Network">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Thu Oct 25 15:21:34 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000443.html">[Netpanzer-cvs] r1419 - in trunk/netpanzer: Languages	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Network/PlayerRequests src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000445.html">[Netpanzer-cvs] r1421 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#444">[ date ]</a>
+              <a href="thread.html#444">[ thread ]</a>
+              <a href="subject.html#444">[ subject ]</a>
+              <a href="author.html#444">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-10-25 15:21:33 +0200 (Thu, 25 Oct 2012)
+New Revision: 1420
+
+Modified:
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+Log:
+Some cleanups of the code...
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -257,7 +257,7 @@
+ }
+ 
+ int
+-SocketBase::doSend(const void* data, size_t len) throw(NetworkException)
++SocketBase::doSend(const void* data, size_t len)
+ {
+     if ( state == CONNECTED )
+     {
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -65,7 +65,7 @@
+     void bindSocket() throw(NetworkException) { bindSocketTo(addr); };
+     void doListen() throw(NetworkException);
+     void doConnect() throw(NetworkException);
+-    int  doSend(const void* data, size_t len) throw(NetworkException);
++    int  doSend(const void* data, size_t len);
+     int  doReceive(void* buffer, size_t len) throw(NetworkException);
+     int  doSendTo(const Address&amp; toaddr, const void* data, size_t len) throw(NetworkException);
+     size_t  doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len) throw(NetworkException);
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -75,7 +75,7 @@
+ }
+ 
+ size_t
+-TCPSocket::send(const void* data, size_t size) throw(NetworkException)
++TCPSocket::send(const void* data, size_t size)
+ {
+     int res = doSend(data,size);
+     if (!res &amp;&amp; !observer) // disconnected
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -51,7 +51,7 @@
+ 
+     void destroy();
+ 
+-    size_t send(const void* data, size_t datasize) throw(NetworkException);
++    size_t send(const void* data, size_t datasize);
+     
+ protected:
+     ~TCPSocket();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -55,25 +55,30 @@
+ 
+ void NetworkServer::resetClientList()
+ {
+-    for(ClientList::iterator i = client_list.begin(); i != client_list.end();
+-            ++i)
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        delete (*i)-&gt;client_socket;
+         delete *i;
++        i++;
+     }
++    
+     client_list.clear();
+ }
+ 
+ void NetworkServer::cleanUpClientList()
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        if( (*i)-&gt;wannadie )
++        if( ! (*i)-&gt;isConnected() )
+         {
+-            delete (*i)-&gt;client_socket;
+             delete (*i);
+             i = client_list.erase(i);
++            continue;
+         }
+         i++;
+     }
+@@ -81,11 +86,7 @@
+ 
+ bool NetworkServer::addClientToSendList( ClientSocket * client )
+ {
+-    ServerClientListData *client_data = new ServerClientListData;
+-
+-    client_data-&gt;client_socket = client;
+-    client_list.push_back(client_data);
+-
++    client_list.push_back(client);
+     return true;
+ }
+ 
+@@ -136,23 +137,14 @@
+ void
+ NetworkServer::broadcastMessage(const NetMessage *message, size_t size)
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        if( ! (*i)-&gt;wannadie )
+-        {
+-            try
+-            {
+-                (*i)-&gt;client_socket-&gt;sendMessage( message, size);
+-            }
+-            catch(std::exception&amp; e)
+-            {
+-                // XXX will it close by itself?
+-                LOGGER.warning (&quot;Network broadcast error when sending to player %d: %s&quot;,
+-                       (*i)-&gt;client_socket-&gt;getPlayerIndex(), e.what() );
+-            }
+-        }
+-        ++i;
++        (*i)-&gt;sendMessage( message, size);
++        
++        i++;
+     }
+ }
+ 
+@@ -163,26 +155,19 @@
+     if( socket == 0 )
+         return;
+     
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        if ( ! (*i)-&gt;wannadie
+-             &amp;&amp; (*i)-&gt;client_socket-&gt;getPlayerIndex() == player_index )
++        if ( (*i)-&gt;getPlayerIndex() == player_index )
+         {
+-            try
+-            {
+-                (*i)-&gt;client_socket-&gt;sendMessage( message, size);
++            (*i)-&gt;sendMessage( message, size);
+ 
+-                NetworkState::incPacketsSent(size);
+-                return; // premature exit
+-            }
+-            catch (NetworkException e)
+-            {
+-                LOGGER.warning (&quot;Network send error when sending to player %d: %s&quot;,
+-                       player_index, e.what() );
+-            }            
++            NetworkState::incPacketsSent(size);
++            return; // premature exit
+         }
+-        ++i;
++        i++;
+     }
+ 
+     // if didn't found player we are here.
+@@ -209,13 +194,15 @@
+ void
+ NetworkServer::dropClient(ClientSocket * client)
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while( i != client_list.end() &amp;&amp; (*i)-&gt;client_socket != client )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e &amp;&amp; *i != client )
+     {
+         ++i;
+     }
+     
+-    if ( i != client_list.end() )
++    if ( i != e )
+     {
+         // XXX hack
+         onClientDisconected(client, &quot;dropped&quot;);
+@@ -225,8 +212,10 @@
+ void
+ NetworkServer::niceDisconnect(ClientSocket * client)
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while( i != client_list.end() &amp;&amp; (*i)-&gt;client_socket != client )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e &amp;&amp; *i != client )
+     {
+         ++i;
+     }
+@@ -241,13 +230,15 @@
+ void
+ NetworkServer::kickClient(ClientSocket * client)
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while( i != client_list.end() &amp;&amp; (*i)-&gt;client_socket != client )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e &amp;&amp; *i != client )
+     {
+         ++i;
+     }
+ 
+-    if ( i != client_list.end() )
++    if ( i != e )
+     {
+         // XXX hack
+         PlayerState *p = PlayerInterface::getPlayer(client-&gt;getPlayerIndex());
+@@ -255,6 +246,7 @@
+         {
+             p-&gt;setStateKicked();
+         }
++        
+         onClientDisconected(client, &quot;kicked&quot;);
+     }
+ }
+@@ -262,13 +254,12 @@
+ void
+ NetworkServer::sendRemaining()
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        if ( ! (*i)-&gt;wannadie )
+-        {
+-            (*i)-&gt;client_socket-&gt;sendRemaining();
+-        }
++        (*i)-&gt;sendRemaining();
+         i++;
+     }
+ }
+@@ -281,29 +272,32 @@
+         return false;
+     }
+ 
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        if ( ! (*i)-&gt;wannadie
+-                &amp;&amp; (*i)-&gt;client_socket-&gt;getIPAddress() == client-&gt;getIPAddress() )
++        if ( (*i)-&gt;getIPAddress() == client-&gt;getIPAddress() )
+         {
+             return true;
+         }
+         i++;
+     }
++
+     return false;
+ }
+ 
+ std::string
+ NetworkServer::getIP(const PlayerID player_index)
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        if ( ! (*i)-&gt;wannadie
+-             &amp;&amp; (*i)-&gt;client_socket-&gt;getPlayerIndex() == player_index )
++        if ( (*i)-&gt;getPlayerIndex() == player_index )
+         {
+-            return (*i)-&gt;client_socket-&gt;getFullIPAddress();
++            return (*i)-&gt;getFullIPAddress();
+         }
+         
+         i++;
+@@ -377,18 +371,6 @@
+     
+     PlayerID player_index = s-&gt;getPlayerIndex();
+     
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
+-    {
+-        if ( (*i)-&gt;client_socket == s )
+-        {
+-            LOGGER.debug(&quot;NetworkServer:onClientDisconnected found client in list, preparing to die [%d]&quot;, player_index);
+-            (*i)-&gt;wannadie = true;
+-            break;
+-        }
+-        ++i;
+-    }
+-    
+     if ( player_index != INVALID_PLAYER_ID )
+     {
+         PlayerState * player = PlayerInterface::getPlayer(player_index);
+@@ -434,16 +416,17 @@
+ ClientSocket *
+ NetworkServer::getClientSocketByPlayerIndex ( const PlayerID index )
+ {
+-    ClientList::iterator i = client_list.begin();
+-    while ( i != client_list.end() )
++    ClientList::iterator i = client_list.begin(),
++                         e = client_list.end();
++    
++    while ( i != e )
+     {
+-        if ( ! (*i)-&gt;wannadie
+-             &amp;&amp; (*i)-&gt;client_socket-&gt;getPlayerIndex() == index )
++        if ( (*i)-&gt;getPlayerIndex() == index )
+         {
+-            return (*i)-&gt;client_socket;
++            return *i;
+         }
+         i++;
+     }
+     
+-    return NULL;
++    return 0;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -27,29 +27,14 @@
+ 
+ using namespace network;
+ 
+-class ServerClientListData
+-{
+-public:
+-    bool          wannadie;
+-    ClientSocket *client_socket;
+-
+-    ServerClientListData()
+-        : wannadie(false), client_socket(0)
+-    { }
+-};
+-
+ class NetworkServer : public NetworkInterface,
+                       public TCPListenSocketObserver,
+                       public ClientSocketObserver
+ {
+ protected:
+-    typedef std::list&lt;ServerClientListData*&gt; ClientList;
++    typedef std::list&lt;ClientSocket*&gt; ClientList;
+     ClientList client_list;
+ 
+-    NetPacket net_packet;
+-
+-    Timer keep_alive_emit_timer;
+-
+     void updateKeepAliveState();
+     void resetClientList();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -156,7 +156,7 @@
+         if ( tempoffset &lt; sizeof(Uint16) )
+             break; // no more data
+ 
+-        packetsize=ltoh16(*((Uint16*)tempbuffer));;
++        packetsize=ltoh16(*((Uint16*)tempbuffer));
+ 
+         if ( packetsize &lt; sizeof(NetMessage) )
+         {
+@@ -219,14 +219,23 @@
+ std::string
+ ClientSocket::getFullIPAddress()
+ {
+-    std::stringstream ip;
+-    ip &lt;&lt; socket-&gt;getAddress().getIP();
+-    ip &lt;&lt; ':' &lt;&lt; socket-&gt;getAddress().getPort();
+-    return ip.str();
++    if ( socket )
++    {
++        std::stringstream ip;
++        ip &lt;&lt; socket-&gt;getAddress().getIP()
++           &lt;&lt; ':' &lt;&lt; socket-&gt;getAddress().getPort();
++        return ip.str();
++    }
++    
++    return &quot;not connected&quot;;
+ }
+ 
+ std::string
+ ClientSocket::getIPAddress()
+ {
+-    return socket-&gt;getAddress().getIP();
++    if ( socket )
++    {
++        return socket-&gt;getAddress().getIP();
++    }
++    return &quot;not connected&quot;;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2012-10-24 20:27:54 UTC (rev 1419)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2012-10-25 13:21:33 UTC (rev 1420)
+@@ -64,9 +64,12 @@
+         if ( socket )
+         {
+             socket-&gt;destroy();
++            socket = 0;
+         }
+     }
+     
++    bool isConnected() const { return socket != 0; }
++    
+ protected:
+     void onDataReceived(network::TCPSocket *so, const char *data, const int len);
+     void onConnected(network::TCPSocket *so);
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000443.html">[Netpanzer-cvs] r1419 - in trunk/netpanzer: Languages	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Network/PlayerRequests src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000445.html">[Netpanzer-cvs] r1421 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#444">[ date ]</a>
+              <a href="thread.html#444">[ thread ]</a>
+              <a href="subject.html#444">[ subject ]</a>
+              <a href="author.html#444">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

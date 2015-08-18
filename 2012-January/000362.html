@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1336 - trunk/netpanzer/src/NetPanzer/System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1336%20-%20trunk/netpanzer/src/NetPanzer/System&In-Reply-To=%3C20120113100205.B80ED4811E0%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000361.html">
+   <LINK REL="Next"  HREF="000363.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1336 - trunk/netpanzer/src/NetPanzer/System</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1336%20-%20trunk/netpanzer/src/NetPanzer/System&In-Reply-To=%3C20120113100205.B80ED4811E0%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1336 - trunk/netpanzer/src/NetPanzer/System">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Jan 13 11:02:05 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000361.html">[Netpanzer-cvs] r1335 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000363.html">[Netpanzer-cvs] r1337 - in trunk/netpanzer: .	src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#362">[ date ]</a>
+              <a href="thread.html#362">[ thread ]</a>
+              <a href="subject.html#362">[ subject ]</a>
+              <a href="author.html#362">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-13 11:02:05 +0100 (Fri, 13 Jan 2012)
+New Revision: 1336
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+Log:
+try fix for keyboards different than querty, awaiting wile test
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2012-01-12 00:25:10 UTC (rev 1335)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2012-01-13 10:02:05 UTC (rev 1336)
+@@ -27,23 +27,56 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+-static SDLKey translate_key(SDLKey original)
++static SDLKey key_ascii_conversion[] =
+ {
+-    switch( original )
++    SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,
++    SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,
++    SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z
++};
++
++static SDLKey translate_key(SDL_keysym *keysym)
++{
++    SDLKey key = keysym-&gt;sym;
++    switch( key )
+     {
+-        case SDLK_AMPERSAND: return SDLK_1;
+-        case SDLK_WORLD_73:  return SDLK_2;
+-        case SDLK_QUOTEDBL:  return SDLK_3;
+-        case SDLK_QUOTE:     return SDLK_4;
+-        case SDLK_LEFTPAREN: return SDLK_5;
+-        case SDLK_MINUS:     return SDLK_6;
+-        case SDLK_WORLD_72:  return SDLK_7;
+-        case SDLK_UNDERSCORE:return SDLK_8;
++        case SDLK_AMPERSAND:  return SDLK_1;
++        case SDLK_WORLD_73:   return SDLK_2;
++        case SDLK_QUOTEDBL:   return SDLK_3;
++        case SDLK_QUOTE:      return SDLK_4;
++        case SDLK_LEFTPAREN:  return SDLK_5;
++        case SDLK_MINUS:      return SDLK_6;
++        case SDLK_WORLD_72:   return SDLK_7;
++        case SDLK_UNDERSCORE: return SDLK_8;
+         case SDLK_WORLD_71:   return SDLK_9;
+         case SDLK_WORLD_64:   return SDLK_0;
+         default:;
+     }
+-    return original;
++
++    if ( key &gt;= SDLK_a &amp;&amp; key &lt;= SDLK_z &amp;&amp; (keysym-&gt;unicode &amp; 0xFF80) == 0 )
++    {
++        SDLKey unicode = (SDLKey)(keysym-&gt;unicode &amp; 0x7F);
++        if ( unicode &gt;= 'a' &amp;&amp; unicode &lt;= 'z' )
++        {
++            key_ascii_conversion[key-SDLK_a] = unicode;
++            return unicode;
++        }
++        else if ( unicode &gt;= 'A' &amp;&amp; unicode &lt;= 'Z' )
++        {
++            unicode = (SDLKey)(unicode + ('a' - 'A'));
++            key_ascii_conversion[key-SDLK_a] = unicode;
++            return unicode;
++        }
++        else if ( unicode &gt;= 1 &amp;&amp; unicode &lt;= 26 )
++        {
++            unicode = (SDLKey)(unicode + ('a' - 1));
++            key_ascii_conversion[key-SDLK_a] = unicode;
++            return unicode;
++        }
++
++        return key_ascii_conversion[key-SDLK_a];
++    }
++
++    return key;
+ }
+ 
+ bool handleSDLEvents()
+@@ -67,7 +100,7 @@
+             break;
+         case SDL_KEYDOWN: {
+ //                LOGGER.debug(&quot;Pressed key : scancode[%d] unicode[%d]&quot;, event.key.keysym.sym, event.key.keysym.unicode);
+-                KeyboardInterface::keyPressed(translate_key(event.key.keysym.sym));
++                KeyboardInterface::keyPressed(translate_key(&amp;event.key.keysym));
+ 
+                 if ( (event.key.keysym.unicode &amp; 0xFF80) == 0 )
+                 {
+@@ -92,7 +125,7 @@
+             }
+         case SDL_KEYUP:
+ //            LOGGER.debug(&quot;Released key: scancode[%d] unicode[%d]&quot;, event.key.keysym.sym, event.key.keysym.unicode);
+-            KeyboardInterface::keyReleased(translate_key(event.key.keysym.sym));
++            KeyboardInterface::keyReleased(translate_key(&amp;event.key.keysym));
+             break;
+        
+         case SDL_ACTIVEEVENT:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000361.html">[Netpanzer-cvs] r1335 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Components Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000363.html">[Netpanzer-cvs] r1337 - in trunk/netpanzer: .	src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#362">[ date ]</a>
+              <a href="thread.html#362">[ thread ]</a>
+              <a href="subject.html#362">[ subject ]</a>
+              <a href="author.html#362">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

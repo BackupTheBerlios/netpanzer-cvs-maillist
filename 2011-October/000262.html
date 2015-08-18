@@ -1,0 +1,492 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1236 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1236%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Network&In-Reply-To=%3C20111002150218.75FE9481229%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000263.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1236 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1236%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Interfaces%20Network&In-Reply-To=%3C20111002150218.75FE9481229%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1236 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Oct  2 17:02:18 CEST 2011</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000263.html">[Netpanzer-cvs] r1237 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Interfaces Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#262">[ date ]</a>
+              <a href="thread.html#262">[ thread ]</a>
+              <a href="subject.html#262">[ subject ]</a>
+              <a href="author.html#262">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-02 17:02:18 +0200 (Sun, 02 Oct 2011)
+New Revision: 1236
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+Log:
+Merged more of Wile64's changes. Currently this is all that will be merged by me, he will start doing changes directly on this code, the changes in this commit includes:
+- Fix the problem of the azerty keys.
+- Only send commands every 0.2s
+- allow or not connecting several times from same IP address
+
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -253,6 +253,27 @@
+     }
+ }
+ 
++bool
++NetworkServer::isAlreadyConnected( ClientSocket * client )
++{
++    if ( GameConfig::game_allowmultiip )
++    {
++        return false;
++    }
++
++    ClientList::iterator i = client_list.begin();
++    while ( i != client_list.end() )
++    {
++        if ( ! (*i)-&gt;wannadie
++                &amp;&amp; (*i)-&gt;client_socket-&gt;getIPAddress() == client-&gt;getIPAddress() )
++        {
++            return true;
++        }
++        i++;
++    }
++    return false;
++}
++
+ std::string
+ NetworkServer::getIP(const PlayerID player_index)
+ {
+@@ -262,7 +283,7 @@
+         if ( ! (*i)-&gt;wannadie
+              &amp;&amp; (*i)-&gt;client_socket-&gt;getPlayerIndex() == player_index )
+         {
+-            return (*i)-&gt;client_socket-&gt;getIPAddress();
++            return (*i)-&gt;client_socket-&gt;getFullIPAddress();
+         }
+         
+         i++;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -60,6 +60,7 @@
+     virtual ~NetworkServer();
+ 
+     bool addClientToSendList( ClientSocket * client );
++    bool isAlreadyConnected( ClientSocket * client );
+     void cleanUpClientList();
+ 
+     void openSession();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -197,7 +197,7 @@
+     ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(), 
+                                   &quot;'%s' [%s] has joined the game.&quot;,
+                                   player_state-&gt;getName().c_str(),
+-                                  client-&gt;getIPAddress().c_str() );
++                                  client-&gt;getFullIPAddress().c_str() );
+ 
+     player_state-&gt;resetAutokick();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -63,6 +63,7 @@
+        _cursor_blocked,
+        _cursor_player_unit,
+        _cursor_enemy_unit,
++       _cursor_blocked_target,
+        _cursor_make_allie,
+        _cursor_break_allie
+      };
+@@ -86,6 +87,10 @@
+ 
+     right_mouse_scroll = false;
+     right_mouse_scroll_moved = false;
++
++    lastSelectTimer.setTimeOut(400);
++    actionTimer.setTimeOut(200);
++
+ }
+ 
+ void
+@@ -179,15 +184,39 @@
+ WorldInputCmdProcessor::getCursorStatus(const iXY&amp; loc)
+ {
+     iXY map_loc;
++    bool fielddraws = false;
+     
+     if (selection_box_active)
+         return _cursor_regular;
+ 
+     if( ((manual_control_state == true) || (manual_fire_state == true)) &amp;&amp; working_list.isSelected() )
+     {
+-        return  _cursor_enemy_unit;
++        unsigned long id_list_index;
++        size_t id_list_size;
++        UnitBase *unit_ptr;
++        iXY range_vector;
++
++        id_list_size = working_list.unit_list.size();
++        for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ )
++        {
++            unit_ptr = UnitInterface::getUnit(working_list.unit_list[ id_list_index ]);
++            if ( unit_ptr != 0 )
++            {
++                range_vector = loc - unit_ptr-&gt;unit_state.location;
++                if ( range_vector.mag2() &lt; unit_ptr-&gt;unit_state.weapon_range )
++                {
++                    fielddraws = true;
++                    return  _cursor_enemy_unit;
++                    break;
++                }
++            }
++        }
+     }
+ 
++    if ((fielddraws == false) &amp;&amp; ((manual_control_state == true) || (manual_fire_state == true)))
++    {
++        return _cursor_blocked_target;
++    }
+     MapInterface::pointXYtoMapXY( loc, &amp;map_loc );
+ 
+     if (MapInterface::getMovementValue(map_loc) &gt;= 0xFF)
+@@ -206,26 +235,30 @@
+         // XXX ALLY
+         if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
+         {
+-//            if ( KeyboardInterface::getKeyState(SDLK_a) )
+-//            {
+-//                if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
+-//                {
+-//                    return _cursor_break_allie;
+-//                }
+-//
+-//                return _cursor_make_allie;
+-//            }
+-            if ( working_list.isSelected() )
++            if ( KeyboardInterface::getKeyState(SDLK_a) )
+             {
++                if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
++                {
++                    return _cursor_break_allie;
++                }
++
++                return _cursor_make_allie;
++            }
++            else if ( working_list.isSelected() &amp;&amp; (fielddraws == true))
++            {
+                 return _cursor_enemy_unit;
+             }
++            else if ( working_list.isSelected() &amp;&amp; (fielddraws == false) &amp;&amp; (manual_fire_state == false))
++            {
++                return _cursor_enemy_unit;
++            }
+         }
+         else
+         {
+-//            if ( KeyboardInterface::getKeyState(SDLK_a) )
+-//            {
+-//                return _cursor_break_allie;
+-//            }
++            if ( KeyboardInterface::getKeyState(SDLK_a) )
++            {
++                return _cursor_break_allie;
++            }
+         }
+         return _cursor_regular;
+     }
+@@ -268,6 +301,9 @@
+         case _cursor_break_allie :
+             MouseInterface::setCursor(&quot;breakallie.bmp&quot;);
+             break;
++        case _cursor_blocked_target :
++            MouseInterface::setCursor(&quot;grey-target.bmp&quot;);
++            break;
+     }
+ }
+ 
+@@ -371,6 +407,9 @@
+ void
+ WorldInputCmdProcessor::evaluateGroupingKeys()
+ {
++    static const int KeyAzerty[10] = {38, 233, 34, 39, 40, 45, 232, 95, 231, 224};
++    static const int KeyQwerty[10] = {SDLK_1, SDLK_2, SDLK_3,SDLK_4, SDLK_5, SDLK_6, SDLK_7, SDLK_8, SDLK_9, SDLK_0};
++
+     bool alt_status = false;
+     bool ctrl_status = false;
+ 
+@@ -387,17 +426,21 @@
+     
+     unsigned selected_bits=0;
+     int released=0;
+-    for(int key_code=SDLK_0;  key_code&lt;=SDLK_9; key_code++) {
++    for(int key_code= 0;  key_code&lt;=9; key_code++)
++    {
+         unsigned int b=1 &lt;&lt; (key_code-SDLK_0);
+-        if ( (KeyboardInterface::getKeyState( key_code ) == true) ) {
+-            selected_bits|=b;
++        if ( (KeyboardInterface::getKeyState( KeyAzerty[key_code] ) == true) ||
++                (KeyboardInterface::getKeyState( KeyQwerty[key_code] ) == true) )
++        {
++            selected_bits|=key_code+1;
+         }
+-        else if(current_selection_list_bits&amp;b) {
++        else if(current_selection_list_bits&amp;b)
++        {
+             // we've released a key
+             released++;
+         }
+     }
+-    
++
+     if(released==0 &amp;&amp; selected_bits&gt;0 &amp;&amp; selected_bits!=current_selection_list_bits) {
+         // we've pressed down a number key
+         if(ctrl_status != true &amp;&amp; alt_status != true &amp;&amp;
+@@ -405,29 +448,32 @@
+                 !KeyboardInterface::getKeyState(SDLK_RSHIFT)) {
+             working_list.unGroup();
+         }
+-        for(int key_code=SDLK_0;  key_code&lt;=SDLK_9; key_code++) {
+-            if ( (KeyboardInterface::getKeyState( key_code ) != true) ) {
+-                continue;
++        for(int key_code=0;  key_code&lt;=9; key_code++)
++        {
++            if ( (KeyboardInterface::getKeyState( KeyAzerty[key_code] ) == true) ||
++                    (KeyboardInterface::getKeyState( KeyQwerty[key_code] ) == true) )
++            {
++                if(ctrl_status == true)
++                {
++                    setSelectionList(key_code+1);
++                    ConsoleInterface::postMessage(Color::brown, false, 0, &quot;Group %d created&quot;, key_code+1);
++                    continue;
++                }
++                if(alt_status == true)
++                {
++                    cycleSelectedUnits(key_code+1);
++                    continue;
++                }
++                working_list.addList( selection_group_lists[key_code+1] );
+             }
+-            int n=key_code-SDLK_0;
+-            if(ctrl_status == true) {
+-                setSelectionList(n);
+-                ConsoleInterface::postMessage(Color::brown, false, 0, &quot;Group %d created&quot;, n );
+-                continue;
+-            }
+-            if(alt_status == true) {
+-                cycleSelectedUnits(n);
+-                continue;
+-            }
+-            working_list.addList( selection_group_lists[ n ] );
+         }
+         if(alt_status != true) {
+             working_list.select();
+             if(ctrl_status != true) {
+-                if(now() - lastSelectTime &lt; .4) {
++                if ( lastSelectTimer.isTimeOut() ) {
+                     centerSelectedUnits();
+                 }
+-                lastSelectTime = now();
++                lastSelectTimer.reset();
+             }
+         }
+     }
+@@ -764,6 +810,13 @@
+ void
+ WorldInputCmdProcessor::sendMoveCommand(const iXY&amp; world_pos)
+ {
++    if ( !actionTimer.isTimeOut() )
++    {
++        return;
++    }
++
++    actionTimer.reset();
++
+     iXY map_pos;
+     PlacementMatrix matrix;
+ 
+@@ -928,6 +981,13 @@
+ void
+ WorldInputCmdProcessor::sendManualFireCommand(const iXY &amp;world_pos)
+ {
++    if ( !actionTimer.isTimeOut() )
++    {
++       return;
++    }
++
++    actionTimer.reset();
++
+     TerminalUnitCmdRequest msg;
+ 
+     size_t id_list_index;
+@@ -980,19 +1040,19 @@
+     if ( target_list.isSelected() == true ) {
+         target_ptr = UnitInterface::getUnit( target_list.unit_list[0] );
+ 
+-        //Uint8 type;
+-        //if ( make_break ) {
+-        //    type = _player_make_alliance;
+-        //} else {
+-        //    type = _player_break_alliance;
+-        //}
++        Uint8 type;
++        if ( make_break ) {
++            type = _player_make_alliance;
++        } else {
++            type = _player_break_alliance;
++        }
+ 
+         // XXX ALLY
+-        //PlayerAllianceRequest allie_request;
+-        //allie_request.set(PlayerInterface::getLocalPlayerIndex(),
+-        //        target_ptr-&gt;player-&gt;getID(), type);
++        PlayerAllianceRequest allie_request;
++        allie_request.set(PlayerInterface::getLocalPlayerIndex(),
++                target_ptr-&gt;player-&gt;getID(), type);
+ 
+-        //CLIENT-&gt;sendMessage( &amp;allie_request, sizeof(PlayerAllianceRequest));
++        CLIENT-&gt;sendMessage( &amp;allie_request, sizeof(PlayerAllianceRequest));
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -20,7 +20,7 @@
+ 
+ #include &quot;SelectionList.hpp&quot;
+ #include &quot;Interfaces/MouseInterface.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ class WorldInputCmdProcessor
+ {
+@@ -46,7 +46,8 @@
+     bool manual_fire_state;
+ 
+     /// timer that detects double keypressed (for centering selected unit group)
+-    TimeStamp lastSelectTime;
++    NTimer lastSelectTimer;
++    NTimer actionTimer;
+ 
+     SelectionList selection_group_lists[10];
+     SelectionList working_list;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -127,8 +127,8 @@
+ 
+     static bool game_enable_bases;
+     static int  game_base_capture_mode; // 0=no capture, 1=normal, 2=...
+-	static int  game_autokicktime; // in minutes
+-	static bool game_allowmultiip; // allow multi connect from same ip
++    static int  game_autokicktime; // in minutes
++    static bool game_allowmultiip; // allow multi connect from same ip
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -217,7 +217,7 @@
+ }
+ 
+ std::string
+-ClientSocket::getIPAddress()
++ClientSocket::getFullIPAddress()
+ {
+     std::stringstream ip;
+     ip &lt;&lt; socket-&gt;getAddress().getIP();
+@@ -225,3 +225,8 @@
+     return ip.str();
+ }
+ 
++std::string
++ClientSocket::getIPAddress()
++{
++    return socket-&gt;getAddress().getIP();
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2011-09-15 11:43:06 UTC (rev 1235)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2011-10-02 15:02:18 UTC (rev 1236)
+@@ -51,8 +51,9 @@
+     ProxyServer proxy;
+ 
+     int getId() { return id; };
++    std::string getFullIPAddress();
+     std::string getIPAddress();
+-    
++
+     PlayerID getPlayerIndex()
+     {
+         return player_id;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000263.html">[Netpanzer-cvs] r1237 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Interfaces Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#262">[ date ]</a>
+              <a href="thread.html#262">[ thread ]</a>
+              <a href="subject.html#262">[ subject ]</a>
+              <a href="author.html#262">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

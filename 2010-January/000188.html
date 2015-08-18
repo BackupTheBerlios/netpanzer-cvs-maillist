@@ -1,0 +1,1117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1160 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Scripts src/NetPanzer/Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1160%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/PowerUps%20src/NetPanzer/Scripts%20src/NetPanzer/Units&In-Reply-To=%3C201001051824.o05IOpFq007045%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000187.html">
+   <LINK REL="Next"  HREF="000189.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1160 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Scripts src/NetPanzer/Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1160%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/PowerUps%20src/NetPanzer/Scripts%20src/NetPanzer/Units&In-Reply-To=%3C201001051824.o05IOpFq007045%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1160 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Scripts src/NetPanzer/Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  5 19:24:51 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000187.html">[Netpanzer-cvs] r1159 - trunk/netpanzer/src/NetPanzer/Particles
+</A></li>
+        <LI>Next message: <A HREF="000189.html">[Netpanzer-cvs] r1161 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Interfaces NetPanzer/Objectives NetPanzer/PowerUps	NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#188">[ date ]</a>
+              <a href="thread.html#188">[ thread ]</a>
+              <a href="subject.html#188">[ subject ]</a>
+              <a href="author.html#188">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-05 19:24:11 +0100 (Tue, 05 Jan 2010)
+New Revision: 1160
+
+Added:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/scripts/usercommands.lua
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.hpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.hpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+Log:
+- Fix crash on Two clans, some bases are too near the borders and the checks went out of bounds.
+- Split the loading of user and server commands in two files &quot;scripts/usercommands.lua&quot; and &quot;scripts/servercommands.lua&quot;
+- Added missing break after loading tileset
+- Remove extra parameter from message in ScriptManager
+- Clean up of power ups, it uses a custom list instead of STL.
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/scripts/initialize.lua	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -1,169 +1 @@
+-
+ LOGGER:log(&quot;Script initialization&quot;);
+-LOGGER:log(&quot;gametype is &quot; .. gameconfig.gametype);
+-
+-UserCommands =
+-{
+-    say_help = &quot;Says something to all players&quot;,
+-    say = function(param)
+-        if param then
+-            ChatInterface:say(param);
+-        end
+-    end,
+-
+-    teamsay_help = &quot;Says something to team players&quot;,
+-    teamsay = function(param)
+-        if param then
+-            ChatInterface:teamsay(param);
+-        end
+-    end,
+-
+-    server_help = &quot;Sends the command to the server, no need to add '/' in command&quot;;
+-    server = function(param)
+-        if param then
+-            ChatInterface:say('/' .. param);
+-        end
+-    end,
+-
+-    listcommands_help = &quot;List all the commands&quot;;
+-    listcommands = function(param)
+-        local out;
+-        for k,v in pairs(UserCommands) do
+-            if type(v) == &quot;function&quot; then
+-                if out then
+-                    out = out .. &quot;, &quot; .. k;
+-                else
+-                    out = k;
+-                end
+-            end
+-        end
+-        ConsoleInterface:post( Color.cyan, false, 0, out);
+-    end,
+-
+-    _help = &quot;Type /help &lt;wanted_command&gt; or /listcommands&quot;,
+-    help_help = &quot;Provides this kind of help&quot;,
+-    help = function(param)
+-        local ht = UserCommands[param .. &quot;_help&quot;];
+-        if ht then
+-            ConsoleInterface:post( Color.cyan, false, 0, param .. &quot;: &quot; .. ht);
+-        else
+-            ConsoleInterface:post( Color.cyan, false, 0, &quot;Help not found for &quot; .. param .. &quot;. Use /listcommands&quot;);
+-        end
+-    end,
+-
+-    quit_help = &quot;Quits NetPanzer.&quot;,
+-    quit = function(param)
+-        GameManager:exitNetPanzer();
+-    end,
+-
+-    disconnect_help = &quot;Disconnects from current server.&quot;,
+-    disconnect = function(param)
+-        GameManager:quitNetPanzerGame();
+-    end,
+-
+-    info = function(param)
+-        ConsoleInterface:post( Color.cyan, false, 0, &quot;You are player: &quot; .. PlayerInterface:getLocalPlayerIndex());
+-        local ps = PlayerInterface:getLocalPlayer();
+-        ConsoleInterface:post( Color.cyan, true, ps:getFlag(), &quot;Your name is &quot; .. ps:getName());
+-        ConsoleInterface:post( Color.cyan, false, 0, &quot;Your id is &quot; .. ps:getID());
+-        ConsoleInterface:post( Color.cyan, false, 0, &quot;Your have &quot; .. ps:getObjectivesHeld() .. &quot; bases&quot;);
+-    end
+-
+-};
+-
+--- modes: 0=objective, 1=frag limit, 2=time limit
+-function test_game_rules()
+-    if gameconfig.gametype == 2 then
+-        ConsoleInterface:post( Color.cyan, false, 0, &quot;Game is time limit&quot;);
+-    end
+-end
+-
+-ServerCommands =
+-{
+-    say_help = &quot;Says something to all players as server.&quot;,
+-    say = function(param, player)
+-        if param then
+-            ChatInterface:serversay(param);
+-        end
+-    end,
+-
+-    kick_help = &quot;Kicks a player, use the player number (starts in 0)&quot;,
+-    kick = function(param, player)
+-        if param then
+-            GameManager:kickPlayer(param);
+-        end
+-    end,
+-
+-    addbot_help = &quot;Adds a new bot to the server.&quot;,
+-    addbot = function(param, player)
+-        GameManager:addBot();
+-    end,
+-
+-    removebots_help = &quot;Removes all bots from server&quot;,
+-    removebots = function(param, player)
+-        GameManager:removeAllBots();
+-    end,
+-
+-    map_help = &quot;Change the map&quot;,
+-    map = function(param, player)
+-        local ok = GameManager:changeMap(param);
+-        if ok then
+-            ChatInterface:serversayTo(player, 'Switching map to &quot;' .. param .. '&quot;');
+-        else
+-            ChatInterface:serversayTo(player, 'Map &quot;' .. param .. '&quot; doesn\'t exists');
+-        end
+-    end,
+-
+-    listcommands_help = &quot;List the server commands&quot;,
+-    listcommands = function(param, player)
+-        local out;
+-        for k,v in pairs(ServerCommands) do
+-            if type(v) == &quot;function&quot; then
+-                if out then
+-                    out = out .. &quot;, &quot; .. k;
+-                else
+-                    out = k;
+-                end
+-            end
+-        end
+-        ChatInterface:serversayTo(player, out);
+-    end,
+-
+-    _help = &quot;Type /server help &lt;wanted_command&gt; or /server listcommands&quot;,
+-    help_help = &quot;Provides this kind of help&quot;,
+-    help = function(param, player)
+-        local ht = ServerCommands[param .. &quot;_help&quot;];
+-        if ht then
+-            ChatInterface:serversayTo( player, param .. &quot;: &quot; .. ht);
+-        else
+-            ChatInterface:serversayTo( player, &quot;Help not found for &quot; .. param .. &quot;. Use /server listcommands&quot;);
+-        end
+-    end,
+-
+-    listplayers_help = &quot;List the players&quot;,
+-    listplayers = function(param,player)
+-        local playerst;
+-        local out;
+-        for p = 0,PlayerInterface:getMaxPlayers()-1 do
+-            playerst = PlayerInterface:getPlayer(p);
+-            if playerst:isConnecting() then
+-                if out then
+-                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                else
+-                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot;.. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                end
+-            elseif playerst:isActive() then
+-                if out then
+-                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                else
+-                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                end
+-            end
+-        end
+-        ChatInterface:serversayTo(player, out);
+-    end,
+-
+-    testrules = function(param)
+-        test_game_rules();
+-    end
+-};
+
+Added: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/scripts/servercommands.lua	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -0,0 +1,96 @@
++ServerCommands =
++{
++    say_help = &quot;Says something to all players as server.&quot;,
++    say = function(param, player)
++        if param then
++            ChatInterface:serversay(param);
++        end
++    end,
++
++    kick_help = &quot;Kicks a player, use the player number (starts in 0)&quot;,
++    kick = function(param, player)
++        if param then
++            GameManager:kickPlayer(param);
++        end
++    end,
++
++    addbot_help = &quot;Adds a new bot to the server.&quot;,
++    addbot = function(param, player)
++        GameManager:addBot();
++    end,
++
++    removebots_help = &quot;Removes all bots from server&quot;,
++    removebots = function(param, player)
++        GameManager:removeAllBots();
++    end,
++
++    map_help = &quot;Change the map&quot;,
++    map = function(param, player)
++        local ok = GameManager:changeMap(param);
++        if ok then
++            ChatInterface:serversayTo(player, 'Switching map to &quot;' .. param .. '&quot;');
++        else
++            ChatInterface:serversayTo(player, 'Map &quot;' .. param .. '&quot; doesn\'t exists');
++        end
++    end,
++
++    listcommands_help = &quot;List the server commands&quot;,
++    listcommands = function(param, player)
++        local out;
++        for k,v in pairs(ServerCommands) do
++            if type(v) == &quot;function&quot; then
++                if out then
++                    out = out .. &quot;, &quot; .. k;
++                else
++                    out = k;
++                end
++            end
++        end
++        ChatInterface:serversayTo(player, out);
++    end,
++
++    _help = &quot;Type /server help &lt;wanted_command&gt; or /server listcommands&quot;,
++    help_help = &quot;Provides this kind of help&quot;,
++    help = function(param, player)
++        local ht = ServerCommands[param .. &quot;_help&quot;];
++        if ht then
++            ChatInterface:serversayTo( player, param .. &quot;: &quot; .. ht);
++        else
++            ChatInterface:serversayTo( player, &quot;Help not found for &quot; .. param .. &quot;. Use /server listcommands&quot;);
++        end
++    end,
++
++    listplayers_help = &quot;List the players&quot;,
++    listplayers = function(param,player)
++        local playerst;
++        local out;
++        for p = 0,PlayerInterface:getMaxPlayers()-1 do
++            playerst = PlayerInterface:getPlayer(p);
++            if playerst:isConnecting() then
++                if out then
++                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                else
++                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot;.. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                end
++            elseif playerst:isActive() then
++                if out then
++                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                else
++                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
++                end
++            end
++        end
++        ChatInterface:serversayTo(player, out);
++    end,
++
++    testrules = function(param)
++        test_game_rules();
++    end
++};
++
++-- modes: 0=objective, 1=frag limit, 2=time limit
++function test_game_rules()
++    if gameconfig.gametype == 2 then
++        ConsoleInterface:post( Color.cyan, false, 0, &quot;Game is time limit&quot;);
++    end
++end
+
+Added: trunk/netpanzer/scripts/usercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/usercommands.lua	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/scripts/usercommands.lua	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -0,0 +1,70 @@
++UserCommands =
++{
++    say_help = &quot;Says something to all players&quot;,
++    say = function(param)
++        if param then
++            ChatInterface:say(param);
++        end
++    end,
++
++    teamsay_help = &quot;Says something to team players&quot;,
++    teamsay = function(param)
++        if param then
++            ChatInterface:teamsay(param);
++        end
++    end,
++
++    server_help = &quot;Sends the command to the server, no need to add '/' in command&quot;;
++    server = function(param)
++        if param then
++            ChatInterface:say('/' .. param);
++        end
++    end,
++
++    listcommands_help = &quot;List all the commands&quot;;
++    listcommands = function(param)
++        local out;
++        for k,v in pairs(UserCommands) do
++            if type(v) == &quot;function&quot; then
++                if out then
++                    out = out .. &quot;, &quot; .. k;
++                else
++                    out = k;
++                end
++            end
++        end
++        ConsoleInterface:post( Color.cyan, false, 0, out);
++    end,
++
++    _help = &quot;Type /help &lt;wanted_command&gt; or /listcommands&quot;,
++    help_help = &quot;Provides this kind of help&quot;,
++    help = function(param)
++        local ht = UserCommands[param .. &quot;_help&quot;];
++        if ht then
++            ConsoleInterface:post( Color.cyan, false, 0, param .. &quot;: &quot; .. ht);
++        else
++            ConsoleInterface:post( Color.cyan, false, 0, &quot;Help not found for &quot; .. param .. &quot;. Use /listcommands&quot;);
++        end
++    end,
++
++    quit_help = &quot;Quits NetPanzer.&quot;,
++    quit = function(param)
++        GameManager:exitNetPanzer();
++    end,
++
++	-- doesn't work as expected, needs checking.
++    --disconnect_help = &quot;Disconnects from current server.&quot;,
++    --disconnect = function(param)
++    --    GameManager:quitNetPanzerGame();
++    --end,
++
++    info = function(param)
++        ConsoleInterface:post( Color.cyan, false, 0, &quot;You are player: &quot; .. PlayerInterface:getLocalPlayerIndex());
++        local ps = PlayerInterface:getLocalPlayer();
++        ConsoleInterface:post( Color.cyan, true, ps:getFlag(), &quot;Your name is &quot; .. ps:getName());
++        ConsoleInterface:post( Color.cyan, false, 0, &quot;Your id is &quot; .. ps:getID());
++        ConsoleInterface:post( Color.cyan, false, 0, &quot;Your have &quot; .. ps:getObjectivesHeld() .. &quot; bases&quot;);
++    end
++
++};
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -156,10 +156,10 @@
+     }
+ 
+     inline void setData( SpritePacked &amp;source )
+-	{
+-		imageData.linkData(source.imageData);
+-		imageData.setOffsetCenter();
+-	}
++    {
++        imageData.linkData(source.imageData);
++        imageData.setOffsetCenter();
++    }
+ 
+     inline void setAttrib( const iXY &amp;worldPos, const iXY &amp;attach,
+                            unsigned char height, int frame )
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -149,6 +149,7 @@
+             return;
+ 
+         case _fsm_state_connecting_to_server:
++            ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
+             LoadingView::show();
+             LoadingView::append(&quot;Starting network connection...&quot;);
+             fsm_state = _fsm_state_connecting_to_server_work;
+@@ -358,6 +359,9 @@
+             if (   map_cycle_fsm_server_endgame_timer.count()
+                 &amp;&amp; ServerConnectDaemon::isConnecting() == false )
+             {
++                ScriptManager::runFile(&quot;server_commands_load&quot;,&quot;scripts/servercommands.lua&quot;);
++                ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
++
+                 if ( nextmap != &quot;&quot; )
+                 {
+                     gameconfig-&gt;map = nextmap;
+@@ -465,6 +469,7 @@
+             TileSet::loadImages();
+             LoadingView::append(&quot;Initializing particles...&quot;);
+             fsm_state = _fsm_state_init_particles;
++            break;
+ 
+         case _fsm_state_init_particles:
+             ParticleInterface::initParticleSystems();
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -37,7 +37,7 @@
+ #include &quot;System/Sound.hpp&quot;
+ 
+ BonusUnitPowerUp::BonusUnitPowerUp(iXY map_loc, int type)
+-        : PowerUp( map_loc, type )
++        : PowerUp( map_loc, -1, type )
+ {
+     bonus_unit_type = rand() % global_game_state-&gt;unit_profile_interface-&gt;getNumUnitTypes();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -56,7 +56,7 @@
+ }
+ 
+ EnemyRadarPowerUp::EnemyRadarPowerUp(iXY map_loc, int type)
+-        : PowerUp( map_loc, type )
++        : PowerUp( map_loc, -1, type )
+ {
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -26,37 +26,14 @@
+ Surface PowerUp::POWERUP_ANIM;
+ Surface PowerUp::POWERUP_ANIM_SHADOW;
+ 
+-PowerUp::PowerUp()
++PowerUp::PowerUp(const iXY&amp; map_loc, PowerUpID ID, int type)
+ {
+-    life_cycle_state = _power_up_lifecycle_state_active;
+-}
+-
+-PowerUp::PowerUp(iXY map_loc, PowerUpID ID, int type)
+-{
+     this-&gt;map_loc = map_loc;
+     this-&gt;ID = ID;
+     this-&gt;type = type;
+ 
+     MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
+-    
+-    this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
+-    
+-    sprite.setData( POWERUP_ANIM );
+-    sprite.setAttrib( world_loc, iXY(0,0), 5 );
+ 
+-    sprite_shadow.setData( POWERUP_ANIM_SHADOW );
+-    sprite_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+-    sprite_shadow.setDrawModeBlend(64); // dark a lot
+-}
+-
+-PowerUp::PowerUp(iXY map_loc, int type)
+-{
+-    this-&gt;map_loc = map_loc;
+-    this-&gt;ID = -1;
+-    this-&gt;type = type;
+-
+-    MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
+-    
+     this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
+ 
+     sprite.setData( POWERUP_ANIM );
+@@ -66,30 +43,3 @@
+     sprite_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+     sprite_shadow.setDrawModeBlend(64); // dark a lot
+ }
+-
+-void PowerUp::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-    sprite.nextFrame();
+-    sprite_shadow.setFrame( sprite.getCurFrame() );
+-
+-    sorter.addSprite( &amp;sprite );
+-    sorter.addSprite( &amp;sprite_shadow );
+-}
+-
+-void
+-PowerUp::updateState( void )
+-{
+-    if ( NetworkState::status == _network_state_server
+-         &amp;&amp; life_cycle_state == _power_up_lifecycle_state_active )
+-    {
+-        if ( UnitInterface::unitOccupiesLoc(map_loc) )
+-        {
+-            Unit * unit = UnitBucketArray::queryUnitAtMapLoc(map_loc);
+-            if ( unit )
+-            {
+-                onHit( unit );
+-            }
+-        }
+-    }
+-}
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.hpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.hpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -32,6 +32,8 @@
+ 
+ class PowerUp
+ {
++private:
++    friend class PowerUpInterface;
+ protected:
+     virtual void onHit( Unit * unit ) = 0;
+     
+@@ -48,17 +50,10 @@
+     int       type;
+     int       life_cycle_state;
+ 
+-public:
+-    PowerUp();
+-    PowerUp(iXY map_loc, PowerUpID ID, int type);
+-    PowerUp(iXY map_loc, int type);
++    PowerUp(const iXY&amp; map_loc, PowerUpID ID, int type);
+     virtual ~PowerUp()
+     { }
+ 
+-    void updateState();
+-
+-    void offloadGraphics(SpriteSorter&amp; );
+-
+     virtual void onHitMessage(PowerUpHitMesg* )
+     { }
+     PowerUp *next;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -20,6 +20,7 @@
+ 
+ #include &lt;stdlib.h&gt;
+ 
++#include &quot;Util/Timer.hpp&quot;
+ 
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+@@ -35,13 +36,14 @@
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/PowerUpNetMessage.hpp&quot;
+ 
+-PowerUpInterface::PowerUpList PowerUpInterface::powerup_list;
++static PowerUp* powerups = 0;
++static unsigned int num_powerups = 0;
+ 
+-int PowerUpInterface::power_up_limit;
+-int PowerUpInterface::power_up_regen_time_upper_bound = 300;
+-int PowerUpInterface::power_up_regen_time_lower_bound = 60;
++static Timer regen_timer;
+ 
+-Timer PowerUpInterface::regen_timer;
++static unsigned int power_up_limit;
++static int power_up_regen_time_upper_bound = 300;
++static int power_up_regen_time_lower_bound = 60;
+ 
+ enum { _powerup_bonus_units,
+        _powerup_unit,
+@@ -53,7 +55,7 @@
+                                       _powerup_enemy_radar
+                                     };
+ 
+-void PowerUpInterface::setPowerUpLimits(unsigned long map_size_x,
++static void setPowerUpLimits(unsigned long map_size_x,
+         unsigned long map_size_y )
+ {
+     int active_players;
+@@ -64,76 +66,100 @@
+     int player_factor = int(( 0.10 ) * active_players);
+     
+     // Magic Number 0.0000625 = 1/16000
+-    int power_up_limit = int( ( 0.0000625 ) * ( (map_size_x * map_size_y) ) );
+-    power_up_limit = power_up_limit + (power_up_limit * player_factor);
++    int power_limit = int( ( 0.0000625 ) * ( (map_size_x * map_size_y) ) );
++    power_limit = power_limit + (power_limit * player_factor);
+ 
+-    PowerUpInterface::power_up_limit = power_up_limit;
++    power_up_limit = power_limit;
+     power_up_regen_time_upper_bound =  300;
+     power_up_regen_time_lower_bound =  60;
+ }
+ 
+-PowerUpID
+-PowerUpInterface::getNextPowerUpID()
++static PowerUpID getNextPowerUpID()
+ {
+     static PowerUpID nextid = 0;
+     return nextid++;
+ }
+ 
+-void PowerUpInterface::generatePowerUp()
++static PowerUp* addNewPowerUp(const iXY&amp; map_pos, PowerUpID id, int type)
+ {
+-    unsigned long map_size_x, map_size_y;
+-    PowerUp *power_up = 0;
+-    float next_regen_interval;
+-    PowerUpCreateMesg create_mesg;
+-    iXY loc;
++    PowerUp* power_up = 0;
++    switch( type )
++    {
++        case _powerup_bonus_units :
++            power_up = new BonusUnitPowerUp( map_pos, type );
++            break;
+ 
+-    if( (powerup_list.size() &lt; (size_t) power_up_limit) )
++        case _powerup_unit :
++            power_up = new UnitPowerUp( map_pos, type );
++            break;
++
++        case _powerup_enemy_radar :
++            power_up = new EnemyRadarPowerUp( map_pos, type );
++            break;
++
++        default:
++            LOGGER.info(&quot;Unknown powerup type?!?&quot;);
++    }
++
++    if ( power_up )
+     {
+-        map_size_x = MapInterface::getWidth();
+-        map_size_y = MapInterface::getHeight();
++        power_up-&gt;ID = id;
++        power_up-&gt;next = powerups;
++        powerups = power_up;
++        ++num_powerups;
++    }
+ 
++    return power_up;
++}
++
++static PowerUp* deleteRemovePowerUp(PowerUp* previous_power_up, const PowerUp* power_up)
++{
++    PowerUp* next_power_up = power_up-&gt;next;
++    if ( ! previous_power_up )
++    {
++        powerups = next_power_up;
++    }
++    else
++    {
++        previous_power_up-&gt;next = next_power_up;
++    }
++
++    delete power_up;
++    --num_powerups;
++    return next_power_up;
++}
++
++static void generatePowerUp()
++{
++    if( num_powerups &lt; (unsigned int)power_up_limit )
++    {
++        iXY loc;
++
++        unsigned int map_size_x = MapInterface::getWidth();
++        unsigned int map_size_y = MapInterface::getHeight();
++
+         do
+         {
+             loc.x = rand() % map_size_x;
+             loc.y = rand() % map_size_y;
+         } while( MapInterface::getMovementValue( loc ) == 0xFF );
+ 
+-        int prob_table_index;
+-        int powerup_type;
++        int powerup_type = powerup_probability_table[ rand() % 3 ];
+ 
+-        prob_table_index = rand() % 3;
+-        powerup_type = powerup_probability_table[ prob_table_index ];
++        PowerUp* power_up = addNewPowerUp(loc, getNextPowerUpID(), powerup_type);
+ 
+-
+-        switch( powerup_type )
++        if ( power_up )
+         {
+-            case _powerup_bonus_units :
+-                power_up = new BonusUnitPowerUp( loc, powerup_type );
+-                break;
+-
+-            case _powerup_unit :
+-                power_up = new UnitPowerUp( loc, powerup_type );
+-                break;
+-
+-            case _powerup_enemy_radar :
+-                power_up = new EnemyRadarPowerUp( loc, powerup_type );
+-                break;
+-
+-            default:
+-                LOGGER.info(&quot;Unknown powerup type?!?&quot;);
+-                return;
++            PowerUpCreateMesg create_mesg;
++            create_mesg.set(power_up-&gt;map_loc, power_up-&gt;ID, power_up-&gt;type);
++            NetworkServer::broadcastMessage(&amp;create_mesg, sizeof(create_mesg));
+         }
++        else
++        {
++            LOGGER.warning(&quot;Couldn't create powerup&quot;);
++        }
+ 
+-        power_up-&gt;ID = getNextPowerUpID();
+-        powerup_list.push_back(power_up);
+-
+-        create_mesg.set( power_up-&gt;map_loc,
+-                         power_up-&gt;ID,
+-                         power_up-&gt;type
+-                       );
+-
+-        NetworkServer::broadcastMessage(&amp;create_mesg, sizeof(create_mesg));
+-
++        float next_regen_interval;
+         do
+         {
+             next_regen_interval = rand() % (power_up_regen_time_upper_bound + 1);
+@@ -159,21 +185,24 @@
+ 
+ void PowerUpInterface::resetLogic( void )
+ {
+-    unsigned long map_size_x, map_size_y;
++    PowerUp *del = 0;
++    PowerUp *p = powerups;
++    while ( p )
++    {
++        del = p;
++        p = p-&gt;next;
++        delete del;
++    }
++    powerups = 0;
++    num_powerups = 0;
+ 
+     if( gameconfig-&gt;powerups == false )
+     {
+         return;
+     }
+ 
+-    // here memory leak, should delete the pointer to powerups in the list
+-    powerup_list.clear();
++    setPowerUpLimits(MapInterface::getWidth(), MapInterface::getHeight());
+ 
+-    map_size_x = MapInterface::getWidth();
+-    map_size_y = MapInterface::getHeight();
+-
+-    setPowerUpLimits( map_size_x, map_size_y );
+-
+     regen_timer.changePeriod( power_up_regen_time_upper_bound );
+ 
+     if ( NetworkState::status == _network_state_server )
+@@ -199,21 +228,30 @@
+         }
+     }
+ 
+-    for (PowerUpList::iterator i = powerup_list.begin();
+-            i != powerup_list.end(); /* empty */)
++    PowerUp* powerup = powerups;
++    PowerUp* previous_power_up = 0;
++    while ( powerup )
+     {
+-        PowerUp* powerup = *i;
+-
+-        if(powerup-&gt;life_cycle_state ==
+-                _power_up_lifecycle_state_inactive)
++        if ( powerup-&gt;life_cycle_state == _power_up_lifecycle_state_inactive )
+         {
+-            delete powerup;
+-            i = powerup_list.erase(i);
++            powerup = deleteRemovePowerUp(previous_power_up, powerup);
++            // previous remains;
+         }
+         else
+         {
+-            powerup-&gt;updateState();
+-            i++;
++            if ( NetworkState::status == _network_state_server )
++            {
++                if ( UnitInterface::unitOccupiesLoc(powerup-&gt;map_loc) )
++                {
++                    Unit * unit = UnitBucketArray::queryUnitAtMapLoc(powerup-&gt;map_loc);
++                    if ( unit )
++                    {
++                        powerup-&gt;onHit( unit );
++                    }
++                }
++            }
++            previous_power_up = powerup;
++            powerup = powerup-&gt;next;
+         }
+     }
+  }
+@@ -225,63 +263,44 @@
+         return;
+     }
+ 
+-    PowerUpList::iterator i;
+-    for(i=powerup_list.begin(); i!=powerup_list.end(); i++)
++    PowerUp* powerup = powerups;
++    while ( powerup )
+     {
+-        PowerUp* powerup = *i;
+-        powerup-&gt;offloadGraphics(sorter);
++        powerup-&gt;sprite.nextFrame();
++        powerup-&gt;sprite_shadow.setFrame( powerup-&gt;sprite.getCurFrame() );
++
++        sorter.addSprite( &amp;powerup-&gt;sprite );
++        sorter.addSprite( &amp;powerup-&gt;sprite_shadow );
++
++        powerup = powerup-&gt;next;
+     }
+ }
+ 
+-void PowerUpInterface::netMessagePowerUpCreate(const NetMessage* message)
++static void netMessagePowerUpCreate(const NetMessage* message)
+ {
+     PowerUp *power_up = 0;
+     PowerUpCreateMesg *create_mesg;
+ 
+     create_mesg = (PowerUpCreateMesg *) message;
+ 
+-    switch( create_mesg-&gt;getType() )
+-    {
+-        case _powerup_bonus_units :
+-            power_up = new BonusUnitPowerUp( 
+-                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                    _powerup_bonus_units );
+-            break;
+-
+-        case _powerup_unit :
+-            power_up = new UnitPowerUp(
+-                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                    _powerup_unit );
+-            break;
+-
+-        case _powerup_enemy_radar :
+-            power_up = new EnemyRadarPowerUp(
+-                    iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+-                    _powerup_enemy_radar);
+-            break;
+-
+-        default:
+-            LOGGER.info(&quot;Unknown powerup type?!?&quot;);
+-            return;
+-    }
+-
+-    power_up-&gt;ID = create_mesg-&gt;getID();
+-
+-    powerup_list.push_back(power_up);
++    power_up = addNewPowerUp(iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
++                             create_mesg-&gt;getID(),
++                             create_mesg-&gt;getType());
+ }
+ 
+-void PowerUpInterface::netMessagePowerUpHit(const NetMessage* message)
++static void netMessagePowerUpHit(const NetMessage* message)
+ {
+     PowerUpHitMesg *hit_mesg = (PowerUpHitMesg *) message;
+ 
+-    PowerUpList::iterator i;
+-    for ( i = powerup_list.begin(); i != powerup_list.end(); i++)
++    PowerUp* powerup = powerups;
++    while ( powerup )
+     {
+-        if ( (*i)-&gt;ID == hit_mesg-&gt;getID() )
++        if ( powerup-&gt;ID == hit_mesg-&gt;getID() )
+         {
+-            (*i)-&gt;onHitMessage( hit_mesg );
++            powerup-&gt;onHitMessage( hit_mesg );
+             break;
+         }
++        powerup = powerup-&gt;next;
+     }
+ }
+ 
+@@ -306,18 +325,16 @@
+ 
+ void PowerUpInterface::syncPowerUps( ClientSocket * client )
+ {
+-    PowerUpList::iterator i;
+-    for(i=powerup_list.begin(); i!=powerup_list.end(); i++)
++    PowerUp* powerup = powerups;
++    while ( powerup )
+     {
+-        PowerUp* powerup_ptr = *i;
+-
+-        PowerUpCreateMesg create_mesg;
+-        create_mesg.set( powerup_ptr-&gt;map_loc,
+-                         powerup_ptr-&gt;ID,
+-                         powerup_ptr-&gt;type
+-                       );
+-
+-        client-&gt;sendMessage( &amp;create_mesg, sizeof(create_mesg));
++        if ( powerup-&gt;life_cycle_state != _power_up_lifecycle_state_inactive )
++        {
++            PowerUpCreateMesg create_mesg;
++            create_mesg.set(powerup-&gt;map_loc, powerup-&gt;ID, powerup-&gt;type);
++            client-&gt;sendMessage( &amp;create_mesg, sizeof(create_mesg));
++        }
++        powerup = powerup-&gt;next;
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.hpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.hpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -18,36 +18,16 @@
+ #ifndef _POWERUP_INTERFACE_HPP
+ #define _POWERUP_INTERFACE_HPP
+ 
+-#include &lt;vector&gt;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+-#include &quot;PowerUps/PowerUp.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
+-#include &quot;Classes/Network/NetPacket.hpp&quot;
+-#include &quot;Network/ClientSocket.hpp&quot;
++class PowerUp;
++class NetMessage;
++class ClientSocket;
++class SpriteSorter;
+ 
+ class PowerUpInterface
+ {
+-protected:
+-    typedef std::vector&lt;PowerUp *&gt; PowerUpList;
+-    static PowerUpList powerup_list;
+-    
+-    static PowerUpID getNextPowerUpID();
+-    
+-    static int power_up_limit;
+-    static int power_up_regen_time_upper_bound;
+-    static int power_up_regen_time_lower_bound;
+-
+-    static Timer regen_timer;
+-
+-    static void setPowerUpLimits( unsigned long map_size_x, unsigned long map_size_y );
+-
+-    static void generatePowerUp();
+-
+-    static void netMessagePowerUpCreate(const NetMessage* message);
+-    static void netMessagePowerUpHit(const NetMessage* message );
+-
+ public:
+-
+     static void initialize();
+     static void resetLogic();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -48,7 +48,7 @@
+      };
+ 
+ UnitPowerUp::UnitPowerUp(iXY map_loc, int type)
+-        : PowerUp( map_loc, type )
++        : PowerUp( map_loc, -1, type )
+ {
+     unit_powerup_type = rand() % _unit_powerup_enum_count;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -127,7 +127,7 @@
+     }
+     else
+     {
+-        ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;There is no defined UserCommands&quot;, str);
++        ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;There is no defined UserCommands&quot;);
+     }
+ 
+     lua_settop(luavm, luatop);
+@@ -207,8 +207,6 @@
+ void
+ ScriptManager::runFile(const char * runname, const char * filename)
+ {
+-//    luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
+-//    int error=lua_pcall(luavm,0,0,0);
+     int error = luaL_dofile(luavm, filesystem::getRealName(filename).c_str());
+     if (error)
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2010-01-04 18:34:46 UTC (rev 1159)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2010-01-05 18:24:11 UTC (rev 1160)
+@@ -144,6 +144,25 @@
+     {
+         bucket_loc.x = (world_loc.x-1) / pixel_x_sample_factor;
+         bucket_loc.y = (world_loc.y-1) / pixel_y_sample_factor;
++        if ( bucket_loc.x &lt; 0 )
++        {
++            bucket_loc.x = 0;
++        }
++
++        if ( (size_t)bucket_loc.x &gt;= column_size)
++        {
++            bucket_loc.x = column_size-1;
++        }
++
++        if ( bucket_loc.y &lt; 0 )
++        {
++            bucket_loc.y = 0;
++        }
++
++        if ( (size_t)bucket_loc.y &gt;= row_size )
++        {
++            bucket_loc.y = row_size -1;
++        }
+     }
+ 
+     static void worldRectToBucketRect(const iRect &amp; world_rect, iRect &amp;bucket_rect)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000187.html">[Netpanzer-cvs] r1159 - trunk/netpanzer/src/NetPanzer/Particles
+</A></li>
+	<LI>Next message: <A HREF="000189.html">[Netpanzer-cvs] r1161 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Interfaces NetPanzer/Objectives NetPanzer/PowerUps	NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#188">[ date ]</a>
+              <a href="thread.html#188">[ thread ]</a>
+              <a href="subject.html#188">[ subject ]</a>
+              <a href="author.html#188">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

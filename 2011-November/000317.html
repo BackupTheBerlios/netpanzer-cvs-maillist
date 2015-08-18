@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1291 - in trunk/netpanzer: src/NetPanzer/Resources	units/profiles
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1291%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Resources%0A%09units/profiles&In-Reply-To=%3C20111128122739.C799B480824%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000316.html">
+   <LINK REL="Next"  HREF="000318.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1291 - in trunk/netpanzer: src/NetPanzer/Resources	units/profiles</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1291%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Resources%0A%09units/profiles&In-Reply-To=%3C20111128122739.C799B480824%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1291 - in trunk/netpanzer: src/NetPanzer/Resources	units/profiles">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 28 13:27:39 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000316.html">[Netpanzer-cvs] r1290 - in trunk/netpanzer: src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+</A></li>
+        <LI>Next message: <A HREF="000318.html">[Netpanzer-cvs] r1292 - in trunk/netpanzer: maps	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#317">[ date ]</a>
+              <a href="thread.html#317">[ thread ]</a>
+              <a href="subject.html#317">[ subject ]</a>
+              <a href="author.html#317">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-28 13:27:38 +0100 (Mon, 28 Nov 2011)
+New Revision: 1291
+
+Added:
+   trunk/netpanzer/units/profiles/Spanzer.upf
+Removed:
+   trunk/netpanzer/units/profiles/SPanzer.upf
+Modified:
+   trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+Log:
+- Resolve bug on flagselection
+- Rename unit profil (case make crash on linux)
+
+Modified: trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2011-11-20 13:57:10 UTC (rev 1290)
++++ trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2011-11-28 12:27:38 UTC (rev 1291)
+@@ -99,6 +99,8 @@
+     filesystem::freeList(list);
+ 
+     flags.create( FLAG_WIDTH, FLAG_HEIGHT, names.size());
++    Surface tmpflags;
++    tmpflags.create( FLAG_WIDTH, FLAG_HEIGHT, 1);
+ 
+     sort(names.begin(), names.end());
+     string path(DEFAULT_FLAGS_PATH);
+@@ -106,7 +108,8 @@
+     for (vector&lt;string&gt;::size_type i = 0; i &lt; names.size(); i++)
+     {
+         flags.setFrame(i);
+-        flags.loadBMP((path+names[i]).c_str(), false);
++        tmpflags.loadBMP((path+names[i]).c_str(), false);
++        tmpflags.blt(flags, 0, 0);
+     }
+     
+     return names.size();
+
+Deleted: trunk/netpanzer/units/profiles/SPanzer.upf
+===================================================================
+--- trunk/netpanzer/units/profiles/SPanzer.upf	2011-11-20 13:57:10 UTC (rev 1290)
++++ trunk/netpanzer/units/profiles/SPanzer.upf	2011-11-28 12:27:38 UTC (rev 1291)
+@@ -1,17 +0,0 @@
+-hitpoints =  60;
+-attack =  15;
+-reload =  20;
+-range =  10;
+-regen =  20;
+-defend_range =  8;
+-speed_rate =  22;
+-speed_factor =  4;
+-image =  &quot;pics/menus/vehicleSelectionView/scout.bmp&quot;;
+-bodysprite =  &quot;units/pics/pak/SpahHNSD.pak&quot;
+-bodyshadow =  &quot;units/pics/pak/SpahHSSD.pak&quot;
+-turretsprite =  &quot;units/pics/pak/SpahTNSD.pak&quot;
+-turretshadow =  &quot;units/pics/pak/SpahTSSD.pak&quot;
+-soundselected =  &quot;yessir&quot;
+-soundfire =  &quot;lt-fire&quot;
+-weapon =  &quot;SHELL&quot;
+-boundbox =  40
+
+Copied: trunk/netpanzer/units/profiles/Spanzer.upf (from rev 1290, trunk/netpanzer/units/profiles/SPanzer.upf)
+===================================================================
+--- trunk/netpanzer/units/profiles/Spanzer.upf	                        (rev 0)
++++ trunk/netpanzer/units/profiles/Spanzer.upf	2011-11-28 12:27:38 UTC (rev 1291)
+@@ -0,0 +1,17 @@
++hitpoints =  60;
++attack =  15;
++reload =  20;
++range =  10;
++regen =  20;
++defend_range =  8;
++speed_rate =  22;
++speed_factor =  4;
++image =  &quot;pics/menus/vehicleSelectionView/scout.bmp&quot;;
++bodysprite =  &quot;units/pics/pak/SpahHNSD.pak&quot;
++bodyshadow =  &quot;units/pics/pak/SpahHSSD.pak&quot;
++turretsprite =  &quot;units/pics/pak/SpahTNSD.pak&quot;
++turretshadow =  &quot;units/pics/pak/SpahTSSD.pak&quot;
++soundselected =  &quot;yessir&quot;
++soundfire =  &quot;lt-fire&quot;
++weapon =  &quot;SHELL&quot;
++boundbox =  40
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000316.html">[Netpanzer-cvs] r1290 - in trunk/netpanzer: src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+</A></li>
+	<LI>Next message: <A HREF="000318.html">[Netpanzer-cvs] r1292 - in trunk/netpanzer: maps	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#317">[ date ]</a>
+              <a href="thread.html#317">[ thread ]</a>
+              <a href="subject.html#317">[ subject ]</a>
+              <a href="author.html#317">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

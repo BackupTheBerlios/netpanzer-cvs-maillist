@@ -1,0 +1,837 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1203 - in trunk/netpanzer: . pics/default	src/Lib/2D src/Lib/Network src/Lib/Util src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Resources	src/NetPanzer/System src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1203%20-%20in%20trunk/netpanzer%3A%20.%20pics/default%0A%09src/Lib/2D%20src/Lib/Network%20src/Lib/Util%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/PowerUps%20src/NetPanzer/Resources%0A%09src/NetPanzer/System%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C201001301447.o0UElbXR014694%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000228.html">
+   <LINK REL="Next"  HREF="000230.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1203 - in trunk/netpanzer: . pics/default	src/Lib/2D src/Lib/Network src/Lib/Util src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Resources	src/NetPanzer/System src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1203%20-%20in%20trunk/netpanzer%3A%20.%20pics/default%0A%09src/Lib/2D%20src/Lib/Network%20src/Lib/Util%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/PowerUps%20src/NetPanzer/Resources%0A%09src/NetPanzer/System%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C201001301447.o0UElbXR014694%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1203 - in trunk/netpanzer: . pics/default	src/Lib/2D src/Lib/Network src/Lib/Util src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Resources	src/NetPanzer/System src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan 30 15:47:37 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000228.html">[Netpanzer-cvs] r1202 - in trunk/netpanzer: maps src/Lib/Network
+</A></li>
+        <LI>Next message: <A HREF="000230.html">[Netpanzer-cvs] r1204 - in trunk/netpanzer/src/NetPanzer:	Interfaces System Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#229">[ date ]</a>
+              <a href="thread.html#229">[ thread ]</a>
+              <a href="subject.html#229">[ subject ]</a>
+              <a href="author.html#229">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-30 15:46:47 +0100 (Sat, 30 Jan 2010)
+New Revision: 1203
+
+Added:
+   trunk/netpanzer/pics/default/playerColor.bmp
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/Lib/2D/ColorTable.cpp
+   trunk/netpanzer/src/Lib/2D/ColorTable.hpp
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/Lib/Util/Log.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/GameControlNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.hpp
+   trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+Log:
+- Added a ball with player color on rankings view
+- fix some compilation warnings on gcc 4.2
+- clear flag images on start of game (unused images get dirty)
+- compile 32bit only on Mac OS X
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/SConstruct	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -213,7 +213,12 @@
+ if thisplatform == 'darwin':
+     env.Append( CPPPATH = ['/Library/Frameworks/SDL.framework/Headers',
+                            '/Library/Frameworks/SDL_mixer.framework/Headers' ] )
+-                           
++    env.Append( CCFLAGS = [ '-arch', 'i386' ] )
++    luaenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
++    physfsenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
++    networkenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
++    env.Append( LINKFLAGS = [ '-arch', 'i386' ] )
++ 
+     if env['universal'] != 'false':
+ 		env.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
+ 		luaenv.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
+@@ -267,26 +272,26 @@
+ MakeStaticLib(crosslinuxluaenv, 'nplua', 'lua toluapp', '*.c')
+ 
+ # BUILDS PHYSFS
+-physfsenv.Append( CFLAGS = '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -DPHYSFS_NO_CDROM_SUPPORT=1' )
++physfsenv.Append( CFLAGS = [ '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -DPHYSFS_NO_CDROM_SUPPORT=1' ] )
+ physfsenv.Append( CPPPATH = [ 'src/Lib/physfs', 'src/Lib/physfs/zlib123' ] )
+ MakeStaticLib(physfsenv, 'npphysfs', 'physfs physfs/platform physfs/archivers physfs/zlib123', '*.c')
+ 
+-crossmingwphysfsenv.Append( CFLAGS = '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -DPHYSFS_NO_CDROM_SUPPORT=1' )
++crossmingwphysfsenv.Append( CFLAGS = [ '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -DPHYSFS_NO_CDROM_SUPPORT=1' ] )
+ crossmingwphysfsenv.Append( CPPPATH = [ 'src/Lib/physfs', 'src/Lib/physfs/zlib123' ] )
+ MakeStaticLib(crossmingwphysfsenv, 'npphysfs', 'physfs physfs/platform physfs/archivers physfs/zlib123', '*.c')
+ 
+-crosslinuxphysfsenv.Append( CFLAGS = '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -DPHYSFS_NO_CDROM_SUPPORT=1' )
++crosslinuxphysfsenv.Append( CFLAGS = [ '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1 -DPHYSFS_NO_CDROM_SUPPORT=1' ] )
+ crosslinuxphysfsenv.Append( CPPPATH = [ 'src/Lib/physfs', 'src/Lib/physfs/zlib123' ] )
+ MakeStaticLib(crosslinuxphysfsenv, 'npphysfs', 'physfs physfs/platform physfs/archivers physfs/zlib123', '*.c')
+ 
+ # BUILDS 2D
+-env.Append( CFLAGS = '-DZ_PREFIX=1' )
++env.Append( CFLAGS = [ '-DZ_PREFIX=1' ] )
+ env.Append( CPPPATH = 'src/Lib/physfs/zlib123' )
+ MakeStaticLib(env, 'np2d', '2D 2D/libpng', '*.c*')
+-crossmingwenv.Append( CFLAGS = '-DZ_PREFIX=1' )
++crossmingwenv.Append( CFLAGS = [ '-DZ_PREFIX=1' ] )
+ crossmingwenv.Append( CPPPATH = 'src/Lib/physfs/zlib123' )
+ MakeStaticLib(crossmingwenv, 'np2d', '2D 2D/libpng', '*.c*')
+-crosslinuxenv.Append( CFLAGS = '-DZ_PREFIX=1' )
++crosslinuxenv.Append( CFLAGS = [ '-DZ_PREFIX=1' ] )
+ crosslinuxenv.Append( CPPPATH = 'src/Lib/physfs/zlib123' )
+ MakeStaticLib(crosslinuxenv, 'np2d', '2D 2D/libpng', '*.c*')
+ 
+
+Added: trunk/netpanzer/pics/default/playerColor.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/default/playerColor.bmp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/src/Lib/2D/ColorTable.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/ColorTable.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/2D/ColorTable.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -27,7 +27,7 @@
+ #include &quot;Surface.hpp&quot;
+ #include &quot;Util/UtilInterface.hpp&quot;
+ 
+-char *ColorTable::extension = &quot;.tbl&quot;;
++const char *ColorTable::extension = &quot;.tbl&quot;;
+ 
+ int ColorTable::totalColorArrayCount = 0;
+ int ColorTable::totalByteCount       = 0;
+
+Modified: trunk/netpanzer/src/Lib/2D/ColorTable.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/ColorTable.hpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/2D/ColorTable.hpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -28,7 +28,7 @@
+     friend class Palette;
+ 
+ protected:
+-    static char *extension;
++    static const char *extension;
+ 
+     int   colorCount;
+     Uint8 *colorArray;
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -535,7 +535,7 @@
+ //          clipping on the bounds of the object. The non-transparent pixels
+ //          are blitted in the specified color.
+ //---------------------------------------------------------------------------
+-void Surface::bltTransColor(Surface &amp;dest, int x, int y, const Uint8 &amp;color) const
++void Surface::bltTransColor(Surface &amp;dest, int x, int y, const Uint8 color) const
+ {
+     assert(getDoesExist());
+     assert(dest.getDoesExist());
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -151,7 +151,7 @@
+ 
+     void blt(Surface &amp;dest, int x, int y) const;
+     void bltTrans(Surface &amp;dest, int x, int y) const;
+-    void bltTransColor(Surface &amp;dest, int x, int y, const PIX &amp;color) const;
++    void bltTransColor(Surface &amp;dest, int x, int y, const PIX color) const;
+     void bltScale(const Surface &amp;source, const iRect &amp;destRect);
+     void bltLookup(const iRect &amp;destRect, const PIX table[]);
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -85,8 +85,8 @@
+             removeInvalidSockets();
+         } else if ( !IS_INTERRUPTED(error) ) { // beware: is NOT interrupted
+             std::stringstream msg;
+-            msg &lt;&lt; &quot;SocketManager: BAD BAD ERROR &quot; &lt;&lt; NETSTRERROR(error);
+-            LOGGER.debug(msg.str().c_str());
++            msg &lt;&lt; NETSTRERROR(error);
++            LOGGER.debug(&quot;SocketManager: BAD BAD ERROR %s&quot;, msg.str().c_str());
+         }
+     }
+ }
+@@ -113,8 +113,8 @@
+                 removeSocket(*i);
+             } else {
+                 std::stringstream msg;
+-                msg &lt;&lt; &quot;SocketManager: Error while finding invalid sockets &quot; &lt;&lt; NETSTRERROR(error);
+-                LOGGER.debug(msg.str().c_str());
++                msg &lt;&lt; NETSTRERROR(error);
++                LOGGER.debug(&quot;SocketManager: Error while finding invalid sockets %s&quot;, msg.str().c_str());
+             }
+         }
+     }
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -62,10 +62,9 @@
+     throw(NetworkException)
+ {
+     int res = doSendTo(toaddr,data,datasize);
+-    if(res != (int) datasize) {
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Send error: not all data sent.&quot;;
+-        LOGGER.warning(msg.str().c_str());
++    if(res != (int) datasize)
++    {
++        LOGGER.warning(&quot;Send error: not all data sent.&quot;);
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -64,7 +64,7 @@
+     delete[] writedir;
+ 
+     /* Root out archives, and add them to search path... */
+-    char* archiveExt = &quot;zip&quot;;
++    const char* archiveExt = &quot;zip&quot;;
+     if (archiveExt != NULL) {
+         char **rc = PHYSFS_enumerateFiles(&quot;/&quot;);
+         char **i;
+
+Modified: trunk/netpanzer/src/Lib/Util/Log.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/Log.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/Lib/Util/Log.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -155,7 +155,7 @@
+     strcat(buf, &quot;\n&quot;);
+     
+     if (m_logLevel &gt;= priority) {
+-        fprintf(stderr, buf);
++        fprintf(stderr, &quot;%s&quot;, buf);
+     }
+     
+     if (m_logfile != 0) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/GameControlNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/GameControlNetMessage.hpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/GameControlNetMessage.hpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -38,7 +38,7 @@
+ 
+     void set(const char* newmap_name)
+     {
+-        snprintf(map_name, sizeof(map_name), newmap_name);
++        snprintf(map_name, sizeof(map_name), &quot;%s&quot;, newmap_name);
+     }
+ 
+     GameControlCycleMap()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -409,9 +409,7 @@
+             int n=key_code-SDLK_0;
+             if(ctrl_status == true) {
+                 setSelectionList(n);
+-                std::stringstream s;
+-                s &lt;&lt; &quot;Group &quot; &lt;&lt; n &lt;&lt; &quot; Created&quot;;
+-                ConsoleInterface::postMessage(Color::brown, false, 0, s.str().c_str() );
++                ConsoleInterface::postMessage(Color::brown, false, 0, &quot;Group %d created&quot;, n );
+                 continue;
+             }
+             if(alt_status == true) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -254,7 +254,7 @@
+     input_string_active = on_off;
+ }
+ 
+-void ConsoleInterface::resetInputString( char *prompt )
++void ConsoleInterface::resetInputString( const char *prompt )
+ {
+     cursorPos = 0;
+     inputString[0] = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -80,7 +80,7 @@
+ 
+     /* Input String Methods */
+     static void setInputStringStatus( bool on_off );
+-    static void resetInputString( char *prompt );
++    static void resetInputString( const char *prompt );
+     static void addChar(int newChar);
+     static void addExtendedChar(int newExtendedChar);
+     static void getInputString( char *string );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -390,7 +390,7 @@
+     GameControlCycleMap *cycle_map_mesg;
+ 
+     cycle_map_mesg = (GameControlCycleMap *) message;
+-    snprintf(map_cycle_fsm_client_map_name, 256, cycle_map_mesg-&gt;map_name);
++    snprintf(map_cycle_fsm_client_map_name, 256, &quot;%s&quot;, cycle_map_mesg-&gt;map_name);
+     map_cycle_fsm_client_state = _map_cycle_client_start_map_load;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -451,7 +451,7 @@
+ 
+     game_setup-&gt;setMaxPlayers(gameconfig-&gt;maxplayers);
+     game_setup-&gt;setMaxUnits(gameconfig-&gt;maxunits);
+-    snprintf(game_setup-&gt;map_name, 32, gameconfig-&gt;map.c_str()); 
++    snprintf(game_setup-&gt;map_name, 32, &quot;%s&quot;, gameconfig-&gt;map.c_str());
+     game_setup-&gt;setCloudCoverage(gameconfig-&gt;cloudcoverage);
+     game_setup-&gt;setWindSpeed(gameconfig-&gt;windspeed);
+     game_setup-&gt;setGameType(gameconfig-&gt;gametype);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -338,8 +338,7 @@
+     try {
+         GameManager::startGameMapLoad(mapname, 20);
+     } catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;Error while loading map '%s':&quot;, mapname);
+-        LOGGER.warning(e.what());
++        LOGGER.warning(&quot;Error while loading map '%s': %s&quot;, mapname, e.what());
+         LoadingView::loadError();
+         return;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -309,8 +309,10 @@
+ int PlayerInterface::countPlayers()
+ {
+     int count=0;
+-    for ( int player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        if ( player_lists[ player_index ].getStatus() != _player_state_free ) {
++    for ( int player_index = 0; player_index &lt; max_players; player_index++ )
++    {
++        if ( player_lists[ player_index ].getStatus() == _player_state_active )
++        {
+             count++;
+         }
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -41,8 +41,8 @@
+ class CommandHelp
+ {
+ public:
+-    char* name;
+-    char* help;
++    const char* name;
++    const char* help;
+ };
+ 
+ static CommandHelp commands[] = {
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -118,7 +118,35 @@
+     UnitInterface::sendMessage( &amp;self_destruct );
+ }
+ 
++static const char * powerupTypeToString( int type )
++{
++    switch( type )
++    {
++        case _unit_powerup_hitpoints:
++            return( &quot;UNIT HITPOINTS&quot; );
+ 
++        case _unit_powerup_range:
++            return( &quot;UNIT WEAPON RANGE&quot; );
++
++        case _unit_powerup_firepower:
++            return( &quot;UNIT FIREPOWER&quot; );
++
++        case _unit_powerup_speed:
++            return( &quot;UNIT SPEED&quot; );
++
++        case _unit_powerup_repair:
++            return( &quot;UNIT REPAIR&quot; );
++
++        case _unit_powerup_reload:
++            return( &quot;UNIT RELOAD TIME&quot; );
++
++        case _unit_powerup_destruct:
++            return( &quot;UNIT DESTRUCT&quot; );
++    }
++
++    return(&quot;&quot;);
++}
++
+ void UnitPowerUp::onHit( UnitID unit_id )
+ {
+     sound-&gt;playPowerUpSound();
+@@ -167,35 +195,6 @@
+     }
+ }
+ 
+-char * UnitPowerUp::powerupTypeToString( int type )
+-{
+-    switch( type )
+-    {
+-        case _unit_powerup_hitpoints:
+-            return( &quot;UNIT HITPOINTS&quot; );
+-
+-        case _unit_powerup_range:
+-            return( &quot;UNIT WEAPON RANGE&quot; );
+-
+-        case _unit_powerup_firepower:
+-            return( &quot;UNIT FIREPOWER&quot; );
+-
+-        case _unit_powerup_speed:
+-            return( &quot;UNIT SPEED&quot; );
+-
+-        case _unit_powerup_repair:
+-            return( &quot;UNIT REPAIR&quot; );
+-
+-        case _unit_powerup_reload:
+-            return( &quot;UNIT RELOAD TIME&quot; );
+-
+-        case _unit_powerup_destruct:
+-            return( &quot;UNIT DESTRUCT&quot; );
+-    }
+-
+-    return(&quot;&quot;);
+-}
+-
+ void UnitPowerUp::onHitMessage( PowerUpHitMesg *message  )
+ {
+     sound-&gt;playPowerUpSound();
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.hpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.hpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -36,8 +36,6 @@
+     void powerUpReload( UnitState *unit_state);
+     void powerUpDestruct( UnitID unit_id );
+ 
+-    char * powerupTypeToString( int type );
+-
+ public:
+ 
+     UnitPowerUp(iXY map_loc, int type);
+
+Modified: trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -60,6 +60,7 @@
+ ResourceManager::loadDefaultFlags()
+ {
+     noimage.create(20,14,1);
++    noimage.fill(0);
+     char** list = filesystem::enumerateFiles(DEFAULT_FLAGS_PATH);
+     
+     vector&lt;string&gt; filenames;
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -27,6 +27,10 @@
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;SDLVideo.hpp&quot;
+ #include &lt;stdlib.h&gt;
++
++#include &quot;Interfaces/ConsoleInterface.hpp&quot;
++#include &quot;2D/Color.hpp&quot;
++
+ #ifdef _WIN32
+   #include &quot;Interfaces/GameConfig.hpp&quot;
+ #endif
+@@ -208,5 +212,6 @@
+ 
+     std::string bmpfile = filesystem::getRealWriteName(buf);
+     SDL_SaveBMP(backBuffer, bmpfile.c_str());
++    ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;Screenshoot saved as: %s&quot;, buf);
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -16,7 +16,6 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+ #include &lt;vector&gt;
+@@ -34,6 +33,27 @@
+ 
+ #include &quot;Views/Components/Label.hpp&quot;
+ 
++#define HEADER_HEIGHT 24
++#define ENTRY_HEIGHT 20
++
++#define TABLE_BORDER 2
++#define TABLE_BORDER_START (HEADER_HEIGHT+TABLE_BORDER)
++#define TABLE_START (HEADER_HEIGHT + TABLE_BORDER)
++
++#define ALLY_START 4
++#define FLAG_START 26
++// characters * character width
++#define NAME_START (6*8)
++
++#define TABLE_HEADER_PIX_LEN (52*8)
++
++#define WINDOW_WIDTH (TABLE_HEADER_PIX_LEN + ((DEFAULT_BORDER_SIZE+TABLE_BORDER) * 2 ) + 14+2)
++
++static const char * table_header =
++        &quot;      Name                 Frags Deaths Points Objs.&quot;;
++
++static const char * stats_format = &quot;%-20s%6i%7i%7i%6i&quot;;
++
+ // RankView
+ //---------------------------------------------------------------------------
+ RankView::RankView() : GameTemplateView()
+@@ -44,34 +64,9 @@
+ 
+     setAllowResize(false);
+     moveTo(gameconfig-&gt;rankposition);
+-    resize(iXY(450+20, 200));
++    resize(iXY(WINDOW_WIDTH, 200));
+     checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+ 
+-    const unsigned MAX_ALLY_CHARS      =  6;
+-//    const unsigned MAX_FLAG_CHARS      =  5;
+-    const unsigned MAX_NAME_CHARS      = 20;
+-    const unsigned MAX_KILLS_CHARS     =  6;
+-    const unsigned MAX_LOSSES_CHARS    =  7;
+-    const unsigned MAX_POINTS_CHARS    =  7;
+-
+-    // hardcoded for now
+-    int CHAR_XPIX = 8;
+-
+-    unsigned xOffset = 8;
+-    unsigned yOffset = 16;
+-    add( new Label( xOffset, yOffset, &quot;* Flag&quot;, Color::red, Color::gray64, true) );
+-    xOffset += (MAX_ALLY_CHARS*CHAR_XPIX) + 8 ;
+-    add( new Label( xOffset, yOffset, &quot;Name&quot;, Color::red, Color::gray64, true) );
+-    xOffset += MAX_NAME_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Kills&quot;, Color::red, Color::gray64, true) );
+-    xOffset += MAX_KILLS_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Losses&quot;, Color::red, Color::gray64, true) );
+-    xOffset += MAX_LOSSES_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Points&quot;, Color::red, Color::gray64, true) );
+-    xOffset += MAX_POINTS_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Objective&quot;, Color::red, Color::gray64, true) );
+-    xOffset += MAX_POINTS_CHARS*CHAR_XPIX;
+-
+     // Define the scrollBar fot this view.
+     scrollBar = new ScrollBar(ScrollBar::VERTICAL, 0, 1, 0, 100);
+     if (scrollBar == 0) {
+@@ -82,6 +77,7 @@
+     allyRequestImage.loadBMP(&quot;pics/default/allyRequest.bmp&quot;);
+     allyOtherImage.loadBMP(&quot;pics/default/allyOther.bmp&quot;);
+     noAllyImage.loadBMP(&quot;pics/default/noAlly.bmp&quot;);
++    colorImage.loadBMP(&quot;pics/default/playerColor.bmp&quot;);
+ 
+     selected_line = -1;
+ 
+@@ -91,22 +87,26 @@
+ //---------------------------------------------------------------------------
+ void RankView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    // make sure the window is big enough for all players
+     unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
+-    unsigned int entryheight = 20; //std::max(CHAR_YPIX, flagHeight) + 2;
+-    unsigned int newheight = 60 + entryheight * PlayerInterface::countPlayers();
+-    
+-    if ( newheight != (unsigned int)getSizeY() ) {
+-        resize(iXY(450+20, newheight));
++    unsigned int newheight = HEADER_HEIGHT
++                             + (TABLE_BORDER * 2)
++                             + (ENTRY_HEIGHT * PlayerInterface::countPlayers())
++                             + DEFAULT_MOVE_AREA_HEIGHT
++                             + (DEFAULT_BORDER_SIZE * 2);
++
++    if ( newheight != (unsigned int)getSizeY() )
++    {
++        resize(WINDOW_WIDTH, newheight);
+         return; // this frame draws nothing
+     }
+     
+     bltViewBackground(viewArea);
+ 
+     clientArea.drawButtonBorder(
+-            iRect(0, 26, getClientRect().getSize().x - 1,
+-                getClientRect().getSize().y - 1), Color::gray64, Color::white);
++            iRect(0, TABLE_BORDER_START, clientArea.getWidth()-1, clientArea.getHeight()-1),
++            Color::gray64, Color::white);
+ 
++    clientArea.bltStringShadowed(0, 16, table_header, Color::red, Color::gray64);
+     drawPlayerStats(clientArea, flagHeight);
+ 
+     View::doDraw(viewArea, clientArea);
+@@ -161,9 +161,8 @@
+             break;
+     }
+ 
+-    unsigned int entryHeight = 20;
+-    iXY offset(64, 40 + ((entryHeight - Surface::getFontHeight())/2));
+-    iXY flagOffset(30, 40 + (int(entryHeight - flagHeight))/2);
++    int cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
++    int flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
+     Surface * flag = 0;
+     int cur_state = 0;
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+@@ -171,38 +170,41 @@
+         const PlayerState* state = *i;
+ 
+         snprintf(statBuf, sizeof(statBuf),
+-                &quot;%-20s%5i%7i%7i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
++                stats_format, state-&gt;getName().substr(0,20).c_str(),
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+-        dest.bltStringShadowed(offset.x, offset.y, statBuf,
++        dest.bltStringShadowed(NAME_START, cur_line_pos, statBuf,
+                                (cur_state == selected_line)?Color::yellow:Color::gray224,
+                                Color::gray64);
+         
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+-        flag-&gt;blt( dest, flagOffset.x, flagOffset.y );
++        flag-&gt;blt( dest, FLAG_START, flag_pos );
+         if ( state-&gt;getID() != PlayerInterface::getLocalPlayerIndex() )
+         {
+             bool meWithHim = PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), state-&gt;getID());
+             bool himWithMe = PlayerInterface::isSingleAllied(state-&gt;getID(), PlayerInterface::getLocalPlayerIndex());
+             if ( meWithHim &amp;&amp; himWithMe )
+             {
+-                allyImage.bltTrans(dest, 4, flagOffset.y );
++                allyImage.bltTrans(dest, ALLY_START, flag_pos );
+             }
+             else if ( meWithHim )
+             {
+-                allyRequestImage.bltTrans(dest, 4, flagOffset.y );
++                allyRequestImage.bltTrans(dest, ALLY_START, flag_pos );
+             }
+             else if ( himWithMe )
+             {
+-                allyOtherImage.bltTrans(dest, 4, flagOffset.y );
++                allyOtherImage.bltTrans(dest, ALLY_START, flag_pos );
+             }
+             else
+             {
+-                noAllyImage.bltTrans(dest, 4, flagOffset.y );
++                noAllyImage.bltTrans(dest, ALLY_START, flag_pos );
+             }
+         }
+-        offset.y += entryHeight;
+-        flagOffset.y += entryHeight;
++
++        colorImage.bltTransColor(dest, TABLE_HEADER_PIX_LEN+2, flag_pos, state-&gt;getColor());
++
++        cur_line_pos += ENTRY_HEIGHT;
++        flag_pos += ENTRY_HEIGHT;
+         ++cur_state;
+     }
+ 
+@@ -216,11 +218,10 @@
+ void RankView::lMouseDown(const iXY&amp; pos)
+ {
+     GameTemplateView::lMouseDown(pos);
+-    if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= 40 )
++    if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= TABLE_START )
+     {
+-        unsigned int ypos = pos.y - 40;
+-        unsigned int entryHeight = 20;
+-        unsigned int linepos = ypos / entryHeight;
++        unsigned int ypos = pos.y - TABLE_START;
++        unsigned int linepos = ypos / ENTRY_HEIGHT;
+         if ( linepos &lt; states.size() )
+         {
+             unsigned int destplayer = states[linepos]-&gt;getID();
+@@ -248,10 +249,9 @@
+ {
+     GameTemplateView::mouseMove(prevPos, newPos);
+     selected_line = -1;
+-    unsigned int entryHeight = 20;
+-    if ( newPos.y &gt;= 40 )
++    if ( newPos.y &gt;= TABLE_START )
+     {
+-        selected_line = (newPos.y-40) / entryHeight;
++        selected_line = (newPos.y-TABLE_START) / ENTRY_HEIGHT;
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -41,6 +41,7 @@
+     Surface allyRequestImage;
+     Surface allyOtherImage;
+     Surface noAllyImage;
++    Surface colorImage;
+     std::vector&lt;const PlayerState*&gt; states;
+     int selected_line;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -237,7 +237,7 @@
+ void MenuTemplateView::doActivate()
+ {
+     // Make the activating view active, redo this please!
+-    sprintf(currentView, searchName);
++    sprintf(currentView, &quot;%s&quot;, searchName);
+     Desktop::setActiveView(searchName);
+ 
+     loadBackgroundSurface();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -183,7 +183,7 @@
+ {
+     MenuTemplateView::doActivate();
+ 
+-    sprintf(currentMultiView, searchName);
++    sprintf(currentMultiView, &quot;%s&quot;, searchName);
+ 
+ } // end GetSessionView::doActivate
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -131,7 +131,7 @@
+ {
+     MenuTemplateView::doActivate();
+ 
+-    sprintf(currentMultiView, searchName);
++    sprintf(currentMultiView, &quot;%s&quot;, searchName);
+ } // end doActivate
+ 
+ // loadBackgroundSurface
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2010-01-25 13:44:51 UTC (rev 1202)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2010-01-30 14:46:47 UTC (rev 1203)
+@@ -133,7 +133,7 @@
+ 
+ }
+ 
+-static char * getGameTypeString()
++static const char * getGameTypeString()
+ {
+     switch ( gameconfig-&gt;gametype ) {
+     case _gametype_objective: {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000228.html">[Netpanzer-cvs] r1202 - in trunk/netpanzer: maps src/Lib/Network
+</A></li>
+	<LI>Next message: <A HREF="000230.html">[Netpanzer-cvs] r1204 - in trunk/netpanzer/src/NetPanzer:	Interfaces System Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#229">[ date ]</a>
+              <a href="thread.html#229">[ thread ]</a>
+              <a href="subject.html#229">[ subject ]</a>
+              <a href="author.html#229">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

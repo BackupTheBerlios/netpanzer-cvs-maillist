@@ -1,0 +1,1017 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1167 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Units	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1167%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/System%20src/NetPanzer/Units%0A%09src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/MainMenu/Options%20src/NetPanzer/Weapons&In-Reply-To=%3C201001091552.o09FqH5L021971%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000194.html">
+   <LINK REL="Next"  HREF="000196.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1167 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Units	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1167%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/System%20src/NetPanzer/Units%0A%09src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/MainMenu/Options%20src/NetPanzer/Weapons&In-Reply-To=%3C201001091552.o09FqH5L021971%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1167 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Units	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan  9 16:52:17 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000194.html">[Netpanzer-cvs] r1166 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Particles src/NetPanzer/Scripts
+</A></li>
+        <LI>Next message: <A HREF="000196.html">[Netpanzer-cvs] r1168 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#195">[ date ]</a>
+              <a href="thread.html#195">[ thread ]</a>
+              <a href="subject.html#195">[ subject ]</a>
+              <a href="author.html#195">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-09 16:51:44 +0100 (Sat, 09 Jan 2010)
+New Revision: 1167
+
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/src/Lib/2D/Color.cpp
+   trunk/netpanzer/src/Lib/2D/ImageArray.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+   trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+Log:
+- Video settings are saved in new configuration file config.cfg, is loaded using lua.
+- Removed some compilation warnings
+- Video configuration window now is synchronized with the game configuration.
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/scripts/initialize.lua	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -1 +1,4 @@
+ LOGGER:log(&quot;Script initialization&quot;);
++
++LOGGER:log(&quot;Video Config: &quot; .. config.video.width .. &quot; x &quot; .. config.video.height)
++LOGGER:log(&quot;Fullscreen: &quot; .. tostring(config.video.fullscreen))
+
+Modified: trunk/netpanzer/src/Lib/2D/Color.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Color.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/Lib/2D/Color.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -134,7 +134,7 @@
+ Color::registerScript(const char *table_name)
+ {
+     ScriptManager::registerLib( table_name, color_methods);
+-    ScriptManager::bindStaticVariables(table_name, &quot;ColorMetaTable&quot;,
++    ScriptManager::bindStaticVariables(table_name, 0, &quot;ColorMetaTable&quot;,
+                                        color_getters, color_setters);
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/ImageArray.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/ImageArray.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/Lib/2D/ImageArray.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -37,7 +37,7 @@
+     num_images = lua_objlen(L, -1);
+     images = new Surface*[num_images];
+ 
+-    for ( int n = 1; n &lt;= num_images; ++n )
++    for ( unsigned int n = 1; n &lt;= num_images; ++n )
+     {
+         lua_rawgeti(L, -1, n); // current record
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -142,7 +142,7 @@
+     SDL_Rect r = { 0, 0, header-&gt;x_pix, header-&gt;y_pix };
+ 
+     tiles = new std::vector&lt;Surface*&gt;();
+-    int ntiles = header-&gt;tile_count;
++    unsigned int ntiles = header-&gt;tile_count;
+     tiles-&gt;resize(ntiles);
+     for ( unsigned int n = 0; n &lt; ntiles; ++n )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -113,7 +113,7 @@
+ 
+     scroll_increment = (long) (scroll_rate * time_slice);
+ 
+-    if(((bool)gameconfig-&gt;fullscreen)!=true) {
++    if( ! GameConfig::video_fullscreen ) {
+         // don't do border scrolling on windowed mode because
+         //  the window isn't always on the edge of the screen.
+         return;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -30,9 +30,65 @@
+ #include &quot;Views/Game/MiniMapView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ 
++#include &quot;Scripts/ScriptManager.hpp&quot;
++#include &quot;Scripts/ScriptHelper.hpp&quot;
++
++unsigned int GameConfig::video_width = 800;
++unsigned int GameConfig::video_height = 600;
++bool         GameConfig::video_fullscreen = false;
++bool         GameConfig::video_hardwaresurface = false;
++bool         GameConfig::video_doublebuffer = false;
++bool         GameConfig::video_shadows = true;
++bool         GameConfig::video_blendsmoke = true;
++#ifdef _WIN32
++bool         GameConfig::video_usedirectx = true;
++#endif
++
++
++#define WRITE_BOOL(v) ((v)?&quot;true&quot;:&quot;false&quot;)
++
++// This generates the tables needed for script binding
++static const ScriptVarBindRecord video_getters[] =
++{
++    { &quot;width&quot;,           GETSVTYPE_INT,     &amp;GameConfig::video_width },
++    { &quot;height&quot;,          GETSVTYPE_INT,     &amp;GameConfig::video_height },
++    { &quot;fullscreen&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::video_fullscreen },
++    { &quot;hardwaresurface&quot;, GETSVTYPE_BOOLEAN, &amp;GameConfig::video_hardwaresurface },
++    { &quot;doublebuffer&quot;,    GETSVTYPE_BOOLEAN, &amp;GameConfig::video_doublebuffer },
++    { &quot;shadows&quot;,         GETSVTYPE_BOOLEAN, &amp;GameConfig::video_shadows },
++    { &quot;blendsmoke&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::video_blendsmoke },
++#ifdef _WIN32
++    { &quot;usedirectx&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::video_usedirectx },
++#endif
++    {0,0}
++};
++
++static const ScriptVarBindRecord video_setters[] =
++{
++    { &quot;width&quot;,           SETSVTYPE_INT,     &amp;GameConfig::video_width },
++    { &quot;height&quot;,          SETSVTYPE_INT,     &amp;GameConfig::video_height },
++    { &quot;fullscreen&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::video_fullscreen },
++    { &quot;hardwaresurface&quot;, SETSVTYPE_BOOLEAN, &amp;GameConfig::video_hardwaresurface },
++    { &quot;doublebuffer&quot;,    SETSVTYPE_BOOLEAN, &amp;GameConfig::video_doublebuffer },
++    { &quot;shadows&quot;,         SETSVTYPE_BOOLEAN, &amp;GameConfig::video_shadows },
++    { &quot;blendsmoke&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::video_blendsmoke },
++#ifdef _WIN32
++    { &quot;usedirectx&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::video_usedirectx },
++#endif
++    {0,0}
++};
++
++void GameConfig::registerScript(const char * table_name)
++{
++//    ScriptManager::registerLib( table_name, video_methods);
++    ScriptManager::bindStaticVariables(table_name, &quot;video&quot;, &quot;ConfigVideoMetaTable&quot;,
++                                       video_getters, video_setters);
++
++}
++
+ GameConfig::GameConfig(const std::string&amp; configfile, bool usePhysFS)
+     // VariableName(&quot;Name&quot;, value [, minimum, maximum])
+-    : windowWidth(800), windowHeight(600),
++    : 
+       hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
+       quickConnect(&quot;quickconnect&quot;, false),
+       serverConnect(&quot;serverconnect&quot;, &quot;&quot;),
+@@ -66,17 +122,6 @@
+       respawnmode(&quot;respawnmode&quot;, 0),
+       respawntime(&quot;respawntime&quot;, 0),
+       
+-      screenresolution(&quot;resolution&quot;, 2, 0, 3),
+-      fullscreen(&quot;fullscreen&quot;, true),
+-      hardwareSurface(&quot;hardwareSurface&quot;, false),
+-      hardwareDoubleBuffer(&quot;hardwareDoubleBuffer&quot;, false),
+-      displayshadows(&quot;displayshadows&quot;, true),
+-      blendsmoke(&quot;blendsmoke&quot;, true),
+-      screengamma(&quot;gamma&quot;, 50, 0, 100),
+-#ifdef _WIN32
+-      usedirectx(&quot;usedirectx&quot;, true),
+-#endif
+-
+       enablesound(&quot;enable&quot;, true),
+       enablemusic(&quot;music&quot;, true),
+       musicvolume(&quot;musicvolume&quot;, 80, 0, 100),
+@@ -171,17 +216,6 @@
+     serversettings.push_back(&amp;respawntime);
+     serversettings.push_back(&amp;respawnmode);
+    
+-    visualssettings.push_back(&amp;screenresolution);
+-    visualssettings.push_back(&amp;fullscreen);
+-    visualssettings.push_back(&amp;hardwareSurface);
+-    visualssettings.push_back(&amp;hardwareDoubleBuffer);
+-    visualssettings.push_back(&amp;displayshadows);
+-    visualssettings.push_back(&amp;blendsmoke);
+-    visualssettings.push_back(&amp;screengamma);
+-#ifdef _WIN32
+-    visualssettings.push_back(&amp;usedirectx);
+-#endif
+-
+     soundsettings.push_back(&amp;enablesound);
+     soundsettings.push_back(&amp;enablemusic);
+     soundsettings.push_back(&amp;musicvolume);
+@@ -249,6 +283,8 @@
+ 
+ void GameConfig::loadConfig()
+ {
++    ScriptManager::runFileInTable(&quot;config/config.cfg&quot;, &quot;config&quot;);
++
+     INI::Store inifile;
+     if(usePhysFS) {
+         IFileStream in(configfile);
+@@ -265,7 +301,6 @@
+         default_player &lt;&lt; &quot;Player&quot; &lt;&lt; (rand()%1000);
+         playername=default_player.str();
+     }
+-    loadSettings(inifile.getSection(&quot;visuals&quot;), visualssettings);
+     loadSettings(inifile.getSection(&quot;sound&quot;), soundsettings);
+     loadSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     loadSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+@@ -350,11 +385,26 @@
+ 
+ void GameConfig::saveConfig()
+ {
++    {
++        OFileStream out(&quot;config/config.cfg&quot;);
++        out &lt;&lt; &quot;-- Beware this file is overwritten each time netpanzer exits&quot; &lt;&lt; std::endl;
++        out &lt;&lt; &quot;video.width = &quot; &lt;&lt; video_width &lt;&lt; std::endl;
++        out &lt;&lt; &quot;video.height = &quot; &lt;&lt; video_height &lt;&lt; std::endl;
++        out &lt;&lt; &quot;video.fullscreen = &quot; &lt;&lt; WRITE_BOOL(video_fullscreen) &lt;&lt; std::endl;
++        out &lt;&lt; &quot;video.hardwaresurface = &quot; &lt;&lt; WRITE_BOOL(video_hardwaresurface) &lt;&lt; std::endl;
++        out &lt;&lt; &quot;video.doublebuffer = &quot; &lt;&lt; WRITE_BOOL(video_doublebuffer) &lt;&lt; std::endl;
++        out &lt;&lt; &quot;video.shadows = &quot; &lt;&lt; WRITE_BOOL(video_shadows) &lt;&lt; std::endl;
++        out &lt;&lt; &quot;video.blendsmoke = &quot; &lt;&lt; WRITE_BOOL(video_blendsmoke) &lt;&lt; std::endl;
++#ifdef _WIN32
++        out &lt;&lt; &quot;video.usedirectx = &quot; &lt;&lt; WRITE_BOOL(video_usedirectx) &lt;&lt; std::endl;
++#endif
++
++//        out &lt;&lt; &quot;video. = &quot; &lt;&lt; WRITE_BOOL(video_) &lt;&lt; std::endl;
++    }
+     INI::Store inifile;
+ 
+     saveSettings(inifile.getSection(&quot;game&quot;), gamesettings);
+     saveSettings(inifile.getSection(&quot;player&quot;), playersettings);
+-    saveSettings(inifile.getSection(&quot;visuals&quot;), visualssettings);
+     saveSettings(inifile.getSection(&quot;sound&quot;), soundsettings);
+     saveSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     saveSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -108,8 +108,16 @@
+     void loadConfig();
+     void saveConfig();
+ 
+-    unsigned int windowWidth;
+-    unsigned int windowHeight;
++    static unsigned int video_width;
++    static unsigned int video_height;
++    static bool         video_fullscreen;
++    static bool         video_hardwaresurface;
++    static bool         video_doublebuffer;
++    static bool         video_shadows;
++    static bool         video_blendsmoke;
++#ifdef _WIN32
++    static bool         video_usedirectx;
++#endif
+ 
+     // game Settings (there are not saved to disk)
+     ConfigInt       hostorjoin;         // 1=host, 2=join
+@@ -146,18 +154,6 @@
+     ConfigInt    respawnmode; // 0- normal, 1- round, 2- timer
+     ConfigInt    respawntime; // used in timer mode. in seconds
+ 
+-    // Visuals Settings
+-    ConfigInt   screenresolution;
+-    ConfigBool  fullscreen;
+-    ConfigBool  hardwareSurface;
+-    ConfigBool  hardwareDoubleBuffer;
+-    ConfigBool  displayshadows;
+-    ConfigBool  blendsmoke;
+-    ConfigInt   screengamma;
+-#ifdef _WIN32
+-    ConfigBool  usedirectx;
+-#endif
+-
+     // sound settings
+     ConfigBool  enablesound;
+     ConfigBool  enablemusic;
+@@ -328,6 +324,8 @@
+     }
+ 
+ private:
++    friend class ScriptManager;
++    static void registerScript(const char * table_name);
+     std::string configfile;
+     bool usePhysFS;
+ 
+@@ -365,7 +363,6 @@
+     std::vector&lt;ConfigVariable*&gt; gamesettings;
+     std::vector&lt;ConfigVariable*&gt; playersettings;
+     std::vector&lt;ConfigVariable*&gt; serversettings;
+-    std::vector&lt;ConfigVariable*&gt; visualssettings;
+     std::vector&lt;ConfigVariable*&gt; soundsettings;
+     std::vector&lt;ConfigVariable*&gt; interfacesettings;
+     std::vector&lt;ConfigVariable*&gt; radarsettings;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -132,34 +132,17 @@
+     // construct flags
+     iXY mode_res;
+     iXY old_res = screen ? iXY(screen-&gt;getWidth(), screen-&gt;getHeight()): iXY(0,0);
+-    Uint32 flags = gameconfig-&gt;fullscreen ? SDL_FULLSCREEN : 0;
+-    flags |= gameconfig-&gt;hardwareSurface ? SDL_HWSURFACE : 0;
+-    flags |= gameconfig-&gt;hardwareDoubleBuffer ? SDL_DOUBLEBUF : 0;
++    Uint32 flags = GameConfig::video_fullscreen ? SDL_FULLSCREEN : 0;
++    flags |= GameConfig::video_hardwaresurface ? SDL_HWSURFACE : 0;
++    flags |= GameConfig::video_doublebuffer ? SDL_DOUBLEBUF : 0;
+ 
+-    if ( ! gameconfig-&gt;fullscreen )
++    if ( ! GameConfig::video_fullscreen )
+     {
+         flags |= SDL_RESIZABLE;
+     }
+ 
+-    mode_res.x = gameconfig-&gt;windowWidth;
+-    mode_res.y = gameconfig-&gt;windowHeight;
+-//    for(mode=gameconfig-&gt;screenresolution; mode&gt;=0; mode--) {
+-//        switch(mode) {
+-//            case 0: mode_res = iXY(640,480); break;
+-//            case 1: mode_res = iXY(800,600); break;
+-//            case 2: mode_res = iXY(1024,768); break;
+-//            case 3: mode_res = iXY(1280,1024); break;
+-//        }
+-//
+-//        if(Screen-&gt;isDisplayModeAvailable(mode_res.x, mode_res.y, flags))
+-//        {
+-//            gameconfig-&gt;screenresolution = mode;
+-//            break;
+-//        }
+-//    }
+-//
+-//    if(mode&lt;0)
+-//        throw Exception(&quot;couldn't find a usable video mode&quot;);
++    mode_res.x = GameConfig::video_width;
++    mode_res.y = GameConfig::video_height;
+ 
+     Screen-&gt;setVideoMode(mode_res.x, mode_res.y, flags);
+ 
+@@ -218,8 +201,8 @@
+ void GameManager::spawnPlayerAt( const Uint16 player, const iXY&amp; location )
+ {
+     if (   location.x &gt;=0 &amp;&amp; location.y &gt;=0
+-        &amp;&amp; location.x &lt; MapInterface::getWidth()
+-        &amp;&amp; location.y &lt; MapInterface::getHeight() )
++        &amp;&amp; location.x &lt; (int)MapInterface::getWidth()
++        &amp;&amp; location.y &lt; (int)MapInterface::getHeight() )
+     {
+         global_engine_state-&gt;sound_manager-&gt;stopTankIdle();
+         PlayerInterface::spawnPlayer( player, location );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -388,7 +388,7 @@
+     {
+         if (KeyboardInterface::getKeyPressed(SDLK_RETURN))
+         {
+-            gameconfig-&gt;fullscreen.toggle();
++            GameConfig::video_fullscreen = !GameConfig::video_fullscreen;
+             GameManager::setVideoMode();
+         }
+     } // ** LFT_ALT or RGT_ALT pressed
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -104,7 +104,7 @@
+     packedSurface.setAttrib(iXY((int) pos.x, (int) (pos.z - arcYPix)), layer);
+     sorter.addSprite(&amp;packedSurface);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         packedSurfaceShadow.setAttrib(iXY((int) (pos.x - arcYPix), (int) pos.z), shadowLayer);
+         sorter.addSprite(&amp;packedSurfaceShadow);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -146,7 +146,7 @@
+     packedSurface.setAttrib(iXY(int(pos.x), int(pos.z)), layer);
+     sorter.addSprite(&amp;packedSurface);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         packedSurfaceShadow.setAttrib(iXY(int(pos.x - 300), int(pos.z)), shadowLayer);
+         sorter.addSprite(&amp;packedSurfaceShadow);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -85,7 +85,7 @@
+ 
+ void ParticleInterface::registerScript(const char * table_name)
+ {
+-    ScriptManager::bindStaticVariables(table_name, &quot;ParticlesMetaTable&quot;,
++    ScriptManager::bindStaticVariables(table_name, 0, &quot;ParticlesMetaTable&quot;,
+                                        particle_getters, particle_setters);
+ 
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -88,7 +88,7 @@
+ 
+     packedSurfaceShadow.setDrawModeBlend(32); // dark a little
+ 
+-    if (gameconfig-&gt;blendsmoke) {
++    if ( GameConfig::video_blendsmoke ) {
+         packedSurface.setDrawModeBlend(128);
+     } else {
+         packedSurface.setDrawModeSolid();
+@@ -124,7 +124,7 @@
+     packedSurface.setAttrib(iXY((int) pos.x, (int) pos.z), layer);
+     sorter.addSprite(&amp;packedSurface);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         if (!userDefinedShadowPos) {
+             shadowPos.x = pos.x - ((float(index) /
+                         float(puff_array-&gt;puffImageArray[0].size())) * packedSurfaceShadow.getCurFrame() * 10);
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -116,8 +116,22 @@
+     lua_pushstring(L, (char*)v );
+     return 1;
+ }
+-    
++
+ int
++ScriptHelper::get_boolean (lua_State *L, void *v)
++{
++    lua_pushboolean(L, *(bool*)v);
++    return 1;
++}
++
++int
++ScriptHelper::set_boolean (lua_State *L, void *v)
++{
++    *(bool*)v = lua_toboolean(L, 3);
++    return 0;
++}
++
++int
+ ScriptHelper::staticVarCall(lua_State *L)
+ {
+     /* for get: stack has userdata, index, lightuserdata */
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptHelper.hpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -31,6 +31,8 @@
+ #define SETSVTYPE_NUMBER ScriptHelper::set_number
+ #define GETSVTYPE_STRING ScriptHelper::get_string
+ //#define SETSVTYPE_STRING ScriptHelper::set_string
++#define GETSVTYPE_BOOLEAN ScriptHelper::get_boolean
++#define SETSVTYPE_BOOLEAN ScriptHelper::set_boolean
+ 
+ typedef int (*ScriptBindFunction) (lua_State *L, void *v);
+ 
+@@ -55,7 +57,10 @@
+     static int set_number (lua_State *L, void *v);
+ 
+     static int get_string (lua_State *L, void *v);
+-    
++
++    static int get_boolean (lua_State *L, void *v);
++    static int set_boolean (lua_State *L, void *v);
++
+ private:
+     friend class ScriptManager;
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -45,6 +45,7 @@
+         tolua_NetPanzer_open(luavm);
+         Color::registerScript(&quot;Color&quot;);
+         ParticleInterface::registerScript(&quot;particles&quot;);
++        GameConfig::registerScript(&quot;config&quot;);
+ 
+     }
+ 
+@@ -257,45 +258,60 @@
+ 
+ void
+ ScriptManager::bindStaticVariables(const char * objectName,
++                                   const char * fieldName,
+                                    const char * metaName,
+                                    ScriptVarBindRecord * getters,
+                                    ScriptVarBindRecord * setters)
+-{
+-    luaL_newmetatable(luavm, metaName);
++{                                                               // stack change
++    luaL_newmetatable(luavm, metaName);                         // +1
+     int metatable = lua_gettop(luavm);
+ 
+-    lua_pushliteral(luavm, &quot;__index&quot;);
+-    lua_pushvalue(luavm, metatable);  /* upvalue index 1 */
+-    bindStaticVars(getters);     /* fill metatable with getters */
+-    lua_pushcclosure(luavm, ScriptHelper::index_handler, 1);
+-    lua_rawset(luavm, metatable);     /* metatable.__index = index_handler */
++    lua_pushliteral(luavm, &quot;__index&quot;);                          // +1
++    lua_pushvalue(luavm, metatable);                            // +1
++    bindStaticVars(getters);                                    // 0
++    lua_pushcclosure(luavm, ScriptHelper::index_handler, 1);    // 0 = -1 +1
++    /* metatable.__index = index_handler */
++    lua_rawset(luavm, metatable);                               // -2
+ 
+-    lua_pushliteral(luavm, &quot;__newindex&quot;);
+-    lua_newtable(luavm);              /* table for members you can set */
+-    bindStaticVars(setters);     /* fill with setters */
+-    lua_pushcclosure(luavm, ScriptHelper::newindex_handler, 1);
+-    lua_rawset(luavm, metatable);     /* metatable.__newindex = newindex_handler */
++    // metatable still in stack (1)
+ 
+-    lua_pop(luavm, 1);                /* drop metatable */
++    lua_pushliteral(luavm, &quot;__newindex&quot;);                       // +1
++    lua_newtable(luavm);   /* table for members you can set */  // +1
++    bindStaticVars(setters);     /* fill with setters */        // 0
++    lua_pushcclosure(luavm, ScriptHelper::newindex_handler, 1); // 0 = -1 +1
++    /* metatable.__newindex = newindex_handler */
++    lua_rawset(luavm, metatable);                               // -2
+ 
+-    lua_getglobal(luavm, objectName);
++    lua_pop(luavm, 1);                /* drop metatable */      // -1 (clean)
++
++    lua_getglobal(luavm, objectName);                           // +1
+     
+-    bool isRegistered = !lua_isnil(luavm, -1);
++    bool isRegistered = !lua_isnil(luavm, -1);                  // 0
+     if ( ! isRegistered )
+     {
+-        lua_pop(luavm,1);
+-        lua_createtable(luavm, 0, 0);
+-        lua_pushvalue(luavm, -1);
+-        lua_setglobal(luavm, objectName);
++        // pop nil
++        lua_pop(luavm,1);                                       // -1 (clean)
++        lua_createtable(luavm, 0, 0);                           // +1
++        lua_pushvalue(luavm, -1);                               // +1
++        lua_setglobal(luavm, objectName);                       // -1
+     }
+ 
+-    luaL_getmetatable(luavm, metaName);
+-    lua_setmetatable(luavm,-2);
++    // we have the global object on stack
+ 
+-    if ( ! isRegistered )
++    int fields_to_pop = 1;
++
++    if ( fieldName )
+     {
+-        lua_setglobal(luavm,objectName);
++        ++fields_to_pop;
++        lua_createtable(luavm, 0, 0);                           // +1
++        lua_pushvalue(luavm, -1);                               // +1
++        lua_setfield(luavm, -3, fieldName);                     // -1
+     }
++
++    luaL_getmetatable(luavm, metaName);                         // +1
++    lua_setmetatable(luavm,-2);                                 // -1
++
++    lua_pop(luavm, fields_to_pop);
+ }
+ 
+ void
+@@ -303,8 +319,8 @@
+ {
+     for (; recordlist-&gt;name; recordlist++)
+     {
+-        lua_pushstring(luavm, recordlist-&gt;name);
+-        lua_pushlightuserdata(luavm, (void*)recordlist);
+-        lua_settable(luavm, -3);
++        lua_pushstring(luavm, recordlist-&gt;name);            // +1
++        lua_pushlightuserdata(luavm, (void*)recordlist);    // +1
++        lua_settable(luavm, -3);                            // -2
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -47,6 +47,7 @@
+     static lua_State* getLuavm() { return luavm; }
+ 
+     static void bindStaticVariables(const char * objectName,
++                                    const char * fieldName,
+                                     const char * metaName,
+                                     ScriptVarBindRecord * getters,
+                                     ScriptVarBindRecord * setters);
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -74,8 +74,8 @@
+                 break;
+ 
+             case SDL_VIDEORESIZE:
+-                gameconfig-&gt;windowWidth = event.resize.w;
+-                gameconfig-&gt;windowHeight = event.resize.h;
++                GameConfig::video_width = event.resize.w;
++                GameConfig::video_height = event.resize.h;
+                 GameManager::setVideoMode();
+                 break;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -95,7 +95,7 @@
+         : frontBuffer(0), backBuffer(0)
+ {
+ #ifdef _WIN32
+-    if ( gameconfig-&gt;usedirectx )
++    if ( GameConfig::video_usedirectx )
+     {
+         putenv(&quot;SDL_VIDEODRIVER=directx&quot;);
+     }
+@@ -139,12 +139,8 @@
+     {
+         return false;
+     }
+-    else if ( modes == (SDL_Rect**)-1 )
++    else if ( modes != (SDL_Rect**)-1 )
+     {
+-        return true;
+-    }
+-    else
+-    {
+         unsigned int min_x_dif = -1;
+         unsigned int min_y_dif = -1;
+         unsigned int nearest = 0;
+@@ -166,6 +162,7 @@
+         *width = modes[nearest]-&gt;w;
+         *height = modes[nearest]-&gt;h;
+     }
++    return true;
+ }
+ 
+ void SDLVideo::setVideoMode(int width, int height, Uint32 flags)
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -124,11 +124,11 @@
+     }
+ }
+ 
+-static void mapLocToBucketLoc(const iXY &amp; map_loc, iXY &amp; bucket_loc)
+-{
+-    bucket_loc.x = map_loc.x / map_x_sample_factor;
+-    bucket_loc.y = map_loc.y / map_y_sample_factor;
+-}
++//static void mapLocToBucketLoc(const iXY &amp; map_loc, iXY &amp; bucket_loc)
++//{
++//    bucket_loc.x = map_loc.x / map_x_sample_factor;
++//    bucket_loc.y = map_loc.y / map_y_sample_factor;
++//}
+ 
+ static unsigned int bucketLocToBucketIndex(const unsigned int row, const unsigned int col)
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -41,11 +41,21 @@
+ 
+     int borderSpace = borderSize * 2;
+ 
+-    size.x = std::max((Surface::getTextLength(item) + borderSpace), size.y);
++    size.x = std::max((Surface::getTextLength(item) + borderSpace), size.x);
+     size.y = ChoiceItemHeight;
+ }
+ 
+ //---------------------------------------------------------------------------
++void Choice::updateItem(const std::string&amp; new_val, unsigned int item)
++{
++    if ( item &lt; choiceList.size() )
++    {
++        choiceList[item] = new_val;
++        int borderSpace = borderSize * 2;
++        size.x = std::max((Surface::getTextLength(new_val) + borderSpace), size.x);
++    }
++}
++//---------------------------------------------------------------------------
+ void Choice::select(const std::string&amp; item)
+ {
+     for(size_t i = 0; i &lt; choiceList.size(); i++) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -51,6 +51,7 @@
+ 
+     void   add(const std::string&amp; item);
+     void   addItem(const std::string&amp; item);
++    void   updateItem(const std::string&amp; new_val, unsigned int item);
+     void   copyItems(const Choice &amp;choice);
+     size_t getItemCount() const
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -153,7 +153,7 @@
+ {
+     iRect objective_rect, map_rect;
+     unsigned char objective_status;
+-    IntColor color;
++    IntColor color = Color::black;
+     ObjectiveID objective_id;
+ 
+     ObjectiveInterface::startObjectivePositionEnumeration(PlayerInterface::getLocalPlayerIndex());
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -59,7 +59,7 @@
+     char res_str[20];
+     choiceResolution = new Choice();
+     choiceResolution-&gt;setName(&quot;Resolution&quot;);
+-
++    choiceResolution-&gt;addItem(&quot;current&quot;);
+     SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
+     int cur_mode = 0;
+     if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
+@@ -74,14 +74,17 @@
+     }
+     
+     choiceResolution-&gt;setLocation(x, y);
+-    choiceResolution-&gt;select(gameconfig-&gt;screenresolution);
++    choiceResolution-&gt;select(0);
+     choiceResolution-&gt;setMinWidth(minWidth);
+     choiceResolution-&gt;setStateChangedCallback(this);
+     add(choiceResolution);
++
++    current_width = 0;
++    current_height = 0;
+     
+     checkBoxFullscreen = new CheckBox();
+     checkBoxFullscreen-&gt;setLabel(&quot;Fullscreen&quot;);
+-    checkBoxFullscreen-&gt;setState(gameconfig-&gt;fullscreen);    
++    checkBoxFullscreen-&gt;setState(GameConfig::video_fullscreen);
+     checkBoxFullscreen-&gt;setLocation(x+ 250, y);
+     checkBoxFullscreen-&gt;setStateChangedCallback(this);
+     add(checkBoxFullscreen);
+@@ -107,7 +110,7 @@
+     
+     checkBoxDrawAllShadows = new CheckBox();
+     checkBoxDrawAllShadows-&gt;setLabel(&quot;Draw All Shadows&quot;);
+-    checkBoxDrawAllShadows-&gt;setState(gameconfig-&gt;displayshadows);
++    checkBoxDrawAllShadows-&gt;setState(GameConfig::video_shadows);
+     checkBoxDrawAllShadows-&gt;setLocation(x, y);
+     checkBoxDrawAllShadows-&gt;setStateChangedCallback(this);
+     add(checkBoxDrawAllShadows);
+@@ -115,7 +118,7 @@
+     
+     checkBoxBlendSmoke = new CheckBox();
+     checkBoxBlendSmoke-&gt;setLabel(&quot;Blend Smoke&quot;);
+-    checkBoxBlendSmoke-&gt;setState(gameconfig-&gt;blendsmoke);
++    checkBoxBlendSmoke-&gt;setState(GameConfig::video_blendsmoke);
+     checkBoxBlendSmoke-&gt;setLocation(x, y);
+     checkBoxBlendSmoke-&gt;setStateChangedCallback(this);
+     add(checkBoxBlendSmoke);
+@@ -170,6 +173,20 @@
+ //---------------------------------------------------------------------------
+ void VisualsView::doDraw()
+ {
++    checkBoxFullscreen-&gt;setState(GameConfig::video_fullscreen);
++    checkBoxBlendSmoke-&gt;setState(GameConfig::video_blendsmoke);
++    checkBoxDrawAllShadows-&gt;setState(GameConfig::video_shadows);
++
++    if (   current_width != GameConfig::video_width
++        || current_height != GameConfig::video_height )
++    {
++        current_width = GameConfig::video_width;
++        current_height = GameConfig::video_height;
++        char new_res[100];
++        snprintf(new_res,sizeof(new_res),&quot;current(%d x %d)&quot;, current_width, current_height);
++        choiceResolution-&gt;updateItem(new_res,0);
++    }
++
+     MenuTemplateView::doDraw();
+ 
+     View::doDraw();
+@@ -189,11 +206,11 @@
+ {
+     if ( source == checkBoxDrawAllShadows )
+     {
+-        gameconfig-&gt;displayshadows = checkBoxDrawAllShadows-&gt;getState();
++        GameConfig::video_shadows = checkBoxDrawAllShadows-&gt;getState();
+     }
+     else if ( source == checkBoxBlendSmoke )
+     {
+-        gameconfig-&gt;blendsmoke = checkBoxBlendSmoke-&gt;getState();
++        GameConfig::video_blendsmoke = checkBoxBlendSmoke-&gt;getState();
+     }
+     else if ( source == checkBoxDrawHitpoints )
+     {
+@@ -209,30 +226,36 @@
+     }
+     else if ( source == checkBoxFullscreen )
+     {
+-        gameconfig-&gt;fullscreen = checkBoxFullscreen-&gt;getState();
++        GameConfig::video_fullscreen = checkBoxFullscreen-&gt;getState();
+         GameManager::setVideoMode();
+     }
+     else if ( source == choiceResolution )
+     {
++        int sel_index = choiceResolution-&gt;getSelectedIndex()-1;
++        if ( sel_index &lt; 0 )
++        {
++            return;
++        }
++
+         SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
+         SDL_Rect* mode = 0;
+         if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
+         {
+-            mode = modes[choiceResolution-&gt;getSelectedIndex()];
++            mode = modes[sel_index];
+         }
+ 
+         if ( mode )
+         {
+-            gameconfig-&gt;windowWidth = mode-&gt;w;
+-            gameconfig-&gt;windowHeight = mode-&gt;h;
++            GameConfig::video_width = mode-&gt;w;
++            GameConfig::video_height = mode-&gt;h;
+         }
+ 
+-        if ( choiceResolution-&gt;getSelectedIndex() == 0 &amp;&amp; ! gameconfig-&gt;fullscreen )
++        if ( sel_index == 0 &amp;&amp; ! GameConfig::video_fullscreen )
+         {
+             // on Mac crash if we are in window and we select the biggest
+             // resolution (the first one in theory), we make it smaller so it
+             // wont crash, it is a SDL error.
+-            gameconfig-&gt;windowHeight -= 50;
++            GameConfig::video_height -= 50;
+         }
+ 
+         GameManager::setVideoMode();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -52,6 +52,8 @@
+ 
+     // Option choices.
+     Choice   * choiceResolution;
++    unsigned int current_width;
++    unsigned int current_height;
+     Choice   * choiceGameViewBackgroundColor;
+     Choice   * choiceMiniMapObjectiveDrawMode;
+     Choice   * choiceMiniMapUnitSize;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -151,7 +151,7 @@
+ 
+     groundLight.setWorldPos(location.x + thrustOffset.x, location.y + thrustOffset.y + heightFromGround);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         shellShadow.setWorldPos(location.x - 20, location.y);
+     }
+ }
+@@ -162,7 +162,7 @@
+     sorter.addSprite(&amp;thrust);
+     //sorter.addSprite(&amp;groundLight);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         sorter.addSprite(&amp;shellShadow);
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-09 10:03:47 UTC (rev 1166)
++++ trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-09 15:51:44 UTC (rev 1167)
+@@ -119,7 +119,7 @@
+ 
+     shell.setWorldPos(location);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         shellShadow.setWorldPos(location);
+     }
+ }
+@@ -128,13 +128,13 @@
+ {
+     shell.setWorldPos(location);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         shellShadow.setWorldPos(location.x - 10, location.y);
+     }
+ 
+     sorter.addSprite(&amp;shell);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         sorter.addSprite(&amp;shellShadow);
+     }
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000194.html">[Netpanzer-cvs] r1166 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Particles src/NetPanzer/Scripts
+</A></li>
+	<LI>Next message: <A HREF="000196.html">[Netpanzer-cvs] r1168 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#195">[ date ]</a>
+              <a href="thread.html#195">[ thread ]</a>
+              <a href="subject.html#195">[ subject ]</a>
+              <a href="author.html#195">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

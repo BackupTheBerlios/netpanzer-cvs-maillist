@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1131 - trunk/netpanzer/support/macosx
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1131%20-%20trunk/netpanzer/support/macosx&In-Reply-To=%3C200906280538.n5S5cC9j010662%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000159.html">
+   <LINK REL="Next"  HREF="000161.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1131 - trunk/netpanzer/support/macosx</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1131%20-%20trunk/netpanzer/support/macosx&In-Reply-To=%3C200906280538.n5S5cC9j010662%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1131 - trunk/netpanzer/support/macosx">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jun 28 07:38:12 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000159.html">[Netpanzer-cvs] r1130 - in trunk/netpanzer: . support/icon	support/macosx
+</A></li>
+        <LI>Next message: <A HREF="000161.html">[Netpanzer-cvs] r1132 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#160">[ date ]</a>
+              <a href="thread.html#160">[ thread ]</a>
+              <a href="subject.html#160">[ subject ]</a>
+              <a href="author.html#160">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-28 07:38:04 +0200 (Sun, 28 Jun 2009)
+New Revision: 1131
+
+Modified:
+   trunk/netpanzer/support/macosx/SDLMain.m
+   trunk/netpanzer/support/macosx/make_appbundle.sh
+Log:
+- added handling of <A HREF="netpanzer://">netpanzer://</A> urls in Mac OS X when clicking on browser
+
+Modified: trunk/netpanzer/support/macosx/SDLMain.m
+===================================================================
+--- trunk/netpanzer/support/macosx/SDLMain.m	2009-06-28 04:11:34 UTC (rev 1130)
++++ trunk/netpanzer/support/macosx/SDLMain.m	2009-06-28 05:38:04 UTC (rev 1131)
+@@ -223,6 +223,8 @@
+ 
+     /* Create SDLMain and make it the app delegate */
+     sdlMain = [[SDLMain alloc] init];
++    [[NSAppleEventManager sharedAppleEventManager] setEventHandler:sdlMain andSelector:@selector(handleOpenURL:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
++
+     [NSApp setDelegate:sdlMain];
+     
+     /* Start the main event loop */
+@@ -283,6 +285,19 @@
+     return TRUE;
+ }
+ 
++- (void)handleOpenURL:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
++{
++	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
++	if ( url )
++	{
++		const char * cstring = [url UTF8String];
++		char * cparam = SDL_strdup(&quot;-c&quot;);
++		char * cstringparam = SDL_strdup(cstring);
++		gArgv[gArgc++] = cparam;
++		gArgv[gArgc++] = cstringparam;
++		gArgv[gArgc] = NULL;
++	}
++}
+ 
+ /* Called when the internal event loop has just started running */
+ - (void) applicationDidFinishLaunching: (NSNotification *) note
+
+Modified: trunk/netpanzer/support/macosx/make_appbundle.sh
+===================================================================
+--- trunk/netpanzer/support/macosx/make_appbundle.sh	2009-06-28 04:11:34 UTC (rev 1130)
++++ trunk/netpanzer/support/macosx/make_appbundle.sh	2009-06-28 05:38:04 UTC (rev 1131)
+@@ -64,6 +64,17 @@
+ 	&lt;string&gt;????&lt;/string&gt;
+ 	&lt;key&gt;CFBundleVersion&lt;/key&gt;
+ 	&lt;string&gt;0.0.1d1&lt;/string&gt;
++	&lt;key&gt;CFBundleURLTypes&lt;/key&gt;
++	&lt;array&gt;
++		&lt;dict&gt;
++			&lt;key&gt;CFBundleURLName&lt;/key&gt;
++			&lt;string&gt;NetPanzer game URL&lt;/string&gt;
++			&lt;key&gt;CFBundleURLSchemes&lt;/key&gt;
++			&lt;array&gt;
++				&lt;string&gt;netpanzer&lt;/string&gt;
++			&lt;/array&gt;
++		&lt;/dict&gt;
++	&lt;/array&gt;
+ &lt;/dict&gt;
+ &lt;/plist&gt;
+ EOF
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000159.html">[Netpanzer-cvs] r1130 - in trunk/netpanzer: . support/icon	support/macosx
+</A></li>
+	<LI>Next message: <A HREF="000161.html">[Netpanzer-cvs] r1132 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#160">[ date ]</a>
+              <a href="thread.html#160">[ thread ]</a>
+              <a href="subject.html#160">[ subject ]</a>
+              <a href="author.html#160">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

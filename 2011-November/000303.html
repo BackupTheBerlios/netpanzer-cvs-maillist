@@ -1,0 +1,896 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1277 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game Views/MainMenu
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1277%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views%20Views/Components%20Views/Game%20Views/MainMenu&In-Reply-To=%3C20111110131109.02F744814CA%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000302.html">
+   <LINK REL="Next"  HREF="000304.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1277 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game Views/MainMenu</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1277%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views%20Views/Components%20Views/Game%20Views/MainMenu&In-Reply-To=%3C20111110131109.02F744814CA%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1277 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game Views/MainMenu">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 10 14:11:08 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000302.html">[Netpanzer-cvs] r1276 - trunk/netpanzer/src/Lib/2D
+</A></li>
+        <LI>Next message: <A HREF="000304.html">[Netpanzer-cvs] r1278 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#303">[ date ]</a>
+              <a href="thread.html#303">[ thread ]</a>
+              <a href="subject.html#303">[ subject ]</a>
+              <a href="author.html#303">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-10 14:11:08 +0100 (Thu, 10 Nov 2011)
+New Revision: 1277
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp
+Log:
+Change Options Menu, Only one screen directly
+Change some component.
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -75,10 +75,6 @@
+ #include &quot;Views/MainMenu/Multi/PlayerNameView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/IPAddressView.hpp&quot;
+ #include &quot;Views/MainMenu/Multi/ServerListView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/SoundView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/ControlsView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/InterfaceView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/VisualsView.hpp&quot;
+ 
+ #include &quot;Views/Game/RankView.hpp&quot;
+ #include &quot;Views/Game/EndRoundView.hpp&quot;
+@@ -198,10 +194,6 @@
+     Desktop::add(new OptionsTemplateView());
+     Desktop::add(new OrderingView());
+     Desktop::add(new HelpView());
+-    Desktop::add(new SoundView());
+-    Desktop::add(new ControlsView());
+-    Desktop::add(new VisualsView());
+-    Desktop::add(new InterfaceView());
+     Desktop::add(new FlagSelectionView());
+     Desktop::add(new HostOptionsView());
+     Desktop::add(new PlayerNameView());
+@@ -558,11 +550,7 @@
+         if (KeyboardInterface::getKeyPressed(SDLK_ESCAPE)) {
+             if (Desktop::getView(&quot;GameView&quot;)-&gt;getVisible())
+             {
+-                if (!Desktop::getView(&quot;OptionsView&quot;)-&gt;getVisible() &amp;&amp;
+-                        !Desktop::getView(&quot;SoundView&quot;)-&gt;getVisible() &amp;&amp;
+-                        !Desktop::getView(&quot;ControlsView&quot;)-&gt;getVisible() &amp;&amp;
+-                        !Desktop::getView(&quot;InterfaceView&quot;)-&gt;getVisible() &amp;&amp;
+-                        !Desktop::getView(&quot;VisualsView&quot;)-&gt;getVisible())
++                if (!Desktop::getView(&quot;OptionsView&quot;)-&gt;getVisible())
+                 {
+                     
+                     View *v = Desktop::getView(&quot;OptionsView&quot;);
+@@ -570,26 +558,6 @@
+                     ((OptionsTemplateView *)v)-&gt;initButtons();
+                     ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+ 
+-                    v = Desktop::getView(&quot;SoundView&quot;);
+-                    assert(v != 0);
+-                    ((SoundView *)v)-&gt;initButtons();
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+-
+-                    v = Desktop::getView(&quot;ControlsView&quot;);
+-                    assert(v != 0);
+-                    ((ControlsView *)v)-&gt;initButtons();
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+-
+-                    v = Desktop::getView(&quot;VisualsView&quot;);
+-                    assert(v != 0);
+-                    ((VisualsView *)v)-&gt;initButtons();
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+-
+-                    v = Desktop::getView(&quot;InterfaceView&quot;);
+-                    assert(v != 0);
+-                    ((InterfaceView *)v)-&gt;initButtons();
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+-
+                     Desktop::setVisibility(&quot;OptionsView&quot;, true);
+                     Desktop::setActiveView(&quot;OptionsView&quot;);
+                 }
+@@ -599,26 +567,6 @@
+                     assert(v != 0);
+                     ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+                     ((OptionsTemplateView *)v)-&gt;setVisible(false);
+-
+-                    v = Desktop::getView(&quot;InterfaceView&quot;);
+-                    assert(v != 0);
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-                    ((OptionsTemplateView *)v)-&gt;setVisible(false);
+-
+-                    v = Desktop::getView(&quot;VisualsView&quot;);
+-                    assert(v != 0);
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-                    ((OptionsTemplateView *)v)-&gt;setVisible(false);
+-
+-                    v = Desktop::getView(&quot;SoundView&quot;);
+-                    assert(v != 0);
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-                    ((OptionsTemplateView *)v)-&gt;setVisible(false);
+-
+-                    v = Desktop::getView(&quot;ControlsView&quot;);
+-                    assert(v != 0);
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-                    ((OptionsTemplateView *)v)-&gt;setVisible(false);
+                 }
+             }
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -20,22 +20,25 @@
+ #include &quot;Views/Components/CheckBox.hpp&quot;
+ #include &quot;MouseEvent.hpp&quot;
+ #include &quot;Views/Components/StateChangedCallback.hpp&quot;
++#include &quot;ViewGlobals.hpp&quot;
+ 
+ void
+ CheckBox::render()
+ {
+-    surface.fill(Color::black);
++    surface.fill(componentBodyColor);
+     Surface text;
+     text.renderText( label.c_str(), textColor, 0);
+-    surface.drawRect( iRect(0,0,12,12), Color::gray96);
+-    surface.drawRect( iRect(1,1,13,13), Color::white);
+-    surface.drawRect( iRect(1,1,12,12), Color::black);
++    surface.FillRoundRect( iRect(0,0,14,14),2,  componentBodyColor);
++    surface.RoundRect( iRect(1,1,12,12), 2, textColor);
+     if (state) {
+-        surface.drawLine( 2, 2, 11, 11, Color::white);
+-        surface.drawLine( 2, 11, 11, 2, Color::white);
++        surface.drawLine( 3, 6, 6, 9, textColor);
++        surface.drawLine( 3, 7, 6, 10, textColor);
++        surface.drawLine( 6, 9, 10, 3, textColor);
++        surface.drawLine( 6, 10, 10, 4, textColor);
+     }
+     
+-    text.blt( surface, 14+2, (surface.getHeight()/2) - (text.getHeight()/2) );
++    surface.bltString(14+4, (surface.getHeight()/2) - (text.getHeight()/2),label.c_str(), textColor);
++    //text.blt( surface, 14+2, (surface.getHeight()/2) - (text.getHeight()/2) );
+     dirty = false;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.hpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -48,7 +48,7 @@
+     CheckBox(const std::string&amp; newlabel, bool newstate = false)
+             : Component(), label(newlabel), state(newstate), callback(0)
+     {
+-        setSize( 14+label.length()*8, 14);
++        setSize( 20+label.length()*8, 14);
+         textColor = Color::white;
+         dirty = true;
+     }
+@@ -69,7 +69,7 @@
+     void setLabel(const std::string&amp; label)
+     {
+         CheckBox::label = label;
+-        setSize( 14+label.length()*8, 14);
++        setSize( 20+label.length()*8, 14);
+         dirty = true;
+     }
+     void setState(bool state)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -21,6 +21,7 @@
+ #include &quot;Views/Components/Choice.hpp&quot;
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Components/StateChangedCallback.hpp&quot;
++#include &quot;ViewGlobals.hpp&quot;
+ 
+ //---------------------------------------------------------------------------
+ void Choice::reset()
+@@ -184,9 +185,9 @@
+     s.setTo(dest, r);
+ 
+     // Draw the border.
+-    s.drawRect(iRect(0, 0, s.getWidth() - 2, s.getHeight() - 2), Color::gray96);
+-    s.drawRect(iRect(1, 1, s.getWidth() - 1, s.getHeight() - 1), Color::white);
+-    s.fillRect(iRect(1, 1, s.getWidth() - 2, s.getHeight() - 2), Color::terreVerte);
++    s.RoundRect(iRect(0, 0, s.getWidth() - 2, s.getHeight() - 2), 4, Color::gray96);
++    s.RoundRect(iRect(1, 1, s.getWidth() - 1, s.getHeight() - 1), 4, Color::white);
++    s.FillRoundRect(iRect(1, 1, s.getWidth() - 2, s.getHeight() - 2), 4, componentBodyColor);
+ 
+     if (!isOpen)	{
+         s.bltStringShadowedCenter(choiceList[index].c_str(), Color::white, Color::black);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -17,13 +17,14 @@
+  */
+ 
+ #include &quot;Label.hpp&quot;
++#include &quot;ViewGlobals.hpp&quot;
+ 
+ void
+ Label::draw(Surface &amp;dest)
+ {    
+     if ( shadowed )
+     {
+-        dest.bltStringShadowed(position.x, position.y, text.c_str(), foreground, background);
++        dest.bltStringShadowed(position.x, position.y, text.c_str(), foreground, componentBodyColor);
+     }
+     else
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -25,6 +25,7 @@
+ #include &quot;Util/TimerInterface.hpp&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;ViewGlobals.hpp&quot;
+ 
+ ////////////////////////////////////////////////////////////////////////////
+ // cInputFieldString definitions.
+@@ -317,7 +318,7 @@
+     checkCursor();
+     checkRepeat();
+ 
+-    inputFieldSurface.fill(Color::black);
++    inputFieldSurface.fill(componentBodyColor);
+     inputFieldSurface.drawButtonBorder(Color::white, Color::gray64);
+     inputFieldSurface.bltString(4, 2, destString+strDisplayStart, Color::white);
+     inputFieldSurface.blt(dest, pos.x, pos.y);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -25,13 +25,10 @@
+ #include &quot;Particles/Particle2D.hpp&quot;
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
+-#include &quot;Views/MainMenu/Options/SoundView.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+-#include &quot;Views/MainMenu/Options/ControlsView.hpp&quot;
+-#include &quot;Views/MainMenu/Options/VisualsView.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+-#include &quot;Views/MainMenu/Options/InterfaceView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+ 
+ //---------------------------------------------------------------------------
+ static void bYES()
+@@ -63,44 +60,12 @@
+ 
+     View *v = Desktop::getView(&quot;OptionsView&quot;);
+ 
+-    if (v != 0) {
++    if (v != 0) 
++    {
+         ((OptionsTemplateView *)v)-&gt;initButtons();
+         ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+     }
+ 
+-    v = Desktop::getView(&quot;SoundView&quot;);
+-    if (v != 0) {
+-        ((SoundView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+-
+-    v = Desktop::getView(&quot;ControlsView&quot;);
+-    if (v != 0) {
+-        ((ControlsView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+-
+-    v = Desktop::getView(&quot;VisualsView&quot;);
+-    if (v != 0) {
+-        ((VisualsView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+-
+-    v = Desktop::getView(&quot;InterfaceView&quot;);
+-    if (v != 0) {
+-        ((InterfaceView *)v)-&gt;initButtons();
+-        ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-    } else {
+-        assert(false);
+-    }
+ }
+ 
+ //---------------------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -33,7 +33,7 @@
+ #define meterWidth                  (280)
+ 
+ #define optionsMeterWidth           (148)
+-#define optionsMeterStartX          (448)
++#define optionsMeterStartX          (120)
+ #define optionsColorMeterStartX     (342)
+ 
+ #define ButonWidth                  (155)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -326,12 +326,4 @@
+     {
+         bCloseOptions();
+     }
+-    else if ( !cname.compare(&quot;Button.EXITNETNP&quot;) )
+-    {
+-        bExitNetPanzer();
+-    }
+-    else if ( !cname.compare(&quot;Button.EXITNETNP&quot;) )
+-    {
+-        bExitNetPanzer();
+-    }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -20,54 +20,80 @@
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/Button.hpp&quot;
++#include &quot;Views/Components/Label.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;System/Sound.hpp&quot;
+ 
+-static void bInterface()
++static void bIncreaseScrollRate()
+ {
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
+-        Desktop::setVisibility(&quot;ControlsView&quot;, false);
+-        Desktop::setVisibility(&quot;VisualsView&quot;, false);
+-        Desktop::setVisibility(&quot;InterfaceView&quot;, false);
+-        Desktop::setVisibility(&quot;SoundView&quot;, false);
+-        Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-    } else {
+-        Desktop::setVisibilityAllWindows(false);
+-    }
++    if(gameconfig-&gt;scrollrate + 100 &lt;= gameconfig-&gt;scrollrate.getMax())
++        gameconfig-&gt;scrollrate = gameconfig-&gt;scrollrate + 100;
++}
+ 
+-    Desktop::setVisibility(&quot;InterfaceView&quot;, true);
++static void bDecreaseScrollRate()
++{
++    if(gameconfig-&gt;scrollrate - 100 &gt;= gameconfig-&gt;scrollrate.getMin())
++        gameconfig-&gt;scrollrate = gameconfig-&gt;scrollrate - 100;
+ }
+ 
+-static void bVisuals()
++static int getScrollRate()
+ {
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
+-        Desktop::setVisibility(&quot;ControlsView&quot;, false);
+-        Desktop::setVisibility(&quot;VisualsView&quot;, false);
+-        Desktop::setVisibility(&quot;InterfaceView&quot;, false);
+-        Desktop::setVisibility(&quot;SoundView&quot;, false);
+-        Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-    } else {
+-        Desktop::setVisibilityAllWindows(false);
++    return (int) gameconfig-&gt;scrollrate;
++}
++
++static void bDecreaseSoundVolume()
++{
++    unsigned int v = gameconfig-&gt;effectsvolume;
++    if (v) {
++        --v;
++        gameconfig-&gt;effectsvolume = v;
++        sound-&gt;setSoundVolume(v);
+     }
++}
+ 
+-    Desktop::setVisibility(&quot;VisualsView&quot;, true);
++static void bIncreaseSoundVolume()
++{
++    unsigned int v = gameconfig-&gt;effectsvolume;
++    if (v&lt;100) {
++        ++v;
++        gameconfig-&gt;effectsvolume = v;
++        sound-&gt;setSoundVolume(v);
++    }
+ }
+ 
+-static void bSound()
++static int getSoundVolume()
+ {
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
+-        Desktop::setVisibility(&quot;ControlsView&quot;, false);
+-        Desktop::setVisibility(&quot;VisualsView&quot;, false);
+-        Desktop::setVisibility(&quot;InterfaceView&quot;, false);
+-        //Desktop::setVisibility(&quot;SoundView&quot;, false);
+-        Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-    } else {
+-        Desktop::setVisibilityAllWindows(false);
++    return gameconfig-&gt;effectsvolume;
++}
++
++static void bDecreaseMusicVolume()
++{
++    unsigned int v = gameconfig-&gt;musicvolume;
++    if (v) {
++        --v;
++        gameconfig-&gt;musicvolume = v;
++        sound-&gt;setMusicVolume(v);
+     }
+-    Desktop::setVisibility(&quot;SoundView&quot;, true);
+-    //Desktop::setVisibility(&quot;VisualsView&quot;, true);
+ }
+ 
++static void bIncreaseMusicVolume()
++{
++    unsigned int v = gameconfig-&gt;musicvolume;
++    if (v&lt;100) {
++        ++v;
++        gameconfig-&gt;musicvolume = v;
++        sound-&gt;setMusicVolume(v);
++    }
++}
+ 
++static int getMusicVolume()
++{
++    return gameconfig-&gt;musicvolume;
++}
++
++
+ // OptionsTemplateView
+ //---------------------------------------------------------------------------
+ OptionsTemplateView::OptionsTemplateView() : MenuTemplateView()
+@@ -90,19 +116,275 @@
+ 
+     MenuTemplateView::initButtons();
+ 
+-    add( Button::createSpecialButton( &quot;SOUND&quot;, &quot;Sound&quot;, soundPos) );
+-    add( Button::createSpecialButton( &quot;INTERFACE&quot;, &quot;Interface&quot;, interfacePos) );
+-    add( Button::createSpecialButton( &quot;VISUALS&quot;, &quot;Visuals&quot;, visualsPos) );
++    int xTextStart       = bodyTextRect.min.x;
++    int x                = xTextStart;
++    int y                = bodyTextRect.min.y;
++    int yOffset          =  17;
++    int arrowButtonWidth =  16;
++    int col              = 200;
++    // Settings
++    //----------------------------------------------------------------------
++    int minWidth = 19 * 8;
+ 
++    y += yOffset;
++    x = xTextStart;
++    checkBoxFullscreen = new CheckBox();
++    checkBoxFullscreen-&gt;setLabel(&quot;Fullscreen&quot;);
++    checkBoxFullscreen-&gt;setLocation(x+ col, y);
++    checkBoxFullscreen-&gt;setStateChangedCallback(this);
++    add(checkBoxFullscreen);
++    y += yOffset;
++    x = xTextStart;
++    checkBoxDrawAllShadows = new CheckBox();
++    checkBoxDrawAllShadows-&gt;setLabel(&quot;Draw All Shadows&quot;);
++    checkBoxDrawAllShadows-&gt;setState(GameConfig::video_shadows);
++    checkBoxDrawAllShadows-&gt;setLocation(x+ col, y);
++    checkBoxDrawAllShadows-&gt;setStateChangedCallback(this);
++    add(checkBoxDrawAllShadows);
++
++    x = xTextStart;
++    char res_str[20];
++    choiceResolution = new Choice();
++    choiceResolution-&gt;setName(&quot;Resolution&quot;);
++    choiceResolution-&gt;addItem(&quot;current&quot;);
++    SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
++    int cur_mode = 0;
++    if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
++    {
++        while ( modes[cur_mode] )
++        {
++            snprintf(res_str,sizeof(res_str),&quot;%dx%d&quot;, modes[cur_mode]-&gt;w, modes[cur_mode]-&gt;h);
++            res_str[sizeof(res_str)-1] = 0;
++            choiceResolution-&gt;addItem(res_str);
++            ++cur_mode;
++        }
++    }
++
++    choiceResolution-&gt;setLocation(x, y-3);
++    choiceResolution-&gt;select(0);
++    choiceResolution-&gt;setMinWidth(minWidth);
++    choiceResolution-&gt;setStateChangedCallback(this);
++    add(choiceResolution);
++    current_width = 0;
++    current_height = 0;
++    y += yOffset;
++
++    x = xTextStart;
++    checkBoxBlendSmoke = new CheckBox();
++    checkBoxBlendSmoke-&gt;setLabel(&quot;Blend Smoke&quot;);
++    checkBoxBlendSmoke-&gt;setState(GameConfig::video_blendsmoke);
++    checkBoxBlendSmoke-&gt;setLocation(x+ col, y);
++    checkBoxBlendSmoke-&gt;setStateChangedCallback(this);
++    add(checkBoxBlendSmoke);
++    y += yOffset;
++ 
++#ifdef _WIN32
++    x = xTextStart;
++    checkBoxUseDirectX = new CheckBox();
++    checkBoxUseDirectX-&gt;setLabel(&quot;Use DirectX&quot;);
++    checkBoxUseDirectX-&gt;setState(GameConfig::video_usedirectx);
++    checkBoxUseDirectX-&gt;setLocation(x+ col, y);
++    checkBoxUseDirectX-&gt;setStateChangedCallback(this);
++    add(checkBoxUseDirectX);
++#endif
++
++    x = xTextStart;
++    choiceMiniMapUnitSize = new Choice();
++    choiceMiniMapUnitSize-&gt;setName(&quot;Mini Map Unit Size&quot;);
++    choiceMiniMapUnitSize-&gt;addItem(&quot;Small&quot;);
++    choiceMiniMapUnitSize-&gt;addItem(&quot;Large&quot;);
++    choiceMiniMapUnitSize-&gt;setLocation(x, y);
++    choiceMiniMapUnitSize-&gt;select(gameconfig-&gt;radar_unitsize);
++    choiceMiniMapUnitSize-&gt;setMinWidth(minWidth);
++    choiceMiniMapUnitSize-&gt;setStateChangedCallback(this);
++    add(choiceMiniMapUnitSize);
++    y += yOffset*4;
++   
++// VISUAL OPTIONS
++
++    x = xTextStart;
++    add( new Label( x, y+3, &quot;Scroll Rate:&quot;, Color::white) );
++    x += optionsMeterStartX;
++    addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseScrollRate);
++    x += optionsMeterWidth + arrowButtonWidth;
++    addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseScrollRate);
++    y += yOffset*4;
++
++// SOUND OPTIONS
++
++    x = xTextStart;
++    add( new Label( x, y, &quot;Sound Status:&quot;, Color::white) );
++    checkBoxSoundEnabled = new CheckBox();
++    checkBoxSoundEnabled-&gt;setLabel(gameconfig-&gt;enablesound?&quot;Enabled&quot;:&quot;Disabled&quot;);
++    checkBoxSoundEnabled-&gt;setState(gameconfig-&gt;enablesound);
++    x += optionsMeterStartX;
++    checkBoxSoundEnabled-&gt;setLocation(x, y-2);
++    checkBoxSoundEnabled-&gt;setStateChangedCallback(this);
++    add(checkBoxSoundEnabled);
++    y += yOffset;
++
++    x = xTextStart;
++    add( new Label( x, y+3, &quot;Sound Volume:&quot;, Color::white) );
++    x += optionsMeterStartX;
++    addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseSoundVolume);
++    x += optionsMeterWidth + arrowButtonWidth;
++    addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseSoundVolume);
++    y += yOffset;
++
++    y += yOffset; 
++    x = xTextStart;
++    add( new Label( x, y, &quot;Music Status:&quot;, Color::white) );
++    checkBoxMusicEnabled = new CheckBox();
++    checkBoxMusicEnabled-&gt;setLabel(gameconfig-&gt;enablemusic?&quot;Enabled&quot;:&quot;Disabled&quot;);
++    checkBoxMusicEnabled-&gt;setState(gameconfig-&gt;enablemusic);
++    x += optionsMeterStartX;
++    checkBoxMusicEnabled-&gt;setLocation(x, y-2);
++    checkBoxMusicEnabled-&gt;setStateChangedCallback(this);
++    add(checkBoxMusicEnabled);
++    y += yOffset;
++
++    x = xTextStart;
++    add( new Label( x, y+3, &quot;Music Volume:&quot;, Color::white) );
++    x += optionsMeterStartX;
++    addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseMusicVolume);
++    x += optionsMeterWidth + arrowButtonWidth;
++    addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseMusicVolume);
++    y += yOffset;
+ } // end OptionsTemplateView::initButtons
+ 
++void Separator(int x, int y, std::string title, Surface &amp;clientArea)
++{
++    clientArea.drawLine(bodyTextRect.min.x, y+3, bodyTextRect.min.x+20, y+3, Color::white);
++    clientArea.drawLine(bodyTextRect.min.x, y+2, bodyTextRect.min.x+20, y+2, Color::black);
++    clientArea.bltStringShadowed(bodyTextRect.min.x+25,y, title.c_str(),  Color::white, Color::black);
++    clientArea.drawLine(bodyTextRect.min.x+30+clientArea.getTextLength(title), y+3, bodyTextRect.max.x, y+3, Color::white);
++    clientArea.drawLine(bodyTextRect.min.x+30+clientArea.getTextLength(title), y+2, bodyTextRect.max.x, y+2, Color::black);
++}
++
+ // doDraw
+ //---------------------------------------------------------------------------
+ void OptionsTemplateView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
++    checkBoxFullscreen-&gt;setState(GameConfig::video_fullscreen);
++    checkBoxBlendSmoke-&gt;setState(GameConfig::video_blendsmoke);
++    checkBoxDrawAllShadows-&gt;setState(GameConfig::video_shadows);
++
+     MenuTemplateView::doDraw(viewArea, clientArea);
+ 
+-    clientArea.bltString(bodyTextRect.min.x, bodyTextRect.min.y, &quot;Select your option category above&quot;, Color::white);
++    Surface tempSurface(optionsMeterWidth, 14, 1);
++
++    // Scroll Rate
++    tempSurface.fill(meterColor);
++    tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
++
++    char strBuf[256];
++    const int arrowButtonWidth = 16;
++    int   x               = bodyTextRect.min.x + optionsMeterStartX + arrowButtonWidth;
++    int   y               = bodyTextRect.min.y ;
++    int yOffset          =  17;
++
++    Separator(bodyTextRect.min.x, y, &quot;VISUAL&quot;, clientArea);
++    y += yOffset*6;
++    Separator(bodyTextRect.min.x, y, &quot;INTERFACE&quot;, clientArea);
++    y += yOffset*2;
++
++    sprintf(strBuf, &quot;%d %%&quot;, int((float(getScrollRate()) / 
++                    float(gameconfig-&gt;scrollrate.getMax())) * 100.0f));
++    tempSurface.bltStringCenter(strBuf, meterTextColor);
++    tempSurface.blt(clientArea, x, y);
++    y += yOffset*2;
++
++    Separator(bodyTextRect.min.x, y, &quot;SOUND&quot;, clientArea);
++    
++    // Sound Volume
++    y += yOffset*3;
++    tempSurface.fill(meterColor);
++    tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
++    sprintf(strBuf, &quot;%d %%&quot;, getSoundVolume());
++    tempSurface.bltStringCenter(strBuf, meterTextColor);
++    tempSurface.blt(clientArea, x, y);
++
++    // Music Volume
++    y += yOffset*3;
++    tempSurface.fill(meterColor);
++    tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
++    sprintf(strBuf, &quot;%d %%&quot;, getMusicVolume());
++    tempSurface.bltStringCenter(strBuf, meterTextColor);
++    tempSurface.blt(clientArea, x, y);
++} // end VisualsView::doDraw
++
++// processEvents
++//---------------------------------------------------------------------------
++//void OptionsView::processEvents()
++//{
++//    OptionsTemplateView::processEvents();
++//} // end VisualsView::processEvents
++
++// actionPerformed
++//---------------------------------------------------------------------------
++void OptionsTemplateView::stateChanged(Component* source)
++{
++    if ( source == checkBoxDrawAllShadows )
++    {
++        GameConfig::video_shadows = checkBoxDrawAllShadows-&gt;getState();
++    }
++    else if ( source == checkBoxBlendSmoke )
++    {
++        GameConfig::video_blendsmoke = checkBoxBlendSmoke-&gt;getState();
++    }
++    else if ( source == checkBoxFullscreen )
++    {
++        GameConfig::video_fullscreen = checkBoxFullscreen-&gt;getState();
++        GameManager::setVideoMode();
++    }
++    else if ( source == choiceResolution )
++    {
++        int sel_index = choiceResolution-&gt;getSelectedIndex()-1;
++        if ( sel_index &lt; 0 )
++        {
++            return;
++        }
++
++        SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
++        SDL_Rect* mode = 0;
++        if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
++        {
++            mode = modes[sel_index];
++        }
++
++        if ( mode )
++        {
++            GameConfig::video_width = mode-&gt;w;
++            GameConfig::video_height = mode-&gt;h;
++        }
++
++        if ( sel_index == 0 &amp;&amp; ! GameConfig::video_fullscreen )
++        {
++            // on Mac crash if we are in window and we select the biggest
++            // resolution (the first one in theory), we make it smaller so it
++            // wont crash, it is a SDL error.
++            GameConfig::video_height -= 50;
++        }
++
++        GameManager::setVideoMode();
++    }
++    else if ( source == choiceMiniMapUnitSize )
++    {
++        if (choiceMiniMapUnitSize-&gt;getSelectedIndex() == 0)
++        {
++            gameconfig-&gt;radar_unitsize = _mini_map_unit_size_small;
++        }
++        else if (choiceMiniMapUnitSize-&gt;getSelectedIndex() == 1)
++        {
++            gameconfig-&gt;radar_unitsize = _mini_map_unit_size_large;
++        }
++    }
++#ifdef _WIN32
++    else if ( source == checkBoxUseDirectX )
++    {
++        GameConfig::video_usedirectx = checkBoxUseDirectX-&gt;getState();
++    }
++#endif
+ } // end OptionsTemplateView::doDraw
+ 
+ // loadBackgroundSurface
+@@ -121,21 +403,5 @@
+ 
+ void OptionsTemplateView::onComponentClicked(Component* c)
+ {
+-    string cname = c-&gt;getName();
+-    if ( !cname.compare(&quot;Button.SOUND&quot;) )
+-    {
+-        bSound();
+-    }
+-    else if ( !cname.compare(&quot;Button.INTERFACE&quot;) )
+-    {
+-        bInterface();
+-    }
+-    else if ( !cname.compare(&quot;Button.VISUALS&quot;) )
+-    {
+-        bVisuals();
+-    }
+-    else
+-    {
+         MenuTemplateView::onComponentClicked(c);
+-    }
+ }
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp	2011-11-04 12:37:13 UTC (rev 1276)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp	2011-11-10 13:11:08 UTC (rev 1277)
+@@ -21,13 +21,53 @@
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
++#include &quot;Views/Components/CheckBox.hpp&quot;
++#include &quot;Views/Components/Choice.hpp&quot;
++#include &quot;Views/Components/StateChangedCallback.hpp&quot;
+ 
+ //--------------------------------------------------------------------------
+-class OptionsTemplateView : public MenuTemplateView
++class OptionsTemplateView : public MenuTemplateView, public StateChangedCallback
+ {
++private:
++    int      selectedColorStartY;
++
++    // Option check boxes.
++    CheckBox * checkBoxDrawAllShadows;
++    CheckBox * checkBoxBlendSmoke;
++    CheckBox * checkBoxFullscreen;
++    CheckBox * checkBoxSoundEnabled;
++    CheckBox * checkBoxMusicEnabled;
++#ifdef _WIN32
++    CheckBox * checkBoxUseDirectX;
++#endif
++    //CheckBox drawUnitReload;
++
++    // Option choices.
++    Choice   * choiceResolution;
++    unsigned int current_width;
++    unsigned int current_height;
++
++    Choice   * choiceGameViewBackgroundColor;
++    Choice   * choiceMiniMapObjectiveDrawMode;
++    Choice   * choiceMiniMapUnitSize;
++    Choice   * choiceUnitSelectionDrawMode;
++
++    //Choice   choiceUnitInfoDrawLayer;
++
++#if 0
++    // Color choices.
++    Choice   choiceYourRadarUnit;
++    Choice   choiceAlliedRadarUnit;
++    Choice   choiceYourRadarObjective;
++    Choice   choiceAlliedRadarObjective;
++    Choice   choiceEnemyRadarObjective;
++    Choice   choiceVehicleSelectionBox;
++    Choice   choiceConsoleText;
++#endif
++
++    virtual void loadTitleSurface();
+ protected:
+     virtual void loadBackgroundSurface();
+-    virtual void loadTitleSurface();
+ 
+ public:
+     OptionsTemplateView();
+@@ -35,6 +75,7 @@
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void initButtons();
+     void onComponentClicked(Component* c);
++    virtual void stateChanged(Component* source);
+ }; // end OptionsTemplateView
+ 
+ #endif // end __OptionsTemplateView_hpp__
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000302.html">[Netpanzer-cvs] r1276 - trunk/netpanzer/src/Lib/2D
+</A></li>
+	<LI>Next message: <A HREF="000304.html">[Netpanzer-cvs] r1278 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#303">[ date ]</a>
+              <a href="thread.html#303">[ thread ]</a>
+              <a href="subject.html#303">[ subject ]</a>
+              <a href="author.html#303">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

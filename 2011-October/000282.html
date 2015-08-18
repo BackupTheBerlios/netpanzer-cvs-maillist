@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1256 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1256%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes&In-Reply-To=%3C20111012202432.1637E4814CB%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000281.html">
+   <LINK REL="Next"  HREF="000283.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1256 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1256%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes&In-Reply-To=%3C20111012202432.1637E4814CB%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1256 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Wed Oct 12 22:24:31 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000281.html">[Netpanzer-cvs] r1255 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Objectives
+</A></li>
+        <LI>Next message: <A HREF="000283.html">[Netpanzer-cvs] r1257 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#282">[ date ]</a>
+              <a href="thread.html#282">[ thread ]</a>
+              <a href="subject.html#282">[ subject ]</a>
+              <a href="author.html#282">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-12 22:24:31 +0200 (Wed, 12 Oct 2011)
+New Revision: 1256
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+Log:
+add check if clipboard is empty
+change gray palette
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2011-10-12 16:43:52 UTC (rev 1255)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2011-10-12 20:24:31 UTC (rev 1256)
+@@ -127,21 +127,14 @@
+     // 256 shades of gray.
+     gray256.init(256);
+     for (num = 0; num &lt; 256; num++) {
+-        int c = int(color[num].r+color[num].g+color[num].b)/3; //brightness
+-        int nearestColor = findNearestColor((int) (c * 1.2f),
+-                                            (int) (c * 1.2f),
+-                                            (int) (c * 1.2f));
+-        gray256.setColor(num, nearestColor);
++        gray256.setColor(num, int(findNearestColor(color[num].r, color[num].r,color[num].r))); // gray
+     }
+ 
+     // 256 shades of dark gray.
+     darkGray256.init(256);
+     for (num = 0; num &lt; 256; num++) {
+-        int c = int(color[num].r+color[num].g+color[num].b)/3; //brightness
+-        int nearestColor = findNearestColor((int) (float(c) / 2.0f),
+-                                            (int) (float(c) / 2.0f),
+-                                            (int) (float(c) / 2.0f));
+-        darkGray256.setColor(num, nearestColor);
++        int c = color[num].r/2;// dark gray
++        darkGray256.setColor(num, int(findNearestColor(c, c, c))); // dark gray
+     }
+ 
+     /*// 64 shades of gray.
+@@ -158,8 +151,8 @@
+     // 256 brightness values.
+     brightness256.init(256);
+     for (num = 0; num &lt; 256; num++) {
+-        // this is brihtness int(color[num].r+color[num].g+color[num].b)/3;
+-        brightness256.setColor(num, int(color[num].r+color[num].g+color[num].b)/3);
++        int c = color[num].r/1.3;// dark gray
++        brightness256.setColor(num, int(findNearestColor(c, c, c))); // dark gray
+     }
+ 
+     // 32 shades of red.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-12 16:43:52 UTC (rev 1255)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-12 20:24:31 UTC (rev 1256)
+@@ -1106,11 +1106,14 @@
+                     OpenClipboard(NULL);
+                     HANDLE clip = GetClipboardData(CF_TEXT);
+                     CloseClipboard();
+-                    char* pntchr = (char*)clip;
+-                    while (*pntchr != 0) 
++                    if (clip)
+                     {
+-                        ConsoleInterface::addChar(*pntchr);
+-                        pntchr++;
++                        char* pntchr = (char*)clip;
++                        while (*pntchr != 0) 
++                        {
++                            ConsoleInterface::addChar(*pntchr);
++                            pntchr++;
++                        }
+                     }
+                 }
+ #endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000281.html">[Netpanzer-cvs] r1255 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Objectives
+</A></li>
+	<LI>Next message: <A HREF="000283.html">[Netpanzer-cvs] r1257 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#282">[ date ]</a>
+              <a href="thread.html#282">[ thread ]</a>
+              <a href="subject.html#282">[ subject ]</a>
+              <a href="author.html#282">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

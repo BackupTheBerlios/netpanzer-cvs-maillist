@@ -1,0 +1,1902 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1371 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1371%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/buttons/default%20src/NetPanzer/Views%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu&In-Reply-To=%3C20120605115518.342B255B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000396.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1371 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1371%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/buttons/default%20src/NetPanzer/Views%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu&In-Reply-To=%3C20120605115518.342B255B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1371 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Tue Jun  5 13:55:17 CEST 2012</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000396.html">[Netpanzer-cvs] r1372 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#395">[ date ]</a>
+              <a href="thread.html#395">[ thread ]</a>
+              <a href="subject.html#395">[ subject ]</a>
+              <a href="author.html#395">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-06-05 13:55:17 +0200 (Tue, 05 Jun 2012)
+New Revision: 1371
+
+Added:
+   trunk/netpanzer/pics/backgrounds/menus/buttons/default/scrollbutton.bmp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/StateChangedCallback.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Theme.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Theme.hpp
+Log:
+New component:
+- tVScrollBar; one true vertical scrollbar
+- tHScrollBar; one true horizontal scrollbar
+- tListStringBox; one string listbox with scrollbar
+- tPlayerStateBox; one playerstatebox with scrollbar
+all new component with prefix &quot;t&quot; work with theming (I active later)
+Game:
+remake help view with scrollbar
+correct main menu (some bad position)
+
+Added: trunk/netpanzer/pics/backgrounds/menus/buttons/default/scrollbutton.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/backgrounds/menus/buttons/default/scrollbutton.bmp
+___________________________________________________________________
+Added: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/StateChangedCallback.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/StateChangedCallback.hpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/StateChangedCallback.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -26,7 +26,7 @@
+ 	virtual ~StateChangedCallback()
+ 	{ }
+ 
+-    virtual void stateChanged(Component* source) = 0;
++    virtual void stateChanged(Component* source){};
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -30,6 +30,7 @@
+ 
+ #include &lt;list&gt;
+ #include &lt;algorithm&gt;
++#include &quot;Views/Components/StateChangedCallback.hpp&quot;
+ 
+ using namespace std;
+ 
+@@ -39,7 +40,7 @@
+     MINMAX_VIEW_BUTTON
+ };
+ 
+-class View : public iRect
++class View : public iRect, public StateChangedCallback
+ {
+     friend class Desktop;
+ public:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -22,18 +22,18 @@
+ #include &quot;Component.hpp&quot;
+ #include &quot;2D/Color.hpp&quot;
+ 
+-typedef enum
+-{
+-    NORMAL =   0,
+-    OVER   =   1,
+-    PRESSED=   2,
+-    DISABLE=   3
+-} BState;
+ 
+ //--------------------------------------------------------------------------
+ class tButton : public Component
+ {
+ protected:
++    enum BState
++    {
++        NORMAL =   0,
++        OVER   =   1,
++        PRESSED=   2,
++        DISABLE=   3
++    } ;
+     std::string label;
+     PIX textColors[4];
+     Surface bimage;
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,217 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#include &quot;Views/Components/tHScrollBar.hpp&quot;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
++
++void tHScrollBar::initScrollBar()
++{
++    Surface bitmap;
++    bitmap.loadBMP(itScroll);
++    bRiseOver.grab(bitmap, iRect(bSize*4, bSize, bSize*5, bSize*2));
++    bRiseNormal.grab(bitmap, iRect(bSize*4, 0, bSize*5, bSize));
++    
++    bUpOver.grab(bitmap, iRect(bSize*2, bSize, bSize*3, bSize*2));
++    bUpNormal.grab(bitmap, iRect(bSize*3, bSize, bSize*4, bSize*2));
++    bDownOver.grab(bitmap, iRect(0, bSize, bSize, bSize*2));
++    bDownNormal.grab(bitmap, iRect(bSize, bSize, bSize*2, bSize*2));
++    setLocation(iXY(0,0));
++    setSize(0, bSize);
++
++    Position = 0;
++    Min = 0;
++    Max = 100;
++    RisePos = 0;
++    bRisestate = NORMAL;
++    bUpstate = NORMAL;
++    bDownstate = NORMAL;
++    background = ctWindowsbackground;
++    SmallChange = 1;
++    LargeChange = 10;
++}
++tHScrollBar::tHScrollBar()
++{
++    initScrollBar();
++}
++
++tHScrollBar::tHScrollBar(iXY pos, int Width, StateChangedCallback* newcallback)
++{
++    callback = newcallback;
++    setLocation(pos);
++    setSize(Width, bSize);
++    initScrollBar();
++    dirty = true;
++}
++
++void tHScrollBar::actionPerformed(const mMouseEvent &amp;me)
++{
++    if (!enabled) return;
++    iRect rect_button_up(position.x, position.y, position.x+bSize, position.y+bSize);
++    iRect rect_button_Down(position.x, position.y+size.y-bSize, position.x+bSize, position.y+size.y);
++    
++    if (rect_button_up.contains(iXY(me.getX(), me.getY())))
++    {
++        bUpstate = OVER;
++        dirty = true;
++        if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
++        {
++            bUpstate = PRESSED;
++            if (Position-SmallChange &gt; Min) setPosition(Position-SmallChange);
++            else setPosition(Min);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++    }
++    else
++    {
++        bUpstate = NORMAL;
++        dirty = true;
++    }
++
++    if (rect_button_Down.contains(iXY(me.getX(), me.getY())))
++    {
++        bDownstate = OVER;
++        dirty = true;
++        if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
++        {
++            bDownstate = PRESSED;
++            if (Position+SmallChange &lt; Max) setPosition(Position+SmallChange);
++            else setPosition(Max);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++    }
++    else
++    {
++        bDownstate = NORMAL;
++        dirty = true;
++    }
++
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
++    {
++        if (me.getY() &lt; (position.y+bSize+RisePos)) 
++        {
++            if (Position-LargeChange &gt; Min) setPosition(Position-LargeChange);
++            else setPosition(Min);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++        if (me.getY() &gt; (position.y+bSize+RisePos+bSize))
++        {
++            if (Position+LargeChange &lt; Max) setPosition(Position+LargeChange);
++            else setPosition(Max);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++    }
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
++            || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED)
++    {
++        bRisestate = OVER;
++        dirty = true;
++        return;
++    }
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_EXITED)
++    {
++        bUpstate = NORMAL;
++        bDownstate = NORMAL;
++        bRisestate = NORMAL;
++        dirty = true;
++    }
++}
++
++void tHScrollBar::render()
++{
++    surface.fill(background);
++    surface.drawRect(surface.getRect(), ctWindowsBorder);
++    if (bUpstate == PRESSED)
++    {
++        bUpOver.bltTrans(surface, 1, 1);
++    }
++    else if (bUpstate == OVER)
++    {
++        bUpOver.bltTrans(surface, 0, 0);
++    } 
++    else
++    {
++        bUpNormal.bltTrans(surface, 0, 0);
++    }
++
++    if (bDownstate == PRESSED)
++    {
++        bDownOver.bltTrans(surface, size.x-(bSize-1), 1);
++    }
++    else if (bDownstate == OVER)
++    {
++        bDownOver.bltTrans(surface, size.x-bSize, 0);
++    } 
++    else
++    {
++        bDownNormal.bltTrans(surface, size.x-bSize, 0);
++    }
++    if (bRisestate == OVER)
++    {
++        bRiseOver.bltTrans(surface, bSize+RisePos, 0);
++    } 
++    else
++    {
++        bRiseNormal.bltTrans(surface, bSize+RisePos, 0);
++    }
++}
++
++void tHScrollBar::setPosition(int newPosition)
++{
++    Position = newPosition;
++
++    int R = Max - Min;
++    if (R == 0) RisePos = 0;
++    else RisePos = (((Position-Min) * (size.x-bSize*3))-1) / R+1 ;
++}
++
++void tHScrollBar::setMax(int newMax)
++{
++    Max = newMax;
++    if (Max &lt; 1) enabled = false;
++    else enabled = true;
++}
++
++void tHScrollBar::setMin(int newMin)
++{
++    Min = newMin;
++}
++
++void tHScrollBar::setColor(PIX newColor)
++{
++    background = newColor;
++    dirty = true;
++}
++
++void tHScrollBar::setWidth(int newWidth)
++{
++    setSize(newWidth, bSize);
++    dirty = true;
++}
++
++
++
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,86 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++#ifndef __tHScrollBar_hpp__
++#define __tHScrollBar_hpp__
++
++#include &quot;Component.hpp&quot;
++#include &quot;MouseEvent.hpp&quot;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Components/StateChangedCallback.hpp&quot;
++
++class StateChangedCallback;
++
++class tHScrollBar : public Component
++{
++private:
++    enum BState
++    {
++        NORMAL =   0,
++        OVER   =   1,
++        PRESSED=   2,
++    } ;
++    StateChangedCallback* callback;
++    
++    BState bUpstate;
++    Surface bUpOver;
++    Surface bUpNormal;
++    
++    BState bDownstate;
++    Surface bDownOver;
++    Surface bDownNormal;
++    
++    BState bRisestate;
++    Surface bRiseOver;
++    Surface bRiseNormal;
++    
++    int RisePos;
++    int Position;
++    int Min;
++    int Max;
++    int LargeChange;
++    int SmallChange;
++    
++    enum { bSize = 19 };
++    
++    virtual void render();
++    virtual void actionPerformed(const mMouseEvent &amp;me);
++    void initScrollBar();
++public:
++
++    tHScrollBar();
++    tHScrollBar(iXY pos, int Width, StateChangedCallback* newcallback = 0);
++    virtual ~tHScrollBar()
++    {}
++
++    int getMin() {  return Min;}
++    int getMax() {return Max;}
++    int getPosition() {return Position;}
++    void setMin(int newMin);
++    void setMax(int newMax);
++    void setPosition(int newPosition);
++    void setColor(PIX newColor);
++    void setWidth(int newWidth);
++    void setSmallChange(int newSmallChange) {SmallChange =newSmallChange;}
++    void setLargeChange(int newLargeChange) {LargeChange = newLargeChange;}
++    void setStateChangedCallback(StateChangedCallback* newcallback)
++    {
++        callback = newcallback;
++    }
++}; 
++
++#endif 
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,83 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#include &quot;Views/Components/tPlayerStateBox.hpp&quot;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
++
++tPlayerStateBox::tPlayerStateBox(iRect rect, StateChangedCallback* newcallback)
++        : tStringListBox(rect, newcallback)
++{
++    DrawFlags = true;
++    UpdateState(true);
++    ShowTeam = false;
++    TeamNumber = 0;
++}
++
++void tPlayerStateBox::onPaint(int Index, int row)
++{
++    char statBuf[256];
++    int StartX = 3;
++    PlayerState *state = reinterpret_cast&lt;PlayerState *&gt;(List[Index].Data);
++    if (DrawFlags)
++    {
++        Surface * flag = 0;
++        flag = ResourceManager::getFlag(state-&gt;getFlag());
++        flag-&gt;blt(surface, 2, row-3);
++        StartX = flag-&gt;getWidth()+4;
++    }
++    snprintf(statBuf, sizeof(statBuf), &quot;%-20s&quot;, state-&gt;getName().c_str());
++    surface.bltString(StartX , row, statBuf, ctTexteNormal);
++}
++
++void tPlayerStateBox::UpdateState(bool ForceUpdate)
++{
++    if ((PlayerInterface::getActivePlayerCount() &gt; Count()) || ForceUpdate) 
++    {
++        Clear();
++        for ( int i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
++        {
++            PlayerState* state = PlayerInterface::getPlayer(i);
++            if( state-&gt;isActive() )
++            {
++                if (ShowTeam)
++                {
++                    if (state-&gt;getTeamID() == TeamNumber)
++                        AddData(state-&gt;getName(), state);
++                } 
++                else AddData(state-&gt;getName(), state);
++            }
++        }
++    }
++}
++void tPlayerStateBox::setDrawFlags(bool df)
++{
++    DrawFlags = df;
++    dirty = true;
++}
++
++void tPlayerStateBox::setShowTeam(Uint8 Team_Number)
++{
++    TeamNumber = Team_Number;
++    ShowTeam = true;
++    UpdateState(true);
++}
++
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,47 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++#ifndef __tPlayerStateBox_hpp__
++#define __tPlayerStateBox_hpp__
++
++#include &lt;vector&gt;
++#include &lt;string&gt;
++#include &quot;Component.hpp&quot;
++#include &quot;MouseEvent.hpp&quot;
++#include &quot;Views/Components/tVScrollBar.hpp&quot;
++#include &quot;Views/Components/tStringListBox.hpp&quot;
++#include &quot;Classes/PlayerState.hpp&quot;
++
++class StateChangedCallback;
++
++class tPlayerStateBox : public tStringListBox
++{
++private:
++    std::vector&lt;const PlayerState*&gt; states;
++    bool DrawFlags;
++    bool ShowTeam;
++    Uint8 TeamNumber;
++public:
++    tPlayerStateBox(iRect rect, StateChangedCallback* newcallback);
++
++    virtual void onPaint(int Index, int row);
++    void UpdateState(bool ForceUpdate);
++    void setDrawFlags(bool df);
++    void setShowTeam(Uint8 Team_Number);
++};
++
++#endif 
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,139 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#include &quot;Views/Components/tStringListBox.hpp&quot;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
++
++tStringListBox::tStringListBox(iRect rect, StateChangedCallback* newcallback)
++{
++    callback = newcallback;
++    setLocation(rect.min);
++    setSize(rect.getSizeX(), rect.getSizeY());
++    background = ctWindowsbackground;
++    VScrollBar = 0;
++    StartItem = 0;
++    SelectedItem = -1;
++    MaxItemView = (size.y-5)/ItemHeight;
++    dirty = true;
++}
++
++void tStringListBox::actionPerformed(const mMouseEvent &amp;me)
++{
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED &amp;&amp;
++        (me.getModifiers() &amp; InputEvent::BUTTON1_MASK)) 
++    {
++        int tmpSelected = (me.getY()-(position.y+3))/ItemHeight;
++        if ((tmpSelected+StartItem) &lt; (int)List.size())
++        {
++            SelectedItem = tmpSelected+StartItem;
++            dirty = true;
++        }
++    }
++}
++
++void tStringListBox::Add(const std::string S)
++{
++    DataItem data;
++    data.text = S;
++    List.push_back(data);
++    if (VScrollBar) VScrollBar-&gt;setMax(List.size()-MaxItemView);
++    dirty = true;
++}
++
++void tStringListBox::AddData(const std::string S, void * D)
++{
++    DataItem data;
++    data.text = S;
++    data.Data = D;
++    List.push_back(data);
++    if (VScrollBar) VScrollBar-&gt;setMax(List.size()-MaxItemView);
++    dirty = true;
++}
++
++void tStringListBox::render()
++{
++    surface.fill(background);
++    surface.drawRect(surface.getRect(), ctWindowsBorder);
++    int MaxItem = MaxItemView-StartItem;
++    if ( (StartItem+MaxItemView) &gt; (int)List.size()) MaxItem  = List.size();
++    else MaxItem = StartItem+MaxItemView;
++    int row = 5;
++    for(PlayerID i = StartItem; i &lt; MaxItem; ++i)
++    {
++        if (SelectedItem == i) 
++        {
++            iRect r(1, row-3, size.x, row+ItemHeight-3);
++            surface.fillRect(r, ctTexteOver);
++        }
++        onPaint(i, row);
++        row += ItemHeight;
++    }
++}
++
++void tStringListBox::onPaint(int Index, int row)
++{
++    surface.bltString(5 , row, List[Index].text.c_str(), ctTexteNormal);
++}
++
++void tStringListBox::setColor(PIX newColor)
++{
++    background = newColor;
++    dirty = true;
++}
++
++void tStringListBox::setVscrollBar(tVScrollBar *newVScrollBar)
++{
++    VScrollBar = newVScrollBar;
++    if (VScrollBar)
++    {
++        VScrollBar-&gt;setLocation(position.x+size.x, position.y);
++        VScrollBar-&gt;setHeight(size.y);
++        VScrollBar-&gt;setStateChangedCallback(this);
++        VScrollBar-&gt;setMax(List.size()-MaxItemView);
++    }
++}
++
++void tStringListBox::stateChanged(Component* source)
++{
++    if (source == VScrollBar)
++    {
++        StartItem = VScrollBar-&gt;getPosition();
++        dirty = true;
++    }
++}
++
++void tStringListBox::Delete(int Index)
++{
++    if (Index &gt; (int)List.size())
++    {
++        List.erase(List.begin()+Index);
++        dirty = true;
++    }
++}
++
++int tStringListBox::IndexOf(const std::string S)
++{
++    for (int i = 0; i &lt; (int)List.size(); ++i)
++    {
++        if (S == List[i].text) return i;
++    }
++    return -1;
++}
++
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,76 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++#ifndef __tStringListBox_hpp__
++#define __tStringListBox_hpp__
++
++#include &lt;vector&gt;
++#include &lt;string&gt;
++#include &quot;Component.hpp&quot;
++#include &quot;MouseEvent.hpp&quot;
++#include &quot;Views/Components/StateChangedCallback.hpp&quot;
++#include &quot;Views/Components/tVScrollBar.hpp&quot;
++
++class StateChangedCallback;
++
++class DataItem
++{
++public:
++    std::string text;
++    void * Data;
++};
++
++class tStringListBox : public Component, public StateChangedCallback
++{
++protected:
++    std::vector&lt;DataItem&gt; List;
++
++private:
++    StateChangedCallback* callback;
++    
++    enum { ItemHeight = 14 };
++    
++    tVScrollBar *VScrollBar;
++    int StartItem;
++    int MaxItemView;
++    int SelectedItem;
++    virtual void render();
++    virtual void actionPerformed(const mMouseEvent &amp;me);
++public:
++
++    tStringListBox(iRect rect, StateChangedCallback* newcallback = 0);
++    virtual ~tStringListBox()
++    {}
++
++    virtual void setColor(PIX newColor);
++    virtual void setStateChangedCallback(StateChangedCallback* newcallback)
++    {
++        callback = newcallback;
++    }
++    virtual void setVscrollBar(tVScrollBar *newVScrollBar);
++    virtual void stateChanged(Component* source);
++    virtual void Add(const std::string S);
++    virtual void AddData(const std::string S, void * D);
++    virtual void Clear(){List.clear();dirty = true;}
++    virtual void Delete(int Index);
++    //virtual void Sort(){sort(List.begin(), List.end());dirty = true;}
++    virtual int IndexOf(const std::string S);
++    virtual int Count(){return List.size();}
++    virtual void onPaint(int Index, int row);
++}; 
++
++#endif 
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,216 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#include &quot;Views/Components/tVScrollBar.hpp&quot;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
++
++void tVScrollBar::initScrollBar()
++{
++    Surface bitmap;
++    bitmap.loadBMP(itScroll);
++    bRiseOver.grab(bitmap, iRect(bSize*4, bSize, bSize*5, bSize*2));
++    bRiseNormal.grab(bitmap, iRect(bSize*4, 0, bSize*5, bSize));
++    bUpOver.grab(bitmap, iRect(bSize*2, 0, bSize*3, bSize));
++    bUpNormal.grab(bitmap, iRect(bSize*3, 0, bSize*4, bSize));
++    bDownOver.grab(bitmap, iRect(0, 0, bSize, bSize));
++    bDownNormal.grab(bitmap, iRect(bSize, 0, bSize*2, bSize));
++    setLocation(iXY(0,0));
++    setSize(bSize, 0);
++
++    Position = 0;
++    Min = 0;
++    Max = 100;
++    RisePos = 0;
++    bRisestate = NORMAL;
++    bUpstate = NORMAL;
++    bDownstate = NORMAL;
++    background = ctWindowsbackground;
++    SmallChange = 1;
++    LargeChange = 10;
++}
++tVScrollBar::tVScrollBar()
++{
++    initScrollBar();
++}
++
++tVScrollBar::tVScrollBar(iXY pos, int Height, StateChangedCallback* newcallback)
++{
++    callback = newcallback;
++    setLocation(pos);
++    setSize(bSize, Height);
++    initScrollBar();
++    dirty = true;
++}
++
++void tVScrollBar::actionPerformed(const mMouseEvent &amp;me)
++{
++    if (!enabled) return;
++    iRect rect_button_up(position.x, position.y, position.x+bSize, position.y+bSize);
++    iRect rect_button_Down(position.x, position.y+size.y-bSize, position.x+bSize, position.y+size.y);
++    
++    if (rect_button_up.contains(iXY(me.getX(), me.getY())))
++    {
++        bUpstate = OVER;
++        dirty = true;
++        if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
++        {
++            bUpstate = PRESSED;
++            if (Position-SmallChange &gt; Min) setPosition(Position-SmallChange);
++            else setPosition(Min);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++    }
++    else
++    {
++        bUpstate = NORMAL;
++        dirty = true;
++    }
++
++    if (rect_button_Down.contains(iXY(me.getX(), me.getY())))
++    {
++        bDownstate = OVER;
++        dirty = true;
++        if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
++        {
++            bDownstate = PRESSED;
++            if (Position+SmallChange &lt; Max) setPosition(Position+SmallChange);
++            else setPosition(Max);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++    }
++    else
++    {
++        bDownstate = NORMAL;
++        dirty = true;
++    }
++
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
++    {
++        if (me.getY() &lt; (position.y+bSize+RisePos)) 
++        {
++            if (Position-LargeChange &gt; Min) setPosition(Position-LargeChange);
++            else setPosition(Min);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++        if (me.getY() &gt; (position.y+bSize+RisePos+bSize))
++        {
++            if (Position+LargeChange &lt; Max) setPosition(Position+LargeChange);
++            else setPosition(Max);
++            if(callback)
++                callback-&gt;stateChanged(this);
++            return;
++        }
++    }
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
++            || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED)
++    {
++        bRisestate = OVER;
++        dirty = true;
++        return;
++    }
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_EXITED)
++    {
++        bUpstate = NORMAL;
++        bDownstate = NORMAL;
++        bRisestate = NORMAL;
++        dirty = true;
++    }
++}
++
++void tVScrollBar::render()
++{
++    surface.fill(background);
++    surface.drawRect(surface.getRect(), ctWindowsBorder);
++    if (bUpstate == PRESSED)
++    {
++        bUpOver.bltTrans(surface, 1, 1);
++    }
++    else if (bUpstate == OVER)
++    {
++        bUpOver.bltTrans(surface, 0, 0);
++    } 
++    else
++    {
++        bUpNormal.bltTrans(surface, 0, 0);
++    }
++
++    if (bDownstate == PRESSED)
++    {
++        bDownOver.bltTrans(surface, 1, size.y-(bSize-1));
++    }
++    else if (bDownstate == OVER)
++    {
++        bDownOver.bltTrans(surface, 0, size.y-bSize);
++    } 
++    else
++    {
++        bDownNormal.bltTrans(surface, 0, size.y-bSize);
++    }
++    if (bRisestate == OVER)
++    {
++        bRiseOver.bltTrans(surface, 0,  bSize+RisePos);
++    } 
++    else
++    {
++        bRiseNormal.bltTrans(surface, 0,  bSize+RisePos);
++    }
++}
++
++void tVScrollBar::setPosition(int newPosition)
++{
++    Position = newPosition;
++
++    int R = Max - Min;
++    if (R == 0) RisePos = 0;
++    else RisePos = (((Position-Min) * (size.y-bSize*3))-1) / R+1 ;
++}
++
++void tVScrollBar::setMax(int newMax)
++{
++    Max = newMax;
++    if (Max &lt; 1) enabled = false;
++    else enabled = true;
++}
++
++void tVScrollBar::setMin(int newMin)
++{
++    Min = newMin;
++}
++
++void tVScrollBar::setColor(PIX newColor)
++{
++    background = newColor;
++    dirty = true;
++}
++
++void tVScrollBar::setHeight(int newHeight)
++{
++    setSize(bSize, newHeight);
++    dirty = true;
++}
++
++
++
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -0,0 +1,86 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++#ifndef __tVScrollBar_hpp__
++#define __tVScrollBar_hpp__
++
++#include &quot;Component.hpp&quot;
++#include &quot;MouseEvent.hpp&quot;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Components/StateChangedCallback.hpp&quot;
++
++class StateChangedCallback;
++
++class tVScrollBar : public Component
++{
++private:
++    enum BState
++    {
++        NORMAL =   0,
++        OVER   =   1,
++        PRESSED=   2,
++    } ;
++    StateChangedCallback* callback;
++    
++    BState bUpstate;
++    Surface bUpOver;
++    Surface bUpNormal;
++    
++    BState bDownstate;
++    Surface bDownOver;
++    Surface bDownNormal;
++    
++    BState bRisestate;
++    Surface bRiseOver;
++    Surface bRiseNormal;
++    
++    int RisePos;
++    int Position;
++    int Min;
++    int Max;
++    int LargeChange;
++    int SmallChange;
++    
++    enum { bSize = 19 };
++    
++    virtual void render();
++    virtual void actionPerformed(const mMouseEvent &amp;me);
++    void initScrollBar();
++public:
++
++    tVScrollBar();
++    tVScrollBar(iXY pos, int Height, StateChangedCallback* newcallback = 0);
++    virtual ~tVScrollBar()
++    {}
++
++    int getMin() {  return Min;}
++    int getMax() {return Max;}
++    int getPosition() {return Position;}
++    void setMin(int newMin);
++    void setMax(int newMax);
++    void setPosition(int newPosition);
++    void setColor(PIX newColor);
++    void setHeight(int newHeight);
++    void setSmallChange(int newSmallChange) {SmallChange =newSmallChange;}
++    void setLargeChange(int newLargeChange) {LargeChange = newLargeChange;}
++    void setStateChangedCallback(StateChangedCallback* newcallback)
++    {
++        callback = newcallback;
++    }
++}; 
++
++#endif 
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -22,231 +22,141 @@
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+-// HelpScrollView
+-//---------------------------------------------------------------------------
+ HelpScrollView::HelpScrollView() : SpecialButtonView()
+ {
+     setSearchName(&quot;HelpScrollView&quot;);
+     setTitle(&quot;Help Information&quot;);
+     setSubTitle(&quot;&quot;);
+-
+     setAllowResize(false);
+     setAllowMove(false);
+ 
+     moveTo(bodyTextRect.min);
+     resize(bodyTextRect.getSize());
++    iRect r(0, 0, bodyTextRect.getSizeX()-25, bodyTextRect.getSizeY()-20);
++    HelpBox = new tStringListBox(r, 0);
++    scrollBar = new tVScrollBar();
++    add(scrollBar);
++    HelpBox-&gt;setVscrollBar(scrollBar);
++    add(HelpBox);
++    HelpBox-&gt;Add(&quot;Key&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  LMC = Left Mouse Click&quot;);
++    HelpBox-&gt;Add(&quot;  RMC = Right Mouse Click&quot;);
++    HelpBox-&gt;Add(&quot;  RMH = Right Mouse Hold&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;Unit Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  LMC                              Selects a unit&quot;);
++    HelpBox-&gt;Add(&quot;  LMH                              Makes a bouding box for unit selection&quot;);
++    HelpBox-&gt;Add(&quot;  RMC                              De-selects all selected units&quot;);
++    HelpBox-&gt;Add(&quot;  LMC + Ctrl                       Directs (force/manual) fire of a unit&quot;);
++    HelpBox-&gt;Add(&quot;  LMC + Shift, LMC + Ctrl          Add unit to selection&quot;);
++    HelpBox-&gt;Add(&quot;  Ctrl + [0..9]                    Define a group of units&quot;);
++    HelpBox-&gt;Add(&quot;  [0..9]                           Recall a group of units&quot;);
++    HelpBox-&gt;Add(&quot;  [0..9] (2 times)                 Center view on a group of units&quot;);
++    //HelpBox-&gt;Add(&quot;  'E'                              Select all units on screen&quot;);
+ 
+-    insert(&quot;Key&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  LMC = Left Mouse Click&quot;);
+-    insert(&quot;  RMC = Right Mouse Click&quot;);
+-    insert(&quot;  RMH = Right Mouse Hold&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;Unit Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  LMC                              Selects a unit&quot;);
+-    insert(&quot;  LMH                              Makes a bouding box for unit selection&quot;);
+-    insert(&quot;  RMC                              De-selects all selected units&quot;);
+-    insert(&quot;  LMC + Ctrl                       Directs (force/manual) fire of a unit&quot;);
+-    insert(&quot;  LMC + Shift, LMC + Ctrl          Add unit to selection&quot;);
+-    insert(&quot;  Ctrl + [0..9]                    Define a group of units&quot;);
+-    insert(&quot;  [0..9]                           Recall a group of units&quot;);
+-    insert(&quot;  [0..9] (2 times)                 Center view on a group of units&quot;);
+-    //insert(&quot;  'E'                              Select all units on screen&quot;);
++    //HelpBox-&gt;Add(&quot;  LMC + 'T'............................Track the selected unit&quot;);
++    //HelpBox-&gt;Add(&quot;  LMC + 'W'............................Set the selected objective's way point&quot;);
++    HelpBox-&gt;Add(&quot;  RMH                              Fast map scroll&quot;);
++    //HelpBox-&gt;Add(&quot;  X....................................Scatter units&quot;);
++    //HelpBox-&gt;Add(&quot;  S....................................Stop units&quot;);
++    //HelpBox-&gt;Add(&quot;  LMC + Ctrl + Alt.....................Escort unit&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;Game Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  LMC + 'A'                        Allies with the clicked unit's team&quot;);
++    HelpBox-&gt;Add(&quot;  ESC                              In game menus&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;Outpost Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  'O'                              Toggle outpost names&quot;);
++    HelpBox-&gt;Add(&quot;  LMC on captured outpost          Displays the outpost view&quot;);
++    HelpBox-&gt;Add(&quot;  mouse drag on captured outpost   Select unit spawn point&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;Chat Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  Enter                            Send message to all&quot;);
++    HelpBox-&gt;Add(&quot;  Ctrl + 'A'                       Send message to allies&quot;);
++    HelpBox-&gt;Add(&quot;  'C'                              Send count down message&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;View Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  F1                               Help View&quot;);
++    HelpBox-&gt;Add(&quot;  'B'                              Toggle flag selection window&quot;);
++    HelpBox-&gt;Add(&quot;  'D'                              Damage View&quot;);
++    HelpBox-&gt;Add(&quot;  'F'                              Flag View&quot;);
++    HelpBox-&gt;Add(&quot;  'M'                              Mini Map View&quot;);
++    HelpBox-&gt;Add(&quot;  'N'                              Name View&quot;);
++    HelpBox-&gt;Add(&quot;  TAB                              Rank View&quot;);
++    HelpBox-&gt;Add(&quot;  RMH + mouse movement             Moves any view on the screen&quot;);
++    HelpBox-&gt;Add(&quot;  RMH + [1 - 5]                    Sets the background drawing mode&quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot;Mini Map View Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  RMH + [1 - 7]                    Sets the blending level of the minimap&quot;);
++    HelpBox-&gt;Add(&quot;  RMH + [+ or -]                   Scales the size of the minimap&quot;);
++    //HelpBox-&gt;Add(&quot;  RMH + 'O'                        Toggles outposts&quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot;System Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  ALT + Enter                      Toggle Fullscreen/Windowed mode&quot;);
++    HelpBox-&gt;Add(&quot;  F9                               BMP screen shot&quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot;Scripting&quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;Client Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  /listcommands                     List of available commands&quot;);
++    HelpBox-&gt;Add(&quot;  /countdown [timeout in seconds]   Generate a countdown&quot;);
++    HelpBox-&gt;Add(&quot;  /quit                             Quit the game&quot;);
++    HelpBox-&gt;Add(&quot;  /help                             Show Help window (same 'F1')&quot;);
++    HelpBox-&gt;Add(&quot;  /say [your talk]                  Send message to all (same 'Enter'&quot;);
++    HelpBox-&gt;Add(&quot;  /teamsay [your talk]              Send message to allies (same Ctrl + 'A')&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;Server Related&quot;);
++    HelpBox-&gt;Add(&quot;&quot;);
++    HelpBox-&gt;Add(&quot;  /server listcommands              List of Gameserver available commands&quot;);
++    HelpBox-&gt;Add(&quot;  /server adminlogin [password]     Gameserver admin login&quot;);
++    HelpBox-&gt;Add(&quot;  /server unitspawnlist [list]      List/set spawn units (number)&quot;);
++    HelpBox-&gt;Add(&quot;  /server unitprofiles [list]       List/set spawn units (types)&quot;);
++    HelpBox-&gt;Add(&quot;  /server help                      Show Help window (same 'F1')&quot;);
++    HelpBox-&gt;Add(&quot;  /server map [map name]            Restart game with the given map&quot;);
++    HelpBox-&gt;Add(&quot;  /server autokick [timeout]        Show/set autokick for inactive players&quot;);
++    HelpBox-&gt;Add(&quot;  /server flagtimer [timeout]       Show/set flag change timer&quot;);
++    HelpBox-&gt;Add(&quot;  /server countdown [timeout]       Generate a countdown (same 'c')&quot;);
++    HelpBox-&gt;Add(&quot;  /server say [your talk]           Server say something in chat&quot;);
++    HelpBox-&gt;Add(&quot;  /server listplayers               List players with the assigned number&quot;);
++    HelpBox-&gt;Add(&quot;  /server listprofiles              List available profiles&quot;);
++    HelpBox-&gt;Add(&quot;  /server kick [player number]      Kick a given player&quot;);
++    HelpBox-&gt;Add(&quot;  /server baselimit [max bases]     Show/set the max bases number per player&quot;);
++    HelpBox-&gt;Add(&quot;  /server gamepass [password]       Show/set game connection password&quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++    HelpBox-&gt;Add(&quot; &quot;);
++}
+ 
+-    //insert(&quot;  LMC + 'T'............................Track the selected unit&quot;);
+-    //insert(&quot;  LMC + 'W'............................Set the selected objective's way point&quot;);
+-    insert(&quot;  RMH                              Fast map scroll&quot;);
+-    //insert(&quot;  X....................................Scatter units&quot;);
+-    //insert(&quot;  S....................................Stop units&quot;);
+-    //insert(&quot;  LMC + Ctrl + Alt.....................Escort unit&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;Game Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  LMC + 'A'                        Allies with the clicked unit's team&quot;);
+-    insert(&quot;  ESC                              In game menus&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;Outpost Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  'O'                              Toggle outpost names&quot;);
+-    insert(&quot;  LMC on captured outpost          Displays the outpost view&quot;);
+-    insert(&quot;  mouse drag on captured outpost   Select unit spawn point&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;Chat Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  Enter                            Send message to all&quot;);
+-    insert(&quot;  Ctrl + 'A'                       Send message to allies&quot;);
+-    insert(&quot;  'C'                              Send count down message&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;View Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  F1                               Help View&quot;);
+-    insert(&quot;  'B'                              Toggle flag selection window&quot;);
+-    insert(&quot;  'D'                              Damage View&quot;);
+-    insert(&quot;  'F'                              Flag View&quot;);
+-    insert(&quot;  'M'                              Mini Map View&quot;);
+-    insert(&quot;  'N'                              Name View&quot;);
+-    insert(&quot;  TAB                              Rank View&quot;);
+-    insert(&quot;  RMH + mouse movement             Moves any view on the screen&quot;);
+-    insert(&quot;  RMH + [1 - 5]                    Sets the background drawing mode&quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot;Mini Map View Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  RMH + [1 - 7]                    Sets the blending level of the minimap&quot;);
+-    insert(&quot;  RMH + [+ or -]                   Scales the size of the minimap&quot;);
+-    //insert(&quot;  RMH + 'O'                        Toggles outposts&quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot;System Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  ALT + Enter                      Toggle Fullscreen/Windowed mode&quot;);
+-    insert(&quot;  F9                               BMP screen shot&quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot;Scripting&quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;Client Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  /listcommands                     List of available commands&quot;);
+-    insert(&quot;  /countdown [timeout in seconds]   Generate a countdown&quot;);
+-    insert(&quot;  /quit                             Quit the game&quot;);
+-    insert(&quot;  /help                             Show Help window (same 'F1')&quot;);
+-    insert(&quot;  /say [your talk]                  Send message to all (same 'Enter'&quot;);
+-    insert(&quot;  /teamsay [your talk]              Send message to allies (same Ctrl + 'A')&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;Server Related&quot;);
+-    insert(&quot;&quot;);
+-    insert(&quot;  /server listcommands              List of Gameserver available commands&quot;);
+-    insert(&quot;  /server adminlogin [password]     Gameserver admin login&quot;);
+-    insert(&quot;  /server unitspawnlist [list]      List/set spawn units (number)&quot;);
+-    insert(&quot;  /server unitprofiles [list]       List/set spawn units (types)&quot;);
+-    insert(&quot;  /server help                      Show Help window (same 'F1')&quot;);
+-    insert(&quot;  /server map [map name]            Restart game with the given map&quot;);
+-    insert(&quot;  /server autokick [timeout]        Show/set autokick for inactive players&quot;);
+-    insert(&quot;  /server flagtimer [timeout]       Show/set flag change timer&quot;);
+-    insert(&quot;  /server countdown [timeout]       Generate a countdown (same 'c')&quot;);
+-    insert(&quot;  /server say [your talk]           Server say something in chat&quot;);
+-    insert(&quot;  /server listplayers               List players with the assigned number&quot;);
+-    insert(&quot;  /server listprofiles              List available profiles&quot;);
+-    insert(&quot;  /server kick [player number]      Kick a given player&quot;);
+-    insert(&quot;  /server baselimit [max bases]     Show/set the max bases number per player&quot;);
+-    insert(&quot;  /server gamepass [password]       Show/set game connection password&quot;);
+-    insert(&quot; &quot;);
+-    insert(&quot; &quot;);
+-    //insert(&quot;  Alt + '-'                        Decrease brightness&quot;);
+-    //insert(&quot;  Alt + '='                        Increase brightness&quot;);
+-
+-    int CHAR_YPIX = Surface::getFontHeight();
+-    maxViewableItems = (getClientRect().getSizeY() - (TEXT_GAP_SPACE + CHAR_YPIX)) / (TEXT_GAP_SPACE + CHAR_YPIX) - 1;
+-    topViewableItem  = 0;
+-
+-    iXY size(20, 20);
+-    iXY pos(getClientRect().getSizeX() - size.x, 0);
+-
+-    upButton = new Button(&quot;upButton&quot;);
+-    upButton-&gt;setLabel(&quot;+&quot;);
+-    upButton-&gt;setLocation(pos.x, pos.y);
+-    upButton-&gt;setSize(size.x, size.y);
+-    upButton-&gt;setNormalBorder();
+-    add(upButton);
+-
+-    pos = iXY(getClientRect().getSizeX() - size.x, getClientRect().getSizeY() - size.y);
+-    downButton = new Button(&quot;downButton&quot;);
+-    downButton-&gt;setLabel(&quot;-&quot;);
+-    downButton-&gt;setLocation(pos.x, pos.y);
+-    downButton-&gt;setSize(size.x, size.y);
+-    downButton-&gt;setNormalBorder();
+-    add(downButton);
+-
+-} // end HelpScrollView::HelpScrollView
+-
+-// doDraw
+-//---------------------------------------------------------------------------
+ void HelpScrollView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+     if (Desktop::getVisible(&quot;GameView&quot;)) {
+         bltViewBackground(viewArea);
+     }
+ 
+-    drawHelpText(clientArea, 0, 0);
+-
+-    clientArea.bltString(   4,
+-                            clientArea.getHeight() - Surface::getFontHeight(),
+-                            &quot;Note: Use the right mouse button to accomplish fast mouse clicking.&quot;,
+-                            windowTextColor);
+-    //char strBuf[256];
+-    //sprintf(strBuf, &quot;%d&quot;, scrollBar-&gt;getValue());
+-    //clientArea.bltStringCenter(strBuf, Color::red);
+-
+     View::doDraw(viewArea, clientArea);
+ } // end HelpScrollView::doDraw
+ 
+-// drawHelpText
+-//--------------------------------------------------------------------------
+-void HelpScrollView::drawHelpText(Surface &amp;dest, const int &amp;, const int &amp;)
+-{
+-    PIX color   = windowTextColor;
+-
+-    //if (scrollBar != 0)
+-    //{
+-    //	int minView = scrollBar-&gt;getValue();
+-    //	int maxView = minView + scrollBar-&gt;getViewableAmount();
+-    //
+-    //	if(maxView &gt; scrollBar-&gt;getMaximum())
+-    //	{
+-    //		maxView = scrollBar-&gt;getMaximum();
+-    //	}
+-    //
+-    int curIndex = 0;
+-    for (int i = topViewableItem; i &lt; topViewableItem + maxViewableItems; i++) {
+-        dest.bltString(1, 6 + curIndex * (TEXT_GAP_SPACE +
+-                    Surface::getFontHeight()), text[i].c_str(), color);
+-        curIndex++;
+-    }
+-    //}
+-
+-} // end HelpScrollView::drawHelpText
+-
+-// insert
+-//--------------------------------------------------------------------------
+-void HelpScrollView::insert(const char *string)
+-{
+-    text.push_back(std::string(string));
+-} // end HelpScrollView::insert
+-
+-// actionPerformed
+-//--------------------------------------------------------------------------
+-void HelpScrollView::actionPerformed(mMouseEvent me)
+-{
+-    if ((me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED) ||
+-        (me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED))
+-    {
+-        if (me.getSource()==upButton) {
+-            if (--topViewableItem &lt; 0) {
+-                topViewableItem = 0;
+-            }
+-        } else if (me.getSource()==downButton) {
+-            if (++topViewableItem &gt;= (long) text.size() - maxViewableItems) {
+-                topViewableItem = (long) text.size() - maxViewableItems;
+-            }
+-        }
+-    }
+-
+-} // end HelpScrollView::actionPerformed
+-
+-// doActivate
+-//--------------------------------------------------------------------------
+ void HelpScrollView::doActivate()
+ {
+     /* empty */
+-} // end HelpScrollView::doActivate
++}
+ 
+ void HelpScrollView::processEvents()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -24,40 +24,24 @@
+ 
+ #include &quot;Views/MainMenu/SpecialButtonView.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+-#include &quot;Views/Components/ScrollBar.hpp&quot;
+ #include &quot;Views/Components/Button.hpp&quot;
++#include &quot;Views/Components/tStringListBox.hpp&quot;
++#include &quot;Views/Components/tVScrollBar.hpp&quot;
+ 
+ //---------------------------------------------------------------------------
+ class HelpScrollView : public SpecialButtonView
+ {
+ protected:
+-    int columns;
+-    int rows;
++    tVScrollBar *scrollBar;
++    tStringListBox *HelpBox;
+ 
+-    int  maxYOffset;
+-    void drawHelpText(Surface &amp;dest, const int &amp;x, const int &amp;y);
+-
+-    ScrollBar *scrollBar;
+-    std::vector&lt;std::string&gt; text;
+-
+-    enum { TEXT_GAP_SPACE = 3 };
+-    void insert(const char *string);
+-
+-    Button * upButton;
+-    Button * downButton;
+-
+-    int maxViewableItems;
+-    int topViewableItem;
+-
+ public:
+     HelpScrollView();
+     virtual ~HelpScrollView()
+     {
+-        delete scrollBar;
+     }
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+-    virtual void actionPerformed(mMouseEvent me);
+     virtual void doActivate();
+     virtual void processEvents();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -30,12 +30,9 @@
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Views/Components/tButton.hpp&quot;
+ #include &quot;Views/Theme.hpp&quot;
++#include &quot;Views/Components/tPlayerStateBox.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+-#include &quot;Resources/ResourceManager.hpp&quot;
+ 
+-static const char * stats_format = &quot;%-20s&quot;;
+-static Uint8 newteam = 0;
+-
+ PrepareTeam::PrepareTeam() : GameTemplateView()
+ {
+     setSearchName(&quot;PrepareTeam&quot;);
+@@ -67,19 +64,32 @@
+     rect.max.y = rect.min.y+330;
+ 
+     firstrect.min.x = rect.min.x+7;
+-    firstrect.min.y = rect.min.y+7;
+-    firstrect.max.x =  rect.min.x+200;
++    firstrect.min.y = rect.min.y+30;
++    firstrect.max.x =  rect.min.x+177;
+     firstrect.max.y = rect.max.y-7;
+ 
+-    secondrect.min.x = rect.max.x-207;
++    secondrect.min.x = rect.max.x-190;
+     secondrect.min.y = firstrect.min.y;
+-    secondrect.max.x = rect.max.x-7;
++    secondrect.max.x = rect.max.x-25;
+     secondrect.max.y = firstrect.max.y;
+     
+-    changebutton = tButton::createtButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+10, (firstrect.min.y+50)), (secondrect.min.x-firstrect.max.x)-20);
++    changebutton = tButton::createtButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+29, (firstrect.min.y+50)), (secondrect.min.x-firstrect.max.x)-39);
+     add(changebutton);
+-    readybutton = tButton::createtButton( &quot;ready&quot;, &quot;Ready&quot;, iXY(firstrect.max.x+10, (firstrect.min.y+85)), (secondrect.min.x-firstrect.max.x)-20);
++    readybutton = tButton::createtButton( &quot;ready&quot;, &quot;Ready&quot;, iXY(firstrect.max.x+29, (firstrect.min.y+85)), (secondrect.min.x-firstrect.max.x)-39);
+     add(readybutton);
++    scTeam1 = new tVScrollBar();
++    add(scTeam1);
++    StateTeam1 = new tPlayerStateBox(firstrect, 0);
++    StateTeam1-&gt;setVscrollBar(scTeam1);
++    StateTeam1-&gt;setShowTeam(0);
++    add(StateTeam1);
++
++    scTeam2 = new tVScrollBar();
++    add(scTeam2);
++    StateTeam2 = new tPlayerStateBox(secondrect, 0);
++    StateTeam2-&gt;setVscrollBar(scTeam2);
++    StateTeam2-&gt;setShowTeam(1);
++    add(StateTeam2);
+     loaded = true;
+ }
+ 
+@@ -89,12 +99,12 @@
+     clientArea.FillRoundRect(rect, 12, ctWindowsbackground);
+     clientArea.RoundRect(rect,12, ctWindowsBorder);
+ 
+-    clientArea.RoundRect(firstrect,10, TeamManager::getTeamColor(0));
+-    clientArea.RoundRect(secondrect,10, TeamManager::getTeamColor(1));
+     DrawInfo(clientArea);
+     drawTeams(clientArea);
+-    vsImage.bltTrans(clientArea, firstrect.max.x+15, firstrect.max.y-vsImage.getHeight()-10);
++    vsImage.bltTrans(clientArea, firstrect.max.x+40, firstrect.max.y-vsImage.getHeight()-10);
+     View::doDraw(viewArea, clientArea);
++    StateTeam1-&gt;UpdateState(true);
++    StateTeam2-&gt;UpdateState(true);
+ }
+ 
+ void PrepareTeam::DrawInfo(Surface &amp;dest)
+@@ -111,7 +121,7 @@
+     else
+     {
+         snprintf(statBuf, sizeof(statBuf), &quot;%d&quot;, GameControlRulesDaemon::getTeamCD());
+-        dest.bltString(firstrect.max.x+40 , firstrect.min.y+5, statBuf, ctTexteNormal);
++        dest.bltString(firstrect.max.x+60 , firstrect.min.y+5, statBuf, ctTexteNormal);
+     }
+     dest.bltString(start.x , start.y, &quot;Game:&quot;, ctTexteNormal);
+     dest.bltString(start.x+nextx , start.y, &quot;Map:&quot;, ctTexteNormal);
+@@ -166,19 +176,7 @@
+ {
+     char statBuf[256];
+ 
+-    states.clear();
+-    PlayerID i;
+-    for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
+-    {
+-        PlayerState* state = PlayerInterface::getPlayer(i);
+-        if( state-&gt;isActive() )
+-        {
+-            states.push_back(state);
+-        }
+-    }
+-    std::sort(states.begin(), states.end(), StatesSortByTeam());
+-
+-    int cur_line_pos = firstrect.min.y +10;
++    int cur_line_pos = rect.min.y +10;
+     snprintf(statBuf, sizeof(statBuf), &quot;Team: %-20s&quot;, TeamManager::getTeamName(0).c_str());
+     dest.bltString(firstrect.min.x+40, cur_line_pos, statBuf,TeamManager::getTeamColor(0));
+     TeamManager::drawFlag(0, dest, firstrect.min.x+10, cur_line_pos-2);
+@@ -190,55 +188,6 @@
+     cur_line_pos += 25;
+     dest.drawLine(firstrect.min.x+10, cur_line_pos-10, firstrect.max.x-10, cur_line_pos-10, TeamManager::getTeamColor(0));
+     dest.drawLine(secondrect.min.x+10, cur_line_pos-10, secondrect.max.x-10, cur_line_pos-10, TeamManager::getTeamColor(1));
+-
+-    int Start_x = firstrect.min.x+30;
+-    int current_Team = 0;
+-    Surface * flag = 0;
+-    PIX textcolor;
+-    for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+-            i != states.end(); ++i)
+-    {
+-        const PlayerState* state = *i;
+-
+-        if (current_Team != state-&gt;getTeamID())
+-        {
+-            cur_line_pos = firstrect.min.y +35;
+-            Start_x = secondrect.min.x+30;
+-            current_Team = state-&gt;getTeamID();
+-        }
+-        flag = ResourceManager::getFlag(state-&gt;getFlag());
+-        flag-&gt;blt( dest, Start_x-23, cur_line_pos-5 );
+-
+-        textcolor = ctTexteNormal;
+-        if (TeamManager::isPlayerReady(state-&gt;getID()))
+-            textcolor = ctTexteDisable;
+-        else if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+-            textcolor = ctTexteOver;
+-
+-        if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+-        {
+-            snprintf(statBuf, sizeof(statBuf),
+-                     stats_format, state-&gt;getName().substr(0,20).c_str());
+-            dest.bltString(Start_x, cur_line_pos, statBuf,textcolor);
+-            if (current_Team &gt; 0)
+-            {
+-                newteam=0;
+-                changebutton-&gt;setLabel(&quot;&lt;&lt;&quot;);
+-            }
+-            else
+-            {
+-                newteam=1;
+-                changebutton-&gt;setLabel(&quot;&gt;&gt;&quot;);
+-            }
+-        }
+-        else
+-        {
+-            snprintf(statBuf, sizeof(statBuf),
+-                     stats_format, state-&gt;getName().substr(0,20).c_str());
+-            dest.bltString(Start_x, cur_line_pos, statBuf,textcolor);
+-        }
+-        cur_line_pos += 20;
+-    }
+ }
+ void PrepareTeam::doActivate()
+ {
+@@ -274,7 +223,11 @@
+ {
+     if ( c == changebutton )
+     {
+-        TeamManager::PlayerrequestchangeTeam(PlayerInterface::getLocalPlayerIndex(), newteam);
++        
++        if (PlayerInterface::getLocalPlayer()-&gt;getTeamID() == 0)
++            TeamManager::PlayerrequestchangeTeam(PlayerInterface::getLocalPlayerIndex(), 1);
++        else 
++            TeamManager::PlayerrequestchangeTeam(PlayerInterface::getLocalPlayerIndex(), 0);
+     }
+     else if ( c == readybutton )
+     {
+@@ -297,3 +250,4 @@
+ 
+ 
+ 
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -23,9 +23,9 @@
+ #include &quot;GameTemplateView.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;Views/Components/tButton.hpp&quot;
++#include &quot;Views/Components/tVScrollBar.hpp&quot;
++#include &quot;Views/Components/tPlayerStateBox.hpp&quot;
+ 
+-class PlayerState;
+-
+ class PrepareTeam : public GameTemplateView
+ {
+ private:
+@@ -34,14 +34,16 @@
+     iRect firstrect;
+     iRect secondrect;
+     iRect rect;
+-    std::vector&lt;const PlayerState*&gt; states;
+     void drawTeams(Surface &amp;dest);
+     void DrawInfo(Surface &amp;dest);
+     iXY menuImageXY;
+     Surface menuImage, vsImage;
+     tButton * changebutton;
+     tButton * readybutton;
+-
++    tVScrollBar * scTeam1;
++    tPlayerStateBox * StateTeam1;
++    tVScrollBar * scTeam2;
++    tPlayerStateBox * StateTeam2;
+ public:
+     PrepareTeam();
+     virtual ~PrepareTeam()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -22,7 +22,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ iRect MenuRect(80, 80, 80+640, 80+470);
+-iRect bodyTextRect(MenuRect.min.x +10, MenuRect.min.y+10, MenuRect.max.x-10, MenuRect.max.y-132);
++iRect bodyTextRect(MenuRect.min.x +10, MenuRect.min.y+10, MenuRect.max.x-10, MenuRect.max.y-80);
+ iRect newsRect(bodyTextRect.min.x, bodyTextRect.max.y+10, bodyTextRect.max.x, MenuRect.max.y-10);
+ 
+ iXY mainPos(MenuRect.min.x+8, MenuRect.min.y-26);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -199,7 +199,7 @@
+         clientArea.RoundRect(MenuRect, 10, Color::gray);
+ 
+         //titlePackedSurface.blt(clientArea, bodyTextRect.min.x, 390);
+-        titlePackedSurface.bltBlend(clientArea, bodyTextRect.min.x, bodyTextRect.max.y-50, Palette::colorTable6040);
++        titlePackedSurface.bltBlend(clientArea, MenuRect.min.x, MenuRect.max.y-60, Palette::colorTable6040);
+     }
+ 
+     static char text[] =
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -23,10 +23,9 @@
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ #include &quot;Views/Components/CheckBox.hpp&quot;
+ #include &quot;Views/Components/Choice.hpp&quot;
+-#include &quot;Views/Components/StateChangedCallback.hpp&quot;
+ 
+ //--------------------------------------------------------------------------
+-class OptionsTemplateView : public MenuTemplateView, public StateChangedCallback
++class OptionsTemplateView : public MenuTemplateView
+ {
+ private:
+     int      selectedColorStartY;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Theme.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Theme.cpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Theme.cpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -1,5 +1,5 @@
+ /*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+  
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Theme.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Theme.hpp	2012-05-24 12:19:40 UTC (rev 1370)
++++ trunk/netpanzer/src/NetPanzer/Views/Theme.hpp	2012-06-05 11:55:17 UTC (rev 1371)
+@@ -29,6 +29,7 @@
+ 
+ // Image theme
+ #define itButton                    (&quot;pics/backgrounds/menus/buttons/default/b-black.bmp&quot;)
++#define itScroll                    (&quot;pics/backgrounds/menus/buttons/default/scrollbutton.bmp&quot;)
+ 
+     //TODO: Load theme from ini file
+ //void LoadNPTheme();
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000396.html">[Netpanzer-cvs] r1372 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#395">[ date ]</a>
+              <a href="thread.html#395">[ thread ]</a>
+              <a href="subject.html#395">[ subject ]</a>
+              <a href="author.html#395">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

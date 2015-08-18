@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1063 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1063%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Views/Game&In-Reply-To=%3C200809201643.m8KGhKH1005080%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000098.html">
+   <LINK REL="Next"  HREF="000100.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1063 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1063%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Views/Game&In-Reply-To=%3C200809201643.m8KGhKH1005080%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1063 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 20 18:43:20 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000098.html">[Netpanzer-cvs] r1062 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+        <LI>Next message: <A HREF="000100.html">[Netpanzer-cvs] r1064 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-20 18:43:06 +0200 (Sat, 20 Sep 2008)
+New Revision: 1063
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+Log:
+- Fix production bug, the window is closed automatically and the server refuses the message if the player doesn't own the outpost.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2008-09-20 15:47:51 UTC (rev 1062)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2008-09-20 16:43:06 UTC (rev 1063)
+@@ -52,19 +52,10 @@
+             UnitInterface::processNetPacket(packet);
+             break;
+ 
+-        case _net_message_id_term_unit_gen: {
+-            const TerminalOutpostUnitGenRequest* terminal_command
+-                = (const TerminalOutpostUnitGenRequest*) message;
+-            ObjectiveInterface::sendMessage( &amp;(terminal_command-&gt;unit_gen_request) );
++        case _net_message_id_term_unit_gen:
++        case _net_message_id_term_output_loc:
++            ObjectiveInterface::processTerminalNetPacket( packet );
+             break;
+-        }
+-
+-        case _net_message_id_term_output_loc: {
+-            const TerminalOutpostOutputLocRequest* terminal_command
+-                = (const TerminalOutpostOutputLocRequest*) message;
+-            ObjectiveInterface::sendMessage( &amp;(terminal_command-&gt;output_loc_request));
+-            break;
+-        }
+         default:
+             LOGGER.warning(&quot;unnown Terminal Message (id %d, player %u)&quot;,
+                     message-&gt;message_id, packet-&gt;fromPlayer);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2008-09-20 15:47:51 UTC (rev 1062)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2008-09-20 16:43:06 UTC (rev 1063)
+@@ -301,6 +301,12 @@
+ //--------------------------------------------------------------------------
+ void VehicleSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
++    if ( ObjectiveInterface::getObjectiveState(CURRENT_SELECTED_OUTPOST_ID)-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
++    {
++        Desktop::setVisibilityNoDoAnything(&quot;VehicleSelectionView&quot;, false);
++        changeMade = false;
++    }
++    
+     char strBuf[256];
+ 
+     const int color = Color::white;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000098.html">[Netpanzer-cvs] r1062 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+	<LI>Next message: <A HREF="000100.html">[Netpanzer-cvs] r1064 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

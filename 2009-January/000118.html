@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1086 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Interfaces NetPanzer/Resources NetPanzer/System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1086%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/Classes%20NetPanzer/Classes/Network%0A%09NetPanzer/Interfaces%20NetPanzer/Resources%20NetPanzer/System&In-Reply-To=%3C200901170904.n0H94L1w016808%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000117.html">
+   <LINK REL="Next"  HREF="000119.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1086 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Interfaces NetPanzer/Resources NetPanzer/System</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1086%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/Classes%20NetPanzer/Classes/Network%0A%09NetPanzer/Interfaces%20NetPanzer/Resources%20NetPanzer/System&In-Reply-To=%3C200901170904.n0H94L1w016808%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1086 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Interfaces NetPanzer/Resources NetPanzer/System">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan 17 10:04:21 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000117.html">[Netpanzer-cvs] r1085 - in trunk/netpanzer: . mk/jam support/icon
+</A></li>
+        <LI>Next message: <A HREF="000119.html">[Netpanzer-cvs] r1087 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Util src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#118">[ date ]</a>
+              <a href="thread.html#118">[ thread ]</a>
+              <a href="subject.html#118">[ subject ]</a>
+              <a href="author.html#118">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-01-17 10:04:05 +0100 (Sat, 17 Jan 2009)
+New Revision: 1086
+
+Modified:
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+Log:
+- fixed: when opening files (for read) if the original file name is not found, try to open the file ignoring the case.
+- fixed: removed directx support when starting game, some players had wrong colors.
+- fixed: server was always synchronizing flags of already disconnected players to the new players.
+- fixed: creating a player server (not dedicated) the player always shaw his flag as black.
+- fixed: when press left mouse button to select tanks, then press control, release mouse button, the selection window remains open, now is ok.
+- removed unused variables on WorldInputCmdProcessor
+
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -149,8 +149,47 @@
+ {
+     PHYSFS_file* file = PHYSFS_openRead(filename);
+     if(!file)
+-        throw Exception(&quot;couldn't open file '%s' for reading: %s&quot;, filename,
++    {
++        int fn_length = strlen(filename)+1;
++        char fn[fn_length];
++        memcpy(fn, filename, fn_length); // includes \0;
++
++        char * folder_sep = strrchr(fn, '/');
++        char * fn_start = fn;
++        char ** filelist = 0;
++        if ( folder_sep )
++        {
++            *folder_sep = 0;
++            filelist = enumerateFiles(fn);
++            *folder_sep = '/';
++            fn_start = folder_sep+1;
++        }
++        else
++        {
++            filelist = enumerateFiles(&quot;.&quot;);
++            folder_sep = fn;
++        }
++
++        if ( filelist )
++        {
++            for(char** curfile = filelist; *curfile != 0; curfile++)
++            {
++                if ( strcasecmp(*curfile, fn_start) == 0 )
++                {
++                    memcpy(fn_start, *curfile, fn_length-(folder_sep-fn));
++                    file = PHYSFS_openRead(filename);
++                    break;
++                }
++            }
++            freeList(filelist);
++        }
++
++        if ( !file )
++        {
++            throw Exception(&quot;couldn't open file '%s' for reading: %s&quot;, filename,
+                         PHYSFS_getLastError());
++        }
++    }
+ 
+     return new ReadFile(file);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -388,13 +388,16 @@
+     {
+         if ( PlayerInterface::syncNextPlayerState( msg.player_state, &amp;percent_complete) )
+         {
++            if ( msg.player_state.getStatus() != _player_state_free )
++            {
++                flagmsg.setFlagID(msg.player_state.getFlag());
++                ResourceManager::getFlagSyncData(flagmsg.getFlagID(), (Uint8*)&amp;flagmsg.flagdata);
++                memcpy(buffer+buffer_pos, &amp;flagmsg, sizeof(flagmsg));
++                buffer_pos += sizeof(flagmsg);
++            }
++            
+             memcpy(buffer+buffer_pos, &amp;msg, sizeof(PlayerStateSync));
+             buffer_pos += sizeof(PlayerStateSync);
+-            
+-            flagmsg.setFlagID(msg.player_state.getFlag());
+-            ResourceManager::getFlagSyncData(flagmsg.getFlagID(), (Uint8*)&amp;flagmsg.flagdata);
+-            memcpy(buffer+buffer_pos, &amp;flagmsg, sizeof(flagmsg));
+-            buffer_pos += sizeof(flagmsg);
+         }     
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -42,6 +42,10 @@
+     {
+         return flag;
+     }
++    Uint8 getStatus()
++    {
++        return status;
++    }
+ 
+ private:
+     NetworkPlayerState() 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -75,8 +75,6 @@
+ 
+     selection_box_active = false;
+     outpost_goal_selection = OBJECTIVE_NONE;
+-    previous_manual_control_state = false;
+-    manual_control_state = false;
+     manual_fire_state = false;
+ 
+     right_mouse_scroll = false;
+@@ -179,7 +177,7 @@
+     if (selection_box_active)
+         return _cursor_regular;
+ 
+-    if( (manual_control_state == true) || (manual_fire_state == true) )
++    if( manual_fire_state == true )
+     {
+         return  _cursor_enemy_unit;
+     }
+@@ -420,8 +418,6 @@
+     evaluateGroupingKeys();
+ 
+     evaluateKeyCommands();
+-
+-    previous_manual_control_state = manual_control_state;
+ }
+ 
+ void
+@@ -572,9 +568,11 @@
+ 
+     WorldViewInterface::clientXYtoWorldXY(world_win, event.pos, &amp;world_pos);
+ 
+-    if ( (manual_control_state == true) ||
+-            KeyboardInterface::getKeyState( SDLK_LCTRL ) ||
+-            KeyboardInterface::getKeyState( SDLK_RCTRL )
++    if ( (!selection_box_active)
++         &amp;&amp; ( manual_fire_state == true
++              || KeyboardInterface::getKeyState( SDLK_LCTRL )
++              || KeyboardInterface::getKeyState( SDLK_RCTRL )
++            )
+        )
+     {
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -41,8 +41,6 @@
+     bool right_mouse_scroll_moved;
+     bool selectBoundBoxUnits();
+ 
+-    bool manual_control_state;
+-    bool previous_manual_control_state;
+     bool manual_fire_state;
+ 
+     /// timer that detects double keypressed (for centering selected unit group)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -368,7 +368,10 @@
+     player_state = PlayerInterface::allocateLoopBackPlayer();
+     const char* playername = gameconfig-&gt;playername.c_str();
+     player_state-&gt;setName(playername);
+-    player_state-&gt;setFlag(0);
++    ResourceManager::loadDefaultFlags();
++    Uint8 flagdata[20*14]; // XXX shouldn't use fixed values
++    ResourceManager::getFlagData(gameconfig-&gt;playerflag.c_str(), (Uint8 *)&amp;flagdata);
++    player_state-&gt;setFlag(ResourceManager::registerFlagFromData(flagdata));
+     
+     //GameManager::spawnPlayer( PlayerInterface::getLocalPlayerIndex() );
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -58,7 +58,6 @@
+     return &noimage;
+ }
+         
+-// actually loads all the flags.
+ int
+ ResourceManager::loadDefaultFlags()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2009-01-13 15:31:51 UTC (rev 1085)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2009-01-17 09:04:05 UTC (rev 1086)
+@@ -32,10 +32,13 @@
+ SDLVideo::SDLVideo()
+         : frontBuffer(0), backBuffer(0)
+ {
+-#ifdef _WIN32
++    // disable directx feature for now
++#if 0
++  #ifdef _WIN32
+     if ( gameconfig-&gt;usedirectx ) {
+         putenv(&quot;SDL_VIDEODRIVER=directx&quot;);
+     }
++  #endif
+ #endif
+     if(SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+         throw Exception(&quot;Couldn't initialize SDL_video subsystem: %s&quot;,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000117.html">[Netpanzer-cvs] r1085 - in trunk/netpanzer: . mk/jam support/icon
+</A></li>
+	<LI>Next message: <A HREF="000119.html">[Netpanzer-cvs] r1087 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Util src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#118">[ date ]</a>
+              <a href="thread.html#118">[ thread ]</a>
+              <a href="subject.html#118">[ subject ]</a>
+              <a href="author.html#118">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1031 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1031%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Interfaces%20NetPanzer/Views/Game&In-Reply-To=%3C200805191205.m4JC5xbw014335%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000072.html">
+   <LINK REL="Next"  HREF="000074.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1031 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1031%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Interfaces%20NetPanzer/Views/Game&In-Reply-To=%3C200805191205.m4JC5xbw014335%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1031 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon May 19 14:05:59 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000072.html">[Netpanzer-cvs] r1030 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000074.html">[Netpanzer-cvs] r1032 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-05-19 14:04:37 +0200 (Mon, 19 May 2008)
+New Revision: 1031
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Palette.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+Log:
+- fix crash in server(switch map) and bot (start)
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.hpp	2008-05-12 12:42:24 UTC (rev 1030)
++++ trunk/netpanzer/src/Lib/2D/Palette.hpp	2008-05-19 12:04:37 UTC (rev 1031)
+@@ -98,6 +98,10 @@
+     static void loadACT(const std::string&amp; filename);
+     static Uint8 findNearestColor(int r, int g, int b, const bool &amp;ignoreIndexZero = false);
+     static void init(const std::string&amp; name);
++    static std::string getName()
++    {
++        return name;
++    }
+     static void setColors();
+     static void setColorTables();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-05-12 12:42:24 UTC (rev 1030)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-05-19 12:04:37 UTC (rev 1031)
+@@ -149,8 +149,10 @@
+ 
+ void GameManager::loadPalette(const std::string&amp; palette_name)
+ {
+-    Palette::init(palette_name);
+-    Screen-&gt;setPalette(Palette::color);
++    if ( Screen ) {
++        Palette::init(palette_name);
++        Screen-&gt;setPalette(Palette::color);
++    }
+ }
+ 
+ // ******************************************************************
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-05-12 12:42:24 UTC (rev 1030)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-05-19 12:04:37 UTC (rev 1031)
+@@ -98,12 +98,12 @@
+                     drawLargeUnitDot( map_surface, map_loc, Color::yellow );
+                 }
+             } else {
+-                PIX *unit_color=&amp;player_unit_color;
+-                if(unit_state.select) { unit_color=&amp;selected_unit_color; }
++                PIX unit_color=player_unit_color;
++                if(unit_state.select) { unit_color=selected_unit_color; }
+                 if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_small) {
+-                    drawSmallUnitDot( map_surface, map_loc, *unit_color );
++                    drawSmallUnitDot( map_surface, map_loc, player_unit_color );
+                 } else if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_large) {
+-                    drawLargeUnitDot( map_surface, map_loc, *unit_color );
++                    drawLargeUnitDot( map_surface, map_loc, unit_color );
+                 } else {
+                     assert(false);
+                 }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2008-05-12 12:42:24 UTC (rev 1030)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2008-05-19 12:04:37 UTC (rev 1031)
+@@ -11,6 +11,10 @@
+ 
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
++#include &quot;2D/Palette.hpp&quot;
++#include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
+ 
+ list&lt;string&gt; LoadingView::lines;
+ bool LoadingView::dirty = true;
+@@ -50,10 +54,15 @@
+ void
+ LoadingView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
++    if ( Palette::getName() != &quot;netpmenu&quot; )
++    {
++        GameManager::loadPalette(&quot;netpmenu&quot;);
++    }
++    
+     if (dirty)
+         render();
+     
+-    //screen-&gt;fill(Color::black);
++    screen-&gt;fill(Color::black);
+     backgroundSurface.blt(clientArea, 0, 0);
+     surface.blt(clientArea, 179, 153);
+     
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000072.html">[Netpanzer-cvs] r1030 -	trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000074.html">[Netpanzer-cvs] r1032 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

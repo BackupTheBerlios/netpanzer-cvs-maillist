@@ -1,0 +1,2926 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1220 - in trunk/netpanzer/src: Lib/2D Lib/optionmm	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Core NetPanzer/Interfaces NetPanzer/Network	NetPanzer/Objectives NetPanzer/Scripts NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1220%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%20Lib/optionmm%0A%09NetPanzer/Bot%20NetPanzer/Classes%20NetPanzer/Classes/Network%0A%09NetPanzer/Core%20NetPanzer/Interfaces%20NetPanzer/Network%0A%09NetPanzer/Objectives%20NetPanzer/Scripts%20NetPanzer/Units%0A%09NetPanzer/Views/Components%20NetPanzer/Views/Game&In-Reply-To=%3C201006051455.o55EtcbX013121%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000245.html">
+   <LINK REL="Next"  HREF="000247.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1220 - in trunk/netpanzer/src: Lib/2D Lib/optionmm	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Core NetPanzer/Interfaces NetPanzer/Network	NetPanzer/Objectives NetPanzer/Scripts NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1220%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%20Lib/optionmm%0A%09NetPanzer/Bot%20NetPanzer/Classes%20NetPanzer/Classes/Network%0A%09NetPanzer/Core%20NetPanzer/Interfaces%20NetPanzer/Network%0A%09NetPanzer/Objectives%20NetPanzer/Scripts%20NetPanzer/Units%0A%09NetPanzer/Views/Components%20NetPanzer/Views/Game&In-Reply-To=%3C201006051455.o55EtcbX013121%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1220 - in trunk/netpanzer/src: Lib/2D Lib/optionmm	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Core NetPanzer/Interfaces NetPanzer/Network	NetPanzer/Objectives NetPanzer/Scripts NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun  5 16:55:38 CEST 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000245.html">[Netpanzer-cvs] r1219 - in trunk/netpanzer/src/NetPanzer:	Interfaces Particles Views/Components	Views/MainMenu/Multi/MasterServer
+</A></li>
+        <LI>Next message: <A HREF="000247.html">[Netpanzer-cvs] r1221 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-06-05 16:54:18 +0200 (Sat, 05 Jun 2010)
+New Revision: 1220
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Span.cpp
+   trunk/netpanzer/src/Lib/optionmm/option.hpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+- removed some compilation warnings
+- removed the player alliances
+- player ids are smaller
+
+Modified: trunk/netpanzer/src/Lib/2D/Span.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Span.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/Lib/2D/Span.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -45,7 +45,8 @@
+ 
+     int stepDecPart = stepAndDecCount&gt;&gt;16;
+     int stepCount=srcX1FracWithCount&gt;&gt;16;
+-    for(int i=0;i&lt;srcX1FracWithCount&amp;0xffff;i++) {
++    for(int i=0; i &lt; (srcX1FracWithCount&amp;0xffff); i++)
++    {
+         dRow[i] = table[(dRow[i]&lt;&lt;8)+*sRow];
+         sRow+=stepWholePart;
+         stepCount+=stepDecPart;
+@@ -76,7 +77,8 @@
+     } // Remove for release candidate.
+     int stepDecPart = stepAndDecCount&gt;&gt;16;
+     int stepCount=srcX1FracWithCount&gt;&gt;16;
+-    for(int i=0;i&lt;srcX1FracWithCount&amp;0xffff;i++) {
++    for(int i=0; i &lt; (srcX1FracWithCount&amp;0xffff); i++)
++    {
+         dRow[i] = *sRow;
+         sRow+=stepWholePart;
+         stepCount+=stepDecPart;
+
+Modified: trunk/netpanzer/src/Lib/optionmm/option.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/optionmm/option.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/Lib/optionmm/option.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -257,7 +257,7 @@
+ inline void option&lt;Type,arg,multi,Convert,Toggle&gt;::push(const value_type&amp; v,
+         int pos)
+ {
+-    if (!many_values() || _values.size() == 1 &amp;&amp; !_got_one) {
++    if (!many_values() || (_values.size() == 1 &amp;&amp; !_got_one) ) {
+         _got_one = true;
+         _values[0] = v;
+         if (_positions.size() &lt;= 0) _positions.push_back(pos);
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -45,8 +45,9 @@
+     void
+ BotPlayer::processEvents()
+ {
+-    int playerIndex = isReady();
+-    if (playerIndex != NONE_PLAYER) {
++    PlayerID playerIndex = isReady();
++    if ( playerIndex != INVALID_PLAYER_ID )
++    {
+         UnitBase *unit = getRandomUnit(playerIndex);
+         if (unit) {
+             int unitTask = m_tasks.queryUnitTask(unit);
+@@ -74,13 +75,14 @@
+  * Whether is time to make action.
+  * @return playerIndex or NONE_PLAYER
+  */
+-   int 
++PlayerID
+ BotPlayer::isReady()
+ {
+-    int playerIndex = NONE_PLAYER;
++    PlayerID playerIndex = INVALID_PLAYER_ID;
+     if (m_timer.count()) {
+         playerIndex = PlayerInterface::getLocalPlayerIndex();
+-        if (playerIndex != NONE_PLAYER) {
++        if ( playerIndex != INVALID_PLAYER_ID )
++        {
+             int unitCount = UnitInterface::getUnitCount(playerIndex);
+             if (unitCount &gt; 0) {
+                 m_timer.changePeriod(5.0 / unitCount);
+@@ -95,7 +97,7 @@
+  * @return unit which belong to playerIndex
+  */
+ UnitBase *
+-BotPlayer::getRandomUnit(int playerIndex)
++BotPlayer::getRandomUnit(PlayerID playerIndex)
+ {
+     const std::vector&lt;UnitBase*&gt;&amp; units 
+         = UnitInterface::getPlayerUnits(playerIndex);
+@@ -115,14 +117,16 @@
+ BotPlayer::getEnemyPlayers()
+ {
+     playerList_t players;
+-    int localIndex = PlayerInterface::getLocalPlayerIndex();
+-    int max_players = PlayerInterface::getMaxPlayers();
+-
+-    for (int player_index = 0; player_index &lt; max_players; player_index++) {
++    PlayerID localIndex = PlayerInterface::getLocalPlayerIndex();
++    PlayerID max_players = PlayerInterface::getMaxPlayers();
++    PlayerID player_index;
++    for ( player_index = 0; player_index &lt; max_players; ++player_index)
++    {
+         if (PlayerInterface::getPlayer(player_index)-&gt;getStatus() ==
+                 _player_state_active
+                 &amp;&amp; localIndex != player_index
+-                &amp;&amp; !PlayerInterface::isAllied(localIndex, player_index))
++//                &amp;&amp; !PlayerInterface::isAllied(localIndex, player_index) // XXX ALLY
++            )
+         {
+             players.push_back(player_index);
+         }
+@@ -133,10 +137,10 @@
+ /**
+  * @return playerIndex or NONE_PLAYER
+  */
+-int
++PlayerID
+ BotPlayer::getRandomEnemyPlayer()
+ {
+-    int result = NONE_PLAYER;
++    PlayerID result = INVALID_PLAYER_ID;
+     playerList_t players = getEnemyPlayers();
+     if (players.size() &gt; 0) {
+         result = players[rand() % players.size()];
+@@ -151,8 +155,9 @@
+ BotPlayer::getRandomEnemy()
+ {
+     UnitBase *enemyUnit = 0;
+-    int enemyPlayer = getRandomEnemyPlayer();
+-    if (enemyPlayer != NONE_PLAYER) {
++    PlayerID enemyPlayer = getRandomEnemyPlayer();
++    if (enemyPlayer != INVALID_PLAYER_ID)
++    {
+         enemyUnit = getRandomUnit(enemyPlayer);
+     }
+     return enemyUnit;
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -26,22 +26,21 @@
+ class Objective;
+ 
+ #include &lt;vector&gt;
+-typedef std::vector&lt;int&gt; playerList_t;
++typedef std::vector&lt;PlayerID&gt; playerList_t;
+ typedef std::vector&lt;ObjectiveID&gt; outpostList_t;
+ 
+ class BotPlayer : public Bot {
+     private:
+-        static const int NONE_PLAYER = 0xFFFF;
+         Timer m_timer;
+     public:
+         BotPlayer();
+         virtual void processEvents();
+ 
+-        int isReady();
+-        UnitBase *getRandomUnit(int playerIndex);
++        PlayerID isReady();
++        UnitBase *getRandomUnit(PlayerID playerIndex);
+ 
+         playerList_t getEnemyPlayers();
+-        int getRandomEnemyPlayer();
++        PlayerID getRandomEnemyPlayer();
+         UnitBase *getRandomEnemy();
+ 
+         void unitOccupyOupost(UnitBase *unit);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -222,7 +222,7 @@
+ class ConnectMesgNetPanzerClientDisconnect : public NetMessage
+ {
+ private:
+-    Uint16 player_id;
++    PlayerID player_id;
+ 
+ public:
+     ConnectMesgNetPanzerClientDisconnect()
+@@ -231,13 +231,13 @@
+         message_id = _net_message_id_connect_netPanzer_client_disconnect;
+     }
+ 
+-    void setPlayerID(Uint16 id)
++    void setPlayerID(PlayerID id)
+     {
+-        player_id = htol16(id);
++        player_id = id;
+     }
+-    Uint16 getPlayerID() const
++    PlayerID getPlayerID() const
+     {
+-        return ltoh16(player_id);
++        return player_id;
+     }
+ } __attribute__((packed));
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -31,7 +31,7 @@
+     resetEncoder();
+ }
+ 
+-NetMessageEncoder::NetMessageEncoder(Uint16 player_index)
++NetMessageEncoder::NetMessageEncoder(PlayerID player_index)
+ {
+     usePlayerID = true;
+     sendAsClient = false;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -25,13 +25,13 @@
+ private:
+     bool sendAsClient;
+     bool usePlayerID;
+-    Uint16 player;
++    PlayerID player;
+     MultiMessage encode_message;
+     unsigned long encode_message_index;
+ 
+ public:
+     NetMessageEncoder(bool sendAsClient = false);
+-    NetMessageEncoder(Uint16 player_index);
++    NetMessageEncoder(PlayerID player_index);
+     ~NetMessageEncoder();
+     
+     void resetEncoder();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacket.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -21,6 +21,7 @@
+ #include &lt;string.h&gt;
+ 
+ #include &quot;Util/Endian.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;NetMessage.hpp&quot;
+ 
+ static const Uint16 _MAX_NET_PACKET_SIZE=512;
+@@ -32,7 +33,7 @@
+ class NetPacket
+ {
+ public:
+-    Uint16 fromPlayer;
++    PlayerID fromPlayer;
+     ClientSocket *fromClient;
+ 
+     Uint8  data[ _MAX_NET_PACKET_SIZE ];
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -22,7 +22,7 @@
+ #include &quot;NetworkInterface.hpp&quot;
+ 
+ void EnqueueIncomingPacket( const void *data, Uint16 size,
+-                            Uint16 fromPlayer, ClientSocket *fromClient)
++                            PlayerID fromPlayer, ClientSocket *fromClient)
+ {
+     static NetPacket TEMP_PACKET;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -21,7 +21,7 @@
+ #include &quot;NetPacketQueues.hpp&quot;
+ 
+ void EnqueueIncomingPacket( const void *data, Uint16 size,
+-                            Uint16 fromPlayer, ClientSocket *fromClient);
++                            PlayerID fromPlayer, ClientSocket *fromClient);
+ 
+ class NetworkInterface
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -185,7 +185,7 @@
+ }
+ 
+ void
+-NetworkServer::sendMessage(Uint16 player_index, NetMessage* message,
++NetworkServer::sendMessage(const PlayerID player_index, NetMessage* message,
+         size_t size)
+ {
+     if( socket == 0 )
+@@ -272,7 +272,7 @@
+ }
+ 
+ std::string
+-NetworkServer::getIP(Uint16 player_index)
++NetworkServer::getIP(const PlayerID player_index)
+ {
+     ClientList::iterator i = client_list.begin();
+     while ( i != client_list.end() )
+@@ -361,7 +361,7 @@
+         NetworkInterface::receive_queue.front = frontsave;
+     }
+     
+-    Uint16 player_index = s-&gt;getPlayerIndex();
++    PlayerID player_index = s-&gt;getPlayerIndex();
+     
+     ClientList::iterator i = client_list.begin();
+     while ( i != client_list.end() )
+@@ -375,7 +375,7 @@
+         ++i;
+     }
+     
+-    if ( player_index != 0xffff )
++    if ( player_index != INVALID_PLAYER_ID )
+     {
+         PlayerState * player = PlayerInterface::getPlayer(player_index);
+         if ( player &amp;&amp; sendalert )
+@@ -412,7 +412,7 @@
+ }
+ 
+ ClientSocket *
+-NetworkServer::getClientSocketByPlayerIndex ( Uint16 index )
++NetworkServer::getClientSocketByPlayerIndex ( const PlayerID index )
+ {
+     ClientList::iterator i = client_list.begin();
+     while ( i != client_list.end() )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -74,7 +74,7 @@
+ 
+     void broadcastMessage(NetMessage *message, size_t size);
+     
+-    void sendMessage(Uint16 player_index, NetMessage* message,
++    void sendMessage(const PlayerID player_index, NetMessage* message,
+             size_t size);
+         
+     void sendRemaining();
+@@ -83,9 +83,9 @@
+ 
+     void dropClient(ClientSocket * client);
+     
+-    ClientSocket * getClientSocketByPlayerIndex ( Uint16 index );
++    ClientSocket * getClientSocketByPlayerIndex ( const PlayerID index );
+ 
+-    std::string getIP(Uint16 player_index);
++    std::string getIP(const PlayerID player_index);
+ 
+ protected:
+     TCPSocketObserver * onNewConnection(TCPListenSocket *so,const Address &amp;fromaddr);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -104,7 +104,7 @@
+ {
+ private:
+     ObjectiveID objective_id;
+-    Uint16 player_id;
++    PlayerID player_id;
+ 
+ public:
+     ObjectiveOccupationUpdate()
+@@ -113,10 +113,10 @@
+         message_id = _net_message_id_occupation_status_update;
+     }
+ 
+-    void set(ObjectiveID id, Uint16 player_id)
++    void set(ObjectiveID id, PlayerID player_id)
+     {
+         objective_id = ObjectiveID_toPortable(id);
+-        this-&gt;player_id = htol16(player_id);
++        this-&gt;player_id = player_id;
+     }
+ 
+     ObjectiveID getObjectiveId() const
+@@ -124,25 +124,25 @@
+         return ObjectiveID_fromPortable(objective_id);
+     }
+ 
+-    Uint16 getPlayerId() const
++    PlayerID getPlayerId() const
+     {
+-        return ltoh16(player_id);
++        return player_id;
+     }
+ }__attribute__((packed));
+ 
+ class ObjectiveSyncData
+ {
+ public:
+-    Uint16 player_id;
++    PlayerID player_id;
+ 
+-    void set(Uint16 player_id)
++    void set(PlayerID player_id)
+     {
+-        this-&gt;player_id = htol16(player_id);
++        this-&gt;player_id = player_id;
+     }
+ 
+-    Uint16 getPlayerId() const
++    PlayerID getPlayerId() const
+     {
+-        return ltoh16(player_id);
++        return player_id;
+     }
+ 
+ }__attribute__((packed));
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -68,8 +68,8 @@
+ class PlayerScoreUpdate : public NetMessage
+ {
+ private:
+-    Uint16 kill_by_player_index;
+-    Uint16 kill_on_player_index;
++    PlayerID kill_by_player_index;
++    PlayerID kill_on_player_index;
+ public:
+     Uint8  unit_type;
+ 
+@@ -79,29 +79,29 @@
+         message_id = _net_message_id_player_score_update;
+     }
+ 
+-    void set(Uint16 kill_by_index, Uint16 kill_on_index, Uint8 unit_type)
++    void set(PlayerID kill_by_index, PlayerID kill_on_index, Uint8 unit_type)
+     {
+-        kill_by_player_index = htol16(kill_by_index);
+-        kill_on_player_index = htol16(kill_on_index);
++        kill_by_player_index = kill_by_index;
++        kill_on_player_index = kill_on_index;
+         this-&gt;unit_type = unit_type;
+     }
+ 
+-    void setKillByPlayerIndex(Uint16 kill_by_index)
++    void setKillByPlayerIndex(PlayerID kill_by_index)
+     {
+-        kill_by_player_index = htol16(kill_by_index);
++        kill_by_player_index = kill_by_index;
+     }
+-    Uint16 getKillByPlayerIndex() const
++    PlayerID getKillByPlayerIndex() const
+     {
+-        return ltoh16(kill_by_player_index);
++        return kill_by_player_index;
+     }
+ 
+-    void setKillOnPlayerIndex(Uint16 kill_on_index)
++    void setKillOnPlayerIndex(PlayerID kill_on_index)
+     {
+-        kill_on_player_index = htol16(kill_on_index);
++        kill_on_player_index = kill_on_index;
+     }
+-    Uint16 getKillOnPlayerIndex() const
++    PlayerID getKillOnPlayerIndex() const
+     {
+-        return ltoh16(kill_on_player_index);
++        return kill_on_player_index;
+     }
+ }
+ __attribute__((packed));
+@@ -114,8 +114,8 @@
+ class PlayerAllianceRequest : public NetMessage
+ {
+ private:
+-    Uint16 allie_by_player_index;
+-    Uint16 allie_with_player_index;
++    PlayerID allie_by_player_index;
++    PlayerID allie_with_player_index;
+ public:
+     Uint8  alliance_request_type;
+ 
+@@ -125,20 +125,20 @@
+         message_id = _net_message_id_player_alliance_request;
+     }
+ 
+-    void set(Uint16 allie_by_player_index, Uint16 allie_with_player_index,
++    void set(PlayerID allie_by_player_index, PlayerID allie_with_player_index,
+             Uint8 alliance_request_type)
+     {
+-        this-&gt;allie_by_player_index = htol16(allie_by_player_index);
+-        this-&gt;allie_with_player_index = htol16(allie_with_player_index);
++        this-&gt;allie_by_player_index = allie_by_player_index;
++        this-&gt;allie_with_player_index = allie_with_player_index;
+         this-&gt;alliance_request_type = alliance_request_type;
+     }
+-    Uint16 getAllieByPlayerIndex() const
++    PlayerID getAllieByPlayerIndex() const
+     {
+-        return ltoh16(allie_by_player_index);
++        return allie_by_player_index;
+     }
+-    Uint16 getAllieWithPlayerIndex() const
++    PlayerID getAllieWithPlayerIndex() const
+     {
+-        return ltoh16(allie_with_player_index);
++        return allie_with_player_index;
+     }
+ }
+ __attribute__((packed));
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PowerUpNetMessage.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -75,8 +75,7 @@
+ {
+ private:
+     PowerUpID  ID;
+-    Uint16     dummy; // XXX only here for compatibility reasons
+-    Uint16     player_id;
++    PlayerID     player_id;
+     Sint32     unit_powerup_type;
+ 
+ public:
+@@ -86,19 +85,19 @@
+         message_id = _net_message_id_powerup_hit;
+         setSize(sizeof(*this));
+     }
+-    void set(PowerUpID ID, Uint16 player_id, int type=0)
++    void set(PowerUpID ID, PlayerID player_id, int type=0)
+     {
+         this-&gt;ID = PowerUpID_toPortable(ID); // XXX protocol
+-        this-&gt;player_id = htol16(player_id);
++        this-&gt;player_id = player_id;
+         this-&gt;unit_powerup_type = htol32(type);
+     }
+     PowerUpID getID() const
+     {
+         return PowerUpID_fromPortable(ID); // XXX protocol
+     }
+-    Uint16 getPlayerID() const
++    PlayerID getPlayerID() const
+     {
+-        return ltoh16(player_id);
++        return player_id;
+     }
+     Sint32 getUnitPowerupType() const
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -253,7 +253,7 @@
+         {
+             connect_result.result_code = _connect_result_success;
+             time_out_timer.reset();
+-            connect_client-&gt;playerIndex = player-&gt;getID();
++            connect_client-&gt;player_id = player-&gt;getID();
+         }
+         connect_result.setSize(sizeof(ClientConnectResult));
+         connect_client-&gt;sendMessage( &amp;connect_result,
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/SystemNetMessage.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -104,19 +104,19 @@
+ class SystemPingRequest : public NetMessage
+ {
+ private:
+-    Uint16 client_player_index;
++    PlayerID client_player_index;
+ 
+ public:
+-    SystemPingRequest(Uint16 playerIndex)
++    SystemPingRequest(PlayerID playerIndex)
+     {
+         message_class = _net_message_class_system;
+         message_id = _net_message_id_system_ping_request;
+-        client_player_index = htol16(playerIndex);
++        client_player_index = playerIndex;
+     }
+     
+-    Uint16 getClientPlayerIndex() const
++    PlayerID getClientPlayerIndex() const
+     {
+-        return ltoh16(client_player_index);
++        return client_player_index;
+     }
+ } __attribute__((packed));
+ 
+@@ -139,7 +139,7 @@
+ class SystemConnectAlert : public NetMessage
+ {
+ private:
+-    Uint16 player_index;
++    PlayerID player_index;
+ public:
+     Uint8 alert_enum;
+ 
+@@ -149,15 +149,15 @@
+         message_id = _net_message_id_system_connect_alert;
+     }
+         
+-    void set(const Uint16 player_idx, unsigned char alert_type)
++    void set(const PlayerID player_idx, unsigned char alert_type)
+     {
+-        player_index = htol16(player_idx);
++        player_index = player_idx;
+         alert_enum = alert_type;
+     }                                               
+     
+-    Uint16 getPlayerID() const
++    PlayerID getPlayerID() const
+     {
+-        return ltoh16(player_index);
++        return player_index;
+     }
+ 
+ } __attribute__((packed));
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -60,22 +60,21 @@
+ public:
+     Uint8 unit_type;
+ private:
+-    // XXX this should really be Uint16 player_id;
+-    Uint8 player_id;
++    PlayerID player_id;
+     Uint16 unit_id;
+     Uint32 location_x;
+     Uint32 location_y;
+ public:
+     NetworkUnitState unit_state;
+ 
+-    UnitIniSyncMessage(Uint8 unit_type, Uint16 player_id, UnitID unit_id,
++    UnitIniSyncMessage(Uint8 unit_type, PlayerID player_id, UnitID unit_id,
+         Uint32 location_x, Uint32 location_y)
+     {
+         message_class = _net_message_class_unit;
+         message_id = _net_message_id_ini_sync_mesg;
+         this-&gt;unit_type = unit_type;
+         //this-&gt;player_id = htol16(player_id);
+-        this-&gt;player_id = (Uint8) player_id;
++        this-&gt;player_id = player_id;
+         this-&gt;unit_id = htol16(unit_id);
+         this-&gt;location_x = htol32(location_x);
+         this-&gt;location_y = htol32(location_y);
+@@ -98,7 +97,7 @@
+     {
+         return ltoh16(unit_id);
+     }
+-    Uint16 getPlayerID() const
++    PlayerID getPlayerID() const
+     {
+         return player_id;
+     }
+@@ -132,19 +131,19 @@
+ class UnitRemoteCreate : public NetMessage
+ {
+ private:
+-    Uint16 player_id;
++    PlayerID player_id;
+     Uint16 new_unit_id;
+     Uint32 location_x;
+     Uint32 location_y;
+ public:
+     Uint8 unit_type;
+ 
+-    UnitRemoteCreate(Uint16 player_id, UnitID id,
++    UnitRemoteCreate(PlayerID player_id, UnitID id,
+             Uint32 x, Uint32 y, Uint8 type)
+     {
+         message_class = _net_message_class_unit;
+         message_id = _net_message_id_create_unit;
+-        this-&gt;player_id = htol16(player_id);             
++        this-&gt;player_id = player_id;
+         new_unit_id = htol16(id);
+         location_x = htol32(x);
+         location_y = htol32(y);
+@@ -163,9 +162,9 @@
+     {
+         return ltoh16(new_unit_id);
+     }
+-    Uint16 getPlayerID() const
++    PlayerID getPlayerID() const
+     {
+-        return ltoh16(player_id);
++        return player_id;
+     }
+ } __attribute__((packed));
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -24,9 +24,9 @@
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &lt;sstream&gt;
+ 
+-Uint16 NetworkPlayerState::getPlayerIndex() const
++PlayerID NetworkPlayerState::getPlayerIndex() const
+ {
+-    return ltoh16(playerindex_id);
++    return id;
+ }
+ 
+ //If you modify this array, also modify the constant above
+@@ -115,7 +115,7 @@
+ }
+ 
+ PlayerState::PlayerState(const PlayerState&amp; other)
+-    : name(other.name), flag(other.flag), player_index(other.player_index),
++    : name(other.name), flag(other.flag), id(other.id),
+       status(other.status), kills(other.kills), kill_points(other.kill_points),
+       losses(other.losses), loss_points(other.loss_points),
+       total(other.total), objectives_held(other.objectives_held),
+@@ -136,7 +136,7 @@
+     objectives_held = other.objectives_held;
+     stats_locked = other.stats_locked;
+     unit_config = other.unit_config;
+-    player_index = other.player_index;
++    id = other.id;
+ }
+ 
+ void PlayerState::setName(const std::string&amp; newname)
+@@ -155,9 +155,10 @@
+     do
+     {
+         recheck = false;
+-        for (Uint16 p=0; p&lt;PlayerInterface::getMaxPlayers(); p++)
++        PlayerID p;
++        for ( p = 0; p&lt;PlayerInterface::getMaxPlayers(); ++p )
+         {
+-            if ( p == player_index )
++            if ( p == id )
+                 continue;
+                 
+             PlayerState *ps=PlayerInterface::getPlayer(p);
+@@ -278,9 +279,9 @@
+     objectives_held = objectives;
+ }
+ 
+-void PlayerState::setID( unsigned short index )
++void PlayerState::setID( PlayerID id )
+ {
+-    player_index = index;
++    this-&gt;id = id;
+ }
+ 
+ void PlayerState::setStatus( unsigned char status )
+@@ -301,9 +302,10 @@
+     do
+     {
+         recheck = false;
+-        for (Uint16 p=0; p&lt;PlayerInterface::getMaxPlayers(); p++)
++        PlayerID p;
++        for ( p=0; p&lt;PlayerInterface::getMaxPlayers(); ++p )
+         {
+-            if ( p == player_index )
++            if ( p == id )
+                 continue;
+                 
+             PlayerState *ps=PlayerInterface::getPlayer(p);
+@@ -351,7 +353,7 @@
+     memset(state.name, 0, sizeof(state.name));
+     strncpy(state.name, name.c_str(), sizeof(state.name)-1);
+     state.flag = flag;
+-    state.playerindex_id = htol16(player_index);
++    state.id = id;
+     state.status = status;
+     state.kills = htol16(kills);
+     state.kill_points = htol16(kill_points);
+@@ -376,7 +378,7 @@
+         LOGGER.warning(&quot;Received flag is not registered: %u&quot;, flag);
+     }
+     
+-    player_index = ltoh16(state-&gt;playerindex_id);
++    id = state-&gt;id;
+     status = state-&gt;status;
+     kills = ltoh16(state-&gt;kills);
+     kill_points = ltoh16(state-&gt;kill_points);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -37,7 +37,7 @@
+ class NetworkPlayerState
+ {
+ public:
+-    Uint16 getPlayerIndex() const;
++    PlayerID getPlayerIndex() const;
+ 
+ private:
+     NetworkPlayerState() 
+@@ -47,7 +47,7 @@
+     
+     char name[64];
+     FlagID flag;
+-    Uint16 playerindex_id;
++    PlayerID id;
+     Uint8 status;
+     Sint16 kills;
+     Sint16 kill_points;
+@@ -67,7 +67,7 @@
+ private:
+     std::string name;
+     FlagID flag;
+-    Uint16 player_index;
++    PlayerID id;
+     unsigned char status;
+     short kills;
+     short kill_points;
+@@ -88,9 +88,9 @@
+ 
+     void setName(const std::string&amp; newname);
+ 
+-    Uint16 getID() const
++    PlayerID getID() const
+     {
+-        return player_index;
++        return id;
+     }
+ 
+     void resetStats();
+@@ -107,7 +107,7 @@
+     void decObjectivesHeld();
+     short getObjectivesHeld() const;
+     void setObjectivesHeld( short objectives );
+-    void setID( unsigned short index );
++    void setID( PlayerID id );
+     void setStatus( unsigned char status );
+     unsigned char getStatus() const;
+     void setFlag(FlagID newflag);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -29,8 +29,9 @@
+     deselect();
+     unit_list.clear();
+ 
+-    Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
+-    UnitInterface::queryUnitsAt(unit_list, point, player_id, _search_player);
++    UnitInterface::queryUnitsAt(unit_list, point,
++                                PlayerInterface::getLocalPlayerIndex(),
++                                _search_player);
+ 
+     select();
+     if (unit_list.size() == 0)
+@@ -44,8 +45,9 @@
+ {
+     deselect();
+ 
+-    Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
+-    UnitInterface::queryUnitsAt(unit_list, point, player_id, _search_player);
++    UnitInterface::queryUnitsAt(unit_list, point,
++                                PlayerInterface::getLocalPlayerIndex(),
++                                _search_player);
+ 
+     select();
+     if (unit_list.size() == 0)
+@@ -61,9 +63,9 @@
+     deselect();
+     unit_list.clear();
+ 
+-    Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
+-    UnitInterface::queryUnitsAt(unit_list, point, player_id,
+-            _search_exclude_player);
++    UnitInterface::queryUnitsAt(unit_list, point,
++                                PlayerInterface::getLocalPlayerIndex(),
++                                _search_exclude_player);
+ 
+     if (unit_list.size() == 0)
+         return false;
+@@ -74,10 +76,10 @@
+ 
+ bool SelectionList::selectBounded(iRect bounds, bool addunits)
+ {
+-    Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
+-
+     std::vector&lt;UnitID&gt; tempunits;
+-    UnitInterface::queryUnitsAt(tempunits, bounds, player_id, _search_player);
++    UnitInterface::queryUnitsAt(tempunits, bounds,
++                                PlayerInterface::getLocalPlayerIndex(),
++                                _search_player);
+     
+     if ( ! tempunits.size() )
+         return false;
+@@ -104,7 +106,7 @@
+ 
+ bool SelectionList::selectSameTypeVisible( iXY point, bool addunits)
+ {
+-    Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
++    PlayerID player_id = PlayerInterface::getLocalPlayerIndex();
+ 
+     if(!addunits) {
+         deselect();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -203,30 +203,34 @@
+         {
+             return _cursor_player_unit;
+         }
+-
+-        if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
++        else if ( working_list.isSelected() )
+         {
+-            if ( KeyboardInterface::getKeyState(SDLK_a) )
+-            {
+-                if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
+-                {
+-                    return _cursor_break_allie;
+-                }
+-
+-                return _cursor_make_allie;
+-            }
+-            else if ( working_list.isSelected() )
+-            {
+-                return _cursor_enemy_unit;
+-            }
++            return _cursor_enemy_unit;
+         }
+-        else
+-        {
+-            if ( KeyboardInterface::getKeyState(SDLK_a) )
+-            {
+-                return _cursor_break_allie;
+-            }
+-        }
++        // XXX ALLY
++//        if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
++//        {
++//            if ( KeyboardInterface::getKeyState(SDLK_a) )
++//            {
++//                if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
++//                {
++//                    return _cursor_break_allie;
++//                }
++//
++//                return _cursor_make_allie;
++//            }
++//            else if ( working_list.isSelected() )
++//            {
++//                return _cursor_enemy_unit;
++//            }
++//        }
++//        else
++//        {
++//            if ( KeyboardInterface::getKeyState(SDLK_a) )
++//            {
++//                return _cursor_break_allie;
++//            }
++//        }
+         return _cursor_regular;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -25,6 +25,9 @@
+ #include &quot;SDL.h&quot;
+ #include &quot;Util/Endian.hpp&quot;
+ 
++//#define __TEST_PLAYERID__
++
++
+ typedef Sint32 PowerUpID;
+ #define PowerUpID_toPortable(a) htol32(a)
+ #define PowerUpID_fromPortable(a) ltoh32(a)
+@@ -38,5 +41,42 @@
+ 
+ typedef Uint8 FlagID;
+ 
++#ifndef __TEST_PLAYERID__
++    typedef Uint8 PlayerID;
++    #define MIN_PLAYER_ID (0)
++    #define MAX_PLAYER_ID (0xfe)
++    #define INVALID_PLAYER_ID (0xff)
++#else
++    class TestPlayerID
++    {
++    private:
++        friend class PlayerInterface; // for array indexing
++        friend class UnitInterface;   // for array indexing
++        friend class InfoSocket;      // for string conversion (using int)
++        friend class DedicatedGameManager; // for string conversion (using int)
++        friend class RankView;        // for height calculation (using int)
++        friend class ScriptManager;   // for passing to lua as int
++        int c;
++        operator unsigned int() { return c; }
++
++    public:
++        TestPlayerID() {}
++        ~TestPlayerID() {}
++        bool operator&gt;=(const TestPlayerID&amp; o) { return c&gt;=o.c; }
++        bool operator&lt;(const TestPlayerID&amp; o) { return c&lt;o.c; }
++        bool operator!=(const TestPlayerID&amp; o) { return c!=o.c; }
++        bool operator==(const TestPlayerID&amp; o) const { return c==o.c; }
++        void operator++() { c++; }
++        void operator=(const int v) { c = v; }
++
++    }__attribute__((packed));;
++
++    typedef TestPlayerID PlayerID;
++    #define MIN_PLAYER_ID (TestPlayerID())
++    #define MAX_PLAYER_ID (TestPlayerID())
++    #define INVALID_PLAYER_ID (TestPlayerID())
++
++#endif
++
+ #endif	/* _CORETYPES_HPP */
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -39,7 +39,7 @@
+ };
+ 
+ #define CHATREQUEST_HEADER_LEN (sizeof(NetMessage) + sizeof(Uint8))
+-#define CHATMESG_HEADER_LEN (sizeof(NetMessage) + sizeof(Uint8) + sizeof(Uint16))
++#define CHATMESG_HEADER_LEN (sizeof(NetMessage) + sizeof(Uint8) + sizeof(PlayerID))
+ #define MAX_CHAT_MSG_LEN (_MAX_NET_PACKET_SIZE - CHATMESG_HEADER_LEN)
+ 
+ class ChatMesgRequest : public NetMessage
+@@ -49,7 +49,7 @@
+     char player_set[32];
+ 
+ private:
+-    Uint16 source_player_index;
++    PlayerID source_player_index;
+ public:
+     char message_text[150];
+ 
+@@ -75,14 +75,14 @@
+         return getSize() - CHATREQUEST_HEADER_LEN;
+     }
+ 
+-    Uint16 getSourcePlayerIndex() const
++    PlayerID getSourcePlayerIndex() const
+ 	{
+-		return SDL_SwapLE16(source_player_index);
++		return source_player_index;
+ 	}
+ 
+-    void setSourcePlayerIndex(Uint16 playerIndex)
++    void setSourcePlayerIndex(PlayerID playerIndex)
+ 	{
+-		source_player_index = SDL_SwapLE16(playerIndex);
++		source_player_index = playerIndex;
+ 	}
+ } __attribute__((packed));
+ 
+@@ -92,7 +92,7 @@
+ public:
+     Uint8  message_scope;
+ private:
+-    Uint16 source_player_index;
++    PlayerID source_player_index;
+ public:
+ //    char message_text[MAX_CHAT_MSG_LEN]; // XPROTO
+     char message_text[150];
+@@ -109,14 +109,14 @@
+         return getSize() - CHATMESG_HEADER_LEN;
+     }
+ 
+-    Uint16 getSourcePlayerIndex() const
++    PlayerID getSourcePlayerIndex() const
+     {
+-        return SDL_SwapLE16(source_player_index);
++        return source_player_index;
+     }
+ 
+-    void setSourcePlayerIndex(Uint16 playerIndex)
++    void setSourcePlayerIndex(PlayerID playerIndex)
+     {
+-        source_player_index = SDL_SwapLE16(playerIndex);
++        source_player_index = playerIndex;
+     }
+ } __attribute__((packed));
+ 
+@@ -140,38 +140,43 @@
+ 	if (chat_request-&gt;message_scope == _chat_mesg_scope_all) {
+ 		SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+ 		post_on_server = true;
+-	} else if (chat_request-&gt;message_scope == _chat_mesg_scope_alliance) {
+-		unsigned long max_players;
+-		unsigned short local_player_index;
+-		PlayerState * player = 0;
+-
+-		local_player_index = PlayerInterface::getLocalPlayerIndex();
+-
+-		max_players = PlayerInterface::getMaxPlayers();
+-		for (unsigned long i = 0; i &lt; max_players; i++) {
+-			player = PlayerInterface::getPlayer((unsigned short) i);
+-
+-			if (player-&gt;getStatus() == _player_state_active) {
+-				if (PlayerInterface::isAllied(
+-						chat_request-&gt;getSourcePlayerIndex(), i) == true) {
+-					if (local_player_index != i) {
+-						SERVER-&gt;sendMessage((unsigned short) i, &amp;chat_mesg,
+-								sizeof(ChatMesg));
+-					} else {
+-						post_on_server = true;
+-					}
+-				}
+-			}
+-		}
+-
+-		if (chat_request-&gt;getSourcePlayerIndex()
+-				== PlayerInterface::getLocalPlayerIndex()) {
+-			post_on_server = true;
+-		} else {
+-			SERVER-&gt;sendMessage(chat_request-&gt;getSourcePlayerIndex(),
+-					&amp;chat_mesg, sizeof(ChatMesg));
+-		}
+-	} else if (chat_request-&gt;message_scope == _chat_mesg_scope_server) {
++	}
++        // XXX ALLY
++//        else if (chat_request-&gt;message_scope == _chat_mesg_scope_alliance)
++//        {
++//		unsigned long max_players;
++//		unsigned short local_player_index;
++//		PlayerState * player = 0;
++//
++//		local_player_index = PlayerInterface::getLocalPlayerIndex();
++//
++//		max_players = PlayerInterface::getMaxPlayers();
++//		for (unsigned long i = 0; i &lt; max_players; i++) {
++//			player = PlayerInterface::getPlayer((unsigned short) i);
++//
++//			if (player-&gt;getStatus() == _player_state_active) {
++//				if (PlayerInterface::isAllied(
++//						chat_request-&gt;getSourcePlayerIndex(), i) == true) {
++//					if (local_player_index != i) {
++//						SERVER-&gt;sendMessage((unsigned short) i, &amp;chat_mesg,
++//								sizeof(ChatMesg));
++//					} else {
++//						post_on_server = true;
++//					}
++//				}
++//			}
++//		}
++//
++//		if (chat_request-&gt;getSourcePlayerIndex()
++//				== PlayerInterface::getLocalPlayerIndex()) {
++//			post_on_server = true;
++//		} else {
++//			SERVER-&gt;sendMessage(chat_request-&gt;getSourcePlayerIndex(),
++//					&amp;chat_mesg, sizeof(ChatMesg));
++//		}
++//	}
++        else if (chat_request-&gt;message_scope == _chat_mesg_scope_server)
++        {
+ 		SERVER-&gt;broadcastMessage(&amp;chat_mesg, sizeof(ChatMesg));
+ 		ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+ 				chat_mesg.message_text);
+@@ -208,8 +213,8 @@
+ 	}
+ }
+ 
+-static void chatMessage(const NetMessage* message) {
+-	unsigned short local_player_index;
++static void chatMessage(const NetMessage* message)
++{
+ 	const ChatMesg *chat_mesg = (const ChatMesg*) message;
+ 
+ 	if (chat_mesg-&gt;message_scope != _chat_mesg_scope_server
+@@ -225,13 +230,9 @@
+ 		return;
+ 	}
+ 
+-	local_player_index = PlayerInterface::getLocalPlayerIndex();
+-
+ 	PlayerState *player_state;
++	player_state = PlayerInterface::getPlayer(chat_mesg-&gt;getSourcePlayerIndex());
+ 
+-	player_state
+-			= PlayerInterface::getPlayer(chat_mesg-&gt;getSourcePlayerIndex());
+-
+ 	PIX color = Color::white;
+ 
+ 	switch (chat_mesg-&gt;message_scope) {
+@@ -357,7 +358,7 @@
+ //	NetworkClient::sendMessage(&amp;cmsg, CHATREQUEST_HEADER_LEN + text_len);
+ }
+ 
+-void ChatInterface::serversayTo(const int player, const char* message)
++void ChatInterface::serversayTo(const PlayerID player, const char* message)
+ {
+ 	if (player == PlayerInterface::getLocalPlayerIndex())
+ 	{
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -18,6 +18,8 @@
+ #ifndef _CHATINTERFACE_HPP
+ #define _CHATINTERFACE_HPP
+ 
++#include &quot;Core/CoreTypes.hpp&quot;
++
+ class NetMessage;
+ 
+ class ChatInterface
+@@ -28,7 +30,7 @@
+     static void say(const char * message);
+     static void teamsay(const char * message);
+     static void serversay(const char * message);
+-    static void serversayTo(const int player, const char * message);
++    static void serversayTo(const PlayerID player, const char * message);
+ };
+ 
+ #endif // ** _CHATINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -128,14 +128,16 @@
+                     &lt;&lt; std::setw(4) &lt;&lt; &quot;Lost&quot; &lt;&lt; &quot; &quot;
+                     &lt;&lt; std::setw(5) &lt;&lt; &quot;Score&quot; &lt;&lt; &quot; &quot;
+                     &lt;&lt; std::setw(21) &lt;&lt; &quot;IP\n&quot;;
+-                for(size_t i = 0; i&lt;PlayerInterface::getMaxPlayers(); ++i) {
++                PlayerID i;
++                for ( i = 0; i&lt;PlayerInterface::getMaxPlayers(); ++i)
++                {
+                     PlayerState* playerstate =
+                         PlayerInterface::getPlayer(i);
+                     if(playerstate-&gt;getStatus() != _player_state_active)
+                         continue;
+                     //*Console::server
+                     std::cout
+-                        &lt;&lt; std::setw(3) &lt;&lt; playerstate-&gt;getID() &lt;&lt; &quot; &quot;
++                        &lt;&lt; std::setw(3) &lt;&lt; i &lt;&lt; &quot; &quot;
+                         &lt;&lt; std::setw(30) &lt;&lt; playerstate-&gt;getName() &lt;&lt; &quot; &quot;
+                         &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getKills() &lt;&lt; &quot; &quot;
+                         &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getLosses() &lt;&lt; &quot; &quot;
+@@ -160,8 +162,8 @@
+                 break;
+             case ServerCommand::KICK:
+                 std::stringstream idstream(command.argument);
+-                Uint16 id = 0xffff;
+-                idstream &gt;&gt; id;
++                PlayerID id = INVALID_PLAYER_ID;
++                idstream &gt;&gt; (int&amp;)id; // XXX KREMOVE
+                 if(id &gt;= PlayerInterface::getMaxPlayers()) {
+                     std::cout &lt;&lt; &quot;Unknown player.&quot; &lt;&lt; std::endl;
+                     break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -322,7 +322,7 @@
+ }
+ 
+ // ******************************************************************
+-void GameManager::spawnPlayer( Uint16 player )
++void GameManager::spawnPlayer( PlayerID player )
+ {
+     sound-&gt;stopTankIdle();
+ 
+@@ -349,12 +349,12 @@
+ void GameManager::respawnAllPlayers()
+ {
+     PlayerState    *player_state;
+-    unsigned short max_players;
+-    unsigned short player_index;
++    PlayerID max_players;
++    PlayerID player_index;
+ 
+     max_players = PlayerInterface::getMaxPlayers();
+ 
+-    for( player_index = 0; player_index &lt; max_players; player_index++ )
++    for( player_index = 0; player_index &lt; max_players; ++player_index )
+     {
+         player_state = PlayerInterface::getPlayer( player_index );
+         if ( player_state-&gt;getStatus() == _player_state_active )
+@@ -482,7 +482,7 @@
+     SystemPingAcknowledge ping_ack;
+ 
+     if ( player-&gt;getStatus() == _player_state_active
+-         &amp;&amp; ping_request-&gt;getClientPlayerIndex() != 0
++         &amp;&amp; ping_request-&gt;getClientPlayerIndex() != MIN_PLAYER_ID
+        )
+     {
+         SERVER-&gt;sendMessage(player-&gt;getID(), &amp;ping_ack, sizeof(SystemPingAcknowledge));
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -66,7 +66,7 @@
+     static bool gameMapLoad( int *percent_complete );
+ 
+     // ** Game Rules Methods
+-    static void spawnPlayer( Uint16 player );
++    static void spawnPlayer( PlayerID player );
+     static void respawnAllPlayers();
+ 
+     static void initializeGameLogic();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -93,16 +93,16 @@
+ InfoSocket::prepareStatusPacket()
+ {
+     stringstream s;
+-    int playingPlayers = PlayerInterface::countPlayers();
+-    int maxPlayers = PlayerInterface::getMaxPlayers();
++    PlayerID playingPlayers = PlayerInterface::countPlayers();
++    PlayerID maxPlayers = PlayerInterface::getMaxPlayers();
+     
+     s &lt;&lt; statusHead
+       &lt;&lt; &quot;\\mapname\\&quot;    &lt;&lt; gameconfig-&gt;map
+       &lt;&lt; &quot;\\mapcycle\\&quot;   &lt;&lt; gameconfig-&gt;mapcycle
+-      &lt;&lt; &quot;\\numplayers\\&quot; &lt;&lt; playingPlayers
+-      &lt;&lt; &quot;\\maxplayers\\&quot; &lt;&lt; maxPlayers;
++      &lt;&lt; &quot;\\numplayers\\&quot; &lt;&lt; (int)playingPlayers
++      &lt;&lt; &quot;\\maxplayers\\&quot; &lt;&lt; (int)maxPlayers;
+     
+-    if ( !playingPlayers )
++    if ( playingPlayers == MIN_PLAYER_ID )
+         s &lt;&lt; &quot;\\empty\\1&quot;;
+     else if ( playingPlayers==maxPlayers )
+         s &lt;&lt; &quot;\\full\\1&quot;;
+@@ -115,7 +115,9 @@
+       &lt;&lt; &quot;\\objectivelimit\\&quot; &lt;&lt; ObjectiveInterface::getObjectiveLimit();
+ 
+     int n = 0;
+-    for(int i = 0; i &lt; maxPlayers; ++i) {
++    PlayerID i;
++    for ( i = 0; i &lt; maxPlayers; ++i)
++    {
+         PlayerState* playerState = PlayerInterface::getPlayer(i);
+         if(playerState-&gt;getStatus() != _player_state_active)
+             continue;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -33,178 +33,180 @@
+ // for UNIT_FLAGS_SURFACE
+ 
+ // ** PlayerInterface Statics
+-PlayerState   *PlayerInterface::player_lists = 0;
+-unsigned short PlayerInterface::max_players = 0;
+-static bool *  alliance_matrix = 0;
+-unsigned short PlayerInterface::local_player_index = 0xFFFF;
++PlayerState   * PlayerInterface::player_lists = 0;
++PlayerID        PlayerInterface::max_players = MIN_PLAYER_ID;
+ 
+-unsigned short PlayerInterface::player_sync_index;
+-unsigned short PlayerInterface::player_sync_connect_player_index;
++//static bool   * alliance_matrix = 0; // XXX ALLY
++PlayerID  PlayerInterface::local_player_index = INVALID_PLAYER_ID;
++
++PlayerID PlayerInterface::player_sync_index;
++PlayerID PlayerInterface::player_sync_connect_player_index;
+ Timer PlayerInterface::player_sync_timer;
+ 
+-unsigned short PlayerInterface::respawn_rule_player_index = 0;
++PlayerID PlayerInterface::respawn_rule_player_index = INVALID_PLAYER_ID;
+ 
+ SDL_mutex* PlayerInterface::mutex = 0;
+ 
+-static void setAlliance(const int by_player, const int with_player )
+-{
+-    *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = true;
+-}
++//static void setAlliance(const int by_player, const int with_player )
++//{
++//    *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = true;
++//}
++//
++//static void clearAlliance(const int by_player, const int with_player )
++//{
++//    *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = false;
++//}
++//
++//static void disconnectedPlayerAllianceCleanup(const int index )
++//{
++//    for ( int player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers(); ++player_index )
++//    {
++//        clearAlliance( index, player_index );
++//        clearAlliance( player_index, index );
++//    }
++//}
+ 
+-static void clearAlliance(const int by_player, const int with_player )
+-{
+-    *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = false;
+-}
++//bool PlayerInterface::isAllied( unsigned short player, unsigned short with_player )
++//{
++//    if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
++//            &amp;&amp; *(alliance_matrix + (with_player * max_players) + player)
++//            &amp;&amp; *(alliance_matrix + (player * max_players) + with_player) )
++//    {
++//        return true;
++//    }
++//    return false;
++//}
++//
++//bool PlayerInterface::isSingleAllied( unsigned short player, unsigned short with_player )
++//{
++//    if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
++//            &amp;&amp; *(alliance_matrix + (player * max_players) + with_player) )
++//    {
++//        return true;
++//    }
++//    return false;
++//}
+ 
+-static void disconnectedPlayerAllianceCleanup(const int index )
+-{
+-    for ( int player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers(); ++player_index )
+-    {
+-        clearAlliance( index, player_index );
+-        clearAlliance( player_index, index );
+-    }
+-}
++//static void handleAllianceMessage(const int type,
++//                                  const int by_player,
++//                                  const int with_player)
++//{
++//    const int local_player = PlayerInterface::getLocalPlayerIndex();
++//    PlayerState *player_state;
++//    if ( type == _player_make_alliance )
++//    {
++//        setAlliance(by_player, with_player);
++//
++//        if ( by_player == local_player )
++//        {
++//            player_state = PlayerInterface::getPlayer(with_player);
++//            if ( PlayerInterface::isSingleAllied(player_state-&gt;getID(), local_player) )
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                              &quot;You accepted %s alliance request.&quot;,
++//                                              player_state-&gt;getName().c_str());
++//            }
++//            else
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                              &quot;You request alliance with %s.&quot;,
++//                                              player_state-&gt;getName().c_str());
++//            }
++//        }
++//        else if ( with_player == local_player )
++//        {
++//            player_state = PlayerInterface::getPlayer(by_player);
++//            if ( PlayerInterface::isSingleAllied( local_player, player_state-&gt;getID()) )
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                           &quot;%s accepted your alliance request.&quot;,
++//                                           player_state-&gt;getName().c_str());
++//            }
++//            else
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                              &quot;%s request to ally with you.&quot;,
++//                                              player_state-&gt;getName().c_str());
++//            }
++//        }
++//    }
++//    else
++//    {
++//        // break alliance cancels both alliances
++//        clearAlliance(by_player, with_player);
++//        if ( by_player == local_player )
++//        {
++//            player_state = PlayerInterface::getPlayer(with_player);
++//            if ( PlayerInterface::isSingleAllied(player_state-&gt;getID(), local_player) )
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                              &quot;You broke the alliance with %s.&quot;,
++//                                              player_state-&gt;getName().c_str());
++//            }
++//            else
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                              &quot;You cancel your alliance request with %s.&quot;,
++//                                              player_state-&gt;getName().c_str());
++//            }
++//        }
++//        else if ( with_player == local_player )
++//        {
++//            player_state = PlayerInterface::getPlayer(by_player);
++//            if ( PlayerInterface::isSingleAllied( local_player, player_state-&gt;getID()) )
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                              &quot;%s broke the alliance with you.&quot;,
++//                                              player_state-&gt;getName().c_str());
++//            }
++//            else
++//            {
++//                ConsoleInterface::postMessage(Color::yellow, false, 0,
++//                                              &quot;%s cancelled the alliance request with you.&quot;,
++//                                              player_state-&gt;getName().c_str());
++//            }
++//        }
++//
++//        clearAlliance(with_player, by_player);
++//    }
++//}
++//
++//static void resetAllianceMatrix()
++//{
++//    int matrix_size;
++//
++//    matrix_size = PlayerInterface::getMaxPlayers() * PlayerInterface::getMaxPlayers();
++//
++//    for ( int i = 0; i &lt; matrix_size; i++ )
++//    {
++//        alliance_matrix[ i ] = false;
++//    }
++//}
+ 
+-bool PlayerInterface::isAllied( unsigned short player, unsigned short with_player )
++void PlayerInterface::initialize(const unsigned int _max_players)
+ {
+-    if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
+-            &amp;&amp; *(alliance_matrix + (with_player * max_players) + player)
+-            &amp;&amp; *(alliance_matrix + (player * max_players) + with_player) )
+-    {
+-        return true;
+-    }
+-    return false;
+-}
+-
+-bool PlayerInterface::isSingleAllied( unsigned short player, unsigned short with_player )
+-{
+-    if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
+-            &amp;&amp; *(alliance_matrix + (player * max_players) + with_player) )
+-    {
+-        return true;
+-    }
+-    return false;
+-}
+-
+-static void handleAllianceMessage(const int type,
+-                                  const int by_player,
+-                                  const int with_player)
+-{
+-    const int local_player = PlayerInterface::getLocalPlayerIndex();
+-    PlayerState *player_state;
+-    if ( type == _player_make_alliance )
+-    {
+-        setAlliance(by_player, with_player);
+-
+-        if ( by_player == local_player )
+-        {
+-            player_state = PlayerInterface::getPlayer(with_player);
+-            if ( PlayerInterface::isSingleAllied(player_state-&gt;getID(), local_player) )
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                              &quot;You accepted %s alliance request.&quot;,
+-                                              player_state-&gt;getName().c_str());
+-            }
+-            else
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                              &quot;You request alliance with %s.&quot;,
+-                                              player_state-&gt;getName().c_str());
+-            }
+-        }
+-        else if ( with_player == local_player )
+-        {
+-            player_state = PlayerInterface::getPlayer(by_player);
+-            if ( PlayerInterface::isSingleAllied( local_player, player_state-&gt;getID()) )
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                           &quot;%s accepted your alliance request.&quot;,
+-                                           player_state-&gt;getName().c_str());
+-            }
+-            else
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                              &quot;%s request to ally with you.&quot;,
+-                                              player_state-&gt;getName().c_str());
+-            }
+-        }
+-    }
+-    else
+-    {
+-        // break alliance cancels both alliances
+-        clearAlliance(by_player, with_player);
+-        if ( by_player == local_player )
+-        {
+-            player_state = PlayerInterface::getPlayer(with_player);
+-            if ( PlayerInterface::isSingleAllied(player_state-&gt;getID(), local_player) )
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                              &quot;You broke the alliance with %s.&quot;,
+-                                              player_state-&gt;getName().c_str());
+-            }
+-            else
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                              &quot;You cancel your alliance request with %s.&quot;,
+-                                              player_state-&gt;getName().c_str());
+-            }
+-        }
+-        else if ( with_player == local_player )
+-        {
+-            player_state = PlayerInterface::getPlayer(by_player);
+-            if ( PlayerInterface::isSingleAllied( local_player, player_state-&gt;getID()) )
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                              &quot;%s broke the alliance with you.&quot;,
+-                                              player_state-&gt;getName().c_str());
+-            }
+-            else
+-            {
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                              &quot;%s cancelled the alliance request with you.&quot;,
+-                                              player_state-&gt;getName().c_str());
+-            }
+-        }
+-
+-        clearAlliance(with_player, by_player);
+-    }
+-}
+-
+-static void resetAllianceMatrix()
+-{
+-    int matrix_size;
+-
+-    matrix_size = PlayerInterface::getMaxPlayers() * PlayerInterface::getMaxPlayers();
+-
+-    for ( int i = 0; i &lt; matrix_size; i++ )
+-    {
+-        alliance_matrix[ i ] = false;
+-    }
+-}
+-
+-void PlayerInterface::initialize(unsigned short maxPlayers)
+-{
+     char temp_str[64];
+-    Uint16 player_index;
+-    max_players = maxPlayers;
++    PlayerID player_id;
++    max_players = _max_players;
+ 
+     delete[] player_lists;
+     player_lists = new PlayerState[max_players];
+ 
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ )
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+-        player_lists[ player_index ].setID( player_index );
+-        player_lists[ player_index ].resetStats();
+-        player_lists[ player_index ].setStatus( _player_state_free );
+-        player_lists[ player_index ].setFlag( 0 );
+-        player_lists[ player_index ].unit_config.initialize();
+-        sprintf( temp_str, &quot;Player %u&quot;, player_index );
+-        player_lists[ player_index ].setName( temp_str );
++        player_lists[ player_id ].setID( player_id );
++        player_lists[ player_id ].resetStats();
++        player_lists[ player_id ].setStatus( _player_state_free );
++        player_lists[ player_id ].setFlag( 0 );
++        player_lists[ player_id ].unit_config.initialize();
++        sprintf( temp_str, &quot;Player %u&quot;, player_id );
++        player_lists[ player_id ].setName( temp_str );
+     }
+ 
+-    delete[] alliance_matrix;
+-    alliance_matrix = new bool [max_players * max_players];
+-    resetAllianceMatrix();
++    // XXX ALLY
++//    delete[] alliance_matrix;
++//    alliance_matrix = new bool [max_players * max_players];
++//    resetAllianceMatrix();
+ 
+     mutex = SDL_CreateMutex();
+     if(!mutex)
+@@ -216,15 +218,15 @@
+ void PlayerInterface::reset()
+ {
+     resetPlayerStats();
+-    resetAllianceMatrix();
++//    resetAllianceMatrix(); // XXX ALLY
+ }
+ 
+ void PlayerInterface::cleanUp()
+ {
+     delete[] player_lists;
+     player_lists = 0;
+-    delete[] alliance_matrix;
+-    alliance_matrix = 0;
++//    delete[] alliance_matrix; // XXX ALLY
++//    alliance_matrix = 0;
+     max_players = 0;
+ 
+     SDL_DestroyMutex(mutex);
+@@ -252,44 +254,49 @@
+ 
+ void PlayerInterface::lockPlayerStats()
+ {
+-    unsigned long player_index;
++    PlayerID player_id;
+ 
+     SDL_mutexP(mutex);
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        player_lists[ player_index ].lockStats();
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        player_lists[ player_id ].lockStats();
+     } // ** for
+     SDL_mutexV(mutex);
+ }
+ 
+ void PlayerInterface::unlockPlayerStats()
+ {
+-    unsigned long player_index;
++    PlayerID player_id;
+ 
+     SDL_mutexP(mutex);
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        player_lists[ player_index ].unlockStats();
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        player_lists[ player_id ].unlockStats();
+     } // ** for
+     SDL_mutexV(mutex);
+ }
+ 
+ void PlayerInterface::resetPlayerStats()
+ {
+-    unsigned long player_index;
++    PlayerID player_id;
+ 
+     SDL_mutexP(mutex);
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        player_lists[ player_index ].resetStats();
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        player_lists[ player_id ].resetStats();
+     } // ** for
+     SDL_mutexV(mutex);
+ }
+ 
+ int PlayerInterface::getActivePlayerCount()
+ {
+-    unsigned long player_index;
++    PlayerID player_id;
+     int count = 0;;
+ 
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        if ( player_lists[ player_index ].getStatus() == _player_state_active ) {
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        if ( player_lists[ player_id ].getStatus() == _player_state_active )
++        {
+             count++;
+         }
+     } // ** for
+@@ -308,14 +315,15 @@
+     return &amp;player_lists[local_player_index];
+ }
+ 
+-int PlayerInterface::countPlayers()
++PlayerID PlayerInterface::countPlayers()
+ {
+-    int count=0;
+-    for ( int player_index = 0; player_index &lt; max_players; player_index++ )
++    PlayerID count;
++    PlayerID player_id;
++    for ( player_id = 0, count=0; player_id &lt; max_players; ++player_id )
+     {
+-        if ( player_lists[ player_index ].getStatus() == _player_state_active )
++        if ( player_lists[ player_id ].getStatus() == _player_state_active )
+         {
+-            count++;
++            ++count;
+         }
+     }
+     return count;
+@@ -323,19 +331,19 @@
+ 
+ PlayerState * PlayerInterface::allocateNewPlayer()
+ {
+-    unsigned long player_index;
++    PlayerID player_id;
+ 
+     SDL_mutexP(mutex);
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ )
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+-        if ( player_lists[ player_index ].getStatus() == _player_state_free )
++        if ( player_lists[ player_id ].getStatus() == _player_state_free )
+         {
+-            player_lists[ player_index ].setStatus( _player_state_allocated );
+-            player_lists[ player_index ].resetStats();
+-            player_lists[ player_index ].setColor( player_index );
+-            player_lists[ player_index ].setID((unsigned short)player_index);
++            player_lists[ player_id ].setStatus( _player_state_allocated );
++            player_lists[ player_id ].resetStats();
++            player_lists[ player_id ].setColor( player_id );
++            player_lists[ player_id ].setID(player_id);
+             SDL_mutexV(mutex);
+-            return( &amp;player_lists[ player_index ] );
++            return( &amp;player_lists[ player_id ] );
+         } // ** if
+ 
+     } // ** for
+@@ -344,16 +352,16 @@
+     return( 0 );
+ }
+ 
+-void PlayerInterface::spawnPlayer( unsigned short player_index, const iXY &amp;location )
++void PlayerInterface::spawnPlayer( PlayerID player_id, const iXY &amp;location )
+ {
+-    if ( player_index &lt; max_players )
++    if ( player_id &lt; max_players )
+     {
+         SDL_mutexP(mutex);
+-        if ( player_lists[player_index].getStatus() != _player_state_free )
++        if ( player_lists[player_id].getStatus() != _player_state_free )
+         {
+             UnitInterface::spawnPlayerUnits( location,
+-                                             player_index,
+-                                             player_lists[ player_index ].unit_config
++                                             player_id,
++                                             player_lists[ player_id ].unit_config
+                                            );
+         } // ** if _player_state_active
+         SDL_mutexV(mutex);
+@@ -363,11 +371,13 @@
+ 
+ bool PlayerInterface::testRuleScoreLimit( long score_limit, PlayerState ** player_state )
+ {
+-    unsigned long player_index;
++    PlayerID player_id;
+ 
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        if ( player_lists[ player_index ].getKills() &gt;= score_limit ) {
+-            *player_state = &amp;player_lists[ player_index ];
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        if ( player_lists[ player_id ].getKills() &gt;= score_limit )
++        {
++            *player_state = &amp;player_lists[ player_id ];
+             return( true );
+         } // ** if
+ 
+@@ -376,7 +386,7 @@
+     return( false );
+ }
+ 
+-static bool testRuleObjectiveOccupationRatio( Uint16 player_index,
++static bool testRuleObjectiveOccupationRatio( PlayerID player_id,
+                                               float precentage )
+ {
+     ObjectiveID num_objectives = ObjectiveInterface::getObjectiveCount();
+@@ -395,17 +405,18 @@
+ 
+         if ( objective_state-&gt;occupying_player != 0 )
+         {
+-            Uint16 occuping_player_index = objective_state-&gt;occupying_player-&gt;getID();
++            PlayerID occuping_player_id = objective_state-&gt;occupying_player-&gt;getID();
+ 
+-            if ( occuping_player_index == player_index )
++            if ( occuping_player_id == player_id )
+             {
+                 occupied++;
+             }
+-            else if ( PlayerInterface::isAllied(occuping_player_index, player_index)
+-                      &amp;&amp; PlayerInterface::isAllied(player_index, occuping_player_index) )
+-            {
+-                occupied++;
+-            }
++            // XXX ALLY
++//            else if ( PlayerInterface::isAllied(occuping_player_index, player_index)
++//                      &amp;&amp; PlayerInterface::isAllied(player_index, occuping_player_index) )
++//            {
++//                occupied++;
++//            }
+         }
+     }
+ 
+@@ -419,13 +430,13 @@
+ 
+ bool PlayerInterface::testRuleObjectiveRatio( float precentage, PlayerState ** player_state )
+ {
+-    unsigned long player_index;
++    PlayerID player_id;
+ 
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ )
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
+     {
+-        if ( testRuleObjectiveOccupationRatio(player_index, precentage) )
++        if ( testRuleObjectiveOccupationRatio(player_id, precentage) )
+         {
+-            *player_state = &amp;player_lists[ player_index ];
++            *player_state = &amp;player_lists[ player_id ];
+             return true;
+         } // ** if
+     } // ** for
+@@ -436,7 +447,8 @@
+ 
+ bool PlayerInterface::testRulePlayerRespawn( bool *completed, PlayerState **player_state )
+ {
+-    if ( respawn_rule_player_index == max_players )
++    if ( respawn_rule_player_index == max_players
++        || respawn_rule_player_index == INVALID_PLAYER_ID )
+     {
+         respawn_rule_player_index = 0;
+         *completed = true;
+@@ -451,18 +463,18 @@
+         if ( UnitInterface::getUnitCount( respawn_rule_player_index ) == 0 )
+         {
+             *player_state = &amp;player_lists[ respawn_rule_player_index ];
+-            respawn_rule_player_index++;
++            ++respawn_rule_player_index;
+             return( true );
+         }
+ 
+-    respawn_rule_player_index++;
++    ++respawn_rule_player_index;
+     return( false );
+ }
+ 
+-void PlayerInterface::startPlayerStateSync(Uint16 player_index)
++void PlayerInterface::startPlayerStateSync(PlayerID player_id)
+ {
+     player_sync_index = 0;
+-    player_sync_connect_player_index = player_index;
++    player_sync_connect_player_index = player_id;
+     player_sync_timer.changeRate( 4 );
+ }
+ 
+@@ -522,19 +534,20 @@
+ {
+     const PlayerStateSync *sync_mesg
+         = (const PlayerStateSync *) message;
+-    Uint16 player_index = sync_mesg-&gt;player_state.getPlayerIndex();
++    PlayerID player_id = sync_mesg-&gt;player_state.getPlayerIndex();
+ 
+-    if(player_index &gt;= max_players) {
++    if(player_id &gt;= max_players) {
+         LOGGER.warning(&quot;Malformed MessageSyncState message&quot;);
+         return;
+     }
+     
+     SDL_mutexP(mutex);
+-        player_lists[player_index].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
+-        if ( player_lists[player_index].getStatus() == _player_state_free )
+-        {
+-            disconnectedPlayerAllianceCleanup(player_index);
+-        }
++        player_lists[player_id].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
++        // XXX ALLY
++//        if ( player_lists[player_index].getStatus() == _player_state_free )
++//        {
++//            disconnectedPlayerAllianceCleanup(player_index);
++//        }
+     SDL_mutexV(mutex);
+ }
+ 
+@@ -556,64 +569,65 @@
+     setKill(player1, player2, (UnitType) score_update-&gt;unit_type );
+ }
+ 
+-void PlayerInterface::netMessageAllianceRequest(const NetMessage *message)
+-{
+-    if ( gameconfig-&gt;allowallies == false )
+-    {
+-        return;
+-    }
++// XXX ALLY
++//void PlayerInterface::netMessageAllianceRequest(const NetMessage *message)
++//{
++//    if ( gameconfig-&gt;allowallies == false )
++//    {
++//        return;
++//    }
++//
++//    const PlayerAllianceRequest *allie_request
++//        = (const PlayerAllianceRequest *) message;
++//
++//    if(allie_request-&gt;getAllieByPlayerIndex() &gt;= max_players
++//       || allie_request-&gt;getAllieWithPlayerIndex() &gt;= max_players)
++//    {
++//        LOGGER.warning(&quot;Invalid alliance request message&quot;);
++//        return;
++//    }
++//
++//    SDL_mutexP(mutex);
++//    handleAllianceMessage(allie_request-&gt;alliance_request_type,
++//                          allie_request-&gt;getAllieByPlayerIndex(),
++//                          allie_request-&gt;getAllieWithPlayerIndex());
++//    SDL_mutexV(mutex);
++//
++//    PlayerAllianceUpdate allie_update;
++//    allie_update.set(allie_request-&gt;getAllieByPlayerIndex(),
++//                     allie_request-&gt;getAllieWithPlayerIndex(),
++//                     allie_request-&gt;alliance_request_type);
++////    SERVER-&gt;broadcastMessage(&amp;allie_update, sizeof(PlayerAllianceUpdate));
++//    if ( allie_request-&gt;getAllieByPlayerIndex() != local_player_index )
++//    {
++//        SERVER-&gt;sendMessage(allie_request-&gt;getAllieByPlayerIndex(),
++//                            &amp;allie_update, sizeof(PlayerAllianceUpdate));
++//    }
++//    if ( allie_request-&gt;getAllieWithPlayerIndex() != local_player_index )
++//    {
++//        SERVER-&gt;sendMessage(allie_request-&gt;getAllieWithPlayerIndex(),
++//                            &amp;allie_update, sizeof(PlayerAllianceUpdate));
++//    }
++//}
++//
++//void PlayerInterface::netMessageAllianceUpdate(const NetMessage* message)
++//{
++//    const PlayerAllianceUpdate* allie_update
++//        = (const PlayerAllianceUpdate *) message;
++//
++//    if(allie_update-&gt;getAllieByPlayerIndex() &gt;= max_players
++//       || allie_update-&gt;getAllieWithPlayerIndex() &gt;= max_players) {
++//        LOGGER.warning(&quot;Invalid alliance update message&quot;);
++//        return;
++//    }
++//
++//    SDL_mutexP(mutex);
++//    handleAllianceMessage(allie_update-&gt;alliance_update_type,
++//                          allie_update-&gt;getAllieByPlayerIndex(),
++//                          allie_update-&gt;getAllieWithPlayerIndex());
++//    SDL_mutexV(mutex);
++//}
+ 
+-    const PlayerAllianceRequest *allie_request
+-        = (const PlayerAllianceRequest *) message;
+-
+-    if(allie_request-&gt;getAllieByPlayerIndex() &gt;= max_players
+-       || allie_request-&gt;getAllieWithPlayerIndex() &gt;= max_players)
+-    {
+-        LOGGER.warning(&quot;Invalid alliance request message&quot;);
+-        return;
+-    }
+-
+-    SDL_mutexP(mutex);
+-    handleAllianceMessage(allie_request-&gt;alliance_request_type,
+-                          allie_request-&gt;getAllieByPlayerIndex(),
+-                          allie_request-&gt;getAllieWithPlayerIndex());
+-    SDL_mutexV(mutex);
+-
+-    PlayerAllianceUpdate allie_update;
+-    allie_update.set(allie_request-&gt;getAllieByPlayerIndex(),
+-                     allie_request-&gt;getAllieWithPlayerIndex(),
+-                     allie_request-&gt;alliance_request_type);
+-//    SERVER-&gt;broadcastMessage(&amp;allie_update, sizeof(PlayerAllianceUpdate));
+-    if ( allie_request-&gt;getAllieByPlayerIndex() != local_player_index )
+-    {
+-        SERVER-&gt;sendMessage(allie_request-&gt;getAllieByPlayerIndex(),
+-                            &amp;allie_update, sizeof(PlayerAllianceUpdate));
+-    }
+-    if ( allie_request-&gt;getAllieWithPlayerIndex() != local_player_index )
+-    {
+-        SERVER-&gt;sendMessage(allie_request-&gt;getAllieWithPlayerIndex(),
+-                            &amp;allie_update, sizeof(PlayerAllianceUpdate));
+-    }
+-}
+-
+-void PlayerInterface::netMessageAllianceUpdate(const NetMessage* message)
+-{
+-    const PlayerAllianceUpdate* allie_update
+-        = (const PlayerAllianceUpdate *) message;
+-
+-    if(allie_update-&gt;getAllieByPlayerIndex() &gt;= max_players
+-       || allie_update-&gt;getAllieWithPlayerIndex() &gt;= max_players) {
+-        LOGGER.warning(&quot;Invalid alliance update message&quot;);
+-        return;
+-    }
+-
+-    SDL_mutexP(mutex);
+-    handleAllianceMessage(allie_update-&gt;alliance_update_type,
+-                          allie_update-&gt;getAllieByPlayerIndex(),
+-                          allie_update-&gt;getAllieWithPlayerIndex());
+-    SDL_mutexV(mutex);
+-}
+-
+ void PlayerInterface::processNetMessage(const NetMessage* message)
+ {
+     switch(message-&gt;message_id) {
+@@ -628,31 +642,26 @@
+         case _net_message_id_player_score_update :
+             netMessageScoreUpdate(message);
+             break;
+-
+-        case _net_message_id_player_alliance_request :
+-            netMessageAllianceRequest(message);
+-            break;
+-
+-        case _net_message_id_player_alliance_update :
+-            netMessageAllianceUpdate(message);
+-            break;
++        // XXX ALLY
++//        case _net_message_id_player_alliance_request :
++//            netMessageAllianceRequest(message);
++//            break;
++//
++//        case _net_message_id_player_alliance_update :
++//            netMessageAllianceUpdate(message);
++//            break;
+     }
+ }
+ 
+-void PlayerInterface::disconnectPlayerCleanup( Uint16 index )
++void PlayerInterface::disconnectPlayerCleanup( PlayerID player_id )
+ {
+-    PlayerState *player_state = getPlayer( index );
++    PlayerState *player_state = getPlayer( player_id );
+     if ( player_state )
+     {
+-        PlayerAllianceUpdate allie_update;
+-
+-        unsigned short disconnect_player_index;
+-
+-        disconnect_player_index = index;
+-
+         SDL_mutexP(mutex);
+ 
+-        disconnectedPlayerAllianceCleanup(disconnect_player_index);
++        // XXX ALLY
++//        disconnectedPlayerAllianceCleanup(player_id);
+ 
+         player_state-&gt;setStatus( _player_state_free );
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -19,6 +19,7 @@
+ #define _PLAYERINTERFACE_HPP
+ 
+ #include &lt;SDL_thread.h&gt;
++#include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ 
+@@ -26,14 +27,14 @@
+ {
+ protected:
+     static PlayerState *player_lists;
+-    static unsigned short max_players;
+-    static unsigned short local_player_index;
++    static PlayerID max_players;
++    static PlayerID local_player_index;
+ 
+     static SDL_mutex* mutex;
+ 
+ public:
+ 
+-    static void initialize(unsigned short maxPlayers);
++    static void initialize(const unsigned int _max_players);
+ 
+     static void reset();
+ 
+@@ -45,22 +46,22 @@
+     static void setKill(PlayerState* by_player, PlayerState* on_player,
+             UnitType unit_type );
+ 
+-    static bool isAllied(unsigned short player, unsigned short with_player);
+-    static bool isSingleAllied(unsigned short player, unsigned short with_player);
++    //static bool isAllied(unsigned short player, unsigned short with_player);
++    //static bool isSingleAllied(unsigned short player, unsigned short with_player);
+ 
+     static void lockPlayerStats();
+     static void unlockPlayerStats();
+ 
+-    static unsigned short getMaxPlayers( )
++    static PlayerID getMaxPlayers( )
+     {
+         return max_players;
+     }
+ 
+-    static PlayerState* getPlayer(Uint16 player_index)
++    static PlayerState* getPlayer(PlayerID player_id)
+     {
+-        if ( player_index &lt; max_players )
++        if ( player_id &lt; max_players )
+         {
+-            return &amp;player_lists[player_index];
++            return &amp;player_lists[player_id];
+         }
+         return NULL;
+     }
+@@ -70,7 +71,7 @@
+         return &amp;player_lists[ local_player_index ];
+     }
+ 
+-    static Uint16 getLocalPlayerIndex()
++    static PlayerID getLocalPlayerIndex()
+     {
+         return local_player_index;
+     }
+@@ -82,35 +83,35 @@
+     static PlayerState * allocateLoopBackPlayer();
+ 
+     static PlayerState * allocateNewPlayer();
+-    static int countPlayers();
++    static PlayerID countPlayers();
+ 
+-    static void spawnPlayer( Uint16 player_index, const iXY &amp;location );
++    static void spawnPlayer( PlayerID player_id, const iXY &amp;location );
+ 
+     static bool testRuleScoreLimit( long score_limit, PlayerState ** player_state );
+ 
+     static bool testRuleObjectiveRatio( float precentage, PlayerState ** player_state );
+ 
+ protected:
+-    static unsigned short respawn_rule_player_index;
++    static PlayerID respawn_rule_player_index;
+ public:
+     static bool testRulePlayerRespawn( bool *completed, PlayerState **player_state );
+ 
+ protected:
+-    static Uint16 player_sync_index;
+-    static Uint16 player_sync_connect_player_index;
++    static PlayerID player_sync_index;
++    static PlayerID player_sync_connect_player_index;
+     static Timer player_sync_timer;
+ 
+     static void netMessageConnectID(const NetMessage *message );
+     static void netMessageSyncState(const NetMessage *message );
+     static void netMessageScoreUpdate(const NetMessage *message );
+-    static void netMessageAllianceRequest(const NetMessage *message );
+-    static void netMessageAllianceUpdate(const NetMessage *message );
++    //static void netMessageAllianceRequest(const NetMessage *message );
++    //static void netMessageAllianceUpdate(const NetMessage *message );
+ 
+ public:
+-    static void startPlayerStateSync(Uint16 player_index);
++    static void startPlayerStateSync(PlayerID player_id);
+     static bool syncNextPlayerState( NetworkPlayerState &amp;dest, int *percent_complete);
+     static void processNetMessage(const NetMessage *message );
+-    static void disconnectPlayerCleanup( Uint16 index );
++    static void disconnectPlayerCleanup( PlayerID player_id );
+ };
+ 
+ #endif // ** _PLAYERINTERFACE_HP
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -35,7 +35,7 @@
+ using namespace std;
+ 
+ ClientSocket::ClientSocket(ClientSocketObserver *o, const std::string&amp; whole_servername)
+-    : observer(0), socket(0), sendpos(0), tempoffset(0), playerIndex(-1)
++    : observer(0), socket(0), sendpos(0), tempoffset(0), player_id(INVALID_PLAYER_ID)
+ {
+     try {
+         proxy.setProxy(gameconfig-&gt;proxyserver,
+@@ -72,7 +72,7 @@
+     }
+ }
+ ClientSocket::ClientSocket(ClientSocketObserver *o)
+-    : observer(o), socket(0), sendpos(0), tempoffset(0), playerIndex(-1)
++    : observer(o), socket(0), sendpos(0), tempoffset(0), player_id(INVALID_PLAYER_ID)
+ {
+     initId();
+ }
+@@ -168,7 +168,7 @@
+             }
+             
+             if ( remaining &gt;= packetsize ) {
+-                EnqueueIncomingPacket(data+dataptr, packetsize, playerIndex, this);
++                EnqueueIncomingPacket(data+dataptr, packetsize, player_id, this);
+                 remaining -= packetsize;
+                 dataptr   += packetsize;
+             } else {
+@@ -216,7 +216,7 @@
+             }
+             
+             if ( tempoffset == packetsize ) {
+-                EnqueueIncomingPacket(tempbuffer, packetsize, playerIndex, this);
++                EnqueueIncomingPacket(tempbuffer, packetsize, player_id, this);
+                 tempoffset = 0;
+             }
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -53,9 +53,9 @@
+     int getId() { return id; };
+     std::string getIPAddress();
+     
+-    int getPlayerIndex()
++    PlayerID getPlayerIndex()
+     {
+-        return playerIndex;
++        return player_id;
+     }
+     
+ protected:
+@@ -76,7 +76,7 @@
+     char tempbuffer[_MAX_NET_PACKET_SIZE];
+     Uint16 tempoffset;
+     int id;
+-    int playerIndex;
++    PlayerID player_id;
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -102,7 +102,7 @@
+ 
+ void Objective::getSyncData(ObjectiveSyncData&amp; sync_data)
+ {
+-    Uint16 player_id = 0xffff;
++    PlayerID player_id = INVALID_PLAYER_ID;
+     if ( occupying_player != 0 )
+     {
+         player_id = occupying_player-&gt;getID();
+@@ -117,7 +117,7 @@
+     if ( sync_data.getPlayerId() &gt;= PlayerInterface::getMaxPlayers() )
+     {
+         occupying_player = 0;
+-        if ( sync_data.getPlayerId() != 0xffff )
++        if ( sync_data.getPlayerId() != INVALID_PLAYER_ID )
+         {
+             LOGGER.warning(&quot;Malformed ObjectvieMesgSync&quot;);
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -300,8 +300,8 @@
+                 break;
+             }
+ 
+-            Uint16 player_id = msg-&gt;getPlayerId();
+-            if ( player_id &gt;= PlayerInterface::getMaxPlayers() &amp;&amp; player_id != 0xffff )
++            PlayerID player_id = msg-&gt;getPlayerId();
++            if ( player_id &gt;= PlayerInterface::getMaxPlayers() &amp;&amp; player_id != INVALID_PLAYER_ID )
+             {
+                 LOGGER.warning(&quot;OICH_OOU CHEAT SERVER sent invalid player_id %u, max is %u&quot;,
+                                player_id, PlayerInterface::getMaxPlayers());
+@@ -310,7 +310,7 @@
+             
+             PlayerState* player = 0;
+ 
+-            if ( player_id != 0xffff )
++            if ( player_id != INVALID_PLAYER_ID )
+             {
+                 player = PlayerInterface::getPlayer(player_id);
+                 if ( player &amp;&amp; player-&gt;getStatus() != _player_state_active )
+@@ -442,7 +442,7 @@
+ }
+ 
+ void
+-ObjectiveInterface::disownPlayerObjectives(Uint16 player_id)
++ObjectiveInterface::disownPlayerObjectives(PlayerID player_id)
+ {
+     for(Uint16 i = 0; i &lt; num_objectives; ++i)
+     {
+@@ -452,7 +452,7 @@
+             objective_list[i]-&gt;changeOwner(0);
+ 
+             ObjectiveOccupationUpdate update_mesg;
+-            update_mesg.set( i, 0xffff);
++            update_mesg.set( i, INVALID_PLAYER_ID);
+             SERVER-&gt;broadcastMessage(&amp;update_mesg, sizeof(update_mesg));
+         }
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -50,7 +50,7 @@
+ 
+     static void updateObjectiveStatus();
+ 
+-    static void disownPlayerObjectives(Uint16 player_id);
++    static void disownPlayerObjectives(PlayerID player_id);
+ 
+     static Objective* getObjective( ObjectiveID objective_id )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -140,7 +140,7 @@
+ }
+ 
+ bool
+-ScriptManager::runServerCommand(const char* str, Uint16 runPlayer)
++ScriptManager::runServerCommand(const char* str, PlayerID runPlayer)
+ {
+     int luatop = lua_gettop(luavm);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -37,7 +37,7 @@
+         
+     static void runStr(const char * runname, const char * str);
+     static bool runUserCommand(const char * str);
+-    static bool runServerCommand(const char * str, Uint16 runPlayer);
++    static bool runServerCommand(const char * str, PlayerID runPlayer);
+     
+     // NOTE: runFile has to run after FileSystem has been initialized.
+     static void runFile(const char * runname, const char * filename);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -52,7 +52,7 @@
+ UnitInterface::PlayerUnitList* UnitInterface::playerUnitLists = 0;
+ UnitBucketArray UnitInterface::unit_bucket_array;
+ 
+-unsigned short UnitInterface::max_players;
++PlayerID UnitInterface::max_players;
+ PlacementMatrix UnitInterface::unit_placement_matrix;
+ 
+ UnitID UnitInterface::lastUnitID;
+@@ -284,7 +284,7 @@
+ 
+ UnitBase * UnitInterface::newUnit( unsigned short unit_type,
+                                    const iXY &amp;location,
+-                                   unsigned short player_index,
++                                   PlayerID player_index,
+                                    UnitID id)
+ {
+     UnitBase* unit = 0;
+@@ -371,7 +371,7 @@
+ // ******************************************************************
+ UnitBase* UnitInterface::createUnit( unsigned short unit_type,
+                                       const iXY &amp;location,
+-                                      Uint16 player_id)
++                                      PlayerID player_id)
+ {
+     if (playerUnitLists[player_id].size() &gt;= units_per_player)
+ 	return 0;
+@@ -385,7 +385,7 @@
+ // ******************************************************************
+ 
+ void UnitInterface::spawnPlayerUnits(const iXY &amp;location,
+-                                     Uint16 player_id,
++                                     PlayerID player_id,
+                                      const PlayerUnitConfig &amp;unit_config)
+ {
+     iXY next_loc;
+@@ -419,7 +419,7 @@
+ 
+ void
+ UnitInterface::queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-        const iXY&amp; point, Uint16 player_id, unsigned char search_flags)
++        const iXY&amp; point, PlayerID player_id, unsigned char search_flags)
+ {
+     for(Units::iterator i = units.begin(); i != units.end(); ++i) {
+         UnitBase* unit = i-&gt;second;
+@@ -441,7 +441,7 @@
+ 
+ void
+ UnitInterface::queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-        const iRect&amp; rect, Uint16 player_id, unsigned char search_flags)
++        const iRect&amp; rect, PlayerID player_id, unsigned char search_flags)
+ {
+     for(Units::iterator i = units.begin(); i != units.end(); ++i) {
+         UnitBase* unit = i-&gt;second;
+@@ -483,7 +483,7 @@
+ /****************************************************************************/
+ 
+ bool UnitInterface::queryClosestUnit( UnitBase **closest_unit_ptr,
+-                                       iXY &amp;loc, Uint16 player_id,
++                                       iXY &amp;loc, PlayerID player_id,
+                                        unsigned char search_flags )
+ {
+     long closest_magnitude = 0;
+@@ -577,17 +577,18 @@
+ // ******************************************************************
+ 
+ bool UnitInterface::queryClosestEnemyUnit(UnitBase **closest_unit_ptr,
+-        iXY &amp;loc, Uint16 player_index)
++        iXY &amp;loc, PlayerID player_index)
+ {
+     UnitBase *closest_unit = 0;
+     long closest_magnitude = 0;
+ 
+     for(Units::iterator i = units.begin(); i != units.end(); ++i) {
+         UnitBase* unit = i-&gt;second;
+-        Uint16 unitPlayerID = unit-&gt;player-&gt;getID();
++        PlayerID unitPlayerID = unit-&gt;player-&gt;getID();
+         
+         if(unitPlayerID == player_index
+-                || PlayerInterface::isAllied(player_index, unitPlayerID))
++//                || PlayerInterface::isAllied(player_index, unitPlayerID) // XXX ALLY
++                )
+             continue;
+ 
+         iXY delta;
+@@ -621,7 +622,7 @@
+ 
+ unsigned char UnitInterface::queryUnitLocationStatus(iXY loc)
+ {
+-    Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
++    PlayerID player_id = PlayerInterface::getLocalPlayerIndex();
+ 
+     std::vector&lt;UnitID&gt; locUnits;
+     queryUnitsAt(locUnits, loc, player_id, 0);
+@@ -637,9 +638,10 @@
+     if(unit-&gt;player-&gt;getID() == player_id) {
+         return _unit_player;
+     }
+-    if(PlayerInterface::isAllied(player_id, unit-&gt;player-&gt;getID())) {
+-        return _unit_allied;
+-    }
++    // XXX ALLY
++//    if(PlayerInterface::isAllied(player_id, unit-&gt;player-&gt;getID())) {
++//        return _unit_allied;
++//    }
+ 
+     return _unit_enemy;
+ }
+@@ -790,7 +792,7 @@
+     const UnitRemoteCreate* create_mesg 
+         = (const UnitRemoteCreate *) net_message;
+ 
+-    Uint16 player_index = create_mesg-&gt;getPlayerID();
++    PlayerID player_index = create_mesg-&gt;getPlayerID();
+ 
+     try {
+         std::map&lt;UnitID, UnitBase*&gt;::iterator uit = units.find(create_mesg-&gt;getUnitID());
+@@ -853,7 +855,7 @@
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::destroyPlayerUnits(Uint16 player_id)
++void UnitInterface::destroyPlayerUnits(PlayerID player_id)
+ {
+     UMesgSelfDestruct self_destruct;
+     self_destruct.setHeader(0, _umesg_flag_unique);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -49,7 +49,7 @@
+     static PlayerUnitList* playerUnitLists;
+         
+     static UnitBucketArray unit_bucket_array;
+-    static unsigned short max_players;
++    static PlayerID max_players;
+     static size_t units_per_player;
+     static PlacementMatrix unit_placement_matrix;
+ 
+@@ -58,7 +58,7 @@
+ 
+     static UnitBase* newUnit(unsigned short unit_type,
+                              const iXY &amp;location,
+-                             unsigned short player_index,
++                             PlayerID player_index,
+                              UnitID id);
+     static void addNewUnit(UnitBase *unit);
+     static void removeUnit(Units::iterator i);
+@@ -75,7 +75,7 @@
+         return units;
+     }
+ 
+-    static const PlayerUnitList&amp; getPlayerUnits(Uint16 player_id)
++    static const PlayerUnitList&amp; getPlayerUnits(PlayerID player_id)
+     {
+         assert(player_id &lt; max_players);
+         return playerUnitLists[player_id];
+@@ -89,7 +89,7 @@
+     }
+ #endif
+ 
+-    static size_t getUnitCount(unsigned short player_index)
++    static size_t getUnitCount(PlayerID player_index)
+     {
+         assert( (player_index &lt; max_players) );
+         return playerUnitLists[player_index].size();
+@@ -112,25 +112,25 @@
+ 
+     static UnitBase* createUnit( unsigned short unit_type,
+                                   const iXY &amp;location,
+-                                  Uint16 player_id);
++                                  PlayerID player_id);
+ 
+     static void spawnPlayerUnits( const iXY &amp;location,
+-                                  Uint16 player_id,
++                                  PlayerID player_id,
+                                   const PlayerUnitConfig &amp;unit_config );
+ 
+     static void queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-                             const iXY&amp; point, Uint16 player_id,
++                             const iXY&amp; point, PlayerID player_id,
+                              unsigned char search_flags);
+ 
+     static void queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-                            const iRect&amp; rect, Uint16 player_id,
++                            const iRect&amp; rect, PlayerID player_id,
+                             unsigned char search_flags);
+ 
+     static PlayerState* querySinglePlayerInArea(const iRect&amp; rect);
+ 
+     static bool queryClosestUnit( UnitBase **closest_unit_ptr,
+                                    iXY &amp;loc,
+-                                   Uint16 player_id,
++                                   PlayerID player_id,
+                                    unsigned char search_flags );
+ 
+     static bool queryClosestUnit( UnitBase **closest_unit_ptr,
+@@ -139,7 +139,7 @@
+ 
+     static bool queryClosestEnemyUnit(UnitBase **closest_unit_ptr,
+                                       iXY &amp;loc,
+-                                      Uint16 player_index);
++                                      PlayerID player_index);
+ 
+     static bool queryUnitAtMapLoc( iXY map_loc, UnitID *query_unit_id );
+ 
+@@ -181,7 +181,7 @@
+ 
+ public:
+     static void processNetMessage(const NetMessage *net_message );
+-    static void destroyPlayerUnits(Uint16 player_id);
++    static void destroyPlayerUnits(PlayerID player_id);
+ };
+ 
+ #endif // ** _UNITINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -166,11 +166,12 @@
+             {
+                 color = gameconfig-&gt;getPlayerOutpostRadarColor();
+             }
+-            else if ( PlayerInterface::isAllied(obj-&gt;occupying_player-&gt;getID(),
+-                                                PlayerInterface::getLocalPlayerIndex()) )
+-            {
+-                color = gameconfig-&gt;getAlliedOutpostRadarColor();
+-            }
++            // XXX ALLY
++//            else if ( PlayerInterface::isAllied(obj-&gt;occupying_player-&gt;getID(),
++//                                                PlayerInterface::getLocalPlayerIndex()) )
++//            {
++//                color = gameconfig-&gt;getAlliedOutpostRadarColor();
++//            }
+             else
+             {
+                 color = obj-&gt;occupying_player-&gt;getColor();
+@@ -261,10 +262,11 @@
+                 }
+             }
+         }
+-        else if (PlayerInterface::isAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID()))
+-        {
+-            color = gameconfig-&gt;getAlliedRadarUnitColor();
+-        }
++        // XXX ALLY
++//        else if (PlayerInterface::isAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID()))
++//        {
++//            color = gameconfig-&gt;getAlliedRadarUnitColor();
++//        }
+         else if ( EnemyRadarPowerUp::isRadarActive() )
+         {
+             color = unit-&gt;player-&gt;getColor();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -344,7 +344,7 @@
+ 
+     char strBuf[256];
+     int total = 0;
+-    int max_players;
++    PlayerID max_players;
+ 
+ 
+     iXY str_loc(2, INFO_AREA_Y_OFFSET);
+@@ -355,8 +355,9 @@
+     str_loc.y += 12;
+ 
+     max_players = PlayerInterface::getMaxPlayers();
+-
+-    for ( int i = 0; i &lt; max_players; i++ ) {
++    PlayerID i;
++    for ( i = 0; i &lt; max_players; ++i )
++    {
+         unsigned long units;
+         units = UnitInterface::getUnitCount( i );
+         total += units;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-06-05 03:14:27 UTC (rev 1219)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-06-05 14:54:18 UTC (rev 1220)
+@@ -144,7 +144,9 @@
+     char statBuf[256];
+ 
+     states.clear();
+-    for(size_t i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i) {
++    PlayerID i;
++    for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
++    {
+         PlayerState* state = PlayerInterface::getPlayer(i);
+         if(state-&gt;getStatus() != _player_state_active)
+             continue;
+@@ -181,8 +183,12 @@
+         flag-&gt;blt( dest, FLAG_START, flag_pos );
+         if ( state-&gt;getID() != PlayerInterface::getLocalPlayerIndex() )
+         {
+-            bool meWithHim = PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), state-&gt;getID());
+-            bool himWithMe = PlayerInterface::isSingleAllied(state-&gt;getID(), PlayerInterface::getLocalPlayerIndex());
++            // XXX ALLY
++//            bool meWithHim = PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), state-&gt;getID());
++//            bool himWithMe = PlayerInterface::isSingleAllied(state-&gt;getID(), PlayerInterface::getLocalPlayerIndex());
++            bool meWithHim = false;
++            bool himWithMe = false;
++            
+             if ( meWithHim &amp;&amp; himWithMe )
+             {
+                 allyImage.bltTrans(dest, ALLY_START, flag_pos );
+@@ -218,31 +224,32 @@
+ void RankView::lMouseDown(const iXY&amp; pos)
+ {
+     GameTemplateView::lMouseDown(pos);
+-    if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= TABLE_START )
+-    {
+-        unsigned int ypos = pos.y - TABLE_START;
+-        unsigned int linepos = ypos / ENTRY_HEIGHT;
+-        if ( linepos &lt; states.size() )
+-        {
+-            unsigned int destplayer = states[linepos]-&gt;getID();
+-            unsigned int localplayer = PlayerInterface::getLocalPlayerIndex();
+-            if ( destplayer != localplayer )
+-            {
+-                PlayerAllianceRequest allie_request;
+-
+-                if ( PlayerInterface::isSingleAllied(localplayer, destplayer) )
+-                {
+-                    allie_request.set( localplayer, destplayer, _player_break_alliance);
+-                }
+-                else
+-                {
+-                    allie_request.set( localplayer, destplayer, _player_make_alliance);
+-                }
+-
+-                CLIENT-&gt;sendMessage( &amp;allie_request, sizeof(PlayerAllianceRequest));
+-            }
+-        }
+-    }
++    // XXX ALLY
++//    if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= TABLE_START )
++//    {
++//        unsigned int ypos = pos.y - TABLE_START;
++//        unsigned int linepos = ypos / ENTRY_HEIGHT;
++//        if ( linepos &lt; states.size() )
++//        {
++//            unsigned int destplayer = states[linepos]-&gt;getID();
++//            unsigned int localplayer = PlayerInterface::getLocalPlayerIndex();
++//            if ( destplayer != localplayer )
++//            {
++//                PlayerAllianceRequest allie_request;
++//
++//                if ( PlayerInterface::isSingleAllied(localplayer, destplayer) )
++//                {
++//                    allie_request.set( localplayer, destplayer, _player_break_alliance);
++//                }
++//                else
++//                {
++//                    allie_request.set( localplayer, destplayer, _player_make_alliance);
++//                }
++//
++//                CLIENT-&gt;sendMessage( &amp;allie_request, sizeof(PlayerAllianceRequest));
++//            }
++//        }
++//    }
+ }
+ 
+ void RankView::mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000245.html">[Netpanzer-cvs] r1219 - in trunk/netpanzer/src/NetPanzer:	Interfaces Particles Views/Components	Views/MainMenu/Multi/MasterServer
+</A></li>
+	<LI>Next message: <A HREF="000247.html">[Netpanzer-cvs] r1221 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

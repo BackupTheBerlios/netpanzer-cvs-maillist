@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r988 - trunk/netpanzer/src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r988%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C200706081913.l58JDsFS015762%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000032.html">
+   <LINK REL="Next"  HREF="000034.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r988 - trunk/netpanzer/src/NetPanzer/Views/Game</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r988%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C200706081913.l58JDsFS015762%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r988 - trunk/netpanzer/src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun  8 21:13:54 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000032.html">[Netpanzer-cvs] r987 -	branches/netpanzer-0.8/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000034.html">[Netpanzer-cvs] r989 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-08 21:13:53 +0200 (Fri, 08 Jun 2007)
+New Revision: 988
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+Limit the length of the name to 20 in the Rank view to avoid hidding the status by using long names
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2007-06-08 19:13:29 UTC (rev 987)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2007-06-08 19:13:53 UTC (rev 988)
+@@ -146,12 +146,15 @@
+     iXY offset(2, 40);
+     iXY flagOffset(162, 40 + (int(CHAR_YPIX - UNIT_FLAGS_SURFACE.getHeight()))/2);
+ 
++    char shortname[21];
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i) {
+         const PlayerState* state = *i;
++        
++        SDL_strlcpy(shortname,state-&gt;getName().c_str(),sizeof(shortname));
+ 
+         SDL_snprintf(statBuf, sizeof(statBuf),
+-                &quot;%-20s%10i%7i%6i%10i&quot;, state-&gt;getName().c_str(),
++                &quot;%-20s%10i%7i%6i%10i&quot;, shortname,
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+         dest.bltString(offset.x, offset.y, statBuf, state-&gt;getColor());
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000032.html">[Netpanzer-cvs] r987 -	branches/netpanzer-0.8/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000034.html">[Netpanzer-cvs] r989 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

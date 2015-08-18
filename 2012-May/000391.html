@@ -1,0 +1,338 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1367 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1367%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Views/Game&In-Reply-To=%3C20120518144855.EBC4655B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000390.html">
+   <LINK REL="Next"  HREF="000392.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1367 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1367%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Views/Game&In-Reply-To=%3C20120518144855.EBC4655B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1367 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Fri May 18 16:48:55 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000390.html">[Netpanzer-cvs] r1366 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000392.html">[Netpanzer-cvs] r1368 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#391">[ date ]</a>
+              <a href="thread.html#391">[ thread ]</a>
+              <a href="subject.html#391">[ subject ]</a>
+              <a href="author.html#391">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-05-18 16:48:55 +0200 (Fri, 18 May 2012)
+New Revision: 1367
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+Log:
+Client Synchronize the objective occupation with server
+TeamMode : 
+ - Finished prepare view
+ - improve start and restart game sever/client in team mode
+ - end of round work well now
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2012-05-16 15:36:42 UTC (rev 1366)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2012-05-18 14:48:55 UTC (rev 1367)
+@@ -182,12 +182,13 @@
+ public:
+     Uint8  powerup_state;
+     Uint8  teammode_state;
++    Uint8  occupation_percentage;
+ private:
+     Sint32  frag_limit;
+     Sint32  time_limit;
+     time_t   elapsed_time;
+     Sint32  flag_time;
+-
++    
+ public:
+     ConnectMesgServerGameSettings();
+     Uint16 getMaxPlayers() const;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-05-16 15:36:42 UTC (rev 1366)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-05-18 14:48:55 UTC (rev 1367)
+@@ -99,7 +99,7 @@
+ {
+     GameControlRulesDaemon::game_state = _game_state_prepare_team;
+     map_cycle_fsm_server_state = _map_cycle_server_prepare_team;
+-    cooldown.changePeriod(300);
++    cooldown.changePeriod(20);
+     cooldown.reset();
+ }
+ //-----------------------------------------------------------------
+@@ -181,24 +181,22 @@
+             map_cycle_fsm_client_state = _map_cycle_client_idle;
+             if (GameConfig::game_teammode)
+             {
+-                map_cycle_fsm_client_state = _map_cycle_client_prepare_team;
+-                TeamManager::reset();
+                 setStateServerprepareteam();
++                TeamManager::reset();
+                 cooldown.reset();
++                map_cycle_fsm_client_state = _map_cycle_client_prepare_team;
+             }
+         }
+- 
+         return;
+     }
+     break;
+ 
+     case _map_cycle_client_prepare_team :
+     {
+-        LOGGER.warning(&quot;_map_cycle_client_prepare_team&quot;);
+         if (!Desktop::getVisible(&quot;PrepareTeam&quot;)&amp;&amp; !Desktop::getVisible(&quot;GFlagSelectionView&quot;))
+         {
+-            TeamManager::reset();
+             Desktop::setVisibility(&quot;PrepareTeam&quot;, true);
++            TeamManager::reset();
+         }
+         if (Desktop::getVisible(&quot;PrepareTeam&quot;))
+             WorldViewInterface::MoveCamera();
+@@ -208,9 +206,9 @@
+  
+     case _map_cycle_client_team_start :
+     {
+-        LOGGER.warning(&quot;_map_cycle_client_team_start&quot;);
+         Desktop::setVisibility(&quot;PrepareTeam&quot;, false);
+         map_cycle_fsm_client_state = _map_cycle_client_idle;
++        setStateServerInProgress();
+         return;
+     }
+     break;
+@@ -382,8 +380,6 @@
+         SERVER-&gt;broadcastMessage( &amp;reset_game_logic_mesg, sizeof(SystemResetGameLogic));
+  
+         PlayerInterface::unlockPlayerStats();
+-        GameControlRulesDaemon::game_state = _game_state_in_progress;
+- 
+         LoadingView::loadFinish();
+  
+         GameControlCycleRespawnAck respawn_ack_mesg;
+@@ -397,7 +393,6 @@
+         {
+             map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+         }
+- 
+         ServerConnectDaemon::unlockConnectProcess();
+     }
+     break;
+@@ -529,6 +524,7 @@
+             {
+                 PlayerInterface::resetPlayerUnitConfig( player_state-&gt;getID() );
+                 GameManager::spawnPlayer( player_state-&gt;getID() );
++                LOGGER.warning(&quot;respawn_rule_complete&quot;);
+             }
+         }
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-05-16 15:36:42 UTC (rev 1366)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2012-05-18 14:48:55 UTC (rev 1367)
+@@ -468,6 +468,7 @@
+     game_setup-&gt;setGameType(GameConfig::game_gametype);
+     game_setup-&gt;powerup_state = GameConfig::game_powerups;
+     game_setup-&gt;teammode_state = GameConfig::game_teammode;
++    game_setup-&gt;occupation_percentage = GameConfig::game_occupationpercentage;
+     game_setup-&gt;setFragLimit(GameConfig::game_fraglimit);
+     game_setup-&gt;setTimeLimit(GameConfig::game_timelimit);
+     game_setup-&gt;setElapsedTime(getGameTime());
+@@ -522,6 +523,7 @@
+     GameConfig::game_windspeed = (int) game_setup-&gt;getWindSpeed();
+     GameConfig::game_powerups = game_setup-&gt;powerup_state;
+     GameConfig::game_teammode = game_setup-&gt;teammode_state;
++    GameConfig::game_occupationpercentage = game_setup-&gt;occupation_percentage;
+     GameConfig::game_gametype = game_setup-&gt;getGameType();
+     GameConfig::game_fraglimit = game_setup-&gt;getFragLimit();
+     GameConfig::game_timelimit = game_setup-&gt;getTimeLimit();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-05-16 15:36:42 UTC (rev 1366)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-05-18 14:48:55 UTC (rev 1367)
+@@ -24,9 +24,10 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
+ 
+  
+-static const char * stats_format = &quot;%-20s%6i%7i%6i&quot;;
++static const char * stats_format = &quot;%-16s%6i%7i%6i&quot;;
+ static Uint8 newteam = 0;
+ static Timer chantetimer;
+ 
+@@ -52,7 +53,6 @@
+     removeAllButtons();
+     iRect viewrect = getClientRect();
+  
+- 
+     firstrect.min.x = (viewrect.getSizeX()/2) - 350;
+     firstrect.min.y = (viewrect.getSizeY()/2) - 250;
+     firstrect.max.x = firstrect.min.x + 350;
+@@ -63,7 +63,9 @@
+     secondrect.max.x = secondrect.min.x + 350;
+     secondrect.max.y = firstrect.max.y;
+  
+-    changebutton = cssButton::createcssButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+1, ((firstrect.getSizeY()/2)-10)), (secondrect.min.x-firstrect.max.x));
++    changebutton = cssButton::createcssButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, 
++                                              iXY(firstrect.max.x+1, firstrect.min.y+((firstrect.getSizeY()/2)-10)), 
++                                              secondrect.min.x-firstrect.max.x);
+     add(changebutton);
+     loaded = true;
+     if (!chantetimer.count()) changebutton-&gt;Disable();
+@@ -118,22 +120,23 @@
+              TeamManager::getKills(0),
+              TeamManager::getLosses(0),
+              TeamManager::getObjectivesHeld(0));
+-    dest.bltStringShadowed(firstrect.min.x+20, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
+-    TeamManager::drawFlag(0, dest, firstrect.min.x+(firstrect.getSizeX()/2), cur_line_pos-17 );
++    dest.bltString(firstrect.min.x+30, cur_line_pos, statBuf,Color::lightGreen);
++    TeamManager::drawFlag(0, dest, firstrect.min.x+7, cur_line_pos-4);
+     snprintf(statBuf, sizeof(statBuf), stats_format, 
+              TeamManager::getTeamName(1).c_str(), 
+              TeamManager::getKills(1),
+              TeamManager::getLosses(1),
+              TeamManager::getObjectivesHeld(1));
+-    dest.bltStringShadowed(secondrect.min.x+20, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
+-    TeamManager::drawFlag(1, dest, secondrect.min.x+(secondrect.getSizeX()/2), cur_line_pos-17);
++    dest.bltString(secondrect.min.x+30, cur_line_pos, statBuf,Color::lightGreen);
++    TeamManager::drawFlag(1, dest, secondrect.min.x+7, cur_line_pos-4);
+     cur_line_pos += 25;
+     dest.drawLine(firstrect.min.x+10, cur_line_pos-10, firstrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+     dest.drawLine(secondrect.min.x+10, cur_line_pos-10, secondrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+  
+-    int Start_x = firstrect.min.x+20;
++    int Start_x = firstrect.min.x+30;
+     int current_Team = 0;
+-    
++    Surface * flag = 0;
++
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i)
+     {
+@@ -142,17 +145,18 @@
+         if (current_Team != state-&gt;getTeamID())
+         {
+             cur_line_pos = firstrect.min.y +45;
+-            Start_x = secondrect.min.x+20;
++            Start_x = secondrect.min.x+30;
+             current_Team = state-&gt;getTeamID();
+         }
+-        TeamManager::drawFlag(current_Team, dest, Start_x-16, cur_line_pos-5 );
+-        
++        flag = ResourceManager::getFlag(state-&gt;getFlag());
++        flag-&gt;blt( dest, Start_x-23, cur_line_pos-4 );
++
+         if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+         {
+             snprintf(statBuf, sizeof(statBuf),
+                      stats_format, state-&gt;getName().substr(0,20).c_str(),
+                      state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getObjectivesHeld());
+-            dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::cyan, Color::gray64);
++            dest.bltString(Start_x, cur_line_pos, statBuf,Color::cyan);
+             if (current_Team &gt; 0)
+             {
+                 newteam=0;
+@@ -169,7 +173,7 @@
+             snprintf(statBuf, sizeof(statBuf),
+                      stats_format, state-&gt;getName().substr(0,20).c_str(),
+                      state-&gt;getKills(), state-&gt;getLosses(),state-&gt;getObjectivesHeld());
+-            dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::gray224, Color::gray64);
++            dest.bltString(Start_x, cur_line_pos, statBuf,Color::gray224);
+         }
+         cur_line_pos += 20;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-05-16 15:36:42 UTC (rev 1366)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-05-18 14:48:55 UTC (rev 1367)
+@@ -93,7 +93,7 @@
+     clientArea.RoundRect(secondrect,10, TeamManager::getTeamColor(1));
+     DrawInfo(clientArea);
+     drawTeams(clientArea);
+-    vsImage.bltTrans(clientArea, firstrect.max.x+10, firstrect.max.y-vsImage.getHeight()-10);
++    vsImage.bltTrans(clientArea, firstrect.max.x+15, firstrect.max.y-vsImage.getHeight()-10);
+     View::doDraw(viewArea, clientArea);
+ }
+ 
+@@ -104,10 +104,15 @@
+     start.y = menuImageXY.y+115;
+     int nextx = 145;
+     char statBuf[256];
+-
+-    snprintf(statBuf, sizeof(statBuf), &quot;%d&quot;, GameControlRulesDaemon::getTeamCD());
+-    dest.bltString(firstrect.max.x+40 , firstrect.min.y+5, statBuf, Color::white);
+-
++    if (GameControlRulesDaemon::getTeamCD() &lt; 1)
++    {
++        dest.bltString(start.x-5 , rect.min.y-5, &quot;Get ready, the battle will begin...&quot;, Color::white);
++    }
++    else
++    {
++        snprintf(statBuf, sizeof(statBuf), &quot;%d&quot;, GameControlRulesDaemon::getTeamCD());
++        dest.bltString(firstrect.max.x+40 , firstrect.min.y+5, statBuf, Color::white);
++    }
+     dest.bltString(start.x , start.y, &quot;Game:&quot;, Color::white);
+     dest.bltString(start.x+nextx , start.y, &quot;Map:&quot;, Color::white);
+     start.y+= 10;
+@@ -128,7 +133,7 @@
+     }
+     case _gametype_objective:
+     {
+-        snprintf(statBuf, sizeof(statBuf), &quot;Objective: %i%%&quot;, GameConfig::game_occupationpercentage);
++        snprintf(statBuf, sizeof(statBuf), &quot;Objective: %i&quot;, GameConfig::game_occupationpercentage);
+         break;
+     }
+     }
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000390.html">[Netpanzer-cvs] r1366 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000392.html">[Netpanzer-cvs] r1368 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#391">[ date ]</a>
+              <a href="thread.html#391">[ thread ]</a>
+              <a href="subject.html#391">[ subject ]</a>
+              <a href="author.html#391">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

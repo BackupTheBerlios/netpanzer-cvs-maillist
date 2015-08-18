@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1260 - in trunk/netpanzer: scripts	src/NetPanzer/Scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1260%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Scripts&In-Reply-To=%3C20111014110059.9C7F24810CB%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000285.html">
+   <LINK REL="Next"  HREF="000287.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1260 - in trunk/netpanzer: scripts	src/NetPanzer/Scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1260%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Scripts&In-Reply-To=%3C20111014110059.9C7F24810CB%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1260 - in trunk/netpanzer: scripts	src/NetPanzer/Scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 14 13:00:59 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000285.html">[Netpanzer-cvs] r1259 - trunk/netpanzer/src/NetPanzer/Objectives
+</A></li>
+        <LI>Next message: <A HREF="000287.html">[Netpanzer-cvs] r1261 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#286">[ date ]</a>
+              <a href="thread.html#286">[ thread ]</a>
+              <a href="subject.html#286">[ subject ]</a>
+              <a href="author.html#286">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-14 13:00:59 +0200 (Fri, 14 Oct 2011)
+New Revision: 1260
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+Log:
+Added command to change maps, '/server listmaps' to list the maps in server, might not show all of them due to line length restriction, '/server map &lt;map name&gt;' to change the map
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-10-14 10:33:07 UTC (rev 1259)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-10-14 11:00:59 UTC (rev 1260)
+@@ -23,14 +23,14 @@
+ 
+     map_help = &quot;Change the map&quot;,
+     map = function(param, player)
+-        local ok = GameManager:changeMap(param);
+-        if ok then
+-            netpanzer.serversayto(player, 'Switching map to &quot;' .. param .. '&quot;');
+-        else
+-            netpanzer.serversayto(player, 'Map &quot;' .. param .. '&quot; doesn\'t exists');
+-        end
++        netpanzer.serversayto(player, netpanzer.map(param));
+     end,
+ 
++    listmaps_help = &quot;List the available maps in server&quot;,
++    listmaps = function(param, player)
++        netpanzer.serversayto(player, netpanzer.listmaps());
++    end,
++
+     listcommands_help = &quot;List the server commands&quot;,
+     listcommands = function(param, player)
+         local out;
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-10-14 10:33:07 UTC (rev 1259)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-10-14 11:00:59 UTC (rev 1260)
+@@ -25,7 +25,10 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/MapsManager.hpp&quot;
++#include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
++#include &quot;Util/FileSystem.hpp&quot;
+ 
+ #include &lt;sstream&gt;
+ 
+@@ -110,6 +113,74 @@
+     return 1;
+ }
+ 
++static int npmodule_map (lua_State *L)
++{
++    const char *mname = lua_tolstring(L,1,0);
++    std::stringstream ss(&quot;&quot;);
++
++    if ( mname )
++    {
++        NPString map_name(mname);
++
++        if ( !MapsManager::existsMap(map_name) )
++        {
++            ss &lt;&lt; &quot;Map '&quot; &lt;&lt; map_name &lt;&lt; &quot;' doesn't exists&quot;;
++        }
++        else
++        {
++            ss &lt;&lt; &quot;Switching to map '&quot; &lt;&lt; map_name &lt;&lt; &quot;'&quot;;
++            GameControlRulesDaemon::forceMapChange(map_name);
++        }
++    }
++    else
++    {
++        ss &lt;&lt; &quot;Missing map name parameter&quot;;
++    }
++
++    lua_pushstring( L, ss.str().c_str() );
++    return 1;
++}
++
++static int npmodule_listMaps (lua_State *L)
++{
++    std::stringstream ss(&quot;&quot;);
++
++    const char mapsPath[] = &quot;maps/&quot;;
++
++    // scan directory for .npm files
++    std::string suffix = &quot;.npm&quot;;
++    char **list = filesystem::enumerateFiles(mapsPath);
++
++    for (char **i = list; *i != NULL; i++)
++    {
++        std::string filename = mapsPath;
++        filename.append(*i);
++
++        if ( !filesystem::isDirectory(filename.c_str()) )
++        {
++            if ( filename.size() &gt;= suffix.size()
++                &amp;&amp; (filename.compare( filename.size() - suffix.size(),
++                                      suffix.size(), suffix) == 0) )
++            {
++                std::string mapname;
++                size_t p = 0;
++                char c;
++                while( (c = (*i)[p++]) != 0) {
++                    if(c == '.')
++                        break;
++                    mapname += c;
++                }
++
++                ss &lt;&lt; mapname &lt;&lt; ',';
++            }
++        }
++    }
++    filesystem::freeList(list);
++
++    lua_pushstring( L, ss.str().c_str() );
++    return 1;
++}
++
+ static const luaL_Reg npmodule[] =
+ {
+     {&quot;say&quot;,           npmodule_say},
+@@ -120,6 +191,8 @@
+     {&quot;quit&quot;,          npmodule_quit},
+     {&quot;kick&quot;,          npmodule_kick},
+     {&quot;listplayers&quot;,   npmodule_listPlayers},
++    {&quot;map&quot;,           npmodule_map},
++    {&quot;listmaps&quot;,      npmodule_listMaps},
+     {NULL, NULL}
+ };
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000285.html">[Netpanzer-cvs] r1259 - trunk/netpanzer/src/NetPanzer/Objectives
+</A></li>
+	<LI>Next message: <A HREF="000287.html">[Netpanzer-cvs] r1261 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#286">[ date ]</a>
+              <a href="thread.html#286">[ thread ]</a>
+              <a href="subject.html#286">[ subject ]</a>
+              <a href="author.html#286">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

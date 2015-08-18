@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1441 - in trunk/netpanzer: . src/Lib/2D
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2013-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1441%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D&In-Reply-To=%3C20130928025627.C162655B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000459.html">
+   <LINK REL="Next"  HREF="000461.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1441 - in trunk/netpanzer: . src/Lib/2D</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1441%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D&In-Reply-To=%3C20130928025627.C162655B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1441 - in trunk/netpanzer: . src/Lib/2D">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sat Sep 28 04:56:27 CEST 2013</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000459.html">[Netpanzer-cvs] r1439 - in trunk/netpanzer: . pics pics/particles	src/Lib src/Lib/physfs src/Lib/physfs/extras units
+</A></li>
+        <LI>Next message: <A HREF="000461.html">[Netpanzer-cvs] r1442 - in trunk/netpanzer: pics/flags	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src/Lib/2D	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Views/Components	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#460">[ date ]</a>
+              <a href="thread.html#460">[ thread ]</a>
+              <a href="subject.html#460">[ subject ]</a>
+              <a href="author.html#460">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2013-09-28 04:56:27 +0200 (Sat, 28 Sep 2013)
+New Revision: 1441
+
+Modified:
+   trunk/netpanzer/
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+Log:
+some cleanup preparation
+
+
+Property changes on: trunk/netpanzer
+___________________________________________________________________
+Modified: svn:ignore
+   - LICENSE.mikmod.txt
+LICENSE.smpeg.txt
+SDL.dll
+smpeg.dll
+.sconsign.dblite
+LICENSE.ogg-vorbis.txt
+libvorbisfile-3.dll
+libFLAC-8.dll
+colorgen.exe
+netpanzer.exe
+libvorbis-0.dll
+build
+SDL_mixer.dll
+nd.exe
+netpanzer-debug.exe
+netpanzer
+libmikmod-2.dll
+.dep.inc
+Makefile
+netpanzer-ded-debug
+stderr.txt
+nb-netpanzer-debug-svn
+releases
+LICENSE.FLAC.txt
+fontdatagen-debug
+nb-netpanzer-debug
+libogg-0.dll
+stdout.txt
+RELEASE_VERSION
+nbproject
+netpanzer-debug
+dist
+
+   + LICENSE.mikmod.txt
+LICENSE.smpeg.txt
+SDL.dll
+smpeg.dll
+.sconsign.dblite
+pak2png-debug.exe
+libFLAC-8.dll
+libvorbisfile-3.dll
+LICENSE.ogg-vorbis.txt
+colorgen.exe
+netpanzer.exe
+build
+libvorbis-0.dll
+nd.exe
+SDL_mixer.dll
+netpanzer
+netpanzer-debug.exe
+libmikmod-2.dll
+.dep.inc
+netpanzer-ded-debug
+Makefile
+stderr.txt
+nb-netpanzer-debug-svn
+releases
+LICENSE.FLAC.txt
+fontdatagen-debug
+nb-netpanzer-debug
+libogg-0.dll
+stdout.txt
+RELEASE_VERSION
+nbproject
+netpanzer-debug
+dist
+
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2013-09-27 20:21:42 UTC (rev 1440)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2013-09-28 02:56:27 UTC (rev 1441)
+@@ -968,89 +968,6 @@
+     }
+ }
+ 
+-unsigned int
+-Surface::getFontHeight()
+-{
+-    return 16;
+-//    return FONT_HEIGHT;
+-}
+-
+-int Surface::getTextLength(const char* text)
+-{
+-    return FONT_WIDTH * strlen(text);
+-}
+-
+-// bltChar8x8
+-//---------------------------------------------------------------------------
+-// Purpose: Blits the specied rom character to the screen at the specified
+-//          location.
+-//---------------------------------------------------------------------------
+-void Surface::bltChar8x8(int x, int y, unsigned char character, const PIX color)
+-{
+-    if (character &gt; 31) character-=32;
+-    if (character &gt;= FONT_MAXCHAR)
+-        return;
+-//    ascii8x8[character]-&gt;bltTransColor(*this, x, y, color);
+-} // end Surface::bltChar8x8
+-
+-// bltString
+-//---------------------------------------------------------------------------
+-// Purpose: Blits the specified string of text to the screen by making
+-//          calls to blitChar for each character of the string. Does not
+-//          handle wrapping.
+-//---------------------------------------------------------------------------
+-
+-void Surface::bltString(int x, int y, const char * str, const PIX color)
+-{
+-} // end Surface::bltString
+-
+-// bltStringLen
+-//---------------------------------------------------------------------------
+-// Purpose: Blits the specified string of text to the screen by making
+-//          calls to blitChar for each character of the string. Does not
+-//          handle wrapping.
+-//---------------------------------------------------------------------------
+-void Surface::bltStringLen(int x, int y, const char * str, int len, const PIX color)
+-{
+-    for (int index = 0; (index &lt; len) &amp;&amp; str[index] != 0; index++) {
+-        // Don't attempt blank spaces.
+-        if (str[index] == 32) {
+-            continue;
+-        }
+-
+-        bltChar8x8(x + (index &lt;&lt; 3), y, str[index], color);
+-    }
+-} // end Surface::bltStringLen
+-
+-// bltStringShadowed
+-//---------------------------------------------------------------------------
+-void Surface::bltStringShadowed(int x, int y, char const *str, const PIX textColor, const PIX shadowColor)
+-{
+-    for (int index = 0; str[index] != 0; index++) {
+-        bltChar8x8(x + (index &lt;&lt; 3) + 1, y + 1, str[index], shadowColor);
+-        bltChar8x8(x + (index &lt;&lt; 3),     y,     str[index], textColor);
+-    }
+-
+-} // end Surface::bltStringShadowed
+-
+-// bltStringCenteredInRect
+-//---------------------------------------------------------------------------
+-// Purpose: Blits the string centered inside the specified rectangle.
+-//---------------------------------------------------------------------------
+-void Surface::bltStringCenteredInRect(const iRect &amp;rect, const char *string, const PIX color)
+-{
+-    int length = strlen(string);
+-
+-    iXY destPos;
+-    destPos.x = rect.getLocationX() + (rect.getWidth() - (length * FONT_WIDTH)) / 2;
+-    destPos.y = rect.getLocationY() + (rect.getHeight() - getFontHeight()) / 2;
+-
+-    for (int i = 0; string[i] != 0; i++) {
+-        bltChar8x8(destPos.x + (i &lt;&lt; 3), destPos.y, string[i], color);
+-    }
+-
+-} // end Surface::bltStringCenteredInRect
+-
+ // create
+ //---------------------------------------------------------------------------
+ void
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2013-09-27 20:21:42 UTC (rev 1440)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2013-09-28 02:56:27 UTC (rev 1441)
+@@ -177,33 +177,13 @@
+ 
+     PIX getAverageColor();
+ 
+-    // Blit a single character of text.
+-    void bltChar8x8(int x, int y, unsigned char character, const PIX color);
+-    void bltString(int x, int y, const char * str, const PIX color);
+-    void bltStringLen(int x, int y, const char * str, int len, const PIX color);
+-
+-    // Blit a shadowed string of text.
+-    void bltStringShadowed(int x, int y, const char *str, const PIX textColor, const PIX shadowColor);
+-    void bltStringCenteredInRect(const iRect &amp;rect, const char *string, const PIX color);
+-
+     void loadBMP(const char *fileName, bool needAlloc = true);
+     void loadPNG(const char *fileName);
+     void savePNG(const char *fileName);
+ 
+     void drawBoxCorners(const iRect &amp;rect, unsigned cornerLength, PIX color);
+ 
+-    void drawBoxCorners(int cornerLength, PIX color)
+-    {
+-        drawBoxCorners(iRect(0, 0, getWidth(), getHeight()), cornerLength, color);
+-    }
+ 
+-    static unsigned int getFontHeight();
+-    static int getTextLength(const char* text);
+-    static int getTextLength(const std::string&amp; text)
+-    {
+-        return getTextLength(text.c_str());
+-    }
+-
+     void circle(int cx, int cy, int radius, PIX color);
+     void FillCircle(int cx, int cy, int radius, PIX color);
+     void BltCircle(int cx, int cy, int radius, const PIX table[]);
+@@ -224,6 +204,15 @@
+         memcpy(mem, src, std::min(frame_len, src_len));
+     }
+ 
++    // @todo delete below here
++    static unsigned int getFontHeight() { return 21; }
++    static int getTextLength(const char* text) { return 0; }
++    static int getTextLength(const std::string&amp; text) { return 0; }
++    void bltString(int x, int y, const char * str, const PIX color) {}
++    void bltStringLen(int x, int y, const char * str, int len, const PIX color) {}
++    void bltStringShadowed(int x, int y, const char *str, const PIX textColor, const PIX shadowColor){}
++    void bltStringCenteredInRect(const iRect &amp;rect, const char *string, const PIX color){}
++
+ }; // end Surface
+ 
+ #endif // __Surface_HPP__
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000459.html">[Netpanzer-cvs] r1439 - in trunk/netpanzer: . pics pics/particles	src/Lib src/Lib/physfs src/Lib/physfs/extras units
+</A></li>
+	<LI>Next message: <A HREF="000461.html">[Netpanzer-cvs] r1442 - in trunk/netpanzer: pics/flags	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src/Lib/2D	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Views/Components	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#460">[ date ]</a>
+              <a href="thread.html#460">[ thread ]</a>
+              <a href="subject.html#460">[ subject ]</a>
+              <a href="author.html#460">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

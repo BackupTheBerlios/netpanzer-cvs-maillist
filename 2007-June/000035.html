@@ -1,0 +1,459 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r990 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Particles	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r990%20-%20in%20branches/netpanzer-0.8%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Classes%20src/NetPanzer/Particles%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200706160337.l5G3bL9B015159%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000034.html">
+   <LINK REL="Next"  HREF="000036.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r990 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Particles	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r990%20-%20in%20branches/netpanzer-0.8%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Classes%20src/NetPanzer/Particles%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C200706160337.l5G3bL9B015159%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r990 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Particles	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun 16 05:37:21 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000034.html">[Netpanzer-cvs] r989 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+        <LI>Next message: <A HREF="000036.html">[Netpanzer-cvs] r991 - in branches/netpanzer-0.8/src: Lib/Util	NetPanzer/Core
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-16 05:37:19 +0200 (Sat, 16 Jun 2007)
+New Revision: 990
+
+Modified:
+   branches/netpanzer-0.8/configure.ac
+   branches/netpanzer-0.8/src/Lib/2D/Surface.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Particles/ParticleInterface.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/Components/cButton.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/Game/MiniMapView.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+Log:
+Clean many signed/unsigned warnings, it was generating some display errors
+
+Modified: branches/netpanzer-0.8/configure.ac
+===================================================================
+--- branches/netpanzer-0.8/configure.ac	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/configure.ac	2007-06-16 03:37:19 UTC (rev 990)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [0.8.2-rc5], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [0.8.2-rc6], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: branches/netpanzer-0.8/src/Lib/2D/Surface.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/Lib/2D/Surface.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/Lib/2D/Surface.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -362,7 +362,7 @@
+ 
+     // Trivial clipping rejection - no overlap.
+     // Also will jump out immediately if either image has zero size.
+-    if ((unsigned int)x &gt;= dest.getWidth() || (unsigned int)y &gt;= dest.getHeight())
++    if (x &gt;= (int)dest.getWidth() || y &gt;= (int)dest.getHeight())
+         return;
+ 
+     int end_x = x + getWidth();
+@@ -447,7 +447,7 @@
+ 
+     // Trivial clipping rejection - no overlap.
+     // Also will jump out immediately if either image has zero size.
+-    if ((unsigned int)x &gt;= dest.getWidth() || (unsigned int)y &gt;= dest.getHeight())
++    if (x &gt;= (int)dest.getWidth() || y &gt;= (int)dest.getHeight())
+         return;
+ 
+     int end_x = x + getWidth();
+@@ -536,7 +536,7 @@
+ 
+     // Trivial clipping rejection - no overlap.
+     // Also will jump out immediately if either image has zero size.
+-    if ((unsigned int)x &gt;= dest.getWidth() || (unsigned int)y &gt;= dest.getHeight())
++    if (x &gt;= (int)dest.getWidth() || y &gt;= (int)dest.getHeight())
+         return;
+ 
+     int end_x = x + getWidth();
+@@ -615,8 +615,8 @@
+ 
+     // Check for trivial rejection
+     if ( y &lt; 0 || x2 &lt;= 0
+-         || (unsigned int)y &gt;= getHeight()
+-         || (unsigned int)x1 &gt;= getWidth() )
++         || y &gt;= (int)getHeight()
++         || x1 &gt;= (int)getWidth() )
+          return;
+ 
+     assert(mem != 0);
+@@ -635,7 +635,7 @@
+     }
+ 
+     // CLIP RIGHT
+-    if ((unsigned int)x2 &gt;= getWidth()) length -= (x2 - getWidth());
++    if (x2 &gt;= (int)getWidth()) length -= (x2 - getWidth());
+ 
+     memset(ptr, color, length * sizeof(PIX));
+ 
+@@ -652,8 +652,8 @@
+ 
+     // Check for trivial rejection
+     if ( x &lt; 0 || y2 &lt;= 0
+-        || (unsigned int)x &gt;= getWidth()
+-        || (unsigned int)y1 &gt;= getHeight() )
++        || x &gt;= (int)getWidth()
++        || y1 &gt;= (int)getHeight() )
+         return;
+ 
+     assert(mem != 0);
+@@ -665,7 +665,7 @@
+     if (y1 &lt; 0) y1 = 0;
+ 
+     // CLIP BOTTOM
+-    if ((unsigned int)y2 &gt;= getHeight()) y2 = getHeight()-1;
++    if (y2 &gt;= (int)getHeight()) y2 = getHeight()-1;
+ 
+     PIX	*ptr	= mem+y1*getPitch()+x;
+ 
+@@ -720,14 +720,14 @@
+     //if (bounds.max &lt; 0 || bounds.min &gt;= pix) return;
+     if (bounds.max.x &lt;  0)     return;
+     if (bounds.max.y &lt;  0)     return;
+-    if (bounds.min.x &gt;= getWidth()) return;
+-    if (bounds.min.y &gt;= getHeight()) return;
++    if (bounds.min.x &gt;= (int)getWidth()) return;
++    if (bounds.min.y &gt;= (int)getHeight()) return;
+ 
+     // Check for clipping
+     if (bounds.min.x &lt;  0)     bounds.min.x = 0;
+     if (bounds.min.y &lt;  0)     bounds.min.y = 0;
+-    if (bounds.max.x &gt; getWidth())  bounds.max.x = getWidth();
+-    if (bounds.max.y &gt; getHeight()) bounds.max.y = getHeight();
++    if (bounds.max.x &gt; (int)getWidth())  bounds.max.x = getWidth();
++    if (bounds.max.y &gt; (int)getHeight()) bounds.max.y = getHeight();
+ 
+     iXY diff;
+     diff = (bounds.max - bounds.min);
+@@ -758,14 +758,14 @@
+     // Check for trivial rejection
+     if      (bounds.max.x &lt;  0)     return;
+     else if (bounds.max.y &lt;  0)     return;
+-    else if (bounds.min.x &gt;= getWidth()) return;
+-    else if (bounds.min.y &gt;= getHeight()) return;
++    else if (bounds.min.x &gt;= (int)getWidth()) return;
++    else if (bounds.min.y &gt;= (int)getHeight()) return;
+ 
+     // Check for clipping
+     if (bounds.min.x &lt;  0)     bounds.min.x = 0;
+     if (bounds.min.y &lt;  0)     bounds.min.y = 0;
+-    if (bounds.max.x &gt;= getWidth())  bounds.max.x = getWidth() - 1;
+-    if (bounds.max.y &gt;= getHeight()) bounds.max.y = getHeight() - 1;
++    if (bounds.max.x &gt;= (int)getWidth())  bounds.max.x = getWidth() - 1;
++    if (bounds.max.y &gt;= (int)getHeight()) bounds.max.y = getHeight() - 1;
+ 
+     drawHLine(bounds.min.x, bounds.min.y, bounds.max.x,   color);
+     drawHLine(bounds.min.x, bounds.max.y, bounds.max.x+1, color);
+@@ -1035,8 +1035,8 @@
+     assert(mem != 0);
+ 
+     iXY min = destRect.min + offset;
+-    if (min.x &gt;= getWidth()) return;
+-    if (min.y &gt;= getHeight()) return;
++    if (min.x &gt;= (int)getWidth()) return;
++    if (min.y &gt;= (int)getHeight()) return;
+ 
+     iXY max = destRect.max + offset;
+     if (max.x &lt;= 0) return;
+@@ -1045,8 +1045,8 @@
+     // Clip destination rectangle
+     if (min.x &lt; 0) min.x = 0;
+     if (min.y &lt; 0) min.y = 0;
+-    if (max.x &gt;= getWidth())  max.x = getWidth();
+-    if (max.y &gt;= getHeight()) max.y = getHeight();
++    if (max.x &gt;= (int)getWidth())  max.x = getWidth();
++    if (max.y &gt;= (int)getHeight()) max.y = getHeight();
+ 
+     size_t pixelsPerRow = max.x - min.x;
+     size_t numRows      = max.y - min.y;
+@@ -1071,8 +1071,8 @@
+     iXY min = destRect.min + source.offset;
+     iXY max = destRect.max + source.offset;
+ 
+-    if (min.x &gt;= getWidth()) return;
+-    if (min.y &gt;= getHeight()) return;
++    if (min.x &gt;= (int)getWidth()) return;
++    if (min.y &gt;= (int)getHeight()) return;
+ 
+     // Something is overlapping, so we need to verify that both
+     // surfaces are valid.
+@@ -1102,7 +1102,7 @@
+     }
+ 
+     // CLIP RIGHT
+-    if (max.x &gt; getWidth()) {
++    if (max.x &gt; (int)getWidth()) {
+         pixelsPerRow -= max.x - getWidth();
+     }
+ 
+@@ -1115,7 +1115,7 @@
+     }
+ 
+     // CLIP BOTTOM
+-    if (max.y &gt; getHeight()) {
++    if (max.y &gt; (int)getHeight()) {
+         numRows -= max.y-getHeight();
+     }
+ 
+@@ -1166,7 +1166,7 @@
+     bounds.min.y = center_y;
+     bounds.max.y = center_y;
+ 
+-    int num;
++    unsigned int num;
+     for (num = 0; num &lt; getNumFrames(); num++) {
+         setFrame(num);
+         //LOG((&quot;curFrame:  %d&quot;, curFrame));
+@@ -1178,10 +1178,10 @@
+         for (unsigned int y = 0; y &lt; getHeight(); y++) {
+             for (unsigned int x = 0; x &lt; getWidth(); x++) {
+                 if (getPixel(x, y) != 0) {
+-                    if (x &lt; bounds.min.x) {
++                    if (x &lt; (unsigned int)bounds.min.x) {
+                         bounds.min.x = x;
+                     }
+-                    if (x &gt; bounds.max.x) {
++                    if (x &gt; (unsigned int)bounds.max.x) {
+                         bounds.max.x = x;
+                     }
+                 }
+@@ -1192,10 +1192,10 @@
+         for (unsigned int x = 0; x &lt; getWidth(); x++) {
+             for (unsigned int y = 0; y &lt; getHeight(); y++) {
+                 if (getPixel(x, y) != 0) {
+-                    if (y &lt; bounds.min.y) {
++                    if (y &lt; (unsigned int)bounds.min.y) {
+                         bounds.min.y = y;
+                     }
+-                    if (y &gt; bounds.max.y) {
++                    if (y &gt; (unsigned int)bounds.max.y) {
+                         bounds.max.y = y;
+                     }
+                 }
+@@ -1287,10 +1287,10 @@
+ 
+             // Get the max image size.
+             tempSurface.loadBMP(name.c_str());
+-            if (maxSize.x &lt; tempSurface.getWidth()) {
++            if (maxSize.x &lt; (int)tempSurface.getWidth()) {
+                 maxSize.x = tempSurface.getWidth();
+             }
+-            if (maxSize.y &lt; tempSurface.getHeight()) {
++            if (maxSize.y &lt; (int)tempSurface.getHeight()) {
+                 maxSize.y = tempSurface.getHeight();
+             }
+         }
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -49,7 +49,7 @@
+         surface-&gt;drawVLine(min_abs.x, min_abs.y, max_abs.y, box_color);
+     }
+ 
+-    if( (max_abs.x &lt; surface-&gt;getWidth())  ) {
++    if( ((unsigned int)max_abs.x &lt; surface-&gt;getWidth())  ) {
+         surface-&gt;drawVLine(max_abs.x, min_abs.y, max_abs.y, box_color);
+     }
+ 
+@@ -57,7 +57,7 @@
+         surface-&gt;drawHLine(min_abs.x, min_abs.y, max_abs.x, box_color);
+     }
+ 
+-    if ( (max_abs.y &lt; surface-&gt;getHeight()) ) {
++    if ( ((unsigned int)max_abs.y &lt; surface-&gt;getHeight()) ) {
+         surface-&gt;drawHLine(min_abs.x, max_abs.y, max_abs.x+1, box_color);
+     }
+ 
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -147,7 +147,7 @@
+         return;
+     }
+ 
+-    if(mouse_pos.x &gt;= (screen-&gt;getWidth() - 1)) {
++    if((unsigned int)mouse_pos.x &gt;= (screen-&gt;getWidth() - 1)) {
+         WorldViewInterface::scroll_right(scroll_increment);
+     }
+ 
+@@ -155,7 +155,7 @@
+         WorldViewInterface::scroll_left(scroll_increment);
+     }
+ 
+-    if( mouse_pos.y &gt;= (screen-&gt;getHeight() - 1)) {
++    if( (unsigned int)mouse_pos.y &gt;= (screen-&gt;getHeight() - 1)) {
+         WorldViewInterface::scroll_down(scroll_increment);
+     }
+ 
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -161,7 +161,7 @@
+ 
+     // Build a table of the ground colors.
+     tempSurface.create(2, 2, 256);
+-    for (int i = 0; i &lt; tempSurface.getNumFrames(); i++) {
++    for (unsigned int i = 0; i &lt; tempSurface.getNumFrames(); i++) {
+         tempSurface.setFrame(i);
+         tempSurface.fill(i);
+ 
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Particles/ParticleInterface.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Particles/ParticleInterface.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -1186,7 +1186,7 @@
+         {
+             source.setFrame(i);
+ 
+-            for (unsigned int offset = 0; offset &lt; source.getCenterX(); offset++) {
++            for (unsigned int offset = 0; offset &lt; (unsigned int)source.getCenterX(); offset++) {
+                 int yy = source.getHeight() - 1 - offset;
+                 for (unsigned int x = offset; x &lt; source.getWidth(); x++) {
+                     if (source.getPixel(x, yy) != 0) {
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/Components/cButton.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/Components/cButton.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/Components/cButton.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -28,7 +28,7 @@
+ {
+     Surface tempTopSurface(source.getWidth(), source.getHeight(), source.getFrameCount());
+ 
+-    for (int i = 0; i &lt; tempTopSurface.getNumFrames(); i++) {
++    for (unsigned int i = 0; i &lt; tempTopSurface.getNumFrames(); i++) {
+         tempTopSurface.setFrame(i);
+         tempTopSurface.fill(0);
+         source.setFrame(i);
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/Game/MiniMapView.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/Game/MiniMapView.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -316,7 +316,7 @@
+     }
+ 
+     // Check the validity of the X dimension.
+-    if ((min.x + destSize.x) &gt;= screen-&gt;getWidth()) {
++    if ((min.x + destSize.x) &gt;= (int)screen-&gt;getWidth()) {
+         int xOffset = min.x + destSize.x - screen-&gt;getWidth();
+ 
+         int destXPos = min.x - xOffset;
+@@ -331,7 +331,7 @@
+     }
+ 
+     // Check the validity of the Y dimension.
+-    if ((min.y + destSize.y) &gt;= screen-&gt;getHeight()) {
++    if ((min.y + destSize.y) &gt;= (int)screen-&gt;getHeight()) {
+         int yOffset = min.y + destSize.y - screen-&gt;getHeight();
+ 
+         int destYPos = min.y - yOffset;
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -80,7 +80,7 @@
+     int x = flagStartOffset.x;
+     int y = flagStartOffset.y;
+ 
+-    for (int i = 0; i &lt; playerFlag.getNumFrames(); i++) {
++    for (unsigned int i = 0; i &lt; playerFlag.getNumFrames(); i++) {
+         playerFlag.setFrame(i);
+         //playerFlag.drawButtonBorder(Color::white, Color::gray64);
+ 
+@@ -88,7 +88,7 @@
+ 
+         x += xOffset;
+ 
+-        if (x &gt; flagStartOffset.x + getClientRect().getSizeX() - BORDER_SPACE - playerFlag.getWidth()) {
++        if (x &gt; flagStartOffset.x + getClientRect().getSizeX() - BORDER_SPACE - (int)playerFlag.getWidth()) {
+             x = flagStartOffset.x;
+             y += yOffset;
+         }
+@@ -158,7 +158,7 @@
+ 
+     const int buttonsBeforeFlags = 0;
+ 
+-    if (getPrevPressedButton() &gt;= buttonsBeforeFlags &amp;&amp; getPrevPressedButton() &lt; playerFlag.getNumFrames() + buttonsBeforeFlags) {
++    if (getPrevPressedButton() &gt;= buttonsBeforeFlags &amp;&amp; getPrevPressedButton() &lt; (int)playerFlag.getNumFrames() + buttonsBeforeFlags) {
+         playerFlagSelected = getPrevPressedButton() - buttonsBeforeFlags;
+     }
+ 
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-11 15:49:12 UTC (rev 989)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2007-06-16 03:37:19 UTC (rev 990)
+@@ -127,7 +127,7 @@
+         return;
+     }
+ 
+-    int y = 0;
++    unsigned int y = 0;
+     for(std::vector&lt;masterserver::ServerInfo*&gt;::iterator i = serverlist.begin();
+             i != serverlist.end(); ++i) {
+         const masterserver::ServerInfo&amp; server = *(*i);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000034.html">[Netpanzer-cvs] r989 - in branches/netpanzer-0.8: .	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+	<LI>Next message: <A HREF="000036.html">[Netpanzer-cvs] r991 - in branches/netpanzer-0.8/src: Lib/Util	NetPanzer/Core
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

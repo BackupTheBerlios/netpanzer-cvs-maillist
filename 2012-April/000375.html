@@ -1,0 +1,767 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1351 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1351%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120422095337.8EFB555B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000374.html">
+   <LINK REL="Next"  HREF="000376.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1351 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1351%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120422095337.8EFB555B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1351 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Sun Apr 22 11:53:37 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000374.html">[Netpanzer-cvs] r1350 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000376.html">[Netpanzer-cvs] r1352 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#375">[ date ]</a>
+              <a href="thread.html#375">[ thread ]</a>
+              <a href="subject.html#375">[ subject ]</a>
+              <a href="author.html#375">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-04-22 11:53:36 +0200 (Sun, 22 Apr 2012)
+New Revision: 1351
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+Log:
+TeamMode:
+  - Add missing files
+  - Add teamscreenview for client (press &quot;t&quot;)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-04-21 20:22:16 UTC (rev 1350)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -339,6 +339,12 @@
+         }
+     }
+     
++    if ( KeyboardInterface::getKeyPressed(SDLK_t) )
++    {
++        if (GameConfig::game_teammode)
++            Desktop::toggleVisibility( &quot;GTeamView&quot; );
++    }
++
+     if ( KeyboardInterface::getKeyPressed(SDLK_m) )
+     {
+         Desktop::toggleVisibility( &quot;MiniMapView&quot; );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-04-21 20:22:16 UTC (rev 1350)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -25,7 +25,8 @@
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+- 
++#include &quot;Interfaces/TeamManager.hpp&quot;
++
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Classes/Network/GameControlNetMessage.hpp&quot;
+@@ -416,7 +417,7 @@
+         case _gametype_fraglimit:
+             if (GameConfig::game_teammode)
+             {
+-                if (TeamManager::testRuleScoreLimit( long score_limit ))
++                if (TeamManager::testRuleScoreLimit( GameConfig::game_fraglimit ))
+                     onFraglimitGameCompleted();
+             }
+             else
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-04-21 20:22:16 UTC (rev 1350)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -77,6 +77,7 @@
+ #include &quot;Views/Game/RankView.hpp&quot;
+ #include &quot;Views/Game/EndRoundView.hpp&quot;
+ #include &quot;Views/Game/GFlagSelectionView.hpp&quot;
++#include &quot;Views/Game/GTeamView.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ #include &quot;Views/Game/CodeStatsView.hpp&quot;
+ #include &quot;Views/Game/LibView.hpp&quot;
+@@ -180,6 +181,8 @@
+     Desktop::add(new LibView());
+     Desktop::add(new HelpScrollView());
+ 
++    Desktop::add(new GTeamView());
++
+     LoadingView *lv = new LoadingView();
+     Desktop::add(lv);
+ 
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -0,0 +1,128 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/Team.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++void Team::initialize(const Uint8 _max_players)
++{
++    max_players = _max_players;
++
++    player_lists = new PlayerID[max_players];
++
++    for (PlayerID player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        player_lists[ player_id ] = 0xFF;
++    }
++    //LOGGER.warning(&quot;Team::initialize(%d)&quot;, _max_players );
++}
++
++void Team::setName(const std::string&amp; newname)
++{
++    if ( newname.length() &gt; 63 )
++    {
++        name = newname.substr(0,63);
++    }
++    else
++    {
++        name = newname;
++    }
++}
++
++const std::string&amp; Team::getName() const
++{
++    return name;
++}
++
++void Team::addPlayer(PlayerID player_id)
++{
++    for ( PlayerID _player_id = 0; _player_id &lt; max_players; ++_player_id )
++    {
++        if (player_lists[ _player_id ] != 0xFF) 
++        {
++            //LOGGER.warning(&quot;ally %d with %d&quot;, _player_id, player_id);
++            PlayerInterface::allyplayers( _player_id, player_id);
++            PlayerInterface::allyplayers( player_id, _player_id);
++        }
++    }
++    player_lists[ player_id ] = player_id;
++    PlayerInterface::getPlayer(player_id)-&gt;setTeamID(teamID);
++    //LOGGER.warning(&quot;Team::addPlayer %d&quot;, player_id);
++}
++
++void Team::removePlayer(PlayerID player_id)
++{
++   // LOGGER.warning(&quot;Team::removePlayer %d&quot;, player_id);
++    player_lists[ player_id ] = 0xFF;
++}
++
++void Team::cleanUp()
++{
++    delete[] player_lists;
++    player_lists = 0;
++    max_players = 0;
++}
++
++PlayerID Team::countPlayers()
++{
++    PlayerID count = 0;
++    PlayerID player_id;
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        if (player_lists[ player_id ] != 0xFF) count++;
++    }
++    return count;
++}
++
++void Team::setID( Uint8 _id )
++{
++    teamID = _id;
++}
++
++void Team::spawnTeam( const iXY &amp;location )
++{
++    PlayerID player_id;
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        if (player_lists[ player_id ] != 0xFF) 
++        {
++            PlayerInterface::spawnPlayer(player_id, location);
++        }
++    }
++}
++
++void Team::spawnPlayer( PlayerID _player_id, const iXY &amp;location )
++{
++    PlayerInterface::spawnPlayer(_player_id, location);
++}
++
++long Team::getTeamScore()
++{
++    long teamScore = 0;
++    PlayerID player_id;
++    
++    for ( player_id = 0; player_id &lt; max_players; ++player_id )
++    {
++        if (player_lists[ player_id ] != 0xFF) 
++        {
++            teamScore = PlayerInterface::getPlayer(player_id)-&gt;getKills();
++        }
++    }
++    return teamScore;
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -0,0 +1,54 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++#ifndef _TEAM_HPP
++#define _TEAM_HPP
++
++#include &quot;Core/CoreTypes.hpp&quot;
++
++class Team
++{
++protected:
++    Uint8 teamID;
++    PlayerID *player_lists;
++    PlayerID max_players;
++    std::string name;
++
++public:
++    void initialize(const Uint8 _max_players);
++
++    void setName(const std::string&amp; newname);
++    const std::string&amp; getName() const;
++    
++    void addPlayer(PlayerID player_id);
++    void removePlayer(PlayerID player_id);
++    void cleanUp();
++    Uint8 getID() const { return teamID; }
++    void setID( Uint8 _id );
++    PlayerID getMaxPlayers()
++    {
++        return max_players;
++    }
++    PlayerID countPlayers();
++    void spawnTeam(const iXY &amp;location );
++    void spawnPlayer(PlayerID player_id, const iXY &amp;location );
++    
++    long getTeamScore();
++
++};
++
++#endif // ** _TEAM_HPP
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -0,0 +1,155 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++ 
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/MapInterface.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
++#include &quot;Interfaces/Team.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++ 
++Team       * TeamManager::Teams_lists = 0;
++Uint8        TeamManager::max_Teams = 0;
++ 
++void TeamManager::initialize(const Uint8 _max_teams)
++{
++ 
++    max_Teams = _max_teams;
++    int team_id;
++ 
++    delete[] Teams_lists;
++    Teams_lists = new Team[max_Teams];
++ 
++    for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        Teams_lists[ team_id ].initialize(GameConfig::game_maxplayers);
++        Teams_lists[ team_id ].setID( team_id );
++    }
++}
++ 
++void TeamManager::addPlayer(PlayerID player_id)
++{
++    int team_id;
++    int lowTeam = 0, countPlayers = Teams_lists[ 0 ].countPlayers();
++ 
++    for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        //LOGGER.warning(&quot;number of players %d in team %d&quot;, Teams_lists[ team_id ].countPlayers(), team_id);
++        if (Teams_lists[ team_id ].countPlayers() &lt; countPlayers)
++        {
++            countPlayers = Teams_lists[ team_id ].countPlayers();
++            lowTeam = team_id;
++        }
++    }
++    //LOGGER.warning(&quot;add players %d in team %d&quot;, player_id, lowTeam);
++    Teams_lists[ lowTeam ].addPlayer(player_id);
++}
++ 
++void TeamManager::addPlayerinTeam(PlayerID player_id, Uint8 team_id)
++{
++    //LOGGER.warning(&quot;add players %d in team %d&quot;, player_id, team_id);
++    Teams_lists[ team_id ].addPlayer(player_id);
++}
++ 
++void TeamManager::removePlayer(PlayerID player_id, Uint8 team_id)
++{
++    Teams_lists[ team_id ].removePlayer(player_id);
++}
++ 
++void TeamManager::SynchPlayers()
++{
++    for ( PlayerID _player_id = 0; _player_id &lt; PlayerInterface::getMaxPlayers(); ++_player_id )
++    {
++        if (PlayerInterface::isPlayerActive(_player_id))
++        {
++            Uint8 Team_id = PlayerInterface::getPlayer(_player_id)-&gt;getTeamID();
++            Uint8 Player_id = PlayerInterface::getPlayer(_player_id)-&gt;getID();
++            Teams_lists[ Team_id ].addPlayer(Player_id);
++        }
++    }
++}
++ 
++void TeamManager::cleanUp()
++{
++    Uint8 team_id;
++    for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        Teams_lists[ team_id ].cleanUp();
++    }
++    delete[] Teams_lists;
++    Teams_lists = 0;
++    max_Teams = 0;
++}
++ 
++void TeamManager::spawnTeams()
++{
++    iXY spawn_point = MapInterface::getMinSpawnPoint();
++    Teams_lists[ 0 ].spawnTeam(spawn_point);
++    spawn_point = MapInterface::getMaxSpawnPoint();
++    Teams_lists[ 1 ].spawnTeam(spawn_point);
++}
++ 
++void TeamManager::spawnPlayer(PlayerID player_id)
++{
++    Uint8 Team_id = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
++    iXY spawn_point;
++    switch (Team_id)
++    {
++    case 0:
++        spawn_point = MapInterface::getMinSpawnPoint();
++        break;
++    case 1:
++        spawn_point = MapInterface::getMaxSpawnPoint();
++        break;
++    default:
++        spawn_point = MapInterface::getFreeSpawnPoint();
++    }
++    Teams_lists[ Team_id ].spawnPlayer(player_id, spawn_point);
++}
++ 
++iXY TeamManager::getPlayerSpawnPoint(PlayerID player_id)
++{
++    Uint8 Team_id = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
++ 
++    iXY spawn_point;
++    switch (Team_id)
++    {
++    case 0:
++        spawn_point = MapInterface::getMinSpawnPoint();
++        break;
++    case 1:
++        spawn_point = MapInterface::getMaxSpawnPoint();
++        break;
++    default:
++        spawn_point = MapInterface::getFreeSpawnPoint();
++    }
++    return spawn_point;
++}
++ 
++bool TeamManager::testRuleScoreLimit( long score_limit )
++{
++    Uint8 team_id;
++    for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        if ( Teams_lists[team_id].getTeamScore() &gt;= score_limit )
++            return( true );
++    }
++    return( false );
++}
++ 
++ 
+\ No newline at end of file
+
+Added: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -0,0 +1,48 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++#ifndef _TEAMMANAGER_HPP
++#define _TEAMMANAGER_HPP
++
++#include &quot;Interfaces/Team.hpp&quot;
++
++class TeamManager
++{
++protected:
++    static Team *Teams_lists;
++    static Uint8 max_Teams;
++
++public:
++    static void initialize(const Uint8 _max_teams);
++    static void addPlayer(PlayerID player_id);
++    static void addPlayerinTeam(PlayerID player_id, Uint8 team_id);
++    static void SynchPlayers();
++    
++    static void cleanUp();
++    static PlayerID getMaxteams()
++    {
++        return max_Teams;
++    }
++    static void spawnTeams();
++    static void spawnPlayer(PlayerID player_id);
++    static iXY getPlayerSpawnPoint(PlayerID player_id);
++    static void removePlayer(PlayerID player_id, Uint8 team_id);
++
++    static bool testRuleScoreLimit( long score_limit );
++};
++
++#endif // ** _TEAMMANAGER_HPP
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -0,0 +1,148 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;GTeamView.hpp&quot;
++#include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
++#include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;2D/Palette.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++
++static const char * stats_format = &quot;%-20s%6i%7i%7i%6i&quot;;
++
++GTeamView::GTeamView() : View()
++{
++    setSearchName(&quot;GTeamView&quot;);
++    setTitle(&quot;GTeamView&quot;);
++    setSubTitle(&quot;&quot;);
++
++    setAllowResize(false);
++    setAllowMove(false);
++    setVisible(false);
++    setBordered(false);
++
++    loaded = false;
++}
++
++void GTeamView::init()
++{
++    removeComponents();
++
++    iRect viewrect = getClientRect();
++
++    rect.min.x = (viewrect.getSizeX()/2) - 250;
++    rect.min.y = (viewrect.getSizeY()/2) - 250;
++    rect.max.x = rect.min.x + 500;
++    rect.max.y = rect.min.y + 500;
++
++    loaded = true;
++}
++
++void GTeamView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++{
++    clientArea.BltRoundRect(rect, 14, Palette::darkGray256.getColorArray());
++    clientArea.RoundRect(rect,14, Color::gray);
++
++    View::doDraw(viewArea, clientArea);
++    drawTeams(clientArea, 20);
++}
++
++class StatesSortByTeam
++    : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
++{
++public:
++    bool operator() (const PlayerState* state1, const PlayerState* state2)
++    {
++        return state1-&gt;getTeamID() &lt; state2-&gt;getTeamID();
++    }
++};
++
++void GTeamView::drawTeams(Surface &amp;dest, unsigned int flagHeight)
++{
++    char statBuf[256];
++
++    states.clear();
++    PlayerID i;
++    for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
++    {
++        PlayerState* state = PlayerInterface::getPlayer(i);
++        if( state-&gt;isActive() )
++        {
++            states.push_back(state);
++        }
++    }
++    std::sort(states.begin(), states.end(), StatesSortByTeam());
++
++    int cur_line_pos = rect.min.y +30 + ((20 - Surface::getFontHeight())/2);
++    int Start_x = rect.min.x+40;
++    int current_Team = 0;
++    snprintf(statBuf, sizeof(statBuf), &quot;Team %2i:&quot;, current_Team);
++    dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
++    cur_line_pos += 20;
++
++    for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
++            i != states.end(); ++i)
++    {
++        const PlayerState* state = *i;
++        if (current_Team != state-&gt;getTeamID())
++        {
++            cur_line_pos += 30;
++            current_Team = state-&gt;getTeamID();
++            snprintf(statBuf, sizeof(statBuf), &quot;Team %2i:&quot;, current_Team);
++            dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
++            cur_line_pos += 20;
++        }
++
++        snprintf(statBuf, sizeof(statBuf),
++                 stats_format, state-&gt;getName().substr(0,20).c_str(),
++                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
++                 state-&gt;getObjectivesHeld());
++
++        dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::gray224, Color::gray64);
++        cur_line_pos += 20;
++    }
++}
++void GTeamView::doActivate()
++{
++    if ( ! loaded )
++    {
++        init();
++    }
++    Desktop::setActiveView(this);
++}
++
++void GTeamView::doDeactivate()
++{
++    if ( ! getVisible() )
++    {
++        removeComponents();
++        loaded = false;
++    }
++}
++
++void
++GTeamView::checkResolution(iXY oldResolution, iXY newResolution)
++{
++    resize(iXY(newResolution.x, newResolution.y));
++    moveTo(iXY(0,0));
++}
++
++void GTeamView::processEvents()
++{
++    COMMAND_PROCESSOR.process(false);
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-04-22 09:53:36 UTC (rev 1351)
+@@ -0,0 +1,52 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef GTEAMVIEW_HPP
++#define GTEAMVIEW_HPP
++
++#include &lt;vector&gt;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;2D/Surface.hpp&quot;
++
++class PlayerState;
++
++class GTeamView : public View
++{
++private:
++    bool loaded;
++
++    iRect rect;
++    std::vector&lt;const PlayerState*&gt; states;
++
++    void drawTeams(Surface &amp;dest, unsigned int flagHeight);
++
++public:
++    GTeamView();
++    virtual ~GTeamView()
++    {}
++
++    virtual void doActivate();
++    virtual void doDeactivate();
++    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void checkResolution(iXY oldResolution, iXY newResolution);
++    virtual void processEvents();
++
++    void init();
++};
++
++#endif // GTEAMVIEW_HPP
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000374.html">[Netpanzer-cvs] r1350 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000376.html">[Netpanzer-cvs] r1352 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#375">[ date ]</a>
+              <a href="thread.html#375">[ thread ]</a>
+              <a href="subject.html#375">[ subject ]</a>
+              <a href="author.html#375">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

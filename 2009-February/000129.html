@@ -1,0 +1,1417 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1097 - in trunk/netpanzer/src/NetPanzer:	Objectives Units Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1097%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Objectives%20Units%20Views/MainMenu/Multi&In-Reply-To=%3C200902211538.n1LFc0Ev029008%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000128.html">
+   <LINK REL="Next"  HREF="000130.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1097 - in trunk/netpanzer/src/NetPanzer:	Objectives Units Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1097%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Objectives%20Units%20Views/MainMenu/Multi&In-Reply-To=%3C200902211538.n1LFc0Ev029008%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1097 - in trunk/netpanzer/src/NetPanzer:	Objectives Units Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb 21 16:38:00 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000128.html">[Netpanzer-cvs] r1096 - in trunk/netpanzer/src/NetPanzer/Views:	Game MainMenu/Multi MainMenu/Options
+</A></li>
+        <LI>Next message: <A HREF="000130.html">[Netpanzer-cvs] r1098 - in trunk/netpanzer: pics src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Units src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#129">[ date ]</a>
+              <a href="thread.html#129">[ thread ]</a>
+              <a href="subject.html#129">[ subject ]</a>
+              <a href="author.html#129">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-02-21 16:37:47 +0100 (Sat, 21 Feb 2009)
+New Revision: 1097
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+Log:
+- Fix problem when selecting flags
+- Fix missing include in UnitBucketArray
+- Reorder UnitInterface
+- UnitBucketArray is const correct and reviewed
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2009-02-21 12:46:36 UTC (rev 1096)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2009-02-21 15:37:47 UTC (rev 1097)
+@@ -128,7 +128,8 @@
+         {
+             iXY unit_loc;
+             unit_loc = unit_ptr-&gt;unit_state.location;
+-            if ( objective_state.capture_area.bounds( occupation_pad_loc, unit_loc ) ) {
++            if ( objective_state.capture_area.bounds( occupation_pad_loc, unit_loc ) )
++            {
+                 attemptOccupationChange( unit_ptr-&gt;id );
+             }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2009-02-21 12:46:36 UTC (rev 1096)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2009-02-21 15:37:47 UTC (rev 1097)
+@@ -26,17 +26,17 @@
+ 
+ void
+ UnitBucketArray::initialize( const iXY &amp; map_size, const iXY &amp; tile_size,
+-        long x_super_sample, long y_super_sample )
++        const unsigned int x_sample, const unsigned int y_sample )
+ {
+     cleanUp();
+ 
+     unsigned long rows, columns;
+ 
+-    assert( x_super_sample &gt;= 1 );
+-    assert( y_super_sample &gt;= 1 );
++    assert( x_sample &gt;= 1 );
++    assert( y_sample &gt;= 1 );
+ 
+-    map_x_sample_factor = x_super_sample;
+-    map_y_sample_factor = y_super_sample;
++    map_x_sample_factor = x_sample;
++    map_y_sample_factor = y_sample;
+ 
+     while( (map_size.x % map_x_sample_factor) &gt; 0 )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-02-21 12:46:36 UTC (rev 1096)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-02-21 15:37:47 UTC (rev 1097)
+@@ -20,6 +20,7 @@
+ 
+ #include &lt;vector&gt;
+ #include &lt;list&gt;
++#include &lt;algorithm&gt;
+ #include &quot;Units/Unit.hpp&quot;
+ 
+ typedef std::vector&lt;Unit *&gt; UnitList;
+@@ -43,17 +44,18 @@
+ 
+     void sort();
+ 
+-    void initialize( const iXY &amp; map_size, const iXY &amp; tile_size, long x_super_sample, long y_super_sample );
++    void initialize( const iXY &amp; map_size, const iXY &amp; tile_size,
++                     const unsigned int x_sample, const unsigned int y_sample );
+     void initialize( const iXY &amp; map_size, const iXY &amp; tile_size)
+     {
+         initialize( map_size, tile_size, 10, 10 );
+     }
+     
+-    void moveUnit( Unit * unit, unsigned int from_bucket_index, unsigned int to_bucket_index )
++    void moveUnit( Unit * unit, const unsigned int from, const unsigned int to )
+     {
+-        UnitList &amp; uli = getBucket(from_bucket_index);
++        UnitList &amp; uli = getBucket(from);
+         uli.erase(std::remove(uli.begin(), uli.end(), unit), uli.end());
+-        getBucket(to_bucket_index).push_back(unit);
++        getBucket(to).push_back(unit);
+     }
+ 
+     void cleanUp()
+@@ -82,7 +84,7 @@
+         getBucketAssocWorldLoc(unit-&gt;unit_state.location).push_back(unit);
+     }
+ 
+-    void removeUnit( Unit *unit )
++    void removeUnit( const Unit *unit )
+     {
+         UnitList &amp; uli = getBucketAssocWorldLoc(unit-&gt;unit_state.location);
+         uli.erase(std::remove(uli.begin(), uli.end(), unit), uli.end());
+@@ -93,48 +95,48 @@
+         return buckets.size();
+     }
+ 
+-    UnitList &amp; getBucket(unsigned int bucket_index)
++    UnitList &amp; getBucket(const unsigned int bucket_index)
+     {
+         assert( bucket_index &lt; getSize() );
+         return( buckets[ bucket_index ] );
+     }
+ 
+-    UnitList &amp; getBucket( unsigned int row, unsigned int column )
++    UnitList &amp; getBucket( const unsigned int row, const unsigned int column )
+     {
+         return ( getBucket((row * column_size) + column) );
+     }
+ 
+-    unsigned int mapLocToBucketIndex( const iXY &amp; map_loc )
++    unsigned int mapLocToBucketIndex( const iXY &amp; map_loc ) const
+     {
+         return ((map_loc.y / map_y_sample_factor) * column_size)
+                 + (map_loc.x / map_x_sample_factor);
+     }
+ 
+-    unsigned int worldLocToBucketIndex( const iXY &amp; world_loc )
++    unsigned int worldLocToBucketIndex( const iXY &amp; world_loc ) const
+     {
+         return ((world_loc.y / pixel_y_sample_factor) * column_size)
+                 + (world_loc.x / pixel_x_sample_factor);
+     }
+ 
+-    void worldLocToBucketLoc( const iXY &amp; world_loc, iXY &amp; bucket_loc )
++    void worldLocToBucketLoc( const iXY &amp; world_loc, iXY &amp; bucket_loc ) const
+     {
+         bucket_loc.x = (world_loc.x-1) / pixel_x_sample_factor;
+         bucket_loc.y = (world_loc.y-1) / pixel_y_sample_factor;
+     }
+ 
+-    void worldRectToBucketRect( const iRect &amp; world_rect, iRect &amp;bucket_rect )
++    void worldRectToBucketRect( const iRect &amp; world_rect, iRect &amp;bucket_rect ) const
+     {
+         worldLocToBucketLoc(world_rect.min, bucket_rect.min);
+         worldLocToBucketLoc(world_rect.max, bucket_rect.max);
+     }
+ 
+-    void mapLocToBucketLoc( const iXY &amp; map_loc, iXY &amp; bucket_loc)
++    void mapLocToBucketLoc( const iXY &amp; map_loc, iXY &amp; bucket_loc) const
+     {
+         bucket_loc.x = map_loc.x / map_x_sample_factor;
+         bucket_loc.y = map_loc.y / map_y_sample_factor;
+     }
+ 
+-    void mapRectToBucketRect( const iRect &amp; map_rect, iRect &amp;bucket_rect )
++    void mapRectToBucketRect( const iRect &amp; map_rect, iRect &amp;bucket_rect ) const
+     {
+         mapLocToBucketLoc(map_rect.min, bucket_rect.min);
+         mapLocToBucketLoc(map_rect.max, bucket_rect.max);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-02-21 12:46:36 UTC (rev 1096)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-02-21 15:37:47 UTC (rev 1097)
+@@ -69,19 +69,20 @@
+ unsigned long   UnitInterface::sync_units_total_units;
+ unsigned long   UnitInterface::sync_units_in_sync_count;
+ unsigned long   UnitInterface::sync_units_in_sync_partial_count;
+-size_t          UnitInterface::units_per_player;
++unsigned int    UnitInterface::units_per_player;
+ Timer		UnitInterface::sync_units_packet_timer;
+ 
+-
+ // ******************************************************************
+ 
+-void UnitInterface::initialize( unsigned long max_units )
++void
++UnitInterface::initialize( const unsigned int max_units )
+ {
++    unit_bucket_array.initialize(MapInterface::getSize(), TileInterface::getTileSize() );
++
+     playerUnitLists.resize(PlayerInterface::getMaxPlayers());
+ 
+-    unit_bucket_array.initialize(MapInterface::getSize(), TileInterface::getTileSize() );
++    lastUnitID = 0;
+ 
+-    lastUnitID = 0;
+     message_timer.changeRate( 8 );
+     no_guarantee_message_timer.changeRate( 15 );
+ 
+@@ -103,6 +104,8 @@
+     units.clear();
+ }
+ 
++// ******************************************************************
++
+ void
+ UnitInterface::reset()
+ {
+@@ -118,107 +121,15 @@
+     units.clear();
+ }
+ 
+-void
+-UnitInterface::processNetPacket(const NetPacket* packet)
+-{
+-    const NetMessage* message = packet-&gt;getNetMessage();
+-    const TerminalUnitCmdRequest* terminal_command =
+-        (const TerminalUnitCmdRequest*) message;
++// ******************************************************************
+ 
+-    const PlayerState* player 
+-        = PlayerInterface::getPlayer(packet-&gt;fromPlayer);
+-    if(player == 0)
+-    {
+-        LOGGER.warning(&quot;UnitInterface: Player not found '%u'?!?&quot;,
+-                packet-&gt;fromPlayer);
+-        return;
+-    }
+-    
+-    sendMessage(&amp;(terminal_command-&gt;comm_request) , player);
+-}
+-
+ void
+-UnitInterface::sendMessage(const UnitMessage* message,const PlayerState* player)
++UnitInterface::updateUnitStatus()
+ {
+-    if (message-&gt;isFlagged(_umesg_flag_unique))
+-    {
+-        Unit* unit = getUnit(message-&gt;getUnitID());
+-        if(unit == 0)
+-        {
+-            return;
+-        }
+-        
+-        if(player &amp;&amp; unit-&gt;player != player)
+-        {
+-            LOGGER.warning(
+-                &quot;Terminal request for unit (%u) not owned by player (%u).\n&quot;,
+-                unit-&gt;id, player-&gt;getID());
+-            return;
+-        }
+-                    
+-        unit-&gt;processMessage(message);
+-    }
+-    else if (message-&gt;isFlagged( _umesg_flag_broadcast) )
+-    {
+-        if(message-&gt;message_id != _umesg_weapon_hit)
+-        {
+-            LOGGER.warning(&quot;Broadcast flag only allowed for weapon hit.&quot;);
+-            if(player)
+-            {
+-                LOGGER.warning(&quot;from player %u.\n&quot;, player-&gt;getID());
+-            }
+-            return;
+-        }
+-            
+-        for(Units::iterator i = units.begin(); i != units.end(); ++i)
+-        {
+-            Unit* unit = i-&gt;second;
+-            unit-&gt;processMessage(message);
+-        }
+-    }
+-    else if (message-&gt;isFlagged( _umesg_flag_manager_request) )
+-    {
+-        if(player)
+-        {
+-            LOGGER.warning(
+-                    &quot;UnitManagerMessage sent out by player %u not allowed.&quot;,
+-                    player-&gt;getID());
+-            return;
+-        }
+-  	processManagerMessage(message);
+-    }
+-}
+-
+-// ******************************************************************
+-
+-void UnitInterface::removeUnit(Units::iterator i)
+-{
+-    Unit* unit = i-&gt;second;
+-    
+-    // unit explosion particles
+-    ParticleInterface::addHit(unit-&gt;unit_state);
+-    
+-    // unit explosion sound
+-    sound-&gt;playAmbientSound(&quot;expl&quot;,                   
+-            WorldViewInterface::getCameraDistance( unit-&gt;unit_state.location ));
+-    
+-    unit_bucket_array.removeUnit(unit);
+-
+-    UnitList&amp; plist = playerUnitLists[unit-&gt;player-&gt;getID()];
+-    plist.erase(std::remove(plist.begin(), plist.end(), unit), plist.end());
+-    
+-    units.erase(i);
+-    delete unit;
+-}
+-
+-// ******************************************************************
+-
+-void UnitInterface::updateUnitStatus()
+-{
+     for(Units::iterator i = units.begin(); i != units.end(); /*nothing*/ )
+     {
+         Unit* unit = i-&gt;second;
+-	    
++
+         if (unit-&gt;unit_state.lifecycle_state == _UNIT_LIFECYCLE_INACTIVE)
+         {
+             removeUnit(i++);
+@@ -226,7 +137,7 @@
+         }
+ 
+         ++i;
+-	    
++
+         unsigned int bucket_before;
+         bucket_before = unit_bucket_array.worldLocToBucketIndex(
+                                                     unit-&gt;unit_state.location );
+@@ -252,7 +163,10 @@
+     }
+ }
+ 
+-void UnitInterface::offloadGraphics(SpriteSorter&amp; sorter)
++// ******************************************************************
++
++void
++UnitInterface::offloadGraphics( SpriteSorter&amp; sorter )
+ {
+     iRect world_window_rect;
+     iRect bucket_rect;
+@@ -262,16 +176,19 @@
+     world_window_rect = sorter.getWorldWindow();
+     unit_bucket_array.worldRectToBucketRect(world_window_rect, bucket_rect);
+ 
+-    for(long row_index = bucket_rect.min.y;
+-            row_index &lt;= bucket_rect.max.y; row_index++ )
++    for( int row_index = bucket_rect.min.y;
++         row_index &lt;= bucket_rect.max.y;
++         ++row_index )
+     {
+-        for(long column_index = bucket_rect.min.x;
+-                column_index &lt;= bucket_rect.max.x; column_index++ )
++        for( int column_index = bucket_rect.min.x;
++             column_index &lt;= bucket_rect.max.x;
++             ++column_index )
+         {
+             UnitList &amp; bucket_list = unit_bucket_array.getBucket(row_index, column_index);
+ 
+-            for(bucket_iter = bucket_list.begin();
+-                    bucket_iter != bucket_list.end(); ++bucket_iter)
++            for( bucket_iter = bucket_list.begin();
++                 bucket_iter != bucket_list.end();
++                 ++bucket_iter )
+             {
+                 unit = *bucket_iter;
+ 
+@@ -311,130 +228,156 @@
+ 
+ // ******************************************************************
+ 
+-UnitID UnitInterface::newUnitID()
++Unit*
++UnitInterface::createUnit( const unsigned short unit_type,
++                           const iXY &amp;location,
++                           const Uint16 player_id )
+ {
+-    UnitID newID = lastUnitID++;
+-    while(getUnit(newID) != 0)
++    if (playerUnitLists[player_id].size() &gt;= units_per_player)
+     {
+-        newID = lastUnitID++;
++        return 0;
+     }
+ 
+-    return newID;
++    Unit* unit = newUnit(unit_type, location, player_id, newUnitID());
++    addUnit(unit);
++
++    return unit;
+ }
+ 
+ // ******************************************************************
+ 
+-Unit * UnitInterface::newUnit( unsigned short unit_type,
+-                                   const iXY &amp;location,
+-                                   unsigned short player_index,
+-                                   UnitID id)
++void
++UnitInterface::spawnPlayerUnits( const iXY &amp;location,
++                                 const Uint16 player_id,
++                                 const PlayerUnitConfig &amp;unit_config )
+ {
+-    Unit* unit = 0;
+-    bool color_flag;
+-    unsigned char unit_flag;
++    iXY next_loc;
++    Unit *unit;
++    unsigned int utype;
++    unsigned int numunits;
+ 
+-    if ( player_index == PlayerInterface::getLocalPlayerIndex() ) {
+-        color_flag = true;
+-    } else {
+-        color_flag = false;
+-    }
++    NetMessageEncoder encoder;
+ 
+-    PlayerState* player = PlayerInterface::getPlayer( player_index );
+-    unit_flag = player-&gt;getFlag();
++    unit_placement_matrix.reset( location );
+ 
+-    if ( unit_type &lt; UnitProfileInterface::getNumUnitTypes() )
++    for ( utype = 0; utype &lt; UnitProfileInterface::getNumUnitTypes(); ++utype )
+     {
+-        unit = new Unit(player, unit_type, id, location);
++        numunits = unit_config.getSpawnUnitCount( utype );
++        while ( numunits )
++        {
++            --numunits;
++
++            unit_placement_matrix.getNextEmptyLoc( &amp;next_loc );
++            unit = createUnit(utype, next_loc, player_id);
++
++            assert(unit != 0);
++
++            UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(), unit-&gt;id,
++                            next_loc.x, next_loc.y, unit-&gt;unit_state.unit_type);
++
++            encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg));
++        }
+     }
+-    else
+-    {   // XXX change for a error window
+-        assert(&quot;unknown unit_type&quot; == 0);        
+-    }
+ 
+-    return unit;
++    encoder.sendEncodedMessage();
+ }
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::addNewUnit(Unit *unit)
++void
++UnitInterface::destroyPlayerUnits( const Uint16 player_id )
+ {
+-    units.insert(std::make_pair(unit-&gt;id, unit));
++    UMesgSelfDestruct self_destruct;
++    self_destruct.setHeader(0, _umesg_flag_unique);
+ 
+-    playerUnitLists[unit-&gt;player-&gt;getID()].push_back(unit);
+-
+-    unit_bucket_array.addUnit(unit);
++    UnitList&amp; unitlist = playerUnitLists[player_id];
++    for(UnitList::iterator i = unitlist.begin(); i != unitlist.end(); ++i)
++    {
++        Unit* unit = *i;
++        unit-&gt;processMessage(&amp;self_destruct);
++    }
+ }
+ 
+ // ******************************************************************
+ 
+-Unit*
+-UnitInterface::getUnit(UnitID id)
++UnitID
++UnitInterface::newUnitID()
+ {
+-    Units::iterator i = units.find(id);
+-    if(i == units.end())
++    UnitID newID = lastUnitID++;
++    while(getUnit(newID) != 0)
+     {
+-        return 0;
++        newID = lastUnitID++;
+     }
+ 
+-    return i-&gt;second;
++    return newID;
+ }
+ 
+ // ******************************************************************
+-Unit* UnitInterface::createUnit( unsigned short unit_type,
+-                                      const iXY &amp;location,
+-                                      Uint16 player_id)
++
++Unit *
++UnitInterface::newUnit( const unsigned short unit_type,
++                        const iXY &amp;location,
++                        const unsigned short player_index,
++                        const UnitID id)
+ {
+-    if (playerUnitLists[player_id].size() &gt;= units_per_player)
++    Unit* unit = 0;
++    unsigned char unit_flag;
++
++    PlayerState* player = PlayerInterface::getPlayer( player_index );
++    unit_flag = player-&gt;getFlag();
++
++    if ( unit_type &lt; UnitProfileInterface::getNumUnitTypes() )
+     {
+-        return 0;
++        unit = new Unit(player, unit_type, id, location);
+     }
++    else
++    {   // XXX change for a error window
++        assert(&quot;unknown unit_type&quot; == 0);
++    }
+ 
+-    Unit* unit = newUnit(unit_type, location, player_id, newUnitID());
+-    addNewUnit(unit);
+-
+     return unit;
+ }
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::spawnPlayerUnits(const iXY &amp;location,
+-                                     Uint16 player_id,
+-                                     const PlayerUnitConfig &amp;unit_config)
++void
++UnitInterface::addUnit( Unit *unit )
+ {
+-    iXY next_loc;
+-    Unit *unit;
+-    unsigned long unit_type_index;
+-    unsigned long unit_spawn_count;
+-    unsigned long unit_spawn_index;
++    units.insert(std::make_pair(unit-&gt;id, unit));
++    playerUnitLists[unit-&gt;player-&gt;getID()].push_back(unit);
++    unit_bucket_array.addUnit(unit);
++}
+ 
+-    NetMessageEncoder encoder;
++// ******************************************************************
+ 
+-    unit_placement_matrix.reset( location );
++void
++UnitInterface::removeUnit( Units::iterator i )
++{
++    Unit* unit = i-&gt;second;
+ 
+-    for ( unit_type_index = 0; unit_type_index &lt; UnitProfileInterface::getNumUnitTypes(); unit_type_index++ )
+-    {
++    // unit explosion particles
++    ParticleInterface::addHit(unit-&gt;unit_state);
+ 
+-        unit_spawn_count = unit_config.getSpawnUnitCount( unit_type_index );
+-        for ( unit_spawn_index = 0; unit_spawn_index &lt; unit_spawn_count; unit_spawn_index++ )
+-        {
+-            unit_placement_matrix.getNextEmptyLoc( &amp;next_loc );
+-            unit = createUnit(unit_type_index, next_loc, player_id);
++    // unit explosion sound
++    sound-&gt;playAmbientSound(&quot;expl&quot;,
++            WorldViewInterface::getCameraDistance( unit-&gt;unit_state.location ));
+ 
+-            assert(unit != 0);
+-            UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(), unit-&gt;id,
+-                    next_loc.x, next_loc.y, unit-&gt;unit_state.unit_type);
+-            encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg));
+-        } // ** for unit_spawn_index
+-    } // ** for unit_type_index
++    unit_bucket_array.removeUnit(unit);
+ 
+-    encoder.sendEncodedMessage();
++    UnitList&amp; plist = playerUnitLists[unit-&gt;player-&gt;getID()];
++    plist.erase(std::remove(plist.begin(), plist.end(), unit), plist.end());
++
++    units.erase(i);
++    delete unit;
+ }
+ 
+ // ******************************************************************
+ 
+ void
+-UnitInterface::queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-        const iXY&amp; point, Uint16 player_id, unsigned char search_flags)
++UnitInterface::queryUnitsAt( std::vector&lt;UnitID&gt;&amp; working_list,
++                             const iXY&amp; point,
++                             const Uint16 player_id,
++                             const unsigned char search_flags )
+ {
+     UnitList &amp; ubl = unit_bucket_array.getBucketAssocWorldLoc(point);
+     for(UnitList::iterator i = ubl.begin(); i != ubl.end(); ++i)
+@@ -457,10 +400,13 @@
+ // ******************************************************************
+ 
+ void
+-UnitInterface::queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-        const iRect&amp; rect, Uint16 player_id, unsigned char search_flags)
++UnitInterface::queryUnitsAt( std::vector&lt;UnitID&gt;&amp; working_list,
++                             const iRect&amp; rect,
++                             const Uint16 player_id,
++                             const unsigned char search_flags )
+ {
+-    for(Units::iterator i = units.begin(); i != units.end(); ++i) {
++    for(Units::iterator i = units.begin(); i != units.end(); ++i)
++    {
+         Unit* unit = i-&gt;second;
+         if(!rect.contains(unit-&gt;unit_state.location))
+             continue;
+@@ -476,21 +422,25 @@
+     }
+ }
+ 
+-/****************************************************************************/
++// ******************************************************************
+ 
+-bool UnitInterface::queryClosestUnit( Unit **closest_unit_ptr,
+-                                       iXY &amp;loc, Uint16 player_id,
+-                                       unsigned char search_flags )
++bool
++UnitInterface::queryClosestUnit( Unit **closest_unit_ptr,
++                                 const iXY &amp;loc,
++                                 const Uint16 player_id,
++                                 unsigned char search_flags )
+ {
+     long closest_magnitude = 0;
+     Unit* closest_unit = 0;
+ 
+-    for(Units::iterator i = units.begin(); i != units.end(); ++i) {
++    for(Units::iterator i = units.begin(); i != units.end(); ++i)
++    {
+         Unit* unit = i-&gt;second;
+ 
+         if(search_flags == _search_exclude_player
+                 &amp;&amp; unit-&gt;player-&gt;getID() == player_id)
+             continue;
++
+         if(search_flags == _search_player
+                 &amp;&amp; unit-&gt;player-&gt;getID() != player_id)
+             continue;
+@@ -498,22 +448,27 @@
+         iXY delta;
+         long temp_mag;
+ 
+-        if ( closest_unit == 0 ) {
++        if ( closest_unit == 0 )
++        {
+             closest_unit = unit;
+             delta  = loc - unit-&gt;unit_state.location;
+             closest_magnitude = long(delta.mag2());
+-        } else {
++        }
++        else
++        {
+             delta  = loc - unit-&gt;unit_state.location;
+             temp_mag = long(delta.mag2());
+-            
+-            if ( closest_magnitude &gt; temp_mag ) {
++
++            if ( closest_magnitude &gt; temp_mag )
++            {
+                 closest_unit = unit;
+                 closest_magnitude = temp_mag;
+             }
+         }
+     }
+ 
+-    if(closest_unit != 0) {
++    if(closest_unit != 0)
++    {
+         *closest_unit_ptr = closest_unit;
+         return true;
+     }
+@@ -522,7 +477,12 @@
+     return false;
+ }
+ 
+-bool UnitInterface::queryClosestUnit( Unit **closest_unit_ptr, iRect &amp;bounding_rect, iXY &amp;loc )
++// ******************************************************************
++
++bool
++UnitInterface::queryClosestUnit( Unit **closest_unit_ptr,
++                                 const iRect &amp;bounding_rect,
++                                 const iXY &amp;loc )
+ {
+     Unit *closest_unit = 0;
+     long closest_magnitude = 0;
+@@ -576,8 +536,10 @@
+ 
+ // ******************************************************************
+ 
+-bool UnitInterface::queryClosestEnemyUnit(Unit **closest_unit_ptr,
+-        iXY &amp;loc, Uint16 player_index)
++bool
++UnitInterface::queryClosestEnemyUnit( Unit **closest_unit_ptr,
++                                      const iXY &amp;loc,
++                                      const Uint16 player_index )
+ {
+     Unit *closest_unit = 0;
+     long closest_magnitude = 0;
+@@ -585,7 +547,7 @@
+     for(Units::iterator i = units.begin(); i != units.end(); ++i) {
+         Unit* unit = i-&gt;second;
+         Uint16 unitPlayerID = unit-&gt;player-&gt;getID();
+-        
++
+         if(unitPlayerID == player_index
+                 || PlayerInterface::isAllied(player_index, unitPlayerID))
+             continue;
+@@ -600,7 +562,7 @@
+         } else {
+             delta  = loc - unit-&gt;unit_state.location;
+             temp_mag = long(delta.mag2());
+-            
++
+             if ( closest_magnitude &gt; temp_mag ) {
+                 closest_unit = unit;
+                 closest_magnitude = temp_mag;
+@@ -619,8 +581,31 @@
+ 
+ // ******************************************************************
+ 
+-unsigned char UnitInterface::queryUnitLocationStatus(iXY loc)
++bool
++UnitInterface::queryUnitAtMapLoc( const iXY &amp; map_loc,
++                                  UnitID *queary_unit_id )
+ {
++    iXY unit_map_loc;
++
++    for(Units::iterator i = units.begin(); i != units.end(); ++i) {
++        Unit* unit = i-&gt;second;
++        UnitState* unit_state = &amp; unit-&gt;unit_state;
++
++        MapInterface::pointXYtoMapXY( unit_state-&gt;location, &amp;unit_map_loc );
++        if( map_loc == unit_map_loc ) {
++            *queary_unit_id = unit-&gt;id;
++            return true;
++        }
++    }
++
++    return false;
++}
++
++// ******************************************************************
++
++unsigned char
++UnitInterface::queryUnitLocationStatus( const iXY &amp; loc )
++{
+     Uint16 player_id = PlayerInterface::getLocalPlayerIndex();
+ 
+     std::vector&lt;UnitID&gt; locUnits;
+@@ -646,28 +631,122 @@
+ 
+ // ******************************************************************
+ 
+-bool UnitInterface::queryUnitAtMapLoc(iXY map_loc, UnitID *queary_unit_id)
++void
++UnitInterface::processNetPacket( const NetPacket* packet )
+ {
+-    iXY unit_map_loc;
++    const NetMessage* message = packet-&gt;getNetMessage();
++    const TerminalUnitCmdRequest* terminal_command =
++        (const TerminalUnitCmdRequest*) message;
+ 
+-    for(Units::iterator i = units.begin(); i != units.end(); ++i) {
+-        Unit* unit = i-&gt;second;
+-        UnitState* unit_state = &amp; unit-&gt;unit_state;
+-            
+-        MapInterface::pointXYtoMapXY( unit_state-&gt;location, &amp;unit_map_loc );
+-        if( map_loc == unit_map_loc ) {
+-            *queary_unit_id = unit-&gt;id;
+-            return true;
++    const PlayerState* player
++        = PlayerInterface::getPlayer(packet-&gt;fromPlayer);
++    if(player == 0)
++    {
++        LOGGER.warning(&quot;UnitInterface: Player not found '%u'?!?&quot;,
++                packet-&gt;fromPlayer);
++        return;
++    }
++
++    sendMessage(&amp;(terminal_command-&gt;comm_request) , player);
++}
++
++// ******************************************************************
++
++void
++UnitInterface::sendMessage( const UnitMessage* message,
++                            const PlayerState* player )
++{
++    if (message-&gt;isFlagged(_umesg_flag_unique))
++    {
++        Unit* unit = getUnit(message-&gt;getUnitID());
++        if(unit == 0)
++        {
++            return;
+         }
++
++        if(player &amp;&amp; unit-&gt;player != player)
++        {
++            LOGGER.warning(
++                &quot;Terminal request for unit (%u) not owned by player (%u).\n&quot;,
++                unit-&gt;id, player-&gt;getID());
++            return;
++        }
++
++        unit-&gt;processMessage(message);
+     }
++    else if (message-&gt;isFlagged( _umesg_flag_broadcast) )
++    {
++        if(message-&gt;message_id != _umesg_weapon_hit)
++        {
++            LOGGER.warning(&quot;Broadcast flag only allowed for weapon hit.&quot;);
++            if(player)
++            {
++                LOGGER.warning(&quot;from player %u.\n&quot;, player-&gt;getID());
++            }
++            return;
++        }
+ 
+-    return false;
++        for(Units::iterator i = units.begin(); i != units.end(); ++i)
++        {
++            Unit* unit = i-&gt;second;
++            unit-&gt;processMessage(message);
++        }
++    }
++    else if (message-&gt;isFlagged( _umesg_flag_manager_request) )
++    {
++        if(player)
++        {
++            LOGGER.warning(
++                    &quot;UnitManagerMessage sent out by player %u not allowed.&quot;,
++                    player-&gt;getID());
++            return;
++        }
++  	processManagerMessage(message);
++    }
+ }
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::processManagerMessage(const UnitMessage* message)
++void
++UnitInterface::processNetMessage( const NetMessage* net_message )
+ {
++    switch(net_message-&gt;message_id)
++    {
++        case _net_message_id_ini_sync_mesg:
++            unitSyncMessage(net_message);
++            break;
++
++        case _net_message_id_opcode_mesg:
++            unitOpcodeMessage(net_message);
++            break;
++
++        case _net_message_id_destroy_unit:
++            unitDestroyMessage(net_message);
++            break;
++
++        case _net_message_id_create_unit:
++            unitCreateMessage(net_message);
++            break;
++
++        case _net_message_id_unit_sync_integrity_check:
++            unitSyncIntegrityCheckMessage(net_message);
++            break;
++
++        default:
++            LOGGER.warning(&quot;Unknown message id in UnitMessage (%d)&quot;,
++                    net_message-&gt;message_id);
++#ifdef DEBUG
++            assert(false);
++#endif
++            break;
++    }
++}
++
++// ******************************************************************
++
++void
++UnitInterface::processManagerMessage( const UnitMessage* message )
++{
+     switch(message-&gt;message_id)
+     {
+         case _umesg_end_lifecycle:
+@@ -684,7 +763,8 @@
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::unitManagerMesgEndLifecycle(const UnitMessage* message)
++void
++UnitInterface::unitManagerMesgEndLifecycle( const UnitMessage* message )
+ {
+     const UMesgEndLifeCycleUpdate *lifecycle_update
+         = (const UMesgEndLifeCycleUpdate *) message;
+@@ -702,14 +782,14 @@
+     PlayerState* player2 = unit2-&gt;player;
+ 
+     int unittype1 = unit1-&gt;unit_state.unit_type;
+-    const std::string&amp; unitname1 = 
++    const std::string&amp; unitname1 =
+         UnitProfileInterface::getUnitProfile(unittype1)-&gt;unitname;
+     int unittype2 = unit2-&gt;unit_state.unit_type;
+     const std::string&amp; unitname2 =
+         UnitProfileInterface::getUnitProfile(unittype2)-&gt;unitname;
+     if(Console::server) {
+         *Console::server &lt;&lt; &quot;'&quot; &lt;&lt; player1-&gt;getName() &lt;&lt; &quot;' killed a '&quot;
+-            &lt;&lt; unitname2 &lt;&lt; &quot;' from '&quot; &lt;&lt; player2-&gt;getName() 
++            &lt;&lt; unitname2 &lt;&lt; &quot;' from '&quot; &lt;&lt; player2-&gt;getName()
+             &lt;&lt; &quot;' with his '&quot; &lt;&lt; unitname1 &lt;&lt; &quot;'.&quot; &lt;&lt; std::endl;
+     }
+ 
+@@ -717,7 +797,7 @@
+     if(player1 != player2) {
+         PlayerInterface::setKill(unit1-&gt;player, unit2-&gt;player,
+                 (UnitType) lifecycle_update-&gt;unit_type);
+-        
++
+         PlayerScoreUpdate score_update;
+         score_update.set(player1-&gt;getID(), player2-&gt;getID(),
+                 (UnitType) lifecycle_update-&gt;unit_type);
+@@ -725,61 +805,44 @@
+     }
+ }
+ 
+-
+ // ******************************************************************
+ 
+-void UnitInterface::unitSyncMessage(const NetMessage *net_message)
++void
++UnitInterface::unitCreateMessage( const NetMessage* net_message )
+ {
+-    const UnitIniSyncMessage* sync_message 
+-        = (const UnitIniSyncMessage *) net_message;
++    const UnitRemoteCreate* create_mesg
++        = (const UnitRemoteCreate *) net_message;
+ 
++    Uint16 player_index = create_mesg-&gt;getPlayerID();
++
+     try
+     {
+-        std::map&lt;UnitID, Unit*&gt;::iterator uit = units.find(sync_message-&gt;getUnitID());
++        std::map&lt;UnitID, Unit*&gt;::iterator uit = units.find(create_mesg-&gt;getUnitID());
+         if ( uit != units.end() )
+         {
+-            LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Received an existing unit [%d]&quot;,
+-                            sync_message-&gt;getUnitID());
++            LOGGER.warning(&quot;UnitInterface::unitCreateMessage() Received an existing unit [%d]&quot;,
++                            create_mesg-&gt;getUnitID());
+             return;
+         }
+-        Unit* unit = newUnit(sync_message-&gt;unit_type,
+-                iXY(sync_message-&gt;getLocX(), sync_message-&gt;getLocY()),
+-                sync_message-&gt;getPlayerID(), sync_message-&gt;getUnitID());
+-        unit-&gt;in_sync_flag = false;
+-        addNewUnit(unit);
++        iXY unitpos(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY());
++        Unit* unit = newUnit(create_mesg-&gt;unit_type, unitpos,
++                                 player_index, create_mesg-&gt;getUnitID());
++        addUnit(unit);
++        // remove unit from blackboard in client (we are client here)
++        UnitBlackBoard::unmarkUnitLoc( unitpos );
+     }
+     catch(std::exception&amp; e)
+     {
+-        LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't sync unit '%s'&quot;, e.what());
++        LOGGER.warning(&quot;UnitInterface::unitCreateMessage() Couldn't create new unit '%s'&quot;, e.what());
+     }
+ }
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::unitOpcodeMessage(const NetMessage *net_message)
++void
++UnitInterface::unitDestroyMessage( const NetMessage *net_message )
+ {
+-    UnitOpcodeDecoder decoder;
+-    decoder.setMessage(net_message);
+-
+-    UnitOpcode* opcode;
+-    while(decoder.decode(&amp;opcode)) {
+-        Unit* unit = getUnit(opcode-&gt;getUnitID());
+-
+-        if(!unit) {
+-            LOGGER.debug(&quot;Update for non-existant unit: %d&quot;,
+-                    opcode-&gt;getUnitID());
+-            continue;
+-        }
+-        
+-        unit-&gt;evalCommandOpcode(opcode);
+-    }
+-}
+-
+-// ******************************************************************
+-
+-void UnitInterface::unitDestroyMessage(const NetMessage *net_message)
+-{
+-    const UnitRemoteDestroy* remote_destroy 
++    const UnitRemoteDestroy* remote_destroy
+         = (const UnitRemoteDestroy *) net_message;
+ 
+     Units::iterator i = units.find(remote_destroy-&gt;getUnitToDestroy());
+@@ -791,89 +854,59 @@
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::unitCreateMessage(const NetMessage* net_message)
++void
++UnitInterface::unitSyncMessage( const NetMessage *net_message )
+ {
+-    const UnitRemoteCreate* create_mesg 
+-        = (const UnitRemoteCreate *) net_message;
++    const UnitIniSyncMessage* sync_message 
++        = (const UnitIniSyncMessage *) net_message;
+ 
+-    Uint16 player_index = create_mesg-&gt;getPlayerID();
+-
+     try
+     {
+-        std::map&lt;UnitID, Unit*&gt;::iterator uit = units.find(create_mesg-&gt;getUnitID());
++        std::map&lt;UnitID, Unit*&gt;::iterator uit = units.find(sync_message-&gt;getUnitID());
+         if ( uit != units.end() )
+         {
+-            LOGGER.warning(&quot;UnitInterface::unitCreateMessage() Received an existing unit [%d]&quot;,
+-                            create_mesg-&gt;getUnitID());
++            LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Received an existing unit [%d]&quot;,
++                            sync_message-&gt;getUnitID());
+             return;
+         }
+-        iXY unitpos(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY());
+-        Unit* unit = newUnit(create_mesg-&gt;unit_type, unitpos,
+-                                 player_index, create_mesg-&gt;getUnitID());
+-        addNewUnit(unit);
+-        // remove unit from blackboard in client (we are client here)
+-        UnitBlackBoard::unmarkUnitLoc( unitpos );
++        Unit* unit = newUnit(sync_message-&gt;unit_type,
++                iXY(sync_message-&gt;getLocX(), sync_message-&gt;getLocY()),
++                sync_message-&gt;getPlayerID(), sync_message-&gt;getUnitID());
++        unit-&gt;in_sync_flag = false;
++        addUnit(unit);
+     }
+     catch(std::exception&amp; e)
+     {
+-        LOGGER.warning(&quot;UnitInterface::unitCreateMessage() Couldn't create new unit '%s'&quot;, e.what());
++        LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't sync unit '%s'&quot;, e.what());
+     }
+ }
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::unitSyncIntegrityCheckMessage(const NetMessage* )
++void
++UnitInterface::unitOpcodeMessage( const NetMessage *net_message )
+ {
+-    unit_bucket_array.sort();
+-}
++    UnitOpcodeDecoder decoder;
++    decoder.setMessage(net_message);
+ 
+-// ******************************************************************
+-void UnitInterface::processNetMessage(const NetMessage* net_message)
+-{
+-    switch(net_message-&gt;message_id)
+-    {
+-        case _net_message_id_ini_sync_mesg:
+-            unitSyncMessage(net_message);
+-            break;
++    UnitOpcode* opcode;
++    while(decoder.decode(&amp;opcode)) {
++        Unit* unit = getUnit(opcode-&gt;getUnitID());
+ 
+-        case _net_message_id_opcode_mesg:
+-            unitOpcodeMessage(net_message);
+-            break;
+-
+-        case _net_message_id_destroy_unit:
+-            unitDestroyMessage(net_message);
+-            break;
+-
+-        case _net_message_id_create_unit:
+-            unitCreateMessage(net_message);
+-            break;
+-
+-        case _net_message_id_unit_sync_integrity_check:
+-            unitSyncIntegrityCheckMessage(net_message);
+-            break;
+-
+-        default:
+-            LOGGER.warning(&quot;Unknown message id in UnitMessage (%d)&quot;,
+-                    net_message-&gt;message_id);
+-#ifdef DEBUG
+-            assert(false);
+-#endif
+-            break;
++        if(!unit) {
++            LOGGER.debug(&quot;Update for non-existant unit: %d&quot;,
++                    opcode-&gt;getUnitID());
++            continue;
++        }
++        
++        unit-&gt;evalCommandOpcode(opcode);
+     }
+ }
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::destroyPlayerUnits(Uint16 player_id)
++void
++UnitInterface::unitSyncIntegrityCheckMessage( const NetMessage* )
+ {
+-    UMesgSelfDestruct self_destruct;
+-    self_destruct.setHeader(0, _umesg_flag_unique);
+-
+-    UnitList&amp; unitlist = playerUnitLists[player_id];
+-    for(UnitList::iterator i = unitlist.begin(); i != unitlist.end(); ++i)
+-    {
+-        Unit* unit = *i;
+-        unit-&gt;processMessage(&amp;self_destruct);
+-    }
++    unit_bucket_array.sort();
+ }
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2009-02-21 12:46:36 UTC (rev 1096)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2009-02-21 15:37:47 UTC (rev 1097)
+@@ -45,47 +45,36 @@
+ class UnitInterface
+ {
+ public:
++    // type definitions
+     typedef std::map&lt;UnitID, Unit*&gt; Units;
+     typedef std::vector&lt;UnitList&gt; PlayerUnitList;
+-    
+-private:
+-    static Units units;
+-    static PlayerUnitList playerUnitLists;
+-        
+-    static UnitBucketArray unit_bucket_array;
+-    static size_t units_per_player;
+-    static PlacementMatrix unit_placement_matrix;
+ 
+-    static Uint16 lastUnitID;
+-    static UnitID newUnitID();
+-
+-    static Unit* newUnit(unsigned short unit_type,
+-                             const iXY &amp;location,
+-                             unsigned short player_index,
+-                             UnitID id);
+-    static void addNewUnit(Unit *unit);
+-    static void removeUnit(Units::iterator i);
+-
+-public:
+-    static void initialize( unsigned long max_units );
++    // initialization/cleanup
++    static void initialize( const unsigned int max_units );
+     static void cleanUp();
+     static void reset();
+ 
++    // unit getters
++    static Unit * getUnit( UnitID id )
++    {
++        Units::iterator i = units.find(id);
++        return (i!=units.end())?i-&gt;second:0;
++    }
++
+     static const Units&amp; getUnits()
+     {
+         return units;
+     }
+ 
+-    static const UnitList&amp; getPlayerUnits(Uint16 player_id)
++    static const UnitList&amp; getPlayerUnits( const Uint16 player_id )
+     {
+         assert(player_id &lt; playerUnitLists.size());
+         return playerUnitLists[player_id];
+     }
+ 
+-    static size_t getUnitCount(unsigned short player_index)
++    static size_t getUnitCount( const Uint16 player_index )
+     {
+-        assert( player_index &lt; playerUnitLists.size() );
+-        return playerUnitLists[player_index].size();
++        return getPlayerUnits(player_index).size();
+     }
+ 
+     static size_t getTotalUnitCount()
+@@ -93,86 +82,110 @@
+         return units.size();
+     }
+ 
+-    static Unit* getUnit(UnitID unit_id);
+-
+-    static void processNetPacket(const NetPacket* packet);
+-    static void sendMessage(const UnitMessage* message,
+-            const PlayerState* player = 0);
+-
++    // main loop methods
+     static void updateUnitStatus();
+ 
++    // graphic methods
+     static void offloadGraphics( SpriteSorter &amp;sorter );
+ 
+-    static Unit* createUnit( unsigned short unit_type,
+-                                  const iXY &amp;location,
+-                                  Uint16 player_id);
++    // unit creation
++    static Unit* createUnit( const unsigned short unit_type,
++                             const iXY &amp;location,
++                             const Uint16 player_id);
+ 
+-    static void spawnPlayerUnits( const iXY &amp;location,
+-                                  Uint16 player_id,
+-                                  const PlayerUnitConfig &amp;unit_config );
++    static void spawnPlayerUnits( const iXY &amp; location,
++                                  const Uint16 player_id,
++                                  const PlayerUnitConfig &amp; unit_config );
+ 
+-    static void queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-                             const iXY&amp; point, Uint16 player_id,
+-                             unsigned char search_flags);
++    static void destroyPlayerUnits( const Uint16 player_id );
+ 
+-    static void queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+-                            const iRect&amp; rect, Uint16 player_id,
+-                            unsigned char search_flags);
+ 
++    // unit querying
++    static void queryUnitsAt( std::vector&lt;UnitID&gt;&amp; working_list,
++                              const iXY&amp; point,
++                              const Uint16 player_id,
++                              const unsigned char search_flags );
++
++    static void queryUnitsAt( std::vector&lt;UnitID&gt;&amp; working_list,
++                              const iRect&amp; rect,
++                              const Uint16 player_id,
++                              const unsigned char search_flags );
++
+     static bool queryClosestUnit( Unit **closest_unit_ptr,
+-                                   iXY &amp;loc,
+-                                   Uint16 player_id,
+-                                   unsigned char search_flags );
++                                  const iXY &amp;loc,
++                                  const Uint16 player_id,
++                                  const unsigned char search_flags );
+ 
+     static bool queryClosestUnit( Unit **closest_unit_ptr,
+-                                   iRect &amp;bounding_rect,
+-                                   iXY &amp;loc );
++                                  const iRect &amp;bounding_rect,
++                                  const iXY &amp;loc );
+ 
+-    static bool queryClosestEnemyUnit(Unit **closest_unit_ptr,
+-                                      iXY &amp;loc,
+-                                      Uint16 player_index);
++    static bool queryClosestEnemyUnit( Unit **closest_unit_ptr,
++                                       const iXY &amp;loc,
++                                       const Uint16 player_index );
+ 
+-    static bool queryUnitAtMapLoc( iXY map_loc, UnitID *query_unit_id );
++    static bool queryUnitAtMapLoc( const iXY &amp; map_loc, UnitID *query_unit_id );
+ 
+-    static unsigned char queryUnitLocationStatus( iXY loc );
++    static unsigned char queryUnitLocationStatus( const iXY &amp; loc );
+ 
+-protected:
++    // message methods
++    static void processNetPacket( const NetPacket* packet );
++    static void sendMessage( const UnitMessage* message,
++                             const PlayerState* player = 0 );
++
++    static void processNetMessage( const NetMessage *net_message );
++
++private:
++    friend class Unit;
++
+     // Unit Message Handler Methods
+-    static void processManagerMessage(const UnitMessage *message);
+-    static void unitManagerMesgEndLifecycle(const UnitMessage *message);
++    static void processManagerMessage( const UnitMessage *message );
++    static void unitManagerMesgEndLifecycle( const UnitMessage *message );
+ 
+-protected:
+-    friend class Unit;
+-    
+     // Network Message Handler Variables
+     static Timer message_timer;
+     static Timer no_guarantee_message_timer;
+     static UnitOpcodeEncoder opcode_encoder;
+ 
+     // Network Message Handler Methods
+-    static void sendOpcode(const UnitOpcode* opcode)
++    static void sendOpcode( const UnitOpcode* opcode )
+     {
+         opcode_encoder.encode(opcode);
+     }
+ 
+-    static void unitSyncMessage(const NetMessage *net_message );
+-    static void unitOpcodeMessage(const NetMessage *net_message );
+-    static void unitDestroyMessage(const NetMessage *net_message );
+-    static void unitCreateMessage(const NetMessage *net_message );
+-    static void unitSyncIntegrityCheckMessage(const NetMessage *net_message );
++    static void unitCreateMessage( const NetMessage *net_message );
++    static void unitDestroyMessage( const NetMessage *net_message );
++    static void unitSyncMessage( const NetMessage *net_message );
++    static void unitOpcodeMessage( const NetMessage *net_message );
++    static void unitSyncIntegrityCheckMessage( const NetMessage *net_message );
+ 
+-protected:
+     static unsigned long  sync_units_iterator;
+-    static bool	      sync_units_complete_flag;
++    static bool           sync_units_complete_flag;
+     static unsigned short sync_units_list_index;
+     static Timer	  sync_units_packet_timer;
+     static unsigned long  sync_units_in_sync_count;
+     static unsigned long  sync_units_in_sync_partial_count;
+     static unsigned long  sync_units_total_units;
+ 
+-public:
+-    static void processNetMessage(const NetMessage *net_message );
+-    static void destroyPlayerUnits(Uint16 player_id);
++    static Units units;
++    static PlayerUnitList playerUnitLists;
++        
++    static UnitBucketArray unit_bucket_array;
++    static unsigned int units_per_player;
++    static PlacementMatrix unit_placement_matrix;
++
++    static Uint16 lastUnitID;
++    static UnitID newUnitID();
++
++    static Unit* newUnit( const unsigned short unit_type,
++                          const iXY &amp;location,
++                          const unsigned short player_index,
++                          const UnitID id );
++
++    static void addUnit( Unit *unit );
++    
++    static void removeUnit( Units::iterator i );
++
+ };
+ 
+ #endif // ** _UNITINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-02-21 12:46:36 UTC (rev 1096)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-02-21 15:37:47 UTC (rev 1097)
+@@ -180,6 +180,7 @@
+     if ( c-&gt;getCustomCode() == FLAGBUTTONCODE )
+     {
+         string n = c-&gt;getName();
+-        setSelectedFlag(n);
++        string fname( n.substr( (n.find('.'))+1 ) );
++        setSelectedFlag( fname );
+     }
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000128.html">[Netpanzer-cvs] r1096 - in trunk/netpanzer/src/NetPanzer/Views:	Game MainMenu/Multi MainMenu/Options
+</A></li>
+	<LI>Next message: <A HREF="000130.html">[Netpanzer-cvs] r1098 - in trunk/netpanzer: pics src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Units src/NetPanzer/Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#129">[ date ]</a>
+              <a href="thread.html#129">[ thread ]</a>
+              <a href="subject.html#129">[ subject ]</a>
+              <a href="author.html#129">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

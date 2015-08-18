@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1374 - in trunk/netpanzer/src/NetPanzer: Core	Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-July/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1374%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Core%0A%09Views/Game&In-Reply-To=%3C20120705134306.1881F55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1374 - in trunk/netpanzer/src/NetPanzer: Core	Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1374%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Core%0A%09Views/Game&In-Reply-To=%3C20120705134306.1881F55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1374 - in trunk/netpanzer/src/NetPanzer: Core	Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Thu Jul  5 15:43:05 CEST 2012</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-07-05 15:43:05 +0200 (Thu, 05 Jul 2012)
+New Revision: 1374
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+Log:
+ChatBox input as default selection
+Up protocol
+release Alpha 1106
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2012-06-22 06:29:36 UTC (rev 1373)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2012-07-05 13:43:05 UTC (rev 1374)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -19,7 +19,7 @@
+ #define __NETWORK_GLOBALS_HPP__
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+-#define NETPANZER_PROTOCOL_VERSION     1106
++#define NETPANZER_PROTOCOL_VERSION     1107
+ #define MASTERSERVER_PORT             28900
+ 
+ const char * getNetpanzerProtocolMessage(const int protocol);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-06-22 06:29:36 UTC (rev 1373)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-07-05 13:43:05 UTC (rev 1374)
+@@ -40,7 +40,7 @@
+     setBordered(false);
+     resize(500, 150);
+     moveTo(screen-&gt;getWidth()-getSizeX(), screen-&gt;getHeight()-getSizeY());
+-    
++
+     Surface bitmap, button;
+     bitmap.loadBMP(itScroll);
+     button.grab(bitmap, iRect(0, 0, 15, 15));
+@@ -52,7 +52,7 @@
+     add(bShowWindow);
+     bShowWindow-&gt;Disable();
+     HideWindow = false;
+-    
++
+     iRect r(0, 15, getSizeX()-15, getSizeY()-31);
+     ChatList = new tChatBox(r, 0);
+     vsbChat = new tVScrollBar();
+@@ -178,7 +178,7 @@
+     va_start( vap, format );
+     vsnprintf( temp_str, 256, format, vap );
+     va_end( vap );
+-    
++
+     ChatList-&gt;AddChat(temp_str, msgcolor, hasFlag, flag);
+ }
+ 
+@@ -190,6 +190,7 @@
+ void ChatView::doActivate()
+ {
+     Desktop::setActiveView(this);
++    View::selectedInputField = View::findInputFieldContaining(input-&gt;getPos());
+ }
+ 
+ void ChatView::clear()
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

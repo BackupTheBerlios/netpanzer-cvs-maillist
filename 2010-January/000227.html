@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1201 - in trunk/netpanzer/src/NetPanzer:	Interfaces PowerUps Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1201%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20PowerUps%20Views/Components%20Views/Game&In-Reply-To=%3C201001241603.o0OG3Vuk006561%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000226.html">
+   <LINK REL="Next"  HREF="000228.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1201 - in trunk/netpanzer/src/NetPanzer:	Interfaces PowerUps Views/Components Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1201%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20PowerUps%20Views/Components%20Views/Game&In-Reply-To=%3C201001241603.o0OG3Vuk006561%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1201 - in trunk/netpanzer/src/NetPanzer:	Interfaces PowerUps Views/Components Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 24 17:03:31 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000226.html">[Netpanzer-cvs] r1200 - in trunk/netpanzer: src/Lib/Network	support/macosx support/scripts
+</A></li>
+        <LI>Next message: <A HREF="000228.html">[Netpanzer-cvs] r1202 - in trunk/netpanzer: maps src/Lib/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#227">[ date ]</a>
+              <a href="thread.html#227">[ thread ]</a>
+              <a href="subject.html#227">[ subject ]</a>
+              <a href="author.html#227">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-24 17:03:21 +0100 (Sun, 24 Jan 2010)
+New Revision: 1201
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+Log:
+- hide rank view when loading next map
+- use &quot;kills&quot; to calculate the frag limit rules
+- removed a couple of loops in powerup regeneration
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-01-23 17:58:56 UTC (rev 1200)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-01-24 16:03:21 UTC (rev 1201)
+@@ -328,7 +328,7 @@
+         {
+             player_lists[ player_index ].setStatus( _player_state_allocated );
+             player_lists[ player_index ].resetStats();
+-	    player_lists[ player_index ].setColor( player_index );
++            player_lists[ player_index ].setColor( player_index );
+             player_lists[ player_index ].setID((unsigned short)player_index);
+             SDL_mutexV(mutex);
+             return( &amp;player_lists[ player_index ] );
+@@ -362,7 +362,7 @@
+     unsigned long player_index;
+ 
+     for ( player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        if ( player_lists[ player_index ].getTotal() &gt;= score_limit ) {
++        if ( player_lists[ player_index ].getKills() &gt;= score_limit ) {
+             *player_state = &amp;player_lists[ player_index ];
+             return( true );
+         } // ** if
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-23 17:58:56 UTC (rev 1200)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-24 16:03:21 UTC (rev 1201)
+@@ -92,11 +92,12 @@
+         map_size_x = MapInterface::getWidth();
+         map_size_y = MapInterface::getHeight();
+ 
+-        do
++        loc.x = rand() % map_size_x;
++        loc.y = rand() % map_size_y;
++        if ( MapInterface::getMovementValue( loc ) == 0xFF )
+         {
+-            loc.x = rand() % map_size_x;
+-            loc.y = rand() % map_size_y;
+-        } while( MapInterface::getMovementValue( loc ) == 0xFF );
++            return; // no powerup, try next time.
++        }
+ 
+         int prob_table_index;
+         int powerup_type;
+@@ -134,11 +135,9 @@
+ 
+         SERVER-&gt;broadcastMessage(&amp;create_mesg, sizeof(create_mesg));
+ 
+-        do
+-        {
+-            next_regen_interval = rand() % (power_up_regen_time_upper_bound + 1);
+-        } while( next_regen_interval &lt; power_up_regen_time_lower_bound );
+-
++        int regrange = power_up_regen_time_upper_bound - power_up_regen_time_lower_bound;
++        next_regen_interval = rand() % regrange;
++        next_regen_interval += power_up_regen_time_lower_bound;
+         regen_timer.changePeriod( next_regen_interval );
+ 
+         setPowerUpLimits( map_size_x, map_size_y );
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2010-01-23 17:58:56 UTC (rev 1200)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2010-01-24 16:03:21 UTC (rev 1201)
+@@ -42,7 +42,7 @@
+              int(UnitInterface::getUnitCount(PlayerInterface::getLocalPlayerIndex())),
+              gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers,
+              
+-             PlayerInterface::getLocalPlayer()-&gt;getTotal(),
++             PlayerInterface::getLocalPlayer()-&gt;getKills(),
+              (gameconfig-&gt;gametype == _gametype_fraglimit)?(int)gameconfig-&gt;fraglimit:0,
+              
+              PlayerInterface::getLocalPlayer()-&gt;getObjectivesHeld(),
+@@ -58,4 +58,4 @@
+     
+     dest.bltStringShadowed(position.x+2,position.y+2,buf,Color::white, Color::black);
+ 
+-}
+\ No newline at end of file
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2010-01-23 17:58:56 UTC (rev 1200)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2010-01-24 16:03:21 UTC (rev 1201)
+@@ -78,6 +78,7 @@
+     
+     static void show()
+     {
++        Desktop::setVisibilityAllWindows(false);
+         Desktop::setVisibility(&quot;LoadingView&quot;, true);
+     }
+     
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000226.html">[Netpanzer-cvs] r1200 - in trunk/netpanzer: src/Lib/Network	support/macosx support/scripts
+</A></li>
+	<LI>Next message: <A HREF="000228.html">[Netpanzer-cvs] r1202 - in trunk/netpanzer: maps src/Lib/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#227">[ date ]</a>
+              <a href="thread.html#227">[ thread ]</a>
+              <a href="subject.html#227">[ subject ]</a>
+              <a href="author.html#227">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

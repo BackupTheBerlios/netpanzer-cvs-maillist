@@ -1,0 +1,924 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1135 - in trunk/netpanzer: pics pics/default	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Components	src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1135%20-%20in%20trunk/netpanzer%3A%20pics%20pics/default%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C200906301646.n5UGk8HT016384%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000163.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1135 - in trunk/netpanzer: pics pics/default	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Components	src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1135%20-%20in%20trunk/netpanzer%3A%20pics%20pics/default%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C200906301646.n5UGk8HT016384%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1135 - in trunk/netpanzer: pics pics/default	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Components	src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jun 30 18:46:08 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000163.html">[Netpanzer-cvs] r1134 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#164">[ date ]</a>
+              <a href="thread.html#164">[ thread ]</a>
+              <a href="subject.html#164">[ subject ]</a>
+              <a href="author.html#164">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-30 18:45:29 +0200 (Tue, 30 Jun 2009)
+New Revision: 1135
+
+Added:
+   trunk/netpanzer/pics/default/
+   trunk/netpanzer/pics/default/ally.bmp
+   trunk/netpanzer/pics/default/allyOther.bmp
+   trunk/netpanzer/pics/default/allyRequest.bmp
+   trunk/netpanzer/pics/default/noAlly.bmp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+Log:
+You actually aren't going to believe that the alliance is fixed:
+- network protocol version changes, now less packets are sent when there are alliance request and when players quits.
+- fixed: when a player disconnected, the server didn't cleanup the alliance matrix, and bogus messages would be shown to the players
+- fixed: there was some differences between the setting an alliance and checking for an alliance.
+- allowallies in the server configuration now is enabled, if you set it to no, players won't be able to create alliances
+- fixed: alliances are real alliances when both players ally with each other
+- when a player try to ally with other player, he will send an ally request, there are new text messages for all of this.
+- ally requests can be cancelled
+- if both players are allied and one break the alliance, both alliances are broken and they are enemy now.
+- the RankView (the list of players) has changed a little:
+  * First column has 2 graphics, the alliance image and the player flag
+  * the player name and points are next
+- NEW: players can ally directly on the RankView clicking on the ally image
+- When a player ally with other player, in the RankView will see his left part of ally image has color (left is 'this' player), the other player will see the right part of the ally image with color, like this you can know if you started the request or it was the other player.
+- When there is a full alliance, the image will have full color, you can click on it to break the alliance too.
+- The images for alliance are a flag that C-D has in his flag package, they new images are in pics/default/*.bmp
+
+
+
+Added: trunk/netpanzer/pics/default/ally.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/default/ally.bmp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/pics/default/allyOther.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/default/allyOther.bmp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/pics/default/allyRequest.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/default/allyRequest.bmp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/pics/default/noAlly.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/default/noAlly.bmp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -19,6 +19,7 @@
+ #define _PLAYERNETMESSAGE_HPP
+ 
+ #include &quot;NetMessage.hpp&quot;
++#include &quot;Classes/PlayerState.hpp&quot;
+ 
+ enum { _net_message_id_player_connect_id,
+        _net_message_id_player_sync_state,
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -153,27 +153,36 @@
+     {
+         return _cursor_blocked;
+     }
+-
+-    unit_loc_status = UnitInterface::queryUnitLocationStatus(loc);
+-    if ( unit_loc_status == _unit_player )
+-    {
+-        return _cursor_player_unit;
+-    }
+-    else if ((unit_loc_status == _unit_enemy) 
+-            &amp;&amp; KeyboardInterface::getKeyState(SDLK_a))
+-    {
+-        return _cursor_make_allie;
+-    }
+-    else if ((unit_loc_status == _unit_enemy) &amp;&amp; working_list.isSelected())
+-    {
+-        return _cursor_enemy_unit;
+-    }
+-    else if ( (unit_loc_status == _unit_allied) 
+-            &amp;&amp; KeyboardInterface::getKeyState(SDLK_a))
+-    {
+-        return _cursor_break_allie;
+-    }
+-
++	
++	Unit * unit = UnitInterface::queryNonPlayerUnitAtWorld( loc, PlayerInterface::getLocalPlayerIndex() );
++	if ( unit )
++	{
++		if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
++		{
++			if ( KeyboardInterface::getKeyState(SDLK_a) )
++			{
++				if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
++				{
++					return _cursor_break_allie;
++				}
++				
++				return _cursor_make_allie;
++			}
++			else if ( working_list.isSelected() )
++			{
++				return _cursor_enemy_unit;
++			}
++		}
++		else
++		{
++			if ( KeyboardInterface::getKeyState(SDLK_a) )
++			{
++				return _cursor_break_allie;
++			}
++		}
++		
++	}
++	
+     if (working_list.isSelected())
+         return _cursor_move;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -19,7 +19,7 @@
+ #define __NETWORK_GLOBALS_HPP__
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+-#define NETPANZER_PROTOCOL_VERSION     1021
++#define NETPANZER_PROTOCOL_VERSION     1022
+ #define MASTERSERVER_PORT             28900
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -19,6 +19,7 @@
+ #include &lt;stdexcept&gt;
+ 
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+@@ -109,35 +110,41 @@
+     SDL_mutexV(mutex);
+ }
+ 
+-void PlayerInterface::setAlliance( unsigned short by_player, unsigned short with_player )
++void
++PlayerInterface::setAlliance( unsigned short by_player, unsigned short with_player )
+ {
+-    assert( (by_player &lt; max_players) &amp;&amp; (with_player &lt; max_players) );
++    *(alliance_matrix + (by_player * max_players) + with_player ) = true;
++}
+ 
+-    SDL_mutexP(mutex);
+-    *(alliance_matrix + (with_player * max_players) + by_player ) = true;
+-    //*(alliance_matrix + (by_player * max_players) + with_player ) = true;
+-    SDL_mutexV(mutex);
++void
++PlayerInterface::clearAlliance( unsigned short by_player, unsigned short with_player )
++{
++    *(alliance_matrix + (by_player * max_players) + with_player ) = false;
+ }
+ 
+-void PlayerInterface::clearAlliance( unsigned short by_player, unsigned short with_player )
++bool
++PlayerInterface::isAllied( unsigned short player, unsigned short with_player )
+ {
+-    assert( (by_player &lt; max_players) &amp;&amp; (with_player &lt; max_players) );
+-
+-    SDL_mutexP(mutex);
+-    *(alliance_matrix + (with_player * max_players) + by_player ) = false;
+-    SDL_mutexV(mutex);
++    if (    player &lt; max_players &amp;&amp; with_player &lt; max_players 
++		 &amp;&amp; *(alliance_matrix + (with_player * max_players) + player )
++		 &amp;&amp; *(alliance_matrix + (player * max_players) + with_player )
++		)
++	{
++		return true;
++	}
++	return false;
+ }
+ 
+-bool PlayerInterface::isAllied( unsigned short player, unsigned short with_player )
++bool
++PlayerInterface::isSingleAllied( unsigned short player, unsigned short with_player )
+ {
+-    bool val;
+-
+-    assert( (player &lt; max_players) &amp;&amp; (with_player &lt; max_players) );
+-
+-    val = *(alliance_matrix + (with_player * max_players) + player );
+-
+-    return( val );
+-
++    if (    player &lt; max_players &amp;&amp; with_player &lt; max_players 
++		 &amp;&amp; *(alliance_matrix + (player * max_players) + with_player )
++		)
++	{
++		return true;
++	}
++	return false;
+ }
+ 
+ void PlayerInterface::lockPlayerStats()
+@@ -363,7 +370,13 @@
+     }
+     
+     SDL_mutexP(mutex);
+-    player_lists[player_index].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
++    
++	player_lists[player_index].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
++	if ( player_lists[player_index].getStatus() == _player_state_free )
++	{
++		disconnectedPlayerAllianceCleanup(player_index);
++	}
++	
+     SDL_mutexV(mutex);
+ }
+ 
+@@ -387,6 +400,11 @@
+ 
+ void PlayerInterface::netMessageAllianceRequest(const NetMessage *message)
+ {
++	if ( gameconfig-&gt;allowallies == false )
++	{
++		return;
++	}
++	
+     PlayerState *player_state;
+ 
+     const PlayerAllianceRequest *allie_request
+@@ -399,42 +417,77 @@
+     }
+ 
+     SDL_mutexP(mutex);
+-    if ( allie_request-&gt;alliance_request_type == _player_make_alliance ) {
+-        setAlliance(
+-                allie_request-&gt;getAllieByPlayerIndex(),
+-                allie_request-&gt;getAllieWithPlayerIndex());
++    if ( allie_request-&gt;alliance_request_type == _player_make_alliance )
++	{
++		setAlliance(  allie_request-&gt;getAllieByPlayerIndex(),
++					  allie_request-&gt;getAllieWithPlayerIndex());
+ 
+-        if( (allie_request-&gt;getAllieByPlayerIndex() == local_player_index) ) {
+-            player_state = getPlayer(
+-                    allie_request-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage(Color::yellow, false, 0, &quot;Alliance created with %s.&quot;,
+-                    player_state-&gt;getName().c_str() );
+-        } else
+-            if( (allie_request-&gt;getAllieWithPlayerIndex() == local_player_index) ) {
+-                player_state = getPlayer(
+-                        allie_request-&gt;getAllieByPlayerIndex());
+-                ConsoleInterface::postMessage(Color::yellow, false, 0, &quot;%s has allied with you.&quot;,
+-                        player_state-&gt;getName().c_str() );
+-            }
+-    } else {
++        if ( allie_request-&gt;getAllieByPlayerIndex() == local_player_index )
++		{
++            player_state = getPlayer( allie_request-&gt;getAllieWithPlayerIndex() );
++			if ( isSingleAllied( player_state-&gt;getID(), local_player_index) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You accepted %s alliance request.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You request alliance with %s.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++        }
++		else if ( allie_request-&gt;getAllieWithPlayerIndex() == local_player_index )
++		{
++			player_state = getPlayer( allie_request-&gt;getAllieByPlayerIndex() );
++			if ( isSingleAllied( local_player_index, player_state-&gt;getID()) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s accepted your alliance request.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s request to ally with you.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++        }
++    }
++	else
++	{
++		// break alliance cancels both alliances
+         clearAlliance( allie_request-&gt;getAllieByPlayerIndex(),
+                        allie_request-&gt;getAllieWithPlayerIndex());
+ 
+-        if( (allie_request-&gt;getAllieByPlayerIndex() == local_player_index) ) {
+-            player_state = getPlayer(
+-                    allie_request-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage(Color::yellow, false, 0, &quot;Alliance broken with %s.&quot;,
+-                    player_state-&gt;getName().c_str() );
+-        } else
+-            if( (allie_request-&gt;getAllieWithPlayerIndex()
+-                        == local_player_index) ) {
+-                player_state = getPlayer(
+-                        allie_request-&gt;getAllieByPlayerIndex());
+-                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                        &quot;%s has broken their alliance with you.&quot;,
+-                        player_state-&gt;getName().c_str() );
+-            }
+-
++        if ( allie_request-&gt;getAllieByPlayerIndex() == local_player_index )
++		{
++            player_state = getPlayer( allie_request-&gt;getAllieWithPlayerIndex() );
++			if ( isSingleAllied( player_state-&gt;getID(), local_player_index) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You broke the alliance with %s.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You cancel your alliance request with %s.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++        }
++		else if ( allie_request-&gt;getAllieWithPlayerIndex() == local_player_index )
++		{
++			player_state = getPlayer( allie_request-&gt;getAllieByPlayerIndex() );
++			if ( isSingleAllied( local_player_index, player_state-&gt;getID()) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s broke the alliance with you.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s cancelled the alliance request with you.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++		}
++		
++		clearAlliance( allie_request-&gt;getAllieWithPlayerIndex(),
++						allie_request-&gt;getAllieByPlayerIndex());
+     }
+     SDL_mutexV(mutex);
+ 
+@@ -442,7 +495,15 @@
+     allie_update.set(allie_request-&gt;getAllieByPlayerIndex(),
+                      allie_request-&gt;getAllieWithPlayerIndex(),
+                      allie_request-&gt;alliance_request_type);
+-    NetworkServer::broadcastMessage(&amp;allie_update, sizeof(PlayerAllianceUpdate));
++    //NetworkServer::broadcastMessage(&amp;allie_update, sizeof(PlayerAllianceUpdate));
++	if ( allie_request-&gt;getAllieByPlayerIndex() != local_player_index )
++	{
++		NetworkServer::sendMessage( allie_request-&gt;getAllieByPlayerIndex(), &amp;allie_update, sizeof(PlayerAllianceUpdate) );
++	}
++	if ( allie_request-&gt;getAllieWithPlayerIndex() != local_player_index )
++	{
++		NetworkServer::sendMessage( allie_request-&gt;getAllieWithPlayerIndex(), &amp;allie_update, sizeof(PlayerAllianceUpdate) );
++	}
+ }
+ 
+ void PlayerInterface::netMessageAllianceUpdate(const NetMessage* message)
+@@ -461,41 +522,75 @@
+     SDL_mutexP(mutex);
+     if (allie_update-&gt;alliance_update_type == _player_make_alliance)
+     {
+-        setAlliance(
+-                allie_update-&gt;getAllieByPlayerIndex(),
+-                allie_update-&gt;getAllieWithPlayerIndex());
++        setAlliance(  allie_update-&gt;getAllieByPlayerIndex(),
++					  allie_update-&gt;getAllieWithPlayerIndex());
+ 
+-        if( (allie_update-&gt;getAllieByPlayerIndex() == local_player_index) )
+-        {
+-            player_state = getPlayer(allie_update-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage(Color::yellow, false, 0, &quot;Alliance created with %s.&quot;,
+-                                          player_state-&gt;getName().c_str() );
++        if ( allie_update-&gt;getAllieByPlayerIndex() == local_player_index )
++		{
++            player_state = getPlayer( allie_update-&gt;getAllieWithPlayerIndex() );
++			if ( isSingleAllied( player_state-&gt;getID(), local_player_index) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You accepted %s alliance request.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You request alliance with %s.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
+         }
+-        else if( allie_update-&gt;getAllieWithPlayerIndex() == local_player_index )
+-        {
+-            player_state = getPlayer(allie_update-&gt;getAllieByPlayerIndex());
+-            ConsoleInterface::postMessage(Color::yellow, false, 0, &quot;%s has allied with you.&quot;,
+-                                          player_state-&gt;getName().c_str() );
++		else if ( allie_update-&gt;getAllieWithPlayerIndex() == local_player_index )
++		{
++			player_state = getPlayer( allie_update-&gt;getAllieByPlayerIndex() );
++			if ( isSingleAllied( local_player_index, player_state-&gt;getID() ) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s accepted your alliance request.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s request to ally with you.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
+         }
+     }
+     else
+     {
+-        clearAlliance(allie_update-&gt;getAllieByPlayerIndex(),
+-                allie_update-&gt;getAllieWithPlayerIndex());
++		// break alliance cancels both alliances
++		clearAlliance( allie_update-&gt;getAllieByPlayerIndex(),
++                       allie_update-&gt;getAllieWithPlayerIndex());
+ 
+-        if( allie_update-&gt;getAllieByPlayerIndex() == local_player_index )
+-        {
+-            player_state = getPlayer(allie_update-&gt;getAllieWithPlayerIndex());
+-            ConsoleInterface::postMessage(Color::yellow, false, 0, &quot;Alliance broken with %s.&quot;,
+-                                          player_state-&gt;getName().c_str() );
++        if ( allie_update-&gt;getAllieByPlayerIndex() == local_player_index )
++		{
++            player_state = getPlayer( allie_update-&gt;getAllieWithPlayerIndex() );
++			if ( isSingleAllied( player_state-&gt;getID(), local_player_index) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You broke the alliance with %s.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;You cancel your alliance request with %s.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
+         }
+-        else if( allie_update-&gt;getAllieWithPlayerIndex() == local_player_index )
+-        {
+-            player_state = getPlayer( allie_update-&gt;getAllieByPlayerIndex());
+-            ConsoleInterface::postMessage(Color::yellow, false, 0,
+-                                    &quot;%s has broken their alliance with you.&quot;,
+-                                    player_state-&gt;getName().c_str() );
+-        }
++		else if ( allie_update-&gt;getAllieWithPlayerIndex() == local_player_index )
++		{
++			player_state = getPlayer( allie_update-&gt;getAllieByPlayerIndex() );
++			if ( isSingleAllied( local_player_index, player_state-&gt;getID()) )
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s broke the alliance with you.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++			else
++			{
++				ConsoleInterface::postMessage( Color::yellow, false, 0, &quot;%s cancelled the alliance request with you.&quot;,
++												player_state-&gt;getName().c_str() );
++			}
++		}
++		
++		clearAlliance( allie_update-&gt;getAllieWithPlayerIndex(),
++						allie_update-&gt;getAllieByPlayerIndex() );
+     }
+     SDL_mutexV(mutex);
+ }
+@@ -538,26 +633,26 @@
+         disconnect_player_index = index;
+ 
+         SDL_mutexP(mutex);
+-        for ( player_index = 0; player_index &lt; max_players; player_index++ )
+-        {
+-            if ( isAllied( disconnect_player_index, player_index ) == true )
+-            {
+-                allie_update.set( disconnect_player_index, player_index, _player_break_alliance );
+-                NetworkServer::broadcastMessage(&amp;allie_update, sizeof(PlayerAllianceUpdate));
+-            }
++		
++        disconnectedPlayerAllianceCleanup(disconnect_player_index);
+ 
+-            if ( isAllied( player_index, disconnect_player_index ) == true )
+-            {
+-                allie_update.set( player_index, disconnect_player_index, _player_break_alliance );
+-                NetworkServer::broadcastMessage(&amp;allie_update, sizeof(PlayerAllianceUpdate));
+-            }
+-        }
+-
+         player_state-&gt;setStatus( _player_state_free );
+ 
+         PlayerStateSync player_state_update(player_state-&gt;getNetworkPlayerState());
+-        SDL_mutexV(mutex);
++        
++		SDL_mutexV(mutex);
+ 
+         NetworkServer::broadcastMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+     }
+ }
++
++void
++PlayerInterface::disconnectedPlayerAllianceCleanup( Uint16 index )
++{
++	for ( Uint16 player_index = 0; player_index &lt; max_players; ++player_index )
++	{
++		clearAlliance( index, player_index );
++		clearAlliance( player_index, index );
++	}
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -30,6 +30,8 @@
+     static bool *alliance_matrix;
+ 
+     static void resetAllianceMatrix();
++    static void setAlliance( unsigned short by_player, unsigned short with_player );
++    static void clearAlliance( unsigned short by_player, unsigned short with_player );
+ 
+     static unsigned short local_player_index;
+ 
+@@ -49,11 +51,8 @@
+     static void setKill(PlayerState* by_player, PlayerState* on_player,
+             UnitType unit_type );
+ 
+-    static void setAlliance( unsigned short by_player, unsigned short with_player );
+-
+-    static void clearAlliance( unsigned short by_player, unsigned short with_player );
+-
+     static bool isAllied(unsigned short player, unsigned short with_player);
++	static bool isSingleAllied(unsigned short player, unsigned short with_player);
+ 
+     static void lockPlayerStats();
+     static void unlockPlayerStats();
+@@ -113,6 +112,7 @@
+     static bool syncNextPlayerState( NetworkPlayerState &amp;dest, int *percent_complete);
+     static void processNetMessage(const NetMessage *message );
+     static void disconnectPlayerCleanup( Uint16 index );
++	static void disconnectedPlayerAllianceCleanup( Uint16 index );
+ };
+ 
+ #endif // ** _PLAYERINTERFACE_HP
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -291,8 +291,7 @@
+ 
+ 
+ bool
+-ObjectiveInterface::testRuleObjectiveOccupationRatio(
+-        Uint16 player_index, float precentage)
++ObjectiveInterface::testRuleObjectiveOccupationRatio( Uint16 player_index, float precentage)
+ {
+     size_t occupation_ratio = (size_t)
+         ( ((float) objective_list.size()) * precentage  + 0.999);
+@@ -302,20 +301,22 @@
+ 
+     std::vector&lt;Objective*&gt;::iterator i;
+     size_t occupied = 0;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
++    for(i = objective_list.begin(); i != objective_list.end(); i++)
++    {
+         ObjectiveState *objective_state = &amp; ((*i)-&gt;objective_state);
+-        if(objective_state-&gt;occupation_status == _occupation_status_occupied) {
++        if(objective_state-&gt;occupation_status == _occupation_status_occupied)
++        {
+             Uint16 occuping_player_index 
+                 = objective_state-&gt;occupying_player-&gt;getID();
+ 
+-            if ( occuping_player_index == player_index ) {
++            if ( occuping_player_index == player_index )
++            {
+                 occupied++;
+-            } else if (PlayerInterface::isAllied(
+-                        occuping_player_index, player_index) &amp;&amp;
+-                        PlayerInterface::isAllied(player_index,
+-                            occuping_player_index)) {
+-                    occupied++;
+             }
++            else if (PlayerInterface::isAllied( occuping_player_index, player_index) )
++            {
++                occupied++;
++            }
+         }
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -362,7 +362,7 @@
+ 
+     focusComponent = 0;
+ 
+-    // Check all components for a pressed event.
++	// Check all components for a pressed event.
+     ComponentsIterator i;
+     for ( i=components.begin(); i != components.end(); i++)
+     {        
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -26,6 +26,8 @@
+ #include &quot;RankView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
++#include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+@@ -41,11 +43,12 @@
+     setSubTitle(&quot; - TAB&quot;);
+ 
+     moveTo(gameconfig-&gt;rankposition);
+-    resize(iXY(450, 200));
++    resize(iXY(450 + 20, 200));
+     checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+ 
+-    const unsigned MAX_NAME_CHARS      = 20;
++    const unsigned MAX_ALLY_CHARS		=  6;
+     const unsigned MAX_FLAG_CHARS      =  5;
++	const unsigned MAX_NAME_CHARS      = 20;
+     const unsigned MAX_KILLS_CHARS     =  6;
+     const unsigned MAX_LOSSES_CHARS    =  7;
+     const unsigned MAX_POINTS_CHARS    =  7;
+@@ -55,10 +58,12 @@
+ 
+     unsigned xOffset = 0;
+     unsigned yOffset = 16;
++    add( new Label( xOffset, yOffset, &quot;*Flag&quot;, Color::red, Color::gray64, true) );
++    xOffset += MAX_ALLY_CHARS*CHAR_XPIX;
++//    add( new Label( xOffset, yOffset, &quot;Flag&quot;, Color::red, Color::gray64, true) );
++//    xOffset += MAX_FLAG_CHARS*CHAR_XPIX;
+     add( new Label( xOffset, yOffset, &quot;Name&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_NAME_CHARS*CHAR_XPIX;
+-    add( new Label( xOffset, yOffset, &quot;Flag&quot;, Color::red, Color::gray64, true) );
+-    xOffset += MAX_FLAG_CHARS*CHAR_XPIX;
+     add( new Label( xOffset, yOffset, &quot;Kills&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_KILLS_CHARS*CHAR_XPIX;
+     add( new Label( xOffset, yOffset, &quot;Losses&quot;, Color::red, Color::gray64, true) );
+@@ -68,7 +73,14 @@
+     add( new Label( xOffset, yOffset, &quot;Objective&quot;, Color::red, Color::gray64, true) );
+     xOffset += MAX_POINTS_CHARS*CHAR_XPIX;
+ 
+-    // Define the scrollBar fot this view.
++	allyImage.loadBMP(&quot;pics/default/ally.bmp&quot;);
++	allyRequestImage.loadBMP(&quot;pics/default/allyRequest.bmp&quot;);
++	allyOtherImage.loadBMP(&quot;pics/default/allyOther.bmp&quot;);
++	noAllyImage.loadBMP(&quot;pics/default/noAlly.bmp&quot;);
++	
++	states.clear();
++    
++	// Define the scrollBar fot this view.
+     scrollBar = new ScrollBar(ScrollBar::VERTICAL, 0, 1, 0, 100);
+     if (scrollBar == 0) {
+         throw Exception(&quot;ERROR: Unable to allocate the scrollBar.&quot;);
+@@ -86,7 +98,7 @@
+     unsigned int newheight = 60 + entryheight * PlayerInterface::countPlayers();
+     
+     if ( newheight != (unsigned int)clientRect.getSizeY() ) {
+-        resize(iXY(450, newheight));
++        resize(iXY(450+20, newheight));
+         return; // this frame draws nothing
+     }
+     
+@@ -132,15 +144,19 @@
+ {
+     char statBuf[256];
+ 
+-    std::vector&lt;const PlayerState*&gt; states;
+-    for(size_t i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i) {
++	states.clear();
++	for(size_t i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
++	{
+         PlayerState* state = PlayerInterface::getPlayer(i);
+         if(state-&gt;getStatus() != _player_state_active)
+-            continue;
++        {
++			continue;
++		}
+         states.push_back(state);
+     }
+ 
+-    switch(gameconfig-&gt;gametype) {
++    switch(gameconfig-&gt;gametype)
++	{
+         case _gametype_objective:
+             std::sort(states.begin(), states.end(), StatesSortByObjectives());
+             break;
+@@ -152,8 +168,8 @@
+ 
+     unsigned int CHAR_YPIX = Surface::getFontHeight();
+     unsigned int entryHeight = std::max(CHAR_YPIX, flagHeight) + 2;
+-    iXY offset(2, 40);
+-    iXY flagOffset(162, 40 + (int(CHAR_YPIX - flagHeight))/2);
++    iXY offset( 6*8, 40);
++    iXY flagOffset(26, 40 + (int(CHAR_YPIX - flagHeight))/2);
+     Surface * flag = 0;
+ 
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+@@ -161,14 +177,35 @@
+         const PlayerState* state = *i;
+ 
+         snprintf(statBuf, sizeof(statBuf),
+-                &quot;%-20s%10i%7i%6i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
++                &quot;%-20s%5i%7i%7i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+         drawStringShadowed(offset.x, offset.y, statBuf, state-&gt;getColor(), Color::gray64);
+         
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         drawImage( *flag, flagOffset.x, flagOffset.y );
+-
++		if ( state-&gt;getID() != PlayerInterface::getLocalPlayerIndex() )
++		{
++			bool meWithHim = PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), state-&gt;getID());
++			bool himWithMe = PlayerInterface::isSingleAllied(state-&gt;getID(), PlayerInterface::getLocalPlayerIndex());
++			if ( meWithHim &amp;&amp; himWithMe )
++			{
++				drawImage( allyImage, 4, flagOffset.y );
++			}
++			else if ( meWithHim )
++			{
++				drawImage( allyRequestImage, 4, flagOffset.y );
++			}
++			else if ( himWithMe )
++			{
++				drawImage( allyOtherImage, 4, flagOffset.y );
++			}
++			else
++			{
++				drawImage( noAllyImage, 4, flagOffset.y );
++			}
++		}
++		
+         offset.y += entryHeight;
+         flagOffset.y += entryHeight;        
+     }
+@@ -179,3 +216,39 @@
+ {
+     gameconfig-&gt;rankposition=min;
+ }
++
++void
++RankView::lMouseDown(const iXY &amp;pos)
++{
++	LOGGER.info(&quot;Mouse down, pos = %d,%d&quot;, pos.x, pos.y);
++	GameTemplateView::lMouseDown(pos);
++
++	if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= 40 )
++	{
++		unsigned int ypos = pos.y - 40;
++		unsigned int CHAR_YPIX = Surface::getFontHeight();
++		unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
++		unsigned int entryHeight = std::max(CHAR_YPIX, flagHeight) + 2;
++		unsigned int linepos = ypos / entryHeight;
++		if ( linepos &lt; states.size() )
++		{
++			unsigned int destplayer = states[linepos]-&gt;getID();
++			unsigned int localplayer = PlayerInterface::getLocalPlayerIndex();
++			if ( destplayer != localplayer )
++			{
++				PlayerAllianceRequest allie_request;
++
++				if ( PlayerInterface::isSingleAllied(localplayer, destplayer) )
++				{
++					allie_request.set( localplayer, destplayer, _player_break_alliance);
++				}
++				else
++				{
++					allie_request.set( localplayer, destplayer, _player_make_alliance);
++				}
++				
++				NetworkClient::sendMessage( &amp;allie_request, sizeof(PlayerAllianceRequest));
++			}
++		}
++	}
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2009-06-29 12:46:32 UTC (rev 1134)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2009-06-30 16:45:29 UTC (rev 1135)
+@@ -20,11 +20,14 @@
+ #ifndef __RankView_hpp__
+ #define __RankView_hpp__
+ 
++#include &lt;vector&gt;
++
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;GameTemplateView.hpp&quot;
+ #include &quot;Views/Components/ScrollBar.hpp&quot;
+ 
++class PlayerState;
+ 
+ //---------------------------------------------------------------------------
+ class RankView : public GameTemplateView
+@@ -33,7 +36,11 @@
+     int viewableMessageCount;
+     enum { ITEM_GAP_SPACE = 10 };
+     void drawPlayerStats( unsigned int flagHeight);
+-
++	Surface allyImage;
++	Surface allyRequestImage;
++	Surface allyOtherImage;
++	Surface noAllyImage;
++    std::vector&lt;const PlayerState*&gt; states;
+     ScrollBar *scrollBar;
+ 
+ public:
+@@ -45,6 +52,9 @@
+ 
+     virtual void doDraw();
+     virtual void notifyMoveTo();
++	
++protected:
++	virtual void lMouseDown(const iXY &amp;pos);
+ }
+ ; // end _WIN
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000163.html">[Netpanzer-cvs] r1134 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#164">[ date ]</a>
+              <a href="thread.html#164">[ thread ]</a>
+              <a href="subject.html#164">[ subject ]</a>
+              <a href="author.html#164">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

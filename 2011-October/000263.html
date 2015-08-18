@@ -1,0 +1,1099 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1237 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Interfaces Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1237%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/AI%20Interfaces%20Units&In-Reply-To=%3C20111003094524.046F44812C1%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000262.html">
+   <LINK REL="Next"  HREF="000264.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1237 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Interfaces Units</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1237%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/AI%20Interfaces%20Units&In-Reply-To=%3C20111003094524.046F44812C1%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1237 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Interfaces Units">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct  3 11:45:23 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000262.html">[Netpanzer-cvs] r1236 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network
+</A></li>
+        <LI>Next message: <A HREF="000264.html">[Netpanzer-cvs] r1238 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#263">[ date ]</a>
+              <a href="thread.html#263">[ thread ]</a>
+              <a href="subject.html#263">[ subject ]</a>
+              <a href="author.html#263">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-03 11:45:23 +0200 (Mon, 03 Oct 2011)
+New Revision: 1237
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+Log:
+Team chat message yellow
+Clic on prohiten zone make nothing
+Actiontimer down to 0.1
+Some pathfinding change (fewer resources)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2011-10-02 15:02:18 UTC (rev 1236)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2011-10-03 09:45:23 UTC (rev 1237)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -290,18 +290,11 @@
+                 movement_value = generateSucc( succ_loop, best_node, &amp;temp_node );
+ 
+                 if ( movement_value != 0xFF ) {
+-                    if ( open_set.getBit( temp_node.map_loc.x, temp_node.map_loc.y ) ) {
+-                        //best_node-&gt;child[ succ_loop ] = old;
+-
+-                    } // ** if in open
+-                    else
+-                        if ( closed_set.getBit( temp_node.map_loc.x, temp_node.map_loc.y ) ) {
++                    if ( !open_set.getBit( temp_node.map_loc.x, temp_node.map_loc.y ) )
++                        if ( !closed_set.getBit( temp_node.map_loc.x, temp_node.map_loc.y ) ) {
+                             //best_node-&gt;child[ succ_loop ] = old;
+ 
+-                        } // ** if in closed
+-                        else {
+                             node = 0;
+-
+                             node = getNewNode();
+ 
+                             if ( node == 0 ) {
+@@ -319,9 +312,7 @@
+ 
+                                 open.push(node);
+                             }
+-
+-                        } // ** else
+-
++                        }
+                 } // ** if valid succesor
+             }  // ** for succ_loop
+ 
+@@ -355,13 +346,13 @@
+ 
+         ini_flag = true;
+         cleanUp();
+-                                                              
++
+         PathingState::astar_gen_time = total_pathing_time;
+         PathingState::astar_gen_time_total += total_pathing_time;
+         *result_code = _path_result_goal_unreachable;
+         return true;
+     }
+-    
++
+     if (done) {
+         bool insert_successful = true;
+         path_length = 0;
+@@ -398,7 +389,7 @@
+         PathingState::astar_gen_time_total += total_pathing_time;
+         *result_code = _path_result_success;
+         return true;
+-    } 
++    }
+ 
+     return false;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-02 15:02:18 UTC (rev 1236)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-03 09:45:23 UTC (rev 1237)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -89,7 +89,7 @@
+     right_mouse_scroll_moved = false;
+ 
+     lastSelectTimer.setTimeOut(400);
+-    actionTimer.setTimeOut(200);
++    actionTimer.setTimeOut(100);
+ 
+ }
+ 
+@@ -185,7 +185,7 @@
+ {
+     iXY map_loc;
+     bool fielddraws = false;
+-    
++
+     if (selection_box_active)
+         return _cursor_regular;
+ 
+@@ -334,7 +334,7 @@
+     {
+         GameConfig::interface_show_flags = !GameConfig::interface_show_flags;
+     }
+-    
++
+     if ( (KeyboardInterface::getKeyPressed( SDLK_n ) == true) )
+     {
+         GameConfig::interface_show_names = !GameConfig::interface_show_names;
+@@ -374,7 +374,7 @@
+     {
+     	WorldViewInterface::scroll_down( 15 );
+     }
+-    
++
+     if( KeyboardInterface::getKeyState( SDLK_RIGHT ) == true )
+     {
+     	WorldViewInterface::scroll_right( 15 );
+@@ -423,7 +423,7 @@
+       ) {
+         alt_status = true;
+     }
+-    
++
+     unsigned selected_bits=0;
+     int released=0;
+     for(int key_code= 0;  key_code&lt;=9; key_code++)
+@@ -517,7 +517,7 @@
+             }
+         }
+         keyboard_input_mode = _keyboard_input_mode_command;
+-        ConsoleInterface::setInputStringStatus(false);             
++        ConsoleInterface::setInputStringStatus(false);
+     }
+ }
+ 
+@@ -566,7 +566,7 @@
+ {
+     bool select_success;
+     iRect r;
+-    
++
+     if ( box_press.x &gt; box_release.x ) {
+         r.min.x=box_release.x;
+         r.max.x=box_press.x;
+@@ -659,7 +659,7 @@
+     else if (event.event == MouseEvent::EVENT_DOWN)
+     {
+         Objective *objective = ObjectiveInterface::getObjectiveAtWorldXY(world_pos);
+-	
++
+         if ( objective &amp;&amp; objective-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
+         {
+             selection_box_active = false;
+@@ -685,7 +685,7 @@
+                 return;
+             }
+         }
+-        
++
+         if (outpost_goal_selection != OBJECTIVE_NONE )
+         {
+             Objective *objective = ObjectiveInterface::getObjectiveAtWorldXY(world_pos);
+@@ -708,7 +708,7 @@
+             outpost_goal_selection = OBJECTIVE_NONE;
+             return;
+         }
+-        
++
+         click_status = getCursorStatus(world_pos);
+         switch(click_status)
+         {
+@@ -762,7 +762,6 @@
+                 break;
+             }
+             case _cursor_move:
+-            case _cursor_blocked:
+                 if(outpost_goal_selection == OBJECTIVE_NONE)
+                     sendMoveCommand(world_pos);
+                 break;
+@@ -794,7 +793,7 @@
+         right_mouse_scrolled_pos.x=right_mouse_scrolled_pos.y=0;
+         mtimer.reset();
+     }
+-    
++
+     if (right_mouse_scroll &amp;&amp; event.event == MouseEvent::EVENT_UP )
+     {
+         right_mouse_scroll=false;
+@@ -1024,7 +1023,7 @@
+             CLIENT-&gt;sendMessage(encoder.getEncodedMessage(),
+                                 encoder.getEncodedLen());
+         }
+-        
++
+         // SFX
+         sound-&gt;playSound(&quot;target&quot;);
+     } // ** if containsItems() &gt; 0
+@@ -1163,17 +1162,17 @@
+     if (Desktop::getVisible(&quot;VehicleSelectionView&quot;) == true) {
+         return true;
+     }
+-                                                                                
++
+     return false;
+ }
+-                                                                                
++
+ const char*
+ WorldInputCmdProcessor::getSelectedObjectiveName()
+ {
+     Objective *objective_state;
+-                                                                                
++
+     objective_state = ObjectiveInterface::getObjective(selected_objective_id);
+-                                                                                
++
+     return objective_state-&gt;name;
+ }
+ 
+@@ -1181,9 +1180,9 @@
+ WorldInputCmdProcessor::getSelectedObjectiveWorldPos()
+ {
+     Objective *objective_state;
+-                                                                                
++
+     objective_state = ObjectiveInterface::getObjective(selected_objective_id);
+-                                                                                
++
+     return objective_state-&gt;location;
+ }
+ 
+@@ -1199,7 +1198,7 @@
+      * direction. So in most cases you will have a focus on the right end of a
+      * group (if that group is in a very long queue passing the map).
+      */
+-    
++
+     UnitBase *maxyunit = 0;
+     UnitBase *maxxunit = 0;
+     UnitBase *minyunit = 0;
+@@ -1209,7 +1208,7 @@
+     int direction[8];
+     for(int i=0;i&lt;8;++i)
+         direction[i]=0;
+-    
++
+     // Vote direction
+     bool firstunit = true;
+     for(unsigned int id_list_index = 0; id_list_index &lt; working_list.unit_list.size(); id_list_index++) {
+@@ -1217,7 +1216,7 @@
+ 
+         if(unit_ptr == 0)
+             continue;
+-                
++
+             // increment one direction
+         direction[unit_ptr-&gt;unit_state.orientation]+=1;
+             // initialize some pointers, get them from first unit
+@@ -1239,7 +1238,7 @@
+                 minxunit=unit_ptr;
+         }
+     }
+-    
++
+     // Index of chosen direction (which is most used by all units of a group)
+     int preferred_direction = 0;
+     int max = -1;
+@@ -1249,7 +1248,7 @@
+             preferred_direction = i;
+         }
+     }
+-        
++
+     // Chose Best unit correspondig to chosen direction
+     UnitBase* unit = 0;
+     switch(preferred_direction) {
+@@ -1293,7 +1292,7 @@
+           assert(false);
+           break;
+     }
+-    
++
+     if(unit != 0)
+         WorldViewInterface::setCameraPosition(unit-&gt;unit_state.location);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-02 15:02:18 UTC (rev 1236)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-03 09:45:23 UTC (rev 1237)
+@@ -1,16 +1,16 @@
+ /*
+  Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+- 
++
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+- 
++
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -194,7 +194,7 @@
+                 break;
+ 
+         case _chat_mesg_scope_alliance:
+-                color = Color::orange;
++                color = Color::yellow;
+                 break;
+ 
+         case _chat_mesg_scope_server:
+@@ -252,7 +252,7 @@
+             break;
+ 
+     case _chat_mesg_scope_alliance:
+-            color = Color::orange;
++            color = Color::yellow;
+             break;
+ 
+     case _chat_mesg_scope_server:
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2011-10-02 15:02:18 UTC (rev 1236)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2011-10-03 09:45:23 UTC (rev 1237)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -22,6 +22,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;PathScheduler.hpp&quot;
+ #include &quot;Classes/AI/PathingState.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ void PathCache::initialize( void )
+ {
+@@ -437,7 +438,7 @@
+ {
+     long path_distance_estimate;
+ 
+-    path_distance_estimate 
++    path_distance_estimate
+         = long ((path_request.start - path_request.goal).mag2());
+ 
+     if ( path_distance_estimate &lt;= short_queue_distance_threshold ) {
+@@ -485,6 +486,11 @@
+ 
+ void PathScheduler::run()
+ {
++    //This procedure takes too much resource, not to execute at each cycle.
++    static NTimer rctimer(90);
++    if (!rctimer.isTimeOut()) return;
++    rctimer.reset();
++
+     unsigned long i;
+     PathRequest request;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2011-10-02 15:02:18 UTC (rev 1236)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2011-10-03 09:45:23 UTC (rev 1237)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -40,7 +40,7 @@
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ 
+-#define MOVEWAIT_TIME 0.8f
++#define MOVEWAIT_TIME 0.9f
+ 
+ enum{ _rotate_and_move, _rotate_stop_move };
+ 
+@@ -71,7 +71,7 @@
+     path_generated = false;
+     critical_ai_section = false;
+     ai_fsm_transition_complete = false;
+-    
++
+     reload_counter = 0;
+     death_counter = 0;
+ 
+@@ -82,7 +82,7 @@
+     fsmBodyRotate_goal_angle = 0;
+     fsmTurretRotate_rotation = 0;
+     fsmTurretRotate_goal_angle = 0;
+-    
++
+     interpolation_speed = 0;
+     fsmMove_first_stamp = false;
+     fsmMove_offset_x = fsmMove_offset_y = 0;
+@@ -102,25 +102,25 @@
+     turret_anim.setAttrib( zero, zero, unitLayer );
+     body_anim_shadow.setAttrib( zero, zero, unitLayer);
+     turret_anim_shadow.setAttrib( zero, zero, unitLayer);
+-    
++
+     select_info_box.setBoxState( false );
+     select_info_box.setFlag( player-&gt;getFlag() );
+     select_info_box.setName( player-&gt;getName() );
+-    
++
+     body_anim_shadow.attachSprite( &amp;body_anim, zero );
+     body_anim_shadow.attachSprite( &amp;turret_anim_shadow, zero );
+     body_anim_shadow.attachSprite( &amp;turret_anim, zero );
+     body_anim_shadow.attachSprite( &amp;select_info_box, zero );
+-    
++
+     aiFsmMoveToLoc_wait_timer.changePeriod( MOVEWAIT_TIME );
+ }
+ 
+ void Vehicle::setUnitProperties( unsigned char utype )
+ {
+     UnitProfile *profile;
+-    
++
+     profile = UnitProfileInterface::getUnitProfile( utype );
+-    
++
+     unit_state.hit_points = profile-&gt;hit_points;
+     unit_state.max_hit_points = profile-&gt;hit_points;
+     unit_state.damage_factor = profile-&gt;attack_factor;
+@@ -230,7 +230,7 @@
+ 
+     MapInterface::pointXYtoMapXY( unit_state.location, &amp;current_loc );
+     MapInterface::offsetToMapXY( square, &amp;next_loc );
+-    
++
+     // so many magic numbers
+     if ( (next_loc.x &gt; current_loc.x)  &amp;&amp;  (next_loc.y == current_loc.y) )
+     {
+@@ -386,7 +386,7 @@
+     fsmMove_moves_per_square = 32;
+     interpolation_speed = unit_state.speed_rate * unit_state.speed_factor;
+     if ( NetworkState::status == _network_state_client )
+-     { interpolation_speed += 2; } 
++     { interpolation_speed += 2; }
+     fsmMove_first_stamp = true;
+     */
+ }
+@@ -404,7 +404,7 @@
+ 
+     end_move_stamp = now();
+ 
+-    move_offset = (end_move_stamp - start_move_stamp) * interpolation_speed;  
++    move_offset = (end_move_stamp - start_move_stamp) * interpolation_speed;
+ 
+     if( (move_offset + fsmMove_moves_counter) &gt; fsmMove_moves_per_square )
+      {
+@@ -510,7 +510,7 @@
+                         UnitInterface::sendOpcode(&amp;move_opcode);
+                         move_opcode_sent = true;
+                     }
+-                    
++
+                     return( true );
+                 }
+             }
+@@ -839,7 +839,8 @@
+ 
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+@@ -847,7 +848,8 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmMoveToLoc_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( path_generated == true )
+                 {
+@@ -857,7 +859,8 @@
+                 }
+                 else
+                 {
+-                    end_cycle = true;                    
++                    end_cycle = true;
++                    return;
+                 }
+             }
+             break;
+@@ -878,7 +881,8 @@
+                     aiFsmMoveToLoc_OnExitCleanUp();
+                     setAiFsmDefendHold();
+ 
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -948,7 +952,8 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmMoveToLoc_prev_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+@@ -956,7 +961,8 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmMoveToLoc_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 } // NextSquareOccupied: does the next square contain a abstruction
+                 else if ( UnitBlackBoard::unitOccupiesLoc( aiFsmMoveToLoc_next_loc ) == true )
+                 {
+@@ -993,7 +999,8 @@
+                         aiFsmMoveToLoc_state = _aiFsmMoveToLoc_path_generate;
+                     }
+                     // can't move and has to wait, finish the loop.
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1003,7 +1010,7 @@
+                     setFsmMoveMapSquare( aiFsmMoveToLoc_next_square );
+ 
+                     aiFsmMoveToLoc_state = _aiFsmMoveToLoc_move_wait;
+-                    aiFsmMoveToLoc_wait_timer.changePeriod( 0.8f );
++                    aiFsmMoveToLoc_wait_timer.changePeriod( MOVEWAIT_TIME );
+                 }
+ 
+             }
+@@ -1024,7 +1031,8 @@
+                 }
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 } // ** else
+ 
+             }
+@@ -1042,7 +1050,8 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmMoveToLoc_next_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+@@ -1050,7 +1059,8 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmMoveToLoc_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1059,9 +1069,9 @@
+ 
+             }
+             break;
+-            
++
+         } // ** switch
+-        
++
+     } while (end_cycle == false);
+ }
+ 
+@@ -1078,7 +1088,7 @@
+     UnitState *target_unit_state = 0;
+     iXY range_vector;
+ 
+-    UnitBase* target_unit_ptr 
++    UnitBase* target_unit_ptr
+         = UnitInterface::getUnit( aiFsmAttackUnit_target_ID );
+     if ( target_unit_ptr == 0 )
+     {
+@@ -1130,7 +1140,8 @@
+ 
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+@@ -1138,7 +1149,8 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( path_generated == true )
+                 {
+@@ -1147,7 +1159,8 @@
+                 }
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+ 
+             }
+@@ -1167,7 +1180,8 @@
+                     MapInterface::pointXYtoMapXY( aiFsmAttackUnit_prev_loc, &amp;aiFsmAttackUnit_prev_loc );
+                     UnitBlackBoard::markUnitLoc( aiFsmAttackUnit_prev_loc );
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1206,7 +1220,8 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_prev_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+@@ -1214,13 +1229,15 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( range_vector.mag2() &lt; unit_state.weapon_range )
+                 {
+                     // Rule: RangeVector &lt; WeaponRange, unit is in range
+                     // Action: Remain in position
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1270,7 +1287,8 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_prev_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+@@ -1278,7 +1296,8 @@
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( UnitBlackBoard::unitOccupiesLoc( aiFsmAttackUnit_next_loc ) == true )
+                 {
+@@ -1304,7 +1323,8 @@
+                         aiFsmAttackUnit_state = _aiFsmAttackUnit_path_generate;
+                     }
+ 
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1324,7 +1344,8 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_prev_loc );
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_check_fsm_transition;
+                 }
+-                end_cycle = true;
++                end_cycle = true;
++                return;
+             }
+             break;
+ 
+@@ -1340,19 +1361,22 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmAttackUnit_next_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+                     ai_fsm_transition_complete = true;
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if (  aiFsmAttackUnit_target_destroyed == true )
+                 {
+                     setAiFsmDefendHold();
+                     aiFsmAttackUnit_OnExitCleanUp();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1379,7 +1403,8 @@
+                     PathScheduler::requestPath( path_request );
+ 
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_path_generate;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1429,14 +1454,16 @@
+                     // Action : Exit fsm gracefully
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+                     // External Event: A new AI command is pending
+                     // Action: Allow command transition to occur
+                     ai_fsm_transition_complete = true;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( aiFsmDefendHold_search_timer.count() )
+                 {
+@@ -1451,22 +1478,26 @@
+                             aiFsmDefendHold_target_ID = target_unit_ptr-&gt;id;
+                             setFsmGunneryTarget( aiFsmDefendHold_target_ID );
+                             aiFsmDefendHold_state = _aiFsmDefendHold_attack_enemy;
+-                            end_cycle = true;
++                            end_cycle = true;
++                            return;
+                         }
+                         else
+                         {
+-                            end_cycle = true;
++                            end_cycle = true;
++                            return;
+                         }
+                     } // **  quearyClosestEnemyUnit
+                     else
+                     {
+-                        end_cycle = true;
++                        end_cycle = true;
++                        return;
+                     }
+ 
+                 } // ** aiFsmDefendHold_search_timer.count()
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+             }
+             break;
+@@ -1480,7 +1511,8 @@
+                     clearFsmGunneryTarget();
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+@@ -1488,7 +1520,8 @@
+                     // Action: Allow command transition to occur
+                     clearFsmGunneryTarget();
+                     ai_fsm_transition_complete = true;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1497,7 +1530,8 @@
+                     {
+                         clearFsmGunneryTarget();
+                         aiFsmDefendHold_state = _aiFsmDefendHold_search_for_enemy;
+-                        end_cycle = true;
++                        end_cycle = true;
++                        return;
+                     }
+                     else
+                     {
+@@ -1506,7 +1540,8 @@
+                         {
+                             clearFsmGunneryTarget();
+                             aiFsmDefendHold_state = _aiFsmDefendHold_search_for_enemy;
+-                            end_cycle = true;
++                            end_cycle = true;
++                            return;
+                         } // ** if
+                         else
+                         {
+@@ -1515,12 +1550,14 @@
+                             {
+                                 clearFsmGunneryTarget();
+                                 aiFsmDefendHold_state = _aiFsmDefendHold_search_for_enemy;
+-                                end_cycle = true;
++                                end_cycle = true;
++                                return;
+                             }
+-                        } 
++                        }
+                     }
+                 }
+-                end_cycle = true;
++                end_cycle = true;
++                return;
+             }
+             break;
+         } // ** switch
+@@ -1554,12 +1591,14 @@
+                 if ( MapInterface::getMovementValue( aiFsmManualMove_next_loc ) == 0xFF )
+                 {
+                     setAiFsmDefendHold();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if( UnitBlackBoard::unitOccupiesLoc( aiFsmManualMove_next_loc ) == true )
+                 {
+                     setAiFsmDefendHold();
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1578,11 +1617,13 @@
+                 {
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmManualMove_prev_loc );
+                     aiFsmManualMove_state = _aiFsmManualMove_check_fsm_transition;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 } // ** else
+             }
+             break;
+@@ -1598,12 +1639,14 @@
+                     UnitBlackBoard::unmarkUnitLoc( aiFsmManualMove_next_loc );
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else if ( pending_AI_comm == true )
+                 {
+                     ai_fsm_transition_complete = true;
+-                    end_cycle = true;
++                    end_cycle = true;
++                    return;
+                 }
+                 else
+                 {
+@@ -1661,7 +1704,7 @@
+     long distance = WorldViewInterface::getCameraDistance(unit_state.location);
+     sound-&gt;playAmbientSound(fireSound.c_str(), distance );
+     sound-&gt;playBattle();
+-    
++
+     return weaponType;
+ }
+ 
+@@ -1862,7 +1905,7 @@
+ 
+     if (!unit_state.bounds(weapon_hit-&gt;getHitLocation()))
+         return;
+-    
++
+     unit_state.hit_points -= weapon_hit-&gt;getDamageFactor();
+     unit_state.threat_level = _threat_level_under_attack;
+     threat_level_under_attack_timer.changePeriod(
+@@ -1893,7 +1936,7 @@
+ 
+ void Vehicle::messageSelectBoxUpdate(const UnitMessage* message)
+ {
+-    const UMesgUpdateSelectBoxInfo *select_box_update 
++    const UMesgUpdateSelectBoxInfo *select_box_update
+         = (const UMesgUpdateSelectBoxInfo *) message;
+ 
+     switch (select_box_update-&gt;request_type)
+@@ -1934,7 +1977,7 @@
+ {
+     if (unit_state.lifecycle_state != _UNIT_LIFECYCLE_ACTIVE)
+         return;
+-    
++
+     switch(message-&gt;message_id)
+     {
+         case _umesg_ai_command:
+@@ -1993,7 +2036,7 @@
+        )
+         return;
+ 
+-    const TurretTrackPointOpcode* track_point_opcode 
++    const TurretTrackPointOpcode* track_point_opcode
+         = (const TurretTrackPointOpcode *) opcode;
+ 
+     if ( track_point_opcode-&gt;activate == true )
+@@ -2015,7 +2058,7 @@
+        )
+         return;
+ 
+-    const TurretTrackTargetOpcode* track_target_opcode 
++    const TurretTrackTargetOpcode* track_target_opcode
+         = (const TurretTrackTargetOpcode *) opcode;
+ 
+     if ( track_target_opcode-&gt;activate == true )
+@@ -2093,7 +2136,7 @@
+             }
+             UnitOpcodeStruct opcodedata = move_opcode_queue.front();
+             move_opcode_queue.pop();
+-            const UnitOpcode* opcode = (UnitOpcode*) &opcodedata; 
++            const UnitOpcode* opcode = (UnitOpcode*) &opcodedata;
+             unitOpcodeMove(opcode);
+         }
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000262.html">[Netpanzer-cvs] r1236 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Network
+</A></li>
+	<LI>Next message: <A HREF="000264.html">[Netpanzer-cvs] r1238 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#263">[ date ]</a>
+              <a href="thread.html#263">[ thread ]</a>
+              <a href="subject.html#263">[ subject ]</a>
+              <a href="author.html#263">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1074 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1074%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes&In-Reply-To=%3C200810020401.m9241pRC014559%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000110.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1074 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1074%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes&In-Reply-To=%3C200810020401.m9241pRC014559%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1074 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct  2 06:01:51 CEST 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000110.html">[Netpanzer-cvs] r1075 - trunk/netpanzer/maps
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-10-02 06:01:34 +0200 (Thu, 02 Oct 2008)
+New Revision: 1074
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+Log:
+- Brown color changed to lighter, black color removed from player color's list
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2008-09-30 08:59:11 UTC (rev 1073)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2008-10-02 04:01:34 UTC (rev 1074)
+@@ -113,8 +113,9 @@
+     Color::orange  = findNearestColor(255, 128,   0); // fixed
+     Color::magenta = findNearestColor(255,   0, 255); // fixed
+     Color::cyan    = findNearestColor(  0, 255, 255); // fixed
+-    Color::brown   = findNearestColor(128,  42,  42); // fixed
+-
++    //Color::brown   = findNearestColor(128,  42,  42); // fixed
++    Color::brown   = findNearestColor(200,  80,  80); // new brown is lighter
++    
+     //tan                   210 180 140   0.8235 0.7059 0.5490
+     Color::tan            = findNearestColor(210, 180, 140); // fixed
+     //chartreuse            127 255   0   0.4980 1.0000 0.0000
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2008-09-30 08:59:11 UTC (rev 1073)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2008-10-02 04:01:34 UTC (rev 1074)
+@@ -48,7 +48,7 @@
+ 	&amp;Color::unitGreen,
+ 	&amp;Color::unitBlueGray,
+ 	&amp;Color::unitDarkRed,
+-	&amp;Color::unitBlack,
++	//&amp;Color::unitBlack, black removed from list
+ 	&amp;Color::unitDarkGreen,
+ 	&amp;Color::unitWhite,
+ 	&amp;Color::unitLightOrange,
+@@ -384,5 +384,5 @@
+     loss_points = ltoh16(state-&gt;loss_points);
+     total = ltoh16(state-&gt;total);
+     objectives_held = ltoh16(state-&gt;objectives_held);
+-    colorIndex = ltoh32(state-&gt;colorIndex);
++    setColor(ltoh32(state-&gt;colorIndex));
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000110.html">[Netpanzer-cvs] r1075 - trunk/netpanzer/maps
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

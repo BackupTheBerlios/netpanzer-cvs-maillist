@@ -1,0 +1,675 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1048 - in trunk/netpanzer/src/NetPanzer:	Interfaces Objectives
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1048%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Objectives&In-Reply-To=%3C200809091542.m89FgCq6026979%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000086.html">
+   <LINK REL="Next"  HREF="000088.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1048 - in trunk/netpanzer/src/NetPanzer:	Interfaces Objectives</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1048%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Objectives&In-Reply-To=%3C200809091542.m89FgCq6026979%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1048 - in trunk/netpanzer/src/NetPanzer:	Interfaces Objectives">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep  9 17:42:12 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000086.html">[Netpanzer-cvs] r1047 - in trunk/netpanzer/src/NetPanzer: . Classes	Objectives
+</A></li>
+        <LI>Next message: <A HREF="000088.html">[Netpanzer-cvs] r1049 - in trunk/netpanzer: nbproject	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#87">[ date ]</a>
+              <a href="thread.html#87">[ thread ]</a>
+              <a href="subject.html#87">[ subject ]</a>
+              <a href="author.html#87">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-09 17:42:00 +0200 (Tue, 09 Sep 2008)
+New Revision: 1048
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+Removed:
+   trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.hpp
+Log:
+- Moved missing objectiveInterface to Objectives
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp	2008-09-09 15:40:26 UTC (rev 1047)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp	2008-09-09 15:42:00 UTC (rev 1048)
+@@ -1,477 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-#include &quot;Interfaces/ObjectiveInterface.hpp&quot;
+-
+-#include &lt;stdio.h&gt;
+-#include &lt;memory&gt;
+-#include &lt;string&gt;
+-#include &lt;sstream&gt;
+-#include &lt;stdexcept&gt;
+-#include &lt;iostream&gt;
+-
+-#include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Util/FileSystem.hpp&quot;
+-#include &quot;Util/Exception.hpp&quot;
+-#include &quot;Util/FileStream.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;Classes/Outpost.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+-
+-#include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
+-#include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
+-#include &quot;Classes/Network/NetPacket.hpp&quot;
+-#include &quot;Network/ClientSocket.hpp&quot;
+-
+-std::vector&lt;Objective*&gt; ObjectiveInterface::objective_list;
+-
+-unsigned long ObjectiveInterface::objective_position_enum_list_size;
+-ObjectiveID   ObjectiveInterface::objective_position_enum_index;
+-Uint16        ObjectiveInterface::objective_position_enum_player_id;
+-
+-NetMessageEncoder ObjectiveInterface::message_encoder;
+-
+-SDL_mutex* ObjectiveInterface::mutex = 0;
+-
+-void
+-ObjectiveInterface::cleanUpObjectiveList()
+-{
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        delete *i;
+-    }
+-
+-    objective_list.clear();
+-}
+-
+-void
+-ObjectiveInterface::cleanUp()
+-{
+-    cleanUpObjectiveList();
+-}
+-
+-void
+-ObjectiveInterface::resetLogic()
+-{
+-    cleanUpObjectiveList();
+-}
+-
+-static inline std::string readToken(std::istream&amp; in, std::string tokenname)
+-{
+-    if(in.eof())
+-        throw std::runtime_error(&quot;file too short.&quot;);
+-    
+-    // skip whitespace characters and comments
+-    char c;
+-    do {
+-        in.get(c);
+-        if(c == '#') {  // comment till end of line
+-            do {
+-                in.get(c);
+-            } while(!in.eof() &amp;&amp; c != '\n');
+-        }
+-    } while(!in.eof() &amp;&amp; isspace(c));
+-
+-    if(in.eof())
+-        throw std::runtime_error(&quot;file too short.&quot;);
+-
+-    // read token
+-    std::string token;
+-    while(!in.eof() &amp;&amp; !isspace(c)) {
+-        token += c;
+-        in.get(c);
+-    }
+-    if(token != tokenname) {
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Expected token '&quot; &lt;&lt; tokenname &lt;&lt; &quot;' got '&quot; &lt;&lt; token &lt;&lt; &quot;'.&quot;;
+-        throw std::runtime_error(msg.str());
+-    }
+-
+-    while(!in.eof() &amp;&amp; isspace(c))
+-        in.get(c);
+-
+-    // read token contents
+-    std::string result;
+-    while(!in.eof() &amp;&amp; c != '\n') {
+-        result += c;
+-        in.get(c);
+-    }
+-
+-    return result;
+-}
+-
+-void
+-ObjectiveInterface::loadObjectiveList(const char *file_path)
+-{
+-    ObjectiveID objective_count = 0;
+-
+-    try
+-    {
+-        IFileStream in(file_path);
+-
+-        cleanUpObjectiveList();
+-
+-        std::string objectivecount = readToken(in, &quot;ObjectiveCount:&quot;);
+-        std::stringstream ss(objectivecount);
+-        ss &gt;&gt; objective_count;
+-
+-        size_t loc_x, loc_y;
+-        size_t world_x, world_y;
+-        std::string name;
+-        cleanUpObjectiveList();
+-        for (ObjectiveID objective_index = 0; objective_index &lt; objective_count; objective_index++ )
+-        {
+-            Objective *objective_obj;
+-       
+-            name = readToken(in, &quot;Name:&quot;);
+-            std::string location = readToken(in, &quot;Location:&quot;);
+-            std::stringstream ss(location);
+-            ss &gt;&gt; loc_x &gt;&gt; loc_y;
+-            
+-            MapInterface::mapXYtoPointXY( loc_x, loc_y, &amp;world_x, &amp;world_y );
+-
+-            objective_obj = new Outpost(objective_index, iXY(world_x, world_y),
+-                    BoundBox( -48, -32, 48, 32 )
+-                    );
+-            
+-            strcpy(objective_obj-&gt;objective_state.name, name.c_str());
+-            objective_list.push_back(objective_obj);
+-        } // ** for
+-    }
+-    catch(std::exception&amp; e)
+-    {
+-        throw Exception(&quot;Error while reading outpost definition '%s': %s&quot;,
+-                file_path, e.what());
+-    }
+-}
+-
+-unsigned char
+-ObjectiveInterface::quearyObjectiveLocationStatus(iXY &amp;loc,
+-        Uint16 player_id, Objective **objective_ptr )
+-{
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        ObjectiveState *objective_state = &amp; ((*i)-&gt;objective_state);
+-
+-        if ( objective_state-&gt;selection_box.contains( loc ) == true ) {
+-            if ( objective_state-&gt;occupation_status == _occupation_status_occupied ) {
+-                if (objective_state-&gt;occupying_player-&gt;getID() == player_id) {
+-                    *objective_ptr = *i;
+-                    return( _player_occupied_objective_found );
+-                } // ** if
+-                else {
+-                    *objective_ptr = *i;
+-                    return( _enemy_occupied_objective_found );
+-                } // ** else
+-            } // ** if
+-            else {
+-                *objective_ptr = *i;
+-                return( _unoccupied_objective_found );
+-            } // ** else
+-        } // ** if
+-    } // ** if
+-
+-    return( _no_objective_found );
+-}
+-
+-void
+-ObjectiveInterface::processTerminalNetPacket(const NetPacket* packet)
+-{
+-    const NetMessage* message = packet-&gt;getNetMessage();
+-    const ObjectiveMessage* objectiveMessage = 0;
+-    switch(message-&gt;message_id) {
+-        case _net_message_id_term_unit_gen: {
+-            const TerminalOutpostUnitGenRequest* request =
+-                (const TerminalOutpostUnitGenRequest*) message;
+-            objectiveMessage = &amp;(request-&gt;unit_gen_request);
+-            break;
+-        }
+-        case _net_message_id_term_output_loc: {
+-            const TerminalOutpostOutputLocRequest* request =
+-                (const TerminalOutpostOutputLocRequest*) message;
+-            objectiveMessage = &amp;(request-&gt;output_loc_request);
+-            break;
+-        }
+-        default:
+-            LOGGER.warning(
+-                    &quot;Unknown objective terminal message (id %u, player %u)&quot;,
+-                    message-&gt;message_id, packet-&gt;fromPlayer);
+-            return;
+-    }                                       
+-
+-    const PlayerState* player 
+-        = PlayerInterface::getPlayer(packet-&gt;fromPlayer);
+-    if(!player) {
+-        LOGGER.warning(&quot;Couldn't find player for packet %u.&quot;,
+-                packet-&gt;fromPlayer);
+-        return;
+-    }
+-    
+-    sendMessage(objectiveMessage, player);
+-}
+-
+-void
+-ObjectiveInterface::sendMessage(const ObjectiveMessage* message,
+-        const PlayerState* player)
+-{
+-    if(message-&gt;getObjectiveID() &gt;= objective_list.size()) {
+-        LOGGER.warning(&quot;Received malformed objective message: id out of range&quot;);
+-        return;
+-    }
+-    Objective* objective = objective_list[message-&gt;getObjectiveID()];
+-    if(player &amp;&amp; objective-&gt;objective_state.occupying_player != player) {
+-        LOGGER.warning(
+-                &quot;Terminal message from player %u for objective %u not allowed.&quot;,
+-                player-&gt;getID(), message-&gt;getObjectiveID());
+-        return;
+-    }
+-    objective_list[message-&gt;getObjectiveID()]-&gt;processMessage(message);
+-}
+-
+-void
+-ObjectiveInterface::processNetMessages(const NetMessage* message)
+-{
+-    switch(message-&gt;message_id) {
+-        case _net_message_id_occupation_status_update:
+-        {
+-            const ObjectiveOccupationUpdate *occupation_update
+-                = (const ObjectiveOccupationUpdate*) message;
+-            sendMessage( &amp;(occupation_update-&gt;status_update) );
+-            break;
+-        }
+-
+-        case _net_message_id_objective_sync:
+-        {
+-            const ObjectiveSyncMesg* sync_mesg 
+-                = (const ObjectiveSyncMesg*) message;
+-            sendMessage( &amp;(sync_mesg-&gt;sync_data) );
+-            break;
+-        }
+-        
+-        default:
+-            LOGGER.warning(&quot;Unknown Objective Message received (id %d)&quot;,
+-                    message-&gt;message_id);
+-            break;
+-    }
+-}
+-
+-void
+-ObjectiveInterface::updateObjectiveStatus()
+-{
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        (*i)-&gt;updateStatus();
+-    }
+-}
+-
+-void
+-ObjectiveInterface::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        (*i)-&gt;offloadGraphics(sorter);
+-    }
+-}
+-
+-
+-bool
+-ObjectiveInterface::testRuleObjectiveOccupationRatio(
+-        Uint16 player_index, float precentage)
+-{
+-    size_t occupation_ratio = (size_t)
+-        ( ((float) objective_list.size()) * precentage  + 0.999);
+-
+-    if (occupation_ratio == 0)
+-        occupation_ratio = 1;
+-
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    size_t occupied = 0;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        ObjectiveState *objective_state = &amp; ((*i)-&gt;objective_state);
+-        if(objective_state-&gt;occupation_status == _occupation_status_occupied) {
+-            Uint16 occuping_player_index 
+-                = objective_state-&gt;occupying_player-&gt;getID();
+-
+-            if ( occuping_player_index == player_index ) {
+-                occupied++;
+-            } else if (PlayerInterface::isAllied(
+-                        occuping_player_index, player_index) &amp;&amp;
+-                        PlayerInterface::isAllied(player_index,
+-                            occuping_player_index)) {
+-                    occupied++;
+-            }
+-        }
+-    }
+-
+-    if(occupied &gt;= occupation_ratio)
+-        return true;
+-
+-    return false;
+-}
+-
+-void
+-ObjectiveInterface::disownPlayerObjectives(Uint16 player_id)
+-{
+-    DisownPlayerObjective disown_player_objective;
+-
+-    for(Uint16 i = 0; i &lt; objective_list.size(); i++) {
+-        disown_player_objective.set(i, player_id);
+-        sendMessage(&amp;disown_player_objective);
+-    }
+-}
+-
+-ObjectiveState*
+-ObjectiveInterface::getObjectiveState( ObjectiveID objective_id )
+-{
+-    return &amp; (objective_list.at(objective_id)-&gt;objective_state);
+-}
+-
+-OutpostStatus
+-ObjectiveInterface::getOutpostStatus( ObjectiveID objective_id )
+-{
+-    OutpostStatus outpost_status;
+-    
+-    Outpost *outpost_ptr 
+-        = dynamic_cast&lt;Outpost*&gt; (objective_list.at(objective_id));
+-    assert(outpost_ptr != 0);
+-
+-    outpost_ptr-&gt;getOutpostStatus( outpost_status );
+-
+-    return outpost_status;
+-}
+-
+-void
+-ObjectiveInterface::startObjectivePositionEnumeration()
+-{
+-    objective_position_enum_index	= 0;
+-    objective_position_enum_list_size = objective_list.size();
+-    objective_position_enum_player_id = PlayerInterface::getLocalPlayerIndex();
+-}
+-
+-bool
+-ObjectiveInterface::objectivePositionEnumeration(iRect *objective_rect,
+-        unsigned char *objective_disposition, ObjectiveID *objective_id)
+-{
+-    ObjectiveState *objective_state;
+-
+-    if( objective_position_enum_index &lt;  objective_position_enum_list_size )
+-    {
+-        objective_state = &amp;(objective_list[ objective_position_enum_index ]-&gt;objective_state);
+-
+-        (*objective_rect) = objective_state-&gt;area.getAbsRect( objective_state-&gt;location );
+-        if( objective_id != 0 )
+-        {
+-            (*objective_id) = objective_position_enum_index;
+-        }
+-
+-        if ( objective_state-&gt;occupation_status == _occupation_status_occupied )
+-        {
+-            if ( objective_position_enum_player_id != objective_state-&gt;occupying_player-&gt;getID() )
+-            {
+-                if (PlayerInterface::isAllied(objective_state-&gt;occupying_player-&gt;getID() , objective_position_enum_player_id)  )
+-                {
+-                    (*objective_disposition) = _objective_disposition_allie;
+-                }
+-                else
+-                {
+-                    (*objective_disposition) = _objective_disposition_enemy;
+-                }
+-            }
+-            else
+-            {
+-                (*objective_disposition) = _objective_disposition_player;
+-            }
+-        }
+-        else
+-        {
+-            (*objective_disposition) = _objective_disposition_unoccupied;
+-        }
+-
+-        objective_position_enum_index++;
+-        return true;
+-    }
+-
+-    return false;
+-}
+-
+-void
+-ObjectiveInterface::syncObjectives( ClientSocket * client )
+-{
+-    unsigned char buffer[_MAX_NET_PACKET_SIZE];
+-    unsigned int buffer_pos = 0;
+-    ObjectiveSyncMesg msg;
+-    msg.setSize(sizeof(ObjectiveSyncMesg));
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); ++i)
+-    {
+-        if ( buffer_pos+sizeof(ObjectiveSyncMesg) &gt; sizeof(buffer) )
+-        {
+-            client-&gt;sendMessage(buffer,buffer_pos);
+-            buffer_pos=0;
+-        }
+-        
+-        (*i)-&gt;getSyncData( msg.sync_data );
+-        memcpy(buffer+buffer_pos, &amp;msg, sizeof(ObjectiveSyncMesg));
+-        buffer_pos += sizeof(ObjectiveSyncMesg);
+-    }
+-
+-    client-&gt;sendMessage(buffer,buffer_pos);
+-}
+-
+-void
+-ObjectiveInterface::updatePlayerObjectiveCounts()
+-{
+-    if(mutex == 0) { // little race condition...
+-        mutex = SDL_CreateMutex();
+-    }
+-    
+-    SDL_mutexP(mutex);
+-    unsigned long player_index, player_count;
+-    PlayerState *player_state = 0;
+-
+-    player_count = PlayerInterface::getMaxPlayers();
+-
+-    for( player_index = 0; player_index &lt; player_count; player_index++ ) {
+-        player_state = PlayerInterface::getPlayer( (unsigned short) player_index );
+-        player_state-&gt;setObjectivesHeld( 0 );
+-    }
+-
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        ObjectiveState *objective_state = &amp; ((*i)-&gt;objective_state);
+-
+-        if( objective_state-&gt;occupation_status == _occupation_status_occupied ) {
+-            objective_state-&gt;occupying_player-&gt;incObjectivesHeld();
+-        }
+-    }
+-    SDL_mutexV(mutex);
+-}
+-
+-int
+-ObjectiveInterface::getObjectiveLimit()
+-{
+-    float percentage
+-        = (float) gameconfig-&gt;objectiveoccupationpercentage / 100.0;
+-    int wincount = (int) ( ((float) getObjectiveCount()) * percentage + 0.999);
+-    if(wincount == 0)
+-        wincount = 1;
+-
+-    return wincount;
+-}
+-
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.hpp	2008-09-09 15:40:26 UTC (rev 1047)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.hpp	2008-09-09 15:42:00 UTC (rev 1048)
+@@ -1,108 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _OBJECTIVEINTERFACE_HPP
+-#define _OBJECTIVEINTERFACE_HPP
+-
+-#include &quot;SDL.h&quot;
+-
+-#include &quot;Classes/Objective.hpp&quot;
+-#include &quot;ArrayUtil/ArrayTemplate.hpp&quot;
+-
+-#include &quot;Classes/Network/NetPacket.hpp&quot;
+-#include &quot;Classes/Network/NetMessageEncoder.hpp&quot;
+-
+-enum { _no_objective_found,
+-       _player_occupied_objective_found,
+-       _enemy_occupied_objective_found,
+-       _unoccupied_objective_found
+-     };
+-
+-enum { _objective_disposition_unoccupied,
+-       _objective_disposition_player,
+-       _objective_disposition_allie,
+-       _objective_disposition_enemy
+-     };
+-
+-class NetPacket;
+-
+-class ObjectiveInterface
+-{
+-protected:
+-    static std::vector&lt;Objective*&gt; objective_list;
+-
+-    static void cleanUpObjectiveList();
+-
+-    static SDL_mutex* mutex;
+-
+-public:
+-    static void cleanUp();
+-
+-    static void resetLogic();
+-
+-    static void loadObjectiveList( const char *file_path );
+-
+-    static unsigned char quearyObjectiveLocationStatus(iXY &amp;loc,
+-            Uint16 player_id, Objective **objective_ptr);
+-
+-    static void processTerminalNetPacket(const NetPacket* packet);
+-    static void sendMessage(const ObjectiveMessage* message,
+-            const PlayerState* player = 0);
+-
+-    static void processNetMessages(const NetMessage* message);
+-
+-    static void updateObjectiveStatus();
+-
+-    static void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-    static bool testRuleObjectiveOccupationRatio(Uint16 player_index,
+-            float precentage );
+-
+-    static void disownPlayerObjectives(Uint16 player_id);
+-
+-    static ObjectiveState * getObjectiveState( ObjectiveID objective_id );
+-
+-    static OutpostStatus getOutpostStatus( ObjectiveID objective_id );
+-
+-    static size_t getObjectiveCount()
+-    {
+-        return objective_list.size();
+-    }
+-
+-    static void updatePlayerObjectiveCounts();
+-
+-    static int getObjectiveLimit();
+-
+-protected:
+-    static NetMessageEncoder message_encoder;
+-
+-public:
+-    static void syncObjectives( ClientSocket * client );
+-
+-    // Objective positions, almost exclusivly for mini map
+-protected:
+-    static ObjectiveID   objective_position_enum_index;
+-    static unsigned long objective_position_enum_list_size;
+-    static Uint16        objective_position_enum_player_id;
+-
+-public:
+-    static void startObjectivePositionEnumeration();
+-    static bool objectivePositionEnumeration(iRect *objective_rect, unsigned char *objective_disposition, ObjectiveID *objective_id);
+-};
+-
+-
+-#endif //  ** _OBJECTIVEINTERFACE_HPP
+
+Copied: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp (from rev 1046, trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp)
+
+Copied: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp (from rev 1046, trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.hpp)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000086.html">[Netpanzer-cvs] r1047 - in trunk/netpanzer/src/NetPanzer: . Classes	Objectives
+</A></li>
+	<LI>Next message: <A HREF="000088.html">[Netpanzer-cvs] r1049 - in trunk/netpanzer: nbproject	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#87">[ date ]</a>
+              <a href="thread.html#87">[ thread ]</a>
+              <a href="subject.html#87">[ subject ]</a>
+              <a href="author.html#87">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,718 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1383 - in trunk/netpanzer/src/NetPanzer: . Actions	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1383%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20.%20Actions%0A%09Views/Components%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C20120901184042.E3FBF55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000406.html">
+   <LINK REL="Next"  HREF="000408.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1383 - in trunk/netpanzer/src/NetPanzer: . Actions	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1383%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20.%20Actions%0A%09Views/Components%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C20120901184042.E3FBF55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1383 - in trunk/netpanzer/src/NetPanzer: . Actions	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sat Sep  1 20:40:42 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000406.html">[Netpanzer-cvs] r1382 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000408.html">[Netpanzer-cvs] r1384 - in trunk/netpanzer/src/NetPanzer: Actions	Interfaces Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#407">[ date ]</a>
+              <a href="thread.html#407">[ thread ]</a>
+              <a href="subject.html#407">[ subject ]</a>
+              <a href="author.html#407">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-01 20:40:42 +0200 (Sat, 01 Sep 2012)
+New Revision: 1383
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Actions/
+   trunk/netpanzer/src/NetPanzer/Actions/Action.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+Log:
+Added initial Action system... cButton is going down soon.
+
+Added: trunk/netpanzer/src/NetPanzer/Actions/Action.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Actions/Action.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Actions/Action.hpp	2012-09-01 18:40:42 UTC (rev 1383)
+@@ -0,0 +1,42 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Aaron Perez
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * Created on September 2, 2012, 1:48 AM
++ */
++
++#ifndef ACTION_HPP
++#define	ACTION_HPP
++
++class Action
++{
++private:
++    Action(const Action&amp;);
++    void operator=(const Action&amp;);
++    
++protected:
++    bool shared;
++    
++public:
++    Action(bool shared) : shared(shared) {}
++    virtual ~Action() {}
++    
++    bool isShared() const { return shared; }
++    
++    virtual void execute() = 0;
++};
++
++#endif	/* ACTION_HPP */
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-01 16:09:07 UTC (rev 1382)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2012-09-01 18:40:42 UTC (rev 1383)
+@@ -23,6 +23,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ 
+ #include &quot;MouseEvent.hpp&quot;
++#include &quot;Actions/Action.hpp&quot;
+ 
+ Button::Button(const std::string &amp;cname)
+         : Component(&quot;Button.&quot; + cname)
+@@ -33,9 +34,30 @@
+     bstate = BNORMAL;
+     memset(borders, 0, sizeof(borders));
+     extraBorder = 0;
++    clickAction = 0;
+     dirty = true;
+ }
+ 
++Button::~Button()
++{
++    if ( clickAction &amp;&amp; ! clickAction-&gt;isShared() )
++    {
++        delete clickAction;
++        clickAction = 0;
++    }
++}
++
++void
++Button::setAction(Action* action)
++{
++    if ( clickAction &amp;&amp; ! clickAction-&gt;isShared() )
++    {
++        delete clickAction;
++    }
++    
++    clickAction = action;
++}
++
+ // render
+ void
+ Button::render()
+@@ -100,7 +122,14 @@
+     }
+     else if (me.getID() == mMouseEvent::MOUSE_EVENT_CLICKED)
+     {
+-        ((View *)parent)-&gt;onComponentClicked(this);
++        if ( clickAction )
++        {
++            clickAction-&gt;execute();
++        }
++        else
++        {
++            ((View *)parent)-&gt;onComponentClicked(this);
++        }
+     }
+ } // end Button::actionPerformed
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2012-09-01 16:09:07 UTC (rev 1382)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2012-09-01 18:40:42 UTC (rev 1383)
+@@ -23,6 +23,8 @@
+ #include &quot;2D/Color.hpp&quot;
+ #include &quot;ViewGlobals.hpp&quot;
+ 
++class Action;
++
+ //--------------------------------------------------------------------------
+ class Button : public Component
+ {
+@@ -38,6 +40,7 @@
+     
+ private:
+     int extraBorder;
++    Action* clickAction;
+     
+ protected:
+     
+@@ -69,7 +72,7 @@
+     
+     Button(const std::string &amp;cname);
+ 
+-    virtual ~Button() {}
++    virtual ~Button();
+ 
+     static Button * createTextButton( std::string cname,
+                                         std::string label,
+@@ -90,6 +93,8 @@
+                                         iXY loc,
+                                         bool inverted);
+ 
++    void setAction( Action * action );
++    
+     void setTextColors( PIX normal, PIX over, PIX pressed, PIX disabled)
+     {
+         textColors[BNORMAL] = normal;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-09-01 18:40:42 UTC (rev 1383)
+@@ -26,7 +26,6 @@
+ #include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+-#include &quot;Views/Components/cButton.hpp&quot;
+ #include &quot;Views/Theme.hpp&quot;
+ 
+ #define HEADER_HEIGHT 70
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2012-09-01 18:40:42 UTC (rev 1383)
+@@ -40,6 +40,8 @@
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+ 
++#include &quot;Actions/Action.hpp&quot;
++
+ #ifndef PACKAGE_VERSION
+ 	#define PACKAGE_VERSION &quot;testing&quot;
+ #endif
+@@ -47,123 +49,180 @@
+ Surface       MenuTemplateView::backgroundSurface;
+ PackedSurface MenuTemplateView::titlePackedSurface;
+ 
+-static void bMain()
++class ShowMainViewAction : public Action
+ {
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-    Desktop::setVisibility(&quot;MainView&quot;, true);
+-    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+-}
++public:
++    ShowMainViewAction() : Action(false) {}
++    
++    void execute()
++    {
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++        Desktop::setVisibility(&quot;MainView&quot;, true);
++        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
++    }
++};
+ 
+-static void bHost()
++class ShowHostViewAction : public Action
+ {
+-    gameconfig-&gt;hostorjoin = _game_session_host;
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-    Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
+-    Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
+-    Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
+-    Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+-    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;showPlayButton();
+-    // TODO: do doLoadTitleSurface(&quot;hostTitle&quot;);
+-}
+-static void bJoin()
+-{
+-    gameconfig-&gt;hostorjoin = _game_session_join;
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-    Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
+-    Desktop::setVisibility(&quot;IPAddressView&quot;, true);
+-    Desktop::setVisibility(&quot;ServerListView&quot;, true);
+-    serverlistview-&gt;refresh();
+-    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;showPlayButton();
+-    // TODO: do doLoadTitleSurface(&quot;joinTitle&quot;);
+-}
++public:
++    ShowHostViewAction() : Action(false) {}
++    
++    void execute()
++    {
++        gameconfig-&gt;hostorjoin = _game_session_host;
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++        Desktop::setVisibility(&quot;UnitSelectionView&quot;, true);
++        Desktop::setVisibility(&quot;HostOptionsView&quot;, true);
++        Desktop::setVisibility(&quot;MapSelectionView&quot;, true);
++        Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
++        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;showPlayButton();
++        // TODO: do doLoadTitleSurface(&quot;hostTitle&quot;);
++    }
++};
+ 
+-static void bOptions()
++class ShowJoinViewAction : public Action
+ {
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;OptionsView&quot;, true);
+-    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+-}
++public:
++    ShowJoinViewAction() : Action(false) {}
++    
++    void execute()
++    {
++        gameconfig-&gt;hostorjoin = _game_session_join;
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++        Desktop::setVisibility(&quot;PlayerNameView&quot;, true);
++        Desktop::setVisibility(&quot;IPAddressView&quot;, true);
++        Desktop::setVisibility(&quot;ServerListView&quot;, true);
++        serverlistview-&gt;refresh();
++        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;showPlayButton();
++        // TODO: do doLoadTitleSurface(&quot;joinTitle&quot;);
++    }
++};
+ 
+-static void bHelp()
++class ShowOptionsViewAction : public Action
+ {
+-    Desktop::setVisibilityAllWindows(false);
+-    // TODO: should doLoadTitleSurface(&quot;helpTitle&quot;);
+-    Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
+-    Desktop::setVisibilityNoDoAnything(&quot;HelpScrollView&quot;, true);
+-    ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
+-}
++public:
++    ShowOptionsViewAction() : Action(false) {}
++    
++    void execute()
++    {
++        Desktop::setVisibilityAllWindows(false);
++        Desktop::setVisibility(&quot;OptionsView&quot;, true);
++        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
++    }
++};
+ 
+-static void bExit()
++class ShowHelpViewAction : public Action
+ {
+-    Desktop::setVisibilityAllWindows(false);
+-    GameManager::exitNetPanzer();
+-}
++public:
++    ShowHelpViewAction() : Action(false) {}
++    
++    void execute()
++    {
++        Desktop::setVisibilityAllWindows(false);
++        // TODO: should doLoadTitleSurface(&quot;helpTitle&quot;);
++        Desktop::setVisibility(&quot;MenuTemplateView&quot;, true);
++        Desktop::setVisibilityNoDoAnything(&quot;HelpScrollView&quot;, true);
++        ((MenuTemplateView*)Desktop::getView(&quot;MenuTemplateView&quot;))-&gt;hidePlayButton();
++    }
++};
+ 
+-//---------------------------------------------------------------------------
+-static void bResign()
++class ExitNetPanzerAction : public Action
+ {
+-    Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-    Desktop::setVisibility(&quot;AreYouSureResignView&quot;, true);
+-}
++public:
++    ExitNetPanzerAction() : Action(false) {}
++    
++    void execute()
++    {
++        Desktop::setVisibilityAllWindows(false);
++        GameManager::exitNetPanzer();
++    }
++};
+ 
+-//---------------------------------------------------------------------------
+-static void bCloseOptions()
++class OpenResignGameViewAction : public Action
+ {
+-    GameManager::setNetPanzerGameOptions();
++public:
++    OpenResignGameViewAction() : Action(false) {}
++    
++    void execute()
++    {
++        Desktop::setVisibility(&quot;OptionsView&quot;, false);
++        Desktop::setVisibility(&quot;AreYouSureResignView&quot;, true);
++    }
++};
+ 
+-    Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-}
+-
+-//---------------------------------------------------------------------------
+-static void bExitNetPanzer()
++class CloseOptionsWindowAction : public Action
+ {
+-    Desktop::setVisibility(&quot;OptionsView&quot;, false);
+-    Desktop::setVisibility(&quot;AreYouSureExitView&quot;, true);
+-}
++public:
++    CloseOptionsWindowAction() : Action(false) {}
++    
++    void execute()
++    {
++        GameManager::setNetPanzerGameOptions();
++        Desktop::setVisibility(&quot;OptionsView&quot;, false);
++    }
++};
+ 
+-static void bPlay()
++class OpenExitConfirmWindowAction : public Action
+ {
+-    if ( GameConfig::player_name-&gt;length() == 0 )
+-        return;
+-
+-    // Check a few things which should be ok.
+-
+-    if (MapSelectionView::curMap == -1)
++public:
++    OpenExitConfirmWindowAction() : Action(false) {}
++    
++    void execute()
+     {
+-        return;
++        Desktop::setVisibility(&quot;OptionsView&quot;, false);
++        Desktop::setVisibility(&quot;AreYouSureExitView&quot;, true);
+     }
++};
++
++class PlayButtonClickedAction : public Action
++{
++public:
++    PlayButtonClickedAction() : Action(false) {}
+     
+-    if (  gameconfig-&gt;hostorjoin == _game_session_join
+-       &amp;&amp; strcmp(IPAddressView::szServer.getString(), &quot;&quot;) == 0 )
++    void execute()
+     {
+-        return;
+-    }
++        if ( GameConfig::player_name-&gt;length() == 0 )
++            return;
+ 
+-    // Close all menu views.
+-    Desktop::setVisibilityAllWindows(false);
++        // Check a few things which should be ok.
+ 
+-    if ( gameconfig-&gt;hostorjoin == _game_session_join )
+-    {
+-        gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
+-        IPAddressView::szServer.setString(&quot;&quot;);
+-    }
+-    
+-    serverlistview-&gt;endQuery();
++        if (MapSelectionView::curMap == -1)
++        {
++            return;
++        }
+ 
+-    // TODO: do it?
+-//    MenuTemplateView::backgroundSurface.free();
++        if (  gameconfig-&gt;hostorjoin == _game_session_join
++           &amp;&amp; strcmp(IPAddressView::szServer.getString(), &quot;&quot;) == 0 )
++        {
++            return;
++        }
+ 
+-    ResourceManager::updateFlagData( 0,
+-                                     GameConfig::player_flag_data,
+-                                     sizeof(GameConfig::player_flag_data) );
++        // Close all menu views.
++        Desktop::setVisibilityAllWindows(false);
+ 
+-    PlayerGameManager* manager = (PlayerGameManager*) gamemanager;
+-    manager-&gt;launchMultiPlayerGame();
+-}
++        if ( gameconfig-&gt;hostorjoin == _game_session_join )
++        {
++            gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
++            IPAddressView::szServer.setString(&quot;&quot;);
++        }
+ 
++        serverlistview-&gt;endQuery();
++
++        // TODO: do it?
++    //    MenuTemplateView::backgroundSurface.free();
++
++        ResourceManager::updateFlagData( 0,
++                                         GameConfig::player_flag_data,
++                                         sizeof(GameConfig::player_flag_data) );
++
++        PlayerGameManager* manager = (PlayerGameManager*) gamemanager;
++        manager-&gt;launchMultiPlayerGame();
++    }
++};
++
+ // MenuTemplateView
+ //---------------------------------------------------------------------------
+ MenuTemplateView::MenuTemplateView() : RMouseHackView()
+@@ -192,14 +251,32 @@
+ // initPreGameOptionButtons
+ void MenuTemplateView::initPreGameOptionButtons()
+ {
+-    add( Button::createMenuButton(&quot;MAIN&quot;, &quot;Main&quot;, mainPos, false) );
+-    add( Button::createMenuButton( &quot;JOIN&quot;, &quot;Join&quot;, joinPos, false) );
+-    add( Button::createMenuButton( &quot;HOST&quot;, &quot;Host&quot;, hostPos, false) );
+-    add( Button::createMenuButton( &quot;OPTIONS&quot;, &quot;Options&quot;, optionsPos, false) );
+-    add( Button::createMenuButton( &quot;HELP&quot;, &quot;Help&quot;, helpPos, false) );
+-    add( Button::createMenuButton( &quot;EXITNP&quot;, &quot;Exit netPanzer&quot;, exitPos, false) );
++    Button *b = Button::createMenuButton(&quot;MAIN&quot;, &quot;Main&quot;, mainPos, false);
++    b-&gt;setAction(new ShowMainViewAction());
++    add( b );
+     
++    b = Button::createMenuButton(&quot;JOIN&quot;, &quot;Join&quot;, joinPos, false);
++    b-&gt;setAction(new ShowJoinViewAction());
++    add( b );
++    
++    b = Button::createMenuButton(&quot;HOST&quot;, &quot;Host&quot;, hostPos, false);
++    b-&gt;setAction(new ShowHostViewAction());
++    add( b );
++    
++    b = Button::createMenuButton(&quot;OPTIONS&quot;, &quot;Options&quot;, optionsPos, false);
++    b-&gt;setAction(new ShowOptionsViewAction());
++    add( b );
++    
++    b = Button::createMenuButton(&quot;HELP&quot;, &quot;Help&quot;, helpPos, false);
++    b-&gt;setAction(new ShowHelpViewAction());
++    add( b );
++    
++    b = Button::createMenuButton(&quot;EXITNP&quot;, &quot;Exit netPanzer&quot;, exitPos, false);
++    b-&gt;setAction(new ExitNetPanzerAction());
++    add( b );
++        
+     playButton = Button::createMenuButton(&quot;PLAY&quot;, &quot;Play&quot;, iXY(-100,-100), true);
++    playButton-&gt;setAction(new PlayButtonClickedAction());
+     add( playButton );
+ } // end MenuTemplateView::initPreGameOptionButtons
+ 
+@@ -207,14 +284,27 @@
+ //---------------------------------------------------------------------------
+ void MenuTemplateView::initInGameOptionButtons()
+ {
+-    if(!gameconfig-&gt;quickConnect) {
+-        add( Button::createMenuButton( &quot;RESIGN&quot;, &quot;Resign&quot;, resignPos, false) );
+-        add( Button::createMenuButton( &quot;EXITNETNP&quot;, &quot;Exit netPanzer&quot;, exitPos, false) );
+-    } else {
+-        add( Button::createMenuButton( &quot;RESIGN&quot;, &quot;Resign&quot;, exitPos, true) );
++    Button *b;
++    if(!gameconfig-&gt;quickConnect)
++    {
++        b = Button::createMenuButton( &quot;RESIGN&quot;, &quot;Resign&quot;, resignPos, false);
++        b-&gt;setAction(new OpenResignGameViewAction());
++        add( b );
++        
++        b = Button::createMenuButton( &quot;EXITNETNP&quot;, &quot;Exit netPanzer&quot;, exitPos, false);
++        b-&gt;setAction(new OpenExitConfirmWindowAction());
++        add( b );
+     }
++    else
++    {
++        b = Button::createMenuButton( &quot;RESIGN&quot;, &quot;Resign&quot;, exitPos, false);
++        b-&gt;setAction(new OpenResignGameViewAction());
++        add( b );
++    }
+ 
+-    add( Button::createMenuButton( &quot;CLOSEOPT&quot;, &quot;Close Options&quot;, returnToGamePos, false) );
++    b = Button::createMenuButton( &quot;CLOSEOPT&quot;, &quot;Close Options&quot;, returnToGamePos, false);
++    b-&gt;setAction(new CloseOptionsWindowAction());
++    add( b );
+ } // end MenuTemplateView::initInGameOptionButtons
+ 
+ // initButtons
+@@ -327,51 +417,6 @@
+ {
+ } // end MenuTemplateView::processEvents
+ 
+-void MenuTemplateView::onComponentClicked(Component* c)
+-{
+-    string cname = c-&gt;getName();
+-    if ( !cname.compare(&quot;Button.MAIN&quot;) )
+-    {
+-        bMain();
+-    }
+-    else if ( !cname.compare(&quot;Button.JOIN&quot;) )
+-    {
+-        bJoin();
+-    }
+-    else if ( !cname.compare(&quot;Button.HOST&quot;) )
+-    {
+-        bHost();
+-    }
+-    else if ( !cname.compare(&quot;Button.OPTIONS&quot;) )
+-    {
+-        bOptions();
+-    }
+-    else if ( !cname.compare(&quot;Button.HELP&quot;) )
+-    {
+-        bHelp();
+-    }
+-    else if ( !cname.compare(&quot;Button.EXITNP&quot;) )
+-    {
+-        bExit();
+-    }
+-    else if ( !cname.compare(&quot;Button.EXITNETNP&quot;) )
+-    {
+-        bExitNetPanzer();
+-    }
+-    else if ( !cname.compare(&quot;Button.RESIGN&quot;) )
+-    {
+-        bResign();
+-    }
+-    else if ( !cname.compare(&quot;Button.CLOSEOPT&quot;) )
+-    {
+-        bCloseOptions();
+-    }
+-    else if ( !cname.compare(&quot;Button.PLAY&quot;) )
+-    {
+-        bPlay();
+-    }
+-}
+-
+ void
+ MenuTemplateView::showPlayButton()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2012-09-01 16:09:07 UTC (rev 1382)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2012-09-01 18:40:42 UTC (rev 1383)
+@@ -44,8 +44,6 @@
+     float curTitleFlashTime;  // Where am I at in the flash?
+     float titleFlashTimeHalf; // Time it takes for a half flash.
+ 
+-    void onComponentClicked(Component *c);
+-
+ public:
+     MenuTemplateView();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-09-01 16:09:07 UTC (rev 1382)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2012-09-01 18:40:42 UTC (rev 1383)
+@@ -22,6 +22,8 @@
+ #include &quot;MapSelectionView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Label.hpp&quot;
++#include &quot;Views/Components/Button.hpp&quot;
++#include &quot;Actions/Action.hpp&quot;
+ 
+ int HostOptionsView::cloudCoverageCount = 1;
+ int HostOptionsView::windSpeed          = 1;
+@@ -52,6 +54,17 @@
+         GameConfig::game_maxplayers = GameConfig::game_maxplayers + 1;
+ }
+ 
++class DecreaseMaxUnitCountAction : public Action
++{
++public:
++    DecreaseMaxUnitCountAction() : Action(false) {}
++    void execute()
++    {
++        if(GameConfig::game_maxunits - 5 &gt;= 2)
++            GameConfig::game_maxunits = GameConfig::game_maxunits - 5;
++    }
++};
++
+ static void bDecreaseMaxUnitCount()
+ {
+     if(GameConfig::game_maxunits - 5 &gt;= 2)
+@@ -312,7 +325,21 @@
+     x = xTextStart;
+     add( new Label(x, y, &quot;Game Max Unit Count&quot;, windowTextColor, windowTextColorShadow, true) );
+     x += xControlStart;
+-    addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseMaxUnitCount);
++    
++    //addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseMaxUnitCount);
++    
++    Button *b = new Button(&quot;aaa&quot;);
++    b-&gt;setLocation(iXY(x-1,y));
++    b-&gt;setLabel(&quot;&lt;&quot;);
++    b-&gt;setTextButtonSize(arrowButtonWidth-2);
++    b-&gt;setNormalBorder();
++    b-&gt;setAction(new DecreaseMaxUnitCountAction());
++    b-&gt;setTextColors(componentInActiveTextColor, componentFocusTextColor, componentActiveTextColor, componentInActiveTextColor);
++    b-&gt;setStateOffset(Button::BPRESSED, 1, 1);
++    add(b);
++    
++    
++    
+     x += arrowButtonWidth + meterWidth;
+     addButtonCenterText(iXY(x + 1, y), arrowButtonWidth, &quot;&gt;&quot;, &quot;&quot;, bIncreaseMaxUnitCount);
+     y += yOffset;
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000406.html">[Netpanzer-cvs] r1382 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000408.html">[Netpanzer-cvs] r1384 - in trunk/netpanzer/src/NetPanzer: Actions	Interfaces Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#407">[ date ]</a>
+              <a href="thread.html#407">[ thread ]</a>
+              <a href="subject.html#407">[ subject ]</a>
+              <a href="author.html#407">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

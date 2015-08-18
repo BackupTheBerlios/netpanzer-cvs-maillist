@@ -1,0 +1,459 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1343 - in trunk/netpanzer: . src/Lib/Util	support/scripts support/win32
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1343%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Util%0A%09support/scripts%20support/win32&In-Reply-To=%3C20120205155233.5A19148158D%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000368.html">
+   <LINK REL="Next"  HREF="000370.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1343 - in trunk/netpanzer: . src/Lib/Util	support/scripts support/win32</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1343%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Util%0A%09support/scripts%20support/win32&In-Reply-To=%3C20120205155233.5A19148158D%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1343 - in trunk/netpanzer: . src/Lib/Util	support/scripts support/win32">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Feb  5 16:52:33 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000368.html">[Netpanzer-cvs] r1342 - trunk/netpanzer/support/scripts
+</A></li>
+        <LI>Next message: <A HREF="000370.html">[Netpanzer-cvs] r1346 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#369">[ date ]</a>
+              <a href="thread.html#369">[ thread ]</a>
+              <a href="subject.html#369">[ subject ]</a>
+              <a href="author.html#369">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-02-05 16:52:32 +0100 (Sun, 05 Feb 2012)
+New Revision: 1343
+
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/Lib/Util/FileSystem.hpp
+   trunk/netpanzer/support/scripts/copy_datafiles.sh
+   trunk/netpanzer/support/scripts/make-linux-binary.sh
+   trunk/netpanzer/support/scripts/make-windows-binary.sh
+   trunk/netpanzer/support/win32/netpanzer.iss
+Log:
+- modified compilation process for easier version generation
+- modified compilation process to be more compatible with older linux systems when compiled on newer gcc
+- redone the innosetup script to create windows installers
+
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-02-04 15:03:05 UTC (rev 1342)
++++ trunk/netpanzer/SConstruct	2012-02-05 15:52:32 UTC (rev 1343)
+@@ -5,34 +5,6 @@
+ import subprocess
+ 
+ ################################################################
+-# Set NetPanzer Version
+-################################################################
+-
+-NPVERSION = ''
+-SVERSION = ''
+-
+-try:
+-    FILE = open('RELEASE_VERSION', 'r')
+-    NPVERSION = FILE.readline().strip(' \n\r')
+-    FILE.close()
+-except:
+-    pass
+-
+-try:
+-    SVERSION = os.popen('svnversion').read()[:-1]
+-    SVERSION = SVERSION.split(':')[-1]
+-except:
+-    pass
+-
+-print &quot;NPVERSION = &quot; + NPVERSION
+-print &quot;SVERSION = &quot; + SVERSION
+-if NPVERSION == '' and SVERSION != '':
+-    NPVERSION = 'svn-' + SVERSION;
+-
+-thisplatform = sys.platform;
+-print 'Building version ' + NPVERSION + ' in ' + thisplatform
+-
+-################################################################
+ # Fix compiling with long lines in windows
+ ################################################################
+ class ourSpawn:
+@@ -93,12 +65,50 @@
+     ('sdlconfig','sets the sdl-config full path, cross compilation sure needs this', 'sdl-config'),
+     ('universal','builds universal app in Max OS X(default false, other value is true)', 'false'),
+     ('compilerprefix', 'sets the prefix for the cross linux compiler, example: i686-pc-linux-gnu-', ''),
++    ('version', 'sets the version name to build, use &quot;auto&quot; for using the RELEASE_VERSION file or the default svn code', 'auto'),
+ )
+ 
+ env = Environment(ENV = os.environ, options = opts)
+ Help(opts.GenerateHelpText(env))
+ 
++
++################################################################
++# Set NetPanzer Version
++################################################################
++
++NPVERSION = ''
++
++if env['version'] != 'auto':
++    NPVERSION = env['version']
++
++if NPVERSION == '':
++    try:
++        FILE = open('RELEASE_VERSION', 'r')
++        NPVERSION = FILE.readline().strip(' \n\r')
++        FILE.close()
++    except:
++        pass
++
++if NPVERSION == '':
++    try:
++        SVERSION = os.popen('svnversion').read()[:-1]
++        NPVERSION = SVERSION.split(':')[-1]
++    except:
++        pass
++
++if NPVERSION == '':
++    NPVERSION = 'testing';
++
++thisplatform = sys.platform;
++print 'Building version ' + NPVERSION + ' on ' + thisplatform
++
++#
++# 
++#
++
+ env.Append( CCFLAGS = [ '-DPACKAGE_VERSION=\\&quot;' + NPVERSION + '\\&quot;' ] )
++env.Append( CCFLAGS = [ '-fno-stack-protector' ] )
++env.Append( CFLAGS = [  '-fno-stack-protector' ] )
+ 
+ if env['datadir'] != '':
+     env.Append( CCFLAGS = [ '-DNP_DATADIR=\\&quot;' +  env['datadir'] + '\\&quot;' ])
+@@ -126,7 +136,7 @@
+     env.Append( LIBS = [ 'ws2_32', 'mingw32' ] )
+     env['WINICON'] = env.RES( 'support/icon/npicon.rc' )
+ 
+-
++env.Append( LINKFLAGS = [ '-static-libstdc++' ] )
+ env.Append( LINKFLAGS = [ '-static-libgcc' ] )
+ 
+ if env['mode'] == 'debug':
+@@ -212,6 +222,8 @@
+ 
+ # BUILDS LUA
+ luaenv.Append(           CPPPATH = [ 'src/Lib/lua'] )
++# _GNU_SOURCE to avoid requiring glibc 2.7 (lua uses fscanf)
++luaenv.Append(           CFLAGS = [ '-D_GNU_SOURCE=1'] )
+ MakeStaticLib(          luaenv, 'nplua', 'lua', '*.c')
+ 
+ # BUILDS PHYSFS
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2012-02-04 15:03:05 UTC (rev 1342)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2012-02-05 15:52:32 UTC (rev 1343)
+@@ -598,7 +598,7 @@
+ 
+ FileReadException::FileReadException(size_t newobjread, size_t newobjrequested,
+ 	const std::string&amp; msg) throw()
+-    : std::range_error(msg), objread(newobjread),
++    : Exception(msg.c_str()), objread(newobjread),
+ 	objrequested(newobjrequested)
+ {
+ }
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.hpp	2012-02-04 15:03:05 UTC (rev 1342)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.hpp	2012-02-05 15:52:32 UTC (rev 1343)
+@@ -19,7 +19,7 @@
+ #ifndef __LIB_FILESYSTEM_HPP__
+ #define __LIB_FILESYSTEM_HPP__
+ 
+-#include &lt;stdexcept&gt;
++#include &quot;Exception.hpp&quot;
+ #include &quot;SDL.h&quot;
+ #include &lt;string&gt;
+ #include &lt;stdlib.h&gt;
+@@ -181,7 +181,7 @@
+ 
+ //---------------------------------------------------------------------------
+ 
+-class FileReadException : public std::range_error
++class FileReadException : public Exception
+ {
+ public:
+     FileReadException(size_t objread, size_t objrequested,
+
+Modified: trunk/netpanzer/support/scripts/copy_datafiles.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/copy_datafiles.sh	2012-02-04 15:03:05 UTC (rev 1342)
++++ trunk/netpanzer/support/scripts/copy_datafiles.sh	2012-02-05 15:52:32 UTC (rev 1343)
+@@ -18,4 +18,6 @@
+ 		echo -n &quot;.&quot;
+ 	done
+ 
++cp support/icon/netpanzer.ico &quot;${DESTDIR}&quot;
++
+ echo &quot;.&quot;
+
+Modified: trunk/netpanzer/support/scripts/make-linux-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-linux-binary.sh	2012-02-04 15:03:05 UTC (rev 1342)
++++ trunk/netpanzer/support/scripts/make-linux-binary.sh	2012-02-05 15:52:32 UTC (rev 1343)
+@@ -1,29 +1,39 @@
+ #! /bin/bash
+ 
+-if [ ! -f RELEASE_VERSION ]; then
+-    echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
+-    exit 1
++VERSION=''
++
++if [ ! -z &quot;$1&quot; ]; then
++    VERSION=&quot;$1&quot;
+ fi
+ 
++if [ -z &quot;${VERSION}&quot; ]; then
++    if [ ! -f RELEASE_VERSION ]; then
++        echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
++        exit 1
++    fi
++    VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
++fi
++
++if [ -z &quot;${VERSION}&quot; ]; then
++    VERSION=&quot;testing&quot;
++fi
++
+ RELEASEDIR=&quot;releases&quot;
+-VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
+ NPDEST=/tmp/netpanzer
+ ZIPNAME=&quot;netpanzer-linux-${VERSION}.tar.gz&quot;
+-EXENAME=&quot;build/crosslinux/release/netpanzer&quot;
++EXENAME=&quot;netpanzer&quot;
+ 
+-PATH=$PATH:/usr/local/gcc/i686-linux/bin/
++#PATH=$PATH:/usr/local/gcc/i686-linux/bin/
+ 
+ echo &quot;Making netPanzer linux version ${VERSION}&quot;
+ 
+-mkdir -p build/crosslinux/{release,debug}/libs
+-ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/release/libs/libstdc++.a
+-ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/debug/libs/libstdc++.a
++#mkdir -p build/crosslinux/{release,debug}/libs
++#ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/release/libs/libstdc++.a
++#ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/debug/libs/libstdc++.a
+ 
+-scons crosslinux \
+-      crosslinuxcompilerprefix=i686-linux- \
+-      crosslinuxsdlconfig=/usr/local/gcc/i686-linux/bin/sdl-config
++scons &quot;version=${VERSION}&quot;
+ 
+-i686-linux-strip &quot;${EXENAME}&quot;
++strip &quot;${EXENAME}&quot;
+ 
+ [ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
+ 
+
+Modified: trunk/netpanzer/support/scripts/make-windows-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-windows-binary.sh	2012-02-04 15:03:05 UTC (rev 1342)
++++ trunk/netpanzer/support/scripts/make-windows-binary.sh	2012-02-05 15:52:32 UTC (rev 1343)
+@@ -1,12 +1,24 @@
+ #! /bin/bash
+ 
+-if [ ! -f RELEASE_VERSION ]; then
+-    echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
+-    exit 1
++VERSION=''
++
++if [ ! -z &quot;$1&quot; ]; then
++    VERSION=&quot;$1&quot;
+ fi
+ 
++if [ -z &quot;${VERSION}&quot; ]; then
++    if [ ! -f RELEASE_VERSION ]; then
++        echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
++        exit 1
++    fi
++    VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
++fi
++
++if [ -z &quot;${VERSION}&quot; ]; then
++    VERSION=&quot;testing&quot;
++fi
++
+ RELEASEDIR=&quot;releases&quot;
+-VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
+ NPDEST=/tmp/netpanzer
+ ZIPNAME=&quot;netpanzer-windows-${VERSION}.zip&quot;
+ EXENAME=&quot;build/mingw/release/netpanzer.exe&quot;
+@@ -14,10 +26,10 @@
+ echo &quot;Making netPanzer windows version ${VERSION}&quot;
+ 
+ scons cross=mingw \
+-      sdlconfig=~/program/tools/crossmingw/bin/sdl-config
++      sdlconfig=~/program/tools/crossmingw/bin/sdl-config \
++      &quot;version=${VERSION}&quot;
+ 
+-# with newer gcc seems stripping works as it should, doesn't need to strip again
+-# i586-mingw32msvc-strip &quot;${EXENAME}&quot;
++i486-mingw32-strip &quot;${EXENAME}&quot;
+ 
+ [ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
+ 
+
+Modified: trunk/netpanzer/support/win32/netpanzer.iss
+===================================================================
+--- trunk/netpanzer/support/win32/netpanzer.iss	2012-02-04 15:03:05 UTC (rev 1342)
++++ trunk/netpanzer/support/win32/netpanzer.iss	2012-02-05 15:52:32 UTC (rev 1343)
+@@ -1,45 +1,46 @@
+ ; Script generated by the Inno Setup Script Wizard.
+ ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
+ 
++#define MyAppName &quot;NetPanzer&quot;
++#define MyAppVersion &quot;0.8.5-test-1&quot;
++#define MyAppPublisher &quot;NetPanzer Team&quot;
++#define MyAppURL &quot;<A HREF="http://www.netpanzer.org/">http://www.netpanzer.org/</A>&quot;
++#define MyAppExeName &quot;netpanzer.exe&quot;
++
+ [Setup]
+-AppName=NetPanzer
+-AppVerName=Netpanzer 0.8
+-AppPublisher=NetPanzer developers
+-AppPublisherURL=<A HREF="http://netpanzer.berlios.de">http://netpanzer.berlios.de</A>
+-AppSupportURL=<A HREF="http://netpanzer.berlios.de">http://netpanzer.berlios.de</A>
+-AppUpdatesURL=<A HREF="http://netpanzer.berlios.de">http://netpanzer.berlios.de</A>
+-DefaultDirName={pf}\NetPanzer
+-DefaultGroupName=NetPanzer
+-UninstallDisplayIcon={app}\netpanzer.ico
++; NOTE: The value of AppId uniquely identifies this application.
++; Do not use the same AppId value in installers for other applications.
++; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
++AppId={{2A5E66D9-4E48-43A1-B269-010CD64E95EE}
++AppName={#MyAppName}
++AppVersion={#MyAppVersion}
++;AppVerName={#MyAppName} {#MyAppVersion}
++AppPublisher={#MyAppPublisher}
++AppPublisherURL={#MyAppURL}
++AppSupportURL={#MyAppURL}
++AppUpdatesURL={#MyAppURL}
++DefaultDirName={pf}\{#MyAppName}
++DefaultGroupName={#MyAppName}
++LicenseFile=C:\users\krom\My Documents\program\netpanzer-svn\releases\win\netpanzer\COPYING
++OutputDir=C:\users\krom\My Documents\program\netpanzer-svn\releases
++OutputBaseFilename=netpanzer-{#MyAppVersion}
++Compression=lzma
++SolidCompression=yes
+ 
++[Languages]
++Name: &quot;english&quot;; MessagesFile: &quot;compiler:Default.isl&quot;
++
+ [Tasks]
+-; NOTE: The following entry contains English phrases (&quot;Create a desktop icon&quot; and &quot;Additional icons&quot;). You are free to translate them into another language if required.
+-Name: &quot;desktopicon&quot;; Description: &quot;Create a &amp;desktop icon&quot;; GroupDescription: &quot;Additional icons:&quot;; Flags: unchecked
++Name: &quot;desktopicon&quot;; Description: &quot;{cm:CreateDesktopIcon}&quot;; GroupDescription: &quot;{cm:AdditionalIcons}&quot;; Flags: unchecked
+ 
+ [Files]
+-Source: &quot;D:\netpanzer\netpanzer.exe&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\support\icon\netpanzer.ico&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\msvcr70.dll&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\libphysfs-1-0-0.dll&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\Relnotes&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\SDL.dll&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\SDL_image.dll&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\SDL_mixer.dll&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\Readme&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\Copying&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\docs\*.txt&quot;; DestDir: &quot;{app}\doc\&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\docs\*.html&quot;; DestDir: &quot;{app}\doc\&quot;; Flags: ignoreversion
+-Source: &quot;D:\netpanzer\cache\*.*&quot;; Excludes: &quot;CVS,Jamfile&quot;; DestDir: &quot;{app}\cache\&quot;; Flags: ignoreversion recursesubdirs
+-Source: &quot;D:\netpanzer\maps\*.*&quot;; Excludes: &quot;CVS,Jamfile&quot;; DestDir: &quot;{app}\maps\&quot;; Flags: ignoreversion recursesubdirs
+-Source: &quot;D:\netpanzer\pics\*.*&quot;; Excludes: &quot;CVS,Jamfile&quot;; DestDir: &quot;{app}\pics\&quot;; Flags: ignoreversion recursesubdirs
+-Source: &quot;D:\netpanzer\powerups\*.*&quot;; Excludes: &quot;CVS,Jamfile&quot;; DestDir: &quot;{app}\powerups\&quot;; Flags: ignoreversion recursesubdirs
+-Source: &quot;D:\netpanzer\sound\*.*&quot;; Excludes: &quot;CVS,Jamfile&quot;; DestDir: &quot;{app}\sound\&quot;; Flags: ignoreversion recursesubdirs
+-Source: &quot;D:\netpanzer\units\*.*&quot;; Excludes: &quot;CVS,Jamfile&quot;; DestDir: &quot;{app}\units\&quot;; Flags: ignoreversion recursesubdirs
+-Source: &quot;D:\netpanzer\wads\*.*&quot;; Excludes: &quot;CVS,Jamfile&quot;; DestDir: &quot;{app}\wads\&quot;; Flags: ignoreversion recursesubdirs
++Source: &quot;C:\users\krom\My Documents\program\netpanzer-svn\releases\win\netpanzer\netpanzer.exe&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion
++Source: &quot;C:\users\krom\My Documents\program\netpanzer-svn\releases\win\netpanzer\*&quot;; DestDir: &quot;{app}&quot;; Flags: ignoreversion recursesubdirs createallsubdirs
+ ; NOTE: Don't use &quot;Flags: ignoreversion&quot; on any shared system files
+ 
+ [INI]
+-Filename: &quot;{app}\netpanzer.url&quot;; Section: &quot;InternetShortcut&quot;; Key: &quot;URL&quot;; String: &quot;<A HREF="http://netpanzer.berlios.de">http://netpanzer.berlios.de</A>&quot;
++Filename: &quot;{app}\netpanzer.url&quot;; Section: &quot;InternetShortcut&quot;; Key: &quot;URL&quot;; String: &quot;<A HREF="http://www.netpanzer.org">http://www.netpanzer.org</A>&quot;
++Filename: &quot;{app}\webbrowser.url&quot;; Section: &quot;InternetShortcut&quot;; Key: &quot;URL&quot;; String: &quot;<A HREF="http://www.netpanzer.org/sb">http://www.netpanzer.org/sb</A>&quot;
+ 
+ [Registry]
+ Root: HKCR; Subkey: &quot;netpanzer&quot;; ValueType: &quot;string&quot;; ValueData: &quot;URL:netpanzer (NetPanzer, an online multiplayer tactical warfare game)&quot;; Flags: uninsdeletekey
+@@ -48,21 +49,21 @@
+ Root: HKCR; SubKey: &quot;netpanzer\shell\open\command&quot;; ValueType: &quot;string&quot;; ValueData: &quot;{app}\netpanzer.exe -c %1&quot;; Flags: uninsdeletekey
+ 
+ [Icons]
+-Name: &quot;{group}\NetPanzer&quot;; Filename: &quot;{app}\netpanzer.exe&quot;; WorkingDir: &quot;{app}&quot;; IconFilename: &quot;{app}\netpanzer.ico&quot;
+-Name: &quot;{group}\NetPanzer Dedicated Server&quot;; Filename: &quot;{app}\netpanzer.exe&quot;; Parameters: &quot;-d&quot;; WorkingDir: &quot;{app}&quot;;
+-; NOTE: The following entry contains an English phrase (&quot;on the Web&quot;). You are free to translate it into another language if required.
+-Name: &quot;{group}\NetPanzer on the Web&quot;; Filename: &quot;{app}\netpanzer.url&quot;
+-; NOTE: The following entry contains an English phrase (&quot;Uninstall&quot;). You are free to translate it into another language if required.
+-Name: &quot;{group}\Uninstall NetPanzer&quot;; Filename: &quot;{uninstallexe}&quot;
+-Name: &quot;{userdesktop}\NetPanzer&quot;; Filename: &quot;{app}\netpanzer.exe&quot;; WorkingDir: &quot;{app}&quot;; IconFilename: &quot;{app}\netpanzer.ico&quot;; Tasks: desktopicon
++Name: &quot;{group}\{#MyAppName}&quot;; Filename: &quot;{app}\{#MyAppExeName}&quot;; WorkingDir: &quot;{app}&quot;
++Name: &quot;{group}\{#MyAppName} Debug&quot;; Filename: &quot;{app}\{#MyAppExeName}&quot;; WorkingDir: &quot;{app}&quot;; Parameters: &quot;-g&quot;
++Name: &quot;{group}\{#MyAppName} Dedicated Server&quot;; Filename: &quot;{app}\{#MyAppExeName}&quot;; WorkingDir: &quot;{app}&quot;; Parameters: &quot;-d&quot;
++Name: &quot;{group}\{#MyAppName} Dedicated Server Debug&quot;; Filename: &quot;{app}\{#MyAppExeName}&quot;; WorkingDir: &quot;{app}&quot;; Parameters: &quot;-d -g&quot;
++Name: &quot;{group}\NetPanzer Homepage&quot;; Filename: &quot;{app}\netpanzer.url&quot;
++Name: &quot;{group}\NetPanzer Web Server Browser&quot;; Filename: &quot;{app}\webbrowser.url&quot;
++Name: &quot;{group}\{cm:UninstallProgram,{#MyAppName}}&quot;; Filename: &quot;{uninstallexe}&quot;
++Name: &quot;{commondesktop}\{#MyAppName}&quot;; Filename: &quot;{app}\{#MyAppExeName}&quot;; Tasks: desktopicon
+ 
+ [Run]
+-; NOTE: The following entry contains an English phrase (&quot;Launch&quot;). You are free to translate it into another language if required.
+-Filename: &quot;{app}\netpanzer.exe&quot;; Description: &quot;Launch NetPanzer&quot;; WorkingDir: &quot;{app}&quot;; Flags: nowait postinstall skipifsilent
++Filename: &quot;{app}\{#MyAppExeName}&quot;; Description: &quot;{cm:LaunchProgram,{#StringChange(MyAppName, '&amp;', '&amp;&amp;')}}&quot;; Flags: nowait postinstall skipifsilent
+ 
+ [UninstallDelete]
+ Type: files; Name: &quot;{app}\netpanzer.url&quot;
++Type: files; Name: &quot;{app}\webbrowser.url&quot;
+ Type: files; Name: &quot;{app}\stdout.txt&quot;
+ Type: files; Name: &quot;{app}\stderr.txt&quot;
+-Type: filesandordirs; Name: &quot;{app}\.netpanzer\cache&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000368.html">[Netpanzer-cvs] r1342 - trunk/netpanzer/support/scripts
+</A></li>
+	<LI>Next message: <A HREF="000370.html">[Netpanzer-cvs] r1346 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#369">[ date ]</a>
+              <a href="thread.html#369">[ thread ]</a>
+              <a href="subject.html#369">[ subject ]</a>
+              <a href="author.html#369">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

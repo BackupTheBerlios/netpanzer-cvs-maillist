@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1172 - in trunk/netpanzer: . src/NetPanzer/Units	support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1172%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Units%0A%09support/scripts&In-Reply-To=%3C201001101604.o0AG4H7i013305%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000199.html">
+   <LINK REL="Next"  HREF="000201.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1172 - in trunk/netpanzer: . src/NetPanzer/Units	support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1172%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Units%0A%09support/scripts&In-Reply-To=%3C201001101604.o0AG4H7i013305%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1172 - in trunk/netpanzer: . src/NetPanzer/Units	support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 10 17:04:17 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000199.html">[Netpanzer-cvs] r1171 - in trunk/netpanzer: scripts	src/NetPanzer/Particles src/NetPanzer/Units src/NetPanzer/Weapons
+</A></li>
+        <LI>Next message: <A HREF="000201.html">[Netpanzer-cvs] r1173 - in trunk/netpanzer: . pics pics/default	pics/particles/clouds pics/particles/craters	pics/particles/explosion pics/particles/lights	pics/particles/missles pics/particles/puff	pics/particles/shells powerups scripts src/Lib/2D	src/NetPanzer/PowerUps src/NetPanzer/Units	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Weapons units/pics
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#200">[ date ]</a>
+              <a href="thread.html#200">[ thread ]</a>
+              <a href="subject.html#200">[ subject ]</a>
+              <a href="author.html#200">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-10 17:04:10 +0100 (Sun, 10 Jan 2010)
+New Revision: 1172
+
+Removed:
+   trunk/netpanzer/cache/
+Modified:
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+   trunk/netpanzer/support/scripts/copy_datafiles.sh
+Log:
+- Fix tank shadows
+- removed unused cache folder (hey saves 1M)
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2010-01-10 14:03:08 UTC (rev 1171)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2010-01-10 16:04:10 UTC (rev 1172)
+@@ -313,6 +313,7 @@
+             Surface t;
+             t.loadPNGSheet(param_list.params[1], 127, 127, 36);
+             profile-&gt;bodyShadow.createShadow(t);
++            profile-&gt;bodyShadow.setAlpha(128);
+ //            profile-&gt;bodyShadow.setOffsetCenter();
+             break;
+         }
+
+Modified: trunk/netpanzer/support/scripts/copy_datafiles.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/copy_datafiles.sh	2010-01-10 14:03:08 UTC (rev 1171)
++++ trunk/netpanzer/support/scripts/copy_datafiles.sh	2010-01-10 16:04:10 UTC (rev 1172)
+@@ -10,7 +10,7 @@
+ [ ! -d &quot;${DESTDIR}&quot; ] &amp;&amp; mkdir -p &quot;${DESTDIR}&quot;
+ 
+ echo -n &quot;Copying files&quot;
+-find cache maps pics powerups scripts sound units wads ! -type d  ! -path '*/.svn/*' ! -iname '.DS_Store' -print | \
++find maps pics powerups scripts sound units tilesets ! -type d  ! -path '*/.svn/*' ! -iname '.DS_Store' -print | \
+ 	while read fname; do 
+ 		DNAME=&quot;`dirname \&quot;${fname}\&quot;`&quot;
+ 		[ ! -d &quot;${DESTDIR}/${DNAME}&quot; ] &amp;&amp; mkdir -p &quot;${DESTDIR}/${DNAME}&quot;
+@@ -18,4 +18,4 @@
+ 		echo -n &quot;.&quot;
+ 	done
+ 
+-echo &quot;.&quot;
+\ No newline at end of file
++echo &quot;.&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000199.html">[Netpanzer-cvs] r1171 - in trunk/netpanzer: scripts	src/NetPanzer/Particles src/NetPanzer/Units src/NetPanzer/Weapons
+</A></li>
+	<LI>Next message: <A HREF="000201.html">[Netpanzer-cvs] r1173 - in trunk/netpanzer: . pics pics/default	pics/particles/clouds pics/particles/craters	pics/particles/explosion pics/particles/lights	pics/particles/missles pics/particles/puff	pics/particles/shells powerups scripts src/Lib/2D	src/NetPanzer/PowerUps src/NetPanzer/Units	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Weapons units/pics
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#200">[ date ]</a>
+              <a href="thread.html#200">[ thread ]</a>
+              <a href="subject.html#200">[ subject ]</a>
+              <a href="author.html#200">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

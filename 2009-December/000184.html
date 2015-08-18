@@ -1,0 +1,1713 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1156 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Core Interfaces Particles PowerUps Units	Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1156%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/AI%20Core%20Interfaces%20Particles%20PowerUps%20Units%0A%09Views/Components%20Views/Game&In-Reply-To=%3C200912311000.nBVA0BHH029961%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000183.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1156 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Core Interfaces Particles PowerUps Units	Views/Components Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1156%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/AI%20Core%20Interfaces%20Particles%20PowerUps%20Units%0A%09Views/Components%20Views/Game&In-Reply-To=%3C200912311000.nBVA0BHH029961%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1156 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/AI Core Interfaces Particles PowerUps Units	Views/Components Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec 31 11:00:11 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000183.html">[Netpanzer-cvs] r1155 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#184">[ date ]</a>
+              <a href="thread.html#184">[ thread ]</a>
+              <a href="subject.html#184">[ subject ]</a>
+              <a href="author.html#184">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-12-31 10:59:37 +0100 (Thu, 31 Dec 2009)
+New Revision: 1156
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp
+   trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.cpp
+   trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+Log:
+- TileInterface removed, functionality in MapInterface now.
+- MapInterface handles the WorldMap now, WorldMap only used for listing maps.
+- MessageRouter run differently.
+- TileSet is only loaded if different than current used tileset, this makes that current netpanzer will only load TileSet once.
+- Added some more states when connecting, the visual feedback to the player is better, can see what is loading more clear.
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -35,11 +35,11 @@
+ void Astar::initializeAstar( unsigned long node_list_size,
+                              unsigned long step_limit)
+ {
+-    open_set.initialize(global_game_state-&gt;world_map-&gt;getWidth(),
+-                        global_game_state-&gt;world_map-&gt;getHeight());
++    open_set.initialize(MapInterface::getWidth(),
++                        MapInterface::getHeight());
+ 
+-    closed_set.initialize(global_game_state-&gt;world_map-&gt;getWidth(),
+-                          global_game_state-&gt;world_map-&gt;getHeight());
++    closed_set.initialize(MapInterface::getWidth(),
++                          MapInterface::getHeight());
+ 
+     open = std::priority_queue&lt;AstarNode*, std::vector&lt;AstarNode*&gt;,
+            AstarNodePtrCompare&gt;();
+@@ -160,8 +160,8 @@
+ {
+     unsigned long abs;
+ 
+-    if ( ( map_loc.x &lt; 0 ) || (map_loc.x &gt;= (int) global_game_state-&gt;world_map-&gt;getWidth() ) ||
+-            ( map_loc.y &lt; 0 ) || (map_loc.y &gt;= (int) global_game_state-&gt;world_map-&gt;getHeight() )
++    if ( ( map_loc.x &lt; 0 ) || (map_loc.x &gt;= (int) MapInterface::getWidth() ) ||
++            ( map_loc.y &lt; 0 ) || (map_loc.y &gt;= (int) MapInterface::getHeight() )
+        )
+         return 0xFFFFFFFF;
+ 
+@@ -432,8 +432,8 @@
+     debug_mode_flag = on_off;
+ 
+     if ( debug_mode_flag == true ) {
+-        astar_set_array.initialize(global_game_state-&gt;world_map-&gt;getWidth(),
+-                                   global_game_state-&gt;world_map-&gt;getHeight());
++        astar_set_array.initialize(MapInterface::getWidth(),
++                                   MapInterface::getHeight());
+     } else {
+         astar_set_array.deallocate();
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -34,114 +34,142 @@
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+-TileSet::TileSet( )
+-{
+-    tile_set_loaded = false;
+-}
++TileSetHeader* TileSet::header = 0;
++std::vector&lt;TileAttributes&gt;* TileSet::tile_attributes = 0;
++std::vector&lt;Surface *&gt;* TileSet::tiles = 0;
++std::string* TileSet::name = 0;
+ 
+-TileSet::~TileSet()
++void
++TileSet::cleanUp()
+ {
+     freeTiles();
++    if ( tile_attributes )
++    {
++        delete tile_attributes;
++        tile_attributes = 0;
++    }
++
++    if ( header )
++    {
++        delete header;
++        header = 0;
++    }
++
++    if ( name )
++    {
++        delete name;
++        name = 0;
++    }
+ }
+ 
+ void
+ TileSet::freeTiles()
+ {
+-    for ( std::vector&lt;Surface*&gt;::iterator i = tiles.begin();
+-                    i != tiles.end(); ++i )
++    if ( tiles )
+     {
+-        delete(*i);
++        for ( std::vector&lt;Surface*&gt;::iterator i = tiles-&gt;begin();
++                        i != tiles-&gt;end(); ++i )
++        {
++            delete(*i);
++        }
++        delete tiles;
++        tiles = 0;
+     }
+-    tiles.resize(0);
+ }
+ 
+ void TileSet::readTileSetHeader(IFileStream &amp; file)
+ {
+-    std::getline(file, header.image_file, ':');
+-    std::getline(file, header.unused, ':');
+-    file &gt;&gt; header.version;
++    if ( ! header )
++    {
++        header = new TileSetHeader();
++    }
++
++    std::getline(file, header-&gt;image_file, ':');
++    std::getline(file, header-&gt;unused, ':');
++    file &gt;&gt; header-&gt;version;
+     file.ignore(1);
+-    file &gt;&gt; header.x_pix;
++    file &gt;&gt; header-&gt;x_pix;
+     file.ignore(1);
+-    file &gt;&gt; header.y_pix;
++    file &gt;&gt; header-&gt;y_pix;
+     file.ignore(1);
+-    file &gt;&gt; header.tile_count;
++    file &gt;&gt; header-&gt;tile_count;
+ 
+-    LOGGER.info(&quot;TSinfo %s (%s) version %d with %d tiles of %dx%d&quot;,
+-                header.image_file.c_str(), header.unused.c_str(), header.version,
+-                header.tile_count, header.x_pix, header.y_pix);
++    LOGGER.debug(&quot;TSinfo %s (%s) version %d with %d tiles of %dx%d&quot;,
++                header-&gt;image_file.c_str(), header-&gt;unused.c_str(), header-&gt;version,
++                header-&gt;tile_count, header-&gt;x_pix, header-&gt;y_pix);
+ }
+ 
+-void TileSet::computeTileConsts( void )
++void
++TileSet::load(const char * tsname)
+ {
+-    tile_size = header.x_pix * header.y_pix;
+-}
+-
+-void TileSet::loadTileSetInfo( const char *file_path )
+-{
+-    IFileStream file(file_path);
+-
+-    freeTiles();
+-    tile_set_loaded = false;
+-
+-    readTileSetHeader(file);
+-    loadTileAttributes(file);
+-
+-    tile_set_loaded = true;
+-
+-    computeTileConsts();
+-}
+-
+-void TileSet::loadTileSet( const char *file_path )
+-{
++    if ( ! name )
++    {
++        name = new std::string(tsname);
++    }
++    else if ( ! name-&gt;compare(tsname) )
++    {
++        LOGGER.warning(&quot;TileSet not loaded, new %s, old %s&quot;, tsname, name-&gt;c_str());
++        return; // is same tileset, do not load it.
++    }
++    
++    std::string file_path(&quot;tilesets/&quot;);
++    file_path.append(tsname);
+     try {
+         IFileStream file(file_path);
+ 
+         freeTiles();
+-        tile_set_loaded = false;
+ 
+         readTileSetHeader(file);
+         loadTileAttributes(file);
++        
++    } catch(std::exception&amp; e) {
++	throw Exception(&quot;Couldn't load tileset '%s': %s&quot;,
++		file_path.c_str(), e.what());
++    }
++}
+ 
+-        Surface big;
++void
++TileSet::loadImages()
++{
++    freeTiles();
+ 
+-        std::string iname(&quot;tilesets/&quot;);
+-        iname += header.image_file;
++    Surface big;
+ 
+-        big.loadPNG(iname.c_str());
+-        SDL_Rect r = { 0, 0, header.x_pix, header.y_pix };
++    std::string iname(&quot;tilesets/&quot;);
++    iname += header-&gt;image_file;
+ 
+-        tiles.resize(header.tile_count);
+-        for ( unsigned int n = 0; n &lt; tiles.size(); ++n )
+-        {
+-                tiles[n] = new Surface(header.x_pix, header.y_pix, 1);
+-                big.bltRect(&amp;r, *tiles[n], 0, 0);
+-                tiles[n]-&gt;optimize();
+-                r.x += header.x_pix;
+-                if ( (unsigned int)r.x &gt;= big.getWidth() )
+-                {
+-                    r.x = 0;
+-                    r.y += header.y_pix;
+-                }
+-        }
++    big.loadPNG(iname.c_str());
++    SDL_Rect r = { 0, 0, header-&gt;x_pix, header-&gt;y_pix };
+ 
+-        tile_set_loaded = true;
+-	
+-	computeTileConsts();
+-    } catch(std::exception&amp; e) {
+-	throw Exception(&quot;Couldn't load tileset '%s': %s&quot;,
+-		file_path, e.what());
++    tiles = new std::vector&lt;Surface*&gt;();
++    int ntiles = header-&gt;tile_count;
++    tiles-&gt;resize(ntiles);
++    for ( unsigned int n = 0; n &lt; ntiles; ++n )
++    {
++            (*tiles)[n] = new Surface(header-&gt;x_pix, header-&gt;y_pix, 1);
++            big.bltRect(&amp;r, *(*tiles)[n], 0, 0);
++            (*tiles)[n]-&gt;optimize();
++            r.x += header-&gt;x_pix;
++            if ( (unsigned int)r.x &gt;= big.getWidth() )
++            {
++                r.x = 0;
++                r.y += header-&gt;y_pix;
++            }
+     }
+ }
+ 
+ void
+ TileSet::loadTileAttributes(IFileStream&amp; file)
+ {
++    if ( ! tile_attributes )
++    {
++        tile_attributes = new std::vector&lt;TileAttributes&gt;();
++    }
+     int number;
+-    tile_attributes.resize(header.tile_count);
++    tile_attributes-&gt;resize(header-&gt;tile_count);
+ 
+     std::vector&lt;TileAttributes&gt;::iterator i;
+-    for ( i = tile_attributes.begin(); i != tile_attributes.end(); ++i )
++    for ( i = tile_attributes-&gt;begin(); i != tile_attributes-&gt;end(); ++i )
+     {
+         file &gt;&gt; number;
+         file.ignore(1);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -20,6 +20,7 @@
+ 
+ #include &lt;vector&gt;
+ #include &quot;2D/Surface.hpp&quot;
++#include &quot;Types/iXY.hpp&quot;
+ #include &quot;SDL.h&quot;
+ #include &quot;Util/FileStream.hpp&quot;
+ 
+@@ -27,10 +28,10 @@
+ 
+ typedef struct TileSetHeader_s
+ {
+-    int     version;
+-    int     x_pix;
+-    int     y_pix;
+-    int     tile_count;
++    unsigned int version;
++    unsigned int x_pix;
++    unsigned int y_pix;
++    unsigned int tile_count;
+     std::string image_file;
+     std::string unused;
+ } TileSetHeader;
+@@ -45,51 +46,42 @@
+ class TileSet
+ {
+ public:
+-    TileSet();
+-    ~TileSet();
++    static const std::string&amp; getName() { return *name; }
+ 
+-    void readTileSetHeader(IFileStream&amp; file);
+-    void loadTileSetInfo( const char *file_path );
++    static void load(const char * tsname);
++    static void loadImages();
+ 
+-    void loadTileSet( const char *file_path );
++    static bool tileImagesLoaded() { return tiles != 0; }
+ 
+-    Surface * getTile(unsigned long index) const { return tiles[index]; }
++    static void cleanUp();
+ 
+-    unsigned short getTileXsize() const { return header.x_pix; }
+-    unsigned short getTileYsize() const { return header.y_pix; }
+-    unsigned short getTileCount() const { return header.tile_count; }
++    static Surface * getTile(unsigned long index) { return (*tiles)[index]; }
+ 
+-    const SDL_Color* getAverageTileColor(unsigned long index) const
+-    {
+-        return &amp;tile_attributes[ index ].avg_color;
+-    }
++    static unsigned int getTileXsize() { return header-&gt;x_pix; }
++    static unsigned int getTileYsize() { return header-&gt;y_pix; }
++    static unsigned int getTileCount() { return header-&gt;tile_count; }
+ 
+-    char getTileMovementValue( unsigned long index )
++    static const SDL_Color* getAverageTileColor(unsigned long index)
+     {
+-        return tile_attributes[ index ].move_value;
++        return &amp;(*tile_attributes)[ index ].avg_color;
+     }
+ 
+-    unsigned char getTilePixel( unsigned long index , unsigned int pixX,
+-                                       unsigned int pixY)
++    static char getTileMovementValue( unsigned long index )
+     {
+-        if( index &lt; tiles.size() )
+-        {
+-            return getTile(index)-&gt;getPixel(pixX, pixY);
+-        }
+-
+-        return( 0 );
++        return (*tile_attributes)[ index ].move_value;
+     }
+ 
+ private:
+-    bool                        tile_set_loaded;
+-    TileSetHeader               header;
+-    std::vector&lt;TileAttributes&gt; tile_attributes;
+-    std::vector&lt;Surface*&gt;       tiles;
+-    unsigned long               tile_size;
++    TileSet();
++    ~TileSet();
++    static TileSetHeader*               header;
++    static std::vector&lt;TileAttributes&gt;* tile_attributes;
++    static std::vector&lt;Surface*&gt;*       tiles;
++    static std::string*                 name;
+ 
+-    void computeTileConsts( void );
+-    void loadTileAttributes(IFileStream&amp; file);
+-    void freeTiles();
++    static void readTileSetHeader(IFileStream&amp; file);
++    static void loadTileAttributes(IFileStream&amp; file);
++    static void freeTiles();
+ };
+ 
+ #endif // ** _TILESET_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -19,7 +19,6 @@
+ #define _VIEWCAMERA_HPP
+ 
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Interfaces/TileInterface.hpp&quot;
+ #include &quot;Types/iRect.hpp&quot;
+ 
+ class ViewCamera : private MapInterface
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -22,6 +22,5 @@
+ GlobalGameState * global_game_state = 0;
+ 
+ GlobalGameState::GlobalGameState()
+-        : tile_set(0), world_map(0), spawn_list(0),
+-          unit_profile_interface(0)
++        : unit_profile_interface(0)
+ {}
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Core/GlobalGameState.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -19,9 +19,6 @@
+ #ifndef GLOBAL_GAME_STATE_HPP__
+ #define GLOBAL_GAME_STATE_HPP__
+ 
+-class TileSet;
+-class WorldMap;
+-class SpawnList;
+ class UnitProfileInterface;
+ 
+ class GlobalGameState
+@@ -29,9 +26,6 @@
+ public:
+     GlobalGameState();
+ 
+-    TileSet * tile_set;
+-    WorldMap * world_map;
+-    SpawnList * spawn_list;
+     UnitProfileInterface * unit_profile_interface;
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -57,6 +57,8 @@
+ #include &quot;Network/MessageRouter.hpp&quot;
+ #include &quot;Bot/BotManager.hpp&quot;
+ 
++#include &quot;Core/GlobalGameState.hpp&quot;
++
+ //------------------------------------------------------------------
+ BaseGameManager::BaseGameManager()
+     : running(true)
+@@ -237,7 +239,7 @@
+ 
+     // GameControlRulesDaemon might take some packets before they are routed.
+     GameControlRulesDaemon::updateGameControlFlow();
+-    MessageRouter::routePackets();
++//    MessageRouter::routePackets();
+ 
+     if ( NetworkState::status == _network_state_server )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -68,6 +68,7 @@
+ 
+ enum { _map_cycle_client_idle,
+        _map_cycle_client_connecting_to_server,
++       _map_cycle_client_connecting_to_server_work,
+        _map_cycle_client_wait_connection,
+        _map_cycle_client_wait_link_ack,
+        _map_cycle_client_wait_connect_start,
+@@ -75,6 +76,8 @@
+        _map_cycle_client_wait_game_setup,
+        _map_cycle_client_start_map_load,
+        _map_cycle_client_load_map,
++       _map_cycle_client_load_tile_set,
++       _map_cycle_client_send_ack,
+        _map_cycle_client_wait_for_resetgamelogic_or_connectid,
+        _map_cycle_client_wait_complete_connect,
+        _map_cycle_client_wait_for_respawn_ack,
+@@ -131,10 +134,9 @@
+ //-----------------------------------------------------------------
+ void GameControlRulesDaemon::mapCycleFsmClient()
+ {
+-    bool loop_finished = false;
+-    while ( ! loop_finished )
++    bool loop_finished = true;
++    do
+     {
+-        loop_finished = true;
+     switch( map_cycle_fsm_client_state )
+     {
+         case _map_cycle_client_idle :
+@@ -143,6 +145,10 @@
+         case _map_cycle_client_connecting_to_server:
+             LoadingView::show();
+             LoadingView::append(&quot;Starting network connection...&quot;);
++            map_cycle_fsm_client_state = _map_cycle_client_connecting_to_server_work;
++            break;
++
++        case _map_cycle_client_connecting_to_server_work:
+             NetworkState::setNetworkStatus( _network_state_client );
+             MessageRouter::initialize(false);
+             NetworkClient::joinServer(connecting_server_name);
+@@ -187,8 +193,7 @@
+                         switch ( msg-&gt;getResultCode() )
+                         {
+                             case _join_request_result_success:
+-                                LoadingView::append(&quot;Link to Server Established&quot;);
+-                                loop_finished = false;
++                                LoadingView::append(&quot;Join successfull&quot;);
+                                 map_cycle_fsm_client_state = _map_cycle_client_wait_connect_start;
+                                 break;
+ 
+@@ -227,11 +232,11 @@
+                         LoadingView::append(&quot;Starting connection ...&quot;);
+                         ClientConnectRequest connect_request;
+                         NetworkClient::sendMessage(&amp;connect_request, sizeof(connect_request));
+-                        loop_finished = false;
+                         map_cycle_fsm_client_state = _map_cycle_client_wait_connect_result;
+                     }
+                     else
+                     {
++                        LoadingView::append(&quot;Wrong connection packet received when waiting for start&quot;);
+                         // TODO fail here if message is not expected
+                     }
+                 }
+@@ -258,16 +263,17 @@
+                                                gameconfig-&gt;playerflag.c_str());
+ 
+                             NetworkClient::sendMessage(&amp;client_setting, sizeof(client_setting));
+-                            loop_finished = false;
+                             map_cycle_fsm_client_state = _map_cycle_client_wait_game_setup;
+                         }
+                         else
+                         {
++                             LoadingView::append(&quot;Connection result failed&quot;);
+                             // TODO fail here
+                         }
+                     }
+                     else
+                     {
++                        LoadingView::append(&quot;Wrong connection packet when waiting for connection result&quot;);
+                         // TODO fail here if message is not expected
+                     }
+                 }
+@@ -299,11 +305,11 @@
+ 
+                         ConnectMesgClientGameSetupPing ping;
+                         NetworkClient::sendMessage(&amp;ping, sizeof(ping));
+-                        loop_finished = false;
+                         map_cycle_fsm_client_state = _map_cycle_client_start_map_load;
+                     }
+                     else
+                     {
++                        LoadingView::append(&quot;Wrong connection packet when waiting server settings&quot;);
+                         // TODO fail here if message is not expected
+                     }
+                 }
+@@ -322,94 +328,103 @@
+                 LoadingView::append( buf);
+                 LoadingView::append( &quot;Loading Game Map ...&quot; );
+ 
+-                try {
+-                    GameManager::loadGameMap(gameconfig-&gt;map.c_str());
+-                } catch(std::exception&amp; e) {
+-                    LoadingView::append(&quot;Error while loading map:&quot;);
+-                    LoadingView::append(e.what());
+-                    map_cycle_fsm_client_state = _map_cycle_client_idle;
+-                    return;
+-                }
+-                
+-                global_engine_state-&gt;game_manager-&gt;resetGameLogic();
+-                loop_finished = false;
+                 map_cycle_fsm_client_state = _map_cycle_client_load_map;
+             }
+             break;
+ 
+         case _map_cycle_client_load_map:
+         {
+-//                int percent_complete;
+-//                char str_buf[128];
+-            LoadingView::append(&quot;Map loaded, sending ack...&quot;);
++            try
++            {
++                GameManager::loadGameMap(gameconfig-&gt;map.c_str());
++            }
++            catch(std::exception&amp; e)
++            {
++                LoadingView::append(&quot;Error while loading map:&quot;);
++                LoadingView::append(e.what());
++                map_cycle_fsm_client_state = _map_cycle_client_idle;
++                return;
++            }
+ 
+-//                if ( GameManager::gameMapLoad( &amp;percent_complete ) == false ) {
+-//
+-//                    sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-//                    LoadingView::update( str_buf );
+-//
+-//                    LoadingView::append( &quot;Waiting to respawn ...&quot; );
+-//                } else {
+-//                    sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-//                    LoadingView::update( str_buf );
+-//                }
++            global_engine_state-&gt;game_manager-&gt;resetGameLogic();
++
++            if ( ! TileSet::tileImagesLoaded() )
++            {
++                LoadingView::append(&quot;Loading TileSet...&quot;);
++                map_cycle_fsm_client_state = _map_cycle_client_load_tile_set;
++            }
++            else
++            {
++                LoadingView::append(&quot;Data loaded, sending ack...&quot;);
++                map_cycle_fsm_client_state = _map_cycle_client_send_ack;
++            }
++            break;
++        }
++
++        case _map_cycle_client_load_tile_set:
++            TileSet::loadImages();
++            LoadingView::append(&quot;Data loaded, sending ack...&quot;);
++            map_cycle_fsm_client_state = _map_cycle_client_send_ack;
++            break;
++
++        case _map_cycle_client_send_ack:
++        {
+             ConnectMesgClientGameSetupAck ack;
+             NetworkClient::sendMessage( &amp;ack, sizeof(ack));
+-            loop_finished = false;
+             map_cycle_fsm_client_state = _map_cycle_client_wait_for_resetgamelogic_or_connectid;
++        }
+             break;
+-        }
+ 
++
+         case _map_cycle_client_wait_for_resetgamelogic_or_connectid:
++        {
++            NetPacket np;
++            if ( MessageRouter::getNextPacket(np) )
+             {
+-                NetPacket np;
+-                if ( MessageRouter::getNextPacket(np) )
++                switch ( np.getNetMessage()-&gt;message_class )
+                 {
+-                    switch ( np.getNetMessage()-&gt;message_class )
+-                    {
+-                        case _net_message_class_player:
+-                            if ( np.getNetMessage()-&gt;message_id == _net_message_id_player_connect_id )
+-                            {
+-                                global_engine_state-&gt;game_manager-&gt;reinitializeGameLogic();
+-                                LoadingView::append(&quot;Received my id...&quot;);
+-                                MessageRouter::routePacket(np);
+-                                loop_finished = false;
+-                                map_cycle_fsm_client_state = _map_cycle_client_wait_complete_connect;
+-                            }
+-                            else
+-                            {
+-                                // TODO fail here
+-                            }
+-                            break;
++                    case _net_message_class_player:
++                        if ( np.getNetMessage()-&gt;message_id == _net_message_id_player_connect_id )
++                        {
++                            global_engine_state-&gt;game_manager-&gt;reinitializeGameLogic();
++                            LoadingView::append(&quot;Received my id...&quot;);
++                            MessageRouter::routePacket(np);
++                            map_cycle_fsm_client_state = _map_cycle_client_wait_complete_connect;
++                        }
++                        else
++                        {
++                            // TODO fail here
++                        }
++                        break;
+ 
+-                        case _net_message_class_system:
+-                            if ( np.getNetMessage()-&gt;message_id == _net_message_id_system_reset_game_logic )
+-                            {
+-                                LoadingView::append(&quot;Resetting game logic...&quot;);
+-                                global_engine_state-&gt;game_manager-&gt;resetGameLogic();
+-                                loop_finished = false;
+-                                map_cycle_fsm_client_state = _map_cycle_client_wait_for_respawn_ack;
+-                            }
+-                            else
+-                            {
+-                                // TODO fail here
+-                            }
+-                            break;
+-                        default:
+-                            char buf[1024];
+-                            snprintf(buf,sizeof(buf), &quot;Received unknown packet: %d:%d&quot;,
+-                                        np.getNetMessage()-&gt;message_class,
+-                                        np.getNetMessage()-&gt;message_id);
+-                            LoadingView::append(buf);
+-                            // TODO fail here if message is not expected
+-                            ;
+-                    }
++                    case _net_message_class_system:
++                        if ( np.getNetMessage()-&gt;message_id == _net_message_id_system_reset_game_logic )
++                        {
++                            LoadingView::append(&quot;Resetting game logic...&quot;);
++                            global_engine_state-&gt;game_manager-&gt;resetGameLogic();
++                            map_cycle_fsm_client_state = _map_cycle_client_wait_for_respawn_ack;
++                        }
++                        else
++                        {
++                            // TODO fail here
++                        }
++                        break;
++                    default:
++                        char buf[1024];
++                        snprintf(buf,sizeof(buf), &quot;Received unknown packet: %d:%d&quot;,
++                                    np.getNetMessage()-&gt;message_class,
++                                    np.getNetMessage()-&gt;message_id);
++                        LoadingView::append(buf);
++                        // TODO fail here if message is not expected
++                        ;
++                }
+ 
+-                }
+             }
++        }
+             break;
+ 
+         case _map_cycle_client_wait_for_respawn_ack:
++            MessageRouter::routePackets();
+             if( map_cycle_fsm_client_respawn_ack_flag == true )
+             {
+                 LoadingView::loadFinish();
+@@ -437,6 +452,7 @@
+             }
+             break;
+         case _map_cycle_client_state_in_progress:
++            MessageRouter::routePackets();
+             UnitInterface::updateUnitStatus();
+ 
+             ProjectileInterface::updateStatus();
+@@ -451,12 +467,15 @@
+             break;
+     } // ** switch
+ 
+-    }
++    } while ( ! loop_finished );
++
+ }
+ 
+ 
+ void GameControlRulesDaemon::mapCycleFsmServer()
+ {
++    MessageRouter::routePackets();
++
+     switch ( map_cycle_fsm_server_state )
+     {
+         case _map_cycle_server_state_idle:
+@@ -521,35 +540,34 @@
+                     } else {
+                         LoadingView::show();
+ 
+-                        LoadingView::append( &quot;Loading Game Map ...&quot; );
+-
+-                        try {
+-                            GameManager::loadGameMap(gameconfig-&gt;map.c_str());
+-                        } catch(std::exception&amp; e) {
+-                            LoadingView::append(
+-                                    &quot;Error while loading map:&quot;);
+-                            LoadingView::append(e.what());
+-                            map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+-                            return;
+-                        }
+-                        
++                        LoadingView::append( &quot;Loading Game Map ...&quot; );                        
+                         map_cycle_fsm_server_state = _map_cycle_server_state_load_map;
+                     }
+                 }
+             }
+             break;
+ 
+-        case _map_cycle_server_state_load_map : {
+-//                int percent_complete;
+-//                char str_buf[128];
++        case _map_cycle_server_state_load_map :
++        {
++            try
++            {
++                GameManager::loadGameMap(gameconfig-&gt;map.c_str());
++                if ( ! TileSet::tileImagesLoaded() )
++                {
++                    TileSet::loadImages();
++                }
++            }
++            catch(std::exception&amp; e)
++            {
++                LoadingView::append(
++                        &quot;Error while loading map:&quot;);
++                LoadingView::append(e.what());
++                map_cycle_fsm_server_state = _map_cycle_server_state_idle;
++                return;
++            }
+ 
+-//                if ( GameManager::gameMapLoad( &amp;percent_complete ) == false ) {
+-                    map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
+-//                }
+-//
+-//                sprintf( str_buf, &quot;Loading Game Map ... (%d%%)&quot;, percent_complete);
+-//                LoadingView::update( str_buf );
+-            }
++            map_cycle_fsm_server_state = _map_cycle_server_state_respawn_players;
++        }
+             break;
+ 
+         case _map_cycle_server_state_wait_for_client_map_load :
+@@ -601,7 +619,7 @@
+             }
+             break;
+ 
+-        case _map_cycle_server_state_in_progress:
++        case _map_cycle_server_state_in_progress:            
+             UnitInterface::updateUnitStatus();
+ 
+             ProjectileInterface::updateStatus();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -42,7 +42,6 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+ #include &quot;Weapons/ProjectileInterface.hpp&quot;
+-#include &quot;Interfaces/TileInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+@@ -186,7 +185,7 @@
+     std::string map_path(&quot;maps/&quot;);
+     map_path.append(map_file_path);
+ 
+-    if (!MapInterface::loadMap( map_path.c_str(), true ))
++    if ( !MapInterface::load( map_path.c_str()) )
+         throw Exception(&quot;map format error.&quot;);
+ 
+     map_path.append(&quot;.opt&quot;);
+@@ -194,7 +193,7 @@
+ 
+     ParticleInterface::initParticleSystems();
+ 
+-    ParticleInterface::addCloudParticle(gameconfig-&gt;cloudcoverage);
++//    ParticleInterface::addCloudParticle(gameconfig-&gt;cloudcoverage);
+     Physics::wind.setVelocity(gameconfig-&gt;windspeed, 107);
+ }
+ 
+@@ -222,7 +221,7 @@
+     std::string map_path(&quot;maps/&quot;);
+     map_path.append(map_name);
+ 
+-    MapInterface::loadMap( map_path.c_str(), false );
++    MapInterface::load( map_path.c_str() );
+ 
+     map_path.append(&quot;.opt&quot;);
+     ObjectiveInterface::loadObjectiveList( map_path.c_str() );
+@@ -237,7 +236,7 @@
+     global_engine_state-&gt;sound_manager-&gt;stopTankIdle();
+ 
+     // ** Get a new spawn point and spawn the player **
+-    iXY spawn_point = global_game_state-&gt;spawn_list-&gt;getFreeSpawnPoint();
++    iXY spawn_point = MapInterface::getFreeSpawnPoint();
+ 
+     PlayerInterface::spawnPlayer( player, spawn_point );
+ 
+@@ -247,8 +246,8 @@
+ void GameManager::spawnPlayerAt( const Uint16 player, const iXY&amp; location )
+ {
+     if (   location.x &gt;=0 &amp;&amp; location.y &gt;=0
+-        &amp;&amp; location.x &lt; global_game_state-&gt;world_map-&gt;getWidth()
+-        &amp;&amp; location.y &lt; global_game_state-&gt;world_map-&gt;getHeight() )
++        &amp;&amp; location.x &lt; MapInterface::getWidth()
++        &amp;&amp; location.y &lt; MapInterface::getHeight() )
+     {
+         global_engine_state-&gt;sound_manager-&gt;stopTankIdle();
+         PlayerInterface::spawnPlayer( player, location );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -19,70 +19,89 @@
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Core/GlobalGameState.hpp&quot;
+ #include &quot;Classes/SpawnList.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ #include &lt;cstdlib&gt;
+ #include &lt;cstring&gt;
+ #include &lt;cstdio&gt;
+ 
+-
+-char MapInterface::map_path[256];
+ MapInterface::MapListenerList MapInterface::listenerList;
++int* MapInterface::map_data = 0;
++unsigned int MapInterface::width = 0;
++unsigned int MapInterface::height = 0;
++char MapInterface::tileset_name[256];
++SpawnList* MapInterface::spawn_list = 0;
+ 
+-bool MapInterface::loadMap(const char *file_path, bool load_tiles)
++bool MapInterface::load(const char *file_path)
+ {
+     char path[256];
+-    char tile_set_path[256];
+ 
+-    strcpy( map_path, file_path );
+-
+     strcpy( path, file_path );
+     strcat( path, &quot;.npm&quot; );
+ 
+-    WorldMap * map = new WorldMap();
+-    map-&gt;loadMapFile( path );
+-    if ( global_game_state-&gt;world_map )
++    std::auto_ptr&lt;filesystem::ReadFile&gt; file(filesystem::openRead(path));
++
++    // magick is sizes of: netp_id_header + id + name + description
++    file-&gt;seek(64 + 2 + 256 + 1024);
++    width = file-&gt;readULE16();
++    height = file-&gt;readULE16();
++    file-&gt;read(tileset_name, sizeof(tileset_name),1);
++
++    file-&gt;readULE16(); // skip thumbnail_width
++    file-&gt;readULE16(); // skip thumbnail_height
++
++    if ( map_data )
+     {
+-        delete global_game_state-&gt;world_map;
++        delete[] map_data;
+     }
+-    global_game_state-&gt;world_map = map;
+ 
+-    strcpy( tile_set_path, &quot;tilesets/&quot; );
+-    strcat( tile_set_path, global_game_state-&gt;world_map-&gt;getAssocTileSet() );
++    int total_size = width*height;
++    map_data = new int[total_size];
++    int* map_ptr = map_data;
+ 
+-    TileSet * ts = new TileSet();
+-    if ( load_tiles == true )
++    for(; total_size != 0; --total_size)
+     {
+-        ts-&gt;loadTileSet(tile_set_path);
++        *map_ptr = file-&gt;readULE16();
++        ++map_ptr;
+     }
+-    else
+-    {
+-        ts-&gt;loadTileSetInfo(tile_set_path);
+-    }
+ 
+-    if ( global_game_state-&gt;tile_set )
++    TileSet::load(tileset_name);
++
++    strcpy( path, file_path );
++    strcat( path, &quot;.spn&quot; );
++
++    if ( spawn_list )
+     {
+-        delete global_game_state-&gt;tile_set;
++        delete spawn_list;
+     }
+-    global_game_state-&gt;tile_set = ts;
+ 
+-    finishMapLoad();
++    spawn_list = new SpawnList();
++    spawn_list-&gt;loadSpawnFile(path);
++
++    notifyMapLoad();
++    
+     return true;
+ }
+ 
+-void MapInterface::finishMapLoad( void )
++void MapInterface::cleanUp()
+ {
+-    char path[256];
++    if ( map_data )
++    {
++        delete[] map_data;
++    }
+ 
+-    strcpy( path, map_path );
+-    strcat( path, &quot;.spn&quot; );
+-
+-    SpawnList * sl = new SpawnList();
+-    sl-&gt;loadSpawnFile(path);
+-    if ( global_game_state-&gt;spawn_list )
++    if ( spawn_list )
+     {
+-        delete global_game_state-&gt;spawn_list;
++        delete spawn_list;
+     }
+-    global_game_state-&gt;spawn_list = sl;
+ 
++    map_data = 0;
++    width = 0;
++    height = 0;
++    tileset_name[0] = 0;
++}
++
++void MapInterface::notifyMapLoad()
++{
+     MapListenerList::iterator i = listenerList.begin();
+     while ( i != listenerList.end() )
+     {
+@@ -96,11 +115,11 @@
+     unsigned short tile_val;
+     char move_val;
+ 
+-    if (      (map_loc.x &gt;= 0) &amp;&amp; ((size_t) map_loc.x &lt; global_game_state-&gt;world_map-&gt;getWidth() )
+-              &amp;&amp; (map_loc.y &gt;= 0) &amp;&amp; ((size_t) map_loc.y &lt; global_game_state-&gt;world_map-&gt;getHeight() )
++    if (      (map_loc.x &gt;= 0) &amp;&amp; ((size_t) map_loc.x &lt; width )
++              &amp;&amp; (map_loc.y &gt;= 0) &amp;&amp; ((size_t) map_loc.y &lt;height )
+        ) {
+-        tile_val = global_game_state-&gt;world_map-&gt;getValue( (unsigned short) map_loc.x, (unsigned short) map_loc.y ) ;
+-        move_val = global_game_state-&gt;tile_set-&gt;getTileMovementValue( tile_val );
++        tile_val = getValue( (unsigned short) map_loc.x, (unsigned short) map_loc.y ) ;
++        move_val = TileSet::getTileMovementValue( tile_val );
+ 
+         switch( move_val ) {
+         case 0 :
+@@ -126,5 +145,21 @@
+     } else {
+         return( 0xFF );
+     }
++}
+ 
++unsigned char
++MapInterface::getWorldPixMovementValue(int worldX, int worldY)
++{
++    int tileX = worldX / TileSet::getTileXsize();
++    int tileY = worldY / TileSet::getTileYsize();
++
++    if(tileX &gt;= (int) width || tileY &gt;= (int) height || tileX &lt; 0 || tileY &lt; 0 )
++    {
++        LOGGER.warning(&quot;query for worldpixmovement outside map (%d,%d)&quot;,
++                worldX, worldY);
++        return 0xff;
++    }
++    int tileValue = getValue(tileX, tileY);
++
++    return TileSet::getTileMovementValue(tileValue);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -20,9 +20,9 @@
+ 
+ #include &lt;list&gt;
+ 
+-#include &quot;TileInterface.hpp&quot;
+-#include &quot;Classes/WorldMap.hpp&quot;
+-#include &quot;Core/GlobalGameState.hpp&quot;
++//#include &quot;Classes/WorldMap.hpp&quot;
++#include &quot;Classes/TileSet.hpp&quot;
++#include &quot;Classes/SpawnList.hpp&quot;
+ 
+ struct SDL_Color;
+ 
+@@ -37,12 +37,16 @@
+ };
+ 
+ 
+-class MapInterface : protected TileInterface
++class MapInterface
+ {
+ public:
+-    static bool loadMap(const char *file_path, bool load_tiles);
++    static bool load(const char *file_path);
++    static void cleanUp();
+ 
+     static unsigned char getMovementValue( iXY map_loc );
++    static unsigned char getWorldPixMovementValue( int worldX, int worldY );
++    static iXY getFreeSpawnPoint() { return spawn_list-&gt;getFreeSpawnPoint(); }
++    static bool isLoaded() { return map_data != 0; }
+ 
+     static void addMapEventListener(MapEventListener *lis)
+     {
+@@ -56,18 +60,16 @@
+     
+     static void getMapPointSize(iXY *map_size)
+     {
+-        map_size-&gt;x = global_game_state-&gt;world_map-&gt;getWidth() * global_game_state-&gt;tile_set-&gt;getTileXsize();
+-        map_size-&gt;y = global_game_state-&gt;world_map-&gt;getHeight() * global_game_state-&gt;tile_set-&gt;getTileYsize();
++        map_size-&gt;x = width * TileSet::getTileXsize();
++        map_size-&gt;y = height * TileSet::getTileYsize();
+     }
+ 
+-    static iXY getSize()
+-    {
+-        return iXY(global_game_state-&gt;world_map-&gt;getWidth(), global_game_state-&gt;world_map-&gt;getHeight());
+-    }
++    static unsigned int getWidth() { return width; }
++    static unsigned int getHeight() { return height; }
+ 
+-    static WorldMap::MapElementType MapValue(size_t x, size_t y)
++    static int getValue(size_t x, size_t y)
+     {
+-        return global_game_state-&gt;world_map-&gt;getValue(x, y);
++        return map_data[(y*width) + x];
+     }
+ 
+     static void mapXYtoPointXY(unsigned short map_x, unsigned short map_y,
+@@ -98,7 +100,7 @@
+ 
+     static size_t mapXYtoOffset(size_t map_x, size_t map_y)
+     {
+-        return (map_y * global_game_state-&gt;world_map-&gt;getWidth()) + map_x;
++        return (map_y * width) + map_x;
+     }
+ 
+     static size_t mapXYtoOffset(const iXY&amp; map_loc)
+@@ -108,19 +110,25 @@
+ 
+     static void offsetToMapXY(size_t offset, iXY *map_loc)
+     {
+-        map_loc-&gt;y = offset/global_game_state-&gt;world_map-&gt;getWidth();
+-        map_loc-&gt;x = offset - (map_loc-&gt;y * global_game_state-&gt;world_map-&gt;getWidth());
++        map_loc-&gt;y = offset/width;
++        map_loc-&gt;x = offset - (map_loc-&gt;y * width);
+     }
+ 
+-protected:
++private:
+     typedef std::list&lt;MapEventListener *&gt; MapListenerList;
+     static MapListenerList listenerList;
+ 
+-    static char map_path[256];
+     static const int TILE_WIDTH = 32;
+     static const int TILE_HEIGHT = 32;
+ 
+-    static void finishMapLoad();
++    static int* map_data;
++    static unsigned int width;
++    static unsigned int height;
++    static char tileset_name[256];
++
++    static SpawnList * spawn_list;
++
++    static void notifyMapLoad();
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -374,11 +374,11 @@
+ 
+ void PathScheduler::initialize()
+ {
+-    if( global_game_state-&gt;world_map ) {
++    if( MapInterface::isLoaded() ) {
+         unsigned long resources;
+         size_t path_list_size;
+-        float map_x_size = global_game_state-&gt;world_map-&gt;getWidth();
+-        float map_y_size = global_game_state-&gt;world_map-&gt;getHeight();
++        float map_x_size = MapInterface::getWidth();
++        float map_y_size = MapInterface::getHeight();
+         float map_size = (map_x_size * map_y_size);
+ 
+         resources = (unsigned long) ( (map_size * 0.019018) + 4018.0 );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -37,7 +37,6 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+ #include &quot;Weapons/ProjectileInterface.hpp&quot;
+-#include &quot;Interfaces/TileInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -1,44 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#include &quot;TileInterface.hpp&quot;
+-#include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-
+-iXY TileInterface::getTileSize( void )
+-{
+-    return( iXY( global_game_state-&gt;tile_set-&gt;getTileXsize(), global_game_state-&gt;tile_set-&gt;getTileYsize() ) );
+-}
+-
+-long TileInterface::getWorldPixMovementValue(int worldX, int worldY)
+-{
+-    int tileX = worldX / global_game_state-&gt;tile_set-&gt;getTileXsize();
+-    int tileY = worldY / global_game_state-&gt;tile_set-&gt;getTileYsize();
+-
+-    if(tileX &gt;= (int) global_game_state-&gt;world_map-&gt;getWidth()
+-            || tileY &gt;= (int) global_game_state-&gt;world_map-&gt;getHeight()
+-            || tileX &lt; 0 || tileY &lt; 0 ) 
+-    {
+-        LOGGER.warning(&quot;query for worldpixmovement outside map (%d,%d)&quot;,
+-                worldX, worldY);
+-        return 0xffff;
+-    }                                                                               
+-    int tileValue = MapInterface::MapValue(tileX, tileY);
+-
+-    return global_game_state-&gt;tile_set-&gt;getTileMovementValue(tileValue);
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -1,34 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _TILEINTERFACE_HPP
+-#define _TILEINTERFACE_HPP
+-
+-#include &quot;Classes/TileSet.hpp&quot;
+-#include &quot;2D/Palette.hpp&quot;
+-#include &quot;Core/CoreTypes.hpp&quot;
+-#include &quot;Types/iXY.hpp&quot;
+-
+-class TileInterface
+-{
+-public:
+-    static iXY getTileSize( void );
+-
+-    static long getWorldPixMovementValue(int worldX, int worldY);
+-};
+-
+-#endif // ** _TILEINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -22,7 +22,6 @@
+ #include &quot;PuffParticle2D.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Util/Math.hpp&quot;
+-#include &quot;Interfaces/TileInterface.hpp&quot;
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -37,6 +37,7 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;2D/Color.hpp&quot;
+ 
+ std::vector&lt;UnitParticleInfo&gt; ParticleInterface::unitParticleInfo;
+ int ParticleInterface::unitBodyMaxArea                   = 0;
+@@ -468,7 +469,7 @@
+ 
+     movePuffWaitGroup += TimerInterface::getTimeSlice();
+ 
+-    if (TileInterface::getWorldPixMovementValue(unitState.location.x, unitState.location.y) == 0) {
++    if (MapInterface::getWorldPixMovementValue(unitState.location.x, unitState.location.y) == 0) {
+         if (movePuffWaitGroup &gt;= movePuffWaitTotal) {
+             iXY size     = unitParticleInfo[unitState.unit_type].minBounds.getSize();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -24,8 +24,8 @@
+ #include &quot;Particles/Particle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ #include &quot;CraterParticle2D.hpp&quot;
+-#include &quot;Interfaces/TileInterface.hpp&quot;
+ #include &quot;Particles/ParticleInterface.hpp&quot;
++#include &quot;Interfaces/MapInterface.hpp&quot;
+ 
+ 
+ // TemplateExplosionSystem
+@@ -55,7 +55,7 @@
+     int halfBoundsY = bounds.getSizeY() / 2;
+ 
+     // Add a crater on the ground if it is a logical location.
+-    int pixMovementValue = TileInterface::getWorldPixMovementValue(int(pos.x), int(pos.z));
++    int pixMovementValue = MapInterface::getWorldPixMovementValue(int(pos.x), int(pos.z));
+ 
+     // Check for water or impassible.
+     if (pixMovementValue != 5 &amp;&amp;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -89,8 +89,8 @@
+ 
+     if( (powerup_list.size() &lt; (size_t) power_up_limit) )
+     {
+-        map_size_x = global_game_state-&gt;world_map-&gt;getWidth();
+-        map_size_y = global_game_state-&gt;world_map-&gt;getHeight();
++        map_size_x = MapInterface::getWidth();
++        map_size_y = MapInterface::getHeight();
+ 
+         do
+         {
+@@ -169,8 +169,8 @@
+     // here memory leak, should delete the pointer to powerups in the list
+     powerup_list.clear();
+ 
+-    map_size_x = global_game_state-&gt;world_map-&gt;getWidth();
+-    map_size_y = global_game_state-&gt;world_map-&gt;getHeight();
++    map_size_x = MapInterface::getWidth();
++    map_size_y = MapInterface::getHeight();
+ 
+     setPowerUpLimits( map_size_x, map_size_y );
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -118,8 +118,8 @@
+     smolderWait    = 0.0f;
+     smolderWaitMin = 0.0f;
+ 
+-    if ( (unsigned int)initial_loc.x &gt;= global_game_state-&gt;world_map-&gt;getWidth()
+-       ||(unsigned int)initial_loc.y &gt;= global_game_state-&gt;world_map-&gt;getHeight())
++    if ( (unsigned int)initial_loc.x &gt;= MapInterface::getWidth()
++       ||(unsigned int)initial_loc.y &gt;= MapInterface::getHeight())
+     {
+         throw std::runtime_error(&quot;Invalid position&quot;);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -24,6 +24,7 @@
+ #include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
++#include &quot;Classes/TileSet.hpp&quot;
+ 
+ BucketList* UnitBucketArray::buckets = 0;
+ long        UnitBucketArray::map_x_sample_factor = 0;
+@@ -34,11 +35,13 @@
+ size_t      UnitBucketArray::column_size = 0;
+ 
+ void
+-UnitBucketArray::initialize( const iXY &amp; map_size, const iXY &amp; tile_size,
+-        const unsigned int x_sample, const unsigned int y_sample )
++UnitBucketArray::initialize(const unsigned int x_sample, const unsigned int y_sample)
+ {
+     cleanUp();
+ 
++    unsigned int map_width = MapInterface::getWidth();
++    unsigned int map_height = MapInterface::getHeight();
++
+     unsigned long rows, columns;
+ 
+     assert( x_sample &gt;= 1 );
+@@ -47,21 +50,21 @@
+     map_x_sample_factor = x_sample;
+     map_y_sample_factor = y_sample;
+ 
+-    while( (map_size.x % map_x_sample_factor) &gt; 0 )
++    while( (map_width % map_x_sample_factor) &gt; 0 )
+     {
+         map_x_sample_factor++;
+     }
+ 
+-    while( (map_size.y % map_y_sample_factor) &gt; 0 )
++    while( (map_height % map_y_sample_factor) &gt; 0 )
+     {
+         map_y_sample_factor++;
+     }
+ 
+-    pixel_x_sample_factor = tile_size.x * map_x_sample_factor;
+-    pixel_y_sample_factor = tile_size.y * map_y_sample_factor;
++    pixel_x_sample_factor = TileSet::getTileXsize() * map_x_sample_factor;
++    pixel_y_sample_factor = TileSet::getTileYsize() * map_y_sample_factor;
+ 
+-    rows = (unsigned long) map_size.y / map_y_sample_factor;
+-    columns = (unsigned long) map_size.x / map_x_sample_factor;
++    rows = (unsigned long) map_width / map_y_sample_factor;
++    columns = (unsigned long) map_height / map_x_sample_factor;
+ 
+     row_size = rows;
+     column_size = columns;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -55,16 +55,17 @@
+                                       unsigned long range,
+                                       const Uint16 player_id);
+ 
++    static void initialize()
++    {
++        initialize(10, 10);
++    }
++
++
+ private:
+     friend class UnitInterface;
+     
+-    static void initialize(const iXY &amp; map_size, const iXY &amp; tile_size,
+-                     const unsigned int x_sample, const unsigned int y_sample);
++    static void initialize(const unsigned int x_sample, const unsigned int y_sample);
+ 
+-    static void initialize(const iXY &amp; map_size, const iXY &amp; tile_size)
+-    {
+-        initialize( map_size, tile_size, 10, 10 );
+-    }
+ 
+     static void cleanUp()
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -32,6 +32,7 @@
+ 
+ #include &quot;Classes/PlacementMatrix.hpp&quot;
+ #include &quot;Classes/PlayerUnitConfig.hpp&quot;
++#include &quot;Classes/TileSet.hpp&quot;
+ 
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+@@ -89,11 +90,10 @@
+ {
+     cleanUp();
+ 
+-    unit_black_board = new BitArray(global_game_state-&gt;world_map-&gt;getWidth(),
+-                                    global_game_state-&gt;world_map-&gt;getHeight());
++    unit_black_board = new BitArray(MapInterface::getWidth(),
++                                    MapInterface::getHeight());
+ 
+-    UnitBucketArray::initialize(MapInterface::getSize(),
+-                                TileInterface::getTileSize());
++    UnitBucketArray::initialize();
+ 
+     units = new Units();
+ 
+@@ -110,7 +110,14 @@
+ 
+     opcode_encoder = new UnitOpcodeEncoder();
+ 
+-    units_per_player = max_units;
++    if ( max_units )
++    {
++        units_per_player = max_units / PlayerInterface::getMaxPlayers();
++    }
++    else
++    {
++        units_per_player = 0;
++    }
+ }
+ 
+ // ******************************************************************
+@@ -335,12 +342,13 @@
+             PlacementMatrix::getNextEmptyLoc( &amp;next_loc );
+             unit = createUnit(utype, next_loc, player_id);
+ 
+-            assert(unit != 0);
+-
+-            UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(), unit-&gt;id,
++            if ( unit )
++            {
++                UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(), unit-&gt;id,
+                             next_loc.x, next_loc.y, unit-&gt;unit_state.unit_type);
+ 
+-            encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg));
++                encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg));
++            }
+         }
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -56,6 +56,12 @@
+ void
+ MiniMap::draw( int posx, int posy, Surface &amp;dest)
+ {
++    if ( dirty )
++    {
++        regenerate();
++        dirty = false;
++    }
++    
+     iXY oldpos(position);
+     position.x += posx;
+     position.y += posy;
+@@ -121,14 +127,12 @@
+ {
+     LOGGER.warning(&quot;Regenerating minimap....&quot;);
+     
+-    WorldMap * map = global_game_state-&gt;world_map;
+-    TileSet * tile_set = global_game_state-&gt;tile_set;
+     float mapx;
+     float mapy = 0.0f;
+     const SDL_Color * oldColor;
+ 
+-    xratio = (float)map-&gt;getWidth() / surface.getWidth();
+-    yratio = (float)map-&gt;getHeight() / surface.getHeight();
++    xratio = (float)MapInterface::getWidth() / surface.getWidth();
++    yratio = (float)MapInterface::getHeight() / surface.getHeight();
+     
+     for ( int y=0; y&lt;(int)surface.getHeight(); y++)
+     {
+@@ -136,7 +140,7 @@
+         for ( int x=0; x&lt;(int)surface.getWidth(); x++)
+         {
+             // XXX Beware, no check for limits, could raise assert and quit the game.
+-            oldColor = tile_set-&gt;getAverageTileColor(map-&gt;getValue((int)mapx, (int)mapy));
++            oldColor = TileSet::getAverageTileColor(MapInterface::getValue((int)mapx, (int)mapy));
+             surface.putPixel(x, y, oldColor-&gt;r, oldColor-&gt;g, oldColor-&gt;b);
+             mapx += xratio;
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -44,7 +44,8 @@
+     void onMapLoadedEvent()
+     {
+         LOGGER.warning(&quot;onMapLoadedEvent received........&quot;);
+-        regenerate();
++        dirty = true;
++//        regenerate();
+     }
+     
+ private:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -171,7 +171,6 @@
+ void
+ GameView::drawMap(Surface &amp;window)
+ {
+-    TileSet * ts = global_game_state-&gt;tile_set;
+     unsigned long world_x;
+     unsigned long world_y;
+     unsigned short map_x;
+@@ -181,7 +180,7 @@
+                               &amp;world_x, &amp;world_y);
+     MapInterface::pointXYtoMapXY( world_x, world_y, &amp;map_x, &amp;map_y );
+         
+-    unsigned short tile_size = ts-&gt;getTileXsize();
++    unsigned short tile_size = TileSet::getTileXsize();
+     
+     long partial_y = world_y % tile_size;
+     int y = 0;
+@@ -197,10 +196,6 @@
+         start_x -= partial_x;
+     }
+     
+-    unsigned int tile = 0;
+-    
+-    WorldMap * map = global_game_state-&gt;world_map;
+-    
+     unsigned short tmx;
+     Surface * tile_surf = 0;
+     
+@@ -209,8 +204,7 @@
+         tmx = map_x;
+         for ( int x = start_x; x &lt; (int)window.getWidth(); x += tile_size )
+         {
+-            tile = map-&gt;getValue(tmx++, map_y);
+-            tile_surf = ts-&gt;getTile(tile);
++            tile_surf = TileSet::getTile(MapInterface::getValue(tmx++, map_y));
+             if ( tile_surf )
+             {
+             	tile_surf-&gt;blt(window, x, y);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2009-12-29 14:37:28 UTC (rev 1155)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2009-12-31 09:59:37 UTC (rev 1156)
+@@ -76,6 +76,7 @@
+     
+     static void show()
+     {
++        Desktop::setVisibilityAllWindows(false);
+         Desktop::setVisibility(&quot;LoadingView&quot;, true);
+     }
+     
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000183.html">[Netpanzer-cvs] r1155 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#184">[ date ]</a>
+              <a href="thread.html#184">[ thread ]</a>
+              <a href="subject.html#184">[ subject ]</a>
+              <a href="author.html#184">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

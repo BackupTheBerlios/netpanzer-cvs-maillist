@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1270 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1270%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20MainMenu/Multi&In-Reply-To=%3C20111025154851.AF7F34813FD%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000295.html">
+   <LINK REL="Next"  HREF="000297.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1270 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1270%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20MainMenu/Multi&In-Reply-To=%3C20111025154851.AF7F34813FD%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1270 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 25 17:48:51 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000295.html">[Netpanzer-cvs] r1269 - in trunk/netpanzer/src: Lib/2D Lib/Util	NetPanzer/Views/Components NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000297.html">[Netpanzer-cvs] r1271 - trunk/netpanzer/src/NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#296">[ date ]</a>
+              <a href="thread.html#296">[ thread ]</a>
+              <a href="subject.html#296">[ subject ]</a>
+              <a href="author.html#296">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-25 17:48:51 +0200 (Tue, 25 Oct 2011)
+New Revision: 1270
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+Log:
+Resolve bug for player imput and limite to 15 char
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-10-25 15:05:59 UTC (rev 1269)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-10-25 15:48:51 UTC (rev 1270)
+@@ -1382,14 +1382,15 @@
+     const iXY &amp;pos,
+     cInputFieldString *string,
+     const char *excludedCharacters,
+-    const bool &amp;isSelected)
++    const bool &amp;isSelected,
++    const int maxCharCount)
+ {
+     cInputField* inputfield = new cInputField;
+ 
+     inputfield-&gt;setPos(pos);
+     inputfield-&gt;setInputFieldString(string);
+     inputfield-&gt;setExcludedCharacters(excludedCharacters);
+-
++    inputfield-&gt;setmaxChar(maxCharCount);
+     inputFields.push_back(inputfield);
+ 
+     if (isSelected) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2011-10-25 15:05:59 UTC (rev 1269)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2011-10-25 15:48:51 UTC (rev 1270)
+@@ -163,7 +163,7 @@
+     void  drawTitle(Surface &amp;windowArea);
+ 
+     // Input Field Functions
+-    cInputField* addInputField(const iXY &amp;pos, cInputFieldString *string, const char *excludedCharacters, const bool &amp;isSelected);
++    cInputField* addInputField(const iXY &amp;pos, cInputFieldString *string, const char *excludedCharacters, const bool &amp;isSelected, const int maxCharCount);
+     int  findInputFieldContaining(const iXY &amp;pos);
+     void drawInputFields(Surface &amp;clientArea);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp	2011-10-25 15:05:59 UTC (rev 1269)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp	2011-10-25 15:48:51 UTC (rev 1270)
+@@ -105,9 +105,13 @@
+     void setInputFieldString(cInputFieldString *string);
+     void setTextAction(ACTION_FUNC_PTR func);
+     void setExcludedCharacters(const char *exChars);
++    void setmaxChar(const int maxChar)
++    {
++        maxCharCount = maxChar;
++    }
+     void addChar(int newChar);
+     void addExtendedChar(int newExtendedChar);
+-   void draw(Surface &amp;dest);
++    void draw(Surface &amp;dest);
+     void drawHighlighted(Surface &amp;dest);
+     void checkCursor();
+     void resetString();     // reset string position
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2011-10-25 15:05:59 UTC (rev 1269)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2011-10-25 15:48:51 UTC (rev 1270)
+@@ -48,7 +48,7 @@
+ void IPAddressView::Init()
+ {
+     szServer.init(&quot;&quot;, 256,29);
+-    addInputField(iXY(8, 6), &amp;szServer, &quot;&quot;, true);
++    addInputField(iXY(8, 6), &amp;szServer, &quot;&quot;, true, 255);
+ } // end IPAddressView::init
+ 
+ // doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2011-10-25 15:05:59 UTC (rev 1269)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2011-10-25 15:48:51 UTC (rev 1270)
+@@ -54,8 +54,9 @@
+ void PlayerNameView::init()
+ {
+     playerName.init(gameconfig-&gt;playername.c_str(), INPUT_FIELD_CHARACTERS);
++    playerName.setString(gameconfig-&gt;playername);
+     cInputField* input 
+-        = addInputField(iXY(BORDER_SPACE, BORDER_SPACE+2), &amp;playerName, &quot;&quot;, true);
++        = addInputField(iXY(BORDER_SPACE, BORDER_SPACE+2), &amp;playerName, &quot;&quot;, true, INPUT_FIELD_CHARACTERS);
+     input-&gt;setTextAction(textChanged);
+     input-&gt;setExcludedCharacters(&quot;\\&quot;);
+ } // end PlayerNameView::init
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2011-10-25 15:05:59 UTC (rev 1269)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2011-10-25 15:48:51 UTC (rev 1270)
+@@ -37,7 +37,7 @@
+     
+     enum { BORDER_SPACE           =  4 };    
+     // irc nick is 16 chars max, 2 = &quot;np&quot;, 1 spare for digit if nick is taken
+-    enum { INPUT_FIELD_CHARACTERS = 13 };
++    enum { INPUT_FIELD_CHARACTERS = 15 };
+ 
+     cInputFieldString playerName;
+ }; // end PlayerNameView
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000295.html">[Netpanzer-cvs] r1269 - in trunk/netpanzer/src: Lib/2D Lib/Util	NetPanzer/Views/Components NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000297.html">[Netpanzer-cvs] r1271 - trunk/netpanzer/src/NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#296">[ date ]</a>
+              <a href="thread.html#296">[ thread ]</a>
+              <a href="subject.html#296">[ subject ]</a>
+              <a href="author.html#296">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

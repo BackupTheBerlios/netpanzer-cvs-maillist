@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1276 - trunk/netpanzer/src/Lib/2D
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1276%20-%20trunk/netpanzer/src/Lib/2D&In-Reply-To=%3C20111104123713.8517948139B%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000303.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1276 - trunk/netpanzer/src/Lib/2D</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1276%20-%20trunk/netpanzer/src/Lib/2D&In-Reply-To=%3C20111104123713.8517948139B%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1276 - trunk/netpanzer/src/Lib/2D">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  4 13:37:13 CET 2011</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000303.html">[Netpanzer-cvs] r1277 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#302">[ date ]</a>
+              <a href="thread.html#302">[ thread ]</a>
+              <a href="subject.html#302">[ subject ]</a>
+              <a href="author.html#302">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-04 13:37:13 +0100 (Fri, 04 Nov 2011)
+New Revision: 1276
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+Log:
+little bug on bltroundrect
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-10-30 04:58:45 UTC (rev 1275)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-11-04 12:37:13 UTC (rev 1276)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -153,7 +153,7 @@
+ Surface::Surface(unsigned int w, unsigned int h, unsigned int nframes)
+ {
+     reset();
+-    
++
+     alloc( w, h, nframes);
+ 
+     totalSurfaceCount++;
+@@ -202,7 +202,7 @@
+     twidth      = 0;
+     theight     = 0;
+     tpitch      = 0;
+-    
++
+     mem         = 0;
+     frame0      = 0;
+     myMem       = false;
+@@ -295,16 +295,16 @@
+         twidth = source.getWidth() - bounds.min.x;
+     else
+         twidth     = bounds.getSizeX();
+-        
++
+     if ( (unsigned int)bounds.max.y &gt; source.getHeight() )
+         theight = source.getHeight() - bounds.min.y;
+     else
+         theight    = bounds.getSizeY();
+-        
++
+     tpitch     = source.getPitch();
+     numFrames  = source.getNumFrames();
+     fps        = source.getFPS();
+-    
++
+     doesExist  = source.getDoesExist();
+ 
+ } // end Surface::setTo
+@@ -348,7 +348,7 @@
+     orderCoords(bounds);
+ 
+     alloc(bounds.getSizeX(), bounds.getSizeY(), 1);
+-    
++
+     // We can blit like this because everything will be clipped away for us.
+     source.blt(*this, -bounds.min.x, -bounds.min.y);
+ 
+@@ -367,7 +367,7 @@
+     assert(dest.getDoesExist());
+     assert(this != 0);
+     assert(mem != 0);
+-    assert(dest.mem != 0);    
++    assert(dest.mem != 0);
+ 
+     // Add in the offset factor.
+     x+=offset.x;
+@@ -452,7 +452,7 @@
+     assert(dest.getDoesExist());
+     assert(this != 0);
+     assert(mem != 0);
+-    assert(dest.mem != 0);    
++    assert(dest.mem != 0);
+ 
+     // Add in the offset factor.
+     x+=offset.x;
+@@ -541,7 +541,7 @@
+     assert(dest.getDoesExist());
+     assert(this != 0);
+     assert(mem != 0);
+-    assert(dest.mem != 0);    
++    assert(dest.mem != 0);
+ 
+     // Add in the offset factor.
+     x+=offset.x;
+@@ -894,7 +894,7 @@
+ {
+     if(!source.getDoesExist())
+         return;
+-    
++
+     assert(this != 0);
+ 
+     // XXX ugly ugly ugly
+@@ -966,7 +966,7 @@
+ {
+     if ( !x || !y || (x==getWidth() &amp;&amp; y==getHeight()))
+         return;
+-        
++
+     // Create a temporary surface to scale the image onto.
+     Surface tempSurface(x, y, getNumFrames());
+ 
+@@ -996,23 +996,23 @@
+     	fXY stepPix;
+     	stepPix.x = float(Surface::pix.x) / float(pix.x);
+     	stepPix.y = float(Surface::pix.y) / float(pix.y);
+-     
++
+     	// Create a temporary surface to scale the image onto.
+     	Surface tempSurface(pix, pix.x, frameCount);
+-     
++
+     	// build a table the first time you go through, then scaling all
+     	// additional frames can be done by getting the values from the table.
+-     
++
+     	fXY curPix;
+     	curPix = 0.0;
+-     
++
+     	// Go through all the frames of the surface.
+     	for (int frame = 0; frame &lt; frameCount; frame++)
+     	{
+     		//LOG((&quot;frame: %d; frameCount: %d&quot;, frame, frameCount));
+     		tempSurface.setFrame(frame);
+     		this-&gt;setFrame(frame);
+-     
++
+     		for (int x = 0; x &lt; pix.x; x++)
+     		{
+     			for (int y = 0; y &lt; pix.y; y++)
+@@ -1025,12 +1025,12 @@
+     		}
+     		curPix.x = 0.0;
+     	}
+-     
++
+     	// Resize the calling surface, then map all the scaled images on it.
+     	this-&gt;resize(pix);
+-     
++
+     	assert(frameCount == tempSurface.frameCount);
+-     
++
+     	for (frame = 0; frame &lt; frameCount; frame++)
+     	{
+     		//LOG((&quot;frame: %d; frameCount: %d&quot;, frame, frameCount));
+@@ -1168,7 +1168,7 @@
+ {
+     assert(getDoesExist());
+     assert(this != 0);
+-    
++
+     int center_x = getWidth()&gt;&gt;1;
+     int center_y = getHeight()&gt;&gt;1;
+ 
+@@ -1332,14 +1332,14 @@
+ {
+     if ( !str )
+         return;
+-    
++
+     int len = strlen(str);
+     if ( !len )
+         return;
+ 
+     unsigned int need_width = len * FONT_WIDTH;
+     unsigned int need_height = FONT_HEIGHT;
+-    
++
+     if ( frame0 != 0 ) {
+         if ( getWidth() != need_width || getHeight() != need_height ) {
+             free();
+@@ -1348,21 +1348,21 @@
+     } else {
+         create( need_width, need_height, 1);
+     }
+-    
++
+     for ( int line = 0; line &lt; FONT_HEIGHT; ++line) {
+         PIX * dptr = getFrame0() + (line * (int)getPitch());
+         const char * pstr = str;
+         for ( unsigned char c = *pstr; c; c= *(++pstr)) {
+             if ( c &gt;=128 ) c = ' ';
+-            
++
+             char * fptr = staticFont + (c*FONT_WIDTH) + (128*FONT_WIDTH*line);
+             PIX * eptr = dptr+FONT_WIDTH;
+             do {
+                 *(dptr++) = *(fptr++)?color:bgcolor;
+             } while ( dptr &lt; eptr );
+-            
++
+         }
+-        
++
+     }
+ }
+ 
+@@ -1496,7 +1496,7 @@
+             throw Exception(&quot;%s is not a valid 8-bit BMP file&quot;, fileName);
+ 
+         BitmapInfoHeader info_header(file.get());
+-        
++
+         if ( info_header.biBitCount != 8 )
+             throw Exception(&quot;%s is not a 8-bit BMP file&quot;, fileName);
+ 
+@@ -1855,14 +1855,15 @@
+ 
+   while (y &gt;= x)
+   {
+-    bltHLine((rect.min.x+radius) - x, (rect.min.y+radius) - y,(rect.max.x-radius)+ x, table);//up
+-    bltHLine((rect.min.x+radius) - x, (rect.max.y-radius) + y,(rect.max.x-radius)+ x, table);//down
+     bltHLine((rect.min.x+radius) - y, (rect.min.y+radius) - x,(rect.max.x-radius)+ y, table);//up
+     bltHLine((rect.min.x+radius) - y, (rect.max.y-radius) + x,(rect.max.x-radius)+ y, table);//down
+ 
+     if (d &lt; 0)
+       d = d + (4 * x) + 6;
+-    else {
++    else
++    {
++      bltHLine((rect.min.x+radius) - x, (rect.min.y+radius) - (y+1),(rect.max.x-radius)+ x, table);//up
++      bltHLine((rect.min.x+radius) - x, (rect.max.y-radius) +(y+1),(rect.max.x-radius)+ x, table);//down
+       d = d + 4 * (x - y) + 10;
+       y--;
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000303.html">[Netpanzer-cvs] r1277 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#302">[ date ]</a>
+              <a href="thread.html#302">[ thread ]</a>
+              <a href="subject.html#302">[ subject ]</a>
+              <a href="author.html#302">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

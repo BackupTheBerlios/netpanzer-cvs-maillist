@@ -1,0 +1,1153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1111 - in trunk/netpanzer: . src/Lib/Network	support support/macosx
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1111%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09support%20support/macosx&In-Reply-To=%3C200903231325.n2NDP2XY020627%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000139.html">
+   <LINK REL="Next"  HREF="000141.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1111 - in trunk/netpanzer: . src/Lib/Network	support support/macosx</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1111%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09support%20support/macosx&In-Reply-To=%3C200903231325.n2NDP2XY020627%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1111 - in trunk/netpanzer: . src/Lib/Network	support support/macosx">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Mar 23 14:25:02 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000139.html">[Netpanzer-cvs] r1110 - in trunk/netpanzer: . nbproject
+</A></li>
+        <LI>Next message: <A HREF="000141.html">[Netpanzer-cvs] r1112 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#140">[ date ]</a>
+              <a href="thread.html#140">[ thread ]</a>
+              <a href="subject.html#140">[ subject ]</a>
+              <a href="author.html#140">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-03-23 14:24:43 +0100 (Mon, 23 Mar 2009)
+New Revision: 1111
+
+Added:
+   trunk/netpanzer/support/macosx/
+   trunk/netpanzer/support/macosx/SDLMain.h
+   trunk/netpanzer/support/macosx/SDLMain.m
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/Lib/Network/Address.cpp
+   trunk/netpanzer/src/Lib/Network/Address.hpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+   trunk/netpanzer/src/Lib/Network/SocketSet.hpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+Log:
+- Added needed files to compile on mac os x
+- More work on scons to support more platforms
+- src/Lib/Network now can be compiled standalone (no need of other netpanzer code)
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/SConstruct	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -4,6 +4,7 @@
+ opts = Options()
+ opts.AddOptions(
+     ('mode','set compile mode to debug or release','release'),
++    ('sdlconfig','sets the sdl-config full path', 'sdl-config'),
+     BoolOption('crossmingw', 'Set to 1 for cross-compilation with mingw', 0)
+ )
+ 
+@@ -14,6 +15,14 @@
+     print &quot;Error: mode can only be 'debug' or 'release', found: &quot; + env['mode']
+     Exit(1)
+ 
++# HANDLE 'mode' flags
++if env['mode'] == 'debug':
++    env.Append(CCFLAGS = ['-g', '-O0'])
++    env['FINALEXENAME'] = 'netpanzer-debug'
++else:
++    env.Append(CCFLAGS = ['-O2','-s'])
++    env['FINALEXENAME'] = 'netpanzer'
++
+ if env['crossmingw']:
+     finalplatform = 'mingw'
+ else:
+@@ -22,11 +31,7 @@
+ env['FINALBUILDDIR'] = 'build/' + finalplatform + '/' + env['mode'] + '/'
+ env['FINALLIBSDIR'] = env['FINALBUILDDIR'] + 'libs/'
+ 
+-def GlobBuildFiles(localenv, pattern):
+-    sources = map(lambda x: localenv['FINALBUILDDIR'] + x, glob.glob(pattern))
+-    return sources
+-
+-# Modified copy from BosWars
++# Modified copy from BosWars of globSources
+ def globSources(localenv, sourcePrefix, sourceDirs, pattern):
+     sources = []
+     sourceDirs = Split(sourceDirs)
+@@ -45,26 +50,42 @@
+ 
+ env.VariantDir(env['FINALBUILDDIR'],'.',duplicate=0)
+ 
+-env['CPPPATH'] = [ '.', 'src/Lib', 'src/NetPanzer' ]
+-env.Append(CPPPATH = ['src/Lib/physfs'])
+-#env.Append(CPPPATH = ['/usr/local/include/SDL'])
++luaenv = env.Clone()
++physfsenv = env.Clone()
++networkenv = env.Clone()
+ 
+-# BUILDS 2D
+-MakeStaticLib(env, 'np2d', '2D', '*.cpp')
++env.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer' ] )
++env.Append( CPPPATH = [ 'src/Lib/physfs' ] )
+ 
++if finalplatform == 'darwin':
++    env.Append(CPPPATH = ['/Library/Frameworks/SDL.framework/Headers',
++                          '/Library/Frameworks/SDL_mixer.framework/Headers' ] )
++    env.AppendUnique(FRAMEWORKS=Split('SDL SDL_mixer Cocoa IOKit'))
++    env.Append( NPSOURCES =  ['support/macosx/SDLMain.m'] )
++elif finalplatform == 'win32':
++    print 'win32 not done'
++    Exit(1)
++else:
++    env.ParseConfig(env['sdlconfig'] + ' --cflags --libs')
++    env.Append( NPLIBS = [ 'SDL_mixer' ] )
++
+ # BUILDS NETWORK
+-MakeStaticLib(env, 'npnetwork', 'Network', '*.cpp')
++MakeStaticLib(networkenv, 'npnetwork', 'Network', '*.cpp')
+ 
+ # BUILDS LUA
+-MakeStaticLib(env, 'nplua', 'lua', '*.c')
++MakeStaticLib(luaenv, 'nplua', 'lua', '*.c')
+ 
++# BUILDS PHYSFS
++physfsenv.Append( CFLAGS = '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1' )
++physfsenv.Append( CPPPATH = 'src/Lib/physfs' )
++MakeStaticLib(physfsenv, 'npphysfs', 'physfs physfs/platform physfs/archivers physfs/zlib123', '*.c')
++
++# BUILDS 2D
++MakeStaticLib(env, 'np2d', '2D', '*.cpp')
++
+ # BUILDS REST OF LIBRARIES
+ MakeStaticLib(env, 'nplibs', 'ArrayUtil INIParser Types Util optionmm','*.cpp')
+ 
+-# BUILDS PHYSFS
+-physfsenv = env.Clone()
+-physfsenv['CFLAGS'] = '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1'
+-MakeStaticLib(physfsenv, 'npphysfs', 'physfs physfs/platform physfs/archivers physfs/zlib123', '*.c')
+ 
+ npdirs = &quot;&quot;&quot;
+     Bot
+@@ -91,10 +112,9 @@
+     Views/MainMenu/Options
+ &quot;&quot;&quot;
+ 
+-netpsources = globSources(env, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;)
+-env.AppendUnique(FRAMEWORKS=Split('SDL SDL_mixer Cocoa IOKit'))
+-env.Program(    'netpanzer',
+-                netpsources,
+-                LIBS=['nplua','npphysfs','np2d','npnetwork','nplibs', 'SDLmain'],
+-                LIBPATH=env['FINALLIBSDIR']
+-            )
+\ No newline at end of file
++env.Append( NPSOURCES = globSources(env, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;) )
++env.Append( NPLIBS = ['nplua','npphysfs','np2d','npnetwork','nplibs'] )
++env.Append( NPLIBPATH = env['FINALLIBSDIR'] )
++
++env.Program( env['FINALEXENAME'], env['NPSOURCES'],
++             LIBS=env['NPLIBS'], LIBPATH=env['NPLIBPATH'] )
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.cpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/Address.cpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -15,7 +15,6 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
+ #include &lt;sstream&gt;
+ #include &lt;string&gt;
+@@ -66,7 +65,7 @@
+     return std::string(inet_ntoa(((struct sockaddr_in &amp;)ss).sin_addr));
+ }
+ 
+-Uint16
++unsigned short
+ Address::getPort() const
+ {
+     // XXX quick hack to get it working until get full ss support
+@@ -75,7 +74,7 @@
+ }
+ 
+ Address
+-Address::resolve(const std::string&amp; name, Uint16 port)
++Address::resolve(const std::string&amp; name, unsigned short port)
+     throw(NetworkException)
+ {
+     // TODO: make a better resolver (ex: getaddrinfo)
+@@ -91,7 +90,7 @@
+     if(!hentry) {
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't resolve address '&quot; &lt;&lt; name;
+-#ifdef USE_WINSOCK
++#ifdef _WIN32
+         msg &lt;&lt; &quot;' (code &quot; &lt;&lt; WSAGetLastError() &lt;&lt; &quot;)&quot;;
+ #else
+         msg &lt;&lt; &quot;': &quot; &lt;&lt; hstrerror(h_errno);
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.hpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/Address.hpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -18,7 +18,6 @@
+ #ifndef __ADDRESS_HPP__
+ #define __ADDRESS_HPP__
+ 
+-#include &quot;SDL.h&quot;
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;NetworkException.hpp&quot;
+ #include &lt;string&gt;
+@@ -35,12 +34,12 @@
+     /** resolves a hostname or IP-Number together with a port and returns a
+      * new Address object.
+      */
+-    static Address resolve(const std::string&amp; name, Uint16 port) throw(NetworkException);
++    static Address resolve(const std::string&amp; name, unsigned short port) throw(NetworkException);
+ 
+     /** returns the ip address of this Address as string */
+     std::string getIP() const;
+     /** returns the port of this address */
+-    Uint16 getPort() const;
++    unsigned short getPort() const;
+ 
+     void operator=(const Address&amp; other);
+     bool operator==(const Address&amp; other) const;
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -15,7 +15,6 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
+ #include &lt;iostream&gt;
+ using namespace std;
+@@ -27,7 +26,6 @@
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;SocketManager.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+ 
+ namespace network
+ {
+@@ -89,7 +87,7 @@
+         sockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+     }
+ 
+-    LOGGER.debug(&quot;SocketBase:: Create [%s:%d] socket&quot;, (tcp)?&quot;tcp&quot;:&quot;udp&quot;,sockfd);
++    //LOGGER.debug(&quot;SocketBase:: Create [%s:%d] socket&quot;, (tcp)?&quot;tcp&quot;:&quot;udp&quot;,sockfd);
+     
+     if(sockfd == INVALID_SOCKET)
+     {
+@@ -230,7 +228,7 @@
+     }
+     
+     if (!res) {
+-        LOGGER.debug(&quot;SocketBase::doReceive Disconected from server&quot;);
++        //LOGGER.debug(&quot;SocketBase::doReceive Disconected from server&quot;);
+         onDisconected();
+     }
+     
+@@ -293,7 +291,7 @@
+ void
+ SocketBase::doClose()
+ {
+-    LOGGER.debug(&quot;SocketBase:: Closing [%d] socket&quot;, sockfd);
++    //LOGGER.debug(&quot;SocketBase:: Closing [%d] socket&quot;, sockfd);
+     SocketManager::removeSocket(this);
+     closesocket(sockfd);
+ }
+@@ -303,7 +301,7 @@
+ {
+     std::stringstream msg;
+     msg &lt;&lt; errorType &lt;&lt; &quot; error: &quot; &lt;&lt; NETSTRERROR(lastError);
+-    LOGGER.debug(&quot;SocketBase::notifyError '%s'&quot;, msg.str().c_str());
++    //LOGGER.debug(&quot;SocketBase::notifyError '%s'&quot;, msg.str().c_str());
+     onSocketError(msg.str().c_str());
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -23,13 +23,12 @@
+ #include &quot;NetworkException.hpp&quot;
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;Address.hpp&quot;
+-#include &quot;Util/NoCopy.hpp&quot;
+ 
+ namespace network
+ {
+ 
+ /** Base class for sockets, this is intended for internal use only */
+-class SocketBase : public NoCopy
++class SocketBase
+ {
+ public:
+     const Address&amp; getAddress() const
+@@ -68,6 +67,9 @@
+     SOCKET doAccept(Address&amp; fromaddr);
+     
+ private:
++    SocketBase(const SocketBase&amp; );
++    void operator=(const SocketBase&amp; );
++    
+     void create(bool tcp) throw(NetworkException);
+     void setNonBlocking() throw(NetworkException);
+     void notifyError(const char * errortype);
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -18,9 +18,7 @@
+ #ifndef __SOCKETHEADERS_HPP__
+ #define __SOCKETHEADERS_HPP__
+ 
+-#include &quot;config.h&quot;
+-
+-#ifdef USE_WINSOCK
++#ifdef _WIN32
+ #include &lt;winsock2.h&gt;
+ 
+ #define GET_NET_ERROR() WSAGetLastError()
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -18,7 +18,6 @@
+ 
+ #include &lt;sstream&gt;
+ #include &quot;SocketManager.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+ 
+ namespace network {
+ 
+@@ -32,18 +31,20 @@
+ {
+     SocketsIterator i;
+ 
+-    if (!deletedSockets.empty()) {
+-        for (i = deletedSockets.begin(); i!=deletedSockets.end(); i++) {
+-            LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++    if (!deletedSockets.empty())
++    {
++        for (i = deletedSockets.begin(); i!=deletedSockets.end(); i++)
++        {
+             socketList.erase(*i);
+             delete *i;
+         }
+         deletedSockets.clear();
+     }
+ 
+-    if (!newSockets.empty()) {
+-        for (i = newSockets.begin(); i!=newSockets.end(); i++) {
+-            LOGGER.debug(&quot;SocketManager:: Adding socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++    if (!newSockets.empty())
++    {
++        for (i = newSockets.begin(); i!=newSockets.end(); i++)
++        {
+             socketList.insert(*i);
+         }
+         newSockets.clear();
+@@ -51,46 +52,62 @@
+ 
+     // Make the socketset every time, not all OS works the same way
+     sset.clear();
+-    for (i = socketList.begin(); i!=socketList.end(); i++) {
+-        if ((*i)-&gt;isConnecting()) {
++    for (i = socketList.begin(); i!=socketList.end(); i++)
++    {
++        if ((*i)-&gt;isConnecting())
++        {
+             sset.addWrite(*i);
+-        } else {
++        }
++        else
++        {
+             sset.add(*i);
+         }
+     }
+ 
+     int r = sset.select(0);
+     if ( !r ) // most common first
++    {
+         return;
++    }
+     
+-    if ( r &gt; 0 ) {    
+-        for (i = socketList.begin(); i!=socketList.end(); i++) {
+-            if ((*i)-&gt;isConnecting()) {
+-                if (sset.isWriteable(*i)) {
++    if ( r &gt; 0 )
++    {
++        for (i = socketList.begin(); i!=socketList.end(); i++)
++        {
++            if ((*i)-&gt;isConnecting())
++            {
++                if (sset.isWriteable(*i))
++                {
+                     (*i)-&gt;connectionFinished();
+                 }
+-            } else {
+-                if (sset.dataAvailable(*i)) {
++            }
++            else
++            {
++                if (sset.dataAvailable(*i))
++                {
+                     (*i)-&gt;onDataReady();
+                 }
+             }
+         }
+-    } else { // some error happened
++    }
++    else
++    { // some error happened
+         int error = sset.getError();
+-        if ( IS_INVALID_SOCKET(error) ) {
++        if ( IS_INVALID_SOCKET(error) )
++        {
+             removeInvalidSockets();
+-        } else if ( !IS_INTERRUPTED(error) ) { // beware: is NOT interrupted
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;SocketManager: BAD BAD ERROR &quot; &lt;&lt; NETSTRERROR(error);
+-            LOGGER.debug(msg.str().c_str());
+         }
++        else if ( !IS_INTERRUPTED(error) )
++        { // beware: is NOT interrupted
++            // BAD ERROR
++        }
+     }
+ }
+ 
+ void
+ SocketManager::removeInvalidSockets()
+ {
+-    LOGGER.debug(&quot;Finding invalid sockets in the set...&quot;);
++    //LOGGER.debug(&quot;Finding invalid sockets in the set...&quot;);
+     SocketsIterator i;
+     int error;
+     for (i = socketList.begin(); i!=socketList.end(); i++)
+@@ -110,16 +127,16 @@
+             error = GET_NET_ERROR();
+             if ( IS_INVALID_SOCKET(error) )
+             {
+-                LOGGER.warning(&quot;SocketManager: FOUND Invalid socket, removing...&quot;);
++                //LOGGER.warning(&quot;SocketManager: FOUND Invalid socket, removing...&quot;);
+                 (*i)-&gt;lastError = error;
+                 (*i)-&gt;notifyError(&quot;Select&quot;);
+                 removeSocket(*i);
+             }
+             else
+             {
+-                std::stringstream msg;
+-                msg &lt;&lt; &quot;SocketManager: Error while finding invalid sockets &quot; &lt;&lt; NETSTRERROR(error);
+-                LOGGER.debug(msg.str().c_str());
++                //std::stringstream msg;
++                //msg &lt;&lt; &quot;SocketManager: Error while finding invalid sockets &quot; &lt;&lt; NETSTRERROR(error);
++                //LOGGER.debug(msg.str().c_str());
+             }
+         }
+     }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -18,7 +18,7 @@
+ 
+ #ifndef _SOCKETMANAGER_HPP
+ #define _SOCKETMANAGER_HPP
+-
++
+ #include &lt;set&gt;
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;TCPSocket.hpp&quot;
+@@ -39,34 +39,40 @@
+ protected:
+     friend class SocketBase; // the only allowed to add/remove
+     static void addSocket(SocketBase *s)
+-    {
+-        SocketsIterator i = deletedSockets.find(s);
+-        if ( i != deletedSockets.end() ) {
+-            deletedSockets.erase(i);
+-        } else {
+-            newSockets.insert(s);
++    {
++        SocketsIterator i = deletedSockets.find(s);
++        if ( i != deletedSockets.end() )
++        {
++            deletedSockets.erase(i);
+         }
++        else
++        {
++            newSockets.insert(s);
++        }
+     }
+     
+     static void removeSocket(SocketBase *s)
+     {
+-        SocketsIterator i = newSockets.find(s);
+-        if ( i != newSockets.end() ) {
+-            newSockets.erase(i);
+-        } else {
+-            deletedSockets.insert(s);
++        SocketsIterator i = newSockets.find(s);
++        if ( i != newSockets.end() )
++        {
++            newSockets.erase(i);
+         }
++        else
++        {
++            deletedSockets.insert(s);
++        }
+     }
+     
+     static void removeInvalidSockets();
+ 
+ private:
+-    typedef set&lt;SocketBase *&gt; Sockets;
+-    typedef set&lt;SocketBase *&gt;::iterator SocketsIterator;
+-    
+-    static SocketSet sset;
+-    static Sockets socketList;
+-    static Sockets newSockets;
++    typedef set&lt;SocketBase *&gt; Sockets;
++    typedef set&lt;SocketBase *&gt;::iterator SocketsIterator;
++    
++    static SocketSet sset;
++    static Sockets socketList;
++    static Sockets newSockets;
+     static Sockets deletedSockets;
+ };
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketSet.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketSet.hpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/SocketSet.hpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -20,12 +20,11 @@
+ 
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;SocketBase.hpp&quot;
+-#include &quot;Util/NoCopy.hpp&quot;
+ 
+ namespace network
+ {
+ 
+-class SocketSet : public NoCopy
++class SocketSet
+ {
+ public:
+     SocketSet()
+@@ -96,6 +95,9 @@
+     inline int getError() const { return select_error; }
+     
+ private:
++    SocketSet( const SocketSet&amp;);
++    void operator=( const SocketSet&amp;);
++
+     SOCKET maxfd;
+     fd_set readset;
+     fd_set writeset;
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -15,10 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
+ #include &quot;TCPListenSocket.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+ 
+ namespace network
+ {
+@@ -52,15 +50,19 @@
+     Address newaddr;
+     SOCKET newsock;
+     TCPSocketObserver * newobserver;
+-    try {
+-        while ( (newsock=doAccept(newaddr)) != INVALID_SOCKET) {
++    try
++    {
++        while ( (newsock=doAccept(newaddr)) != INVALID_SOCKET)
++        {
+             newobserver = observer-&gt;onNewConnection(this, newaddr);
+             TCPSocket * newcon = new TCPSocket(newsock,newaddr,newobserver);
+             newcon-&gt;onConnected();
+         }
+-    } catch (NetworkException e) {
+-        LOGGER.warning(&quot;Error Accepting new connections: '%s'&quot;, e.what());
+     }
++    catch (NetworkException e)
++    {
++        //LOGGER.warning(&quot;Error Accepting new connections: '%s'&quot;, e.what());
++    }
+ }
+ 
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -15,15 +15,10 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
+-#include &lt;sstream&gt;
+-#include &lt;stdexcept&gt;
+-
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;Address.hpp&quot;
+ #include &quot;TCPSocket.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+ 
+ 
+ namespace network
+@@ -58,7 +53,9 @@
+ {
+     int res = doSend(data,size);
+     if (!res &amp;&amp; !observer) // disconnected
++    {
+         return size; // as is disconnected, avoid catching of unsend data
++    }
+     return res;
+ }
+ 
+@@ -66,14 +63,18 @@
+ TCPSocket::onConnected()
+ {
+     if (observer)
++    {
+         observer-&gt;onConnected(this);
++    }
+ }
+ 
+ void
+ TCPSocket::onDisconected()
+ {
+     if (observer)
++    {
+         observer-&gt;onDisconected(this);
++    }
+     destroy();
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -16,12 +16,8 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
+-
+ #include &quot;UDPSocket.hpp&quot;
+-#include &lt;sstream&gt;
+ 
+-
+ namespace network
+ {
+ 
+@@ -66,9 +62,7 @@
+     int res = doSendTo(toaddr,data,datasize);
+     if(res != (int) datasize)
+     {
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Send error: not all data sent.&quot;;
+-        throw NetworkException(msg.str());
++        onSocketError(&quot;UDPSocket::send error: not all data sent.&quot;);
+     }
+ }
+ 
+@@ -78,10 +72,13 @@
+     Address a;
+     char buffer[4096];
+     int len;
+-    do {
++    do
++    {
+         len=doReceiveFrom(a,buffer,sizeof(buffer));
+         if (len &amp;&amp; observer)
++        {
+             observer-&gt;onDataReceived(this,a,buffer,len);
++        }
+     } while (len &amp;&amp; observer);
+ }
+ 
+
+Added: trunk/netpanzer/support/macosx/SDLMain.h
+===================================================================
+--- trunk/netpanzer/support/macosx/SDLMain.h	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/support/macosx/SDLMain.h	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -0,0 +1,11 @@
++/*   SDLMain.m - main entry point for our Cocoa-ized SDL app
++       Initial Version: Darrell Walisser &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">dwaliss1 at purdue.edu</A>&gt;
++       Non-NIB-Code &amp; other changes: Max Horn &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">max at quendi.de</A>&gt;
++
++    Feel free to customize this file to suit your needs
++*/
++
++#import &lt;Cocoa/Cocoa.h&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at interface</A> SDLMain : NSObject
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at end</A>
+
+Added: trunk/netpanzer/support/macosx/SDLMain.m
+===================================================================
+--- trunk/netpanzer/support/macosx/SDLMain.m	2009-03-23 01:14:39 UTC (rev 1110)
++++ trunk/netpanzer/support/macosx/SDLMain.m	2009-03-23 13:24:43 UTC (rev 1111)
+@@ -0,0 +1,384 @@
++/*   SDLMain.m - main entry point for our Cocoa-ized SDL app
++       Initial Version: Darrell Walisser &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">dwaliss1 at purdue.edu</A>&gt;
++       Non-NIB-Code &amp; other changes: Max Horn &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">max at quendi.de</A>&gt;
++
++    Feel free to customize this file to suit your needs
++*/
++
++#import &quot;SDL.h&quot;
++#import &quot;SDLMain.h&quot;
++#import &lt;sys/param.h&gt; /* for MAXPATHLEN */
++#import &lt;unistd.h&gt;
++
++/* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
++ but the method still is there and works. To avoid warnings, we declare
++ it ourselves here. */
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at interface</A> NSApplication(SDL_Missing_Methods)
++- (void)setAppleMenu:(NSMenu *)menu;
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at end</A>
++
++/* Use this flag to determine whether we use SDLMain.nib or not */
++#define		SDL_USE_NIB_FILE	0
++
++/* Use this flag to determine whether we use CPS (docking) or not */
++#define		SDL_USE_CPS		1
++#ifdef SDL_USE_CPS
++/* Portions of CPS.h */
++typedef struct CPSProcessSerNum
++{
++	UInt32		lo;
++	UInt32		hi;
++} CPSProcessSerNum;
++
++extern OSErr	CPSGetCurrentProcess( CPSProcessSerNum *psn);
++extern OSErr 	CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
++extern OSErr	CPSSetFrontProcess( CPSProcessSerNum *psn);
++
++#endif /* SDL_USE_CPS */
++
++static int    gArgc;
++static char  **gArgv;
++static BOOL   gFinderLaunch;
++static BOOL   gCalledAppMainline = FALSE;
++
++static NSString *getApplicationName(void)
++{
++    NSDictionary *dict;
++    NSString *appName = 0;
++
++    /* Determine the application name */
++    dict = (NSDictionary *)CFBundleGetInfoDictionary(CFBundleGetMainBundle());
++    if (dict)
++        appName = [dict objectForKey: @&quot;CFBundleName&quot;];
++    
++    if (![appName length])
++        appName = [[NSProcessInfo processInfo] processName];
++
++    return appName;
++}
++
++#if SDL_USE_NIB_FILE
++/* A helper category for NSString */
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at interface</A> NSString (ReplaceSubString)
++- (NSString *)stringByReplacingRange:(NSRange)aRange with:(NSString *)aString;
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at end</A>
++#endif
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at interface</A> SDLApplication : NSApplication
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at end</A>
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at implementation</A> SDLApplication
++/* Invoked from the Quit menu item */
++- (void)terminate:(id)sender
++{
++    /* Post a SDL_QUIT event */
++    SDL_Event event;
++    event.type = SDL_QUIT;
++    SDL_PushEvent(&amp;event);
++}
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at end</A>
++
++/* The main class of the application, the application's delegate */
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at implementation</A> SDLMain
++
++/* Set the working directory to the .app's parent directory */
++- (void) setupWorkingDirectory:(BOOL)shouldChdir
++{
++    if (shouldChdir)
++    {
++        char parentdir[MAXPATHLEN];
++		CFURLRef url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
++		CFURLRef url2 = CFURLCreateCopyDeletingLastPathComponent(0, url);
++		if (CFURLGetFileSystemRepresentation(url2, true, (UInt8 *)parentdir, MAXPATHLEN)) {
++	        assert ( chdir (parentdir) == 0 );   /* chdir to the binary app's parent */
++		}
++		CFRelease(url);
++		CFRelease(url2);
++	}
++
++}
++
++#if SDL_USE_NIB_FILE
++
++/* Fix menu to contain the real app name instead of &quot;SDL App&quot; */
++- (void)fixMenu:(NSMenu *)aMenu withAppName:(NSString *)appName
++{
++    NSRange aRange;
++    NSEnumerator *enumerator;
++    NSMenuItem *menuItem;
++
++    aRange = [[aMenu title] rangeOfString:@&quot;SDL App&quot;];
++    if (aRange.length != 0)
++        [aMenu setTitle: [[aMenu title] stringByReplacingRange:aRange with:appName]];
++
++    enumerator = [[aMenu itemArray] objectEnumerator];
++    while ((menuItem = [enumerator nextObject]))
++    {
++        aRange = [[menuItem title] rangeOfString:@&quot;SDL App&quot;];
++        if (aRange.length != 0)
++            [menuItem setTitle: [[menuItem title] stringByReplacingRange:aRange with:appName]];
++        if ([menuItem hasSubmenu])
++            [self fixMenu:[menuItem submenu] withAppName:appName];
++    }
++    [ aMenu sizeToFit ];
++}
++
++#else
++
++static void setApplicationMenu(void)
++{
++    /* warning: this code is very odd */
++    NSMenu *appleMenu;
++    NSMenuItem *menuItem;
++    NSString *title;
++    NSString *appName;
++    
++    appName = getApplicationName();
++    appleMenu = [[NSMenu alloc] initWithTitle:@&quot;&quot;];
++    
++    /* Add menu items */
++    title = [@&quot;About &quot; stringByAppendingString:appName];
++    [appleMenu addItemWithTitle:title action:@selector(orderFrontStandardAboutPanel:) keyEquivalent:@&quot;&quot;];
++
++    [appleMenu addItem:[NSMenuItem separatorItem]];
++
++    title = [@&quot;Hide &quot; stringByAppendingString:appName];
++    [appleMenu addItemWithTitle:title action:@selector(hide:) keyEquivalent:@&quot;h&quot;];
++
++    menuItem = (NSMenuItem *)[appleMenu addItemWithTitle:@&quot;Hide Others&quot; action:@selector(hideOtherApplications:) keyEquivalent:@&quot;h&quot;];
++    [menuItem setKeyEquivalentModifierMask:(NSAlternateKeyMask|NSCommandKeyMask)];
++
++    [appleMenu addItemWithTitle:@&quot;Show All&quot; action:@selector(unhideAllApplications:) keyEquivalent:@&quot;&quot;];
++
++    [appleMenu addItem:[NSMenuItem separatorItem]];
++
++    title = [@&quot;Quit &quot; stringByAppendingString:appName];
++    [appleMenu addItemWithTitle:title action:@selector(terminate:) keyEquivalent:@&quot;q&quot;];
++
++    
++    /* Put menu into the menubar */
++    menuItem = [[NSMenuItem alloc] initWithTitle:@&quot;&quot; action:nil keyEquivalent:@&quot;&quot;];
++    [menuItem setSubmenu:appleMenu];
++    [[NSApp mainMenu] addItem:menuItem];
++
++    /* Tell the application object that this is now the application menu */
++    [NSApp setAppleMenu:appleMenu];
++
++    /* Finally give up our references to the objects */
++    [appleMenu release];
++    [menuItem release];
++}
++
++/* Create a window menu */
++static void setupWindowMenu(void)
++{
++    NSMenu      *windowMenu;
++    NSMenuItem  *windowMenuItem;
++    NSMenuItem  *menuItem;
++
++    windowMenu = [[NSMenu alloc] initWithTitle:@&quot;Window&quot;];
++    
++    /* &quot;Minimize&quot; item */
++    menuItem = [[NSMenuItem alloc] initWithTitle:@&quot;Minimize&quot; action:@selector(performMiniaturize:) keyEquivalent:@&quot;m&quot;];
++    [windowMenu addItem:menuItem];
++    [menuItem release];
++    
++    /* Put menu into the menubar */
++    windowMenuItem = [[NSMenuItem alloc] initWithTitle:@&quot;Window&quot; action:nil keyEquivalent:@&quot;&quot;];
++    [windowMenuItem setSubmenu:windowMenu];
++    [[NSApp mainMenu] addItem:windowMenuItem];
++    
++    /* Tell the application object that this is now the window menu */
++    [NSApp setWindowsMenu:windowMenu];
++
++    /* Finally give up our references to the objects */
++    [windowMenu release];
++    [windowMenuItem release];
++}
++
++/* Replacement for NSApplicationMain */
++static void CustomApplicationMain (int argc, char **argv)
++{
++    NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
++    SDLMain				*sdlMain;
++
++    /* Ensure the application object is initialised */
++    [SDLApplication sharedApplication];
++    
++#ifdef SDL_USE_CPS
++    {
++        CPSProcessSerNum PSN;
++        /* Tell the dock about us */
++        if (!CPSGetCurrentProcess(&amp;PSN))
++            if (!CPSEnableForegroundOperation(&amp;PSN,0x03,0x3C,0x2C,0x1103))
++                if (!CPSSetFrontProcess(&amp;PSN))
++                    [SDLApplication sharedApplication];
++    }
++#endif /* SDL_USE_CPS */
++
++    /* Set up the menubar */
++    [NSApp setMainMenu:[[NSMenu alloc] init]];
++    setApplicationMenu();
++    setupWindowMenu();
++
++    /* Create SDLMain and make it the app delegate */
++    sdlMain = [[SDLMain alloc] init];
++    [NSApp setDelegate:sdlMain];
++    
++    /* Start the main event loop */
++    [NSApp run];
++    
++    [sdlMain release];
++    [pool release];
++}
++
++#endif
++
++
++/*
++ * Catch document open requests...this lets us notice files when the app
++ *  was launched by double-clicking a document, or when a document was
++ *  dragged/dropped on the app's icon. You need to have a
++ *  CFBundleDocumentsType section in your Info.plist to get this message,
++ *  apparently.
++ *
++ * Files are added to gArgv, so to the app, they'll look like command line
++ *  arguments. Previously, apps launched from the finder had nothing but
++ *  an argv[0].
++ *
++ * This message may be received multiple times to open several docs on launch.
++ *
++ * This message is ignored once the app's mainline has been called.
++ */
++- (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
++{
++    const char *temparg;
++    size_t arglen;
++    char *arg;
++    char **newargv;
++
++    if (!gFinderLaunch)  /* MacOS is passing command line args. */
++        return FALSE;
++
++    if (gCalledAppMainline)  /* app has started, ignore this document. */
++        return FALSE;
++
++    temparg = [filename UTF8String];
++    arglen = SDL_strlen(temparg) + 1;
++    arg = (char *) SDL_malloc(arglen);
++    if (arg == NULL)
++        return FALSE;
++
++    newargv = (char **) realloc(gArgv, sizeof (char *) * (gArgc + 2));
++    if (newargv == NULL)
++    {
++        SDL_free(arg);
++        return FALSE;
++    }
++    gArgv = newargv;
++
++    SDL_strlcpy(arg, temparg, arglen);
++    gArgv[gArgc++] = arg;
++    gArgv[gArgc] = NULL;
++    return TRUE;
++}
++
++
++/* Called when the internal event loop has just started running */
++- (void) applicationDidFinishLaunching: (NSNotification *) note
++{
++    int status;
++
++    /* Set the working directory to the .app's parent directory */
++    [self setupWorkingDirectory:gFinderLaunch];
++
++#if SDL_USE_NIB_FILE
++    /* Set the main menu to contain the real app name instead of &quot;SDL App&quot; */
++    [self fixMenu:[NSApp mainMenu] withAppName:getApplicationName()];
++#endif
++
++    /* Hand off to main application code */
++    gCalledAppMainline = TRUE;
++    status = SDL_main (gArgc, gArgv);
++
++    /* We're done, thank you for playing */
++    exit(status);
++}
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at end</A>
++
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at implementation</A> NSString (ReplaceSubString)
++
++- (NSString *)stringByReplacingRange:(NSRange)aRange with:(NSString *)aString
++{
++    unsigned int bufferSize;
++    unsigned int selfLen = [self length];
++    unsigned int aStringLen = [aString length];
++    unichar *buffer;
++    NSRange localRange;
++    NSString *result;
++
++    bufferSize = selfLen + aStringLen - aRange.length;
++    buffer = NSAllocateMemoryPages(bufferSize*sizeof(unichar));
++    
++    /* Get first part into buffer */
++    localRange.location = 0;
++    localRange.length = aRange.location;
++    [self getCharacters:buffer range:localRange];
++    
++    /* Get middle part into buffer */
++    localRange.location = 0;
++    localRange.length = aStringLen;
++    [aString getCharacters:(buffer+aRange.location) range:localRange];
++     
++    /* Get last part into buffer */
++    localRange.location = aRange.location + aRange.length;
++    localRange.length = selfLen - localRange.location;
++    [self getCharacters:(buffer+aRange.location+aStringLen) range:localRange];
++    
++    /* Build output string */
++    result = [NSString stringWithCharacters:buffer length:bufferSize];
++    
++    NSDeallocateMemoryPages(buffer, bufferSize);
++    
++    return result;
++}
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">+ at end</A>
++
++
++
++#ifdef main
++#  undef main
++#endif
++
++
++/* Main entry point to executable - should *not* be SDL_main! */
++int main (int argc, char **argv)
++{
++    /* Copy the arguments into a global variable */
++    /* This is passed if we are launched by double-clicking */
++    if ( argc &gt;= 2 &amp;&amp; strncmp (argv[1], &quot;-psn&quot;, 4) == 0 ) {
++        gArgv = (char **) SDL_malloc(sizeof (char *) * 2);
++        gArgv[0] = argv[0];
++        gArgv[1] = NULL;
++        gArgc = 1;
++        gFinderLaunch = YES;
++    } else {
++        int i;
++        gArgc = argc;
++        gArgv = (char **) SDL_malloc(sizeof (char *) * (argc+1));
++        for (i = 0; i &lt;= argc; i++)
++            gArgv[i] = argv[i];
++        gFinderLaunch = NO;
++    }
++
++#if SDL_USE_NIB_FILE
++    [SDLApplication poseAsClass:[NSApplication class]];
++    NSApplicationMain (argc, argv);
++#else
++    CustomApplicationMain (argc, argv);
++#endif
++    return 0;
++}
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000139.html">[Netpanzer-cvs] r1110 - in trunk/netpanzer: . nbproject
+</A></li>
+	<LI>Next message: <A HREF="000141.html">[Netpanzer-cvs] r1112 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#140">[ date ]</a>
+              <a href="thread.html#140">[ thread ]</a>
+              <a href="subject.html#140">[ subject ]</a>
+              <a href="author.html#140">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

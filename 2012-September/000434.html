@@ -1,0 +1,460 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1410 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1410%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120919115119.2988355B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000433.html">
+   <LINK REL="Next"  HREF="000435.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1410 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1410%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120919115119.2988355B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1410 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Wed Sep 19 13:51:19 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000433.html">[Netpanzer-cvs] r1409 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000435.html">[Netpanzer-cvs] r1411 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#434">[ date ]</a>
+              <a href="thread.html#434">[ thread ]</a>
+              <a href="subject.html#434">[ subject ]</a>
+              <a href="author.html#434">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-09-19 13:51:18 +0200 (Wed, 19 Sep 2012)
+New Revision: 1410
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp
+Log:
+Team mode:
+- Add Rank view (tab)
+- Resolve check before send surrendering message
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-18 07:37:58 UTC (rev 1409)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-09-19 11:51:18 UTC (rev 1410)
+@@ -381,8 +381,12 @@
+         Desktop::toggleVisibility( &quot;HelpScrollView&quot; );
+     }
+ 
+-    if (KeyboardInterface::getKeyPressed(SDLK_TAB) ) {
+-        Desktop::toggleVisibility( &quot;RankView&quot; );
++    if (KeyboardInterface::getKeyPressed(SDLK_TAB) )
++    {
++        if (GameConfig::game_teammode)
++            Desktop::toggleVisibility( &quot;RankTeam&quot; );
++        else
++            Desktop::toggleVisibility( &quot;RankView&quot; );
+     }
+ 
+     if (KeyboardInterface::getKeyPressed(SDLK_F3)) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-18 07:37:58 UTC (rev 1409)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-09-19 11:51:18 UTC (rev 1410)
+@@ -68,6 +68,7 @@
+ #include &quot;Views/MainMenu/Multi/ServerListView.hpp&quot;
+ 
+ #include &quot;Views/Game/RankView.hpp&quot;
++#include &quot;Views/Game/RankTeam.hpp&quot;
+ #include &quot;Views/Game/EndRoundView.hpp&quot;
+ #include &quot;Views/Game/GFlagSelectionView.hpp&quot;
+ #include &quot;Views/Game/PrepareTeam.hpp&quot;
+@@ -167,6 +168,7 @@
+ {
+     Desktop::add(new GameView());
+     Desktop::add(new RankView());
++    Desktop::add(new RankTeam());
+     Desktop::add(new EndRoundView());
+     Desktop::add(new GFlagSelectionView());
+     Desktop::add(new VehicleSelectionView());
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp	2012-09-18 07:37:58 UTC (rev 1409)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/VoteManager.cpp	2012-09-19 11:51:18 UTC (rev 1410)
+@@ -170,21 +170,27 @@
+ 
+     int no_percent = ((players_in_vote-yes_vote)*100)/players_in_vote;
+     int yes_percent = ((players_in_vote-no_vote)*100)/players_in_vote;
+-
++
++    bool accepted_vote = ( yes_percent &gt; 80 );
++
+     sprintf(buff, &quot;%d %% players has voted YES, %d %% has voted NO&quot;, yes_percent, no_percent);
+-    if (GameConfig::game_teammode)
++
++    if ( GameConfig::game_teammode )
+     {
+         TeamManager::serversayToTeam(vote_team, buff);
+-        sprintf(buff, &quot;%s team has accepted surrendering. Round is over&quot;,
+-                TeamManager::getTeamName(vote_team).c_str());
+-        ChatInterface::serversay(buff);
++        if ( accepted_vote )
++        {
++            sprintf(buff, &quot;%s team has accepted surrendering. Round is over&quot;,
++                    TeamManager::getTeamName(vote_team).c_str());
++            ChatInterface::serversay(buff);
++        }
+     }
+     else
+     {
+         ChatInterface::serversay(buff);
+     }
+     vote_in_progress = false;
+-    if (yes_percent &gt; 80) executeVoteAction();
++    if ( accepted_vote ) executeVoteAction();
+ }
+ 
+ void VoteManager::playerVote(Uint8 responce)
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.cpp	2012-09-19 11:51:18 UTC (rev 1410)
+@@ -0,0 +1,237 @@
++/*
++Copyright (C) 2009 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#include &quot;RankTeam.hpp&quot;
++#include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/TeamManager.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
++
++#define HEADER_HEIGHT 60
++#define ENTRY_HEIGHT 18
++
++#define TABLE_START (HEADER_HEIGHT + 2)
++
++RankTeam::RankTeam() : GameTemplateView()
++{
++    setSearchName(&quot;RankTeam&quot;);
++    setTitle(&quot;Round stats&quot;);
++    setSubTitle(&quot;&quot;);
++
++    setAllowResize(false);
++    setBordered(false);
++
++    moveTo(GameConfig::interface_rankposition_x, GameConfig::interface_rankposition_y);
++    resize(iXY(400, 200));
++    checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
++
++    selected_line = -1;
++    selected_col = -1;
++    RectStates = getClientRect();
++}
++
++// doDraw
++//---------------------------------------------------------------------------
++void RankTeam::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++{
++    unsigned int newheight = HEADER_HEIGHT
++                             + (ENTRY_HEIGHT * (PlayerInterface::countPlayers()+1/2))
++                             + 60;
++
++    if ( newheight != (unsigned int)getSizeY() )
++    {
++        resize(400, newheight);
++        RectStates = getClientRect();
++        return; // this frame draws nothing
++    }
++    clientArea.BltRoundRect(RectStates, 14, Palette::darkbrown256.getColorArray());
++    clientArea.RoundRect(RectStates, 14, ctWindowsBorder);
++
++    drawTeamStats(clientArea);
++
++    View::doDraw(viewArea, clientArea);
++}
++
++class StatesSortByTeam
++    : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
++{
++public:
++    bool operator() (const PlayerState* state1, const PlayerState* state2)
++    {
++        if (state1-&gt;getTeamID() != state2-&gt;getTeamID())
++            return state1-&gt;getTeamID() &lt; state2-&gt;getTeamID();
++        else
++            return state1-&gt;getTotal() &gt; state2-&gt;getTotal();
++    }
++};
++
++static void DrawPanelUser(iRect rect, Surface&amp; dest, const PlayerState* state)
++{
++    char statBuf[256];
++    int x = rect.min.x+5;
++    int y = rect.min.y+5;
++
++    dest.bltString(x, y, state-&gt;getName().c_str(), ctTexteOver);
++    snprintf(statBuf, sizeof(statBuf), &quot;%5i Points&quot;, state-&gt;getTotal());
++    dest.bltString(rect.max.x-100, y, statBuf, ctTexteOver);
++    y += 10;
++    dest.drawLine(x, y, rect.max.x-5, y, ctTexteOver);
++    y += 5;
++    snprintf(statBuf, sizeof(statBuf), &quot; Frags: %5i&quot;, state-&gt;getKills());
++    dest.bltString(x, y, statBuf, ctTexteNormal);
++    y += 12;
++    snprintf(statBuf, sizeof(statBuf), &quot;deaths: %5i&quot;, state-&gt;getLosses());
++    dest.bltString(x, y, statBuf, ctTexteNormal);
++    x += 120;
++    y = rect.min.y+20;
++    snprintf(statBuf, sizeof(statBuf), &quot;Objectives: %5i&quot;, state-&gt;getObjectivesHeld());
++    dest.bltString(x, y, statBuf, ctTexteNormal);
++}
++
++static void DrawTeamHeader(Surface&amp; dest, const Uint8 team, int x, int y)
++{
++    char statBuf[256];
++    int color = TeamManager::getTeamColor(team);
++    int row = y;
++    TeamManager::drawFlag( team, dest, x+10, row );
++    snprintf(statBuf, sizeof(statBuf), &quot;Team %s&quot;, TeamManager::getTeamName(team).c_str());
++    dest.bltString(x+30, row+7, statBuf, color);
++
++    row+=25;
++    snprintf(statBuf, sizeof(statBuf), &quot;     frags: %8i&quot;, TeamManager::getKills(team));
++    dest.bltString(x+10, row, statBuf, color);
++    row+=15;
++    snprintf(statBuf, sizeof(statBuf), &quot;    deaths: %8i&quot;, TeamManager::getLosses(team));
++    dest.bltString(x+10, row, statBuf, color);
++    row+=15;
++    snprintf(statBuf, sizeof(statBuf), &quot;Objectives: %8i&quot;, TeamManager::getObjectivesHeld(team));
++    dest.bltString(x+10, row, statBuf, color);
++}
++
++void RankTeam::drawTeamStats(Surface&amp; dest)
++{
++    unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
++    char statBuf[256];
++    iRect r((RectStates.getSizeX()/2)-2, RectStates.min.y+5, (RectStates.getSizeX()/2)+2, RectStates.max.y-20);
++    dest.fillRect(r, ctTexteDisable);
++
++    states.clear();
++    PlayerID i;
++    for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
++    {
++        PlayerState* state = PlayerInterface::getPlayer(i);
++        if( state-&gt;isActive() )
++        {
++            states.push_back(state);
++        }
++    }
++    std::sort(states.begin(), states.end(), StatesSortByTeam());
++
++    DrawTeamHeader(dest, 0, 5, 7);
++    DrawTeamHeader(dest, 1, (RectStates.getSizeX()/2)+5, 7);
++
++    int cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
++    int flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
++    Surface * flag = 0;
++    int cur_state = 1;
++
++    dest.drawLine(RectStates.min.x+5, cur_line_pos+10, RectStates.max.x-5, cur_line_pos+10, ctTexteNormal);
++
++    cur_line_pos += ENTRY_HEIGHT;
++    flag_pos += ENTRY_HEIGHT;
++    int current_Team = 0;
++    int FLAG_START = 3+RectStates.min.x+5;
++    int NAME_START = 3+RectStates.min.x+28;
++
++    iRect infopanel(RectStates.min.x+10,RectStates.max.y-50, RectStates.max.x-10, RectStates.max.y-5);
++    dest.fillRect(infopanel, ctWindowsbackground);
++
++    for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
++            i != states.end(); ++i)
++    {
++        const PlayerState* state = *i;
++
++        if (current_Team != state-&gt;getTeamID())
++        {
++            cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
++            flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
++            cur_line_pos += ENTRY_HEIGHT;
++            flag_pos += ENTRY_HEIGHT;
++            current_Team = state-&gt;getTeamID();
++            FLAG_START = (3+RectStates.getSizeX()/2)+5;
++            NAME_START = (3+RectStates.getSizeX()/2)+28;
++            cur_state = 1;
++        }
++        snprintf(statBuf, sizeof(statBuf),
++                 &quot;%-15s&quot;, state-&gt;getName().c_str());
++        if (cur_state == selected_line)
++        {
++            if (selected_col == current_Team)
++            {
++                iRect r(FLAG_START, cur_line_pos-3, FLAG_START+185, cur_line_pos+11);
++                dest.fillRect(r, ctTexteOver);
++                DrawPanelUser(infopanel, dest, state);
++            }
++        }
++        dest.bltString(NAME_START, cur_line_pos, statBuf, ctTexteNormal);
++
++        flag = ResourceManager::getFlag(state-&gt;getFlag());
++        flag-&gt;blt( dest, FLAG_START, flag_pos );
++
++        cur_line_pos += ENTRY_HEIGHT;
++        flag_pos += ENTRY_HEIGHT;
++        ++cur_state;
++    }
++
++}
++
++void RankTeam::mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos)
++{
++    GameTemplateView::mouseMove(prevPos, newPos);
++    if ( newPos.y &gt;= TABLE_START )
++    {
++        selected_line = (newPos.y-TABLE_START) / ENTRY_HEIGHT;
++        if (newPos.x &gt; RectStates.getSizeX()/2) selected_col = 1;
++        else selected_col = 0;
++    }
++}
++
++void RankTeam::notifyMoveTo()
++{
++    GameConfig::interface_rankposition_x = min.x;
++    GameConfig::interface_rankposition_y = min.y;
++}
++
++void RankTeam::doActivate()
++{
++    selected_line = -1;
++}
++
++void RankTeam::doDeactivate()
++{
++    selected_line = -1;
++}
++
++void RankTeam::processEvents()
++{
++    COMMAND_PROCESSOR.process(false);
++}
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.cpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.hpp	2012-09-19 11:51:18 UTC (rev 1410)
+@@ -0,0 +1,42 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &lt;vector&gt;
++#include &quot;2D/Surface.hpp&quot;
++#include &quot;GameTemplateView.hpp&quot;
++
++class PlayerState;
++
++class RankTeam : public GameTemplateView
++{
++private:
++    void drawTeamStats(Surface &amp;dest);
++    std::vector&lt;const PlayerState*&gt; states;
++    int selected_line;
++    int selected_col;
++    iRect RectStates;
++public:
++    RankTeam();
++    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++protected:
++    virtual void doActivate();
++    virtual void doDeactivate();
++    virtual void mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos);
++    virtual void notifyMoveTo();
++    virtual void processEvents();
++};
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Game/RankTeam.hpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000433.html">[Netpanzer-cvs] r1409 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000435.html">[Netpanzer-cvs] r1411 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#434">[ date ]</a>
+              <a href="thread.html#434">[ thread ]</a>
+              <a href="subject.html#434">[ subject ]</a>
+              <a href="author.html#434">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

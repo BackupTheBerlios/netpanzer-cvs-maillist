@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1247 - trunk/netpanzer/src/NetPanzer/Classes
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1247%20-%20trunk/netpanzer/src/NetPanzer/Classes&In-Reply-To=%3C20111007144944.9797F481358%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000272.html">
+   <LINK REL="Next"  HREF="000274.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1247 - trunk/netpanzer/src/NetPanzer/Classes</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1247%20-%20trunk/netpanzer/src/NetPanzer/Classes&In-Reply-To=%3C20111007144944.9797F481358%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1247 - trunk/netpanzer/src/NetPanzer/Classes">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct  7 16:49:44 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000272.html">[Netpanzer-cvs] r1246 - trunk/netpanzer/units/profiles
+</A></li>
+        <LI>Next message: <A HREF="000274.html">[Netpanzer-cvs] r1248 - in trunk/netpanzer: scripts	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Objectives	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-07 16:49:44 +0200 (Fri, 07 Oct 2011)
+New Revision: 1247
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+Log:
+Resolve some bug on command (separate left mouse Up and Down clic)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-07 01:48:29 UTC (rev 1246)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-07 14:49:44 UTC (rev 1247)
+@@ -186,9 +186,6 @@
+     iXY map_loc;
+     bool fielddraws = false;
+ 
+-    if (selection_box_active)
+-        return _cursor_regular;
+-
+     if( ((manual_control_state == true) || (manual_fire_state == true)) &amp;&amp; working_list.isSelected() )
+     {
+         unsigned long id_list_index;
+@@ -213,7 +210,7 @@
+         }
+     }
+ 
+-    if ((fielddraws == false) &amp;&amp; ((manual_control_state == true) || (manual_fire_state == true)))
++    if ((fielddraws == false) &amp;&amp; ((manual_control_state == true) || (manual_fire_state == true)) &amp;&amp; working_list.isSelected())
+     {
+         return _cursor_blocked_target;
+     }
+@@ -260,12 +257,15 @@
+                 return _cursor_break_allie;
+             }
+         }
+-        return _cursor_regular;
++        //return _cursor_regular;
+     }
+ 
+     if (working_list.isSelected())
+         return _cursor_move;
+ 
++    if (selection_box_active)
++        return _cursor_regular;
++
+     return _cursor_regular;
+ }
+ 
+@@ -636,154 +636,159 @@
+     }
+ }
+ 
+-void
+-WorldInputCmdProcessor::evalLeftMButtonEvents(const MouseEvent &amp;event)
++void WorldInputCmdProcessor::evalLeftMButtonDownEvents(const MouseEvent &amp;event)
+ {
+     iXY world_pos;
+-    unsigned char click_status;
+-
+     WorldViewInterface::clientXYtoWorldXY(world_win, event.pos, &amp;world_pos);
+ 
+     if ( (manual_control_state == true) ||
+-            KeyboardInterface::getKeyState( SDLK_LCTRL ) ||
+-            KeyboardInterface::getKeyState( SDLK_RCTRL )
+-       )
++          KeyboardInterface::getKeyState( SDLK_LCTRL ) ||
++          KeyboardInterface::getKeyState( SDLK_RCTRL ))
+     {
++        sendManualFireCommand( world_pos );
++        return;
++    }
++    Objective *objective = ObjectiveInterface::getObjectiveAtWorldXY(world_pos);
+ 
+-        if (event.event == MouseEvent::EVENT_DOWN )
+-        {
+-            sendManualFireCommand( world_pos );
+-        }
++    if ( objective &amp;&amp; objective-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
++    {
++        selection_box_active = false;
++        outpost_goal_selection = objective-&gt;id;
++        output_pos_press = objective-&gt;location;
++    }
++    else
++    {
++        box_press = world_pos;
++        box_release = world_pos;
++        selection_box_active = true;
++    }
+ 
++    unsigned char click_status;
++    
++    click_status = getCursorStatus(world_pos);
++    switch(click_status)
++    {
++        case _cursor_enemy_unit:
++            sendAttackCommand(world_pos);
++            break;
++
++        case _cursor_make_allie:
++            sendAllianceRequest(world_pos, true);
++            break;
++
++        case _cursor_break_allie:
++            sendAllianceRequest(world_pos, false);
++            break;
+     }
+-    else if (event.event == MouseEvent::EVENT_DOWN)
++}
++void WorldInputCmdProcessor::evalLeftMButtonUpEvents(const MouseEvent &amp;event)
++{
++    iXY world_pos;
++    unsigned char click_status;
++
++    WorldViewInterface::clientXYtoWorldXY(world_win, event.pos, &amp;world_pos);
++    if (selection_box_active)
+     {
++        selection_box_active = false;
++        box_release = world_pos;
++        if(abs(box_release.x - box_press.x) &gt; 3
++        &amp;&amp; abs(box_release.y - box_press.y) &gt; 3)
++        {
++            return;
++        } 
++    }
++
++    if (outpost_goal_selection != OBJECTIVE_NONE )
++    {
+         Objective *objective = ObjectiveInterface::getObjectiveAtWorldXY(world_pos);
+ 
+-        if ( objective &amp;&amp; objective-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
++        if ( objective
++             &amp;&amp; objective-&gt;occupying_player == PlayerInterface::getLocalPlayer()
++             &amp;&amp; outpost_goal_selection == objective-&gt;id )
+         {
+-            selection_box_active = false;
+-            outpost_goal_selection = objective-&gt;id;
+-            output_pos_press = objective-&gt;location;
++            // we've let go of the mouse on the building so we're
++            //  not changing the spawn point
++            selected_objective_id = objective-&gt;id;
++            activateVehicleSelectionView( selected_objective_id );
+         }
+         else
+         {
+-            box_press = world_pos;
+-            box_release = world_pos;
+-            selection_box_active = true;
++            ObjectiveInterface::sendChangeOutputLocation(outpost_goal_selection,
++                                                         MapInterface::pointXtoMapX(world_pos.x),
++                                                         MapInterface::pointYtoMapY(world_pos.y));
+         }
++        outpost_goal_selection = OBJECTIVE_NONE;
++        return;
+     }
+-    else if(event.event == MouseEvent::EVENT_UP)
++
++    click_status = getCursorStatus(world_pos);
++    switch(click_status)
+     {
+-        if (selection_box_active)
++        case _cursor_player_unit:
+         {
+-            selection_box_active = false;
+-            box_release = world_pos;
+-            if(abs(box_release.x - box_press.x) &gt; 3
+-		    &amp;&amp; abs(box_release.y - box_press.y) &gt; 3)
++            static NTimer dclick_timer(200);
++            static int click_times = 0;
++            bool addunits = false;
++            if( (KeyboardInterface::getKeyState(SDLK_LSHIFT) == true) ||
++                    (KeyboardInterface::getKeyState(SDLK_RSHIFT) == true))
+             {
+-                return;
++                addunits = true;
+             }
+-        }
+-
+-        if (outpost_goal_selection != OBJECTIVE_NONE )
+-        {
+-            Objective *objective = ObjectiveInterface::getObjectiveAtWorldXY(world_pos);
+-
+-            if ( objective
+-                 &amp;&amp; objective-&gt;occupying_player == PlayerInterface::getLocalPlayer()
+-                 &amp;&amp; outpost_goal_selection == objective-&gt;id )
++            if ( ! dclick_timer.isTimeOut() )
+             {
+-                // we've let go of the mouse on the building so we're
+-                //  not changing the spawn point
+-                selected_objective_id = objective-&gt;id;
+-                activateVehicleSelectionView( selected_objective_id );
+-            }
+-            else
+-            {
+-                ObjectiveInterface::sendChangeOutputLocation(outpost_goal_selection,
+-                                                             MapInterface::pointXtoMapX(world_pos.x),
+-                                                             MapInterface::pointYtoMapY(world_pos.y));
+-            }
+-            outpost_goal_selection = OBJECTIVE_NONE;
+-            return;
+-        }
+-
+-        click_status = getCursorStatus(world_pos);
+-        switch(click_status)
+-        {
+-            case _cursor_player_unit:
+-            {
+-                static NTimer dclick_timer(200);
+-                static int click_times = 0;
+-                bool addunits = false;
+-                if( (KeyboardInterface::getKeyState(SDLK_LSHIFT) == true) ||
+-                        (KeyboardInterface::getKeyState(SDLK_RSHIFT) == true))
++                if ( click_times )
+                 {
+-                    addunits = true;
++                    iRect wr;
++                    WorldViewInterface::getViewWindow(&amp;wr);
++                    working_list.selectBounded(wr, addunits);
++                    click_times=0;
+                 }
+-                if ( ! dclick_timer.isTimeOut() )
+-                {
+-                    if ( click_times )
+-                    {
+-                        iRect wr;
+-                        WorldViewInterface::getViewWindow(&amp;wr);
+-                        working_list.selectBounded(wr, addunits);
+-                        click_times=0;
+-                    }
+-                    else
+-                    {
+-                        working_list.selectSameTypeVisible(world_pos,addunits);
+-                        dclick_timer.reset();
+-                        click_times++;
+-                    }
+-                    break;
+-                }
+-                else if (addunits)
+-                {
+-                    working_list.addUnit(world_pos);
+-                }
+                 else
+                 {
+-                    working_list.selectUnit(world_pos );
++                    working_list.selectSameTypeVisible(world_pos,addunits);
++                    dclick_timer.reset();
++                    click_times++;
+                 }
+-
+-                current_selection_list_bits=0;
+-                current_selection_list_index = 0xFFFF;
+-                if (working_list.unit_list.size() &gt; 0)
+-                {
+-                    UnitBase *unit = UnitInterface::getUnit(
+-                            working_list.unit_list[0]);
+-                    if(unit)
+-                        unit-&gt;soundSelected();
+-                }
+-                dclick_timer.reset();
+-                click_times=0;
+                 break;
+             }
+-            case _cursor_move:
+-                if(outpost_goal_selection == OBJECTIVE_NONE)
+-                    sendMoveCommand(world_pos);
+-                break;
++            else if (addunits)
++            {
++                working_list.addUnit(world_pos);
++            }
++            else
++            {
++                working_list.selectUnit(world_pos );
++            }
+ 
+-            case _cursor_enemy_unit:
+-                sendAttackCommand(world_pos);
+-                break;
++            current_selection_list_bits=0;
++            current_selection_list_index = 0xFFFF;
++            if (working_list.unit_list.size() &gt; 0)
++            {
++                UnitBase *unit = UnitInterface::getUnit(
++                        working_list.unit_list[0]);
++                if(unit)
++                    unit-&gt;soundSelected();
++            }
++            dclick_timer.reset();
++            click_times=0;
++            break;
++        }
++        case _cursor_move:
++            if(outpost_goal_selection == OBJECTIVE_NONE)
++                sendMoveCommand(world_pos);
++            break;
+ 
+-            case _cursor_make_allie:
+-                sendAllianceRequest(world_pos, true);
+-                break;
+-
+-            case _cursor_break_allie:
+-                sendAllianceRequest(world_pos, false);
+-                break;
+-        }
+     }
+ }
+-
+ void
+-WorldInputCmdProcessor::evalRightMButtonEvents(const MouseEvent&amp; event)
++WorldInputCmdProcessor::evalLeftMButtonEvents(const MouseEvent &amp;event)
+ {
++    if(event.event == MouseEvent::EVENT_DOWN) evalLeftMButtonDownEvents(event);
++    else if(event.event == MouseEvent::EVENT_UP) evalLeftMButtonUpEvents(event);
++}
++
++void WorldInputCmdProcessor::evalRightMButtonEvents(const MouseEvent&amp; event)
++{
+     static NTimer mtimer(75);
+     if (event.event == MouseEvent::EVENT_DOWN )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-10-07 01:48:29 UTC (rev 1246)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-10-07 14:49:44 UTC (rev 1247)
+@@ -71,6 +71,8 @@
+     void sendAttackCommand(const iXY &amp;world_pos);
+     void sendAllianceRequest(const iXY &amp;world_pos, bool make_break);
+ 
++    void evalLeftMButtonDownEvents(const MouseEvent &amp;event);
++    void evalLeftMButtonUpEvents(const MouseEvent &amp;event);
+     void evalLeftMButtonEvents(const MouseEvent &amp;event);
+     void evalRightMButtonEvents(const MouseEvent &amp;event);
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000272.html">[Netpanzer-cvs] r1246 - trunk/netpanzer/units/profiles
+</A></li>
+	<LI>Next message: <A HREF="000274.html">[Netpanzer-cvs] r1248 - in trunk/netpanzer: scripts	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Objectives	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

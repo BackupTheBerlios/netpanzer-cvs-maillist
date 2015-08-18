@@ -1,0 +1,1005 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1087 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Util src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/MainMenu/Options
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1087%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/Lib/Util%20src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200901201617.n0KGHYxk016158%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000118.html">
+   <LINK REL="Next"  HREF="000120.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1087 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Util src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/MainMenu/Options</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1087%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/Lib/Util%20src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200901201617.n0KGHYxk016158%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1087 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Util src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/MainMenu/Options">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 20 17:17:34 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000118.html">[Netpanzer-cvs] r1086 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Interfaces NetPanzer/Resources NetPanzer/System
+</A></li>
+        <LI>Next message: <A HREF="000120.html">[Netpanzer-cvs] r1088 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Particles NetPanzer/Views	NetPanzer/Views/Components NetPanzer/Views/Game	NetPanzer/Views/MainMenu NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#119">[ date ]</a>
+              <a href="thread.html#119">[ thread ]</a>
+              <a href="subject.html#119">[ subject ]</a>
+              <a href="author.html#119">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-01-20 17:17:03 +0100 (Tue, 20 Jan 2009)
+New Revision: 1087
+
+Modified:
+   trunk/netpanzer/BUGS
+   trunk/netpanzer/README
+   trunk/netpanzer/TODO
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/Lib/Util/NTimer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+Log:
+- Modify BUGS, README and TODO files
+- really fix the problem of file names on some systems.
+- new: able to hide names over tanks, press 'n' or ...
+- new: able to configure the visual of names, health bar and flag in the options-&gt;visuals configuration window.
+- new: quick chat, press ctrl+number to send a preconfigured message to all players, you can configure in netpanzer.ini. You can only send a quick message every 2 seconds.
+- new: server configuration: capturebases, yes/no to allow capture of outposts
+- new: server configuration: respawnmode and respawntime. respawnmode has 0=normal, 1=round, 2=timer. If use timer, respawntime has the number of seconds to respawn.
+
+
+Modified: trunk/netpanzer/BUGS
+===================================================================
+--- trunk/netpanzer/BUGS	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/BUGS	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -2,36 +2,8 @@
+ - when a client connect to a server, it will save the configuration that
+   the server sent to him when exit netpanzer.
+ - sometimes 2 players spawn at the same place - hard to fix, low priority
+-- it is reported that in timelimit mode games might end too early (ie. client
+-  display 40/60 and game ends) - is it possible that the client time doesn't
+-  sync correctly with server time?
+ - Astar sometimes calculates strange paths. Very obvious if you try to capture
+   and outpost from the left side: Your panzers will drive around it before
+   entering it. (it is not a complete Astar, needs to rewrite)
+ - The no allies flag in the server config has no effect
+-- Clients pressing the Abort button when connecting leave a ghost on the server
+-which displays no IP. (i think matze fixed this in 0.8.1)
+ - The Abort button when connecting doesn't really aborts the operation, just hide the window
+--netpanzer fails on win98se
+--setting allowallies=no in config has no effect
+-
+--NOTE: next error would be cause by previously fixed error (maybe, lets see in future)
+-&lt;BenUrban&gt; have you encountered either of the pantom tank bugs yet MatzeB ?
+-&lt;MatzeB&gt; nope
+-&lt;BenUrban&gt; there's one where an actual tank is really there (apparently) but
+-just not visible in the client
+-&lt;MatzeB&gt; how do you know it's there then?
+-&lt;BenUrban&gt; my own tanks shoot at it
+-&lt;MatzeB&gt; and it explodes when you shoot long enough on it?
+-&lt;BenUrban&gt; i think so
+-&lt;xpanthom&gt; the cvs link on berlios is dead, what's the link with svn?
+-&lt;BenUrban&gt; not sure though
+-* BenUrban points out that netpanzer doesn't use cvs at all
+-&lt;xpanthom&gt; it apparently has at some point...
+-&lt;BenUrban&gt; the other bug occurs when someone unexpectedly disconnects
+-&lt;BenUrban&gt; the positions that their tanks occupied become unavailable
+-&lt;BenUrban&gt; until the next server rest
+-&lt;BenUrban&gt; or map change
+-&lt;BenUrban&gt; that one is far more common
+-&lt;BenUrban&gt; and has been known to block off bases completely
+-&lt;MatzeB&gt; oh
+
+Modified: trunk/netpanzer/README
+===================================================================
+--- trunk/netpanzer/README	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/README	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -47,12 +47,6 @@
+ * SDL_mixer 1.2.4 or later
+   <A HREF="http://www.libsdl.org/projects/SDL_mixer/">http://www.libsdl.org/projects/SDL_mixer/</A>
+ 
+-* SDL_image 1.2.3 or later
+-  <A HREF="http://www.libsdl.org/projects/SDL_image/">http://www.libsdl.org/projects/SDL_image/</A>
+-
+-* PhysicsFS 0.1.9 or later
+-  <A HREF="http://www.icculus.org/physfs/">http://www.icculus.org/physfs/</A>
+-
+ Thanks to all the authors of these helpful libraries that made our development
+ easy and straightforward.
+ 
+@@ -169,28 +163,14 @@
+ 
+ 5. Bot Players
+ 
+-Netpanzer provides a bot player for these times when you don't have a human
+-opponent. You can start netpanzer in a special mode where it connects to a
+-server and simulates a real player. You can start netpanzer like this to connect
+-as bot to a server:
++-- this has to change for new mode --
+ 
+-netpanzer -b servername
+-
+-Example:
+-This example shows how you can play locally against 2 bots:
+-
+-netpanzer -d &amp;
+-netpanzer -b localhost &amp;
+-netpanzer -b localhost &amp;
+-netpanzer -c localhost
+-
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+ 6. Contact
+ 
+-Bugs should be reported to the bug trackker on Berlios:
+-    <A HREF="http://developer.berlios.de/bugs/?group_id=1250">http://developer.berlios.de/bugs/?group_id=1250</A>
+-You can contact us at the netpanzer-devel mailinglist at Berlios:
+-    <A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-devel">https://lists.berlios.de/mailman/listinfo/netpanzer-devel</A>
+-or you might be able to catch us in irc at irc.freenode.net #netpanzer.
++Bugs should be reported to the netPanzer forum:
++    <A HREF="http://www.netpanzer.org/forum">http://www.netpanzer.org/forum</A>
+ 
++or you might be able to catch someone in irc at irc.freenode.net #netpanzer.
++
+
+Modified: trunk/netpanzer/TODO
+===================================================================
+--- trunk/netpanzer/TODO	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/TODO	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -1,18 +1,8 @@
+ TODO Now:
+-- In SocketManager, replace list with vector, use direct access to list, and
+-  change the way the sockets are added/removed.
+-- In heartbeat, change the way the received information is parsed, the same method
+-  should be used for other communications that use a similar protocol, like server
+-  query.
+-- Recreate the fd_sets in each iteration in SocketSet, and/or remove SocketSet
+-  class and handle it in SocketManager.
+-- Remove exception code from networking.
++- Remove remaining exception code from networking.
+ - Create a task manager for the game main loop. These tasks will run each loop,
+   with a defined priority to select the running order,
+   should have a &quot;runable&quot; like interface.
+-- Move all units related classes to src/NetPanzer/Units
+-- Import physfs code into netpanzer trunk
+-- Import lua code into netpanzer trunk 
+ 
+ *** Old todo
+ -after having a full nodelist in A* the server is getting slow
+@@ -34,8 +24,6 @@
+  * Create UDP broadcast code for LAN games
+ 
+ *** Server related
+- * refactor bot code, so that it is possible to directly spawn bots at the
+-   server, after that we could easily add a &quot;Skirmish&quot; button to the main menu.
+  * let dedicated server output statistics on console or in some log files. 
+  * the Server has a massive memory leak somewhere - might be fixed now
+  * synchronize resources between server and clients, both should have same flags
+@@ -48,7 +36,6 @@
+    color/style. (^ like in quake based games?)
+  * Convert the 256 color stuff to truecolor, usage of opengl is probably a good
+    idea.
+- * bots should have different names and different flags - partly implemented
+  * display alliances in the status screens.
+  * think about setting unit spawnpoint/opening outpost view. It's very hard to
+    select units standing in your base because of the other 2 functions.
+@@ -63,9 +50,6 @@
+   -a key to cycle through all (offline) outposts
+   -add possibilty for setting waypoints (ALT+leftclick?)
+   -add possibility to set markers for allies
+-  -double clicking on a unit marks all units of the same type on screen -done
+-    (tripple clicking marks all units of this type on the map?
+-     or all units in screen?)
+   -&quot;subclassing&quot; like in WC3: A key that cycles though different unit types in
+    the currently selected group.
+   - S key stops tanks
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -1,9 +1,3 @@
+-
+-#include &quot;Util/Log.hpp&quot;
+-
+-
+-#include &quot;Scripts/ScriptManager.hpp&quot;
+-
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+  
+@@ -27,9 +21,11 @@
+ #include &lt;memory&gt;
+ 
+ #include &quot;Palette.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/UtilInterface.hpp&quot;
++#include &quot;Scripts/ScriptManager.hpp&quot;
+ 
+ float Palette::brightness = 1.0f;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -177,7 +177,7 @@
+                 if ( strcasecmp(*curfile, fn_start) == 0 )
+                 {
+                     memcpy(fn_start, *curfile, fn_length-(folder_sep-fn));
+-                    file = PHYSFS_openRead(filename);
++                    file = PHYSFS_openRead(fn);
+                     break;
+                 }
+             }
+
+Modified: trunk/netpanzer/src/Lib/Util/NTimer.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/NTimer.hpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/Lib/Util/NTimer.hpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -16,9 +16,9 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#ifndef _NTIMER_HPP_
+-#define _NTIMER_HPP_
+-
++#ifndef _NTIMER_HPP_
++#define _NTIMER_HPP_
++
+ #include &quot;SDL.h&quot;
+ 
+ class NTimer
+@@ -26,8 +26,9 @@
+ public:
+     NTimer() : starttime(0), timeout(0) {};
+     NTimer(Uint32 t) : starttime(0), timeout(t) {};
+-    
++
+     inline void reset()              { starttime = SDL_GetTicks(); }
++    /** Sets start time to t */
+     inline void reset(Uint32 t)      { starttime = t; }
+     
+     inline Uint32 getStartTime()     { return starttime; }
+@@ -37,11 +38,12 @@
+     inline Uint32 getTimeOut()       { return timeout; }
+     
+     inline bool isTimeOut() { return (SDL_GetTicks()-starttime)&gt;timeout; }
++    /** Checks the time with the provided time (supposed to be now) */
+     inline bool isTimeOut(Uint32 t) { return (t-starttime)&gt;timeout; }
+     
+ private:
+     Uint32 starttime;
+     Uint32 timeout;
+-};
+-
+-#endif // _NTIMER_HPP_
++};
++
++#endif // _NTIMER_HPP_
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -144,12 +144,15 @@
+         //unit_flag.blt( *surface, iXY( min_abs.x, min_abs.y - unit_flag.getPix().y ) );
+         //surface-&gt;bltString(min_abs.x + 2, min_abs.y - 6, &quot;Panther1&quot;, Color::white);
+         unit_flag-&gt;blt( *surface, min_abs.x, min_abs.y-unit_flag-&gt;getHeight()-1 );
+-        if ( playerName.length() &gt; 0 )
+-        {   // XXX dirty trick, I don't center the text, just &quot;by hand&quot;
+-            surface-&gt;bltString(min_abs.x+unit_flag-&gt;getWidth() + 2,
++    }
++
++    if ( gameconfig-&gt;drawunitowner == true &amp;&amp; playerName.length() &gt; 0)
++    {
++        // XXX dirty trick, I don't center the text, just &quot;by hand&quot;
++        surface-&gt;bltString(min_abs.x+unit_flag-&gt;getWidth() + 2,
+                            min_abs.y - unit_flag-&gt;getHeight() + 2 ,
+                            playerName.c_str(), Color::white);
+-        }
++
+     }
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -277,12 +277,17 @@
+     {
+         gameconfig-&gt;drawunitflags.toggle();
+     }
+-    
++
+     if ( (KeyboardInterface::getKeyPressed( SDLK_d ) == true) )
+     {
+         gameconfig-&gt;drawunitdamage.toggle();
+     }
+ 
++    if ( (KeyboardInterface::getKeyPressed( SDLK_n ) == true) )
++    {
++        gameconfig-&gt;drawunitowner.toggle();
++    }
++
+     if ( (KeyboardInterface::getKeyPressed( SDLK_RETURN ) == true)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_LALT ) == false)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_RALT ) == false))
+@@ -349,50 +354,64 @@
+     bool ctrl_status = false;
+ 
+     if( (KeyboardInterface::getKeyState(SDLK_LCTRL) == true) ||
+-            (KeyboardInterface::getKeyState(SDLK_RCTRL) == true)) {
++            (KeyboardInterface::getKeyState(SDLK_RCTRL) == true))
++    {
+         ctrl_status = true;
+     }
+ 
+     if( (KeyboardInterface::getKeyState( SDLK_LALT ) == true) ||
+             (KeyboardInterface::getKeyState( SDLK_RALT ) == true)
+-      ) {
++      )
++    {
+         alt_status = true;
+     }
+     
+     unsigned selected_bits=0;
+     int released=0;
+-    for(int key_code=SDLK_0;  key_code&lt;=SDLK_9; key_code++) {
++    for(int key_code=SDLK_0;  key_code&lt;=SDLK_9; key_code++)
++    {
+         unsigned int b=1 &lt;&lt; (key_code-SDLK_0);
+-        if ( (KeyboardInterface::getKeyState( key_code ) == true) ) {
++        if ( (KeyboardInterface::getKeyState( key_code ) == true) )
++        {
+             selected_bits|=b;
+         }
+-        else if(current_selection_list_bits&amp;b) {
++        else if(current_selection_list_bits&amp;b)
++        {
+             // we've released a key
+             released++;
+         }
+     }
+     
+-    if(released==0 &amp;&amp; selected_bits&gt;0 &amp;&amp; selected_bits!=current_selection_list_bits) {
++    if(released==0 &amp;&amp; selected_bits&gt;0 &amp;&amp; selected_bits!=current_selection_list_bits)
++    {
+         // we've pressed down a number key
+         if(ctrl_status != true &amp;&amp; alt_status != true &amp;&amp;
+                 !KeyboardInterface::getKeyState(SDLK_LSHIFT) &amp;&amp;
+-                !KeyboardInterface::getKeyState(SDLK_RSHIFT)) {
++                !KeyboardInterface::getKeyState(SDLK_RSHIFT))
++        {
+             working_list.unGroup();
+         }
+-        for(int key_code=SDLK_0;  key_code&lt;=SDLK_9; key_code++) {
+-            if ( (KeyboardInterface::getKeyState( key_code ) != true) ) {
++
++        for(int key_code=SDLK_0;  key_code&lt;=SDLK_9; key_code++)
++        {
++            if ( (KeyboardInterface::getKeyState( key_code ) != true) )
++            {
+                 continue;
+             }
+             int n=key_code-SDLK_0;
+-            if(ctrl_status == true) {
++            
++            if(ctrl_status == true)
++            {
+                 setSelectionList(n);
+                 std::stringstream s;
+                 s &lt;&lt; &quot;Group &quot; &lt;&lt; n &lt;&lt; &quot; Created&quot;;
+                 ConsoleInterface::postMessage(Color::brown, false, 0, s.str().c_str() );
+                 continue;
+             }
+-            if(alt_status == true) {
+-                cycleSelectedUnits(n);
++            
++            if(alt_status == true)
++            {
++                ChatInterface::sendQuickMessage(n);
+                 continue;
+             }
+             working_list.addList( selection_group_lists[ n ] );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -27,6 +27,8 @@
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/ChatNetMessage.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;GameConfig.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ 
+ 
+ ChatMesgRequest ChatInterface::current_chat_mesg;
+@@ -247,3 +249,56 @@
+     current_chat_mesg.reset();
+ }
+ 
++void
++ChatInterface::sendQuickMessage(unsigned int n)
++{
++    static NTimer sendtimer(2000);
++    if ( ! sendtimer.isTimeOut() )
++    {
++        return; // can't send now
++    }
++
++    sendtimer.reset();
++
++    char * msg = 0;
++    switch ( n )
++    {
++        case 0:
++            msg = (char *)gameconfig-&gt;quickchat_0.c_str();
++            break;
++        case 1:
++            msg = (char *)gameconfig-&gt;quickchat_1.c_str();
++            break;
++        case 2:
++            msg = (char *)gameconfig-&gt;quickchat_2.c_str();
++            break;
++        case 3:
++            msg = (char *)gameconfig-&gt;quickchat_3.c_str();
++            break;
++        case 4:
++            msg = (char *)gameconfig-&gt;quickchat_4.c_str();
++            break;
++        case 5:
++            msg = (char *)gameconfig-&gt;quickchat_5.c_str();
++            break;
++        case 6:
++            msg = (char *)gameconfig-&gt;quickchat_6.c_str();
++            break;
++        case 7:
++            msg = (char *)gameconfig-&gt;quickchat_7.c_str();
++            break;
++        case 8:
++            msg = (char *)gameconfig-&gt;quickchat_8.c_str();
++            break;
++        case 9:
++            msg = (char *)gameconfig-&gt;quickchat_9.c_str();
++            break;
++        default:
++            ; // nothing
++    }
++
++    if ( msg )
++    {
++        sendCurrentMessage(msg);
++    }
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -39,6 +39,7 @@
+     static void setMessageScopeEnemies();
+     static void setMessageScopeServer();
+     static void sendCurrentMessage(const char *message_text);
++    static void sendQuickMessage(unsigned int n);
+ };
+ 
+ #endif // ** _CHATINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -61,6 +61,9 @@
+       motd(&quot;motd&quot;,&quot;&quot;),
+       logging(&quot;logging&quot;, false),
+       publicServer(&quot;public&quot;, true),
++      capturebases(&quot;capturebases&quot;, true),
++      respawntime(&quot;respawntime&quot;, 0),
++      respawnmode(&quot;respawnmode&quot;, 0),
+       
+       screenresolution(&quot;resolution&quot;, 2, 0, 3),
+       fullscreen(&quot;fullscreen&quot;, true),
+@@ -88,6 +91,7 @@
+       drawunitdamage(&quot;drawunitdamage&quot;, true),
+       drawunitreload(&quot;drawunitreload&quot;, false),
+       drawunitflags(&quot;drawunitflags&quot;, true),
++      drawunitowner(&quot;drawunitowner&quot;, true),
+       consoletextdelay(&quot;consoletextdelay&quot;, 3, 1, 20),
+       consoletextusage(&quot;consoletextusage&quot;, 25, 1, 100),
+       scrollrate(&quot;scrollrate&quot;, 1000, 100, 10000),
+@@ -119,7 +123,18 @@
+       wolf(&quot;wolf&quot;,0),
+       bear(&quot;bear&quot;,0),
+       drake(&quot;drake&quot;,0),
+-      archer(&quot;archer&quot;,0)
++      archer(&quot;archer&quot;,0),
++
++      quickchat_1(&quot;1&quot;, &quot;Taking fire! Need assistance!!&quot;),
++      quickchat_2(&quot;2&quot;, &quot;Fight!!!&quot;),
++      quickchat_3(&quot;3&quot;, &quot;Who wants to fight?&quot;),
++      quickchat_4(&quot;4&quot;, &quot;Who wants to ally?&quot;),
++      quickchat_5(&quot;5&quot;, &quot;Who wants some?&quot;),
++      quickchat_6(&quot;6&quot;, &quot;LAG! LAG! LAG!&quot;),
++      quickchat_7(&quot;7&quot;, &quot;Stop!!!&quot;),
++      quickchat_8(&quot;8&quot;, &quot;Wait!!!&quot;),
++      quickchat_9(&quot;9&quot;, &quot;brb&quot;),
++      quickchat_0(&quot;0&quot;, &quot;Bye!!!&quot;)
+ {
+     this-&gt;configfile = configfile;
+     this-&gt;usePhysFS = usePhysFS;
+@@ -151,6 +166,9 @@
+     serversettings.push_back(&amp;motd);
+     serversettings.push_back(&amp;logging);
+     serversettings.push_back(&amp;publicServer);
++    serversettings.push_back(&amp;capturebases);
++    serversettings.push_back(&amp;respawntime);
++    serversettings.push_back(&amp;respawnmode);
+    
+     visualssettings.push_back(&amp;screenresolution);
+     visualssettings.push_back(&amp;fullscreen);
+@@ -178,6 +196,7 @@
+     interfacesettings.push_back(&amp;drawunitdamage);
+     interfacesettings.push_back(&amp;drawunitreload);
+     interfacesettings.push_back(&amp;drawunitflags);
++    interfacesettings.push_back(&amp;drawunitowner);
+     interfacesettings.push_back(&amp;consoletextdelay);
+     interfacesettings.push_back(&amp;consoletextusage);
+     interfacesettings.push_back(&amp;scrollrate);
+@@ -198,6 +217,17 @@
+     radarsettings.push_back(&amp;radar_unitsize);
+     radarsettings.push_back(&amp;radar_objectivedrawmode);
+     radarsettings.push_back(&amp;radar_resizerate);
++
++    quickchatsettings.push_back(&amp;quickchat_1);
++    quickchatsettings.push_back(&amp;quickchat_2);
++    quickchatsettings.push_back(&amp;quickchat_3);
++    quickchatsettings.push_back(&amp;quickchat_4);
++    quickchatsettings.push_back(&amp;quickchat_5);
++    quickchatsettings.push_back(&amp;quickchat_6);
++    quickchatsettings.push_back(&amp;quickchat_7);
++    quickchatsettings.push_back(&amp;quickchat_8);
++    quickchatsettings.push_back(&amp;quickchat_9);
++    quickchatsettings.push_back(&amp;quickchat_0);
+     
+     try {
+         loadConfig();
+@@ -240,6 +270,7 @@
+     loadSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+     loadSettings(inifile.getSection(&quot;server&quot;), serversettings);
+     loadSpawnSettings(inifile.getSection(&quot;spawnconfig&quot;),spawnsettings);
++    loadSettings(inifile.getSection(&quot;quickchat&quot;), quickchatsettings);
+ }
+ 
+ void GameConfig::loadSettings(const INI::Section&amp; section,
+@@ -328,6 +359,7 @@
+     saveSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+     saveSettings(inifile.getSection(&quot;server&quot;), serversettings);
+     saveSettings(inifile.getSection(&quot;spawnconfig&quot;),spawnsettings);
++    saveSettings(inifile.getSection(&quot;quickchat&quot;), quickchatsettings);
+ 
+     if(usePhysFS) {
+         OFileStream out (configfile);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -132,13 +132,16 @@
+     ConfigInt    objectiveoccupationpercentage;
+     ConfigBool   allowallies;
+     ConfigInt    cloudcoverage;
+-    ConfigInt    respawntype;
+     ConfigInt    windspeed;
+     ConfigString map;
+     ConfigString mapcycle;
+     ConfigString motd;
+     ConfigBool   logging;
+     ConfigBool   publicServer;
++    ConfigBool   capturebases;
++    ConfigInt    respawntype; // this is round robin or random already in np
++    ConfigInt    respawnmode; // 0- normal, 1- round, 2- timer
++    ConfigInt    respawntime; // used in timer mode. in seconds
+ 
+     // Visuals Settings
+     ConfigInt   screenresolution;
+@@ -169,6 +172,7 @@
+     ConfigBool  drawunitdamage;
+     ConfigBool  drawunitreload;
+     ConfigBool  drawunitflags;
++    ConfigBool  drawunitowner;
+     ConfigInt   consoletextdelay;
+     ConfigInt   consoletextusage;
+     ConfigInt   scrollrate;
+@@ -203,8 +207,21 @@
+     ConfigInt   bear;
+     ConfigInt   drake;
+     ConfigInt   archer;
+-    
++
++    // quick chat settings
++    ConfigString quickchat_1;
++    ConfigString quickchat_2;
++    ConfigString quickchat_3;
++    ConfigString quickchat_4;
++    ConfigString quickchat_5;
++    ConfigString quickchat_6;
++    ConfigString quickchat_7;
++    ConfigString quickchat_8;
++    ConfigString quickchat_9;
++    ConfigString quickchat_0;
++
+     std::vector&lt;ConfigVariable*&gt; spawnsettings;
++    std::vector&lt;ConfigVariable*&gt; quickchatsettings;
+     
+ public:
+     void clearSpawnSettings()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -16,7 +16,10 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ #include &lt;config.h&gt;
++
++#include &quot;Util/NTimer.hpp&quot;
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
++#include &quot;GameManager.hpp&quot;
+ 
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+@@ -62,6 +65,7 @@
+ int GameControlRulesDaemon::execution_mode = _execution_mode_loop_back_server;
+ unsigned char GameControlRulesDaemon::game_state  = _game_state_idle;
+ std::string GameControlRulesDaemon::nextmap = &quot;&quot;;
++NTimer GameControlRulesDaemon::respawntimer;
+ 
+ #define _MAP_CYCLE_ENDGAME_WAIT_PERIOD  (20) // seconds
+ #define _MAP_CYCLE_MAP_LOAD_WAIT_PERIOD (7) // seconds
+@@ -372,16 +376,60 @@
+                 ;
+         }
+ 
+-        // ** Check for Player Respawns **
+-        bool respawn_rule_complete = false;
+-        while( respawn_rule_complete == false )
++        checkRespawn();
++    }
++
++}
++
++void
++GameControlRulesDaemon::checkRespawn()
++{
++    bool doRespawn = false;
++
++    switch ( gameconfig-&gt;respawnmode )
++    {
++        case 1: // round mode
+         {
+-            if ( PlayerInterface::testRulePlayerRespawn( &amp;respawn_rule_complete, &amp;player_state ) )
++            unsigned short players_alive = 0;
++            for ( unsigned short player = 0; player &lt; PlayerInterface::getMaxPlayers(); player++ )
+             {
+-                GameManager::spawnPlayer( player_state-&gt;getID() );
++                if ( PlayerInterface::getPlayer(player)-&gt;getStatus() == _player_state_active
++                     &amp;&amp; UnitInterface::getUnitCount( player ) &gt; 0 )
++                {
++                    players_alive++;
++                }
+             }
++            
++            if ( players_alive &lt; 2 )
++            {
++                doRespawn = true;
++            }
++            break;
+         }
++        case 2: // timer mode
++            respawntimer.setTimeOut(int(gameconfig-&gt;respawntime) * 1000);
++            if ( respawntimer.isTimeOut() )
++            {
++                doRespawn = true;
++                respawntimer.reset();
++            }
++            break;
++        case 0: // normal mode
++        default:
++            doRespawn = true;
++    }
+ 
++    if ( doRespawn )
++    {
++        for ( unsigned short player = 0; player &lt; PlayerInterface::getMaxPlayers(); player++ )
++        {
++            if ( PlayerInterface::getPlayer(player)-&gt;getStatus() == _player_state_active
++                 &amp;&amp; UnitInterface::getUnitCount( player ) == 0 )
++            {
++                GameManager::spawnPlayer(player);
++            }
++        }
++        respawntimer.reset();
+     }
+ 
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.hpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -20,6 +20,7 @@
+ 
+ #include &lt;string&gt;
+ #include &quot;Util/Timer.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
+ 
+ class GameControlRulesDaemon
+@@ -27,6 +28,7 @@
+     static int execution_mode;
+     static unsigned char game_state;
+     static std::string nextmap;
++    static NTimer respawntimer;
+ 
+ protected:
+     static int map_cycle_fsm_server_state;
+@@ -44,6 +46,7 @@
+     static void onObjectiveGameCompleted();
+ 
+     static void checkGameRules();
++    static void checkRespawn();
+ 
+     static void mapLoadFailureResponse(int result_code, const char *map_name);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -39,8 +39,6 @@
+ unsigned short PlayerInterface::player_sync_connect_player_index;
+ Timer PlayerInterface::player_sync_timer;
+ 
+-unsigned short PlayerInterface::respawn_rule_player_index = 0;
+-
+ SDL_mutex* PlayerInterface::mutex = 0;
+ 
+ void PlayerInterface::initialize(unsigned short maxPlayers)
+@@ -294,32 +292,6 @@
+     return false;
+ }
+ 
+-
+-bool PlayerInterface::testRulePlayerRespawn( bool *completed, PlayerState **player_state )
+-{
+-    if ( respawn_rule_player_index == max_players )
+-    {
+-        respawn_rule_player_index = 0;
+-        *completed = true;
+-        return( false );
+-    }
+-    else
+-    {
+-        *completed = false;
+-    }
+-    
+-    if ( player_lists[ respawn_rule_player_index ].getStatus() == _player_state_active )
+-        if ( UnitInterface::getUnitCount( respawn_rule_player_index ) == 0 )
+-        {
+-            *player_state = &amp;player_lists[ respawn_rule_player_index ];
+-            respawn_rule_player_index++;
+-            return( true );
+-        }
+-
+-    respawn_rule_player_index++;
+-    return( false );
+-}
+-
+ void PlayerInterface::startPlayerStateSync(Uint16 player_index)
+ {
+     player_sync_index = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -98,11 +98,6 @@
+     static bool testRuleObjectiveRatio( float precentage, PlayerState ** player_state );
+ 
+ protected:
+-    static unsigned short respawn_rule_player_index;
+-public:
+-    static bool testRulePlayerRespawn( bool *completed, PlayerState **player_state );
+-
+-protected:
+     static Uint16 player_sync_index;
+     static Uint16 player_sync_connect_player_index;
+     static Timer player_sync_timer;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -23,6 +23,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+@@ -190,7 +191,9 @@
+ void
+ Outpost::updateStatus()
+ {
+-    if ( NetworkState::status == _network_state_server ) {
++    if ( NetworkState::status == _network_state_server
++            &amp;&amp; gameconfig-&gt;capturebases == true)
++    {
+         checkOccupationStatus();
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -109,8 +109,31 @@
+     checkBoxBlendSmoke-&gt;setStateChangedCallback(this);
+     add(checkBoxBlendSmoke);
+     y += yOffset;
+-    
+-    
++
++    checkBoxDrawHitpoints = new CheckBox();
++    checkBoxDrawHitpoints-&gt;setLabel(&quot;Draw Hitpoints Bar&quot;);
++    checkBoxDrawHitpoints-&gt;setState(gameconfig-&gt;drawunitdamage);
++    checkBoxDrawHitpoints-&gt;setLocation(x, y);
++    checkBoxDrawHitpoints-&gt;setStateChangedCallback(this);
++    add(checkBoxDrawHitpoints);
++    y += yOffset;
++
++    checkBoxDrawFlags = new CheckBox();
++    checkBoxDrawFlags-&gt;setLabel(&quot;Draw Flags&quot;);
++    checkBoxDrawFlags-&gt;setState(gameconfig-&gt;drawunitflags);
++    checkBoxDrawFlags-&gt;setLocation(x, y);
++    checkBoxDrawFlags-&gt;setStateChangedCallback(this);
++    add(checkBoxDrawFlags);
++    y += yOffset;
++
++    checkBoxDrawNames = new CheckBox();
++    checkBoxDrawNames-&gt;setLabel(&quot;Draw Player Names&quot;);
++    checkBoxDrawNames-&gt;setState(gameconfig-&gt;drawunitowner);
++    checkBoxDrawNames-&gt;setLocation(x, y);
++    checkBoxDrawNames-&gt;setStateChangedCallback(this);
++    add(checkBoxDrawNames);
++    y += yOffset;
++
+     //removeAllButtons();
+     //removeComponents();
+     
+@@ -160,29 +183,45 @@
+ //---------------------------------------------------------------------------
+ void VisualsView::stateChanged(Component* source)
+ {
+-    // Check Box Draw All Shadows
+-    if (source == checkBoxDrawAllShadows) {
++    if ( source == checkBoxDrawAllShadows )
++    {
+         gameconfig-&gt;displayshadows = checkBoxDrawAllShadows-&gt;getState();
+     }
+-    // Check Box Blend Smoke
+-    else if (source == checkBoxBlendSmoke) {
++    else if ( source == checkBoxBlendSmoke )
++    {
+         gameconfig-&gt;blendsmoke = checkBoxBlendSmoke-&gt;getState();
+-    } else if (source == checkBoxFullscreen) {
++    }
++    else if ( source == checkBoxDrawHitpoints )
++    {
++        gameconfig-&gt;drawunitdamage = checkBoxDrawHitpoints-&gt;getState();
++    }
++    else if ( source == checkBoxDrawFlags )
++    {
++        gameconfig-&gt;drawunitflags = checkBoxDrawFlags-&gt;getState();
++    }
++    else if ( source == checkBoxDrawNames )
++    {
++        gameconfig-&gt;drawunitowner = checkBoxDrawNames-&gt;getState();
++    }
++    else if ( source == checkBoxFullscreen )
++    {
+         gameconfig-&gt;fullscreen = checkBoxFullscreen-&gt;getState();
+         GameManager::setVideoMode();
+     }
+-    // Choice Resolution
+-    else if (source == choiceResolution) {
++    else if ( source == choiceResolution )
++    {
+         gameconfig-&gt;screenresolution = choiceResolution-&gt;getSelectedIndex();
+         GameManager::setVideoMode();
+     }
+-    // Choice Mini Map Unit Size
+-    else if (source == choiceMiniMapUnitSize) {
+-        if (choiceMiniMapUnitSize-&gt;getSelectedIndex() == 0) {
++    else if ( source == choiceMiniMapUnitSize )
++    {
++        if (choiceMiniMapUnitSize-&gt;getSelectedIndex() == 0)
++        {
+             gameconfig-&gt;radar_unitsize = _mini_map_unit_size_small;
+-        } else if (choiceMiniMapUnitSize-&gt;getSelectedIndex() == 1) {
++        }
++        else if (choiceMiniMapUnitSize-&gt;getSelectedIndex() == 1)
++        {
+             gameconfig-&gt;radar_unitsize = _mini_map_unit_size_large;
+         }
+     }
+ }
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2009-01-17 09:04:05 UTC (rev 1086)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
+@@ -45,6 +45,9 @@
+     CheckBox * checkBoxDrawAllShadows;
+     CheckBox * checkBoxBlendSmoke;
+     CheckBox * checkBoxFullscreen;
++    CheckBox * checkBoxDrawHitpoints;
++    CheckBox * checkBoxDrawFlags;
++    CheckBox * checkBoxDrawNames;
+     //CheckBox drawUnitReload;
+ 
+     // Option choices.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000118.html">[Netpanzer-cvs] r1086 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Classes NetPanzer/Classes/Network	NetPanzer/Interfaces NetPanzer/Resources NetPanzer/System
+</A></li>
+	<LI>Next message: <A HREF="000120.html">[Netpanzer-cvs] r1088 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Particles NetPanzer/Views	NetPanzer/Views/Components NetPanzer/Views/Game	NetPanzer/Views/MainMenu NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#119">[ date ]</a>
+              <a href="thread.html#119">[ thread ]</a>
+              <a href="subject.html#119">[ subject ]</a>
+              <a href="author.html#119">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

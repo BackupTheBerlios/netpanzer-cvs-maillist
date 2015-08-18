@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1032 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1032%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game&In-Reply-To=%3C200805261304.m4QD4pHE028990%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000073.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1032 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1032%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game&In-Reply-To=%3C200805261304.m4QD4pHE028990%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1032 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon May 26 15:04:51 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000073.html">[Netpanzer-cvs] r1031 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-05-26 15:04:41 +0200 (Mon, 26 May 2008)
+New Revision: 1032
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+Log:
+- fix minimap colors
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-05-19 12:04:37 UTC (rev 1031)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MiniMapInterface.cpp	2008-05-26 13:04:41 UTC (rev 1032)
+@@ -101,7 +101,7 @@
+                 PIX unit_color=player_unit_color;
+                 if(unit_state.select) { unit_color=selected_unit_color; }
+                 if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_small) {
+-                    drawSmallUnitDot( map_surface, map_loc, player_unit_color );
++                    drawSmallUnitDot( map_surface, map_loc, unit_color );
+                 } else if (gameconfig-&gt;radar_unitsize == _mini_map_unit_size_large) {
+                     drawLargeUnitDot( map_surface, map_loc, unit_color );
+                 } else {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2008-05-19 12:04:37 UTC (rev 1031)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2008-05-26 13:04:41 UTC (rev 1032)
+@@ -61,9 +61,9 @@
+     
+     static void loadFinish()
+     {
+-        GameManager::setNetPanzerGameOptions();
+         Desktop::setVisibilityAllWindows(false);
+         GameManager::loadPalette(&quot;netp&quot;);
++        GameManager::setNetPanzerGameOptions();
+         Desktop::setVisibility(&quot;GameInfoView&quot;, true);
+         Desktop::setVisibility(&quot;MiniMapView&quot;, true);
+         Desktop::setVisibility(&quot;GameView&quot;, true);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000073.html">[Netpanzer-cvs] r1031 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

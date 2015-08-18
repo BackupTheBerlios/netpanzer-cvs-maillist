@@ -1,0 +1,531 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1399 -	trunk/netpanzer/src/NetPanzer/Views/Components
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1399%20-%0A%09trunk/netpanzer/src/NetPanzer/Views/Components&In-Reply-To=%3C20120910123321.19EB555B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000422.html">
+   <LINK REL="Next"  HREF="000424.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1399 -	trunk/netpanzer/src/NetPanzer/Views/Components</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1399%20-%0A%09trunk/netpanzer/src/NetPanzer/Views/Components&In-Reply-To=%3C20120910123321.19EB555B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1399 -	trunk/netpanzer/src/NetPanzer/Views/Components">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Mon Sep 10 14:33:20 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000422.html">[Netpanzer-cvs] r1398 - in trunk/netpanzer/src/NetPanzer: Actions	Classes Views/Components Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000424.html">[Netpanzer-cvs] r1400 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#423">[ date ]</a>
+              <a href="thread.html#423">[ thread ]</a>
+              <a href="subject.html#423">[ subject ]</a>
+              <a href="author.html#423">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-10 14:33:20 +0200 (Mon, 10 Sep 2012)
+New Revision: 1399
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+Log:
+Limit the text messages in the chat box to 2k.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp	2012-09-05 16:32:28 UTC (rev 1398)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.cpp	2012-09-10 12:33:20 UTC (rev 1399)
+@@ -23,12 +23,12 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+-int tChatBox::getMaxItemWidth(int Index)
++int tChatBox::getMaxItemWidth(const DataItem&amp; data)
+ {
+-    return Surface::getTextLength(List[Index].text)+34;
++    return Surface::getTextLength(data.text)+34;
+ }
+ 
+-void tChatBox::onPaint(Surface &amp;dst, int Index, int SubLine)
++void tChatBox::onPaint(Surface &amp;dst, const DataItem&amp; data, int SubLine)
+ {
+     int StartX = 0;
+     PIX color = ctTexteNormal;
+@@ -37,7 +37,7 @@
+     
+     StartChar = SubLine * NumPrintableChars; // XXX not checking for out of bounds
+     
+-    ChatMessage *MsgData = (ChatMessage*)(List[Index].Data);
++    ChatMessage *MsgData = (ChatMessage*)(data.Data);
+     if (MsgData)
+     {
+         color = MsgData-&gt;Color;
+@@ -63,7 +63,7 @@
+         } 
+     }
+     
+-    dst.bltStringLen(StartX , 4, List[Index].text.c_str() + StartChar, NumPrintableChars, color);
++    dst.bltStringLen(StartX , 4, data.text.c_str() + StartChar, NumPrintableChars, color);
+ }
+ 
+ void tChatBox::AddChat(std::string msg, PIX color, bool isflag, FlagID flagindex)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp	2012-09-05 16:32:28 UTC (rev 1398)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tChatBox.hpp	2012-09-10 12:33:20 UTC (rev 1399)
+@@ -38,12 +38,21 @@
+         setAutoWrap(true);
+     }
+         
+-    virtual int getMaxItemWidth(int Index);
+-    virtual void onPaint(Surface &amp;dst, int Index, int SubLine);
++    virtual int getMaxItemWidth(const DataItem&amp; data);
++    virtual void onPaint(Surface &amp;dst, const DataItem&amp; data, int SubLine);
+     virtual void AddChat(std::string msg, PIX color, bool isflag, FlagID flagindex);
++    void deleteData(const DataItem&amp; data)
++    {
++        ChatMessage *MsgData = (ChatMessage*)(data.Data);
++        if ( MsgData )
++        {
++            delete MsgData;
++        }
++    }
++    
+     virtual void Clear()
+     {
+-        std::vector&lt;DataItem&gt;::iterator f;
++        std::list&lt;DataItem&gt;::iterator f;
+         for (f = List.begin(); f != List.end(); f++)
+         {
+             ChatMessage *MsgData = (ChatMessage*)(f-&gt;Data);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp	2012-09-05 16:32:28 UTC (rev 1398)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.cpp	2012-09-10 12:33:20 UTC (rev 1399)
+@@ -34,19 +34,19 @@
+     TeamNumber = 0;
+ }
+ 
+-int tPlayerStateBox::getMaxItemWidth(int Index)
++int tPlayerStateBox::getMaxItemWidth(const DataItem&amp; data)
+ {
+     if (DrawFlags)
+-        return Surface::getTextLength(List[Index].text)+34;
++        return Surface::getTextLength(data.text)+34;
+     else
+-        return Surface::getTextLength(List[Index].text)+10;
++        return Surface::getTextLength(data.text)+10;
+ }
+ 
+-void tPlayerStateBox::onPaint(Surface &amp;dst, int Index)
++void tPlayerStateBox::onPaint(Surface &amp;dst, const DataItem&amp; data)
+ {
+     char statBuf[256];
+     int StartX = 1;
+-    PlayerState *state = (PlayerState*)(List[Index].Data);
++    PlayerState *state = (PlayerState*)(data.Data);
+     if (DrawFlags)
+     {
+         Surface * flag = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp	2012-09-05 16:32:28 UTC (rev 1398)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tPlayerStateBox.hpp	2012-09-10 12:33:20 UTC (rev 1399)
+@@ -32,8 +32,8 @@
+ public:
+     tPlayerStateBox(iRect rect, StateChangedCallback* newcallback);
+ 
+-    virtual int getMaxItemWidth(int Index);
+-    virtual void onPaint(Surface &amp;dst, int Index);
++    virtual int getMaxItemWidth(const DataItem&amp; data);
++    virtual void onPaint(Surface &amp;dst, const DataItem&amp; data);
+     void UpdateState(bool ForceUpdate);
+     void setDrawFlags(bool df);
+     void setShowTeam(Uint8 Team_Number);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	2012-09-05 16:32:28 UTC (rev 1398)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.cpp	2012-09-10 12:33:20 UTC (rev 1399)
+@@ -21,6 +21,8 @@
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Theme.hpp&quot;
+ 
++#define MAX_CHAT_LINES (2000)
++
+ tStringListBox::tStringListBox(iRect rect, StateChangedCallback* newcallback)
+ {
+     VScrollBar = 0;
+@@ -29,13 +31,13 @@
+     setLocation(rect.min);
+     setSize(rect.getSizeX(), rect.getSizeY());
+     background = ctWindowsbackground;
+-    StartItem = 0;
++    StartItem = List.end();
+     StartSubLine = 0;
+     StartWidth = 0;
+     TotalLines = 0;
+     TotalPosition = 0;
+     MaxItemWidth = size.x;
+-    SelectedItem = -1;
++    SelectedItem = List.end();
+     MaxItemView = (size.y-5)/ItemHeight;
+     AutoScroll = false;
+     AutoWrap = false;
+@@ -51,11 +53,13 @@
+         SelectedItem = StartItem;
+         int TmpSubLine = StartSubLine;
+         
+-        while ( SelectedLine-- &amp;&amp; SelectedItem &lt; List.size() )
++        SelectedItem = StartItem;
++        
++        while ( SelectedLine-- &amp;&amp; SelectedItem != List.end() )
+         {
+-            if ( ++TmpSubLine &gt;= List[SelectedItem].num_lines )
++            if ( ++TmpSubLine &gt;= (*SelectedItem).num_lines )
+             {
+-                SelectedItem += 1;
++                SelectedItem++;
+                 TmpSubLine = 0;
+             }
+         }
+@@ -63,20 +67,18 @@
+     }
+ }
+ 
+-int tStringListBox::getSelectedItem()
+-{
+-    return SelectedItem;
+-}
+-
+ std::string tStringListBox::getTextItem()
+ {
+-    if (SelectedItem &lt; 0) return &quot;&quot;;
+-    else return List[SelectedItem].text;
++    if ( SelectedItem == List.end() )
++    {
++        return &quot;&quot;;
++    }
++    return (*SelectedItem).text;
+ }
+ 
+-int tStringListBox::getMaxItemWidth(int Index)
++int tStringListBox::getMaxItemWidth(const DataItem&amp; data)
+ {
+-    return Surface::getTextLength(List[Index].text)+10;
++    return Surface::getTextLength(data.text)+10;
+ }
+ 
+ void tStringListBox::AddData(const std::string&amp; S, void * D)
+@@ -88,10 +90,40 @@
+     data.Data = D;
+     data.num_lines = getNumLines(DisplaySize, data);
+     List.push_back(data);
++
++    if ( List.size() &gt; MAX_CHAT_LINES )
++    {
++        bool was_first = StartItem == List.begin();
++        bool was_selected = SelectedItem == List.begin();
++        
++        const DataItem&amp; d = (*List.begin());
++        
++        TotalLines -= d.num_lines;
++        TotalPosition = std::max(0, TotalPosition - d.num_lines);
++        
++        deleteData(d);
++        
++        List.pop_front();
++        
++        if ( was_first )
++        {
++            StartItem = List.begin();
++        }
++        
++        if ( was_selected )
++        {
++            SelectedItem = List.end();
++        }
++    }
+     
++    if ( StartItem == List.end() )
++    {
++        StartItem = List.begin();
++    }
++    
+     TotalLines += data.num_lines;
+     
+-    int HSize = getMaxItemWidth(List.size()-1);
++    int HSize = getMaxItemWidth(data);
+     
+     if (MaxItemWidth &lt; HSize)
+     {
+@@ -100,7 +132,6 @@
+     
+     if (VScrollBar)
+     {
+-//        VScrollBar-&gt;setMax(List.size()-MaxItemView);
+         VScrollBar-&gt;setMax(TotalLines-MaxItemView);
+     }
+     
+@@ -121,8 +152,8 @@
+             {
+                 if ( (--StartSubLine) &lt; 0 )
+                 {
+-                    StartItem -= 1;
+-                    StartSubLine = List[StartItem].num_lines - 1;
++                    StartItem--;
++                    StartSubLine = (*StartItem).num_lines - 1;
+                 }
+                 TotalPosition -= 1;
+             }
+@@ -131,15 +162,14 @@
+         {
+             while ( TotalPosition &lt; new_pos )
+             {
+-                if ( (++StartSubLine) &gt;= List[StartItem].num_lines )
++                if ( (++StartSubLine) &gt;= (*StartItem).num_lines )
+                 {
+-                    StartItem += 1;
++                    StartItem++;
+                     StartSubLine = 0;
+                 }
+                 TotalPosition += 1;
+             }
+         }
+-//        StartItem = VScrollBar-&gt;getPosition();
+     }
+     
+     dirty = true;
+@@ -149,9 +179,6 @@
+ {
+     surface.fill(background);
+     surface.drawRect(surface.getRect(), ctWindowsBorder);
+-    int MaxItem = MaxItemView-StartItem;
+-    if ( (StartItem+MaxItemView) &gt; (int)List.size()) MaxItem  = List.size();
+-    else MaxItem = StartItem+MaxItemView;
+     int row = 4;
+     
+     int maxw = 0;
+@@ -167,36 +194,37 @@
+     Surface RowPaint(maxw, ItemHeight, 1);
+     Surface Bitmap(size.x-6, ItemHeight, 1);
+     
+-    int item_num = StartItem;
++    std::list&lt;DataItem&gt;::iterator item = StartItem;
+     int subline_num = StartSubLine;
+     int max_size_y = size.y - ItemHeight;
+     
+-    while ( (row &lt; max_size_y) &amp;&amp; (item_num &lt; List.size()) )
++    while ( (row &lt; max_size_y) &amp;&amp; (item != List.end()) )
+     {
+         RowPaint.fill(background);
+-        if (SelectedItem == item_num)
++        if ( SelectedItem == item )
+         {
+             RowPaint.fill(ctTexteOver);
+         }
+-        onPaint(RowPaint, item_num, subline_num);
+         
++        onPaint(RowPaint, *item, subline_num);
++        
+         iRect r(StartWidth, 0, StartWidth+(size.x-6), ItemHeight);
+         Bitmap.grab(RowPaint, r);
+         Bitmap.blt(surface, 3, row);
+         
+         row += ItemHeight;
+         subline_num += 1;
+-        if ( subline_num &gt;= List[item_num].num_lines )
++        if ( subline_num &gt;= (*item).num_lines )
+         {
+             subline_num = 0;
+-            item_num += 1;
++            item++;
+         }
+     }
+ }
+ 
+-void tStringListBox::onPaint(Surface &amp;dst, int Index, int SubLine)
++void tStringListBox::onPaint(Surface &amp;dst, const DataItem&amp; data, int SubLine)
+ {
+-    dst.bltString(1 , 4, List[Index].text.c_str(), ctTexteNormal);
++    dst.bltString(1 , 4, data.text.c_str(), ctTexteNormal);
+ }
+ 
+ void tStringListBox::setColor(PIX newColor)
+@@ -234,9 +262,6 @@
+ {
+     if (source == VScrollBar)
+     {
+-        
+-//        StartItem = VScrollBar-&gt;getPosition();
+-        
+         int new_pos = VScrollBar-&gt;getPosition();
+         
+         if ( new_pos &lt; TotalPosition )
+@@ -245,8 +270,8 @@
+             {
+                 if ( (--StartSubLine) &lt; 0 )
+                 {
+-                    StartItem -= 1;
+-                    StartSubLine = List[StartItem].num_lines - 1;
++                    StartItem--;
++                    StartSubLine = (*StartItem).num_lines - 1;
+                 }
+                 TotalPosition -= 1;
+             }
+@@ -255,9 +280,9 @@
+         {
+             while ( TotalPosition &lt; new_pos )
+             {
+-                if ( (++StartSubLine) &gt;= List[StartItem].num_lines )
++                if ( (++StartSubLine) &gt;= (*StartItem).num_lines )
+                 {
+-                    StartItem += 1;
++                    StartItem++;
+                     StartSubLine = 0;
+                 }
+                 TotalPosition += 1;
+@@ -273,24 +298,6 @@
+     }
+ }
+ 
+-void tStringListBox::Delete(int Index)
+-{
+-    if (Index &gt; (int)List.size())
+-    {
+-        List.erase(List.begin()+Index);
+-        dirty = true;
+-    }
+-}
+-
+-int tStringListBox::IndexOf(const std::string S)
+-{
+-    for (int i = 0; i &lt; (int)List.size(); ++i)
+-    {
+-        if (S == List[i].text) return i;
+-    }
+-    return -1;
+-}
+-
+ void tStringListBox::setLocation(int x, int y)
+ {
+     position.x = x;
+@@ -317,7 +324,7 @@
+             int DisplaySize = size.x - 6;
+             int c;
+             
+-            std::vector&lt;DataItem&gt;::iterator i = List.begin();
++            std::list&lt;DataItem&gt;::iterator i = List.begin();
+             while ( i != List.end() )
+             {
+                 c = getNumLines( DisplaySize, *i);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-05 16:32:28 UTC (rev 1398)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-10 12:33:20 UTC (rev 1399)
+@@ -18,7 +18,8 @@
+ #ifndef __tStringListBox_hpp__
+ #define __tStringListBox_hpp__
+ 
+-#include &lt;vector&gt;
++//#include &lt;vector&gt;
++#include &lt;list&gt;
+ #include &lt;string&gt;
+ #include &quot;Component.hpp&quot;
+ #include &quot;MouseEvent.hpp&quot;
+@@ -39,7 +40,7 @@
+ class tStringListBox : public Component, public StateChangedCallback
+ {
+ protected:
+-    std::vector&lt;DataItem&gt; List;
++    std::list&lt;DataItem&gt; List;
+ 
+ private:
+     StateChangedCallback* callback;
+@@ -49,12 +50,12 @@
+     tVScrollBar *VScrollBar;
+     tHScrollBar *HScrollBar;
+     
+-    int StartItem;
++    std::list&lt;DataItem&gt;::iterator StartItem;
+     int StartSubLine;
+     int StartWidth;
+     
+     int MaxItemView;
+-    int SelectedItem;
++    std::list&lt;DataItem&gt;::iterator SelectedItem;
+     int MaxItemWidth;
+     
+     int TotalLines;
+@@ -80,21 +81,18 @@
+     
+     virtual void setHscrollBar(tHScrollBar *newHScrollBar);
+     virtual void stateChanged(Component* source);
+-    virtual int getMaxItemWidth(int Index);
+-    virtual int getSelectedItem();
++    virtual int getMaxItemWidth(const DataItem&amp; data);
+     virtual std::string getTextItem();
+     
+     int getNumVisibleLines() { return MaxItemView; }
+     
+     virtual void Add(const std::string&amp; S) { AddData(S, 0); }
+     virtual void AddData(const std::string&amp; S, void * D);
++    virtual void deleteData(const DataItem&amp; data) { /* to be overriden */}
+     
+     virtual void Clear(){List.clear();dirty = true;}
+-    virtual void Delete(int Index);
+-    //virtual void Sort(){sort(List.begin(), List.end());dirty = true;}
+-    virtual int IndexOf(const std::string S);
+     virtual int Count(){return List.size();}
+-    virtual void onPaint(Surface &amp;dst, int Index, int SubLine);
++    virtual void onPaint(Surface &amp;dst, const DataItem&amp; data, int SubLine);
+     virtual void setLocation(int x, int y);
+     virtual void setLocation(const iXY &amp;p) { setLocation(p.x, p.y); }
+     virtual void setAutoScroll(bool Value){AutoScroll = Value;}
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000422.html">[Netpanzer-cvs] r1398 - in trunk/netpanzer/src/NetPanzer: Actions	Classes Views/Components Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000424.html">[Netpanzer-cvs] r1400 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#423">[ date ]</a>
+              <a href="thread.html#423">[ thread ]</a>
+              <a href="subject.html#423">[ subject ]</a>
+              <a href="author.html#423">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

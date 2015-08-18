@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1346 - trunk/netpanzer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1346%20-%20trunk/netpanzer&In-Reply-To=%3C20120208120937.0A4F4481020%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000369.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1346 - trunk/netpanzer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1346%20-%20trunk/netpanzer&In-Reply-To=%3C20120208120937.0A4F4481020%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1346 - trunk/netpanzer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Feb  8 13:09:36 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000369.html">[Netpanzer-cvs] r1343 - in trunk/netpanzer: . src/Lib/Util	support/scripts support/win32
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#370">[ date ]</a>
+              <a href="thread.html#370">[ thread ]</a>
+              <a href="subject.html#370">[ subject ]</a>
+              <a href="author.html#370">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-02-08 13:09:36 +0100 (Wed, 08 Feb 2012)
+New Revision: 1346
+
+Modified:
+   trunk/netpanzer/SConstruct
+Log:
+- added more options for compiling the code. Usefull for linux distributions
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-02-07 12:11:19 UTC (rev 1345)
++++ trunk/netpanzer/SConstruct	2012-02-08 12:09:36 UTC (rev 1346)
+@@ -77,6 +77,9 @@
+     ('version', 'sets the version name to build, use &quot;auto&quot; for using the RELEASE_VERSION file or the default svn code', 'auto'),
+     ('with_lua', 'use internal lua or link with provided parameter, with_lua=lua5.1 will add -llua5.1 in the link stage, default is internal', 'internal'),
+     ('with_physfs', 'use internal physfs or link with provided parameter, with_physfs=physfs will add -lphysfs in the link stage, default is internal', 'internal'),
++    EnumVariable('with_libgcc', 'Link libgcc static or dynamic', 'static', allowed_values=('static', 'dynamic')),
++    EnumVariable('with_libstdcpp', 'Link libstdc++ static or dynamic', 'static', allowed_values=('static', 'dynamic')),
++    EnumVariable('with_stackprotector', 'Enable gcc stack protector (requires glibc 2.7)', 'no', allowed_values=('no', 'yes')),
+ )
+ 
+ env = Environment(ENV = os.environ, variables = vars)
+@@ -118,9 +121,11 @@
+ #
+ 
+ env.Append( CCFLAGS = [ '-DPACKAGE_VERSION=\\&quot;' + NPVERSION + '\\&quot;' ] )
+-#env.Append( CCFLAGS = [ '-fno-stack-protector' ] )
+-env.Append( CFLAGS = [  '-fno-stack-protector' ] )
+ 
++if env['with_stackprotector'] == 'no':
++    #env.Append( CCFLAGS = [ '-fno-stack-protector' ] )
++    env.Append( CFLAGS = [  '-fno-stack-protector' ] )
++
+ if env['datadir'] != '':
+     env.Append( CCFLAGS = [ '-DNP_DATADIR=\\&quot;' +  env['datadir'] + '\\&quot;' ])
+ 
+@@ -147,8 +152,11 @@
+     env.Append( LIBS = [ 'ws2_32', 'mingw32' ] )
+     env['WINICON'] = env.RES( 'support/icon/npicon.rc' )
+ 
+-env.Append( LINKFLAGS = [ '-static-libstdc++' ] )
+-env.Append( LINKFLAGS = [ '-static-libgcc' ] )
++if env['with_libstdcpp'] == 'static':
++    env.Append( LINKFLAGS = [ '-static-libstdc++' ] )
++    
++if env['with_libgcc'] == 'static':
++    env.Append( LINKFLAGS = [ '-static-libgcc' ] )
+ 
+ if env['mode'] == 'debug':
+     env.Append(CCFLAGS = ['-g', '-O0'])
+@@ -174,7 +182,6 @@
+ #    #crosslinuxenv.Prepend( _LIBFLAGS = [ '-lstdc++' ] )
+ #    #crosslinuxenv.Append( _LIBFLAGS = [ '`' + crosslinuxenv['CXX'] + ' -print-file-name=libstdc++.a`' ] )
+ #    #crosslinuxenv.Prepend( _LIBFLAGS = [ '/usr/local/gcc/i686-linux/lib/gcc/i686-linux/4.2.4/../../../../i686-linux/lib/libstdc++.a' ] )
+-    
+ 
+ env.VariantDir(buildpath,'.',duplicate=0)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000369.html">[Netpanzer-cvs] r1343 - in trunk/netpanzer: . src/Lib/Util	support/scripts support/win32
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#370">[ date ]</a>
+              <a href="thread.html#370">[ thread ]</a>
+              <a href="subject.html#370">[ subject ]</a>
+              <a href="author.html#370">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1311 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts support/icon
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1311%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%20support/icon&In-Reply-To=%3C20111222115911.0023B481510%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000336.html">
+   <LINK REL="Next"  HREF="000338.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1311 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts support/icon</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1311%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Scripts%20support/icon&In-Reply-To=%3C20111222115911.0023B481510%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1311 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts support/icon">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec 22 12:59:10 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000336.html">[Netpanzer-cvs] r1310 - in branches: . newpath	newpath/src/Lib/Types newpath/src/Lib/Util	newpath/src/NetPanzer/Bot newpath/src/NetPanzer/Classes	newpath/src/NetPanzer/Classes/AI	newpath/src/NetPanzer/Classes/Network	newpath/src/NetPanzer/Interfaces newpath/src/NetPanzer/Objectives	newpath/src/NetPanzer/PowerUps newpath/src/NetPanzer/Units	newpath/src/NetPanzer/Views/Components	newpath/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000338.html">[Netpanzer-cvs] r1312 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#337">[ date ]</a>
+              <a href="thread.html#337">[ thread ]</a>
+              <a href="subject.html#337">[ subject ]</a>
+              <a href="author.html#337">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-12-22 12:59:10 +0100 (Thu, 22 Dec 2011)
+New Revision: 1311
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   trunk/netpanzer/support/icon/npicon.rc
+Log:
+sync flagtimer with all clients
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -207,6 +207,7 @@
+             netpanzer.serversayto( player, &quot;flagtimer time is &quot; .. config.game.changeflagtime);
+         else
+             config.game.changeflagtime = param;
++            netpanzer.syncflagtimer();
+             netpanzer.serversayto( player, &quot;flagtimer time was set to &quot; .. config.game.changeflagtime);
+         end
+     end
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -188,3 +188,13 @@
+     elapsed_time = (time_t)htol32((Uint32)elapsedTime);
+ }
+ 
++Sint32 ConnectMesgServerGameSettings::getFlagTime() const
++{
++    return ltoh32(flag_time);
++}
++
++void ConnectMesgServerGameSettings::setFlagTime(Sint32 flagtime)
++{
++    flag_time = htol32(flagtime);
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -185,6 +185,7 @@
+     Sint32  frag_limit;
+     Sint32  time_limit;
+     time_t   elapsed_time;
++    Sint32  flag_time;
+ 
+ public:
+     ConnectMesgServerGameSettings();
+@@ -206,6 +207,8 @@
+     void setTimeLimit(Sint32 timeLimit);
+     time_t getElapsedTime() const;
+     void setElapsedTime(time_t elapsedTime);
++    Sint32 getFlagTime() const;
++    void setFlagTime(Sint32 flagtime);
+ } __attribute__((packed));
+ 
+ class ConnectMesgClientGameSetupAck : public NetMessage
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -27,7 +27,8 @@
+        _net_message_id_player_sync_state,
+        _net_message_id_player_score_update,
+        _net_message_id_player_alliance_request,
+-       _net_message_id_player_alliance_update
++       _net_message_id_player_alliance_update,
++       _net_message_id_player_flagtimer_update
+      };
+ 
+ #ifdef MSVC
+@@ -207,6 +208,25 @@
+ }
+ __attribute__((packed));
+ 
++class PlayerFlagTimerUpdate : public NetMessage
++{
++public:
++    Uint16 flag_timer;
++
++    PlayerFlagTimerUpdate(Uint16 flagtimer)
++    {
++        message_class = _net_message_class_player;
++        message_id = _net_message_id_player_flagtimer_update;
++        flag_timer = flagtimer;
++    }
++    
++    Uint16 getflagtimer() const
++    {
++        return flag_timer;
++    }
++}
++__attribute__((packed));
++
+ #ifdef MSVC
+ #pragma pack()
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -333,7 +333,10 @@
+        &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() ) 
+     {
+         if (GameConfig::game_changeflagtime == 0)
++        {
+             Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
++            Flagtimer.reset();
++        }
+         else 
+         if (Flagtimer.checkWithTimeOut(GameConfig::game_changeflagtime * 60000)) 
+         {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -286,7 +286,7 @@
+         &lt;&lt; &quot;MaxPlayers: &quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;MaxUnits: &quot; &lt;&lt; gameconfig-&gt;maxunits &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;AutoKick: &quot; &lt;&lt; GameConfig::game_autokicktime &lt;&lt; &quot;\n&quot;
+-        &lt;&lt; &quot;FagTimer: &quot; &lt;&lt; GameConfig::game_changeflagtime &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;FlagTimer: &quot; &lt;&lt; GameConfig::game_changeflagtime &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;Gametype: &quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;ObjectivePercentage: &quot; &lt;&lt;
+             gameconfig-&gt;objectiveoccupationpercentage &lt;&lt; &quot;\n&quot;
+@@ -437,6 +437,7 @@
+     game_setup-&gt;setFragLimit(gameconfig-&gt;fraglimit);
+     game_setup-&gt;setTimeLimit(gameconfig-&gt;timelimit);
+     game_setup-&gt;setElapsedTime(getGameTime());
++    game_setup-&gt;setFlagTime(gameconfig-&gt;game_changeflagtime);
+ 
+     return game_setup;
+ }
+@@ -489,7 +490,7 @@
+     gameconfig-&gt;gametype = game_setup-&gt;getGameType();
+     gameconfig-&gt;fraglimit = game_setup-&gt;getFragLimit();
+     gameconfig-&gt;timelimit = game_setup-&gt;getTimeLimit();
+-
++    gameconfig-&gt;game_changeflagtime = game_setup-&gt;getFlagTime();
+     startGameTimer();
+     game_elapsed_time_offset = game_setup-&gt;getElapsedTime();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -626,6 +626,11 @@
+         case _net_message_id_player_alliance_update :
+             netMessageAllianceUpdate(message);
+             break;
++
++        case _net_message_id_player_flagtimer_update :
++                const PlayerFlagTimerUpdate* pftu = (const PlayerFlagTimerUpdate*)message;
++                gameconfig-&gt;game_changeflagtime = pftu-&gt;getflagtimer();
++            break;
+     }
+ }
+ 
+@@ -649,3 +654,10 @@
+         SERVER-&gt;broadcastMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+     }
+ }
++
++void PlayerInterface::SyncFlagTimer()
++{
++    PlayerFlagTimerUpdate player_flagtimer_update(gameconfig-&gt;game_changeflagtime);
++    
++    SERVER-&gt;broadcastMessage(&amp;player_flagtimer_update, sizeof(PlayerFlagTimerUpdate));
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -129,6 +129,8 @@
+     static bool testRuleObjectiveRatio( float precentage, PlayerState ** player_state );
+ 
+     static bool testRulePlayerRespawn( bool *completed, PlayerState **player_state );
++    
++    static void SyncFlagTimer();
+ 
+ protected:
+     static PlayerID respawn_rule_player_index;
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -231,6 +231,12 @@
+     return 1;
+ }
+ 
++static int npmodule_SyncFlagTimer (lua_State *L)
++{
++    PlayerInterface::SyncFlagTimer();
++    return 0;
++}
++
+ static const luaL_Reg npmodule[] =
+ {
+     {&quot;say&quot;,           npmodule_say},
+@@ -244,6 +250,7 @@
+     {&quot;map&quot;,           npmodule_map},
+     {&quot;listmaps&quot;,      npmodule_listMaps},
+     {&quot;listprofiles&quot;,  npmodule_listProfiles},
++    {&quot;syncflagtimer&quot;, npmodule_SyncFlagTimer},
+     {NULL, NULL}
+ };
+ 
+
+Modified: trunk/netpanzer/support/icon/npicon.rc
+===================================================================
+--- trunk/netpanzer/support/icon/npicon.rc	2011-12-21 16:52:46 UTC (rev 1310)
++++ trunk/netpanzer/support/icon/npicon.rc	2011-12-22 11:59:10 UTC (rev 1311)
+@@ -8,8 +8,8 @@
+ //
+ 
+ VS_VERSION_INFO VERSIONINFO
+- FILEVERSION 0,8,4
+- PRODUCTVERSION 0,8,4
++ FILEVERSION 0,8,4,0
++ PRODUCTVERSION 0,8,4,0
+  FILEFLAGSMASK 0x3fL
+  FILEFLAGS 0x0L
+  FILEOS 0x40004L
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000336.html">[Netpanzer-cvs] r1310 - in branches: . newpath	newpath/src/Lib/Types newpath/src/Lib/Util	newpath/src/NetPanzer/Bot newpath/src/NetPanzer/Classes	newpath/src/NetPanzer/Classes/AI	newpath/src/NetPanzer/Classes/Network	newpath/src/NetPanzer/Interfaces newpath/src/NetPanzer/Objectives	newpath/src/NetPanzer/PowerUps newpath/src/NetPanzer/Units	newpath/src/NetPanzer/Views/Components	newpath/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000338.html">[Netpanzer-cvs] r1312 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#337">[ date ]</a>
+              <a href="thread.html#337">[ thread ]</a>
+              <a href="subject.html#337">[ subject ]</a>
+              <a href="author.html#337">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

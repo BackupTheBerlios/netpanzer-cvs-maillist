@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1402 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1402%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Units&In-Reply-To=%3C20120910151848.7458755B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000425.html">
+   <LINK REL="Next"  HREF="000427.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1402 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Units</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1402%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Units&In-Reply-To=%3C20120910151848.7458755B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1402 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Units">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Mon Sep 10 17:18:48 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000425.html">[Netpanzer-cvs] r1401 -	trunk/netpanzer/src/NetPanzer/Views/Components
+</A></li>
+        <LI>Next message: <A HREF="000427.html">[Netpanzer-cvs] r1403 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#426">[ date ]</a>
+              <a href="thread.html#426">[ thread ]</a>
+              <a href="subject.html#426">[ subject ]</a>
+              <a href="author.html#426">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-10 17:18:47 +0200 (Mon, 10 Sep 2012)
+New Revision: 1402
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp
+Log:
+Remove some unused code...........................
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp	2012-09-10 13:29:07 UTC (rev 1401)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitNetMessage.hpp	2012-09-10 15:18:47 UTC (rev 1402)
+@@ -54,55 +54,6 @@
+     }
+ } __attribute__((packed));
+ 
+-
+-class UnitIniSyncMessage : public NetMessage
+-{
+-public:
+-    Uint8 unit_type;
+-private:
+-    PlayerID player_id;
+-    Uint16 unit_id;
+-    Uint32 location_x;
+-    Uint32 location_y;
+-public:
+-    NetworkUnitState unit_state;
+-
+-    UnitIniSyncMessage(Uint8 unit_type, PlayerID player_id, UnitID unit_id,
+-        Uint32 location_x, Uint32 location_y)
+-    {
+-        message_class = _net_message_class_unit;
+-        message_id = _net_message_id_ini_sync_mesg;
+-        this-&gt;unit_type = unit_type;
+-        //this-&gt;player_id = htol16(player_id);
+-        this-&gt;player_id = player_id;
+-        this-&gt;unit_id = htol16(unit_id);
+-        this-&gt;location_x = htol32(location_x);
+-        this-&gt;location_y = htol32(location_y);
+-    }
+-      
+-    unsigned short realSize() const
+-    {
+-        return( sizeof( UnitIniSyncMessage ) );
+-    }
+-    Uint32 getLocX() const
+-    {
+-        return ltoh32(location_x);
+-    }
+-    Uint32 getLocY() const
+-    {
+-        return ltoh32(location_y);
+-    }
+-
+-    UnitID getUnitID() const
+-    {
+-        return ltoh16(unit_id);
+-    }
+-    PlayerID getPlayerID() const
+-    {
+-        return player_id;
+-    }
+-} __attribute__((packed));
+-
+ // ** NOTE: A big, mother fucking HACK
+ 
+ class UnitRemoteDestroy : public NetMessage
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-09-10 13:29:07 UTC (rev 1401)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-09-10 15:18:47 UTC (rev 1402)
+@@ -736,30 +736,6 @@
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::unitSyncMessage(const NetMessage *net_message)
+-{
+-    const UnitIniSyncMessage* sync_message 
+-        = (const UnitIniSyncMessage *) net_message;
+-
+-    try {
+-        std::map&lt;UnitID, UnitBase*&gt;::iterator uit = units.find(sync_message-&gt;getUnitID());
+-        if ( uit != units.end() ) {
+-            LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Received an existing unit [%d]&quot;,
+-                            sync_message-&gt;getUnitID());
+-            return;
+-        }
+-        UnitBase* unit = newUnit(sync_message-&gt;unit_type,
+-                iXY(sync_message-&gt;getLocX(), sync_message-&gt;getLocY()),
+-                sync_message-&gt;getPlayerID(), sync_message-&gt;getUnitID());
+-        unit-&gt;in_sync_flag = false;
+-        addNewUnit(unit);
+-    } catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't sync unit '%s'&quot;, e.what());
+-    }
+-}
+-
+-// ******************************************************************
+-
+ void UnitInterface::unitOpcodeMessage(const NetMessage *net_message, size_t size)
+ {
+     UnitOpcodeDecoder decoder;
+@@ -830,9 +806,6 @@
+ void UnitInterface::processNetMessage(const NetMessage* net_message, size_t size)
+ {
+     switch(net_message-&gt;message_id)  {
+-        case _net_message_id_ini_sync_mesg:
+-            unitSyncMessage(net_message);
+-            break;
+ 
+         case _net_message_id_opcode_mesg:
+             unitOpcodeMessage(net_message, size);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2012-09-10 13:29:07 UTC (rev 1401)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2012-09-10 15:18:47 UTC (rev 1402)
+@@ -164,7 +164,6 @@
+         opcode_encoder.encode(opcode);
+     }
+ 
+-    static void unitSyncMessage(const NetMessage *net_message );
+     static void unitOpcodeMessage(const NetMessage *net_message, size_t size);
+     static void unitDestroyMessage(const NetMessage *net_message );
+     static void unitCreateMessage(const NetMessage *net_message );
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp	2012-09-10 13:29:07 UTC (rev 1401)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp	2012-09-10 15:18:47 UTC (rev 1402)
+@@ -59,65 +59,3 @@
+ 
+     return( damage_percentage );
+ }
+-
+-NetworkUnitState UnitState::getNetworkUnitState() const
+-{
+-    NetworkUnitState state;
+-
+-    state.unit_type = unit_type;
+-    state.location_x = htol32(location.x);
+-    state.location_y = htol32(location.y);
+-    state.bbox_min_x = htol32(bbox.min.x);
+-    state.bbox_min_y = htol32(bbox.min.y);
+-    state.bbox_max_x = htol32(bbox.max.x);
+-    state.bbox_max_y = htol32(bbox.max.y);
+-
+-    state.body_angle = body_angle.getNetworkAngleInt();
+-    state.turret_angle = turret_angle.getNetworkAngleInt();
+-    state.orientation = htol16(orientation);
+-    state.speed_rate = htol16(speed_rate);
+-    state.speed_factor = htol16(speed_factor);
+-    
+-    state.reload_time = htol16(reload_time);
+-    state.max_hit_points = htol16(max_hit_points);
+-    state.hit_points = htol16(hit_points);
+-    state.damage_factor = htol16(damage_factor);
+-    state.weapon_range = htol32(weapon_range);
+-    state.defend_range = htol32(defend_range);
+-    
+-    state.threat_level = threat_level;
+-    state.lifecycle_state = lifecycle_state;
+-
+-    return state;
+-}
+-
+-void UnitState::setFromNetworkUnitState(const NetworkUnitState&amp; state)
+-{
+-    select = false;
+-
+-    unit_type = state.unit_type;
+-    location.x = ltoh32(state.location_x);
+-    location.y = ltoh32(state.location_y);
+-    bbox.min.x = ltoh32(state.bbox_min_x);
+-    bbox.min.y = ltoh32(state.bbox_min_y);
+-    bbox.max.x = ltoh32(state.bbox_max_x);
+-    bbox.max.y = ltoh32(state.bbox_max_y);
+-
+-    body_angle.setFromNetworkAngleInt(state.body_angle);
+-    turret_angle.setFromNetworkAngleInt(state.turret_angle);
+-
+-    orientation = ltoh16(state.orientation);
+-    speed_rate = ltoh16(state.speed_rate);
+-    speed_factor = ltoh16(state.speed_factor);
+-    
+-    reload_time = ltoh16(state.reload_time);
+-    max_hit_points = ltoh16(state.max_hit_points);
+-    hit_points = ltoh16(state.hit_points);
+-    damage_factor = ltoh16(state.damage_factor);
+-    weapon_range = ltoh32(state.weapon_range);
+-    defend_range = ltoh32(state.defend_range);
+-
+-    threat_level = state.threat_level;
+-    lifecycle_state = state.lifecycle_state;
+-}
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp	2012-09-10 13:29:07 UTC (rev 1401)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp	2012-09-10 15:18:47 UTC (rev 1402)
+@@ -30,50 +30,6 @@
+        _threat_level_defending
+      };
+ 
+-#ifdef MSVC
+-#pragma pack(1)
+-#endif
+-
+-class NetworkUnitState
+-{
+-public:
+-    NetworkUnitState()
+-    { }
+-
+-private:
+-    Uint8     unit_type;
+-
+-    Sint32     location_x;
+-    Sint32     location_y;
+-    Sint32     bbox_min_x;
+-    Sint32     bbox_min_y;
+-    Sint32     bbox_max_x;
+-    Sint32     bbox_max_y;
+-    
+-    NetworkAngleInt body_angle;
+-    NetworkAngleInt turret_angle;
+-
+-    Uint16    orientation;
+-    Uint16    speed_rate;
+-    Uint16    speed_factor;
+-
+-    Uint16    reload_time;
+-    Sint16     max_hit_points;
+-    Sint16     hit_points;
+-    Uint16    damage_factor;
+-    Uint32    weapon_range;
+-    Uint32    defend_range;
+-
+-    Uint8 threat_level;
+-    Uint8 lifecycle_state;
+-
+-    friend class UnitState;
+-} __attribute__((packed));
+-
+-#ifdef MSVC
+-#pragma pack()
+-#endif
+-
+ class UnitState
+ {
+ public:
+@@ -111,9 +67,10 @@
+ 
+     int percentDamageInt();
+     float percentDamageFloat();
+-
+-    NetworkUnitState getNetworkUnitState() const;
+-    void setFromNetworkUnitState(const NetworkUnitState&amp; state);
++    
++private:
++    UnitState(const UnitState&amp;);
++    void operator=(const UnitState&amp;);
+ };
+ 
+ #endif
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000425.html">[Netpanzer-cvs] r1401 -	trunk/netpanzer/src/NetPanzer/Views/Components
+</A></li>
+	<LI>Next message: <A HREF="000427.html">[Netpanzer-cvs] r1403 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units Weapons
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#426">[ date ]</a>
+              <a href="thread.html#426">[ thread ]</a>
+              <a href="subject.html#426">[ subject ]</a>
+              <a href="author.html#426">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

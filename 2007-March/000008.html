@@ -1,0 +1,938 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r961 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Interfaces NetPanzer/Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r961%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Interfaces%20NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200703191512.l2JFCQ1B013826%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000007.html">
+   <LINK REL="Next"  HREF="000009.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r961 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Interfaces NetPanzer/Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r961%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Interfaces%20NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200703191512.l2JFCQ1B013826%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r961 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Interfaces NetPanzer/Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Mar 19 16:12:26 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000007.html">[Netpanzer-cvs] r960 - trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+        <LI>Next message: <A HREF="000009.html">[Netpanzer-cvs] r962 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/AI NetPanzer/Interfaces	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#8">[ date ]</a>
+              <a href="thread.html#8">[ thread ]</a>
+              <a href="subject.html#8">[ subject ]</a>
+              <a href="author.html#8">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-03-19 16:12:22 +0100 (Mon, 19 Mar 2007)
+New Revision: 961
+
+Modified:
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+Log:
+InfoThread.cpp and HeartbeatThread.cpp:
+- Fixed 2 race conditions where the SDL_WaitThread would wait forever if the destructor is called soon after the new thread is created. It was because destructor was setting running to false and THEN the thread would set it to true (just after it starts) so would never exit the loop. Actually this happened to me when testing the game without network cable connected to computer, the network functions would fail and throw an exception then ...
+
+- HeartbeatThread.cpp dont save the new list of masterservers. Right now the masterservers are not synchronize and only one server is saved in the list.
+
+ServerQueryThread.cpp:
+
+- Finish the thread when the state is NOSERVERS|ERROR, before would loop forever in this point.
+- Now will query all available masterservers and wont modify the masterservers list in the config file, this should be done by hand or by user interaction through the interface ( i have an idea about putting the list in a web page and query the masterservers list on that page for future for example we could use <A HREF="http://netpanzer.berlios.de/masterservers.txt">http://netpanzer.berlios.de/masterservers.txt</A> to get the list)
+
+Lib/Network changes:
+
+- Moved all the lowlevel networking functions to SocketBase.cpp
+- Made sockfd private to SocketBase and all the sockets has a private Address
+- TCPListenSocket no inherits from SocketBase
+
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -83,6 +83,35 @@
+ }
+ 
+ void
++SocketBase::bindSocketTo(const Address&amp; toaddr)
++{
++    int res = bind(sockfd, toaddr.getSockaddr(), toaddr.getSockaddrLen());
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
++            &lt;&lt; toaddr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; toaddr.getPort()
++            &lt;&lt; &quot;: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());           
++    }
++}
++
++void
++SocketBase::setReuseAddr()
++{
++    int val = 1;
++    int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't set SO_REUSEADDR: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++}
++
++void
+ SocketBase::setNonBlocking()
+ {
+     int res;
+@@ -102,6 +131,112 @@
+ }
+ 
+ void
++SocketBase::doListen()
++{
++    int res = listen(sockfd, 20);
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't listen on socket: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++}
++
++void
++SocketBase::doConnect()
++{
++    int res = connect(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't connect to '&quot; &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot;
++            &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++}
++
++int
++SocketBase::doSend(const void* data, size_t len)
++{
++    int res = send(sockfd, (const char*) data, len, 0);
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Send error: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++    return res;
++}
++
++int
++SocketBase::doReceive(void* buffer, size_t len)
++{
++    int res = recv(sockfd, (char*) buffer, len, 0);
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        if ( error == NETERROR_WOULDBLOCK)
++            return 0;
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Read error: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++    return res;
++}
++
++int
++SocketBase::doSendTo(const Address&amp; toaddr, const void* data, size_t len)
++{
++    int res = sendto(sockfd, (const char*) data, len, 0,
++                toaddr.getSockaddr(), toaddr.getSockaddrLen());
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Send error: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++    return res;
++}
++
++size_t
++SocketBase::doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len)
++{
++    int res = recvfrom(sockfd, (char*) buffer, len, 0,
++            fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
++    if(res == SOCKET_ERROR) {
++        int error = GET_NET_ERROR();
++        if ( error == NETERROR_WOULDBLOCK)
++            return 0;
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Receive error: &quot; &lt;&lt; strerror(errno);
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++    return res;
++}
++
++SOCKET
++SocketBase::doAccept(Address&amp; fromaddr)
++{
++    SOCKET newsock;
++    newsock= accept(sockfd, fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
++    if (newsock == INVALID_SOCKET) {
++        int error = GET_NET_ERROR();
++        if ( error == NETERROR_WOULDBLOCK )
++            return INVALID_SOCKET; // XXX this could be better
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Accept error: &quot;;
++        printError(msg,error);
++        throw std::runtime_error(msg.str());
++    }
++    return newsock;
++}
++
++void
+ SocketBase::close()
+ {
+     closesocket(sockfd);
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -20,6 +20,7 @@
+ 
+ #include &lt;iostream&gt;
+ #include &quot;SocketHeaders.hpp&quot;
++#include &quot;Address.hpp&quot;
+ #include &quot;Util/NoCopy.hpp&quot;
+ 
+ namespace network
+@@ -28,8 +29,17 @@
+ /** Base class for sockets, this is intended for internal use only */
+ class SocketBase : public NoCopy
+ {
++public:
++    const Address&amp; getAddress() const
++    {
++        return addr;
++    }
+ protected:
+     SocketBase();
++    SocketBase(SOCKET fd) : sockfd(fd) {};
++    SocketBase(const Address &amp;a) : addr(a) {};
++    SocketBase(SOCKET fd, const Address &amp;a) : sockfd(fd), addr(a) {};
++    
+     ~SocketBase();
+ 
+ protected:
+@@ -38,8 +48,22 @@
+     void setNonBlocking();
+     void close();
+     void printError(std::ostream&amp; out, int e);
++    
++    void bindSocketTo(const Address&amp; toaddr);
++    void bindSocket() { bindSocketTo(addr); };
++    void setReuseAddr();
++    void doListen();
++    void doConnect();
++    int  doSend(const void* data, size_t len);
++    int  doReceive(void* buffer, size_t len);
++    int  doSendTo(const Address&amp; toaddr, const void* data, size_t len);
++    size_t  doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len);
++    SOCKET doAccept(Address&amp; fromaddr);
+ 
++private:    
+     SOCKET sockfd;
++    Address addr;
++
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -28,12 +28,17 @@
+ {
+     
+ TCPListenSocket::TCPListenSocket(const Address&amp; newaddr, bool blocking)
++    : SocketBase(newaddr)
+ {
+-    addr = newaddr;
+-    create(true);
+-
+     try {
+-        createBind(blocking);
++        create(true);
++        setReuseAddr();
++        bindSocket();
++        doListen();
++    
++        if(!blocking)
++            setNonBlocking();
++
+     } catch(...) {
+         close();
+         throw;
+@@ -43,62 +48,17 @@
+ #endif
+ }
+ 
+-void
+-TCPListenSocket::createBind(bool blocking)
+-{
+-    int val = 1;
+-    int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
+-    if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't set SO_REUSEADDR: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
+-    
+-    res = bind(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+-    if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+-            &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; addr.getPort()
+-            &lt;&lt; &quot;: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
+-
+-    res = listen(sockfd, 20);
+-    if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't listen on socket: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
+-
+-    if(!blocking)
+-        setNonBlocking();
+-}
+-
+ TCPSocket*
+ TCPListenSocket::accept()
+ {
+-    Address addr;
++    Address newaddr;
+     SOCKET newsock;
+-    newsock= ::accept(sockfd, addr.getSockaddr(), addr.getSockaddrLenPointer());
+-    if (newsock == INVALID_SOCKET) {
+-        int error = GET_NET_ERROR();
+-        if ( error == NETERROR_WOULDBLOCK )
+-            return 0;
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Accept error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
+-
++    newsock = doAccept(newaddr);
++    if (newsock == INVALID_SOCKET)
++        return 0; 
+     TCPSocket* result;
+     try {
+-        result = new TCPSocket(newsock, addr);
++        result = new TCPSocket(newsock, newaddr);
+     } catch(...) {
+         close();
+         throw;
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -19,12 +19,12 @@
+ #define __TCPLISTENSOCKET_HPP__
+ 
+ #include &lt;assert.h&gt;
+-#include &quot;TCPSocket.hpp&quot;
++#include &quot;SocketBase.hpp&quot;
+ 
+ namespace network
+ {
+ 
+-class TCPListenSocket : public TCPSocket
++class TCPListenSocket : public SocketBase
+ {
+ public:
+     /** creates a new listen socket and binds it to the specified address */
+@@ -36,8 +36,6 @@
+     TCPSocket* accept();
+ 
+ private:
+-    void createBind(bool blocking);
+-    
+     // forbidden on listening socket
+     void send(const void* , size_t )
+     { assert(false); }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -27,45 +27,25 @@
+ namespace network
+ {
+ 
+-TCPSocket::TCPSocket(const Address&amp; newaddr, bool blocking)
+-    : addr(newaddr)
++TCPSocket::TCPSocket(const Address&amp; newaddr, bool blocking) :SocketBase(newaddr)
+ {
+-    init(Address::ANY, blocking);
++    create(true);
++    init(blocking);
+ }
+ 
+ TCPSocket::TCPSocket(const Address&amp; bindaddr, const Address&amp; newaddr,
+-        bool blocking) : addr(newaddr)
++        bool blocking) : SocketBase(newaddr)
+ {
+-    init(bindaddr, blocking);
++    create(true);
++    bindSocketTo(bindaddr);
++    init(blocking);
+ }
+ 
+ void
+-TCPSocket::init(const Address&amp; bindaddr, bool blocking)
++TCPSocket::init(bool blocking)
+ {
+-    create(true);
+-
+     try {
+-        int res = bind(sockfd, bindaddr.getSockaddr(), bindaddr.getSockaddrLen());
+-        if(res == SOCKET_ERROR) {
+-            int error = GET_NET_ERROR();
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+-                &lt;&lt; bindaddr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; bindaddr.getPort()
+-                &lt;&lt; &quot;: &quot;;
+-            printError(msg,error);
+-            throw std::runtime_error(msg.str());           
+-        }
+-        
+-        res = connect(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+-        if(res == SOCKET_ERROR) {
+-            int error = GET_NET_ERROR();
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Couldn't connect to '&quot; &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot;
+-                &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot;;
+-            printError(msg,error);
+-            throw std::runtime_error(msg.str());
+-        }
+-
++        doConnect();
+         if(!blocking)
+             setNonBlocking();
+     } catch(...) {
+@@ -81,14 +61,7 @@
+ void
+ TCPSocket::send(const void* data, size_t size)
+ {
+-    int res = ::send(sockfd, (const char*) data, size, 0);
+-    if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Send error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
++    int res = doSend(data,size);
+     if(res != (int) size) {
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: Couldn't send all data.&quot;;
+@@ -99,29 +72,15 @@
+ size_t
+ TCPSocket::recv(void* buffer, size_t size)
+ {
+-    int res = ::recv(sockfd, (char*) buffer, size, 0);
+-
+-    if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        if ( error == NETERROR_WOULDBLOCK)
+-            return 0;
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Read error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
+-
+-    return res;
++    return doReceive(buffer,size);
+ }
+ 
+ TCPSocket::TCPSocket()
+ {
+ }
+ 
+-TCPSocket::TCPSocket(SOCKET fd, const Address&amp; newaddr)
+-    : addr(newaddr)
++TCPSocket::TCPSocket(SOCKET fd, const Address&amp; newaddr) : SocketBase(fd,newaddr)
+ {
+-    sockfd = fd;
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -40,22 +40,13 @@
+      */
+     size_t recv(void* buffer, size_t bufsize);
+ 
+-    /** returns the address associated with this socket */
+-    const Address&amp; getAddress() const
+-    {
+-        return addr;
+-    }
+-
+ private:
+     friend class TCPListenSocket;
+-    friend class SocketStreamBuf;
+ 
+     TCPSocket();
+     TCPSocket(SOCKET fd, const Address&amp; addr);
+ 
+-    void init(const Address&amp; bindaddr, bool blocking);
+-
+-    Address addr;
++    void init(bool blocking);
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -27,33 +27,24 @@
+ namespace network
+ {
+ 
+-UDPSocket::UDPSocket(bool blocking)
++UDPSocket::UDPSocket(bool blocking) : SocketBase(Address::ANY)
+ {
+-    init(Address::ANY, blocking);
++    init(blocking);
+ }
+ 
+-UDPSocket::UDPSocket(const Address&amp; addr, bool blocking)
++UDPSocket::UDPSocket(const Address&amp; bindaddr, bool blocking)
++    : SocketBase(bindaddr)
+ {
+-    init(addr, blocking);
++    init(blocking);
+ }
+ 
+ void
+-UDPSocket::init(const Address&amp; addr, bool blocking)
++UDPSocket::init(bool blocking)
+ {
+     create(false);
+ 
+     try {
+-        int res = bind(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+-        if(res == SOCKET_ERROR) {
+-            int error = GET_NET_ERROR();
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+-                &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; addr.getPort()
+-                &lt;&lt; &quot;: &quot;;
+-            printError(msg,error);
+-            throw std::runtime_error(msg.str());
+-        }
+-
++        bindSocket();
+         if(!blocking)
+             setNonBlocking();
+     } catch(...) {
+@@ -67,17 +58,9 @@
+ }
+ 
+ void
+-UDPSocket::send(const Address&amp; addr, const void* data, size_t datasize)
++UDPSocket::send(const Address&amp; toaddr, const void* data, size_t datasize)
+ {
+-    int res = sendto(sockfd, (const char*) data, datasize, 0,
+-                addr.getSockaddr(), addr.getSockaddrLen());
+-    if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Send error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
++    int res = doSendTo(toaddr,data,datasize);
+     if(res != (int) datasize) {
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: not all data sent.&quot;;
+@@ -86,21 +69,9 @@
+ }
+ 
+ size_t
+-UDPSocket::recv(Address&amp; addr, void* buffer, size_t bufsize)
++UDPSocket::recv(Address&amp; fromaddr, void* buffer, size_t bufsize)
+ {
+-    int res = recvfrom(sockfd, (char*) buffer, bufsize, 0,
+-            addr.getSockaddr(), addr.getSockaddrLenPointer());
+-    if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        if ( error == NETERROR_WOULDBLOCK)
+-            return 0;
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Receive error: &quot; &lt;&lt; strerror(errno);
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
+-    }
+-
+-    return res;
++    return doReceiveFrom(fromaddr,buffer,bufsize);
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -33,18 +33,18 @@
+      * random port if port == 0
+      */
+     UDPSocket(bool blocking = true);
+-    UDPSocket(const Address&amp; addr, bool blocking = true);
++    UDPSocket(const Address&amp; bindaddr, bool blocking = true);
+     ~UDPSocket();
+ 
+     /** send data to the specified address */
+-    void send(const Address&amp; addr, const void* data, size_t datasize);
++    void send(const Address&amp; toaddr, const void* data, size_t datasize);
+     /** receives data from socket. Returns the number of bytes read and stores
+      * the address of the client who sent the data in addr.
+      */
+-    size_t recv(Address&amp; addr, void* buffer, size_t bufsize);
++    size_t recv(Address&amp; fromaddr, void* buffer, size_t bufsize);
+ 
+ private:
+-    void init(const Address&amp; addr, bool blocking);
++    void init(bool blocking);
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/HeartbeatThread.cpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -74,6 +74,7 @@
+     }
+ 
+     // start thread
++    running = true;
+     thread = SDL_CreateThread(threadMain, this);
+     if(thread == NULL) {
+       throw std::runtime_error(&quot;Couldn't create heartbeat thread.&quot;);
+@@ -99,7 +100,7 @@
+             gameservers += &quot;,&quot;;
+         gameservers += i-&gt;getIP();
+     }
+-    gameconfig-&gt;masterservers = gameservers;
++    //gameconfig-&gt;masterservers = gameservers;
+ }
+ 
+ int
+@@ -107,7 +108,6 @@
+ {
+     HeartbeatThread* _this = reinterpret_cast&lt;HeartbeatThread*&gt; (data);
+     
+-    _this-&gt;running = true;
+     while(_this-&gt;running) {
+         time_t t = time(0);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoThread.cpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -47,6 +47,7 @@
+     lastFrame = SDL_GetTicks();
+     
+     // start the thread
++    running=true;
+     thread = SDL_CreateThread(threadMain, this);
+     if(thread == NULL)
+       throw new std::runtime_error(&quot;Couldn't create info thread&quot;);
+@@ -65,7 +66,6 @@
+ {
+     InfoThread* _this = reinterpret_cast&lt;InfoThread*&gt; (data);
+ 
+-    _this-&gt;running = true;
+     while(_this-&gt;running) {
+         try {
+             _this-&gt;handleStatusRequests();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-03-15 15:37:30 UTC (rev 960)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-03-19 15:12:22 UTC (rev 961)
+@@ -49,7 +49,7 @@
+     while( (server = tokenizer.getNextToken()) != &quot;&quot;) {
+         masterservers.push_back(removeSurroundingSpaces(server));
+     }
+-    std::random_shuffle(masterservers.begin(), masterservers.end());
++    //std::random_shuffle(masterservers.begin(), masterservers.end());
+ 
+     if(masterservers.size() == 0) {
+         state = STATE_NOSERVERS;
+@@ -97,11 +97,11 @@
+                 case STATE_QUERYSERVERS:
+                     queryServers();
+                     break;
++                case STATE_NOSERVERS:
++                case STATE_ERROR:
+                 case STATE_DONE:
+                     running = false;
+                     break;
+-                default:
+-                    break;
+             }
+             // sleep a little bit
+             SDL_Delay(10); // this destroys ping times :-(
+@@ -117,95 +117,103 @@
+ ServerQueryThread::queryMasterServer()
+ {
+     if(masterservers.empty()) {
+-        LOGGER.warning(&quot;No success querying masterserver.&quot;);
++        LOGGER.warning(&quot;masterservers list is empty.&quot;);
+         state = STATE_ERROR;
+         return;
+     }
+ 
+-    network::TCPSocket* tcpsocket = 0;
+ 
+-    try {
+-        network::Address ip
+-            = network::Address::resolve(masterservers.back(), 28900);
++    while (!masterservers.empty()) {
++        try {
++            std::string masterserverip = masterservers.back();
++            masterservers.pop_back();
++            
++            network::Address ip
++                = network::Address::resolve(masterserverip, 28900);
+ 
+-        tcpsocket = new network::TCPSocket(ip, false);
+-        stream = new network::SocketStream(*tcpsocket);
+-        StreamTokenizer tokenizer(*stream, '\\');
++            network::TCPSocket* tcpsocket = new network::TCPSocket(ip, false);
++            stream = new network::SocketStream(*tcpsocket);
++            StreamTokenizer tokenizer(*stream, '\\');
+ 
+-        if(!running)
+-            throw std::runtime_error(&quot;query aborted&quot;);
++            if(!running)
++                throw std::runtime_error(&quot;query aborted&quot;);
+ 
+-        // send query
+-        *stream &lt;&lt; &quot;\\list\\gamename\\master\\final&quot;
+-                &lt;&lt; &quot;\\list\\gamename\\netpanzer&quot;
+-                // &lt;&lt; &quot;\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION 
+-                &lt;&lt; &quot;\\final\\&quot; &lt;&lt; std::flush;
+-        
+-        ServerInfo* lastserver = 0;
+-        std::string newMasterServers;
++            // send query
++            *stream &lt;&lt; &quot;\\list\\gamename\\master\\final&quot;
++                    &lt;&lt; &quot;\\list\\gamename\\netpanzer&quot;
++                    // &lt;&lt; &quot;\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION 
++                    &lt;&lt; &quot;\\final\\&quot; &lt;&lt; std::flush;
+ 
+-        // parse master server list
+-        while(!stream-&gt;eof() &amp;&amp; running) {
+-            std::string token = tokenizer.getNextToken();
+-            if(token == &quot;ip&quot;) {
+-                if(newMasterServers != &quot;&quot;)
+-                    newMasterServers += &quot;,&quot;;
+-                newMasterServers += tokenizer.getNextToken();
+-            } else if(token == &quot;port&quot;) {
+-                tokenizer.getNextToken();
+-                // ignored
+-            } else if(token == &quot;final&quot;) {
+-                break;
+-            } else {
+-                std::stringstream msg;
+-                msg &lt;&lt; &quot;Unknown token '&quot; 
+-                    &lt;&lt; token &lt;&lt; &quot;' when querying masterserver (master list)&quot;;
+-                throw std::runtime_error(msg.str());
++            ServerInfo* lastserver = 0;
++            std::string newMasterServers;
++
++            // parse master server list
++            while(!stream-&gt;eof() &amp;&amp; running) {
++                std::string token = tokenizer.getNextToken();
++                if(token == &quot;ip&quot;) {
++                    if(newMasterServers != &quot;&quot;)
++                        newMasterServers += &quot;,&quot;;
++                    newMasterServers += tokenizer.getNextToken();
++                } else if(token == &quot;port&quot;) {
++                    tokenizer.getNextToken();
++                    // ignored
++                } else if(token == &quot;final&quot;) {
++                    break;
++                } else {
++                    std::stringstream msg;
++                    msg &lt;&lt; &quot;Unknown token '&quot; 
++                        &lt;&lt; token &lt;&lt; &quot;' when querying masterserver (master list)&quot;;
++                    throw std::runtime_error(msg.str());
++                }
+             }
+-        }
+ 
+-        // parse server list
+-        while(!stream-&gt;eof() &amp;&amp; running) {
+-            std::string token = tokenizer.getNextToken();
+-            if(token == &quot;ip&quot;) {
+-                ServerInfo* info = new ServerInfo();
+-                info-&gt;status = ServerInfo::QUERYING;
+-                info-&gt;address = tokenizer.getNextToken();
+-                if(info-&gt;address == &quot;&quot;)
++            // parse server list
++            while(!stream-&gt;eof() &amp;&amp; running) {
++                std::string token = tokenizer.getNextToken();
++                if(token == &quot;ip&quot;) {
++                    ServerInfo* info = new ServerInfo();
++                    info-&gt;status = ServerInfo::QUERYING;
++                    info-&gt;address = tokenizer.getNextToken();
++                    if(info-&gt;address == &quot;&quot;)
++                        break;
++
++                    // add server into list
++                    SDL_mutexP(serverlist-&gt;mutex);
++                    serverlist-&gt;push_back(info);
++                    not_queried.push_back(info);
++                    lastserver = info;
++                    SDL_mutexV(serverlist-&gt;mutex);
++                } else if(token == &quot;port&quot;) {
++                    std::stringstream portstr(tokenizer.getNextToken());
++                    portstr &gt;&gt; lastserver-&gt;port;
++                } else if(token == &quot;final&quot;) {
+                     break;
++                } else {
++                    std::stringstream msg;
++                    msg &lt;&lt; &quot;Unknown token '&quot; 
++                        &lt;&lt; token &lt;&lt; &quot;' when querying masterserver (game list)&quot;;
++                    throw std::runtime_error(msg.str());
++                }
++            }
++            delete stream;
++            stream=0;
++            delete tcpsocket;
+             
+-                // add server into list
+-                SDL_mutexP(serverlist-&gt;mutex);
+-                serverlist-&gt;push_back(info);
+-                not_queried.push_back(info);
+-                lastserver = info;
+-                SDL_mutexV(serverlist-&gt;mutex);
+-            } else if(token == &quot;port&quot;) {
+-                std::stringstream portstr(tokenizer.getNextToken());
+-                portstr &gt;&gt; lastserver-&gt;port;
+-            } else if(token == &quot;final&quot;) {
+-                break;
+-            } else {
+-                std::stringstream msg;
+-                msg &lt;&lt; &quot;Unknown token '&quot; 
+-                    &lt;&lt; token &lt;&lt; &quot;' when querying masterserver (game list)&quot;;
+-                throw std::runtime_error(msg.str());
+-            }
++            //if(newMasterServers != &quot;&quot;)
++            //    gameconfig-&gt;masterservers = newMasterServers;
++        } catch(std::exception&amp; e) {
++            LOGGER.warning(&quot;Problem querying masterserver: %s.&quot;, e.what());
++            //masterservers.pop_back();
+         }
++    } // while
+ 
+-        state = STATE_QUERYSERVERS;
+-        if(newMasterServers != &quot;&quot;)
+-            gameconfig-&gt;masterservers = newMasterServers;
+-    } catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;Problem querying masterserver: %s.&quot;, e.what());
+-        masterservers.pop_back();
+-    }
++    state = STATE_QUERYSERVERS;
+ 
+-    SDL_mutexP(shutdown_mutex);
+-    delete stream;
+-    stream = 0;
+-    delete tcpsocket;
+-    SDL_mutexV(shutdown_mutex);
++//    SDL_mutexP(shutdown_mutex);
++//    delete stream;
++//    stream = 0;
++//    delete tcpsocket;
++//    SDL_mutexV(shutdown_mutex);
+ }
+ 
+ void
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000007.html">[Netpanzer-cvs] r960 - trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+	<LI>Next message: <A HREF="000009.html">[Netpanzer-cvs] r962 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes/AI NetPanzer/Interfaces	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#8">[ date ]</a>
+              <a href="thread.html#8">[ thread ]</a>
+              <a href="subject.html#8">[ subject ]</a>
+              <a href="author.html#8">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

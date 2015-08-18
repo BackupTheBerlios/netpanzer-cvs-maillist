@@ -1,0 +1,3743 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1182 - in trunk/netpanzer: . cache	cache/colorfilters cache/colorfilters/netp	cache/colorfilters/netpmenu scripts src/Lib/2D	src/Lib/ArrayUtil src/Lib/INIParser src/Lib/Network	src/Lib/Types src/Lib/Util src/Lib/optionmm src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/AI	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Particles	src/NetPanzer/PowerUps src/NetPanzer/System	src/NetPanzer/Units src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons wads
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1182%20-%20in%20trunk/netpanzer%3A%20.%20cache%0A%09cache/colorfilters%20cache/colorfilters/netp%0A%09cache/colorfilters/netpmenu%20scripts%20src/Lib/2D%0A%09src/Lib/ArrayUtil%20src/Lib/INIParser%20src/Lib/Network%0A%09src/Lib/Types%20src/Lib/Util%20src/Lib/optionmm%20src/NetPanzer/Bot%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/AI%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Network%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Particles%0A%09src/NetPanzer/PowerUps%20src/NetPanzer/System%0A%09src/NetPanzer/Units%20src/NetPanzer/Views%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20src/NetPanzer/Views/MainMenu/Multi%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer%0A%09src/NetPanzer/Views/MainMenu/Options%20src/NetPanzer/Weapons%20wads&In-Reply-To=%3C201001191615.o0JGFurl000526%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000207.html">
+   <LINK REL="Next"  HREF="000209.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1182 - in trunk/netpanzer: . cache	cache/colorfilters cache/colorfilters/netp	cache/colorfilters/netpmenu scripts src/Lib/2D	src/Lib/ArrayUtil src/Lib/INIParser src/Lib/Network	src/Lib/Types src/Lib/Util src/Lib/optionmm src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/AI	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Particles	src/NetPanzer/PowerUps src/NetPanzer/System	src/NetPanzer/Units src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons wads</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1182%20-%20in%20trunk/netpanzer%3A%20.%20cache%0A%09cache/colorfilters%20cache/colorfilters/netp%0A%09cache/colorfilters/netpmenu%20scripts%20src/Lib/2D%0A%09src/Lib/ArrayUtil%20src/Lib/INIParser%20src/Lib/Network%0A%09src/Lib/Types%20src/Lib/Util%20src/Lib/optionmm%20src/NetPanzer/Bot%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/AI%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Network%0A%09src/NetPanzer/Objectives%20src/NetPanzer/Particles%0A%09src/NetPanzer/PowerUps%20src/NetPanzer/System%0A%09src/NetPanzer/Units%20src/NetPanzer/Views%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu%20src/NetPanzer/Views/MainMenu/Multi%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer%0A%09src/NetPanzer/Views/MainMenu/Options%20src/NetPanzer/Weapons%20wads&In-Reply-To=%3C201001191615.o0JGFurl000526%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1182 - in trunk/netpanzer: . cache	cache/colorfilters cache/colorfilters/netp	cache/colorfilters/netpmenu scripts src/Lib/2D	src/Lib/ArrayUtil src/Lib/INIParser src/Lib/Network	src/Lib/Types src/Lib/Util src/Lib/optionmm src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/AI	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Particles	src/NetPanzer/PowerUps src/NetPanzer/System	src/NetPanzer/Units src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons wads">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 19 17:15:56 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000207.html">[Netpanzer-cvs] r1181 - trunk/netpanzer/powerups
+</A></li>
+        <LI>Next message: <A HREF="000209.html">[Netpanzer-cvs] r1183 - in trunk/netpanzer/src/NetPanzer: Classes	Core Interfaces Particles System Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#208">[ date ]</a>
+              <a href="thread.html#208">[ thread ]</a>
+              <a href="subject.html#208">[ subject ]</a>
+              <a href="author.html#208">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-19 17:08:17 +0100 (Tue, 19 Jan 2010)
+New Revision: 1182
+
+Added:
+   trunk/netpanzer/cache/
+   trunk/netpanzer/cache/colorfilters/
+   trunk/netpanzer/cache/colorfilters/2080.tbl
+   trunk/netpanzer/cache/colorfilters/4060.tbl
+   trunk/netpanzer/cache/colorfilters/6040.tbl
+   trunk/netpanzer/cache/colorfilters/8020.tbl
+   trunk/netpanzer/cache/colorfilters/Brighten.tbl
+   trunk/netpanzer/cache/colorfilters/DarkenALittle.tbl
+   trunk/netpanzer/cache/colorfilters/DarkenALot.tbl
+   trunk/netpanzer/cache/colorfilters/LightDark.tbl
+   trunk/netpanzer/cache/colorfilters/netp/
+   trunk/netpanzer/cache/colorfilters/netp/2080.tbl
+   trunk/netpanzer/cache/colorfilters/netp/4060.tbl
+   trunk/netpanzer/cache/colorfilters/netp/6040.tbl
+   trunk/netpanzer/cache/colorfilters/netp/8020.tbl
+   trunk/netpanzer/cache/colorfilters/netp/Brighten.tbl
+   trunk/netpanzer/cache/colorfilters/netp/DarkenALittle.tbl
+   trunk/netpanzer/cache/colorfilters/netp/DarkenALot.tbl
+   trunk/netpanzer/cache/colorfilters/netp/LightDark.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/
+   trunk/netpanzer/cache/colorfilters/netpmenu/2080.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/4060.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/6040.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/8020.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/Brighten.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/DarkenALittle.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/DarkenALot.tbl
+   trunk/netpanzer/cache/colorfilters/netpmenu/LightDark.tbl
+   trunk/netpanzer/wads/
+   trunk/netpanzer/wads/netp.act
+   trunk/netpanzer/wads/netpmenu.act
+   trunk/netpanzer/wads/summer12mb.tls
+Removed:
+   trunk/netpanzer/tilesets/
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/scripts/initcolors.lua
+   trunk/netpanzer/src/Lib/2D/Color.cpp
+   trunk/netpanzer/src/Lib/2D/ColorTable.cpp
+   trunk/netpanzer/src/Lib/2D/PackedSurface.cpp
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/Lib/2D/Span.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/ArrayUtil/BitArray.cpp
+   trunk/netpanzer/src/Lib/ArrayUtil/BoundBox.cpp
+   trunk/netpanzer/src/Lib/INIParser/Section.cpp
+   trunk/netpanzer/src/Lib/INIParser/Store.cpp
+   trunk/netpanzer/src/Lib/Network/Address.cpp
+   trunk/netpanzer/src/Lib/Network/Address.hpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+   trunk/netpanzer/src/Lib/Types/Angle.cpp
+   trunk/netpanzer/src/Lib/Types/fRect.cpp
+   trunk/netpanzer/src/Lib/Types/fXYZ.cpp
+   trunk/netpanzer/src/Lib/Types/iRect.cpp
+   trunk/netpanzer/src/Lib/Types/iXY.cpp
+   trunk/netpanzer/src/Lib/Util/BresenhamLine.cpp
+   trunk/netpanzer/src/Lib/Util/Exception.cpp
+   trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+   trunk/netpanzer/src/Lib/Util/Log.cpp
+   trunk/netpanzer/src/Lib/Util/Math.cpp
+   trunk/netpanzer/src/Lib/Util/StringUtil.cpp
+   trunk/netpanzer/src/Lib/Util/TimeStamp.cpp
+   trunk/netpanzer/src/Lib/Util/Timer.cpp
+   trunk/netpanzer/src/Lib/Util/TimerInterface.cpp
+   trunk/netpanzer/src/Lib/Util/UtilInterface.cpp
+   trunk/netpanzer/src/Lib/optionmm/command_line.cpp
+   trunk/netpanzer/src/Lib/optionmm/option.cpp
+   trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotTaskList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/AI/PathList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/AI/PathingState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/MapFile.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketQueues.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/OpcodeDebugger.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlacementMatrix.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Sprite.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SpriteSorter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/TipOfDay.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/WorldViewInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FireParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/Physics.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/SmokingTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/SmolderParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/SnowParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/TemplateMuzzleSystem.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/VectorPuffParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/WindParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/System/DummySound.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/System/Sound.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeEncoder.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cButton.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/RMouseHackView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/Projectile.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/ProjectileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp
+Log:
+- Finished recovering of old version, it compiles with SCONS
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/SConstruct	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -247,6 +247,9 @@
+ ################################################################
+ 
+ # BUILDS NETWORK
++networkenv.Append(           CPPPATH = [ 'src/Lib' ] )
++crossmingwnetworkenv.Append( CPPPATH = [ 'src/Lib' ] )
++crosslinuxnetworkenv.Append( CPPPATH = [ 'src/Lib' ] )
+ MakeStaticLib(          networkenv, 'npnetwork', 'Network', '*.cpp')
+ MakeStaticLib(crossmingwnetworkenv, 'npnetwork', 'Network', '*.cpp')
+ MakeStaticLib(crosslinuxnetworkenv, 'npnetwork', 'Network', '*.cpp')
+
+Added: trunk/netpanzer/cache/colorfilters/2080.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/2080.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/4060.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/4060.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/6040.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/6040.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/8020.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/8020.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/Brighten.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/Brighten.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/DarkenALittle.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/DarkenALittle.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/DarkenALot.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/DarkenALot.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/LightDark.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/LightDark.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/2080.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/2080.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/4060.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/4060.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/6040.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/6040.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/8020.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/8020.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/Brighten.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/Brighten.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/DarkenALittle.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/DarkenALittle.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/DarkenALot.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/DarkenALot.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netp/LightDark.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netp/LightDark.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/2080.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/2080.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/4060.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/4060.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/6040.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/6040.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/8020.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/8020.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/Brighten.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/Brighten.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/DarkenALittle.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/DarkenALittle.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/DarkenALot.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/DarkenALot.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/cache/colorfilters/netpmenu/LightDark.tbl
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/cache/colorfilters/netpmenu/LightDark.tbl
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/scripts/initcolors.lua
+===================================================================
+--- trunk/netpanzer/scripts/initcolors.lua	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/scripts/initcolors.lua	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -1,75 +1,77 @@
+-unitAqua        = rgb(  0, 204, 255)
+-unitYellow      = rgb(255, 255,   0)
+-unitRed         = rgb(255,   0,   0)
+-unitBlue        = rgb(  3,   3, 255)
+-unitDarkBlue    = rgb(  0,   0, 128)
+-unitLightGreen  = rgb(163, 214, 159)
+-unitGreen       = rgb( 31, 166,  36)
+-unitBlueGray    = rgb( 43,  85, 131)
+-unitDarkRed     = rgb(150,   0,   0)
+-unitBlack       = rgb(  6,   2,   2)
+-unitDarkGreen   = rgb( 26,  88,  36)
+-unitWhite       = rgb(250, 253, 248)
+-unitLightOrange = rgb(246, 210,  99)
+-unitOrange      = rgb(205, 144,   9)
+-unitGray        = rgb(186, 186, 186)
+-unitDarkGray    = rgb( 99, 100, 102)
++print(&quot;Setting colors&quot;);
++    Color.unitAqua        = ColorUtil.makeColor(  0, 204, 255);
++print(&quot;unitAqua is &quot; .. Color.unitAqua);
++    Color.unitYellow      = ColorUtil.makeColor(255, 255,   0);
++    Color.unitRed         = ColorUtil.makeColor(255,   0,   0);
++    Color.unitBlue        = ColorUtil.makeColor(  3,   3, 255);
++    Color.unitDarkBlue    = ColorUtil.makeColor(  0,   0, 128);
++    Color.unitLightGreen  = ColorUtil.makeColor(163, 214, 159);
++    Color.unitGreen       = ColorUtil.makeColor( 31, 166,  36);
++    Color.unitBlueGray    = ColorUtil.makeColor( 43,  85, 131);
++    Color.unitDarkRed     = ColorUtil.makeColor(150,   0,   0);
++    Color.unitBlack       = ColorUtil.makeColor(  6,   2,   2);
++    Color.unitDarkGreen   = ColorUtil.makeColor( 26,  88,  36);
++    Color.unitWhite       = ColorUtil.makeColor(250, 253, 248);
++    Color.unitLightOrange = ColorUtil.makeColor(246, 210,  99);
++    Color.unitOrange      = ColorUtil.makeColor(205, 144,   9);
++    Color.unitGray        = ColorUtil.makeColor(186, 186, 186);
++    Color.unitDarkGray    = ColorUtil.makeColor( 99, 100, 102);
+ 
+--- Grays
+-black   = rgb(  0,   0,   0)
+-gray32  = rgb( 32,  32,  32)
+-gray64  = rgb( 64,  64,  64)
+-gray96  = rgb( 96,  96,  96)
+-gray128 = rgb(128, 128, 128)
+-gray160 = rgb(160, 160, 160)
+-gray192 = rgb(192, 192, 192)
+-gray224 = rgb(224, 224, 224)
+-white   = rgb(255, 255, 255)
++    -- Grays
++    Color.black   = ColorUtil.makeColor(  0,   0,   0, true);
++    Color.gray32  = ColorUtil.makeColor( 32,  32,  32);
++    Color.gray64  = ColorUtil.makeColor( 64,  64,  64);
++    Color.gray96  = ColorUtil.makeColor( 96,  96,  96);
++    Color.gray128 = ColorUtil.makeColor(128, 128, 128);
++    Color.gray160 = ColorUtil.makeColor(160, 160, 160);
++    Color.gray192 = ColorUtil.makeColor(192, 192, 192);
++    Color.gray224 = ColorUtil.makeColor(224, 224, 224);
++    Color.white   = ColorUtil.makeColor(255, 255, 255);
++print(&quot;white is &quot; .. Color.white);
++    -- Dark Colors !FIXME!
++    Color.darkGray    = Color.gray64;
++    Color.darkRed     = ColorUtil.makeColor(128,   0,   0); -- fixed
++    Color.darkGreen   = ColorUtil.makeColor(  0, 128,   0); -- fixed
++    Color.darkBlue    = ColorUtil.makeColor(  0,   0, 128); -- fixed
++    Color.darkYellow  = ColorUtil.makeColor(255, 168,  18); -- fixed
++    Color.darkOrange  = ColorUtil.makeColor(255, 140,   0); -- fixed
++    Color.darkMagenta = ColorUtil.makeColor(148,   0, 211); -- fixed
++    Color.darkCyan    = ColorUtil.makeColor(  0, 206, 209); -- fixed
+ 
+--- Dark Colors !FIXME!
+-darkGray    = gray64;
+-darkRed     = rgb(128,   0,   0) -- fixed
+-darkGreen   = rgb(  0, 128,   0) -- fixed
+-darkBlue    = rgb(  0,   0, 128) -- fixed
+-darkYellow  = rgb(255, 168,  18) -- fixed
+-darkOrange  = rgb(255, 140,   0) -- fixed
+-darkMagenta = rgb(148,   0, 211) -- fixed
+-darkCyan    = rgb(  0, 206, 209) -- fixed
++    -- Normal Colors
++    Color.gray    = Color.gray128;
++    Color.red     = ColorUtil.makeColor(255,   0,   0); -- fixed
++    Color.green   = ColorUtil.makeColor(  0, 255,   0); -- fixed
++    Color.blue    = ColorUtil.makeColor(  0,   0, 255); -- fixed
++    Color.yellow  = ColorUtil.makeColor(255, 255,   0); -- fixed
++    Color.orange  = ColorUtil.makeColor(255, 128,   0); -- fixed
++    Color.magenta = ColorUtil.makeColor(255,   0, 255); -- fixed
++    Color.cyan    = ColorUtil.makeColor(  0, 255, 255); -- fixed
++    --Color.brown   = ColorUtil.makeColor(128,  42,  42); -- fixed
++    Color.brown   = ColorUtil.makeColor(200,  80,  80); -- new brown is lighter
++    
++    --tan                   210 180 140   0.8235 0.7059 0.5490
++    Color.tan            = ColorUtil.makeColor(210, 180, 140); -- fixed
++    --chartreuse            127 255   0   0.4980 1.0000 0.0000
++    Color.chartreuse     = ColorUtil.makeColor(127, 255,   0); -- fixed
++    --cobalt_green           61 145  64   0.2400 0.5700 0.2500
++    Color.cobaltGreen    = ColorUtil.makeColor( 61, 145,  64); -- fixed
++    --emerald_green           0 201  87   0.0000 0.7900 0.3400
++    Color.emeraldGreen   = ColorUtil.makeColor(  0, 201,  87); -- fixed
++    --forest_green           34 139  34   0.1333 0.5451 0.1333
++    Color.forestGreen    = ColorUtil.makeColor( 34, 139,  34); -- fixed
++    --olive_green_dark       85 107  47   0.3333 0.4196 0.1843
++    Color.darkOliveGreen = ColorUtil.makeColor( 85, 107,  47); -- fixed
++    --terre_verte            56  94  15   0.2200 0.3700 0.0600
++    Color.terreVerte     = ColorUtil.makeColor( 56,  94,  15); -- fixed
+ 
+--- Normal Colors
+-gray    = gray128;
+-red     = rgb(255,   0,   0) -- fixed
+-green   = rgb(  0, 255,   0) -- fixed
+-blue    = rgb(  0,   0, 255) -- fixed
+-yellow  = rgb(255, 255,   0) -- fixed
+-orange  = rgb(255, 128,   0) -- fixed
+-magenta = rgb(255,   0, 255) -- fixed
+-cyan    = rgb(  0, 255, 255) -- fixed
+---brown   = rgb(128,  42,  42) -- fixed
+-brown   = rgb(200,  80,  80) -- new brown is lighter
++    -- Normal Colors !FIXME!
++    Color.lightGray    = Color.gray192;
++    Color.lightRed     = ColorUtil.makeColor(255, 160, 122); -- fixed
++    Color.lightGreen   = ColorUtil.makeColor( 50, 205,  50); -- fixed
++    Color.lightBlue    = ColorUtil.makeColor(135, 206, 250); -- fixed
++    Color.lightYellow  = ColorUtil.makeColor(255, 255, 224); -- fixed
++    Color.lightOrange  = ColorUtil.makeColor(237, 145,  33); -- fixed
++    Color.lightMagenta = ColorUtil.makeColor(  0, 255, 255);
++    Color.lightCyan    = ColorUtil.makeColor(224, 255, 255); -- fixed
+ 
+---tan                   210 180 140   0.8235 0.7059 0.5490
+-tan            = rgb(210, 180, 140) -- fixed
+---chartreuse            127 255   0   0.4980 1.0000 0.0000
+-chartreuse     = rgb(127, 255,   0) -- fixed
+---cobalt_green           61 145  64   0.2400 0.5700 0.2500
+-cobaltGreen    = rgb( 61, 145,  64) -- fixed
+---emerald_green           0 201  87   0.0000 0.7900 0.3400
+-emeraldGreen   = rgb(  0, 201,  87) -- fixed
+---forest_green           34 139  34   0.1333 0.5451 0.1333
+-forestGreen    = rgb( 34, 139,  34) -- fixed
+---olive_green_dark       85 107  47   0.3333 0.4196 0.1843
+-darkOliveGreen = rgb( 85, 107,  47) -- fixed
+---terre_verte            56  94  15   0.2200 0.3700 0.0600
+-terreVerte     = rgb( 56,  94,  15) -- fixed
+-
+--- Normal Colors !FIXME!
+-lightGray    = gray192;
+-lightRed     = rgb(255, 160, 122) -- fixed
+-lightGreen   = rgb( 50, 205,  50) -- fixed
+-lightBlue    = rgb(135, 206, 250) -- fixed
+-lightYellow  = rgb(255, 255, 224) -- fixed
+-lightOrange  = rgb(237, 145,  33) -- fixed
+-lightMagenta = rgb(  0, 255, 255)
+-lightCyan    = rgb(224, 255, 255) -- fixed
+-
+
+Modified: trunk/netpanzer/src/Lib/2D/Color.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Color.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/2D/Color.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -17,7 +17,7 @@
+ */
+ 
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;Color.hpp&quot;
+ 
+ // Here is some preprocessor abuse
+
+Modified: trunk/netpanzer/src/Lib/2D/ColorTable.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/ColorTable.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/2D/ColorTable.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;memory&gt;
+ 
+ #include &quot;Util/FileSystem.hpp&quot;
+
+Modified: trunk/netpanzer/src/Lib/2D/PackedSurface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/PackedSurface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/2D/PackedSurface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;iostream&gt;
+ #include &lt;vector&gt;
+ #include &lt;string&gt;
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -21,8 +21,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;math.h&gt;
+ #include &lt;memory&gt;
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Span.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Span.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/2D/Span.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;string.h&gt;
+ #include &quot;Span.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;math.h&gt;
+ #include &lt;ctype.h&gt;
+ #include &lt;memory&gt;
+
+Modified: trunk/netpanzer/src/Lib/ArrayUtil/BitArray.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/ArrayUtil/BitArray.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/ArrayUtil/BitArray.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &lt;assert.h&gt;
+ #include &lt;string.h&gt;
+ #include &quot;BitArray.hpp&quot;
+
+Modified: trunk/netpanzer/src/Lib/ArrayUtil/BoundBox.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/ArrayUtil/BoundBox.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/ArrayUtil/BoundBox.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;BoundBox.hpp&quot;
+ 
+ bool BoundBox::bounds(const iXY&amp; center, const iXY&amp; test ) const
+
+Modified: trunk/netpanzer/src/Lib/INIParser/Section.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/INIParser/Section.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/INIParser/Section.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Section.hpp&quot;
+ 
+ #include &lt;sstream&gt;
+
+Modified: trunk/netpanzer/src/Lib/INIParser/Store.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/INIParser/Store.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/INIParser/Store.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Store.hpp&quot;
+ 
+ #include &lt;ctype.h&gt;
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Network/Address.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;sstream&gt;
+ #include &lt;string&gt;
+ #include &lt;string.h&gt;
+@@ -66,7 +66,7 @@
+     return std::string(inet_ntoa(((struct sockaddr_in &amp;)ss).sin_addr));
+ }
+ 
+-Uint16
++unsigned short
+ Address::getPort() const
+ {
+     // XXX quick hack to get it working until get full ss support
+@@ -75,7 +75,7 @@
+ }
+ 
+ Address
+-Address::resolve(const std::string&amp; name, Uint16 port)
++Address::resolve(const std::string&amp; name, unsigned short port)
+     throw(NetworkException)
+ {
+     // TODO: make a better resolver (ex: getaddrinfo)
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.hpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Network/Address.hpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -18,7 +18,6 @@
+ #ifndef __ADDRESS_HPP__
+ #define __ADDRESS_HPP__
+ 
+-#include &quot;SDL.h&quot;
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;NetworkException.hpp&quot;
+ #include &lt;string&gt;
+@@ -35,12 +34,12 @@
+     /** resolves a hostname or IP-Number together with a port and returns a
+      * new Address object.
+      */
+-    static Address resolve(const std::string&amp; name, Uint16 port) throw(NetworkException);
++    static Address resolve(const std::string&amp; name, unsigned short port) throw(NetworkException);
+ 
+     /** returns the ip address of this Address as string */
+     std::string getIP() const;
+     /** returns the port of this address */
+-    Uint16 getPort() const;
++    unsigned short getPort() const;
+ 
+     void operator=(const Address&amp; other);
+     bool operator==(const Address&amp; other) const;
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;iostream&gt;
+ using namespace std;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -18,8 +18,6 @@
+ #ifndef __SOCKETHEADERS_HPP__
+ #define __SOCKETHEADERS_HPP__
+ 
+-#include &quot;config.h&quot;
+-
+ #ifdef USE_WINSOCK
+ #include &lt;winsock2.h&gt;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;TCPListenSocket.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;sstream&gt;
+ #include &lt;stdexcept&gt;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,8 +16,8 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;UDPSocket.hpp&quot;
+ #include &lt;sstream&gt;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Types/Angle.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Types/Angle.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Types/Angle.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;Angle.hpp&quot;
+ 
+ double Angle::deg_const = 57.2957795132;
+
+Modified: trunk/netpanzer/src/Lib/Types/fRect.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Types/fRect.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Types/fRect.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;algorithm&gt;
+ #include &quot;fRect.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Types/fXYZ.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Types/fXYZ.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Types/fXYZ.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;fXYZ.hpp&quot;
+ 
+ const fXYZ fXYZ::ZERO(0.0,  0.0,  0.0);
+
+Modified: trunk/netpanzer/src/Lib/Types/iRect.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Types/iRect.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Types/iRect.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;algorithm&gt;
+ #include &quot;iRect.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Types/iXY.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Types/iXY.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Types/iXY.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &lt;math.h&gt;
+ #include &quot;iXY.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Util/BresenhamLine.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/BresenhamLine.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/BresenhamLine.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;BresenhamLine.hpp&quot;
+ 
+ void BresenhamLine::set_path( iXY &amp;start, iXY &amp;end )
+
+Modified: trunk/netpanzer/src/Lib/Util/Exception.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/Exception.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/Exception.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;stdio.h&gt;
+ #include &lt;stdarg.h&gt;
+ #include &lt;string.h&gt;
+
+Modified: trunk/netpanzer/src/Lib/Util/FileSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/FileSystem.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;stdio.h&gt;
+ #include &lt;string.h&gt;
+ #include &quot;Exception.hpp&quot;
+
+Modified: trunk/netpanzer/src/Lib/Util/Log.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/Log.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/Log.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,8 +16,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;stdarg.h&gt;
+ #include &lt;errno.h&gt;
+ #include &lt;string.h&gt;
+
+Modified: trunk/netpanzer/src/Lib/Util/Math.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/Math.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/Math.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &lt;assert.h&gt;
+ #include &quot;Math.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Util/StringUtil.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/StringUtil.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/StringUtil.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;StringUtil.hpp&quot;
+ 
+ #include &lt;ctype.h&gt;
+
+Modified: trunk/netpanzer/src/Lib/Util/TimeStamp.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/TimeStamp.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/TimeStamp.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;TimeStamp.hpp&quot;
+ 
+ TimeStamp now()
+
+Modified: trunk/netpanzer/src/Lib/Util/Timer.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/Timer.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/Timer.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,5 +16,5 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;Timer.hpp&quot;
+
+Modified: trunk/netpanzer/src/Lib/Util/TimerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/TimerInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/TimerInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;TimerInterface.hpp&quot;
+ 
+ bool gTimeSliceFlag = false;
+
+Modified: trunk/netpanzer/src/Lib/Util/UtilInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/UtilInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/Util/UtilInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;sstream&gt;
+ 
+ #include &lt;sys/stat.h&gt;
+
+Modified: trunk/netpanzer/src/Lib/optionmm/command_line.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/optionmm/command_line.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/optionmm/command_line.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -23,8 +23,8 @@
+     @author Christian Holm
+     @date   Sat Dec 28 19:02:59 2002
+     @brief  Command line parser */
+-#include &lt;config.h&gt;
+ 
++
+ #ifndef OPTIONMM_command_line
+ #include &quot;command_line.hpp&quot;
+ #endif
+
+Modified: trunk/netpanzer/src/Lib/optionmm/option.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/optionmm/option.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/Lib/optionmm/option.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -23,8 +23,8 @@
+     @author Christian Holm
+     @date   Sat Dec 28 19:10:36 2002
+     @brief  Command line option  */
+-#include &lt;config.h&gt;
+ 
++
+ #ifndef OPTIONMM_option
+ #include &quot;option.hpp&quot;
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;iostream&gt;
+ 
+ #include &quot;Bot.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;iostream&gt;
+ 
+ #include &quot;SDL.h&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotTaskList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotTaskList.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotTaskList.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;BotTaskList.hpp&quot;
+ #include &quot;BotTask.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;functional&gt;
+ #include &quot;Astar.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/PathList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/PathList.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/PathList.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;assert.h&gt;
+ #include &quot;Classes/AI/PathList.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/PathingState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/PathingState.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/PathingState.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;PathingState.hpp&quot;
+ 
+ float         PathingState::astar_gen_time = 0.0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/MapFile.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/MapFile.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/MapFile.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;MapFile.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Classes/Network/ClientConnectDaemon.hpp&quot;
+ 
+ #include &lt;stdio.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;ClientMessageRouter.hpp&quot;
+ 
+ #include &quot;NetworkClient.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;string.h&gt;
+ 
+ #include &quot;ConnectNetMessage.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageDecoder.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;string.h&gt;
+ #include &quot;NetMessageDecoder.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetMessageEncoder.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Classes/Network/NetMessageEncoder.hpp&quot;
+ 
+ #include &lt;string.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;unistd.h&gt;
+ 
+ #include &lt;iostream&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketQueues.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketQueues.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketQueues.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;NetPacketQueues.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;assert.h&gt;
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;NetworkInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;algorithm&gt;
+ 
+ #include &quot;NetMessage.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkState.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkState.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;stdio.h&gt;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -18,7 +18,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;algorithm&gt;
+ #include &quot;Classes/Network/ServerConnectDaemon.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;ServerMessageRouter.hpp&quot;
+ 
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;UnitSync.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/OpcodeDebugger.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/OpcodeDebugger.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/OpcodeDebugger.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;string&gt;
+ #include &lt;sstream&gt;
+ #include &lt;stdio.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlacementMatrix.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlacementMatrix.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlacementMatrix.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Classes/PlacementMatrix.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Units/UnitBlackBoard.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Endian.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Classes/PlayerState.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Classes/PlayerUnitConfig.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;System/SDLVideo.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Classes/SelectionBoxSprite.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;SelectionList.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/SpawnList.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;stdlib.h&gt;
+ #include &lt;stdio.h&gt;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Sprite.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Sprite.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/Sprite.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Classes/Sprite.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SpriteSorter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SpriteSorter.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/SpriteSorter.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;algorithm&gt;
+ #include &lt;functional&gt;
+ #include &quot;Util/Exception.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Classes/TileSet.hpp&quot;
+ 
+ #include &lt;memory&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TipOfDay.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TipOfDay.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/TipOfDay.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;memory&gt;
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;ViewCamera.hpp&quot;
+ 
+ ViewCamera::ViewCamera()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;sstream&gt;
+ #include &quot;WorldInputCmdProcessor.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldMap.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;stdlib.h&gt;
+ #include &lt;stdio.h&gt;
+ #include &lt;string.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,5 +15,5 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Core/NetworkGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Scripts/ScriptManager.hpp&quot;
+ 
+ #include &quot;lua/lua.hpp&quot;
+@@ -121,7 +121,7 @@
+ 
+     // Parse commandline
+     using namespace optionmm;
+-    command_line commandline(PACKAGE_NAME, PACKAGE_VERSION,
++    command_line commandline(&quot;NetPanzer&quot;, PACKAGE_VERSION,
+             &quot;Copyright(c) 1998 Pyrosoft Inc. and nepanzer-devel team&quot;, &quot;&quot;,
+             argc, argv);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;BaseGameManager.hpp&quot;
+ 
+ #include &quot;SDL.h&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;BotGameManager.hpp&quot;
+ 
+ #include &quot;Bot/Bot.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;2D/Color.hpp&quot;
+ 
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConfigVariable.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;ConfigVariable.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Console.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;sstream&gt;
+ 
+ #include &quot;Console.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ 
+ #include &lt;time.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;DedicatedGameManager.hpp&quot;
+ 
+ #include &lt;stdio.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;fstream&gt;
+ #include &lt;sstream&gt;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+ 
+ #include &quot;Interfaces/GameManager.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ 
+ #include &lt;stdio.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,8 +16,6 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &quot;config.h&quot;
+-
+ #include &quot;InfoSocket.hpp&quot;
+ #include &quot;Util/StringTokenizer.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;KeyboardInterface.hpp&quot;
+ 
+ bool KeyboardInterface::key_table[SDLK_LAST];
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &lt;stdlib.h&gt;
+ #include &lt;string.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapsManager.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;stdio.h&gt;
+ #include &lt;string.h&gt;
+ #include &lt;memory&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;SDL.h&quot;
+ 
+ #include &quot;MouseInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;math.h&gt;
+ 
+ #include &quot;Util/Log.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;exception&gt;
+ 
+ #include &quot;Interfaces/PlayerGameManager.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;stdexcept&gt;
+ 
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ServerConsole.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;iostream&gt;
+ 
+ #include &quot;ServerConsole.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;TileInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/WorldViewInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/WorldViewInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/WorldViewInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ 
+ ViewCamera   WorldViewInterface::camera_list[10];
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &lt;string&gt;
+ #include &lt;string.h&gt;
+ #include &lt;sstream&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Network/ProxyServer.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;cstdlib&gt;
+ #include &lt;string&gt;
+ #include &lt;stdexcept&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Objectives/Objective.hpp&quot;
+ #include &quot;Outpost.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ 
+ #include &lt;stdio.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Outpost.hpp&quot;
+ 
+ #include &quot;Units/UnitInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ChunkTrajectoryParticle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ #include &quot;PuffParticle2D.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;CloudParticle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;CraterParticle2D.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;DirtKickParticle2D.hpp&quot;
+ 
+ Surface DirtKickParticle2D::dirtKickSprite;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FireParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FireParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/FireParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;FireParticle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ #include &quot;2D/Color.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;FireParticleSystem2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;FlameParticle2D.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Particles/FlashParticle2D.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;GroundExplosionParticle2D.hpp&quot;
+ #include &quot;2D/Color.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticleSystem2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/GroundExplosionParticleSystem2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;assert.h&gt;
+ #include &lt;stdlib.h&gt;
+ #include &quot;Util/Log.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,8 +16,8 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ //---------------------------------------------------------------------------
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Particles/Particle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;PuffParticle2D.hpp&quot;
+ #include &quot;SmolderParticleSystem2D.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;assert.h&gt;
+ #include &quot;ParticleSystem2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;ParticleSystemGlobals.hpp&quot;
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;ParticleTweakView.hpp&quot;
+ 
+ #include &quot;Views/Components/Desktop.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/Physics.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/Physics.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/Physics.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;string.h&gt;
+ #include &lt;stdlib.h&gt;
+ #include &quot;Physics.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;PuffParticle2D.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;RadarPingParticle2D.hpp&quot;
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SmokingTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SmokingTrajectoryParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/SmokingTrajectoryParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;SmokingTrajectoryParticle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SmolderParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SmolderParticleSystem2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/SmolderParticleSystem2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;SmolderParticleSystem2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SnowParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SnowParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/SnowParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,8 +16,8 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;2D/Color.hpp&quot;
+ #include &quot;SnowParticle2D.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;SnowParticleSystem2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;SparkParticle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/TemplateExplosionSystem.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;TemplateExplosionSystem.hpp&quot;
+ #include &quot;ChunkTrajectoryParticle2D.hpp&quot;
+ #include &quot;FlameParticle2D.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/TemplateMuzzleSystem.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/TemplateMuzzleSystem.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/TemplateMuzzleSystem.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;TemplateMuzzleSystem.hpp&quot;
+ #include &quot;VectorPuffParticle2D.hpp&quot;
+ #include &quot;Util/Math.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;TrajectoryParticle2D.hpp&quot;
+ #include &quot;Physics.hpp&quot;
+ #include &quot;Util/Math.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/VectorPuffParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/VectorPuffParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/VectorPuffParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;VectorPuffParticle2D.hpp&quot;
+ #include &quot;PuffParticle2D.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/WindParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/WindParticle2D.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Particles/WindParticle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;WindParticle2D.hpp&quot;
+ #include &quot;Physics.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;BonusUnitPowerUp.hpp&quot;
+ 
+ #include &lt;stdlib.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/EnemyRadarPowerUp.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;EnemyRadarPowerUp.hpp&quot;
+ 
+ #include &lt;stdlib.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;PowerUps/PowerUp.hpp&quot;
+ 
+ #include &quot;Units/UnitBlackBoard.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+ 
+ #include &lt;stdlib.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/UnitPowerUp.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;UnitPowerUp.hpp&quot;
+ 
+ #include &lt;stdlib.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/System/DummySound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/DummySound.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/System/DummySound.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;DummySound.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;ctype.h&gt;
+ #include &quot;SDL.h&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,8 +16,8 @@
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;sys/types.h&gt;
+ #include &lt;dirent.h&gt;
+ #include &lt;errno.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;iostream&gt;
+ 
+ #include &quot;Util/Log.hpp&quot;
+@@ -79,7 +79,7 @@
+     // let's scare the mouse :)
+     SDL_ShowCursor(SDL_DISABLE);
+     // and set a window title
+-    SDL_WM_SetCaption(PACKAGE_STRING, 0);
++    SDL_WM_SetCaption(&quot;NetPanzer &quot; PACKAGE_VERSION, 0);
+ }
+ 
+ bool SDLVideo::isDisplayModeAvailable(int width, int height, int bpp,
+
+Modified: trunk/netpanzer/src/NetPanzer/System/Sound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/Sound.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/System/Sound.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Sound.hpp&quot;
+ 
+ Sound* sound = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Units/UnitBlackBoard.hpp&quot;
+ 
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Units/UnitBucketArray.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitGlobals.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitGlobals.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;UnitGlobals.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;iostream&gt;
+ #include &lt;algorithm&gt;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeDecoder.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;UnitOpcodeDecoder.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeEncoder.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeEncoder.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitOpcodeEncoder.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Units/UnitOpcodeEncoder.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitState.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Util/Endian.hpp&quot;
+ #include &quot;Units/UnitState.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;stdexcept&gt;
+ 
+ #include &lt;string.h&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/Components/Button.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/CheckBox.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/Components/CheckBox.hpp&quot;
+ #include &quot;MouseEvent.hpp&quot;
+ #include &quot;Views/Components/StateChangedCallback.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;algorithm&gt;
+ #include &quot;Views/Components/Choice.hpp&quot;
+ #include &quot;Views/Components/View.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Component.hpp&quot;
+ #include &quot;ViewGlobals.hpp&quot;
+ #include &quot;Views/Components/View.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;algorithm&gt;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/Components/ScrollBar.hpp&quot;
+ 
+ // ScrollBar
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/Label.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/ViewGlobals.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;config.h&gt;
++
+ #include &quot;ViewGlobals.hpp&quot;
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cButton.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cButton.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cButton.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;cButton.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;string.h&gt;
+ #include &lt;ctype.h&gt;
+ #include &quot;2D/Color.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;AreYouSureExitView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;AreYouSureResignView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;CodeStatsView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Classes/SpriteSorter.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameTemplateView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;GameTemplateView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -21,8 +21,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;GameView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;HelpScrollView.hpp&quot;
+ #include &quot;GameView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;LibView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Particles/ParticleSystem2D.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;MiniMapView.hpp&quot;
+ #include &quot;Views/Components/MiniMap.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+ #include &lt;vector&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ResignView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;VehicleSelectionView.hpp&quot;
+ #include &quot;Units/UnitTypes.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;HelpView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Game/GameView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;MainMenuView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+ #include &quot;FlagSelectionView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;GetSessionView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;ctype.h&gt;
+ #include &lt;sstream&gt;
+ #include &quot;HostJoinTemplateView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;HostOptionsView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;HostView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;HostView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;IPAddressView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;JoinView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;memory&gt;
+ #include &lt;vector&gt;
+ #include &lt;string&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ServerInfo.hpp&quot;
+ 
+ namespace masterserver
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerList.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ServerList.hpp&quot;
+ 
+ namespace masterserver
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ServerQueryThread.hpp&quot;
+ 
+ #include &lt;algorithm&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;SDL.h&quot;
+ 
+ #include &quot;PlayerNameView.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ServerListView.hpp&quot;
+ 
+ #include &lt;iostream&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;UnitColorView.hpp&quot;
+ #include &quot;Views/Game/GameView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;UnitSelectionView.hpp&quot;
+ #include &quot;Views/Game/GameView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ControlsView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/MainMenu/Options/InterfaceView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;SoundView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;VisualsView.hpp&quot;
+ #include &quot;Particles/ParticleSystemGlobals.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/MainMenu/OptionsTemplateView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;OrderingView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/RMouseHackView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/RMouseHackView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/RMouseHackView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/MainMenu/RMouseHackView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;SkirmishView.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;Views/MainMenu/SpecialButtonView.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;BulletWeapon.hpp&quot;
+ #include &quot;Classes/UnitMessageTypes.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;MissleWeapon.hpp&quot;
+ #include &quot;Classes/UnitMessageTypes.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/Projectile.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/Projectile.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Weapons/Projectile.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,5 +15,5 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;Projectile.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/ProjectileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/ProjectileInterface.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Weapons/ProjectileInterface.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;ProjectileInterface.hpp&quot;
+ 
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &quot;ShellWeapon.hpp&quot;
+ #include &quot;Classes/UnitMessageTypes.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,8 +15,8 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
+ 
++
+ #include &lt;math.h&gt;
+ 
+ #include &quot;Weapons/Weapon.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp	2010-01-19 15:44:29 UTC (rev 1181)
++++ trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp	2010-01-19 16:08:17 UTC (rev 1182)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#include &lt;config.h&gt;
++
+ #include &quot;WeaponGlobals.hpp&quot;
+ 
+ 
+
+Added: trunk/netpanzer/wads/netp.act
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/wads/netp.act
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/wads/netpmenu.act
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/wads/netpmenu.act
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/netpanzer/wads/summer12mb.tls
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/wads/summer12mb.tls
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000207.html">[Netpanzer-cvs] r1181 - trunk/netpanzer/powerups
+</A></li>
+	<LI>Next message: <A HREF="000209.html">[Netpanzer-cvs] r1183 - in trunk/netpanzer/src/NetPanzer: Classes	Core Interfaces Particles System Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#208">[ date ]</a>
+              <a href="thread.html#208">[ thread ]</a>
+              <a href="subject.html#208">[ subject ]</a>
+              <a href="author.html#208">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

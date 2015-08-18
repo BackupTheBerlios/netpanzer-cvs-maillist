@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1120 - in trunk/netpanzer/src/NetPanzer:	Interfaces Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1120%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Network&In-Reply-To=%3C200905111132.n4BBWGjb021520%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000150.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1120 - in trunk/netpanzer/src/NetPanzer:	Interfaces Network</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1120%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Network&In-Reply-To=%3C200905111132.n4BBWGjb021520%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1120 - in trunk/netpanzer/src/NetPanzer:	Interfaces Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon May 11 13:32:16 CEST 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000150.html">[Netpanzer-cvs] r1121 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#149">[ date ]</a>
+              <a href="thread.html#149">[ thread ]</a>
+              <a href="subject.html#149">[ subject ]</a>
+              <a href="author.html#149">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-05-11 13:31:44 +0200 (Mon, 11 May 2009)
+New Revision: 1120
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+Log:
+- show networking statistics when players disconnect (on log file), and show the ip address of the 'status query'
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2009-03-30 16:31:51 UTC (rev 1119)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2009-05-11 11:31:44 UTC (rev 1120)
+@@ -69,6 +69,8 @@
+     string querypacket(data,len);
+     StringTokenizer qtokenizer(querypacket, '\\');
+     
++    LOGGER.info(&quot;Infosocket:: received packet from [%s]&quot;, s-&gt;getAddress().getIP().c_str());
++
+     string query;
+     while ( !(query = qtokenizer.getNextToken()).empty()) {
+         LOGGER.debug(&quot;InfoSocket:: Received query '%s'&quot;, query.c_str());
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2009-03-30 16:31:51 UTC (rev 1119)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2009-05-11 11:31:44 UTC (rev 1120)
+@@ -89,7 +89,10 @@
+ ClientSocket::~ClientSocket()
+ {
+     if (socket)
++    {
++	logStatistics();
+         socket-&gt;destroy();
++    }
+ }
+ 
+ void
+@@ -111,6 +114,7 @@
+         }
+         memcpy(sendbuffer+sendpos, data, size);
+         sendpos += size;
++	++packetsSent; // it may NOT be a real packet;
+     }
+ }
+ 
+@@ -129,9 +133,11 @@
+         {
+             memmove(sendbuffer, sendbuffer+s, sendpos-s);
+             sendpos -= s;
++	    bytesSent += s;
+         }
+         else
+         {
++	    bytesSent += s;
+             sendpos = 0;
+         }
+     }
+@@ -143,6 +149,7 @@
+     (void)so;
+     int dataptr = 0;
+     unsigned int remaining = len;
++    bytesReceived += len;
+     Uint16 packetsize=0;
+     while ( remaining ) {
+         if ( !tempoffset ) {
+@@ -167,6 +174,7 @@
+             }
+             
+             if ( remaining &gt;= packetsize ) {
++		++packetsReceived;
+                 MessageRouter::enqueueIncomingPacket(data+dataptr, packetsize, playerIndex, this);
+                 remaining -= packetsize;
+                 dataptr   += packetsize;
+@@ -215,6 +223,7 @@
+             }
+             
+             if ( tempoffset == packetsize ) {
++		++packetsReceived;
+                 MessageRouter::enqueueIncomingPacket(tempbuffer, packetsize, playerIndex, this);
+                 tempoffset = 0;
+             }
+@@ -225,8 +234,13 @@
+ void
+ ClientSocket::onConnected(network::TCPSocket *so)
+ {
+-    LOGGER.debug(&quot;ClientSocket: connected, id=%d&quot;, id);
++    connectStartSeconds = time(0);
++    bytesReceived = 0;
++    packetsReceived = 0;
++    bytesSent = 0;
++    packetsSent = 0;
+     socket = so;
++    LOGGER.debug(&quot;ClientSocket: connected [%s] id=%d at %d&quot;, getIPAddress().c_str(), id, connectStartSeconds);
+     if ( observer )
+     {
+         observer-&gt;onClientConnected(this);
+@@ -237,7 +251,8 @@
+ ClientSocket::onDisconected(network::TCPSocket *so)
+ {
+     (void)so;
+-    LOGGER.debug(&quot;ClientSocket: Disconected id=%d&quot;, id);
++    LOGGER.debug(&quot;ClientSocket: Disconected [%s] id=%d&quot;, getIPAddress().c_str(), id);
++    logStatistics();
+     socket=0;
+     disconnect(&quot;Socket Disconnected&quot;);
+ }
+@@ -246,11 +261,27 @@
+ ClientSocket::onSocketError(network::TCPSocket *so, const char * msg)
+ {
+     (void)so;
+-    LOGGER.warning(&quot;ClientSocket: Network connection error id=%d, msg: '%s'&quot;, id, msg);
++    LOGGER.warning(&quot;ClientSocket: Network connection error [%s] id=%d, msg: '%s'&quot;, getIPAddress().c_str(), id, msg);
++    logStatistics();
+     socket=0;
+     disconnect(msg);
+ }
+ 
++void
++ClientSocket::logStatistics()
++{
++    time_t connectedTime = time(0) - connectStartSeconds;
++    LOGGER.warning( &quot;ClientSocket statistics for [%s]:\n&quot;
++		    &quot; * Seconds Connected: %d\n&quot;
++		    &quot; * Packets Received/Sent: %u / %u\n&quot;
++		    &quot; * Bytes Received/Sent: %u / %u&quot;,
++		    getIPAddress().c_str(),
++		    connectedTime,
++		    packetsReceived, packetsSent,
++		    bytesReceived, bytesSent
++		  );
++}
++
+ std::string
+ ClientSocket::getIPAddress()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2009-03-30 16:31:51 UTC (rev 1119)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2009-05-11 11:31:44 UTC (rev 1120)
+@@ -19,6 +19,7 @@
+ #define __UILIB_NETWORK_CLIENTSOCKET_HPP__
+ 
+ #include &lt;string&gt;
++#include &lt;time.h&gt;
+ 
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
+ #include &quot;ProxyServer.hpp&quot;
+@@ -79,6 +80,14 @@
+     Uint16 tempoffset;
+     int id;
+     int playerIndex;
++
++    /** statistics */
++    void logStatistics();
++    unsigned int bytesReceived;
++    unsigned int packetsReceived;
++    unsigned int bytesSent;
++    unsigned int packetsSent;
++    time_t connectStartSeconds;
+ };
+ 
+ #endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000150.html">[Netpanzer-cvs] r1121 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#149">[ date ]</a>
+              <a href="thread.html#149">[ thread ]</a>
+              <a href="subject.html#149">[ subject ]</a>
+              <a href="author.html#149">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

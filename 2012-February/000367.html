@@ -1,0 +1,350 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1341 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/System
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1341%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Util%0A%09src/NetPanzer/System&In-Reply-To=%3C20120204145306.17E7148158A%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000366.html">
+   <LINK REL="Next"  HREF="000368.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1341 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/System</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1341%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Util%0A%09src/NetPanzer/System&In-Reply-To=%3C20120204145306.17E7148158A%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1341 - in trunk/netpanzer: . src/Lib/Util	src/NetPanzer/System">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb  4 15:53:05 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000366.html">[Netpanzer-cvs] r1340 - in trunk/netpanzer: pics/flags	src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000368.html">[Netpanzer-cvs] r1342 - trunk/netpanzer/support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#367">[ date ]</a>
+              <a href="thread.html#367">[ thread ]</a>
+              <a href="subject.html#367">[ subject ]</a>
+              <a href="author.html#367">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-02-04 15:53:05 +0100 (Sat, 04 Feb 2012)
+New Revision: 1341
+
+Modified:
+   trunk/netpanzer/crossmingw.py
+   trunk/netpanzer/src/Lib/Util/Log.cpp
+   trunk/netpanzer/src/Lib/Util/NTimer.hpp
+   trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp
+Log:
+- add mising include in Log.cpp
+- add some protection to playing the same sound multiple times at the same time.
+
+
+
+
+Modified: trunk/netpanzer/crossmingw.py
+===================================================================
+--- trunk/netpanzer/crossmingw.py	2012-02-04 08:36:20 UTC (rev 1340)
++++ trunk/netpanzer/crossmingw.py	2012-02-04 14:53:05 UTC (rev 1341)
+@@ -14,6 +14,7 @@
+   i486-mingw32msvc-
+   i586-mingw32msvc-
+   i686-mingw32msvc-
++  i486-mingw32-
+ &quot;&quot;&quot;)
+ 
+ def find(env):
+
+Modified: trunk/netpanzer/src/Lib/Util/Log.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/Log.cpp	2012-02-04 08:36:20 UTC (rev 1340)
++++ trunk/netpanzer/src/Lib/Util/Log.cpp	2012-02-04 14:53:05 UTC (rev 1341)
+@@ -27,6 +27,7 @@
+ #include &lt;algorithm&gt;
+ #include &lt;exception&gt;
+ #include &lt;iomanip&gt;
++#include &lt;time.h&gt;
+ 
+ #include &quot;Exception.hpp&quot;
+ #include &quot;FileSystem.hpp&quot;
+
+Modified: trunk/netpanzer/src/Lib/Util/NTimer.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/NTimer.hpp	2012-02-04 08:36:20 UTC (rev 1340)
++++ trunk/netpanzer/src/Lib/Util/NTimer.hpp	2012-02-04 14:53:05 UTC (rev 1341)
+@@ -24,8 +24,8 @@
+ class NTimer
+ {
+ public:
+-    NTimer() : starttime(0), timeout(0) {};
+-    NTimer(Uint32 t) : starttime(0), timeout(t) {};
++    NTimer() : starttime(0), timeout(0) {}
++    NTimer(Uint32 t) : starttime(0), timeout(t) {}
+     
+     inline void reset()              { starttime = SDL_GetTicks(); }
+     inline void reset(Uint32 t)      { starttime = t; }
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2012-02-04 08:36:20 UTC (rev 1340)
++++ trunk/netpanzer/src/NetPanzer/System/SDLSound.cpp	2012-02-04 14:53:05 UTC (rev 1341)
+@@ -29,6 +29,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ #include &quot;SDLSound.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+@@ -37,6 +38,30 @@
+ #define HAS_LOADMUS_RW
+ #endif
+ 
++#define SOUND_REPLAY_PROTECTION_TIME 50
++
++class SoundData
++{
++private:
++    Mix_Chunk* chunk;
++public:
++    NTimer last_played;
++
++    SoundData() : chunk(0), last_played(SOUND_REPLAY_PROTECTION_TIME) {}
++    SoundData(Mix_Chunk* c) : chunk(c), last_played(SOUND_REPLAY_PROTECTION_TIME) {}
++    ~SoundData()
++    {
++        if ( chunk )
++        {
++            Mix_FreeChunk(chunk);
++            chunk = 0;
++        }
++    }
++
++    Mix_Chunk* getData() const { return chunk; }
++};
++
++
+ musics_t SDLSound::musicfiles;
+ musics_t::iterator SDLSound::currentsong;
+ 
+@@ -58,8 +83,9 @@
+ {
+     stopMusic();
+     Mix_CloseAudio();
+-    for (chunks_t::iterator i = m_chunks.begin(); i != m_chunks.end(); i++) {
+-        Mix_FreeChunk(i-&gt;second);
++    for (chunks_t::iterator i = m_chunks.begin(); i != m_chunks.end(); i++)
++    {
++        delete i-&gt;second;
+     }
+ 
+     SDL_QuitSubSystem(SDL_INIT_AUDIO);
+@@ -70,18 +96,21 @@
+  * @param name sound name
+  * @return the chunk or NULL
+  */
+-Mix_Chunk *SDLSound::findChunk(const char *name)
++SoundData *SDLSound::findChunk(const char *name)
+ {
+     chunks_t::size_type count = m_chunks.count(name);
+-    if (count == 0) {
++    if (count == 0)
++    {
+         LOG ((&quot;Silent sound '%s'&quot;, name));
+         return 0;
+     }
+ 
+     chunks_t::iterator it = m_chunks.find(name);
+-    for (int i = rand() % count; i &gt; 0; i--) {
++    for (int i = rand() % count; i &gt; 0; i--)
++    {
+         it++;
+     }
++    
+     return it-&gt;second;
+ }
+ //-----------------------------------------------------------------
+@@ -91,11 +120,22 @@
+  */
+ void SDLSound::playSound(const char* name)
+ {
+-    Mix_Chunk *chunk = findChunk(name);
+-    if (chunk) {
+-        if (Mix_PlayChannel(-1, chunk, 0) == -1) {
+-            //LOG ((&quot;Couldn't play sound '%s': %s&quot;, name, Mix_GetError()));
++    SoundData *sdata = findChunk(name);
++    if (sdata)
++    {
++        if ( sdata-&gt;last_played.isTimeOut() )
++        {
++            if (Mix_PlayChannel(-1, sdata-&gt;getData(), 0) == -1)
++            {
++                //LOG ((&quot;Couldn't play sound '%s': %s&quot;, name, Mix_GetError()));
++            }
++            sdata-&gt;last_played.reset();
+         }
++        else
++        {
++//            LOGGER.debug(&quot;Skipped sound '%s' due to timeout&quot;, name);
++        }
++        
+     }
+ }
+ //-----------------------------------------------------------------
+@@ -106,13 +146,23 @@
+  */
+ void SDLSound::playAmbientSound(const char* name, long distance)
+ {
+-    Mix_Chunk *chunk = findChunk(name);
+-    if (chunk) {
+-        int oldVolume = Mix_VolumeChunk(chunk, getSoundVolume(distance));
+-        if (Mix_PlayChannel(-1, chunk, 0) == -1) {
+-            //LOG ((&quot;Couldn't play sound '%s': %s&quot;, name, Mix_GetError()));
++    SoundData *sdata = findChunk(name);
++    if (sdata)
++    {
++        if ( sdata-&gt;last_played.isTimeOut() )
++        {
++            int oldVolume = Mix_VolumeChunk(sdata-&gt;getData(), getSoundVolume(distance));
++            if (Mix_PlayChannel(-1, sdata-&gt;getData(), 0) == -1)
++            {
++                //LOG ((&quot;Couldn't play sound '%s': %s&quot;, name, Mix_GetError()));
++            }
++            Mix_VolumeChunk(sdata-&gt;getData(), oldVolume);
++            sdata-&gt;last_played.reset();
+         }
+-        Mix_VolumeChunk(chunk, oldVolume);
++        else
++        {
++//            LOGGER.debug(&quot;Skipped ambient sound '%s' due to timeout&quot;, name);
++        }
+     }
+ }
+ //-----------------------------------------------------------------
+@@ -124,9 +174,9 @@
+ int SDLSound::playSoundRepeatedly(const char* name)
+ {
+     int channel = -1;
+-    Mix_Chunk *chunk = findChunk(name);
+-    if (chunk) {
+-        if ((channel = Mix_PlayChannel(-1, chunk, -1)) == -1) {
++    SoundData *sdata = findChunk(name);
++    if (sdata) {
++        if ((channel = Mix_PlayChannel(-1, sdata-&gt;getData(), -1)) == -1) {
+             LOG ((&quot;Couldn't play sound '%s': %s&quot;, name, Mix_GetError()));
+         }
+     }
+@@ -174,26 +224,32 @@
+ {
+     char **list = filesystem::enumerateFiles(directory);
+ 
+-    for (char **i = list; *i != NULL; i++) {
++    for (char **i = list; *i != NULL; i++)
++    {
+         std::string filename = directory;
+         filename.append(*i);
+-        if (!filesystem::isDirectory(filename.c_str())) {
+-            try {
++        if (!filesystem::isDirectory(filename.c_str()))
++        {
++            try
++            {
+                 filesystem::ReadFile *file 
+                     = filesystem::openRead(filename.c_str());
+                 Mix_Chunk *chunk = Mix_LoadWAV_RW(file-&gt;getSDLRWOps(), 1);
+-                if (chunk) {
++                if (chunk)
++                {
+                     std::string idName = getIdName(*i);
+-                    m_chunks.insert(
+-                        std::pair&lt;std::string,Mix_Chunk*&gt;(idName, chunk));
+-                } else {
+-                    LOG ((&quot;Couldn't load wav_rw '%s': %s&quot;,
+-                          filename.c_str(), Mix_GetError()));
++                    m_chunks.insert( std::pair&lt;std::string,SoundData*&gt;(idName, new SoundData(chunk)) );
+                 }
+-            } catch (Exception &amp;e) {
+-                LOG ((&quot;Couldn't load wav '%s': %s&quot;,
+-                      filename.c_str(), e.what()));
++                else
++                {
++                    LOGGER.info(&quot;Couldn't load wav_rw '%s': %s&quot;,
++                          filename.c_str(), Mix_GetError());
++                }
+             }
++            catch (Exception &amp;e)
++            {
++                LOGGER.info(&quot;Couldn't load wav '%s': %s&quot;, filename.c_str(), e.what());
++            }
+         }
+     }
+     filesystem::freeList(list);
+@@ -218,7 +274,7 @@
+     unsigned int sdlvol = (volume*100)/MIX_MAX_VOLUME;
+     chunks_t::iterator i = m_chunks.begin();
+     while ( i != m_chunks.end() ) {
+-        Mix_VolumeChunk(i-&gt;second, sdlvol);
++        Mix_VolumeChunk(i-&gt;second-&gt;getData(), sdlvol);
+         ++i;
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp	2012-02-04 08:36:20 UTC (rev 1340)
++++ trunk/netpanzer/src/NetPanzer/System/SDLSound.hpp	2012-02-04 14:53:05 UTC (rev 1341)
+@@ -24,7 +24,9 @@
+ #include &lt;SDL_mixer.h&gt;
+ #include &quot;System/Sound.hpp&quot;
+ 
+-typedef std::multimap&lt;std::string,Mix_Chunk*&gt; chunks_t;
++class SoundData;
++
++typedef std::multimap&lt;std::string,SoundData*&gt; chunks_t;
+ typedef std::vector&lt;std::string&gt; musics_t;
+ 
+ class SDLSound : public Sound
+@@ -46,7 +48,7 @@
+ private:
+     chunks_t m_chunks;
+ 
+-    Mix_Chunk *findChunk(const char *name);
++    SoundData* findChunk(const char *name);
+     int getSoundVolume(long distance);
+     void loadSound(const char* directory);
+     std::string getIdName(const char* filename);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000366.html">[Netpanzer-cvs] r1340 - in trunk/netpanzer: pics/flags	src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000368.html">[Netpanzer-cvs] r1342 - trunk/netpanzer/support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#367">[ date ]</a>
+              <a href="thread.html#367">[ thread ]</a>
+              <a href="subject.html#367">[ subject ]</a>
+              <a href="author.html#367">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

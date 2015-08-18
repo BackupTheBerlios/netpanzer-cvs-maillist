@@ -1,0 +1,1109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1369 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1369%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views%20Views/Components%20Views/Game&In-Reply-To=%3C20120523134920.E504BBF401%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000392.html">
+   <LINK REL="Next"  HREF="000394.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1369 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1369%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views%20Views/Components%20Views/Game&In-Reply-To=%3C20120523134920.E504BBF401%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1369 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Wed May 23 15:49:20 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000392.html">[Netpanzer-cvs] r1368 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000394.html">[Netpanzer-cvs] r1370 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-05-23 15:49:20 +0200 (Wed, 23 May 2012)
+New Revision: 1369
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Views/Components/tButton.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Theme.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Theme.hpp
+Removed:
+   trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+Log:
+preparing for menu theme
+TeamMode : 
+ - remake endroundview
+ - disable teammode on hosting
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -282,6 +282,7 @@
+     PlayerState *player_state;
+     Timer wait;
+ 
++    GameConfig::game_teammode = false;
+     LoadingView::show();
+     // refresh the view in each append
+     LoadingView::append( &quot;Launching Server ...&quot; );
+@@ -336,7 +337,6 @@
+     // refresh views
+     LoadingView::update( &quot;Launching Server ... (100%) &quot; );
+     graphicsLoop();
+-
+     GameControlRulesDaemon::setStateServerInProgress();
+     NetworkState::setNetworkStatus( _network_state_server );
+ 
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.cpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.cpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -1,129 +0,0 @@
+-/*
+-Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-
+-#include &quot;Views/Components/cssButton.hpp&quot;
+-#include &quot;Views/Components/View.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-
+-#include &quot;MouseEvent.hpp&quot;
+-
+-cssButton::cssButton(const std::string &amp;cname)
+-    : Component(&quot;Button.&quot; + cname)
+-{
+-    setTextColors(Color::white, Color::red, Color::yellow, Color::darkGray);
+-    position.zero();
+-    label.clear();
+-    bstate = NORMAL;
+-    dirty = true;
+-}
+-
+-// render
+-void
+-cssButton::render()
+-{
+-    surface.fill(0);
+-    Surface text;
+-    text.renderText( label.c_str(), textColors[bstate], 0);
+-    if (bstate == PRESSED)
+-    {
+-        bimage.bltTrans(surface, 1, 1);
+-        text.bltTrans(surface, ((surface.getWidth()/2) - (text.getWidth()/2))+1,
+-                      ((surface.getHeight()/2) - (text.getHeight()/2))+1);
+-    }
+-    else
+-    {
+-        bimage.bltTrans(surface, 0, 0);
+-        text.bltTrans(surface, (surface.getWidth()/2) - (text.getWidth()/2),
+-                      (surface.getHeight()/2) - (text.getHeight()/2));
+-    }
+-
+-    dirty = false;
+-}
+-
+-// actionPerformed
+-//---------------------------------------------------------------------------
+-void
+-cssButton::actionPerformed(const mMouseEvent &amp;me)
+-{
+-    if (enabled == false) return;
+-    
+-    if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
+-            || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED)
+-    {
+-        bstate = OVER;
+-        dirty = true;
+-    }
+-    else if (me.getID() == mMouseEvent::MOUSE_EVENT_EXITED)
+-    {
+-        bstate = NORMAL;
+-        dirty = true;
+-    }
+-    else if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
+-    {
+-        bstate = PRESSED;
+-        dirty = true;
+-    }
+-    else if (me.getID() == mMouseEvent::MOUSE_EVENT_CLICKED)
+-    {
+-        ((View *)parent)-&gt;onComponentClicked(this);
+-    }
+-} // end Button::actionPerformed
+-
+-cssButton *
+-cssButton::createcssButton( std::string cname,
+-                            std::string label,
+-                            iXY loc)
+-{
+-    cssButton *b = cssButton::createcssButton(cname, label, loc, Surface::getTextLength(label)+20);
+-    return b;
+-}
+-
+-cssButton *
+-cssButton::createcssButton( std::string cname,
+-                            std::string label,
+-                            iXY loc, int width)
+-{
+-    Surface bitmap;
+-    bitmap.loadBMP(&quot;pics/backgrounds/menus/buttons/default/b-black.bmp&quot;);
+-    
+-    Surface bstart;
+-    bstart.grab(bitmap, iRect(0, 0, 15, bitmap.getHeight()));
+-    Surface bend;
+-    bend.grab(bitmap, iRect(bitmap.getWidth()-15, 0, bitmap.getWidth(), bitmap.getHeight()));
+-    Surface bmiddle;
+-    bmiddle.grab(bitmap, iRect(15, 0, bitmap.getWidth()-15, bitmap.getHeight()));
+-
+-    Surface spbutton(width, bstart.getHeight(), 1);
+-
+-    spbutton.setFrame(0);
+-    bstart.blt(spbutton,0,0);
+-    int msize = bmiddle.getWidth();
+-    for (int i = 0; i &lt; (int)((spbutton.getWidth())/msize);i++)
+-    {
+-        bmiddle.blt(spbutton,15+(msize*i),0);
+-    }
+-    bend.blt(spbutton,spbutton.getWidth()-15,0);
+-    cssButton *b = new cssButton(cname);
+-    b-&gt;setImage(spbutton);
+-    b-&gt;setLabel(label);
+-    b-&gt;setLocation(loc);
+-    b-&gt;setTextColors(componentActiveTextColor, componentBodyColor, componentBodyColor, 33);
+-
+-    return b;
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -1,110 +0,0 @@
+-/*
+-Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#ifndef __cssButton_hpp__
+-#define __cssButton_hpp__
+-
+-#include &quot;Component.hpp&quot;
+-#include &quot;2D/Color.hpp&quot;
+-#include &quot;ViewGlobals.hpp&quot;
+-
+-typedef enum
+-{
+-    NORMAL =   0,
+-    OVER   =   1,
+-    PRESSED=   2,
+-    DISABLE=   3
+-} BState;
+-
+-//--------------------------------------------------------------------------
+-class cssButton : public Component
+-{
+-protected:
+-    std::string label;
+-    PIX textColors[4];
+-    Surface bimage;
+-    BState bstate;
+-    void render();
+-    void resetState()
+-    {
+-        bstate = NORMAL;
+-        dirty = true;
+-    }
+-
+-public:
+-
+-    cssButton(const std::string &amp;cname);
+-
+-    virtual ~cssButton() {}
+-
+-    static cssButton * createcssButton(std::string cname,
+-                                       std::string label,
+-                                       iXY loc);
+-    static cssButton * createcssButton(std::string cname,
+-                                       std::string label,
+-                                       iXY loc, int with);
+-
+-    void setTextColors( PIX normal, PIX over, PIX pressed, PIX disable)
+-    {
+-        textColors[NORMAL] = normal;
+-        textColors[OVER] = over;
+-        textColors[PRESSED] = pressed;
+-        textColors[DISABLE] = disable;
+-    }
+-    void Enable()
+-    {
+-        enabled = true;
+-        bstate = NORMAL;
+-        dirty = true;
+-    }
+-    void Disable()
+-    {
+-        enabled = false;
+-        bstate = DISABLE;
+-        dirty = true;
+-    }
+-    
+-    bool isEnable() const
+-    {
+-        return enabled;
+-    }
+-    
+-    void setLabel(const std::string&amp; l)
+-    {
+-        label = l;
+-        dirty = true;
+-    }
+-
+-    void setImage(const Surface &amp;s)
+-    {
+-        if ( s.getNumFrames() )
+-        {
+-            bimage.copy(s);
+-            setSize(bimage.getWidth(), bimage.getHeight());
+-        }
+-        dirty = true;
+-    }
+-    const std::string&amp; getLabel() const
+-    {
+-        return label;
+-    }
+-
+-    virtual void actionPerformed(const mMouseEvent &amp;me);
+-}; // end Button
+-
+-#endif // end __Button_hpp__
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tButton.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tButton.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tButton.cpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -0,0 +1,130 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#include &quot;Views/Components/tButton.hpp&quot;
++#include &quot;Views/Components/View.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++#include &quot;MouseEvent.hpp&quot;
++
++tButton::tButton(const std::string &amp;cname)
++    : Component(&quot;Button.&quot; + cname)
++{
++    setTextColors(ctTexteNormal, ctTexteOver, ctTextePressed, ctTexteDisable);
++    position.zero();
++    label.clear();
++    bstate = NORMAL;
++    dirty = true;
++}
++
++// render
++void
++tButton::render()
++{
++    surface.fill(0);
++    Surface text;
++    text.renderText( label.c_str(), textColors[bstate], 0);
++    if (bstate == PRESSED)
++    {
++        bimage.bltTrans(surface, 1, 1);
++        text.bltTrans(surface, ((surface.getWidth()/2) - (text.getWidth()/2))+1,
++                      ((surface.getHeight()/2) - (text.getHeight()/2))+1);
++    }
++    else
++    {
++        bimage.bltTrans(surface, 0, 0);
++        text.bltTrans(surface, (surface.getWidth()/2) - (text.getWidth()/2),
++                      (surface.getHeight()/2) - (text.getHeight()/2));
++    }
++
++    dirty = false;
++}
++
++// actionPerformed
++//---------------------------------------------------------------------------
++void
++tButton::actionPerformed(const mMouseEvent &amp;me)
++{
++    if (enabled == false) return;
++    
++    if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
++            || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED)
++    {
++        bstate = OVER;
++        dirty = true;
++    }
++    else if (me.getID() == mMouseEvent::MOUSE_EVENT_EXITED)
++    {
++        bstate = NORMAL;
++        dirty = true;
++    }
++    else if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
++    {
++        bstate = PRESSED;
++        dirty = true;
++    }
++    else if (me.getID() == mMouseEvent::MOUSE_EVENT_CLICKED)
++    {
++        ((View *)parent)-&gt;onComponentClicked(this);
++    }
++} // end Button::actionPerformed
++
++tButton *
++tButton::createtButton( std::string cname,
++                            std::string label,
++                            iXY loc)
++{
++    tButton *b = tButton::createtButton(cname, label, loc, Surface::getTextLength(label)+20);
++    return b;
++}
++
++tButton *
++tButton::createtButton( std::string cname,
++                            std::string label,
++                            iXY loc, int width)
++{
++    Surface bitmap;
++    bitmap.loadBMP(itButton);
++    
++    Surface bstart;
++    bstart.grab(bitmap, iRect(0, 0, 15, bitmap.getHeight()));
++    Surface bend;
++    bend.grab(bitmap, iRect(bitmap.getWidth()-15, 0, bitmap.getWidth(), bitmap.getHeight()));
++    Surface bmiddle;
++    bmiddle.grab(bitmap, iRect(15, 0, bitmap.getWidth()-15, bitmap.getHeight()));
++
++    Surface spbutton(width, bstart.getHeight(), 1);
++
++    spbutton.setFrame(0);
++    bstart.blt(spbutton,0,0);
++    int msize = bmiddle.getWidth();
++    for (int i = 0; i &lt; (int)((spbutton.getWidth())/msize);i++)
++    {
++        bmiddle.blt(spbutton,15+(msize*i),0);
++    }
++    bend.blt(spbutton,spbutton.getWidth()-15,0);
++    tButton *b = new tButton(cname);
++    b-&gt;setImage(spbutton);
++    b-&gt;setLabel(label);
++    b-&gt;setLocation(loc);
++    b-&gt;setTextColors(ctTexteNormal, ctTexteOver, ctTextePressed, ctTexteDisable);
++
++    return b;
++}
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tButton.cpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -0,0 +1,109 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef __tButton_hpp__
++#define __tButton_hpp__
++
++#include &quot;Component.hpp&quot;
++#include &quot;2D/Color.hpp&quot;
++
++typedef enum
++{
++    NORMAL =   0,
++    OVER   =   1,
++    PRESSED=   2,
++    DISABLE=   3
++} BState;
++
++//--------------------------------------------------------------------------
++class tButton : public Component
++{
++protected:
++    std::string label;
++    PIX textColors[4];
++    Surface bimage;
++    BState bstate;
++    void render();
++    void resetState()
++    {
++        bstate = NORMAL;
++        dirty = true;
++    }
++
++public:
++
++    tButton(const std::string &amp;cname);
++
++    virtual ~tButton() {}
++
++    static tButton * createtButton(std::string cname,
++                                       std::string label,
++                                       iXY loc);
++    static tButton * createtButton(std::string cname,
++                                       std::string label,
++                                       iXY loc, int with);
++
++    void setTextColors( PIX normal, PIX over, PIX pressed, PIX disable)
++    {
++        textColors[NORMAL] = normal;
++        textColors[OVER] = over;
++        textColors[PRESSED] = pressed;
++        textColors[DISABLE] = disable;
++    }
++    void Enable()
++    {
++        enabled = true;
++        bstate = NORMAL;
++        dirty = true;
++    }
++    void Disable()
++    {
++        enabled = false;
++        bstate = DISABLE;
++        dirty = true;
++    }
++    
++    bool isEnable() const
++    {
++        return enabled;
++    }
++    
++    void setLabel(const std::string&amp; l)
++    {
++        label = l;
++        dirty = true;
++    }
++
++    void setImage(const Surface &amp;s)
++    {
++        if ( s.getNumFrames() )
++        {
++            bimage.copy(s);
++            setSize(bimage.getWidth(), bimage.getHeight());
++        }
++        dirty = true;
++    }
++    const std::string&amp; getLabel() const
++    {
++        return label;
++    }
++
++    virtual void actionPerformed(const mMouseEvent &amp;me);
++}; // end Button
++
++#endif // end __tButton_hpp__
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Components/tButton.hpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -27,6 +27,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ #include &quot;Views/Components/cButton.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
+ 
+ #define HEADER_HEIGHT 70
+ #define ENTRY_HEIGHT 20
+@@ -36,12 +37,7 @@
+ #define TABLE_START (HEADER_HEIGHT + TABLE_BORDER)
+ 
+ #define ALLY_START 4
+-#define FLAG_START 26
+-// characters * character width
+-#define NAME_START (6*8)
+ 
+-#define TABLE_HEADER_PIX_LEN (52*8)
+-
+ #define WINDOW_WIDTH (TABLE_HEADER_PIX_LEN + ((DEFAULT_BORDER_SIZE+TABLE_BORDER) * 2 ) + 14+2)
+ 
+ static const char * table_header =
+@@ -73,6 +69,7 @@
+     colorImage.loadBMP(&quot;pics/default/playerColor.bmp&quot;);
+ 
+     selected_line = -1;
++    selected_col = -1;
+     RectWinner = getClientRect();
+     RectWinner.min.x = RectWinner.min.y = 0;
+     RectStates = RectWinner;
+@@ -87,10 +84,10 @@
+ {
+     unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
+     clientArea.BltRoundRect(RectWinner, 14, Palette::green256.getColorArray());
+-    clientArea.RoundRect(RectWinner,14, Color::gray);
++    clientArea.RoundRect(RectWinner,14, ctWindowsBorder);
+ 
+-    clientArea.BltRoundRect(RectStates, 14, Palette::darkGray256.getColorArray());
+-    clientArea.RoundRect(RectStates, 14, Color::gray);
++    clientArea.BltRoundRect(RectStates, 14, Palette::darkbrown256.getColorArray());
++    clientArea.RoundRect(RectStates, 14, ctWindowsBorder);
+ 
+     if (GameConfig::game_teammode) drawTeamStats(clientArea, flagHeight);
+     else drawPlayerStats(clientArea, flagHeight);
+@@ -161,11 +158,13 @@
+     Surface * flag = 0;
+     int cur_state = 0;
+ 
+-    dest.bltString(0, cur_line_pos, table_header, Color::gray);
++    dest.bltString(0, cur_line_pos, table_header, ctTexteNormal);
+     cur_line_pos += ENTRY_HEIGHT;
+     flag_pos += ENTRY_HEIGHT;
+     ++cur_state;
+-
++    int FLAG_START = RectStates.min.x+5;
++    int NAME_START = RectStates.min.x+27;
++    
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i)
+     {
+@@ -175,9 +174,8 @@
+                  stats_format, state-&gt;getName().substr(0,20).c_str(),
+                  state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                  state-&gt;getObjectivesHeld());
+-        dest.bltStringShadowed(NAME_START, cur_line_pos, statBuf,
+-                               (cur_state == selected_line)?Color::yellow:Color::gray224,
+-                               Color::gray64);
++        dest.bltString(NAME_START, cur_line_pos, statBuf,
++                       (cur_state == selected_line)?Color::yellow:ctTexteNormal);
+ 
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         flag-&gt;blt( dest, FLAG_START, flag_pos );
+@@ -204,7 +202,7 @@
+             }
+         }
+ 
+-        colorImage.bltTransColor(dest, TABLE_HEADER_PIX_LEN+5, flag_pos, state-&gt;getColor());
++        colorImage.bltTransColor(dest, 52+5, flag_pos, state-&gt;getColor());
+ 
+         cur_line_pos += ENTRY_HEIGHT;
+         flag_pos += ENTRY_HEIGHT;
+@@ -223,9 +221,34 @@
+     }
+ };
+ 
++static void DrawPanelUser(iRect rect, Surface&amp; dest, const PlayerState* state)
++{
++    char statBuf[256];
++    int x = rect.min.x+5;
++    int y = rect.min.y+5;
++    
++    dest.bltString(x, y, state-&gt;getName().c_str(), ctTexteOver);
++    snprintf(statBuf, sizeof(statBuf), &quot;%5i Points&quot;, state-&gt;getTotal());
++    dest.bltString(rect.max.x-100, y, statBuf, ctTexteOver);
++    y += 10;
++    dest.drawLine(x, y, rect.max.x-5, y, ctTexteOver);
++    y += 5;
++    snprintf(statBuf, sizeof(statBuf), &quot; Frags: %5i&quot;, state-&gt;getKills());
++    dest.bltString(x, y, statBuf, ctTexteNormal);
++    y += 12;
++    snprintf(statBuf, sizeof(statBuf), &quot;deaths: %5i&quot;, state-&gt;getLosses());
++    dest.bltString(x, y, statBuf, ctTexteNormal);
++    x += 120;
++    y = rect.min.y+20;
++    snprintf(statBuf, sizeof(statBuf), &quot; Objectives: %5i&quot;, state-&gt;getObjectivesHeld());
++    dest.bltString(x, y, statBuf, ctTexteNormal);
++}
++
+ void EndRoundView::drawTeamStats(Surface&amp; dest, unsigned int flagHeight)
+ {
+     char statBuf[256];
++    iRect r((RectStates.getSizeX()/2)-2, RectStates.min.y+5, (RectStates.getSizeX()/2)+2, RectStates.max.y-20);
++    dest.fillRect(r, ctTexteDisable);
+ 
+     states.clear();
+     PlayerID i;
+@@ -250,14 +273,21 @@
+     int cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
+     int flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
+     Surface * flag = 0;
+-    int cur_state = 0;
++    int cur_state = 1;
+ 
+-    dest.bltString(0, cur_line_pos, table_header, Color::gray);
++    dest.bltString(0, cur_line_pos, &quot;      Name             Points&quot;, ctTexteNormal);
++    dest.bltString(5+RectStates.getSizeX()/2, cur_line_pos, &quot;      Name             Points&quot;, ctTexteNormal);
++    dest.drawLine(RectStates.min.x+5, cur_line_pos+10, RectStates.max.x-5, cur_line_pos+10, ctTexteNormal);
++
+     cur_line_pos += ENTRY_HEIGHT;
+     flag_pos += ENTRY_HEIGHT;
+-    ++cur_state;
+     int current_Team = 0;
++    int FLAG_START = 3+RectStates.min.x+5;
++    int NAME_START = 3+RectStates.min.x+28;
+ 
++    iRect infopanel(RectStates.min.x+10,RectStates.max.y-50, RectStates.max.x-10, RectStates.max.y-5);
++    dest.fillRect(infopanel, ctWindowsbackground);
++    
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i)
+     {
+@@ -265,26 +295,31 @@
+ 
+         if (current_Team != state-&gt;getTeamID())
+         {
++            cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
++            flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
+             cur_line_pos += ENTRY_HEIGHT;
+-            dest.drawLine(RectStates.min.x+10, cur_line_pos-10, RectStates.max.x-10, cur_line_pos-10, Color::lightGreen);
+             flag_pos += ENTRY_HEIGHT;
+             current_Team = state-&gt;getTeamID();
++            FLAG_START = (3+RectStates.getSizeX()/2)+5;
++            NAME_START = (3+RectStates.getSizeX()/2)+28;
++            cur_state = 1;
+         }
+-
+         snprintf(statBuf, sizeof(statBuf),
+-                 stats_format, state-&gt;getName().substr(0,20).c_str(),
+-                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+-                 state-&gt;getObjectivesHeld());
+-        dest.bltStringShadowed(NAME_START, cur_line_pos, statBuf,
+-                               Color::gray224,
+-                               Color::gray64);
++                 &quot;%-15s%7i&quot;, state-&gt;getName().c_str(), state-&gt;getTotal());
++        if (cur_state == selected_line)
++        {
++            if (selected_col == current_Team)
++            {
++                iRect r(FLAG_START, cur_line_pos-3, FLAG_START+235, cur_line_pos+11);
++                dest.fillRect(r, ctTexteOver);
++                DrawPanelUser(infopanel, dest, state);
++            } 
++        }
++        dest.bltString(NAME_START, cur_line_pos, statBuf, ctTexteNormal);
+ 
+-        TeamManager::drawFlag(current_Team, dest, FLAG_START-20, flag_pos );
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         flag-&gt;blt( dest, FLAG_START, flag_pos );
+ 
+-        colorImage.bltTransColor(dest, TABLE_HEADER_PIX_LEN+5, flag_pos, state-&gt;getColor());
+-
+         cur_line_pos += ENTRY_HEIGHT;
+         flag_pos += ENTRY_HEIGHT;
+         ++cur_state;
+@@ -292,6 +327,19 @@
+ 
+ }
+ 
++void EndRoundView::mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos)
++{
++    GameTemplateView::mouseMove(prevPos, newPos);
++//    selected_line = -1;
++//    selected_col = -1;
++    if ( newPos.y &gt;= TABLE_START )
++    {
++        selected_line = (newPos.y-TABLE_START) / ENTRY_HEIGHT;
++        if (newPos.x &gt; RectStates.getSizeX()/2) selected_col = 1;
++        else selected_col = 0;
++    }
++}
++
+ void EndRoundView::doActivate()
+ {
+     selected_line = -1;
+@@ -308,8 +356,3 @@
+     int y = (screen-&gt;getHeight() / 2) - 250;
+     moveTo(iXY(x, y));
+ }
+-
+-void EndRoundView::processEvents()
+-{
+-    COMMAND_PROCESSOR.process(false);
+-}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -42,6 +42,7 @@
+     Surface colorImage;
+     std::vector&lt;const PlayerState*&gt; states;
+     int selected_line;
++    int selected_col;
+     iRect RectWinner;
+     iRect RectStates;
+ public:
+@@ -56,7 +57,7 @@
+ protected:
+     virtual void doActivate();
+     virtual void doDeactivate();
+-    virtual void processEvents();
++    virtual void mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos);
+     void drawTitle(Surface &amp;windowArea)
+     {
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -63,7 +63,7 @@
+     secondrect.max.x = secondrect.min.x + 350;
+     secondrect.max.y = firstrect.max.y;
+  
+-    changebutton = cssButton::createcssButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, 
++   changebutton = tButton::createtButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, 
+                                               iXY(firstrect.max.x+1, firstrect.min.y+((firstrect.getSizeY()/2)-10)), 
+                                               secondrect.min.x-firstrect.max.x);
+     add(changebutton);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -22,7 +22,7 @@
+ #include &lt;vector&gt;
+ #include &quot;GameTemplateView.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+-#include &quot;Views/Components/cssButton.hpp&quot;
++#include &quot;Views/Components/tButton.hpp&quot;
+ 
+ class PlayerState;
+ 
+@@ -35,7 +35,7 @@
+     iRect secondrect;
+     std::vector&lt;const PlayerState*&gt; states;
+     void drawTeams(Surface &amp;dest);
+-    cssButton * changebutton;
++    tButton * changebutton;
+ 
+ public:
+     GTeamView();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -28,8 +28,8 @@
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+-#include &quot;Views/Components/cButton.hpp&quot;
+-#include &quot;Views/Components/cssButton.hpp&quot;
++#include &quot;Views/Components/tButton.hpp&quot;
++#include &quot;Views/Theme.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+@@ -76,9 +76,9 @@
+     secondrect.max.x = rect.max.x-7;
+     secondrect.max.y = firstrect.max.y;
+     
+-    changebutton = cssButton::createcssButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+10, (firstrect.min.y+50)), (secondrect.min.x-firstrect.max.x)-20);
++    changebutton = tButton::createtButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+10, (firstrect.min.y+50)), (secondrect.min.x-firstrect.max.x)-20);
+     add(changebutton);
+-    readybutton = cssButton::createcssButton( &quot;ready&quot;, &quot;Ready&quot;, iXY(firstrect.max.x+10, (firstrect.min.y+85)), (secondrect.min.x-firstrect.max.x)-20);
++    readybutton = tButton::createtButton( &quot;ready&quot;, &quot;Ready&quot;, iXY(firstrect.max.x+10, (firstrect.min.y+85)), (secondrect.min.x-firstrect.max.x)-20);
+     add(readybutton);
+     loaded = true;
+ }
+@@ -86,8 +86,8 @@
+ void PrepareTeam::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+     menuImage.bltTrans(clientArea, menuImageXY.x, menuImageXY.y);
+-    clientArea.FillRoundRect(rect, 12, 33);
+-    clientArea.RoundRect(rect,12, 15);
++    clientArea.FillRoundRect(rect, 12, ctWindowsbackground);
++    clientArea.RoundRect(rect,12, ctWindowsBorder);
+ 
+     clientArea.RoundRect(firstrect,10, TeamManager::getTeamColor(0));
+     clientArea.RoundRect(secondrect,10, TeamManager::getTeamColor(1));
+@@ -106,18 +106,18 @@
+     char statBuf[256];
+     if (GameControlRulesDaemon::getTeamCD() &lt; 1)
+     {
+-        dest.bltString(start.x-5 , rect.min.y-5, &quot;Get ready, the battle will begin...&quot;, Color::white);
++        dest.bltString(start.x-5 , rect.min.y-5, &quot;Get ready, the battle will begin...&quot;, ctTexteNormal);
+     }
+     else
+     {
+         snprintf(statBuf, sizeof(statBuf), &quot;%d&quot;, GameControlRulesDaemon::getTeamCD());
+-        dest.bltString(firstrect.max.x+40 , firstrect.min.y+5, statBuf, Color::white);
++        dest.bltString(firstrect.max.x+40 , firstrect.min.y+5, statBuf, ctTexteNormal);
+     }
+-    dest.bltString(start.x , start.y, &quot;Game:&quot;, Color::white);
+-    dest.bltString(start.x+nextx , start.y, &quot;Map:&quot;, Color::white);
++    dest.bltString(start.x , start.y, &quot;Game:&quot;, ctTexteNormal);
++    dest.bltString(start.x+nextx , start.y, &quot;Map:&quot;, ctTexteNormal);
+     start.y+= 10;
+-    dest.drawLine(start.x, start.y, start.x+100, start.y, Color::white);
+-    dest.drawLine(start.x+nextx, start.y, start.x+nextx+100, start.y, Color::white);
++    dest.drawLine(start.x, start.y, start.x+100, start.y, ctTexteNormal);
++    dest.drawLine(start.x+nextx, start.y, start.x+nextx+100, start.y,ctTexteNormal);
+     start.y+= 7;
+     switch(GameConfig::game_gametype)
+     {
+@@ -137,19 +137,19 @@
+         break;
+     }
+     }
+-    dest.bltString(start.x, start.y, statBuf, Color::white);
++    dest.bltString(start.x, start.y, statBuf, ctTexteNormal);
+     snprintf(statBuf, sizeof(statBuf), &quot;Name: %-20s&quot;, MapInterface::getMap()-&gt;getName().c_str());
+-    dest.bltString(start.x+nextx, start.y, statBuf, Color::white);
++    dest.bltString(start.x+nextx, start.y, statBuf, ctTexteNormal);
+     start.y+= 13;
+     snprintf(statBuf, sizeof(statBuf), &quot;Players: %i/%i&quot;,  
+              PlayerInterface::getActivePlayerCount(), 
+              GameConfig::game_maxplayers);
+-    dest.bltString(start.x, start.y, statBuf, Color::white);
++    dest.bltString(start.x, start.y, statBuf, ctTexteNormal);
+     snprintf(statBuf, sizeof(statBuf), &quot;Objectives: %i&quot;, (int) ObjectiveInterface::getObjectiveCount());
+-    dest.bltString(start.x+nextx, start.y, statBuf, Color::white);
++    dest.bltString(start.x+nextx, start.y, statBuf, ctTexteNormal);
+     start.y+= 13;
+     snprintf(statBuf, sizeof(statBuf), &quot;Units: %i&quot;, GameConfig::game_maxunits/GameConfig::game_maxplayers);
+-    dest.bltString(start.x, start.y, statBuf, Color::white);
++    dest.bltString(start.x, start.y, statBuf, ctTexteNormal);
+ }
+ 
+ class StatesSortByTeam
+@@ -209,11 +209,11 @@
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+         flag-&gt;blt( dest, Start_x-23, cur_line_pos-5 );
+ 
+-        textcolor = Color::white;
++        textcolor = ctTexteNormal;
+         if (TeamManager::isPlayerReady(state-&gt;getID()))
+-            textcolor = Color::darkGray;
++            textcolor = ctTexteDisable;
+         else if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+-            textcolor = Color::cyan;
++            textcolor = ctTexteOver;
+ 
+         if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+         {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-05-18 14:50:44 UTC (rev 1368)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -22,7 +22,7 @@
+ #include &lt;vector&gt;
+ #include &quot;GameTemplateView.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
+-#include &quot;Views/Components/cssButton.hpp&quot;
++#include &quot;Views/Components/tButton.hpp&quot;
+ 
+ class PlayerState;
+ 
+@@ -39,8 +39,8 @@
+     void DrawInfo(Surface &amp;dest);
+     iXY menuImageXY;
+     Surface menuImage, vsImage;
+-    cssButton * changebutton;
+-    cssButton * readybutton;
++    tButton * changebutton;
++    tButton * readybutton;
+ 
+ public:
+     PrepareTeam();
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Theme.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Theme.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Theme.cpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -0,0 +1,22 @@
++/*
++Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#include &quot;Views/Theme.hpp&quot;
++
++
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Theme.cpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Theme.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Theme.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Theme.hpp	2012-05-23 13:49:20 UTC (rev 1369)
+@@ -0,0 +1,36 @@
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++#ifndef __Theme_hpp__
++#define __Theme_hpp__
++
++//Color theme
++#define ctWindowsBorder             (15)
++#define ctWindowsbackground         (33)
++
++#define ctTexteNormal               (Color::lightGray)
++#define ctTexteOver                 (174)
++#define ctTextePressed              (174)
++#define ctTexteDisable              (15)
++
++// Image theme
++#define itButton                    (&quot;pics/backgrounds/menus/buttons/default/b-black.bmp&quot;)
++
++    //TODO: Load theme from ini file
++//void LoadNPTheme();
++
++#endif // __Theme_hpp__
+
+
+Property changes on: trunk/netpanzer/src/NetPanzer/Views/Theme.hpp
+___________________________________________________________________
+Added: svn:eol-style
+   + native
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000392.html">[Netpanzer-cvs] r1368 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000394.html">[Netpanzer-cvs] r1370 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

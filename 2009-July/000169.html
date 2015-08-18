@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1140 - in trunk/netpanzer: .	src/NetPanzer/Interfaces support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-July/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1140%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Interfaces%20support/scripts&In-Reply-To=%3C200907011659.n61Gx4oa012193%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000168.html">
+   <LINK REL="Next"  HREF="000170.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1140 - in trunk/netpanzer: .	src/NetPanzer/Interfaces support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1140%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Interfaces%20support/scripts&In-Reply-To=%3C200907011659.n61Gx4oa012193%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1140 - in trunk/netpanzer: .	src/NetPanzer/Interfaces support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul  1 18:59:04 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000168.html">[Netpanzer-cvs] r1139 - trunk/netpanzer/maps
+</A></li>
+        <LI>Next message: <A HREF="000170.html">[Netpanzer-cvs] r1141 - in trunk/netpanzer: src/NetPanzer/Particles	support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#169">[ date ]</a>
+              <a href="thread.html#169">[ thread ]</a>
+              <a href="subject.html#169">[ subject ]</a>
+              <a href="author.html#169">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-07-01 18:58:45 +0200 (Wed, 01 Jul 2009)
+New Revision: 1140
+
+Added:
+   trunk/netpanzer/support/scripts/make-linux-binary.sh
+   trunk/netpanzer/support/scripts/make-windows-binary.sh
+Removed:
+   trunk/netpanzer/make-linux-binary.sh
+   trunk/netpanzer/make-windows-binary.sh
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp
+Log:
+- NEW: added a new command to the InfoSocket 'getflag' can be used by server browsers to get the flags that the game is using.
+The flag request should be: '\getflag\x\' where x is the flag number.
+The answer will be '\flag\x\aabbccdd' where x is the flag number and aabbccdd is an array hex encoded with the flag data.
+The flag data array is 20x14 long and doesn't include the palette (flags are 8 bit), the requester of the flag &quot;should&quot; know what the pallete is.
+Every 2 characters of the flag data can make a flag 'byte', example:
+
+Flag data: \flag\0\059a3f...\
+ - The answer is for flag 0
+ - the first 3 bytes of the flag are: 0x05, 0x9a and 0x3f
+
+
+- modifed the scripts to make the windows and linux version packages.
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-07-01 13:28:09 UTC (rev 1139)
++++ trunk/netpanzer/SConstruct	2009-07-01 16:58:45 UTC (rev 1140)
+@@ -117,7 +117,12 @@
+     crosslinuxenv.Replace( CC = env['crosslinuxcompilerprefix'] + env['CC'] )
+     crosslinuxenv.Replace( AR = env['crosslinuxcompilerprefix'] + env['AR'] )
+     crosslinuxenv.Replace( RANLIB = env['crosslinuxcompilerprefix'] + env['RANLIB'] )
+-    crosslinuxenv.Append( _LIBFLAGS = [ '`' + crosslinuxenv['CXX'] + ' -print-file-name=libstdc++.a`' ] )
++    crosslinuxenv.Append( LINKFLAGS = [ '-static-libgcc' ] )
++    #crosslinuxenv.Prepend( _LIBFLAGS = [ '-static-libgcc' ] )
++    #crosslinuxenv.Prepend( _LIBFLAGS = [ '-lstdc++' ] )
++    #crosslinuxenv.Append( _LIBFLAGS = [ '`' + crosslinuxenv['CXX'] + ' -print-file-name=libstdc++.a`' ] )
++    #crosslinuxenv.Prepend( _LIBFLAGS = [ '/usr/local/gcc/i686-linux/lib/gcc/i686-linux/4.2.4/../../../../i686-linux/lib/libstdc++.a' ] )
++    
+ 
+ env['FINALBUILDDIR'] = 'build/' + env['mode'] + '/'
+ env['FINALLIBSDIR'] = env['FINALBUILDDIR'] + 'libs/'
+
+Deleted: trunk/netpanzer/make-linux-binary.sh
+===================================================================
+--- trunk/netpanzer/make-linux-binary.sh	2009-07-01 13:28:09 UTC (rev 1139)
++++ trunk/netpanzer/make-linux-binary.sh	2009-07-01 16:58:45 UTC (rev 1140)
+@@ -1,36 +0,0 @@
+-#! /bin/bash
+-
+-if [ -z &quot;$1&quot; ]; then
+-	echo &quot;usage: $0 &lt;netpanzer_version&gt;&quot;
+-	exit 1
+-fi
+-
+-VERSION=&quot;$1&quot;
+-NPDEST=/tmp/netpanzer-svn
+-ZIPNAME=&quot;netpanzer-linux-${VERSION}.tar.gz&quot;
+-PATH=$PATH:/usr/local/gcc/i686-linux/bin/
+-
+-./configure \
+-	--host=i686-linux \
+-	--with-sdl-exec-prefix=/usr/local/gcc/i686-linux/usr \
+-	--enable-linuxbin
+-
+-jam clean
+-jam 
+-
+-i686-linux-strip netpanzer
+-
+-jam &quot;-sDESTDIR=${NPDEST}&quot; \
+-	-sbindir=. \
+-	-sappdatadir=. \
+-	-sappdocdir=. \
+-	-sapplicationsdir=. \
+-	-spixmapsdir=. \
+-	install
+-
+-mkdir packages
+-pushd &quot;${NPDEST}/..&quot;
+-tar zcvf &quot;${ZIPNAME}&quot; `basename &quot;${NPDEST}&quot;`
+-popd
+-mv &quot;${NPDEST}/../${ZIPNAME}&quot; packages
+-
+
+Deleted: trunk/netpanzer/make-windows-binary.sh
+===================================================================
+--- trunk/netpanzer/make-windows-binary.sh	2009-07-01 13:28:09 UTC (rev 1139)
++++ trunk/netpanzer/make-windows-binary.sh	2009-07-01 16:58:45 UTC (rev 1140)
+@@ -1,37 +0,0 @@
+-#! /bin/bash
+-
+-if [ -z &quot;$1&quot; ]; then
+-	echo &quot;usage: $0 &lt;netpanzer_version&gt;&quot;
+-	exit 1
+-fi
+-
+-VERSION=&quot;$1&quot;
+-NPDEST=/tmp/netpanzer-svnwin
+-ZIPNAME=&quot;netpanzer-windows-${VERSION}.zip&quot;
+-
+-./configure \
+-	--host=i686-mingw32 \
+-	--with-sdl-exec-prefix=/usr/local/gcc/mingw-3.4.5/usr
+-
+-jam clean
+-jam 
+-
+-i686-mingw32-strip netpanzer.exe
+-
+-jam &quot;-sDESTDIR=${NPDEST}&quot; \
+-	-sbindir=. \
+-	-sappdatadir=. \
+-	-sappdocdir=. \
+-	-sapplicationsdir=. \
+-	-spixmapsdir=. \
+-	install
+-
+-cp /usr/local/gcc/mingw-3.4.5/usr/bin/SDL.dll &quot;${NPDEST}&quot;
+-cp /usr/local/gcc/mingw-3.4.5/usr/lib/*.dll &quot;${NPDEST}&quot;
+-
+-mkdir packages
+-pushd &quot;${NPDEST}/..&quot;
+-zip -9r &quot;${ZIPNAME}&quot; `basename &quot;${NPDEST}&quot;`
+-popd
+-mv &quot;${NPDEST}/../${ZIPNAME}&quot; packages
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2009-07-01 13:28:09 UTC (rev 1139)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2009-07-01 16:58:45 UTC (rev 1140)
+@@ -26,6 +26,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Resources/ResourceManager.hpp&quot;
+ 
+ #include &quot;Util/Log.hpp&quot;
+ 
+@@ -72,20 +73,40 @@
+     LOGGER.info(&quot;Infosocket:: received packet from [%s] size [%d]&quot;, from.getIP().c_str(), len);
+ 
+     string query;
+-    while ( !(query = qtokenizer.getNextToken()).empty()) {
++    while ( !(query = qtokenizer.getNextToken()).empty())
++    {
+         LOGGER.debug(&quot;InfoSocket:: Received query '%s'&quot;, query.c_str());
+-        if ( query == &quot;status&quot; ) {
++        if ( query == &quot;status&quot; )
++        {
+             string answer = prepareStatusPacket();
+ 
+             LOGGER.debug(&quot;InfoSocket:: sending answer [%s][%d]&quot;, answer.c_str(), (int)answer.size());
+             socket-&gt;send(from, answer.c_str(), answer.size());
+ 
+             break;
+-        } else if(query == &quot;echo&quot;) {
++        }
++        else if(query == &quot;echo&quot;)
++        {
+             string echotoken = qtokenizer.getNextToken();
++            LOGGER.info(&quot;InfoSocket:: Received echo query of size %d&quot;, echotoken.size());
+             if ( echotoken.size() )
+                 socket-&gt;send(from, echotoken.c_str(), echotoken.size());
+         }
++        else if ( query == &quot;getflag&quot; )
++        {
++            string flagstr = qtokenizer.getNextToken();
++            
++            LOGGER.info(&quot;InfoSocket:: Received flag query for %s&quot;, flagstr.c_str());
++            if ( flagstr.size() )
++            {
++                unsigned int flagnum = atoi(flagstr.c_str());
++                if ( flagnum &lt; 256 &amp;&amp; ResourceManager::isFlagActive(flagnum) )
++                {
++                    string answer = prepareFlagPacket(flagnum);
++                    socket-&gt;send(from, answer.c_str(), answer.size());
++                }
++            }
++        }
+     }
+ }
+ 
+@@ -132,3 +153,30 @@
+ 
+     return s.str();
+ }
++
++static const char hextochar[] = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' };
++
++string
++InfoSocket::prepareFlagPacket(const int flagNum)
++{
++    Surface * fsurf = ResourceManager::getFlag(flagNum);
++    unsigned char flagdata[((20*14)*2) + 1];
++    flagdata[((20*14)*2)] = 0;
++    Uint8 * surfacedata = fsurf-&gt;getFrame0();
++    int curpos = 0;
++    for ( int y = 0; y &lt; 14; ++y )
++    {
++        for ( int x = 0; x &lt; 20; ++x )
++        {
++            unsigned char b = *(surfacedata + (y*fsurf-&gt;getPitch()) + x);
++            flagdata[curpos] = hextochar[((b&gt;&gt;4)&amp;0x0f)];
++            ++curpos;
++            flagdata[curpos] = hextochar[b&amp;0x0f];
++            ++curpos;
++        }
++    }
++    
++    stringstream s;
++    s &lt;&lt; &quot;\\flag\\&quot; &lt;&lt; flagNum &lt;&lt; '\\' &lt;&lt; flagdata &lt;&lt; '\\';
++    return s.str();
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp	2009-07-01 13:28:09 UTC (rev 1139)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.hpp	2009-07-01 16:58:45 UTC (rev 1140)
+@@ -36,6 +36,7 @@
+     void onSocketError(UDPSocket *so, const char * msg);
+     
+ private:
++    string prepareFlagPacket(const int flagNum);
+     string prepareStatusPacket();
+     string statusHead;
+     UDPSocket * socket;
+
+Added: trunk/netpanzer/support/scripts/make-linux-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-linux-binary.sh	2009-07-01 13:28:09 UTC (rev 1139)
++++ trunk/netpanzer/support/scripts/make-linux-binary.sh	2009-07-01 16:58:45 UTC (rev 1140)
+@@ -0,0 +1,49 @@
++#! /bin/bash
++
++if [ ! -f RELEASE_VERSION ]; then
++    echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
++    exit 1
++fi
++
++RELEASEDIR=&quot;releases&quot;
++VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
++NPDEST=/tmp/netpanzer
++ZIPNAME=&quot;netpanzer-linux-${VERSION}.tar.gz&quot;
++EXENAME=&quot;build/crosslinux/release/netpanzer&quot;
++
++PATH=$PATH:/usr/local/gcc/i686-linux/bin/
++
++echo &quot;Making netPanzer linux version ${VERSION}&quot;
++
++mkdir -p build/crosslinux/{release,debug}/libs
++ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/release/libs/libstdc++.a
++ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/debug/libs/libstdc++.a
++
++scons crosslinux \
++      crosslinuxcompilerprefix=i686-linux- \
++      crosslinuxsdlconfig=/usr/local/gcc/i686-linux/bin/sdl-config
++
++i686-linux-strip &quot;${EXENAME}&quot;
++exit 1
++
++[ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
++
++mkdir -p &quot;${NPDEST}&quot;
++cp &quot;${EXENAME}&quot; &quot;${NPDEST}&quot;
++
++support/scripts/copy_datafiles.sh &quot;${NPDEST}&quot;
++support/scripts/copy_docfiles.sh &quot;${NPDEST}&quot;
++
++[ ! -d &quot;${RELEASEDIR}&quot; ] &amp;&amp; mkdir &quot;${RELEASEDIR}&quot;
++
++
++find &quot;${NPDEST}&quot; -name &quot;*/.*&quot; -exec rm -f &quot;{}&quot; \;
++
++pushd &quot;${NPDEST}/..&quot;
++tar zcvf &quot;${ZIPNAME}&quot; `basename &quot;${NPDEST}&quot;`
++popd
++
++[ -f &quot;${RELEASEDIR}/${ZIPNAME}&quot; ] &amp;&amp; rm -f &quot;${RELEASEDIR}/${ZIPNAME}&quot;
++
++mv &quot;${NPDEST}/../${ZIPNAME}&quot; &quot;${RELEASEDIR}&quot;
++#rm -rf &quot;${NPDEST}&quot;
+
+
+Property changes on: trunk/netpanzer/support/scripts/make-linux-binary.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/netpanzer/support/scripts/make-windows-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-windows-binary.sh	2009-07-01 13:28:09 UTC (rev 1139)
++++ trunk/netpanzer/support/scripts/make-windows-binary.sh	2009-07-01 16:58:45 UTC (rev 1140)
+@@ -0,0 +1,43 @@
++#! /bin/bash
++
++if [ ! -f RELEASE_VERSION ]; then
++    echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
++    exit 1
++fi
++
++RELEASEDIR=&quot;releases&quot;
++VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
++NPDEST=/tmp/netpanzer
++ZIPNAME=&quot;netpanzer-windows-${VERSION}.zip&quot;
++EXENAME=&quot;build/crossmingw/release/netpanzer.exe&quot;
++
++echo &quot;Making netPanzer windows version ${VERSION}&quot;
++
++scons crossmingw \
++      crossmingwcompilerprefix=i686-mingw32-\
++      crossmingwsdlconfig=/usr/local/gcc/mingw-3.4.5/bin/sdl-config
++
++i686-mingw32-strip &quot;${EXENAME}&quot;
++
++[ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
++
++mkdir -p &quot;${NPDEST}&quot;
++cp &quot;${EXENAME}&quot; &quot;${NPDEST}&quot;
++
++support/scripts/copy_datafiles.sh &quot;${NPDEST}&quot;
++support/scripts/copy_docfiles.sh &quot;${NPDEST}&quot;
++
++cp /usr/local/gcc/mingw-3.4.5/usr/bin/SDL.dll &quot;${NPDEST}&quot;
++cp /usr/local/gcc/mingw-3.4.5/usr/lib/*.dll &quot;${NPDEST}&quot;
++
++[ ! -d &quot;${RELEASEDIR}&quot; ] &amp;&amp; mkdir &quot;${RELEASEDIR}&quot;
++
++pushd &quot;${NPDEST}/..&quot;
++zip -9r &quot;${ZIPNAME}&quot; `basename &quot;${NPDEST}&quot;`
++popd
++
++[ -f &quot;${RELEASEDIR}/${ZIPNAME}&quot; ] &amp;&amp; rm -f &quot;${RELEASEDIR}/${ZIPNAME}&quot;
++
++mv &quot;${NPDEST}/../${ZIPNAME}&quot; &quot;${RELEASEDIR}&quot;
++rm -rf &quot;${NPDEST}&quot;
++
+
+
+Property changes on: trunk/netpanzer/support/scripts/make-windows-binary.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000168.html">[Netpanzer-cvs] r1139 - trunk/netpanzer/maps
+</A></li>
+	<LI>Next message: <A HREF="000170.html">[Netpanzer-cvs] r1141 - in trunk/netpanzer: src/NetPanzer/Particles	support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#169">[ date ]</a>
+              <a href="thread.html#169">[ thread ]</a>
+              <a href="subject.html#169">[ subject ]</a>
+              <a href="author.html#169">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

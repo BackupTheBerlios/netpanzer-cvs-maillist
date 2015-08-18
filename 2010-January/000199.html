@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1171 - in trunk/netpanzer: scripts	src/NetPanzer/Particles src/NetPanzer/Units src/NetPanzer/Weapons
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1171%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Particles%20src/NetPanzer/Units%20src/NetPanzer/Weapons&In-Reply-To=%3C201001101403.o0AE3Lne003385%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000198.html">
+   <LINK REL="Next"  HREF="000200.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1171 - in trunk/netpanzer: scripts	src/NetPanzer/Particles src/NetPanzer/Units src/NetPanzer/Weapons</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1171%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Particles%20src/NetPanzer/Units%20src/NetPanzer/Weapons&In-Reply-To=%3C201001101403.o0AE3Lne003385%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1171 - in trunk/netpanzer: scripts	src/NetPanzer/Particles src/NetPanzer/Units src/NetPanzer/Weapons">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 10 15:03:21 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000198.html">[Netpanzer-cvs] r1170 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+        <LI>Next message: <A HREF="000200.html">[Netpanzer-cvs] r1172 - in trunk/netpanzer: . src/NetPanzer/Units	support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#199">[ date ]</a>
+              <a href="thread.html#199">[ thread ]</a>
+              <a href="subject.html#199">[ subject ]</a>
+              <a href="author.html#199">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-10 15:03:08 +0100 (Sun, 10 Jan 2010)
+New Revision: 1171
+
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+Log:
+- Fix craters not fading out
+- Saving configuration (lua) stores correct numeric arrays now.
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/scripts/initialize.lua	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -15,17 +15,37 @@
+     if type(t) ~= 'table' then
+         LOGGER:log(&quot;ERROR dumping table: it is not a table&quot;)
+         return
+-    end
++    end    
++    
+ 	for key,value in pairs(t) do
+-	    -- print('temporal: ' .. key .. ' is ' .. type(value))
++        local keytext
++	    local valuetext
++    
++        if type(key) == 'number' then
++            if extra then
++                keytext = &quot;[&quot; .. key .. &quot;]&quot;
++            end
++        else
++            if extra then
++                keytext = &quot;.&quot; .. key
++            else
++                keytext = key;
++            end
++        end
++        
+ 	    if type(value) == 'table' then
+-	        dump_table(result, value, (lin or &quot;&quot;) .. key .. &quot;.&quot;)
++	        if keytext then
++	            dump_table(result, value, (lin or &quot;&quot;) .. keytext)
++            end
+ 	    elseif type(value) == 'string' then
+-	        value = string.gsub(value,'&quot;','\\&quot;')
+-	        table.insert(result, lin .. key .. &quot; = \&quot;&quot; .. value .. &quot;\&quot;&quot;);
+-	    elseif type(value) ~= 'function' then
+-	        table.insert(result, lin .. key .. &quot; = &quot; .. tostring(value));
+-		end
++            valuetext = '&quot;' .. string.gsub(value,'&quot;','\\&quot;') .. '&quot;'
++        elseif type(value) ~= 'function' then
++            valuetext = tostring(value)
++        end
++        
++        if keytext and valuetext then
++            table.insert(result, lin .. keytext .. &quot; = &quot; .. valuetext)
++        end
+ 	end
+ end
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -67,7 +67,6 @@
+ 
+     packedSurface.setData(*staticPackedGroundChunks);
+     packedSurface.setDrawModeSolid();
+-    //packedSurface.setDrawModeBlend(&amp;Palette::colorTableBrighten);
+ 
+     // Get particle color.
+     if (ParticleInterface::gSolidColorExplosionParticles) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -68,10 +68,6 @@
+     packedSurfaceShadow.setData(*staticCloudShadow);
+     packedSurfaceShadow.setFrame(randFrame);
+ 
+-//    packedSurfaceShadow.setDrawModeBlend(32);
+-
+-//    packedSurface.setDrawModeBlend(128);
+-
+ } // end CloudParticle2D::setRandomSurface
+ 
+ int CloudParticle2D::loadClouds(lua_State * L, void * v)
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -40,7 +40,7 @@
+ {
+     packedSurface.setData(*staticPackedCrater);
+ 
+-    packedSurface.setDrawModeSolid();
++    packedSurface.setDrawModeBlend(255);
+ 
+     packedSurface.setFrame(rand() % staticPackedCrater-&gt;getNumFrames());
+ 
+@@ -118,13 +118,13 @@
+             craterCache[cacheIndex].pos.zero();
+         }
+     } else if (age &gt; lifetime * 0.9f) {
+-        packedSurface.setDrawModeBlend(200); // 80%
++        packedSurface.setDrawModeBlend(50); // 80% 200
+     } else if (age &gt; lifetime * 0.8f) {
+-        packedSurface.setDrawModeBlend(150); // 60%
++        packedSurface.setDrawModeBlend(100); // 60% 150
+     } else if (age &gt; lifetime * 0.7f) {
+-        packedSurface.setDrawModeBlend(100); // 40%
++        packedSurface.setDrawModeBlend(150); // 40% 100
+     } else if (age &gt; lifetime * 0.6f) {
+-        packedSurface.setDrawModeBlend(50); // 20%
++        packedSurface.setDrawModeBlend(200); // 20% 50
+     }
+ 
+     Particle2D::sim();
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -137,9 +137,6 @@
+ 
+     in_sync_flag = true;
+ 
+-    body_anim_shadow.setDrawModeBlend(128); // dark a lot
+-    turret_anim_shadow.setDrawModeBlend(128); // dark a lot
+-
+     ai_fsm_transition_complete = false;
+     
+     reload_counter = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -53,15 +53,12 @@
+     shell.setFrame(getGoalAngle(start, end));
+     shell.setAttrib(location, weaponLayer);
+ 
+-    shellShadow.setDrawModeBlend(64); // dark little
+     shellShadow.setFrame(getGoalAngle(start, end));
+     shellShadow.setAttrib(location, weaponShadowLayer);
+ 
+-    thrust.setDrawModeBlend(192); // brighten
+     thrust.setData(gMissleThrustPackedSurface);
+     thrust.setAttrib(location, weaponPuffLayer);
+ 
+-    groundLight.setDrawModeBlend(192); // brighten
+     groundLight.setData(gMissleGroundLightPackedSurface);
+     groundLight.setAttrib(location, weaponPuffLayer);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -52,7 +52,6 @@
+ 
+     shell.setDrawModeSolid();
+ 
+-    shellShadow.setDrawModeBlend(64); // dark little
+     shellShadow.setData(gShellShadowSurface);
+     shellShadow.setFrame(getGoalAngle(start, end));
+     shellShadow.setLayer(weaponShadowLayer);
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2010-01-10 05:46:53 UTC (rev 1170)
++++ trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2010-01-10 14:03:08 UTC (rev 1171)
+@@ -47,25 +47,30 @@
+ 
+     gMissleMediumPackedSurface.loadPNGSheet(&quot;pics/particles/missles/misslesMedium.png&quot;, 14, 14, 360);
+     gMissleMediumShadowSurface.createShadow(gMissleMediumPackedSurface);
++    gMissleMediumShadowSurface.setAlpha(64);
+     gMissleMediumPackedSurface.setColorkey();
+ //    gMissleMediumPackedSurface.setOffsetCenter();
+ 
+     gMissleSmallPackedSurface.loadPNGSheet(&quot;pics/particles/missles/misslesSmall.png&quot;, 14, 14, 360);
+     gMissleSmallShadowSurface.createShadow(gMissleSmallPackedSurface);
++    gMissleSmallShadowSurface.setAlpha(64);
+     gMissleSmallPackedSurface.setColorkey();
+ //    gMissleSmallPackedSurface.setOffsetCenter();
+ 
+     gShellPackedSurface.loadPNGSheet(&quot;pics/particles/shells/shells.png&quot;, 14, 14, 360);
+     gShellShadowSurface.createShadow(gShellPackedSurface);
++    gShellShadowSurface.setAlpha(64);
+     gShellPackedSurface.setColorkey();
+ //    gShellPackedSurface.setOffsetCenter();
+ 
+     gMissleThrustPackedSurface.loadPNG(&quot;pics/particles/lights/missleThrust.png&quot;);
+     gMissleThrustPackedSurface.setColorkey();
++    gMissleThrustPackedSurface.setAlpha(192);
+     gMissleThrustPackedSurface.setOffset(iXY(-15, -15));
+ 
+     gMissleGroundLightPackedSurface.loadPNG(&quot;pics/particles/lights/missleGroundLight.png&quot;);
+     gMissleGroundLightPackedSurface.setColorkey();
++    gMissleGroundLightPackedSurface.setAlpha(192);
+     gMissleGroundLightPackedSurface.setOffset(iXY(-33,-24));
+ 
+ //    gMissleThrustPackedSurface.brigthenFrames();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000198.html">[Netpanzer-cvs] r1170 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+	<LI>Next message: <A HREF="000200.html">[Netpanzer-cvs] r1172 - in trunk/netpanzer: . src/NetPanzer/Units	support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#199">[ date ]</a>
+              <a href="thread.html#199">[ thread ]</a>
+              <a href="subject.html#199">[ subject ]</a>
+              <a href="author.html#199">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

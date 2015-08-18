@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1313 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1313%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20support/scripts&In-Reply-To=%3C20111222183207.1EC4A480B79%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000338.html">
+   <LINK REL="Next"  HREF="000340.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1313 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1313%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20support/scripts&In-Reply-To=%3C20111222183207.1EC4A480B79%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1313 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec 22 19:32:06 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000338.html">[Netpanzer-cvs] r1312 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu support/scripts
+</A></li>
+        <LI>Next message: <A HREF="000340.html">[Netpanzer-cvs] r1314 - tags/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#339">[ date ]</a>
+              <a href="thread.html#339">[ thread ]</a>
+              <a href="subject.html#339">[ subject ]</a>
+              <a href="author.html#339">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-22 19:32:06 +0100 (Thu, 22 Dec 2011)
+New Revision: 1313
+
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/support/scripts/make-windows-binary.sh
+Log:
+- THIS IS 0.8.4 -
+
+- When pressing Escape will close flag selection, or help view or options, depending which is opened.
+- Fixed crosscompiling from windows to linux and windows package generation.
+
+- THIS IS 0.8.4 -
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2011-12-22 16:08:26 UTC (rev 1312)
++++ trunk/netpanzer/SConstruct	2011-12-22 18:32:06 UTC (rev 1313)
+@@ -245,7 +245,8 @@
+ # for crossmingw platform
+ if 'crossmingw' in COMMAND_LINE_TARGETS:
+     crossmingwenv.ParseConfig(env['crossmingwsdlconfig'] + ' --cflags --libs')
+-    crossmingwenv.Append( NPLIBS = [ 'SDL_mixer' ] )
++    crossmingwenv.Prepend( _LIBFLAGS = [ '-L/usr/local/lib', '/usr/local/lib/SDL_mixer.lib' ] )
++#    crossmingwenv.Append( NPLIBS = [ '/usr/local/lib/SDL_mixer.lib' ] )
+ 
+ # for crosslinux platform
+ if 'crosslinux' in COMMAND_LINE_TARGETS:
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-22 16:08:26 UTC (rev 1312)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-22 18:32:06 UTC (rev 1313)
+@@ -330,7 +330,8 @@
+ WorldInputCmdProcessor::evaluateKeyCommands()
+ {
+     if (KeyboardInterface::isCharPressed('B') 
+-       &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() ) 
++       &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag()
++       &amp;&amp; ! Desktop::getVisible(&quot;HelpScrollView&quot;) )
+     {
+         if ( Desktop::getVisible(&quot;GFlagSelectionView&quot;)
+             || GameConfig::game_changeflagtime == 0
+@@ -376,7 +377,8 @@
+         }
+     }
+ 
+-    if (KeyboardInterface::getKeyPressed(SDLK_F1)) {
++    if ( KeyboardInterface::getKeyPressed(SDLK_F1)
++       &amp;&amp; ! Desktop::getVisible(&quot;GFlagSelectionView&quot;) ) {
+         Desktop::toggleVisibility( &quot;HelpScrollView&quot; );
+     }
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-22 16:08:26 UTC (rev 1312)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-22 18:32:06 UTC (rev 1313)
+@@ -527,14 +527,24 @@
+         if (KeyboardInterface::getKeyPressed(SDLK_ESCAPE)) {
+             if (!Desktop::getView(&quot;OptionsView&quot;)-&gt;getVisible())
+             {
+-                
+-                View *v = Desktop::getView(&quot;OptionsView&quot;);
+-                assert(v != 0);
+-                ((OptionsTemplateView *)v)-&gt;initButtons();
+-                ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
++                if ( Desktop::getVisible(&quot;HelpScrollView&quot;) )
++                {
++                    Desktop::toggleVisibility(&quot;HelpScrollView&quot;);
++                }
++                else if ( Desktop::getVisible(&quot;GFlagSelectionView&quot;) )
++                {
++                    Desktop::toggleVisibility(&quot;GFlagSelectionView&quot;);
++                }
++                else
++                {
++                    View *v = Desktop::getView(&quot;OptionsView&quot;);
++                    assert(v != 0);
++                    ((OptionsTemplateView *)v)-&gt;initButtons();
++                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+ 
+-                Desktop::setVisibility(&quot;OptionsView&quot;, true);
+-                Desktop::setActiveView(&quot;OptionsView&quot;);
++                    Desktop::setVisibility(&quot;OptionsView&quot;, true);
++                    Desktop::setActiveView(&quot;OptionsView&quot;);
++                }
+             }
+             else
+             {
+
+Modified: trunk/netpanzer/support/scripts/make-windows-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-windows-binary.sh	2011-12-22 16:08:26 UTC (rev 1312)
++++ trunk/netpanzer/support/scripts/make-windows-binary.sh	2011-12-22 18:32:06 UTC (rev 1313)
+@@ -14,10 +14,10 @@
+ echo &quot;Making netPanzer windows version ${VERSION}&quot;
+ 
+ scons crossmingw \
+-      crossmingwcompilerprefix=i686-mingw32-\
+-      crossmingwsdlconfig=/usr/local/gcc/mingw-3.4.5/bin/sdl-config
++      crossmingwcompilerprefix=i586-mingw32msvc-\
++      crossmingwsdlconfig=/usr/local/bin/sdl-config-mingw
+ 
+-i686-mingw32-strip &quot;${EXENAME}&quot;
++i586-mingw32msvc-strip &quot;${EXENAME}&quot;
+ 
+ [ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
+ 
+@@ -27,8 +27,10 @@
+ support/scripts/copy_datafiles.sh &quot;${NPDEST}&quot;
+ support/scripts/copy_docfiles.sh &quot;${NPDEST}&quot;
+ 
+-cp /usr/local/gcc/mingw-3.4.5/usr/bin/SDL.dll &quot;${NPDEST}&quot;
+-cp /usr/local/gcc/mingw-3.4.5/usr/lib/*.dll &quot;${NPDEST}&quot;
++cp /usr/local/bin/SDL.dll &quot;${NPDEST}&quot;
++cp /usr/local/lib/*.dll &quot;${NPDEST}&quot;
++cp /usr/local/bin/README-SDL.txt &quot;${NPDEST}&quot;
++cp /usr/local/bin/README-SDL_mixer.txt &quot;${NPDEST}&quot;
+ 
+ [ ! -d &quot;${RELEASEDIR}&quot; ] &amp;&amp; mkdir &quot;${RELEASEDIR}&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000338.html">[Netpanzer-cvs] r1312 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu support/scripts
+</A></li>
+	<LI>Next message: <A HREF="000340.html">[Netpanzer-cvs] r1314 - tags/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#339">[ date ]</a>
+              <a href="thread.html#339">[ thread ]</a>
+              <a href="subject.html#339">[ subject ]</a>
+              <a href="author.html#339">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

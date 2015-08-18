@@ -1,0 +1,498 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1251 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Interfaces src/NetPanzer/Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1251%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/Util%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%20src/NetPanzer/Units&In-Reply-To=%3C20111011122134.3745C481353%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000276.html">
+   <LINK REL="Next"  HREF="000278.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1251 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Interfaces src/NetPanzer/Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1251%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/Util%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%20src/NetPanzer/Units&In-Reply-To=%3C20111011122134.3745C481353%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1251 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Interfaces src/NetPanzer/Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 11 14:21:33 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000276.html">[Netpanzer-cvs] r1250 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000278.html">[Netpanzer-cvs] r1252 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Scripts	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#277">[ date ]</a>
+              <a href="thread.html#277">[ thread ]</a>
+              <a href="subject.html#277">[ subject ]</a>
+              <a href="author.html#277">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-11 14:21:33 +0200 (Tue, 11 Oct 2011)
+New Revision: 1251
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/Lib/Util/StringUtil.cpp
+   trunk/netpanzer/src/Lib/Util/StringUtil.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+Log:
+Added initial unit counts configuration (spawn config)
+- now it is configured in game.unit_spawnlist, it is a string with the number of units to load of each type, separate by space or &quot;,&quot;, by default one of each. example &quot;1 1 1 0&quot;.
+- can be modified or queried remotely by &quot;/server unitspawnlist&quot; once modified, the next player that connects will use the new configuration
+
+also deleted the old spawnconfig in the ini file.
+
+
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -93,6 +93,16 @@
+         end
+     end,
+ 
++    unitspawnlist_help = &quot;sets or get the unitspawnlist&quot;,
++    unitspawnlist = function(param, player)
++        if ( param == &quot;&quot; ) then
++            netpanzer.serversayto( player, &quot;Unit spawn list: &quot; .. config.game.unit_spawnlist);
++        else
++            config.game.unit_spawnlist = param;
++            netpanzer.serversayto( player, &quot;Unit spawn list set to: &quot; .. config.game.unit_spawnlist);
++        end
++    end,
++
+     countdown_help = &quot;Do a countdown, use 'countdown &lt;time&gt; &lt;message&gt;'&quot;,
+     countdown = function(param, player)
+         local counttime, message = string.match(param, &quot;(%d+) *(.*)&quot;);
+
+Modified: trunk/netpanzer/src/Lib/Util/StringUtil.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/StringUtil.cpp	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/src/Lib/Util/StringUtil.cpp	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -40,3 +40,35 @@
+     return std::string(str, s, e-s+1);
+ }
+ 
++void string_to_params( const NPString&amp; str, std::vector&lt;NPString&gt;&amp; parameters )
++{
++    parameters.clear();
++
++    static char* limiters[] = { &quot;, \t&quot;, &quot;\&quot;&quot; };
++
++    NPString::size_type start = 0;
++    NPString::size_type end = 0;
++
++    do
++    {
++        start = str.find_first_not_of(&quot; \t&quot;, start);
++        if ( start != NPString::npos )
++        {
++            int limit_index = 0;
++            if ( str[start] == '&quot;' &amp;&amp; start &lt; str.length()-1 )
++            {
++                limit_index = 1;
++                ++start;
++            }
++
++            end = str.find_first_of(limiters[limit_index], start);
++
++            parameters.push_back( str.substr(start, end != NPString::npos ? end-start : end) );
++
++            if ( end != NPString::npos )
++            {
++                start = str.find_first_not_of(limiters[limit_index], end);
++            }
++        }
++    } while ( start != NPString::npos &amp;&amp; end != NPString::npos );
++}
+
+Modified: trunk/netpanzer/src/Lib/Util/StringUtil.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/StringUtil.hpp	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/src/Lib/Util/StringUtil.hpp	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -18,9 +18,11 @@
+ #ifndef __STRINGUTIL_HPP__
+ #define __STRINGUTIL_HPP__
+ 
+-#include &lt;string&gt;
++#include &quot;Core/CoreTypes.hpp&quot;
++#include &lt;vector&gt;
+ 
+-std::string removeSurroundingSpaces(const std::string&amp; str);
++NPString removeSurroundingSpaces(const NPString&amp; str);
++void string_to_params( const NPString&amp; str, std::vector&lt;NPString&gt;&amp; parameters );
+ 
+ #endif
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -20,6 +20,13 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ 
++#include &quot;Util/StringUtil.hpp&quot;
++
++#include &quot;Util/Log.hpp&quot;
++
++// for atoi for now
++#include &lt;stdlib.h&gt;
++
+ PlayerUnitConfig::PlayerUnitConfig()
+ {
+ }
+@@ -27,36 +34,45 @@
+ void PlayerUnitConfig::initialize()
+ {
+     max_allowed_units = gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers;
+-    unit_spawn_list.resize(UnitProfileInterface::getNumUnitTypes(), 0);
++
++    int num_types = UnitProfileInterface::getNumUnitTypes();
++    unit_spawn_list.resize(num_types, 0);
+     
+     int rem_units = max_allowed_units;
+-    int numunits;
++    int num_units;
+ 
+-    vector&lt;ConfigVariable*&gt;::iterator i = gameconfig-&gt;spawnsettings.begin();
+-    while ( i != gameconfig-&gt;spawnsettings.end() )
++    std::vector&lt;NPString&gt; str_counts;
++
++    string_to_params(*GameConfig::game_unit_spawnlist, str_counts);
++
++    for ( int n = 0; n &lt; num_types ; n++ )
+     {
+-        UnitProfile * u = UnitProfileInterface::getProfileByName((*i)-&gt;getName());
+-        if ( u )
++        num_units = n &lt; (int)str_counts.size() ? atoi(str_counts[n].c_str()) : 0;
++
++        if ( num_units &lt; 0 )
+         {
+-            numunits = *(ConfigInt *)(*i);
+-            if ( numunits &gt; rem_units )
+-                numunits = rem_units;
+-            rem_units -= numunits;
+-            unit_spawn_list[u-&gt;unit_type] = numunits;
++            num_units = 0;
+         }
+-        i++;
++        else if ( num_units &gt; rem_units )
++        {
++            num_units = rem_units;
++        }
++
++        rem_units -= num_units;
++
++        unit_spawn_list[n] = num_units;
+     }
+     
+     if ( ! unitTotal() )
+     {
+         // there wasn't any unit, create some and add to config
+-        gameconfig-&gt;clearSpawnSettings();
++        NPString cfg_str;
+         for ( int a=0; a&lt;(int)unit_spawn_list.size(); a++ )
+         {
+             unit_spawn_list[a] = 1;
+-            UnitProfile * u = UnitProfileInterface::getUnitProfile(a);
+-            gameconfig-&gt;spawnsettings.push_back(new ConfigInt(u-&gt;unitname,1));
++            cfg_str += &quot; 1&quot;;
+         }
++        GameConfig::game_unit_spawnlist-&gt;assign(cfg_str);
+     }
+     
+     unit_color = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -53,6 +53,7 @@
+ int       GameConfig::game_autokicktime = 20; // minutes;
+ bool      GameConfig::game_allowmultiip = true;
+ NPString* GameConfig::game_unit_profiles = 0;
++NPString* GameConfig::game_unit_spawnlist = 0;
+ NPString* GameConfig::game_adminpass = 0;
+ 
+ Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
+@@ -113,6 +114,7 @@
+     { &quot;autokicktime&quot;,      GETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+     { &quot;allowmultiip&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+     { &quot;unit_profiles&quot;,     GETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
++    { &quot;unit_spawnlist&quot;,    GETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         GETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+     {0,0}
+ };
+@@ -124,6 +126,7 @@
+     { &quot;autokicktime&quot;,      SETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+     { &quot;allowmultiip&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+     { &quot;unit_profiles&quot;,     SETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
++    { &quot;unit_spawnlist&quot;,    SETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         SETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+     {0,0}
+ };
+@@ -135,6 +138,11 @@
+         game_unit_profiles = new NPString(&quot;Manta, Panther1, Titan, Stinger, Bobcat, Bear, Archer, Wolf, Drake, Spanzer&quot;);
+     }
+ 
++    if ( ! game_unit_spawnlist )
++    {
++        game_unit_spawnlist = new NPString(&quot;1, 1, 1, 1, 1, 1, 1, 1, 1, 1&quot;);
++    }
++
+     if ( ! game_adminpass )
+     {
+         game_adminpass = new NPString(&quot;&quot;);
+@@ -219,18 +227,7 @@
+       radar_enemyoutpostcolor(&quot;enemyoutpostcolor&quot;, _color_red, 0, _color_last-1),
+       radar_unitsize(&quot;unitsize&quot;, _mini_map_unit_size_small, 0, _mini_map_unit_size_last-1),
+       radar_objectivedrawmode(&quot;objectivedrawmode&quot;, _mini_map_objective_draw_mode_outline_rect, 0, _mini_map_objective_draw_mode_last-1),
+-      radar_resizerate(&quot;resizerate&quot;, 400, 10, 1000),
+-      
+-      titan(&quot;titan&quot;,2),
+-      manta(&quot;manta&quot;,2),
+-      panther1(&quot;panther1&quot;,2),
+-      stinger(&quot;stinger&quot;,1),
+-      spanzer(&quot;spanzer&quot;,2),
+-      bobcat(&quot;bobcat&quot;,0),
+-      wolf(&quot;wolf&quot;,0),
+-      bear(&quot;bear&quot;,0),
+-      drake(&quot;drake&quot;,0),
+-      archer(&quot;archer&quot;,0)
++      radar_resizerate(&quot;resizerate&quot;, 400, 10, 1000)
+ {
+     this-&gt;configfile = configfile;
+     this-&gt;usePhysFS = usePhysFS;
+@@ -337,7 +334,6 @@
+     loadSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     loadSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+     loadSettings(inifile.getSection(&quot;server&quot;), serversettings);
+-    loadSpawnSettings(inifile.getSection(&quot;spawnconfig&quot;),spawnsettings);
+ }
+ 
+ void GameConfig::loadSettings(const INI::Section&amp; section,
+@@ -401,19 +397,6 @@
+     }
+ }
+ 
+-void GameConfig::loadSpawnSettings(const INI::Section&amp; section,
+-                                   std::vector&lt;ConfigVariable*&gt;&amp; settings)
+-{
+-    INI::valuesIterator i = section.getValuesBegin();
+-    while ( i != section.getValuesEnd() )
+-    {
+-        ConfigInt * intvar = new ConfigInt( i-&gt;first, section.getIntValue(i-&gt;first) );
+-        settings.push_back(intvar);
+-        i++;
+-    }
+-}
+-
+-
+ void GameConfig::saveConfig()
+ {
+     INI::Store inifile;
+@@ -424,7 +407,6 @@
+     saveSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     saveSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+     saveSettings(inifile.getSection(&quot;server&quot;), serversettings);
+-    saveSettings(inifile.getSection(&quot;spawnconfig&quot;),spawnsettings);
+ 
+     if(usePhysFS) {
+         OFileStream out (configfile);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -129,7 +129,8 @@
+     static int       game_base_capture_mode; // 0=no capture, 1=normal, 2=...
+     static int       game_autokicktime; // in minutes
+     static bool      game_allowmultiip; // allow multi connect from same ip
+-    static NPString* game_unit_profiles; // &quot;,&quot; separated list of profiles to load
++    static NPString* game_unit_profiles; // &quot;,&quot; or space separated list of profiles to load
++    static NPString* game_unit_spawnlist; // &quot;,&quot; or space separated list with the numbers of each unit to spawn with
+     static NPString* game_adminpass;     // the secret password for admins
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+@@ -203,31 +204,7 @@
+     ConfigInt   radar_objectivedrawmode;
+     ConfigInt   radar_resizerate;
+     
+-    // spawnconfig settings
+-    ConfigInt   titan;
+-    ConfigInt   manta;
+-    ConfigInt   panther1;
+-    ConfigInt   stinger;
+-    ConfigInt   spanzer;
+-    ConfigInt   bobcat;
+-    ConfigInt   wolf;
+-    ConfigInt   bear;
+-    ConfigInt   drake;
+-    ConfigInt   archer;
+-    
+-    std::vector&lt;ConfigVariable*&gt; spawnsettings;
+-    
+ public:
+-    void clearSpawnSettings()
+-    {
+-        std::vector&lt;ConfigVariable*&gt;::iterator i = spawnsettings.begin();
+-        while ( i != spawnsettings.end() )
+-        {
+-            delete *i;
+-            i++;
+-        }
+-        spawnsettings.clear();
+-    }
+     const char* getGameTypeString() const
+     {
+         switch(gametype) {
+@@ -352,8 +329,6 @@
+ 
+     void loadSettings(const INI::Section&amp;,
+             std::vector&lt;ConfigVariable*&gt;&amp; settings);
+-    void loadSpawnSettings(const INI::Section&amp; section,
+-                           std::vector&lt;ConfigVariable*&gt;&amp; settings);
+     void saveSettings(INI::Section&amp;, std::vector&lt;ConfigVariable*&gt;&amp; settings);
+ 
+     std::vector&lt;ConfigVariable*&gt; gamesettings;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -191,7 +191,6 @@
+         player_lists[ player_id ].setID( player_id );
+         player_lists[ player_id ].resetStats();
+         player_lists[ player_id ].setStatus( _player_state_free );
+-        player_lists[ player_id ].unit_config.initialize();
+         sprintf( temp_str, &quot;Player %u&quot;, player_id );
+         player_lists[ player_id ].setName( temp_str );
+     }
+@@ -302,6 +301,7 @@
+ 
+     SDL_mutexP(mutex);
+     player_lists[local_player_index].setStatus(_player_state_active);
++    player_lists[local_player_index].unit_config.initialize();
+     SDL_mutexV(mutex);
+ 
+     return &amp;player_lists[local_player_index];
+@@ -333,6 +333,7 @@
+         {
+             player_lists[ player_id ].setStatus( _player_state_allocated );
+             player_lists[ player_id ].resetStats();
++            player_lists[ player_id ].unit_config.initialize();
+             res = &amp;player_lists[ player_id ];
+             break;
+         }
+@@ -619,6 +620,7 @@
+         disconnectedPlayerAllianceCleanup(player_id);
+ 
+         player_state-&gt;setStatus( _player_state_free );
++        player_state-&gt;setAdmin(false);
+ 
+         PlayerStateSync player_state_update(player_state-&gt;getNetworkPlayerState());
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-10-11 11:56:36 UTC (rev 1250)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-10-11 12:21:33 UTC (rev 1251)
+@@ -32,6 +32,8 @@
+ #include &quot;Classes/Network/NetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
+ 
++#include &quot;Util/StringUtil.hpp&quot;
++
+ enum
+ {
+     _profile_msg_profile_desc = 0
+@@ -184,39 +186,6 @@
+     }
+ };
+ 
+-void string_to_params( const NPString&amp; str, vector&lt;NPString&gt;&amp; parameters )
+-{
+-    parameters.clear();
+-
+-    static char* limiters[] = { &quot;, \t&quot;, &quot;\&quot;&quot; };
+-
+-    NPString::size_type start = 0;
+-    NPString::size_type end = 0;
+-
+-    do
+-    {
+-        start = str.find_first_not_of(&quot; \t&quot;, start);
+-        if ( start != NPString::npos )
+-        {
+-            int limit_index = 0;
+-            if ( str[start] == '&quot;' &amp;&amp; start &lt; str.length()-1 )
+-            {
+-                limit_index = 1;
+-                ++start;
+-            }
+-
+-            end = str.find_first_of(limiters[limit_index], start);
+-
+-            parameters.push_back( str.substr(start, end != NPString::npos ? end-start : end) );
+-
+-            if ( end != NPString::npos )
+-            {
+-                start = str.find_first_not_of(limiters[limit_index], end);
+-            }
+-        }
+-    } while ( start != NPString::npos &amp;&amp; end != NPString::npos );
+-}
+-
+ bool read_vehicle_profile(const NPString&amp; unitName, UnitProfile *profile)
+ {
+     int temp_int;
+@@ -368,7 +337,7 @@
+ 
+     string_to_params(pl, plist);
+ 
+-    for ( int n = 0; n &lt; plist.size(); ++n )
++    for ( unsigned int n = 0; n &lt; plist.size(); ++n )
+     {
+         addLocalProfile(plist[n]);
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000276.html">[Netpanzer-cvs] r1250 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000278.html">[Netpanzer-cvs] r1252 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Scripts	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#277">[ date ]</a>
+              <a href="thread.html#277">[ thread ]</a>
+              <a href="subject.html#277">[ subject ]</a>
+              <a href="author.html#277">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1397 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1397%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game&In-Reply-To=%3C20120905135822.13D3955B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000420.html">
+   <LINK REL="Next"  HREF="000422.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1397 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1397%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%0A%09Components%20Game&In-Reply-To=%3C20120905135822.13D3955B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1397 - in trunk/netpanzer/src/NetPanzer/Views:	Components Game">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Wed Sep  5 15:58:21 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000420.html">[Netpanzer-cvs] r1396 - in trunk/netpanzer/src/NetPanzer: Actions	Classes/Network Interfaces Scripts Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000422.html">[Netpanzer-cvs] r1398 - in trunk/netpanzer/src/NetPanzer: Actions	Classes Views/Components Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#421">[ date ]</a>
+              <a href="thread.html#421">[ thread ]</a>
+              <a href="subject.html#421">[ subject ]</a>
+              <a href="author.html#421">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-05 15:58:21 +0200 (Wed, 05 Sep 2012)
+New Revision: 1397
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+Log:
+When clicking on the scrollbar, the &quot;jump&quot; it does is the number of visible lines - 1 (to keep one line context).
+
+Added using mouse to click and move the scroll bar.
+
+IMPORTANT: The code needs review, those are only quick hacks.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp	2012-09-05 12:12:26 UTC (rev 1396)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.cpp	2012-09-05 13:58:21 UTC (rev 1397)
+@@ -21,6 +21,8 @@
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Theme.hpp&quot;
+ 
++#define bSize (15)
++
+ void tHScrollBar::initScrollBar()
+ {
+     Surface bitmap;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp	2012-09-05 12:12:26 UTC (rev 1396)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tHScrollBar.hpp	2012-09-05 13:58:21 UTC (rev 1397)
+@@ -55,8 +55,6 @@
+     int LargeChange;
+     int SmallChange;
+     
+-    enum { bSize = 15 };
+-    
+     virtual void render();
+     virtual void actionPerformed(const mMouseEvent &amp;me);
+     void initScrollBar();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-05 12:12:26 UTC (rev 1396)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tStringListBox.hpp	2012-09-05 13:58:21 UTC (rev 1397)
+@@ -82,6 +82,8 @@
+     virtual int getSelectedItem();
+     virtual std::string getTextItem();
+     
++    int getNumVisibleLines() { return MaxItemView; }
++    
+     virtual void Add(const std::string&amp; S) { AddData(S, 0); }
+     virtual void AddData(const std::string&amp; S, void * D);
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp	2012-09-05 12:12:26 UTC (rev 1396)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.cpp	2012-09-05 13:58:21 UTC (rev 1397)
+@@ -16,11 +16,12 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;Views/Components/tVScrollBar.hpp&quot;
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Theme.hpp&quot;
+ 
++#define bSize (15)
++
+ void tVScrollBar::initScrollBar()
+ {
+     Surface bitmap;
+@@ -105,9 +106,12 @@
+         dirty = true;
+     }
+ 
++    int bar_min = position.y+bSize+RisePos;
++    int bar_max = bar_min + bSize;
++    
+     if (me.getID() == mMouseEvent::MOUSE_EVENT_PRESSED)
+     {
+-        if (me.getY() &lt; (position.y+bSize+RisePos)) 
++        if ( me.getY() &lt; bar_min ) 
+         {
+             if (Position-LargeChange &gt; Min) setPosition(Position-LargeChange);
+             else setPosition(Min);
+@@ -115,7 +119,7 @@
+                 callback-&gt;stateChanged(this);
+             return;
+         }
+-        if (me.getY() &gt; (position.y+bSize+RisePos+bSize))
++        else if ( me.getY() &gt; bar_max )
+         {
+             if (Position+LargeChange &lt; Max) setPosition(Position+LargeChange);
+             else setPosition(Max);
+@@ -123,7 +127,52 @@
+                 callback-&gt;stateChanged(this);
+             return;
+         }
++        else // clicked on the bar
++        {
++            bRisestate = PRESSED;
++        }
+     }
++    
++    if ( (bRisestate == PRESSED) &amp;&amp; (me.getID() == mMouseEvent::MOUSE_EVENT_DRAGGED) )
++    {
++        int scroll_begin = position.y+bSize;
++        int scroll_end = scroll_begin + (size.y - (bSize * 2));
++        int mouse_y = me.getY();
++        if ( mouse_y &lt; scroll_begin )
++        {
++            mouse_y = scroll_begin;
++        }
++        else if ( mouse_y &gt; scroll_end )
++        {
++            mouse_y = scroll_end;
++        }
++        
++        int base_y = mouse_y - (position.y+bSize);
++        int total_size = size.y-(bSize * 2);
++        
++        int new_pos = 0;
++        if ( base_y &gt; 0 )
++        {
++            new_pos = ( base_y * (Max-Min))/total_size;
++        }
++        
++        if ( new_pos &lt; 0 )
++        {
++            new_pos = 0;
++        }
++        else if ( new_pos &gt; (Max-Min) )
++        {
++            new_pos = Max-Min;
++        }
++        
++        if ( Position != (Min + new_pos) )
++        {
++            setPosition(Min + new_pos);
++            if(callback) callback-&gt;stateChanged(this);
++        }
++    }
++    
++    
+     if (me.getID() == mMouseEvent::MOUSE_EVENT_ENTERED
+             || me.getID() == mMouseEvent::MOUSE_EVENT_RELEASED)
+     {
+@@ -151,7 +200,7 @@
+     else if (bUpstate == OVER)
+     {
+         bUpOver.bltTrans(surface, 0, 0);
+-    } 
++    }
+     else
+     {
+         bUpNormal.bltTrans(surface, 0, 0);
+@@ -169,7 +218,8 @@
+     {
+         bDownNormal.bltTrans(surface, 0, size.y-bSize);
+     }
+-    if (bRisestate == OVER)
++    
++    if ( (bRisestate == OVER) || (bRisestate == PRESSED) )
+     {
+         bRiseOver.bltTrans(surface, 0,  bSize+RisePos);
+     } 
+@@ -185,8 +235,14 @@
+     Position = newPosition;
+ 
+     int R = Max - Min;
+-    if (R == 0) RisePos = 0;
+-    else RisePos = ((Position-Min) * (size.y-(bSize*3))) / R+1 ;
++    if (R == 0)
++    {
++        RisePos = 0;
++    }
++    else
++    {
++        RisePos = ((Position-Min) * (size.y-(bSize*3))) / R+1; // XXX / R+1 or (R+1) it is different...
++    }
+     dirty = true;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp	2012-09-05 12:12:26 UTC (rev 1396)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/tVScrollBar.hpp	2012-09-05 13:58:21 UTC (rev 1397)
+@@ -55,8 +55,6 @@
+     int LargeChange;
+     int SmallChange;
+     
+-    enum { bSize = 15 };
+-    
+     virtual void render();
+     virtual void actionPerformed(const mMouseEvent &amp;me);
+     void initScrollBar();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-05 12:12:26 UTC (rev 1396)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ChatView.cpp	2012-09-05 13:58:21 UTC (rev 1397)
+@@ -144,6 +144,7 @@
+     ChatList = new tChatBox(r, 0);
+     vsbChat = new tVScrollBar();
+     add(vsbChat);
++    vsbChat-&gt;setLargeChange(ChatList-&gt;getNumVisibleLines() -1);
+     ChatList-&gt;setVscrollBar(vsbChat);
+     ChatList-&gt;setColor(0);
+     ChatList-&gt;setAutoScroll(true);
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000420.html">[Netpanzer-cvs] r1396 - in trunk/netpanzer/src/NetPanzer: Actions	Classes/Network Interfaces Scripts Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000422.html">[Netpanzer-cvs] r1398 - in trunk/netpanzer/src/NetPanzer: Actions	Classes Views/Components Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#421">[ date ]</a>
+              <a href="thread.html#421">[ thread ]</a>
+              <a href="subject.html#421">[ subject ]</a>
+              <a href="author.html#421">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

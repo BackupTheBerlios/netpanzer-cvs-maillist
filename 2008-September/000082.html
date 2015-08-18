@@ -1,0 +1,585 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1042 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1042%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200809031305.m83D5O53014640%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000081.html">
+   <LINK REL="Next"  HREF="000083.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1042 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1042%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200809031305.m83D5O53014640%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1042 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep  3 15:05:24 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000081.html">[Netpanzer-cvs] r1041 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000083.html">[Netpanzer-cvs] r1043 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#82">[ date ]</a>
+              <a href="thread.html#82">[ thread ]</a>
+              <a href="subject.html#82">[ subject ]</a>
+              <a href="author.html#82">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-03 15:05:11 +0200 (Wed, 03 Sep 2008)
+New Revision: 1042
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+Log:
+- Removed duplicated code and sprites for the PowerUps
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -33,26 +33,14 @@
+ 
+ #include &quot;System/Sound.hpp&quot;
+ 
+-
+-SpritePacked BONUS_POWERUP_ANIM;
+-SpritePacked BONUS_POWERUP_ANIM_SHADOW;
+-
+ BonusUnitPowerUp::BonusUnitPowerUp(iXY map_loc, int type)
+         : PowerUp( map_loc, type )
+ {
+     bonus_unit_type = rand() % UnitProfileInterface::getNumUnitTypes();
+-
+-    bonus_unit_animation.setData( BONUS_POWERUP_ANIM );
+-    bonus_unit_animation.setAttrib( world_loc, iXY(0,0), 5 );
+-
+-    bonus_unit_animation_shadow.setData( BONUS_POWERUP_ANIM_SHADOW );
+-    bonus_unit_animation_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+-    bonus_unit_animation_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+-
+ }
+ 
+ 
+-void BonusUnitPowerUp::spawnBonusUnits( UnitID &amp;unit_id )
++void BonusUnitPowerUp::onHit( UnitID unit_id )
+ {
+     PlacementMatrix placement_matrix;
+     iXY map_pos;
+@@ -98,33 +86,8 @@
+     }
+ }
+ 
+-void BonusUnitPowerUp::updateState( void )
++void BonusUnitPowerUp::onHitMessage( PowerUpHitMesg *message  )
+ {
+-    UnitID unit_id;
+-
+-    if ( NetworkState::status == _network_state_server )
+-    {
+-        if ( life_cycle_state == _power_up_lifecycle_state_active )
+-        {
+-            if( isPowerUpHit( &amp;unit_id ) == true )
+-            {
+-                spawnBonusUnits( unit_id );
+-            }
+-        }
+-    }
+-}
+-
+-void BonusUnitPowerUp::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-    bonus_unit_animation.nextFrame();
+-    bonus_unit_animation_shadow.setFrame( bonus_unit_animation.getCurFrame() );
+-
+-    sorter.addSprite( &amp;bonus_unit_animation );
+-    sorter.addSprite( &amp;bonus_unit_animation_shadow );
+-}
+-
+-void BonusUnitPowerUp::onHit( PowerUpHitMesg *message  )
+-{
+     sound-&gt;playPowerUpSound();
+     life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.hpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.hpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -19,20 +19,13 @@
+ #define _BONUS_UNIT_POWERUP_HPP
+ 
+ #include &quot;Classes/PowerUp.hpp&quot;
+-#include &quot;Classes/Sprite.hpp&quot;
+ 
+-extern SpritePacked BONUS_POWERUP_ANIM;
+-extern SpritePacked BONUS_POWERUP_ANIM_SHADOW;
+-
+ class BonusUnitPowerUp : public PowerUp
+ {
+ protected:
+-    SpritePacked bonus_unit_animation;
+-    SpritePacked bonus_unit_animation_shadow;
+-
+     int bonus_unit_type;
+ 
+-    void spawnBonusUnits( UnitID &amp;unit_id );
++    virtual void onHit( UnitID unit_id );
+ 
+ public:
+     virtual ~BonusUnitPowerUp()
+@@ -40,12 +33,8 @@
+ 
+     BonusUnitPowerUp(iXY map_loc, int type);
+ 
+-    virtual void updateState( void );
++    virtual void onHitMessage( PowerUpHitMesg *message  );
+ 
+-    virtual void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-    virtual void onHit( PowerUpHitMesg *message  );
+-
+ };
+ 
+ #endif // ** _BONUS_UNIT_POWERUP_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -33,24 +33,13 @@
+ 
+ #include &quot;System/Sound.hpp&quot;
+ 
+-
+-SpritePacked ENEMY_RADAR_POWERUP_ANIM;
+-SpritePacked ENEMY_RADAR_POWERUP_ANIM_SHADOW;
+-
+ EnemyRadarPowerUp::EnemyRadarPowerUp(iXY map_loc, int type)
+         : PowerUp( map_loc, type )
+ {
+-    enemy_radar_animation.setData( ENEMY_RADAR_POWERUP_ANIM );
+-    enemy_radar_animation.setAttrib( world_loc, iXY(0,0), 5 );
+-
+-    enemy_radar_animation_shadow.setData( ENEMY_RADAR_POWERUP_ANIM_SHADOW );
+-    enemy_radar_animation_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+-    enemy_radar_animation_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+-
+ }
+ 
+ void
+-EnemyRadarPowerUp::setRadar(UnitID &amp;unit_id)
++EnemyRadarPowerUp::onHit(UnitID unit_id)
+ {
+     sound-&gt;playPowerUpSound();
+ 
+@@ -70,36 +59,8 @@
+ }
+ 
+ void
+-EnemyRadarPowerUp::updateState()
++EnemyRadarPowerUp::onHitMessage( PowerUpHitMesg *message  )
+ {
+-    UnitID unit_id;
+-
+-    if ( NetworkState::status == _network_state_server )
+-    {
+-        if ( life_cycle_state == _power_up_lifecycle_state_active )
+-        {
+-            if( isPowerUpHit( &amp;unit_id ) == true )
+-            {
+-                setRadar( unit_id );
+-            }
+-        }
+-    }
+-}
+-
+-void
+-EnemyRadarPowerUp::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-    enemy_radar_animation.nextFrame();
+-    enemy_radar_animation_shadow.setFrame( enemy_radar_animation.getCurFrame() );
+-
+-    sorter.addSprite( &amp;enemy_radar_animation );
+-    sorter.addSprite( &amp;enemy_radar_animation_shadow );
+-
+-}
+-
+-void
+-EnemyRadarPowerUp::onHit( PowerUpHitMesg *message  )
+-{
+     sound-&gt;playPowerUpSound();
+ 
+     if( PlayerInterface::getLocalPlayerIndex() == message-&gt;getPlayerID() )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.hpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.hpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -19,31 +19,20 @@
+ #define _ENEMY_RADAR_POWERUP_HPP
+ 
+ #include &quot;Classes/PowerUp.hpp&quot;
+-#include &quot;Classes/Sprite.hpp&quot;
+ 
+-extern SpritePacked ENEMY_RADAR_POWERUP_ANIM;
+-extern SpritePacked ENEMY_RADAR_POWERUP_ANIM_SHADOW;
+-
+ class EnemyRadarPowerUp : public PowerUp
+ {
+ protected:
+-    SpritePacked enemy_radar_animation;
+-    SpritePacked enemy_radar_animation_shadow;
++    virtual void onHit( UnitID unit_id );
+ 
+-    void setRadar( UnitID &amp;unit_id );
+-
+ public:
+ 
+     EnemyRadarPowerUp(iXY map_loc, int type);
+     virtual ~EnemyRadarPowerUp()
+     { }
+ 
+-    virtual void updateState( void );
++    virtual void onHitMessage( PowerUpHitMesg *message  );
+ 
+-    virtual void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-    virtual void onHit( PowerUpHitMesg *message  );
+-
+ };
+ 
+ #endif // ** _ENEMY_RADAR_POWERUP_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -21,7 +21,11 @@
+ #include &quot;Classes/UnitBlackBoard.hpp&quot;
+ #include &quot;Interfaces/UnitInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
++#include &quot;Classes/Network/NetworkState.hpp&quot;
+ 
++SpritePacked PowerUp::POWERUP_ANIM;
++SpritePacked PowerUp::POWERUP_ANIM_SHADOW;
++
+ PowerUp::PowerUp()
+ {
+     life_cycle_state = _power_up_lifecycle_state_active;
+@@ -34,7 +38,15 @@
+     this-&gt;type = type;
+ 
+     MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
++    
+     this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
++    
++    sprite.setData( POWERUP_ANIM );
++    sprite.setAttrib( world_loc, iXY(0,0), 5 );
++
++    sprite_shadow.setData( POWERUP_ANIM_SHADOW );
++    sprite_shadow.setAttrib( world_loc, iXY(0,0), 4 );
++    sprite_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+ }
+ 
+ PowerUp::PowerUp(iXY map_loc, int type)
+@@ -44,16 +56,48 @@
+     this-&gt;type = type;
+ 
+     MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
++    
+     this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
++
++    sprite.setData( POWERUP_ANIM );
++    sprite.setAttrib( world_loc, iXY(0,0), 5 );
++
++    sprite_shadow.setData( POWERUP_ANIM_SHADOW );
++    sprite_shadow.setAttrib( world_loc, iXY(0,0), 4 );
++    sprite_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+ }
+ 
+ bool PowerUp::isPowerUpHit(UnitID *unit_id)
+ {
+-    if(UnitBlackBoard::unitOccupiesLoc(map_loc) == true) {
+-        if( UnitInterface::queryUnitAtMapLoc(map_loc, unit_id) == true) {
+-            return true;
++    if( UnitBlackBoard::unitOccupiesLoc(map_loc) 
++        &amp;&amp; UnitInterface::queryUnitAtMapLoc(map_loc, unit_id) )
++    {
++        return true;
++    }
++    
++    return false;
++}
++
++void PowerUp::offloadGraphics( SpriteSorter &amp;sorter )
++{
++    sprite.nextFrame();
++    sprite_shadow.setFrame( sprite.getCurFrame() );
++
++    sorter.addSprite( &amp;sprite );
++    sorter.addSprite( &amp;sprite_shadow );
++}
++
++void
++PowerUp::updateState( void )
++{
++    if ( NetworkState::status == _network_state_server
++         &amp;&amp; life_cycle_state == _power_up_lifecycle_state_active )
++    {
++        UnitID unit_id;
++        if( isPowerUpHit( &amp;unit_id ) == true )
++        {
++            onHit( unit_id );
+         }
+     }
++}
+ 
+-    return false;
+-}
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -18,7 +18,8 @@
+ #ifndef _POWERUP_HPP
+ #define _POWERUP_HPP
+ 
+-#include &quot;SpriteSorter.hpp&quot;
++#include &quot;Classes/SpriteSorter.hpp&quot;
++#include &quot;Classes/Sprite.hpp&quot;
+ #include &quot;Classes/Network/PowerUpNetMessage.hpp&quot;
+ 
+ enum { _power_up_lifecycle_state_active,
+@@ -29,8 +30,15 @@
+ {
+ protected:
+     bool isPowerUpHit( UnitID *unit_id );
++    virtual void onHit( UnitID unit_id ) = 0;
++    
++    SpritePacked sprite;
++    SpritePacked sprite_shadow;
+ 
+ public:
++    static SpritePacked POWERUP_ANIM;
++    static SpritePacked POWERUP_ANIM_SHADOW;
++
+     iXY     map_loc;
+     iXY     world_loc;
+     int     ID;
+@@ -44,13 +52,11 @@
+     virtual ~PowerUp()
+     { }
+ 
+-    virtual void updateState()
+-    { }
++    void updateState();
+ 
+-    virtual void offloadGraphics(SpriteSorter&amp; )
+-    { }
++    void offloadGraphics(SpriteSorter&amp; );
+ 
+-    virtual void onHit(PowerUpHitMesg* )
++    virtual void onHitMessage(PowerUpHitMesg* )
+     { }
+     PowerUp *next;
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -45,20 +45,10 @@
+        _unit_powerup_enum_count
+      };
+ 
+-SpritePacked UNIT_POWERUP_ANIM;
+-SpritePacked UNIT_POWERUP_ANIM_SHADOW;
+-
+ UnitPowerUp::UnitPowerUp(iXY map_loc, int type)
+         : PowerUp( map_loc, type )
+ {
+     unit_powerup_type = rand() % _unit_powerup_enum_count;
+-    unit_powerup_animation.setData( UNIT_POWERUP_ANIM );
+-    unit_powerup_animation.setAttrib( world_loc, iXY(0,0), 5 );
+-
+-    unit_powerup_animation_shadow.setData( UNIT_POWERUP_ANIM_SHADOW );
+-    unit_powerup_animation_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+-    unit_powerup_animation_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+-
+ }
+ 
+ void UnitPowerUp::powerUpHitPoints( UnitState *unit_state)
+@@ -129,7 +119,7 @@
+ }
+ 
+ 
+-void UnitPowerUp::selectPowerUp( UnitID &amp;unit_id )
++void UnitPowerUp::onHit( UnitID unit_id )
+ {
+     sound-&gt;playPowerUpSound();
+ 
+@@ -206,34 +196,8 @@
+     return(&quot;&quot;);
+ }
+ 
+-
+-void UnitPowerUp::updateState( void )
++void UnitPowerUp::onHitMessage( PowerUpHitMesg *message  )
+ {
+-    UnitID unit_id;
+-
+-    if ( NetworkState::status == _network_state_server )
+-    {
+-        if ( life_cycle_state == _power_up_lifecycle_state_active )
+-        {
+-            if( isPowerUpHit( &amp;unit_id ) == true )
+-            {
+-                selectPowerUp( unit_id );
+-            }
+-        }
+-    }
+-}
+-
+-void UnitPowerUp::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-    unit_powerup_animation.nextFrame();
+-    unit_powerup_animation_shadow.setFrame( unit_powerup_animation.getCurFrame() );
+-
+-    sorter.addSprite( &amp;unit_powerup_animation );
+-    sorter.addSprite( &amp;unit_powerup_animation_shadow );
+-}
+-
+-void UnitPowerUp::onHit( PowerUpHitMesg *message  )
+-{
+     sound-&gt;playPowerUpSound();
+     life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.hpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.hpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -19,20 +19,15 @@
+ #define _UNIT_POWERUP_HPP
+ 
+ #include &quot;Classes/PowerUp.hpp&quot;
+-#include &quot;Classes/Sprite.hpp&quot;
+ #include &quot;Classes/UnitState.hpp&quot;
+ 
+-extern SpritePacked UNIT_POWERUP_ANIM;
+-extern SpritePacked UNIT_POWERUP_ANIM_SHADOW;
+-
+ class UnitPowerUp : public PowerUp
+ {
+ protected:
+-    SpritePacked unit_powerup_animation;
+-    SpritePacked unit_powerup_animation_shadow;
+-
+     int unit_powerup_type;
+ 
++    virtual void onHit( UnitID unit_id );
++
+     void powerUpHitPoints( UnitState *unit_state);
+     void powerUpRange( UnitState *unit_state);
+     void powerUpFirePower( UnitState *unit_state);
+@@ -41,8 +36,6 @@
+     void powerUpReload( UnitState *unit_state);
+     void powerUpDestruct( UnitID unit_id );
+ 
+-    void selectPowerUp( UnitID &amp;unit_id );
+-
+     char * powerupTypeToString( int type );
+ 
+ public:
+@@ -51,12 +44,8 @@
+     virtual ~UnitPowerUp()
+     { }
+ 
+-    virtual void updateState( void );
++    virtual void onHitMessage( PowerUpHitMesg *message  );
+ 
+-    virtual void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-    virtual void onHit( PowerUpHitMesg *message  );
+-
+ };
+ 
+ #endif // ** _UNIT_POWERUP_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2008-09-03 10:55:14 UTC (rev 1041)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2008-09-03 13:05:11 UTC (rev 1042)
+@@ -163,15 +163,9 @@
+ 
+ void PowerUpInterface::initialize( void )
+ {
+-    BONUS_POWERUP_ANIM.load( &quot;powerups/Bolt.pak&quot; );
+-    BONUS_POWERUP_ANIM.setFPS( 15 );
+-    BONUS_POWERUP_ANIM_SHADOW.load( &quot;powerups/BoltS.pak&quot; );
+-
+-    UNIT_POWERUP_ANIM.setTo( BONUS_POWERUP_ANIM );
+-    UNIT_POWERUP_ANIM_SHADOW.setTo( BONUS_POWERUP_ANIM_SHADOW );
+-
+-    ENEMY_RADAR_POWERUP_ANIM.setTo( BONUS_POWERUP_ANIM );
+-    ENEMY_RADAR_POWERUP_ANIM_SHADOW.setTo( BONUS_POWERUP_ANIM_SHADOW );
++    PowerUp::POWERUP_ANIM.load( &quot;powerups/Bolt.pak&quot; );
++    PowerUp::POWERUP_ANIM.setFPS( 15 );
++    PowerUp::POWERUP_ANIM_SHADOW.load( &quot;powerups/BoltS.pak&quot; );
+ }
+ 
+ void PowerUpInterface::resetLogic( void )
+@@ -285,7 +279,7 @@
+     power_up = powerup_list.find( hit_mesg-&gt;getID() );
+ 
+     if (power_up != 0) {
+-        power_up-&gt;onHit( hit_mesg );
++        power_up-&gt;onHitMessage( hit_mesg );
+     }
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000081.html">[Netpanzer-cvs] r1041 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000083.html">[Netpanzer-cvs] r1043 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#82">[ date ]</a>
+              <a href="thread.html#82">[ thread ]</a>
+              <a href="subject.html#82">[ subject ]</a>
+              <a href="author.html#82">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

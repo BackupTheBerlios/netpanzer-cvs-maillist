@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r969 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r969%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces&In-Reply-To=%3C200704171534.l3HFYpuD018122%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000015.html">
+   <LINK REL="Next"  HREF="000017.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r969 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r969%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces&In-Reply-To=%3C200704171534.l3HFYpuD018122%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r969 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Apr 17 17:34:51 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000015.html">[Netpanzer-cvs] r968 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes
+</A></li>
+        <LI>Next message: <A HREF="000017.html">[Netpanzer-cvs] r970 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-04-17 17:34:48 +0200 (Tue, 17 Apr 2007)
+New Revision: 969
+
+Modified:
+   trunk/netpanzer/configure.ac
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+Log:
+- Enforce different flags for players, now should work ok, and all players should 'see' the same flags of other players.
+
+
+Modified: trunk/netpanzer/configure.ac
+===================================================================
+--- trunk/netpanzer/configure.ac	2007-04-17 15:05:46 UTC (rev 968)
++++ trunk/netpanzer/configure.ac	2007-04-17 15:34:48 UTC (rev 969)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [svn-r968], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [svn-r969], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2007-04-17 15:05:46 UTC (rev 968)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2007-04-17 15:34:48 UTC (rev 969)
+@@ -293,10 +293,36 @@
+     return status;
+ }
+ 
+-void PlayerState::setFlag(unsigned char flag)
++void PlayerState::setFlag(unsigned char newflag)
+ {
+-	assert(flag &lt; UNIT_FLAGS_SURFACE.getFrameCount());
+-    PlayerState::flag = flag;
++    if ( newflag &gt; UNIT_FLAGS_SURFACE.getFrameCount() )
++        newflag=0;
++    flag = newflag;
++    
++    bool recheck;
++    do {
++        recheck = false;
++        for (uint16_t p=0; p&lt;PlayerInterface::getMaxPlayers(); p++) {
++            if ( p == ID.getIndex() )
++                continue;
++                
++            PlayerState *ps=PlayerInterface::getPlayerState(p);
++            if ( (ps-&gt;status==_player_state_connecting 
++                    || ps-&gt;status==_player_state_active )
++                    &amp;&amp; ps-&gt;flag == flag ) {
++                flag++;
++                if ( flag &gt; UNIT_FLAGS_SURFACE.getFrameCount() )
++                    flag = 0;
++                    
++                if ( flag != newflag ) // there are no free flags if it is ==
++                    recheck = true;
++                else
++                    LOGGER.warning(&quot;No more free flags&quot;);
++                    
++                break;
++            }
++        }
++    } while (recheck);
+ }
+ 
+ unsigned char PlayerState::getFlag() const
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2007-04-17 15:05:46 UTC (rev 968)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2007-04-17 15:34:48 UTC (rev 969)
+@@ -121,7 +121,7 @@
+     }
+     void setStatus( unsigned char status );
+     unsigned char getStatus() const;
+-    void setFlag(unsigned char flag);
++    void setFlag(unsigned char newflag);
+     unsigned char getFlag() const;
+     short getTotal() const;
+     NetworkPlayerState getNetworkPlayerState() const;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2007-04-17 15:05:46 UTC (rev 968)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2007-04-17 15:34:48 UTC (rev 969)
+@@ -419,7 +419,6 @@
+     SDL_mutexP(mutex);
+     player_lists[local_player_index].setFromNetworkPlayerState
+         (&amp;connect_mesg-&gt;connect_state);
+-    //forceUniquePlayerFlags();
+     SDL_mutexV(mutex);
+ }
+ 
+@@ -436,51 +435,9 @@
+     
+     SDL_mutexP(mutex);
+     player_lists[player_index].setFromNetworkPlayerState(&amp;sync_mesg-&gt;player_state);
+-    forceUniquePlayerFlags();
+     SDL_mutexV(mutex);
+ }
+ 
+-void PlayerInterface::forceUniquePlayerFlags()
+-{
+-    // make sure our own flag stays the same (TODO: avoid copy&amp;paste here...)
+-    PlayerState&amp; player1 = player_lists[local_player_index];
+-    bool unique;
+-    do {
+-        unique = true;
+-        for(int player_id2 = local_player_index-1; player_id2&gt;=0;--player_id2) {
+-            const PlayerState&amp; player2 = player_lists[player_id2];
+-            if(player1.getFlag() == player2.getFlag()) {
+-                unique = false;
+-                uint16_t newflag = player1.getFlag() + 1;
+-                if(newflag &gt;= UNIT_FLAGS_SURFACE.getFrameCount())
+-                    newflag = 0;
+-                player1.setFlag(newflag);
+-                break;
+-            }
+-        }
+-    } while(!unique);                                                      
+-    
+-    // make sure each player has a unique flag
+-    for(uint16_t player_id = 0; player_id &lt; max_players; ++player_id) {
+-        PlayerState&amp; player1 = player_lists[player_id];
+-        bool unique;
+-        do {
+-            unique = true;
+-            for(int player_id2 = player_id-1; player_id2&gt;=0;--player_id2) {
+-                const PlayerState&amp; player2 = player_lists[player_id2];
+-                if(player1.getFlag() == player2.getFlag()) {
+-                    unique = false;
+-                    uint16_t newflag = player1.getFlag() + 1;
+-                    if(newflag &gt;= UNIT_FLAGS_SURFACE.getFrameCount())
+-                        newflag = 0;
+-                    player1.setFlag(newflag);
+-                    break;
+-                }
+-            }
+-        } while(!unique);
+-    }
+-}
+-
+ void PlayerInterface::netMessageScoreUpdate(const NetMessage *message)
+ {
+     const PlayerScoreUpdate* score_update 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2007-04-17 15:05:46 UTC (rev 968)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.hpp	2007-04-17 15:34:48 UTC (rev 969)
+@@ -147,8 +147,6 @@
+     static void netMessageAllianceRequest(const NetMessage *message );
+     static void netMessageAllianceUpdate(const NetMessage *message );
+ 
+-    static void forceUniquePlayerFlags();
+-
+ public:
+     static void startPlayerStateSync(const PlayerID &amp;connect_player);
+     static bool syncPlayerState(int *percent_complete);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000015.html">[Netpanzer-cvs] r968 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes
+</A></li>
+	<LI>Next message: <A HREF="000017.html">[Netpanzer-cvs] r970 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Classes/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

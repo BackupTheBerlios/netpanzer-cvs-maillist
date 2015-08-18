@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1288 - trunk/netpanzer/src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1288%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111119200658.2E0C348140A%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000313.html">
+   <LINK REL="Next"  HREF="000315.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1288 - trunk/netpanzer/src/NetPanzer/Views/Game</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1288%20-%20trunk/netpanzer/src/NetPanzer/Views/Game&In-Reply-To=%3C20111119200658.2E0C348140A%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1288 - trunk/netpanzer/src/NetPanzer/Views/Game">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Sat Nov 19 21:06:57 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000313.html">[Netpanzer-cvs] r1287 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000315.html">[Netpanzer-cvs] r1289 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#314">[ date ]</a>
+              <a href="thread.html#314">[ thread ]</a>
+              <a href="subject.html#314">[ subject ]</a>
+              <a href="author.html#314">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-19 21:06:57 +0100 (Sat, 19 Nov 2011)
+New Revision: 1288
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+Log:
+Update Help screen
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-11-17 11:59:30 UTC (rev 1287)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-11-19 20:06:57 UTC (rev 1288)
+@@ -72,7 +72,7 @@
+     insert(&quot;&quot;);
+     insert(&quot;Outpost Related&quot;);
+     insert(&quot;&quot;);
+-    insert(&quot;  'O'                              Cycle through your outposts&quot;);
++    insert(&quot;  'O'                              Toggle outpost names&quot;);
+     insert(&quot;  LMC on captured outpost          Displays the outpost view&quot;);
+     insert(&quot;  mouse drag on captured outpost   Select unit spawn point&quot;);
+     insert(&quot;&quot;);
+@@ -81,12 +81,13 @@
+     insert(&quot;&quot;);
+     insert(&quot;  Enter                            Send message to all&quot;);
+     insert(&quot;  Ctrl + 'A'                       Send message to allies&quot;);
+-    insert(&quot;  Ctrl + 'C'                       Send count down message&quot;);
++    insert(&quot;  'C'                              Send count down message&quot;);
+     insert(&quot;&quot;);
+     insert(&quot;&quot;);
+     insert(&quot;View Related&quot;);
+     insert(&quot;&quot;);
+     insert(&quot;  F1                               Help View&quot;);
++    insert(&quot;  'B'                              Toggle flag selection window&quot;);
+     insert(&quot;  'D'                              Damage View&quot;);
+     insert(&quot;  'F'                              Flag View&quot;);
+     insert(&quot;  'M'                              Mini Map View&quot;);
+@@ -107,6 +108,36 @@
+     insert(&quot;&quot;);
+     insert(&quot;  ALT + Enter                      Toggle Fullscreen/Windowed mode&quot;);
+     insert(&quot;  F9                               BMP screen shot&quot;);
++    insert(&quot; &quot;);
++    insert(&quot; &quot;);
++    insert(&quot;Scripting&quot;);
++    insert(&quot; &quot;);
++    insert(&quot;&quot;);
++    insert(&quot;Client Related&quot;);
++    insert(&quot;&quot;);
++    insert(&quot;  /listcommands                     List of available commands&quot;);
++    insert(&quot;  /countdown [timeout in seconds]   Generate a countdown&quot;);
++    insert(&quot;  /quit                             Quit the game&quot;);
++    insert(&quot;  /help                             Show Help window (same 'F1')&quot;);
++    insert(&quot;  /say [your talk]                  Send message to all (same 'Enter'&quot;);
++    insert(&quot;  /teamsay [your talk]              Send message to allies (same Ctrl + 'A')&quot;);
++    insert(&quot;&quot;);
++    insert(&quot;Server Related&quot;);
++    insert(&quot;&quot;);
++    insert(&quot;  /server listcommands              List of Gameserver available commands&quot;);
++    insert(&quot;  /server adminlogin [password]     Gameserver admin login&quot;);
++    insert(&quot;  /server unitspawnlist [list]      List/set spawn units (number)&quot;);
++    insert(&quot;  /server unitprofiles [list]       List/set spawn units (types)&quot;);
++    insert(&quot;  /server help                      Show Help window (same 'F1')&quot;);
++    insert(&quot;  /server map [map name]            Restart game with the given map&quot;);
++    insert(&quot;  /server autokick [timeout]        Show/set autokick for inactive players&quot;);
++    insert(&quot;  /server countdown [timeout]       Generate a countdown (same 'c')&quot;);
++    insert(&quot;  /server say [your talk]           Server say something in chat&quot;);
++    insert(&quot;  /server listplayers               List players with the assigned number&quot;);
++    insert(&quot;  /server kick [player number]      Kick a given player&quot;);
++    insert(&quot;  /server baselimit [max bases]     Show/set the max bases number per player&quot;);
++    insert(&quot; &quot;);
++    insert(&quot; &quot;);
+     //insert(&quot;  Alt + '-'                        Decrease brightness&quot;);
+     //insert(&quot;  Alt + '='                        Increase brightness&quot;);
+ 
+@@ -148,7 +179,6 @@
+                             clientArea.getHeight() - Surface::getFontHeight(),
+                             &quot;Note: Use the right mouse button to accomplish fast mouse clicking.&quot;,
+                             windowTextColor);
+-
+     //char strBuf[256];
+     //sprintf(strBuf, &quot;%d&quot;, scrollBar-&gt;getValue());
+     //clientArea.bltStringCenter(strBuf, Color::red);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-11-17 11:59:30 UTC (rev 1287)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2011-11-19 20:06:57 UTC (rev 1288)
+@@ -40,7 +40,7 @@
+     ScrollBar *scrollBar;
+     std::vector&lt;std::string&gt; text;
+ 
+-    enum { TEXT_GAP_SPACE = 2 };
++    enum { TEXT_GAP_SPACE = 3 };
+     void insert(const char *string);
+ 
+     Button * upButton;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000313.html">[Netpanzer-cvs] r1287 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000315.html">[Netpanzer-cvs] r1289 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Scripts src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#314">[ date ]</a>
+              <a href="thread.html#314">[ thread ]</a>
+              <a href="subject.html#314">[ subject ]</a>
+              <a href="author.html#314">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

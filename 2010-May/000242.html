@@ -1,0 +1,2888 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1216 - in trunk/netpanzer: src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Objectives	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	support/macosx
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1216%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Bot%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Objectives%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09support/macosx&In-Reply-To=%3C201005251628.o4PGSdI4015049%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000243.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1216 - in trunk/netpanzer: src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Objectives	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	support/macosx</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1216%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Bot%0A%09src/NetPanzer/Classes%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Objectives%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09support/macosx&In-Reply-To=%3C201005251628.o4PGSdI4015049%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1216 - in trunk/netpanzer: src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Objectives	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	support/macosx">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue May 25 18:28:39 CEST 2010</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000243.html">[Netpanzer-cvs] r1217 - in trunk/netpanzer: . src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Objectives	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-05-25 18:27:27 +0200 (Tue, 25 May 2010)
+New Revision: 1216
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Classes/ObjectiveMessageTypes.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp
+   trunk/netpanzer/src/NetPanzer/Bot/Bot.hpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/TerminalNetMesg.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/support/macosx/make_appbundle.sh
+Log:
+- fix mac os x package creation, SDL_mixer framework was missing.
+- cleanup of Objective functions (the bases), many changes.
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Bot/Bot.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -27,6 +27,7 @@
+ #include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
++#include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+@@ -103,15 +104,15 @@
+                  outpostID, selectedProduce);
+ 
+     // Send the server the selected unit and whether factory power is on.
+-    TerminalOutpostUnitGenRequest term_mesg;
++    ObjectiveChangeGeneratingUnit msg;
+ 
+-    term_mesg.unit_gen_request.set(outpostID, selectedProduce, true);
++    msg.set(outpostID, selectedProduce, true);
+ 
+-    CLIENT-&gt;sendMessage(&amp;term_mesg, sizeof(TerminalOutpostUnitGenRequest));
++    CLIENT-&gt;sendMessage(&amp;msg, sizeof(msg));
+ 
+     // XXX is this needed?
+-    if (NetworkState::status == _network_state_client) {
+-        ObjectiveInterface::sendMessage(&amp;(term_mesg.unit_gen_request));
+-    }
++//    if (NetworkState::status == _network_state_client) {
++//        ObjectiveInterface::sendMessage(&amp;(term_mesg.unit_gen_request));
++//    }
+  }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/Bot.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/Bot.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Bot/Bot.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -19,7 +19,6 @@
+ #define BOT_H
+ 
+ class UnitBase;
+-class ObjectiveState;
+ class iXY;
+ 
+ #include &quot;BotTaskList.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -158,48 +158,45 @@
+     return enemyUnit;
+ }
+ //-----------------------------------------------------------------
+-/**
+- *  Dispositions:
+- *  _objective_disposition_unoccupied,
+- *  _objective_disposition_player,
+- *  _objective_disposition_allie,
+- *  _objective_disposition_enemy
+- *
+- * @return list of outposts with this disposition
+- */
+-outpostList_t
+-BotPlayer::getOutposts(int disposition)
++
++static Objective* getRandomFreeOutpost()
+ {
++    ObjectiveID num_objectives = ObjectiveInterface::getObjectiveCount();
+     outpostList_t outposts;
+-    iRect objRect;
+-    unsigned char objectiveDisposition;
+-    ObjectiveID   objectiveID;
+-
+-    ObjectiveInterface::startObjectivePositionEnumeration();
+-    while (ObjectiveInterface::objectivePositionEnumeration(&amp;objRect,
+-            &amp;objectiveDisposition, &amp;objectiveID))
++    for ( int i = 0; i &lt; num_objectives; ++i )
+     {
+-        if (disposition == objectiveDisposition) {
+-            outposts.push_back(objectiveID);
++        if ( ! ObjectiveInterface::getObjective(i)-&gt;occupying_player )
++        {
++            outposts.push_back(i);
+         }
+     }
+-    return outposts;
++
++    if ( ! outposts.empty() )
++    {
++        return ObjectiveInterface::getObjective(outposts[rand()%outposts.size()]);
++    }
++    return 0;
+ }
+-//-----------------------------------------------------------------
+-/**
+- * @return objective with this disposition or 0
+- */
+-ObjectiveState *
+-BotPlayer::getRandomOutpost(int disposition)
++
++static Objective* getRandomEnemyOrFreeOutpost()
+ {
+-    ObjectiveState *result = 0;
+-    outpostList_t outposts = getOutposts(disposition);
+-    if (outposts.size() &gt; 0) {
+-        ObjectiveID outpostID = outposts[rand() % outposts.size()];
+-        result = ObjectiveInterface::getObjectiveState(outpostID);
++    ObjectiveID num_objectives = ObjectiveInterface::getObjectiveCount();
++    outpostList_t outposts;
++    for ( int i = 0; i &lt; num_objectives; ++i )
++    {
++        if ( ObjectiveInterface::getObjective(i)-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
++        {
++            outposts.push_back(i);
++        }
+     }
+-    return result;
++
++    if ( ! outposts.empty() )
++    {
++        return ObjectiveInterface::getObjective(outposts[rand()%outposts.size()]);
++    }
++    return 0;
+ }
++
+ //-----------------------------------------------------------------
+ /**
+  * Occupy free or enemy oupost.
+@@ -207,12 +204,14 @@
+ void
+ BotPlayer::unitOccupyOupost(UnitBase *unit)
+ {
+-    ObjectiveState *outpost =
+-        getRandomOutpost(_objective_disposition_unoccupied);
+-    if (!outpost) {
+-        outpost = getRandomOutpost(_objective_disposition_enemy);
++    Objective *outpost = getRandomFreeOutpost();
++    if (!outpost)
++    {
++        outpost = getRandomEnemyOrFreeOutpost();
+     }
+-    if (outpost) {
++
++    if (outpost)
++    {
+         // XXX hack, const occupation_pad_offset
+         static const iXY occupation_pad_offset(224, 48);
+ 
+@@ -230,14 +229,16 @@
+ void
+ BotPlayer::outpostProduce()
+ {
+-    outpostList_t outposts = getOutposts(_objective_disposition_player);
+-    for (outpostList_t::iterator i = outposts.begin();
+-            i != outposts.end(); i++)
++    ObjectiveID num_objectives = ObjectiveInterface::getObjectiveCount();
++    Objective* obj;
++    for ( int i = 0; i &lt; num_objectives; ++i )
+     {
+-        OutpostStatus outpostStatus =
+-            ObjectiveInterface::getOutpostStatus(*i);
+-        if (outpostStatus.unit_generation_on_off == false) {
+-            produceUnit(*i, rand() % UnitProfileInterface::getNumUnitTypes() );
++        obj = ObjectiveInterface::getObjective(i);
++        if ( obj-&gt;occupying_player
++             &amp;&amp; obj-&gt;occupying_player == PlayerInterface::getLocalPlayer()
++             &amp;&amp; obj-&gt;unit_generation_on_flag == false )
++        {
++            produceUnit( i, rand() % UnitProfileInterface::getNumUnitTypes() );
+         }
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -23,7 +23,7 @@
+ #include &quot;Bot.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
+ 
+-class ObjectiveState;
++class Objective;
+ 
+ #include &lt;vector&gt;
+ typedef std::vector&lt;int&gt; playerList_t;
+@@ -44,8 +44,6 @@
+         int getRandomEnemyPlayer();
+         UnitBase *getRandomEnemy();
+ 
+-        outpostList_t getOutposts(int disposition);
+-        ObjectiveState *getRandomOutpost(int disposition);
+         void unitOccupyOupost(UnitBase *unit);
+         void outpostProduce();
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientMessageRouter.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -81,7 +81,7 @@
+             break;
+ 
+         case _net_message_class_objective:
+-            ObjectiveInterface::processNetMessages(message);
++            ObjectiveInterface::clientHandleNetMessage(message);
+             break;
+ 
+         case _net_message_class_game_control:
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetPacketDebugger.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -247,16 +247,6 @@
+             logAICommand(log, cmd);
+             break;
+         }
+-        case _net_message_id_term_unit_gen:
+-        {
+-            log &lt;&lt; &quot;UnitGen: &quot;;
+-            break;
+-        }
+-        case _net_message_id_term_output_loc:
+-        {
+-            log &lt;&lt; &quot;OutpLoc: &quot;;
+-            break;
+-        }
+         default:
+         {
+             log &lt;&lt; &quot;?&quot;;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ObjectiveNetMessage.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -20,38 +20,156 @@
+ 
+ #include &quot;NetMessage.hpp&quot;
+ 
+-#include &quot;Classes/ObjectiveMessageTypes.hpp&quot;
++enum
++{
++    _net_message_id_change_output_location,
++    _net_message_id_change_generating_unit,
++    _net_message_id_occupation_status_update,
++    _net_message_id_objective_sync
++};
+ 
+-enum { _net_message_id_occupation_status_update,
+-       _net_message_id_objective_sync };
+-
+ #ifdef MSVC
+ #pragma pack(1)
+ #endif
+ 
++class ObjectiveChangeOutputLocation : public NetMessage
++{
++private:
++    ObjectiveID objective_id;
++    Sint32 new_point_x;
++    Sint32 new_point_y;
++
++public:
++    ObjectiveChangeOutputLocation()
++    {
++        message_class = _net_message_class_objective;
++        message_id = _net_message_id_change_output_location;
++    }
++
++    void set(ObjectiveID id, iXY point)
++    {
++        objective_id = ObjectiveID_toPortable(id);
++        new_point_x = htol32(point.x);
++        new_point_y = htol32(point.y);
++    }
++
++    ObjectiveID getObjectiveId() const
++    {
++        return ObjectiveID_fromPortable(objective_id);
++    }
++
++    Sint32 getPointX() const
++    {
++        return ltoh32(new_point_x);
++    }
++
++    Sint32 getPointY() const
++    {
++        return ltoh32(new_point_y);
++    }
++
++}__attribute__((packed));
++
++class ObjectiveChangeGeneratingUnit : public NetMessage
++{
++private:
++    ObjectiveID objective_id;
++
++public:
++    Uint8 unit_type;
++    Uint8 unit_gen_on;
++
++    ObjectiveChangeGeneratingUnit()
++    {
++        message_class = _net_message_class_objective;
++        message_id = _net_message_id_change_generating_unit;
++    }
++
++    void set(ObjectiveID id, Uint8 unit_type, bool unit_generation_on)
++    {
++        objective_id = ObjectiveID_toPortable(id);
++        this-&gt;unit_type = unit_type;
++        unit_gen_on = unit_generation_on;
++    }
++
++    ObjectiveID getObjectiveId() const
++    {
++        return ObjectiveID_fromPortable(objective_id);
++    }
++
++} __attribute__((packed));
++
+ class ObjectiveOccupationUpdate : public NetMessage
+ {
++private:
++    ObjectiveID objective_id;
++    Uint16 player_id;
++
+ public:
+-    UpdateOccupationsStatus status_update;
+-
+     ObjectiveOccupationUpdate()
+     {
+         message_class = _net_message_class_objective;
+         message_id = _net_message_id_occupation_status_update;
+     }
+-}
+-__attribute__((packed));
+ 
++    void set(ObjectiveID id, Uint16 player_id)
++    {
++        objective_id = ObjectiveID_toPortable(id);
++        this-&gt;player_id = htol16(player_id);
++    }
++
++    ObjectiveID getObjectiveId() const
++    {
++        return ObjectiveID_fromPortable(objective_id);
++    }
++
++    Uint16 getPlayerId() const
++    {
++        return ltoh16(player_id);
++    }
++}__attribute__((packed));
++
++class ObjectiveSyncData
++{
++public:
++    Uint16 player_id;
++
++    void set(Uint16 player_id)
++    {
++        this-&gt;player_id = htol16(player_id);
++    }
++
++    Uint16 getPlayerId() const
++    {
++        return ltoh16(player_id);
++    }
++
++}__attribute__((packed));
++
+ class ObjectiveSyncMesg : public NetMessage
+ {
++private:
++    ObjectiveID objective_id;
++
+ public:
+-    SyncObjective sync_data;
++    ObjectiveSyncData sync_data;
+ 
+     ObjectiveSyncMesg()
+     {
+         message_class = _net_message_class_objective;
+         message_id = _net_message_id_objective_sync;
+     }
++
++    void set(ObjectiveID id)
++    {
++        this-&gt;objective_id = ObjectiveID_toPortable(id);
++    }
++    
++    ObjectiveID getObjectiveId() const
++    {
++        return ObjectiveID_fromPortable(objective_id);
++    }
++
+ } __attribute__((packed));
+ 
+ #ifdef MSVC
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerMessageRouter.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -52,10 +52,6 @@
+             UnitInterface::processNetPacket(packet);
+             break;
+ 
+-        case _net_message_id_term_unit_gen:
+-        case _net_message_id_term_output_loc:
+-            ObjectiveInterface::processTerminalNetPacket( packet );
+-            break;
+         default:
+             LOGGER.warning(&quot;unnown Terminal Message (id %d, player %u)&quot;,
+                     message-&gt;message_id, packet-&gt;fromPlayer);
+@@ -70,6 +66,10 @@
+             processTerminalPacket(packet);
+             break;
+ 
++        case _net_message_class_objective:
++            ObjectiveInterface::serverHandleNetPacket(packet);
++            break;
++
+         case _net_message_class_system:
+             GameManager::processSystemMessage(message);
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/TerminalNetMesg.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/TerminalNetMesg.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/TerminalNetMesg.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -20,12 +20,8 @@
+ 
+ #include &quot;NetMessage.hpp&quot;
+ #include &quot;Classes/UnitMessageTypes.hpp&quot;
+-#include &quot;Classes/ObjectiveMessageTypes.hpp&quot;
+ 
+-enum { _net_message_id_term_unit_cmd,
+-       _net_message_id_term_unit_gen,
+-       _net_message_id_term_output_loc
+-     };
++enum { _net_message_id_term_unit_cmd };
+ 
+ #ifdef MSVC
+ #pragma pack(1)
+@@ -41,34 +37,9 @@
+         message_class = _net_message_class_terminal;
+         message_id = _net_message_id_term_unit_cmd;
+     }
+-}
+-__attribute__((packed));
++    
++}__attribute__((packed));
+ 
+-class TerminalOutpostUnitGenRequest : public NetMessage
+-{
+-public:
+-    ChangeUnitGeneration unit_gen_request;
+-
+-    TerminalOutpostUnitGenRequest()
+-    {
+-        message_class = _net_message_class_terminal;
+-        message_id = _net_message_id_term_unit_gen;
+-    }
+-} __attribute__((packed));
+-
+-class TerminalOutpostOutputLocRequest : public NetMessage
+-{
+-public:
+-    ChangeOutputLocation output_loc_request;
+-
+-    TerminalOutpostOutputLocRequest()
+-    {
+-        message_class = _net_message_class_terminal;
+-        message_id = _net_message_id_term_output_loc;
+-    }
+-}
+-__attribute__((packed));
+-
+ #ifdef MSVC
+ #pragma pack()
+ #endif
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/ObjectiveMessageTypes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ObjectiveMessageTypes.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/ObjectiveMessageTypes.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -1,176 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _OBJECTIVE_MESSSAGE_TYPES_HPP
+-#define _OBJECTIVE_MESSSAGE_TYPES_HPP
+-
+-#include &quot;Core/CoreTypes.hpp&quot;
+-#include &quot;Classes/PlayerState.hpp&quot;
+-#include &quot;Types/iXY.hpp&quot;
+-#include &quot;Util/Endian.hpp&quot;
+-
+-#ifdef MSVC
+-#pragma pack(1)
+-#endif
+-
+-class ObjectiveMessage
+-{
+-public:
+-    Uint8 message_type;
+-private:
+-    ObjectiveID objective_id;
+-
+-public:
+-    ObjectiveID getObjectiveID() const
+-    {
+-        return ObjectiveID_fromPortable(objective_id); // XXX protocol
+-    }
+-    void setObjectiveID(ObjectiveID id)
+-    {
+-        objective_id = ObjectiveID_toPortable(id); // XXX protocol
+-    }
+-} __attribute__((packed));
+-
+-enum { _objective_mesg_update_occupation,
+-       _objective_mesg_change_unit_generation,
+-       _objective_mesg_disown_player_objective,
+-       _objective_mesg_sync_objective,
+-       _objective_mesg_change_output_location
+-     };
+-
+-class UpdateOccupationsStatus : public ObjectiveMessage
+-{
+-public:
+-    Uint8 occupation_status;
+-private:
+-    Uint16 occupying_player_id;
+-    Uint32 timeleft;
+-
+-public:
+-    Uint8  unit_type;
+-    bool   unit_gen_on;
+-        
+-    void set(ObjectiveID id, Uint8 status, Uint16 player_id,
+-            bool unit_gen_on, Uint8 unit_type, Uint32 timeleft)
+-    {
+-        message_type = _objective_mesg_update_occupation;
+-        setObjectiveID(id);
+-        occupation_status = status;
+-        occupying_player_id = htol16(player_id);
+-        this-&gt;unit_gen_on = unit_gen_on;
+-        this-&gt;timeleft = htol32(timeleft);
+-        this-&gt;unit_type = unit_type;
+-    }
+-   
+-    Uint16 getOccupyingPlayerID() const
+-    {
+-        return ltoh16(occupying_player_id);
+-    }
+-    Uint32 getTimeLeft() const
+-    {
+-        return ltoh32(timeleft);
+-    }
+-} __attribute__((packed));
+-
+-class ChangeUnitGeneration : public ObjectiveMessage
+-{
+-public:
+-    Uint8 unit_type;
+-    Uint8 unit_gen_on;
+-
+-    void set(ObjectiveID id, Uint8 unit_type, bool unit_generation_on)
+-    {
+-        setObjectiveID(id);
+-        this-&gt;unit_type = unit_type;
+-        unit_gen_on = unit_generation_on;                             
+-        message_type = _objective_mesg_change_unit_generation;
+-    }
+-}
+-__attribute__((packed));
+-
+-class DisownPlayerObjective : public ObjectiveMessage
+-{
+-private:
+-    Uint16 disowned_player_id;
+-
+-public:
+-    void set(ObjectiveID id, Uint16 disowned_player)
+-    {
+-        setObjectiveID(id);
+-        disowned_player_id = htol16(disowned_player);
+-        message_type = _objective_mesg_disown_player_objective;        
+-    }
+-    Uint16 getDisownedPlayerID() const
+-    {
+-        return ltoh16(disowned_player_id);
+-    }
+-} __attribute__((packed));
+-
+-class SyncObjective : public ObjectiveMessage
+-{
+-public:
+-    Uint8 objective_status;
+-    Uint8 occupation_status;
+-private:
+-    Uint16 occupying_player_id;
+-
+-public:
+-    void set(ObjectiveID id, Uint8 objective_status,
+-            Uint8 occupation_status, Uint16 occupying_player)
+-    {
+-        setObjectiveID(id);
+-        message_type = _objective_mesg_sync_objective;
+-                                                                             
+-        this-&gt;objective_status = objective_status;
+-        this-&gt;occupation_status = occupation_status;
+-        this-&gt;occupying_player_id = htol16(occupying_player);
+-    }
+-    Uint16 getOccupyingPlayerID() const
+-    {
+-        return ltoh16(occupying_player_id);
+-    }
+-} __attribute__((packed));
+-
+-class ChangeOutputLocation : public ObjectiveMessage
+-{
+-private:
+-    Sint32 new_point_x;
+-    Sint32 new_point_y;
+-  
+-public:
+-    void set(ObjectiveID id, iXY point)
+-    {
+-        setObjectiveID(id);
+-        new_point_x = htol32(point.x);
+-        new_point_y = htol32(point.y);
+-        message_type = _objective_mesg_change_output_location;
+-    }
+-    Sint32 getPointX() const
+-    {
+-        return ltoh32(new_point_x);
+-    }
+-    Sint32 getPointY() const
+-    {
+-        return ltoh32(new_point_y);
+-    }
+-} __attribute__((packed));
+-
+-#ifdef MSVC
+-#pragma pack()
+-#endif
+-
+-#endif // ** _OBJECTIVE_MESSSAGE_TYPES_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -56,8 +56,7 @@
+     Sint16 total;
+     Sint16 objectives_held;
+     Uint32 colorIndex;
+-}
+-__attribute__((packed));
++}__attribute__((packed));
+ 
+ #ifdef MSVC
+ #pragma pack()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -24,11 +24,15 @@
+ 
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ 
++#include &quot;Units/UnitInterface.hpp&quot;
++
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
++#include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
++
+ #include &quot;Classes/UnitMessageTypes.hpp&quot;
+ #include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+@@ -609,15 +613,13 @@
+     }
+     else if (event.event == MouseEvent::EVENT_DOWN)
+     {
+-        Objective *objective = 0;
+-        click_status = ObjectiveInterface::quearyObjectiveLocationStatus(
+-            world_pos, PlayerInterface::getLocalPlayerIndex(), &amp;objective);
++        Objective *objective = ObjectiveInterface::getObjectiveAtWorldXY(world_pos);
+ 	
+-        if ( click_status == _player_occupied_objective_found )
++        if ( objective &amp;&amp; objective-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
+         {
+             selection_box_active = false;
+-            outpost_goal_selection = objective-&gt;objective_state.ID;
+-            output_pos_press = objective-&gt;objective_state.location; 
++            outpost_goal_selection = objective-&gt;id;
++            output_pos_press = objective-&gt;location;
+         }
+         else
+         {
+@@ -641,33 +643,28 @@
+         
+         if (outpost_goal_selection != OBJECTIVE_NONE )
+         {
+-            Objective *objective = 0;
+-            int cs = ObjectiveInterface::quearyObjectiveLocationStatus(
+-                    world_pos, PlayerInterface::getLocalPlayerIndex(),
+-                    &amp;objective);
+-            
+-            if ( (cs == _player_occupied_objective_found) 
+-                    &amp;&amp; outpost_goal_selection == objective-&gt;objective_state.ID
+-               )
++            Objective *objective = ObjectiveInterface::getObjectiveAtWorldXY(world_pos);
++
++            if ( objective
++                 &amp;&amp; objective-&gt;occupying_player == PlayerInterface::getLocalPlayer()
++                 &amp;&amp; outpost_goal_selection == objective-&gt;id )
+             {
+                 // we've let go of the mouse on the building so we're
+                 //  not changing the spawn point
+-                selected_objective_id = objective-&gt;objective_state.ID;
++                selected_objective_id = objective-&gt;id;
+                 activateVehicleSelectionView( selected_objective_id );
+             }
+             else
+             {
+-                TerminalOutpostOutputLocRequest term_mesg;
++                ObjectiveChangeOutputLocation msg;
+                 
+-                term_mesg.output_loc_request.set( outpost_goal_selection,
+-                        world_pos);
+-                
+-                CLIENT-&gt;sendMessage(&amp;term_mesg, sizeof(TerminalOutpostOutputLocRequest));
++                msg.set( outpost_goal_selection, world_pos);
++                CLIENT-&gt;sendMessage(&amp;msg, sizeof(msg));
+ 
+-                if ( NetworkState::status == _network_state_client )
+-                {    
+-                    ObjectiveInterface::sendMessage( &amp;(term_mesg.output_loc_request) );
+-                }
++//                if ( NetworkState::status == _network_state_client )
++//                {
++//                    ObjectiveInterface::sendMessage( &amp;(term_mesg.output_loc_request) );
++//                }
+             }
+             outpost_goal_selection = OBJECTIVE_NONE;
+             return;
+@@ -1069,9 +1066,9 @@
+ const char*
+ WorldInputCmdProcessor::getSelectedObjectiveName()
+ {
+-    ObjectiveState *objective_state;
++    Objective *objective_state;
+                                                                                 
+-    objective_state = ObjectiveInterface::getObjectiveState(selected_objective_id);
++    objective_state = ObjectiveInterface::getObjective(selected_objective_id);
+                                                                                 
+     return objective_state-&gt;name;
+ }
+@@ -1079,9 +1076,9 @@
+ iXY
+ WorldInputCmdProcessor::getSelectedObjectiveWorldPos()
+ {
+-    ObjectiveState *objective_state;
++    Objective *objective_state;
+                                                                                 
+-    objective_state = ObjectiveInterface::getObjectiveState(selected_objective_id);
++    objective_state = ObjectiveInterface::getObjective(selected_objective_id);
+                                                                                 
+     return objective_state-&gt;location;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -20,9 +20,11 @@
+ 
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
++
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+-#include &quot;Interfaces/ConsoleInterface.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
+ 
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+@@ -374,12 +376,55 @@
+     return( false );
+ }
+ 
++static bool testRuleObjectiveOccupationRatio( Uint16 player_index,
++                                              float precentage )
++{
++    ObjectiveID num_objectives = ObjectiveInterface::getObjectiveCount();
++
++    size_t occupation_ratio = (size_t) ( ((float) num_objectives) * precentage  + 0.999);
++
++    if (occupation_ratio == 0)
++    {
++        occupation_ratio = 1;
++    }
++
++    size_t occupied = 0;
++    for ( int i = 0; i &lt; num_objectives; ++i )
++    {
++        Objective *objective_state = ObjectiveInterface::getObjective(i);
++
++        if ( objective_state-&gt;occupying_player != 0 )
++        {
++            Uint16 occuping_player_index = objective_state-&gt;occupying_player-&gt;getID();
++
++            if ( occuping_player_index == player_index )
++            {
++                occupied++;
++            }
++            else if ( PlayerInterface::isAllied(occuping_player_index, player_index)
++                      &amp;&amp; PlayerInterface::isAllied(player_index, occuping_player_index) )
++            {
++                occupied++;
++            }
++        }
++    }
++
++    if ( occupied &gt;= occupation_ratio )
++    {
++        return true;
++    }
++
++    return false;
++}
++
+ bool PlayerInterface::testRuleObjectiveRatio( float precentage, PlayerState ** player_state )
+ {
+     unsigned long player_index;
+ 
+-    for ( player_index = 0; player_index &lt; max_players; player_index++ ) {
+-        if ( ObjectiveInterface::testRuleObjectiveOccupationRatio( player_index, precentage ) == true ) {
++    for ( player_index = 0; player_index &lt; max_players; player_index++ )
++    {
++        if ( testRuleObjectiveOccupationRatio(player_index, precentage) )
++        {
+             *player_state = &amp;player_lists[ player_index ];
+             return true;
+         } // ** if
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -16,112 +16,242 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &quot;Objectives/Objective.hpp&quot;
+-#include &quot;Outpost.hpp&quot;
++#include &quot;Objective.hpp&quot;
++
++#include &quot;Util/Log.hpp&quot;
++
++#include &quot;Units/UnitInterface.hpp&quot;
++#include &quot;Units/UnitProfileInterface.hpp&quot;
++
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+-#include &quot;Units/UnitProfileInterface.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+ 
+-Objective::Objective(ObjectiveID ID, iXY location, BoundBox area)
++#include &quot;Classes/Network/NetworkServer.hpp&quot;
++#include &quot;Classes/Network/NetworkState.hpp&quot;
++#include &quot;Classes/Network/UnitNetMessage.hpp&quot;
++#include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
++#include &quot;Classes/UnitMessageTypes.hpp&quot;
++
++
++Objective::Objective(ObjectiveID id, iXY location, BoundBox area)
+ {
+-    objective_state.ID = ID;
+-    objective_state.location = location;
+-    objective_state.capture_area = area;
+-    objective_state.objective_status = _objective_status_null;
+-    objective_state.occupation_status = _occupation_status_unoccupied;
+-    objective_state.occupying_player = 0;
++    this-&gt;id = id;
++    this-&gt;location = location;
++    capture_area = area;
++    occupying_player = 0;
++
++    MapInterface::pointXYtoMapXY( location, &amp;outpost_map_loc );
++    selection_box.max = location + iXY( 64, 32 );
++    selection_box.min = location + iXY( -224, -128 );
++    this-&gt;area.min = iXY( -400, -144 );
++    this-&gt;area.max = iXY(  400,  240 );
++    outpost_type = 0;
++
++    unit_generation_type = 0;
++    occupation_status_timer.changePeriod( 3 );
++    unit_generation_timer.changePeriod( 1 );
++    unit_collection_loc = outpost_map_loc + iXY( 13, 13 );
++    unit_generation_loc = iXY( 1, 3 );
++    occupation_pad_offset = iXY( 224, 48 );
++    unit_generation_on_flag = false;
++
+ }
+ 
+ void
+-Objective::objectiveMesgUpdateOccupation(const ObjectiveMessage* message)
++Objective::changeOwner( PlayerState * new_owner )
+ {
+-    const UpdateOccupationsStatus *occupation_update
+-        = (const UpdateOccupationsStatus *) message;
++    if ( occupying_player )
++    {
++        occupying_player-&gt;decObjectivesHeld();
++    }
+ 
+-    if ( objective_state.occupation_status == _occupation_status_occupied )
++    occupying_player = new_owner;
++
++    if ( occupying_player )
+     {
+-        objective_state.occupying_player-&gt;decObjectivesHeld();
++        occupying_player-&gt;incObjectivesHeld();
++
++        ConsoleInterface::postMessage(Color::cyan, false, 0,
++                                      &quot;'%s' has been occupied by '%s'&quot;,
++                                      name, new_owner-&gt;getName().c_str() );
+     }
+     
+-    objective_state.occupation_status = occupation_update-&gt;occupation_status;
+-    objective_state.occupying_player
+-        = PlayerInterface::getPlayer(occupation_update-&gt;getOccupyingPlayerID());
++    unit_generation_on_flag = false;
++}
+ 
+-    Outpost* outpost = dynamic_cast&lt;Outpost*&gt; (this);
+-    if(outpost)
++void
++Objective::changeUnitGeneration(bool is_on, int unit_type)
++{
++    unit_generation_on_flag = is_on;
++    if ( is_on )
+     {
+-        outpost-&gt;unit_generation_on_flag = occupation_update-&gt;unit_gen_on;
+-        outpost-&gt;unit_generation_type = occupation_update-&gt;unit_type;
+-        UnitProfile* profile =
+-            UnitProfileInterface::getUnitProfile(
+-                    outpost-&gt;unit_generation_type );
+-        outpost-&gt;unit_generation_timer.changePeriod((float)profile-&gt;regen_time);
+-        outpost-&gt;unit_generation_timer.setTimeLeft(
+-                float(occupation_update-&gt;getTimeLeft()) / 128.0);
++        UnitProfile *profile = UnitProfileInterface::getUnitProfile( unit_type );
++        if ( profile )
++        {
++            unit_generation_type = unit_type;
++            unit_generation_timer.changePeriod( (float) profile-&gt;regen_time );
++        }
++        else
++        {
++            unit_generation_on_flag = false;
++        }
+     }
++}
+ 
+-    if( objective_state.occupation_status != _occupation_status_unoccupied )
++void Objective::getSyncData(ObjectiveSyncData&amp; sync_data)
++{
++    Uint16 player_id = 0xffff;
++    if ( occupying_player != 0 )
+     {
+-        objective_state.occupying_player-&gt;incObjectivesHeld();
+-        
+-        ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;'%s' has been occupied by '%s'&quot;,
+-                objective_state.name, objective_state.occupying_player-&gt;getName().c_str() );
++        player_id = occupying_player-&gt;getID();
+     }
++
++    sync_data.set(player_id);
+ }
+ 
+ void
+-Objective::objectiveMesgSync(const ObjectiveMessage* message)
++Objective::syncFromData(const ObjectiveSyncData&amp; sync_data)
+ {
+-    const SyncObjective *sync_mesg = (const SyncObjective*) message;
++    if ( sync_data.getPlayerId() &gt;= PlayerInterface::getMaxPlayers() )
++    {
++        occupying_player = 0;
++        if ( sync_data.getPlayerId() != 0xffff )
++        {
++            LOGGER.warning(&quot;Malformed ObjectvieMesgSync&quot;);
++        }
++    }
++    else
++    {
++        occupying_player = PlayerInterface::getPlayer(sync_data.getPlayerId());
++    }
++}
+ 
+-    if(sync_mesg-&gt;getOccupyingPlayerID() &gt;= PlayerInterface::getMaxPlayers()) {
+-        LOGGER.warning(&quot;Malformed ObjectvieMesgSync&quot;);
+-        return;
++void
++Objective::attemptOccupationChange(UnitID unit_id)
++{
++    ObjectiveOccupationUpdate msg;
++    int player_status;
++
++    UnitBase* unit = UnitInterface::getUnit(unit_id);
++    PlayerState* player = unit-&gt;player;
++    player_status = player-&gt;getStatus();
++
++    if ( occupying_player == 0 )
++    {
++        if ( player_status == _player_state_active )
++        {
++            occupying_player = player;
++            occupying_player-&gt;incObjectivesHeld();
++
++            msg.set( id, occupying_player-&gt;getID());
++            SERVER-&gt;broadcastMessage(&amp;msg, sizeof(msg));
++
++            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;'%s' has been occupied by '%s'&quot;,
++                    name, player-&gt;getName().c_str() );
++        }
+     }
++    else if (occupying_player != player)
++    {
++        if( player_status == _player_state_active  )
++        {
++            occupying_player-&gt;decObjectivesHeld();
++            occupying_player = player;
++            occupying_player-&gt;incObjectivesHeld();
++            msg.set(id, occupying_player-&gt;getID());
+ 
+-    objective_state.objective_status = sync_mesg-&gt;objective_status;
+-    objective_state.occupation_status = sync_mesg-&gt;occupation_status;
+-    if(objective_state.occupation_status != _occupation_status_unoccupied) {
+-        objective_state.occupying_player =
+-            PlayerInterface::getPlayer(sync_mesg-&gt;getOccupyingPlayerID());
+-    } else {
+-        objective_state.occupying_player = 0;
++            SERVER-&gt;broadcastMessage(&amp;msg, sizeof(msg));
++            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;'%s' has been occupied by '%s'&quot;,
++                    name, player-&gt;getName().c_str() );
++        }
+     }
+ }
+ 
+-void Objective::getSyncData(SyncObjective&amp; objective_sync_mesg)
++void
++Objective::checkOccupationStatus()
+ {
+-    Uint16 player_id = 0;
+-    if(objective_state.occupation_status != _occupation_status_unoccupied
+-            &amp;&amp; objective_state.occupying_player) {
+-        player_id = objective_state.occupying_player-&gt;getID();
+-    }
+-    objective_sync_mesg.set(objective_state.ID,
+-                            objective_state.objective_status,
+-                            objective_state.occupation_status,
+-                            player_id);
++    if( occupation_status_timer.count()  )	//
++    {
++        UnitBase *unit_ptr;
++        iRect bounding_area;
++        iXY occupation_pad_loc;
++
++        occupation_pad_loc = location + occupation_pad_offset;
++        bounding_area = capture_area.getAbsRect( occupation_pad_loc );
++
++
++        UnitInterface::queryClosestUnit( &amp;unit_ptr,
++                                          bounding_area,
++                                          occupation_pad_loc
++                                        );
++
++        if ( unit_ptr != 0 )
++        {
++            iXY unit_loc;
++            unit_loc = unit_ptr-&gt;unit_state.location;
++            if ( capture_area.bounds( occupation_pad_loc, unit_loc ) ) {
++                attemptOccupationChange( unit_ptr-&gt;id );
++            }
++
++        } // ** if unit_ptr != 0
++
++    } // ** if occupation_status_timer.count()
++
+ }
+ 
++void
++Objective::generateUnits()
++{   // XXX CHECK
++    if ( occupying_player &amp;&amp; unit_generation_on_flag == true )
++    {
++        if( unit_generation_timer.count() == true )
++        {
++            UnitBase *unit;
++            iXY gen_loc;
++            gen_loc = outpost_map_loc + unit_generation_loc;
+ 
+-void Objective::processMessage(const ObjectiveMessage* message)
+-{
+-    switch(message-&gt;message_type) {
+-        case _objective_mesg_update_occupation:
+-            objectiveMesgUpdateOccupation(message);
+-            break;
++            unit = UnitInterface::createUnit(unit_generation_type,
++                    gen_loc, occupying_player-&gt;getID());
+ 
+-        case _objective_mesg_sync_objective:
+-            objectiveMesgSync(message);
+-            break;
++            if ( unit != 0 )
++            {
++                UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(),
++                        unit-&gt;id, gen_loc.x, gen_loc.y,
++                        unit_generation_type);
++                SERVER-&gt;broadcastMessage(&amp;create_mesg, sizeof(UnitRemoteCreate));
+ 
+-        case _objective_mesg_change_unit_generation:
+-        case _objective_mesg_disown_player_objective:
+-        case _objective_mesg_change_output_location:
+-            break;
++                UMesgAICommand ai_command;
++                PlacementMatrix placement_matrix;
++                iXY collection_loc, loc;
+ 
+-        default:
+-            LOGGER.warning(&quot;Unknown ObjectiveMessage received (type %d)&quot;,
+-                    message-&gt;message_type);
++                collection_loc = /*outpost_map_loc +*/ unit_collection_loc;
++
++                placement_matrix.reset( collection_loc );
++                placement_matrix.getNextEmptyLoc( &amp;loc );
++
++                ai_command.setHeader( unit-&gt;id, _umesg_flag_unique );
++                ai_command.setMoveToLoc( loc );
++                UnitInterface::sendMessage( &amp;ai_command );
++            }
++        } // ** if
++    } // ** if
++}
++
++void
++Objective::updateStatus()
++{
++    if ( NetworkState::status == _network_state_server )
++    {
++        checkOccupationStatus();
++        generateUnits();
+     }
++    else
++    {
++        if( unit_generation_timer.count() == true )
++        {
++            unit_generation_timer.reset();
++        }
++    }
++
++
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -20,70 +20,54 @@
+ 
+ #include &quot;Core/CoreTypes.hpp&quot;
+ #include &quot;ArrayUtil/BoundBox.hpp&quot;
+-#include &quot;Classes/SpriteSorter.hpp&quot;
+-#include &quot;Classes/PlayerState.hpp&quot;
+-#include &quot;Classes/ObjectiveMessageTypes.hpp&quot;
++#include &quot;Util/Timer.hpp&quot;
+ 
+-enum { _objective_status_null };
++class PlayerState;
++class ObjectiveSyncData;
+ 
+-enum { _occupation_status_unoccupied,
+-       _occupation_status_occupied
+-     };
+-
+-
+-class ObjectiveState
++class Objective
+ {
+ public:
+-    ObjectiveID   ID;
++    ObjectiveID   id;
+     iRect         selection_box;
+     unsigned char outpost_type;
+     char          name[64];
+     iXY           location;
+     BoundBox      capture_area;
+     BoundBox      area;
+-    unsigned char objective_status;
+-    unsigned char occupation_status;
+     PlayerState*  occupying_player;
+ 
+-    inline bool isBounded( iXY &amp;test )
+-    {
+-        return( capture_area.bounds( location, test ) );
+-    }
+-};
++// from outpost
++    unsigned char outpost_state;
++    iXY outpost_map_loc;
++    iXY unit_generation_loc;
++    iXY unit_collection_loc;
++    iXY occupation_pad_offset;
+ 
+-
+-class OutpostStatus
+-{
+-public:
+     unsigned short unit_generation_type;
+-    bool           unit_generation_on_off;
+-    float          unit_generation_time;
+-    float          unit_generation_time_remaining;
+-    iXY unit_collection_loc;
+-};
++    bool unit_generation_on_flag;
+ 
+-class Objective
+-{
+-protected:
+-    void objectiveMesgUpdateOccupation(const ObjectiveMessage* message);
+-    void objectiveMesgSync(const ObjectiveMessage* message);
++    Timer occupation_status_timer;
++    Timer unit_generation_timer;
+ 
+-public:
+-    ObjectiveState objective_state;
+-
+     Objective(ObjectiveID ID, iXY location, BoundBox area );
+-    virtual ~Objective()
+-    { }
++    ~Objective() { }
+ 
+-    void getSyncData( SyncObjective &amp;objective_sync_mesg );
++    void changeOwner( PlayerState * new_owner );
++    void changeUnitGeneration(bool is_on, int unit_type);
+ 
+-    virtual void processMessage(const ObjectiveMessage* message);
++    void getSyncData( ObjectiveSyncData&amp; sync_data );
++    void syncFromData( const ObjectiveSyncData&amp; sync_data );
+ 
+-    virtual void updateStatus()
+-    { }
++    void updateStatus();
+ 
+-    virtual void offloadGraphics(SpriteSorter&amp; )
+-    { }
++private:
++    void attemptOccupationChange(UnitID unit_id);
++
++    void checkOccupationStatus( void );
++
++    void generateUnits( void );
++
+ };
+ 
+ #endif // ** _OBJECTIVE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -16,7 +16,8 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;ObjectiveInterface.hpp&quot;
++#include &quot;Objective.hpp&quot;
+ 
+ #include &lt;stdio.h&gt;
+ #include &lt;memory&gt;
+@@ -27,37 +28,38 @@
+ 
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++
+ #include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileStream.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+-#include &quot;Objectives/Outpost.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
+ 
++#include &quot;Classes/Network/NetMessage.hpp&quot;
+ #include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
+ #include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
+ #include &quot;Classes/Network/NetPacket.hpp&quot;
++#include &quot;Classes/Network/NetworkServer.hpp&quot;
++
+ #include &quot;Network/ClientSocket.hpp&quot;
+ 
+-std::vector&lt;Objective*&gt; ObjectiveInterface::objective_list;
++Objective** ObjectiveInterface::objective_list = 0;
++int ObjectiveInterface::num_objectives = 0;
+ 
+-unsigned long ObjectiveInterface::objective_position_enum_list_size;
+-ObjectiveID   ObjectiveInterface::objective_position_enum_index;
+-Uint16        ObjectiveInterface::objective_position_enum_player_id;
+-
+-NetMessageEncoder ObjectiveInterface::message_encoder;
+-
+-SDL_mutex* ObjectiveInterface::mutex = 0;
+-
+ void
+ ObjectiveInterface::cleanUpObjectiveList()
+ {
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        delete *i;
++    if ( objective_list )
++    {
++        for ( int n=0; n &lt; num_objectives; ++n )
++        {
++            delete objective_list[n];
++        }
++        delete[] objective_list;
++        objective_list = 0;
+     }
+ 
+-    objective_list.clear();
++    num_objectives = 0;
+ }
+ 
+ void
+@@ -131,10 +133,16 @@
+         std::stringstream ss(objectivecount);
+         ss &gt;&gt; objective_count;
+ 
++        if ( objective_count &gt; 0 )
++        {
++            objective_list = new Objective*[objective_count];
++            num_objectives = 0;
++        }
++
+         size_t loc_x, loc_y;
+         size_t world_x, world_y;
+         std::string name;
+-        cleanUpObjectiveList();
++
+         for (ObjectiveID objective_index = 0; objective_index &lt; objective_count; objective_index++ )
+         {
+             Objective *objective_obj;
+@@ -146,123 +154,148 @@
+             
+             MapInterface::mapXYtoPointXY( loc_x, loc_y, &amp;world_x, &amp;world_y );
+ 
+-            objective_obj = new Outpost(objective_index, iXY(world_x, world_y),
++            objective_obj = new Objective(objective_index, iXY(world_x, world_y),
+                     BoundBox( -48, -32, 48, 32 )
+                     );
+             
+-            strcpy(objective_obj-&gt;objective_state.name, name.c_str());
+-            objective_list.push_back(objective_obj);
++            strcpy(objective_obj-&gt;name, name.c_str());
++            objective_list[objective_index] = objective_obj;
++            ++num_objectives;
+         } // ** for
+     }
+     catch(std::exception&amp; e)
+     {
++        cleanUpObjectiveList();
+         throw Exception(&quot;Error while reading outpost definition '%s': %s&quot;,
+                 file_path, e.what());
+     }
+ }
+ 
+-unsigned char
+-ObjectiveInterface::quearyObjectiveLocationStatus(iXY &amp;loc,
+-        Uint16 player_id, Objective **objective_ptr )
++/*
++ * Only used in server, when received a packet from a player.
++ */
++void
++ObjectiveInterface::serverHandleNetPacket(const NetPacket* packet)
+ {
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        ObjectiveState *objective_state = &amp; ((*i)-&gt;objective_state);
++    const PlayerState* player = PlayerInterface::getPlayer(packet-&gt;fromPlayer);
++    if ( !player )
++    {
++        LOGGER.warning(&quot;Couldn't find player for packet %u.&quot;,
++                packet-&gt;fromPlayer);
++        return;
++    }
+ 
+-        if ( objective_state-&gt;selection_box.contains( loc ) == true ) {
+-            if ( objective_state-&gt;occupation_status == _occupation_status_occupied ) {
+-                if (objective_state-&gt;occupying_player-&gt;getID() == player_id) {
+-                    *objective_ptr = *i;
+-                    return( _player_occupied_objective_found );
+-                } // ** if
+-                else {
+-                    *objective_ptr = *i;
+-                    return( _enemy_occupied_objective_found );
+-                } // ** else
+-            } // ** if
+-            else {
+-                *objective_ptr = *i;
+-                return( _unoccupied_objective_found );
+-            } // ** else
+-        } // ** if
+-    } // ** if
++    const NetMessage* message = packet-&gt;getNetMessage();
+ 
+-    return( _no_objective_found );
+-}
++    switch(message-&gt;message_id)
++    {
++        case _net_message_id_change_generating_unit:
++        {
++            const ObjectiveChangeGeneratingUnit* msg =
++                (const ObjectiveChangeGeneratingUnit*) message;
+ 
+-void
+-ObjectiveInterface::processTerminalNetPacket(const NetPacket* packet)
+-{
+-    const NetMessage* message = packet-&gt;getNetMessage();
+-    const ObjectiveMessage* objectiveMessage = 0;
+-    switch(message-&gt;message_id) {
+-        case _net_message_id_term_unit_gen: {
+-            const TerminalOutpostUnitGenRequest* request =
+-                (const TerminalOutpostUnitGenRequest*) message;
+-            objectiveMessage = &amp;(request-&gt;unit_gen_request);
++            ObjectiveID obj_id = msg-&gt;getObjectiveId();
++            if ( obj_id &lt; num_objectives )
++            {
++                objective_list[obj_id]-&gt;changeUnitGeneration(msg-&gt;unit_gen_on, msg-&gt;unit_type);
++                if ( packet-&gt;fromClient )
++                {
++                    packet-&gt;fromClient-&gt;sendMessage(msg, msg-&gt;getSize());
++                }
++            }
++
+             break;
+         }
+-        case _net_message_id_term_output_loc: {
+-            const TerminalOutpostOutputLocRequest* request =
+-                (const TerminalOutpostOutputLocRequest*) message;
+-            objectiveMessage = &amp;(request-&gt;output_loc_request);
++
++        case _net_message_id_change_output_location:
++        {
++            const ObjectiveChangeOutputLocation* msg =
++                (const ObjectiveChangeOutputLocation*) message;
++
++            ObjectiveID obj_id = msg-&gt;getObjectiveId();
++            if ( obj_id &lt; num_objectives )
++            {
++                MapInterface::pointXYtoMapXY(iXY(msg-&gt;getPointX(), msg-&gt;getPointY()),
++                                             &amp;(objective_list[obj_id]-&gt;unit_collection_loc) );
++                if ( packet-&gt;fromClient )
++                {
++                    packet-&gt;fromClient-&gt;sendMessage(msg, msg-&gt;getSize());
++                }
++            }
++
+             break;
+         }
++
+         default:
+             LOGGER.warning(
+                     &quot;Unknown objective terminal message (id %u, player %u)&quot;,
+                     message-&gt;message_id, packet-&gt;fromPlayer);
+-            return;
+-    }                                       
+-
+-    const PlayerState* player 
+-        = PlayerInterface::getPlayer(packet-&gt;fromPlayer);
+-    if(!player) {
+-        LOGGER.warning(&quot;Couldn't find player for packet %u.&quot;,
+-                packet-&gt;fromPlayer);
+-        return;
+     }
+-    
+-    sendMessage(objectiveMessage, player);
+ }
+ 
+ void
+-ObjectiveInterface::sendMessage(const ObjectiveMessage* message,
+-        const PlayerState* player)
++ObjectiveInterface::clientHandleNetMessage(const NetMessage* message)
+ {
+-    if(message-&gt;getObjectiveID() &gt;= objective_list.size()) {
+-        LOGGER.warning(&quot;Received malformed objective message: id out of range&quot;);
+-        return;
+-    }
+-    Objective* objective = objective_list[message-&gt;getObjectiveID()];
+-    if(player &amp;&amp; objective-&gt;objective_state.occupying_player != player) {
+-        LOGGER.warning(
+-                &quot;Terminal message from player %u for objective %u not allowed.&quot;,
+-                player-&gt;getID(), message-&gt;getObjectiveID());
+-        return;
+-    }
+-    objective_list[message-&gt;getObjectiveID()]-&gt;processMessage(message);
+-}
+-
+-void
+-ObjectiveInterface::processNetMessages(const NetMessage* message)
+-{
+     switch(message-&gt;message_id) {
+         case _net_message_id_occupation_status_update:
+         {
+-            const ObjectiveOccupationUpdate *occupation_update
+-                = (const ObjectiveOccupationUpdate*) message;
+-            sendMessage( &amp;(occupation_update-&gt;status_update) );
++            const ObjectiveOccupationUpdate* msg =
++                (const ObjectiveOccupationUpdate*) message;
++
++            ObjectiveID obj_id = msg-&gt;getObjectiveId();
++            if ( obj_id &lt; num_objectives )
++            {
++                Uint16 player_id = msg-&gt;getPlayerId();
++                if ( player_id &lt; PlayerInterface::getMaxPlayers() )
++                {
++                    objective_list[obj_id]-&gt;changeOwner(PlayerInterface::getPlayer(player_id));
++                }
++            }
++
+             break;
+         }
+ 
+         case _net_message_id_objective_sync:
+         {
+-            const ObjectiveSyncMesg* sync_mesg 
+-                = (const ObjectiveSyncMesg*) message;
+-            sendMessage( &amp;(sync_mesg-&gt;sync_data) );
++            const ObjectiveSyncMesg* msg =
++                (const ObjectiveSyncMesg*) message;
++
++            ObjectiveID obj_id = msg-&gt;getObjectiveId();
++            if ( obj_id &lt; num_objectives )
++            {
++                objective_list[obj_id]-&gt;syncFromData(msg-&gt;sync_data);
++            }
+             break;
+         }
++
++        case _net_message_id_change_generating_unit:
++        {
++            const ObjectiveChangeGeneratingUnit* msg =
++                (const ObjectiveChangeGeneratingUnit*) message;
++
++            ObjectiveID obj_id = msg-&gt;getObjectiveId();
++            if ( obj_id &lt; num_objectives )
++            {
++                objective_list[obj_id]-&gt;changeUnitGeneration(msg-&gt;unit_gen_on, msg-&gt;unit_type);
++            }
++
++            break;
++        }
++
++        case _net_message_id_change_output_location:
++        {
++            const ObjectiveChangeOutputLocation* msg =
++                (const ObjectiveChangeOutputLocation*) message;
++
++            ObjectiveID obj_id = msg-&gt;getObjectiveId();
++            if ( obj_id &lt; num_objectives )
++            {
++                MapInterface::pointXYtoMapXY(iXY(msg-&gt;getPointX(), msg-&gt;getPointY()),
++                                             &amp;(objective_list[obj_id]-&gt;unit_collection_loc) );
++            }
++
++            break;
++        }
+         
+         default:
+             LOGGER.warning(&quot;Unknown Objective Message received (id %d)&quot;,
+@@ -274,140 +307,40 @@
+ void
+ ObjectiveInterface::updateObjectiveStatus()
+ {
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        (*i)-&gt;updateStatus();
++    for ( int i = 0; i &lt; num_objectives; ++i )
++    {
++        objective_list[i]-&gt;updateStatus();
+     }
+ }
+ 
+ void
+-ObjectiveInterface::offloadGraphics( SpriteSorter &amp;sorter )
++ObjectiveInterface::disownPlayerObjectives(Uint16 player_id)
+ {
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        (*i)-&gt;offloadGraphics(sorter);
+-    }
+-}
++    for(Uint16 i = 0; i &lt; num_objectives; ++i)
++    {
++        if ( objective_list[i]-&gt;occupying_player
++             &amp;&amp; objective_list[i]-&gt;occupying_player-&gt;getID() == player_id )
++        {
++            objective_list[i]-&gt;changeOwner(0);
+ 
+-
+-bool
+-ObjectiveInterface::testRuleObjectiveOccupationRatio(
+-        Uint16 player_index, float precentage)
+-{
+-    size_t occupation_ratio = (size_t)
+-        ( ((float) objective_list.size()) * precentage  + 0.999);
+-
+-    if (occupation_ratio == 0)
+-        occupation_ratio = 1;
+-
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    size_t occupied = 0;
+-    for(i = objective_list.begin(); i != objective_list.end(); i++) {
+-        ObjectiveState *objective_state = &amp; ((*i)-&gt;objective_state);
+-        if(objective_state-&gt;occupation_status == _occupation_status_occupied) {
+-            Uint16 occuping_player_index 
+-                = objective_state-&gt;occupying_player-&gt;getID();
+-
+-            if ( occuping_player_index == player_index ) {
+-                occupied++;
+-            } else if (PlayerInterface::isAllied(
+-                        occuping_player_index, player_index) &amp;&amp;
+-                        PlayerInterface::isAllied(player_index,
+-                            occuping_player_index)) {
+-                    occupied++;
+-            }
++            ObjectiveOccupationUpdate update_mesg;
++            update_mesg.set( i, 0xffff);
++            SERVER-&gt;broadcastMessage(&amp;update_mesg, sizeof(update_mesg));
+         }
+     }
+-
+-    if(occupied &gt;= occupation_ratio)
+-        return true;
+-
+-    return false;
+ }
+ 
+-void
+-ObjectiveInterface::disownPlayerObjectives(Uint16 player_id)
++Objective*
++ObjectiveInterface::getObjectiveAtWorldXY(const iXY&amp; loc)
+ {
+-    DisownPlayerObjective disown_player_objective;
+-
+-    for(Uint16 i = 0; i &lt; objective_list.size(); i++) {
+-        disown_player_objective.set(i, player_id);
+-        sendMessage(&amp;disown_player_objective);
+-    }
+-}
+-
+-ObjectiveState*
+-ObjectiveInterface::getObjectiveState( ObjectiveID objective_id )
+-{
+-    return &amp; (objective_list.at(objective_id)-&gt;objective_state);
+-}
+-
+-OutpostStatus
+-ObjectiveInterface::getOutpostStatus( ObjectiveID objective_id )
+-{
+-    OutpostStatus outpost_status;
+-    
+-    Outpost *outpost_ptr 
+-        = dynamic_cast&lt;Outpost*&gt; (objective_list.at(objective_id));
+-    assert(outpost_ptr != 0);
+-
+-    outpost_ptr-&gt;getOutpostStatus( outpost_status );
+-
+-    return outpost_status;
+-}
+-
+-void
+-ObjectiveInterface::startObjectivePositionEnumeration()
+-{
+-    objective_position_enum_index	= 0;
+-    objective_position_enum_list_size = objective_list.size();
+-    objective_position_enum_player_id = PlayerInterface::getLocalPlayerIndex();
+-}
+-
+-bool
+-ObjectiveInterface::objectivePositionEnumeration(iRect *objective_rect,
+-        unsigned char *objective_disposition, ObjectiveID *objective_id)
+-{
+-    ObjectiveState *objective_state;
+-
+-    if( objective_position_enum_index &lt;  objective_position_enum_list_size )
++    for ( Uint16 i = 0; i &lt; num_objectives; ++i )
+     {
+-        objective_state = &amp;(objective_list[ objective_position_enum_index ]-&gt;objective_state);
+-
+-        (*objective_rect) = objective_state-&gt;area.getAbsRect( objective_state-&gt;location );
+-        if( objective_id != 0 )
++        if ( objective_list[i]-&gt;selection_box.contains( loc ) )
+         {
+-            (*objective_id) = objective_position_enum_index;
++            return objective_list[i];
+         }
+-
+-        if ( objective_state-&gt;occupation_status == _occupation_status_occupied )
+-        {
+-            if ( objective_position_enum_player_id != objective_state-&gt;occupying_player-&gt;getID() )
+-            {
+-                if (PlayerInterface::isAllied(objective_state-&gt;occupying_player-&gt;getID() , objective_position_enum_player_id)  )
+-                {
+-                    (*objective_disposition) = _objective_disposition_allie;
+-                }
+-                else
+-                {
+-                    (*objective_disposition) = _objective_disposition_enemy;
+-                }
+-            }
+-            else
+-            {
+-                (*objective_disposition) = _objective_disposition_player;
+-            }
+-        }
+-        else
+-        {
+-            (*objective_disposition) = _objective_disposition_unoccupied;
+-        }
+-
+-        objective_position_enum_index++;
+-        return true;
+     }
+-
+-    return false;
++    return 0;
+ }
+ 
+ void
+@@ -417,8 +350,7 @@
+     unsigned int buffer_pos = 0;
+     ObjectiveSyncMesg msg;
+     msg.setSize(sizeof(ObjectiveSyncMesg));
+-    std::vector&lt;Objective*&gt;::iterator i;
+-    for(i = objective_list.begin(); i != objective_list.end(); ++i)
++    for(int i = 0; i &lt; num_objectives; ++i )
+     {
+         if ( buffer_pos+sizeof(ObjectiveSyncMesg) &gt; sizeof(buffer) )
+         {
+@@ -426,7 +358,7 @@
+             buffer_pos=0;
+         }
+         
+-        (*i)-&gt;getSyncData( msg.sync_data );
++        objective_list[i]-&gt;getSyncData( msg.sync_data );
+         memcpy(buffer+buffer_pos, &amp;msg, sizeof(ObjectiveSyncMesg));
+         buffer_pos += sizeof(ObjectiveSyncMesg);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -18,37 +18,23 @@
+ #ifndef _OBJECTIVEINTERFACE_HPP
+ #define _OBJECTIVEINTERFACE_HPP
+ 
+-#include &quot;SDL.h&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+-#include &quot;Objectives/Objective.hpp&quot;
+-#include &quot;ArrayUtil/ArrayTemplate.hpp&quot;
+-
+-#include &quot;Classes/Network/NetPacket.hpp&quot;
+-#include &quot;Classes/Network/NetMessageEncoder.hpp&quot;
+-
+-enum { _no_objective_found,
+-       _player_occupied_objective_found,
+-       _enemy_occupied_objective_found,
+-       _unoccupied_objective_found
+-     };
+-
+-enum { _objective_disposition_unoccupied,
+-       _objective_disposition_player,
+-       _objective_disposition_allie,
+-       _objective_disposition_enemy
+-     };
+-
++class Objective;
+ class NetPacket;
++class NetMessage;
++class iXY;
++class ClientSocket;
+ 
+ class ObjectiveInterface
+ {
+ protected:
+-    static std::vector&lt;Objective*&gt; objective_list;
+ 
++    static Objective** objective_list;
++    static int num_objectives;
++
+     static void cleanUpObjectiveList();
+ 
+-    static SDL_mutex* mutex;
+-
+ public:
+     static void cleanUp();
+ 
+@@ -56,50 +42,30 @@
+ 
+     static void loadObjectiveList( const char *file_path );
+ 
+-    static unsigned char quearyObjectiveLocationStatus(iXY &amp;loc,
+-            Uint16 player_id, Objective **objective_ptr);
++    static void serverHandleNetPacket(const NetPacket* packet);
++    static void clientHandleNetMessage(const NetMessage* message);
+ 
+-    static void processTerminalNetPacket(const NetPacket* packet);
+-    static void sendMessage(const ObjectiveMessage* message,
+-            const PlayerState* player = 0);
+-
+-    static void processNetMessages(const NetMessage* message);
+-
+     static void updateObjectiveStatus();
+ 
+-    static void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-    static bool testRuleObjectiveOccupationRatio(Uint16 player_index,
+-            float precentage );
+-
+     static void disownPlayerObjectives(Uint16 player_id);
+ 
+-    static ObjectiveState * getObjectiveState( ObjectiveID objective_id );
++    static Objective* getObjective( ObjectiveID objective_id )
++    {
++        return objective_list[objective_id];
++    }
++    
++    static Objective* getObjectiveAtWorldXY( const iXY&amp; loc );
+ 
+-    static OutpostStatus getOutpostStatus( ObjectiveID objective_id );
+-
+     static size_t getObjectiveCount()
+     {
+-        return objective_list.size();
++        return num_objectives;
+     }
+ 
+     static int getObjectiveLimit();
+ 
+-protected:
+-    static NetMessageEncoder message_encoder;
+-
+-public:
+     static void syncObjectives( ClientSocket * client );
+ 
+     // Objective positions, almost exclusivly for mini map
+-protected:
+-    static ObjectiveID   objective_position_enum_index;
+-    static unsigned long objective_position_enum_list_size;
+-    static Uint16        objective_position_enum_player_id;
+-
+-public:
+-    static void startObjectivePositionEnumeration();
+-    static bool objectivePositionEnumeration(iRect *objective_rect, unsigned char *objective_disposition, ObjectiveID *objective_id);
+ };
+ 
+ 
+
+Deleted: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -1,303 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#include &quot;Outpost.hpp&quot;
+-
+-#include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Units/UnitProfileInterface.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+-
+-#include &quot;Classes/Network/NetworkServer.hpp&quot;
+-#include &quot;Classes/Network/NetworkState.hpp&quot;
+-#include &quot;Classes/Network/UnitNetMessage.hpp&quot;
+-#include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
+-#include &quot;Classes/UnitMessageTypes.hpp&quot;
+-
+-Outpost::Outpost( ObjectiveID ID, iXY location, BoundBox area )
+-        : Objective( ID, location, area )
+-{
+-    MapInterface::pointXYtoMapXY( location, &amp;outpost_map_loc );
+-    objective_state.selection_box.max = location + iXY( 64, 32 );
+-    objective_state.selection_box.min = location + iXY( -224, -128 );
+-    objective_state.area.min = iXY( -400, -144 );
+-    objective_state.area.max = iXY(  400,  240 );
+-    objective_state.outpost_type = 0;
+-    
+-
+-    unit_generation_type = 0;
+-    occupation_status_timer.changePeriod( 3 );
+-    unit_generation_timer.changePeriod( 1 );
+-    unit_collection_loc = outpost_map_loc + iXY( 13, 13 );
+-    unit_generation_loc = iXY( 1, 3 );
+-    occupation_pad_offset = iXY( 224, 48 );
+-    unit_generation_on_flag = false;
+-}
+-
+-void
+-Outpost::attemptOccupationChange(UnitID unit_id)
+-{
+-    ObjectiveOccupationUpdate update_mesg;
+-    int player_status;
+-
+-    UnitBase* unit = UnitInterface::getUnit(unit_id);
+-    PlayerState* player = unit-&gt;player;
+-    player_status = player-&gt;getStatus();
+-
+-    if ( objective_state.occupation_status == _occupation_status_unoccupied )
+-    {
+-        if ( player_status == _player_state_active )
+-        {
+-            objective_state.occupying_player = player;
+-            objective_state.occupying_player-&gt;incObjectivesHeld();
+-            objective_state.occupation_status = _occupation_status_occupied;
+-
+-            update_mesg.status_update.set(objective_state.ID,
+-                        objective_state.occupation_status,
+-                        objective_state.occupying_player-&gt;getID(),
+-                        unit_generation_on_flag,
+-                        unit_generation_type,
+-                        Uint32(unit_generation_timer.getTimeLeft() * 128.0));
+-            SERVER-&gt;broadcastMessage(&amp;update_mesg, sizeof(ObjectiveOccupationUpdate));
+-
+-            const PlayerState *player_state = objective_state.occupying_player;
+-            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;'%s' has been occupied by '%s'&quot;,
+-                    objective_state.name, player_state-&gt;getName().c_str() );
+-        }
+-    }
+-    else if (objective_state.occupying_player != player)
+-    {
+-        if( player_status == _player_state_active  )
+-        {
+-            objective_state.occupying_player-&gt;decObjectivesHeld();
+-            objective_state.occupying_player = player;
+-            objective_state.occupying_player-&gt;incObjectivesHeld();
+-            objective_state.occupation_status = _occupation_status_occupied;
+-            update_mesg.status_update.set(
+-                    objective_state.ID,
+-                    objective_state.occupation_status,
+-                    objective_state.occupying_player-&gt;getID(),
+-                    unit_generation_on_flag,
+-                    unit_generation_type,
+-                    Uint32(unit_generation_timer.getTimeLeft() * 128));
+-            SERVER-&gt;broadcastMessage(&amp;update_mesg,
+-                    sizeof(ObjectiveOccupationUpdate));
+-            const PlayerState *player = objective_state.occupying_player;
+-            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;'%s' has been occupied by '%s'&quot;,
+-                    objective_state.name, player-&gt;getName().c_str() );
+-        }
+-    }
+-}
+-
+-void
+-Outpost::checkOccupationStatus()
+-{
+-    if( occupation_status_timer.count()  )	//
+-    {
+-        UnitBase *unit_ptr;
+-        iRect bounding_area;
+-        iXY occupation_pad_loc;
+-
+-        occupation_pad_loc = objective_state.location + occupation_pad_offset;
+-        bounding_area = objective_state.capture_area.getAbsRect( occupation_pad_loc );
+-
+-
+-        UnitInterface::queryClosestUnit( &amp;unit_ptr,
+-                                          bounding_area,
+-                                          occupation_pad_loc
+-                                        );
+-
+-        if ( unit_ptr != 0 )
+-        {
+-            iXY unit_loc;
+-            unit_loc = unit_ptr-&gt;unit_state.location;
+-            if ( objective_state.capture_area.bounds( occupation_pad_loc, unit_loc ) ) {
+-                attemptOccupationChange( unit_ptr-&gt;id );
+-            }
+-
+-        } // ** if unit_ptr != 0
+-
+-    } // ** if occupation_status_timer.count()
+-
+-}
+-
+-void
+-Outpost::generateUnits()
+-{   // XXX CHECK
+-    if ( NetworkState::status == _network_state_server )
+-    {
+-        if ( (unit_generation_on_flag == true) &amp;&amp;
+-            (objective_state.occupation_status == _occupation_status_occupied) )
+-        {
+-            if( (unit_generation_timer.count() == true) )
+-            {
+-                UnitBase *unit;
+-                iXY gen_loc;
+-                gen_loc = outpost_map_loc + unit_generation_loc;
+-
+-                unit = UnitInterface::createUnit(unit_generation_type,
+-                        gen_loc, objective_state.occupying_player-&gt;getID());
+-
+-                if ( unit != 0 )
+-                {
+-                    UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(),
+-                            unit-&gt;id, gen_loc.x, gen_loc.y,
+-                            unit_generation_type);
+-                    SERVER-&gt;broadcastMessage(&amp;create_mesg, sizeof(UnitRemoteCreate));
+-
+-                    UMesgAICommand ai_command;
+-                    PlacementMatrix placement_matrix;
+-                    iXY collection_loc, loc;
+-
+-                    collection_loc = /*outpost_map_loc +*/ unit_collection_loc;
+-
+-                    placement_matrix.reset( collection_loc );
+-                    placement_matrix.getNextEmptyLoc( &amp;loc );
+-
+-                    ai_command.setHeader( unit-&gt;id, _umesg_flag_unique );
+-                    ai_command.setMoveToLoc( loc );
+-                    UnitInterface::sendMessage( &amp;ai_command );
+-                }
+-            } // ** if
+-        } // ** if
+-    } // ** if ( objective_state.occupation_status == _occupation_status_unoccupied )
+-    else
+-    {
+-        if( (unit_generation_timer.count() == true) )
+-        {
+-            unit_generation_timer.reset();
+-        }
+-    }
+-
+-}
+-
+-void
+-Outpost::updateStatus()
+-{
+-    if ( NetworkState::status == _network_state_server ) {
+-        checkOccupationStatus();
+-    }
+-
+-    generateUnits();
+-
+-}
+-
+-void
+-Outpost::objectiveMesgChangeOutputLocation(const ObjectiveMessage* message)
+-{
+-    ChangeOutputLocation *msg;
+-    msg = (ChangeOutputLocation *) message;
+-    iXY temp;
+-    MapInterface::pointXYtoMapXY(iXY(msg-&gt;getPointX(), msg-&gt;getPointY()),
+-            &amp;temp );
+-    unit_collection_loc = temp;
+-}
+-
+-void
+-Outpost::objectiveMesgChangeUnitGeneration(const ObjectiveMessage* message)
+-{
+-    ChangeUnitGeneration *unit_gen_mesg;
+-    UnitProfile *profile;
+-
+-    unit_gen_mesg = (ChangeUnitGeneration *) message;
+-
+-    unit_generation_type = unit_gen_mesg-&gt;unit_type;
+-    unit_generation_on_flag = unit_gen_mesg-&gt;unit_gen_on;
+-
+-    profile = UnitProfileInterface::getUnitProfile( unit_generation_type );
+-    unit_generation_timer.changePeriod( (float) profile-&gt;regen_time );
+-}
+-
+-void
+-Outpost::objectiveMesgDisownPlayerObjective(const ObjectiveMessage* message)
+-{
+-    const DisownPlayerObjective *disown_mesg =
+-        (const DisownPlayerObjective *) message;
+-
+-    if( objective_state.occupation_status == _occupation_status_occupied ) {
+-        if (disown_mesg-&gt;getDisownedPlayerID() ==
+-                objective_state.occupying_player-&gt;getID() ) {
+-            objective_state.occupation_status = _occupation_status_unoccupied;
+-
+-            ObjectiveOccupationUpdate update_mesg;
+-            update_mesg.status_update.set( objective_state.ID,
+-                                           objective_state.occupation_status,
+-                                           0,
+-                                           false,
+-                                           0,
+-                                           0);
+-
+-            SERVER-&gt;broadcastMessage(&amp;update_mesg, sizeof(ObjectiveOccupationUpdate));
+-
+-            unit_generation_type = 0;
+-            UnitProfile *profile
+-                = UnitProfileInterface::getUnitProfile( unit_generation_type );
+-            unit_generation_timer.changePeriod( (float) profile-&gt;regen_time );
+-            unit_generation_on_flag = false;
+-        }
+-    }
+-}
+-
+-void
+-Outpost::getOutpostStatus( OutpostStatus &amp;status )
+-{
+-    UnitProfile *profile;
+-
+-    status.unit_generation_type = unit_generation_type;
+-    status.unit_generation_on_off = unit_generation_on_flag;
+-    status.unit_collection_loc = unit_collection_loc;
+-
+-    profile = UnitProfileInterface::getUnitProfile( unit_generation_type );
+-    if ( profile )
+-        status.unit_generation_time = (float) profile-&gt;regen_time;
+-    else
+-        status.unit_generation_time = 0;
+-
+-    if ( unit_generation_on_flag == true ) {
+-        status.unit_generation_time_remaining = unit_generation_timer.getTimeLeft();
+-    } else {
+-        status.unit_generation_time_remaining = 0;
+-    }
+-
+-}
+-
+-void
+-Outpost::processMessage(const ObjectiveMessage* message)
+-{
+-    switch(message-&gt;message_type) {
+-        case _objective_mesg_change_unit_generation:
+-            objectiveMesgChangeUnitGeneration(message);
+-            break;
+-
+-        case _objective_mesg_disown_player_objective:
+-            objectiveMesgDisownPlayerObjective(message);
+-            break;
+-            
+-        case _objective_mesg_change_output_location:
+-            objectiveMesgChangeOutputLocation(message);
+-            break;
+-    }
+-
+-    Objective::processMessage(message);
+-}
+-
+-void
+-Outpost::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -1,68 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _OUTPOST_HPP
+-#define _OUTPOST_HPP
+-
+-#include &quot;Objectives/Objective.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
+-#include &quot;Units/UnitBase.hpp&quot;
+-
+-class Outpost : public Objective
+-{
+-private:
+-    unsigned char outpost_state;
+-    iXY outpost_map_loc;
+-    iXY unit_generation_loc;
+-    iXY unit_collection_loc;
+-    iXY occupation_pad_offset;
+-public:
+-    unsigned short unit_generation_type;
+-    bool unit_generation_on_flag;
+-
+-public:
+-    Timer occupation_status_timer;
+-    Timer unit_generation_timer;
+-
+-private:
+-    void attemptOccupationChange(UnitID unit_id);
+-
+-    void checkOccupationStatus( void );
+-
+-    void generateUnits( void );
+-
+-    // ** Message Handlers **
+-    void objectiveMesgChangeUnitGeneration(const ObjectiveMessage* message);
+-    void objectiveMesgDisownPlayerObjective(const ObjectiveMessage* message);
+-    void objectiveMesgChangeOutputLocation(const ObjectiveMessage* message);
+-
+-public:
+-
+-    Outpost( ObjectiveID ID, iXY location, BoundBox area );
+-
+-    void getOutpostStatus( OutpostStatus &amp;status );
+-
+-    virtual void processMessage(const ObjectiveMessage* message);
+-
+-    virtual void updateStatus();
+-
+-    virtual void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-};
+-
+-#endif // ** _OUTPOST_HPP
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -18,26 +18,25 @@
+  * Created on September 20, 2008, 10:49 AM
+  */
+ 
+-#include &quot;Util/NTimer.hpp&quot;
+-
+-
+-#include &quot;Util/Log.hpp&quot;
+ #include &quot;MiniMap.hpp&quot;
++#include &quot;MouseEvent.hpp&quot;
+ 
+-
+-// work in progres first has to change the input handling of game.
+-
+ #include &quot;Core/CoreTypes.hpp&quot;
+-#include &quot;Views/Components/MiniMap.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
++
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;MouseEvent.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+-#include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;PowerUps/EnemyRadarPowerUp.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+ 
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
++
++#include &quot;PowerUps/EnemyRadarPowerUp.hpp&quot;
++
++#include &quot;Util/NTimer.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
+ MiniMap::MiniMap(int x, int y, int w, int h) : mousepos(0,0)
+ {
+     setLocation(x, y);
+@@ -151,35 +150,39 @@
+ MiniMap::drawObjectives(Surface &amp;dest)
+ {
+     iRect objective_rect, map_rect;
+-    unsigned char objective_status;
+     PIX color;
+     ObjectiveID objective_id;
+ 
+-    ObjectiveInterface::startObjectivePositionEnumeration();
++    Objective* obj;
++    ObjectiveID max_objective = ObjectiveInterface::getObjectiveCount();
+ 
+-    while( ObjectiveInterface::objectivePositionEnumeration( &amp;objective_rect, &amp;objective_status, &amp;objective_id ) )
++    for ( objective_id = 0; objective_id &lt; max_objective; ++objective_id)
+     {
+-        ObjectiveState * obj_state = ObjectiveInterface::getObjectiveState(objective_id);
+-
+-	switch( objective_status )
++        // don't check for null must be always there
++        obj = ObjectiveInterface::getObjective(objective_id);
++        if ( obj-&gt;occupying_player )
+         {
+-            case _objective_disposition_unoccupied :
+-                color = Color::white;
+-                break;
+-
+-            case _objective_disposition_player :
++            if ( obj-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
++            {
+                 color = gameconfig-&gt;getPlayerOutpostRadarColor();
+-                break;
+-
+-            case _objective_disposition_allie :
++            }
++            else if ( PlayerInterface::isAllied(obj-&gt;occupying_player-&gt;getID(),
++                                                PlayerInterface::getLocalPlayerIndex()) )
++            {
+                 color = gameconfig-&gt;getAlliedOutpostRadarColor();
+-                break;
+-
+-            case _objective_disposition_enemy :
+-                color = obj_state-&gt;occupying_player-&gt;getColor();
+-                break;
++            }
++            else
++            {
++                color = obj-&gt;occupying_player-&gt;getColor();
++            }
+         }
++        else
++        {
++            color = Color::white;
++        }
+ 
++        objective_rect = obj-&gt;area.getAbsRect( obj-&gt;location );
++
+         // magic 32 to convert from point to tile
+         map_rect.min.x = int(float(objective_rect.min.x/32) / xratio)+position.x;
+         map_rect.min.y = int(float(objective_rect.min.y/32) / yratio)+position.y;
+@@ -199,17 +202,16 @@
+ //        }
+ 
+         //LOG((&quot;%d&quot;, obj_state.outpost_type));
+-        if(objective_status == _objective_disposition_player)
++        if ( obj-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
+         {
+-            OutpostStatus status = ObjectiveInterface::getOutpostStatus(objective_id);
+             //Only draw our unit collection location
+             iXY objdest, src;
+-            MapInterface::mapXYtoPointXY(status.unit_collection_loc, &amp;objdest);
++            MapInterface::mapXYtoPointXY(obj-&gt;unit_collection_loc, &amp;objdest);
+             objdest.x = int(float(objdest.x/32) / xratio)+position.x;
+             objdest.y = int(float(objdest.y/32) / yratio)+position.y;
+             
+-            src.x  = int(float(obj_state-&gt;location.x/32) / xratio)+position.x;
+-            src.y  = int(float(obj_state-&gt;location.y/32) / yratio)+position.y;
++            src.x  = int(float(obj-&gt;location.x/32) / xratio)+position.x;
++            src.y  = int(float(obj-&gt;location.y/32) / yratio)+position.y;
+             dest.drawLine(src.x, src.y, objdest.x, objdest.y, color);
+         }
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -122,7 +122,6 @@
+ 
+     UnitInterface::offloadGraphics( SPRITE_SORTER );
+     ProjectileInterface::offloadGraphics( SPRITE_SORTER );
+-    ObjectiveInterface::offloadGraphics( SPRITE_SORTER );
+     PowerUpInterface::offloadGraphics( SPRITE_SORTER );
+ 
+     SPRITE_SORTER.blitLists(&amp;clientArea);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -16,23 +16,31 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+-#include &quot;Util/Exception.hpp&quot;
+ #include &quot;VehicleSelectionView.hpp&quot;
+-#include &quot;Units/UnitTypes.hpp&quot;
+-#include &quot;Views/GameViewGlobals.hpp&quot;
++
+ #include &quot;Classes/Network/TerminalNetMesg.hpp&quot;
++#include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
++
+ #include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
++
+ #include &quot;Util/Math.hpp&quot;
++#include &quot;Util/Exception.hpp&quot;
++
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
++#include &quot;Objectives/Objective.hpp&quot;
++
+ #include &quot;Units/UnitProfileInterface.hpp&quot;
+ #include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Units/UnitTypes.hpp&quot;
++
++#include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Label.hpp&quot;
+@@ -49,17 +57,15 @@
+     }
+     
+     // Send the server the selected unit and whether factory power is on.
+-    TerminalOutpostUnitGenRequest term_mesg;
++    ObjectiveChangeGeneratingUnit msg;
+     
+-    term_mesg.unit_gen_request.set( CURRENT_SELECTED_OUTPOST_ID,
+-                                   (char) vsvSelectedUnit,
+-                                   vsvUnitGenOn );
++    msg.set( CURRENT_SELECTED_OUTPOST_ID, (char) vsvSelectedUnit, vsvUnitGenOn );
+     
+-    CLIENT-&gt;sendMessage(&amp;term_mesg, sizeof(term_mesg));
++    CLIENT-&gt;sendMessage(&amp;msg, sizeof(msg));
+     
+-    if(NetworkState::status == _network_state_client) {
+-        ObjectiveInterface::sendMessage( &amp;(term_mesg.unit_gen_request) );
+-    }
++//    if(NetworkState::status == _network_state_client) {
++//        ObjectiveInterface::sendMessage( &amp;(term_mesg.unit_gen_request) );
++//    }
+ }
+ 
+ static void bOK()
+@@ -134,14 +140,13 @@
+ 
+ void activateVehicleSelectionView(ObjectiveID outpost_id)
+ {
+-    OutpostStatus outpost_status;
+-
+     CURRENT_SELECTED_OUTPOST_ID = outpost_id;
+ 
+-    outpost_status  = ObjectiveInterface::getOutpostStatus(CURRENT_SELECTED_OUTPOST_ID);
+-    vsvSelectedUnit = outpost_status.unit_generation_type;
+-    vsvUnitGenOn    = outpost_status.unit_generation_on_off;
++    Objective* obj = ObjectiveInterface::getObjective(outpost_id);
+ 
++    vsvSelectedUnit = obj-&gt;unit_generation_type;
++    vsvUnitGenOn    = obj-&gt;unit_generation_on_flag;
++
+     if (vsvUnitGenOn) {
+         VehicleSelectionView::setPowerOn();
+     } else {
+@@ -301,7 +306,7 @@
+ //--------------------------------------------------------------------------
+ void VehicleSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    if ( ObjectiveInterface::getObjectiveState(CURRENT_SELECTED_OUTPOST_ID)-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
++    if ( ObjectiveInterface::getObjective(CURRENT_SELECTED_OUTPOST_ID)-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
+     {
+         Desktop::setVisibilityNoDoAnything(&quot;VehicleSelectionView&quot;, false);
+         changeMade = false;
+@@ -379,10 +384,18 @@
+ 
+     bltViewBackground(viewArea);
+ 
+-    OutpostStatus outpost_status;
++    Objective* obj = ObjectiveInterface::getObjective(CURRENT_SELECTED_OUTPOST_ID);
+ 
+-    outpost_status = ObjectiveInterface::getOutpostStatus( CURRENT_SELECTED_OUTPOST_ID );
++    int remaining_time = 0;
++    int generation_time = 0;
+ 
++    if ( obj-&gt;unit_generation_on_flag )
++    {
++        remaining_time = obj-&gt;unit_generation_timer.getTimeLeft();
++        UnitProfile* profile = UnitProfileInterface::getUnitProfile(obj-&gt;unit_generation_type);
++        generation_time = profile-&gt;regen_time;
++    }
++
+     if (vsvUnitGenOn)
+     {
+         sprintf(strBuf, &quot;%s&quot;, getUnitName(vsvSelectedUnit));
+@@ -390,10 +403,8 @@
+                                 strBuf, color);
+ 
+         sprintf(strBuf, &quot;%01d:%02d/%01d:%02d&quot;,
+-                    ((int)outpost_status.unit_generation_time_remaining) / 60,
+-                    ((int)outpost_status.unit_generation_time_remaining) % 60,
+-                    ((int)outpost_status.unit_generation_time) / 60,
+-                    ((int)outpost_status.unit_generation_time) % 60);
++                        remaining_time / 60, remaining_time % 60,
++                        generation_time / 60, generation_time % 60);
+          
+         clientArea.bltString(   timeRequiredPos.x, timeRequiredPos.y, 
+                                 strBuf, color);
+@@ -509,162 +520,96 @@
+ //---------------------------------------------------------------------------
+ void VehicleSelectionView::drawMiniProductionStatus(Surface &amp;dest)
+ {
++    char strBuf[256];
++    char outpostNameBuf[256];
++    char productionUnitBuf[256];
++    char timeLeftBuf[256];
+     iRect         objectiveBounds;
+-    unsigned char objectiveOwner;
+     iRect         gameViewRect;
+-    OutpostStatus outpostStatus;
+-    ObjectiveID   objectiveID = 0;
+ 
+     WorldViewInterface::getViewWindow(&amp;gameViewRect);
+-    ObjectiveInterface::startObjectivePositionEnumeration();
+ 
+-    while(ObjectiveInterface::objectivePositionEnumeration(&amp;objectiveBounds, &amp;objectiveOwner, &amp;objectiveID )) {
+-        char strBuf[256];
+-        char outpostNameBuf[256];
+-        char productionUnitBuf[256];
+-        char timeLeftBuf[256];
+-        ObjectiveState *objective_state;
++    ObjectiveID objective_id;
+ 
+-        objective_state = ObjectiveInterface::getObjectiveState( objectiveID );
++    Objective* obj;
++    ObjectiveID max_objective = ObjectiveInterface::getObjectiveCount();
+ 
+-        switch(objectiveOwner) {
+-            //break;
++    for ( objective_id = 0; objective_id &lt; max_objective; ++objective_id)
++    {
++        obj = ObjectiveInterface::getObjective( objective_id );
+ 
+-        case _objective_disposition_player: {
++        bool owned = obj-&gt;occupying_player &amp;&amp; obj-&gt;occupying_player == PlayerInterface::getLocalPlayer();
+ 
+-                iXY objectiveScreenPos(objectiveBounds.min - gameViewRect.min);
++        if ( ! displayOutpostNames &amp;&amp; ( ! owned || ! displayMiniProductionStatus ) )
++        {
++            continue;
++        }
+ 
+-                outpostStatus = ObjectiveInterface::getOutpostStatus(objectiveID);
++        miniProductionRect.min = obj-&gt;area.getAbsRect(obj-&gt;location).min - gameViewRect.min;
++        miniProductionRect.max.x = miniProductionRect.min.x + 140;
++        miniProductionRect.max.y = miniProductionRect.min.y + (owned ? 50 : 20);
+ 
+-                assert(screen-&gt;getDoesExist());
++        iXY pos(miniProductionRect.min);
++        pos.x += 4;
++        pos.y += 4;
+ 
+-                miniProductionRect.min   = objectiveScreenPos;
+-                miniProductionRect.max.x = 0;
+-                miniProductionRect.max.y = miniProductionRect.min.y + 50;
++        // Make sure the name will fit reasonably in the area.
++        int length = strlen( obj-&gt;name );
++        if (length &gt; 20)
++        {
++            strncpy(strBuf, (const char *) obj-&gt;name , 20);
++            sprintf(outpostNameBuf, &quot;Outpost:    %s...&quot;, strBuf);
++        }
++        else
++        {
++            sprintf(outpostNameBuf, &quot;Outpost:    %s&quot;, (const char *) obj-&gt;name );
++        }
+ 
+-                if (!displayMiniProductionStatus &amp;&amp; !displayOutpostNames) {
+-                    return;
+-                }
++        checkMiniProductionRect(outpostNameBuf);
+ 
+-                if (!outpostStatus.unit_generation_on_off) {
+-                    miniProductionRect.max.x = miniProductionRect.min.x + 140;
++        if ( owned )
++        {
++            if ( ! obj-&gt;unit_generation_on_flag )
++            {
++                // Objective is off.
++                dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
+ 
+-                    iXY pos;
+-
+-                    pos.x = miniProductionRect.min.x + 4;
+-                    pos.y = miniProductionRect.min.y + 4;
+-
+-
+-                    // Make sure the name will fit reasonably in the area.
+-                    int length = strlen( objective_state-&gt;name );
+-                    if (length &gt; 20) {
+-                        strncpy(strBuf, (const char *) objective_state-&gt;name , 20);
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s...&quot;, strBuf);
+-
+-                    } else {
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s&quot;, (const char *) objective_state-&gt;name );
+-                    }
+-                    checkMiniProductionRect(outpostNameBuf);
+-
+-
+-                    //pos.x = (miniProductionRect.getSizeX() - strlen(&quot;Production Off&quot;) * CHAR_XPIX) / 2 + miniProductionRect.min.x;
+-                    //pos.y = (miniProductionRect.getSizeY() - CHAR_YPIX) / 2 + miniProductionRect.min.y;
+-
+-                    // Objective is off.
+-                    dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
+-
+-                    dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
+-                    pos.y += 16;
+-                    dest.bltString(pos.x, pos.y, &quot;Production Off&quot;, Color::white);
+-
+-                } else {
+-                    // Objective is on.
+-
+-                    iXY pos;
+-                    pos.x = miniProductionRect.min.x + unitImages.getWidth() + 4;
+-                    pos.y = miniProductionRect.min.y + 4;
+-
+-                    // Make sure the name will fit reasonably in the area.
+-                    int length = strlen( objective_state-&gt;name );
+-                    if (length &gt; 20) {
+-                        strncpy(strBuf, (const char *) objective_state-&gt;name , 20);
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s...&quot;, strBuf);
+-
+-                    } else {
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s&quot;, (const char *) objective_state-&gt;name );
+-                    }
+-                    checkMiniProductionRect(outpostNameBuf);
+-
+-                    sprintf(productionUnitBuf, &quot;Production: %s&quot;,
+-                            getUnitName(outpostStatus.unit_generation_type));
+-                    checkMiniProductionRect(productionUnitBuf);
+-
+-                    sprintf(timeLeftBuf, &quot;Time Left:  %01d:%02d&quot;,
+-                            ((int)outpostStatus.unit_generation_time_remaining)
+-                                / 60,
+-                            ((int)outpostStatus.unit_generation_time_remaining)
+-                                % 60);
+-                    checkMiniProductionRect(timeLeftBuf);
+-
+-                    dest.bltLookup(miniProductionRect,
+-                            Palette::darkGray256.getColorArray());
+-
+-                    dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
+-                    pos.y += 16;
+-                    dest.bltString(pos.x, pos.y, productionUnitBuf, Color::white);
+-                    pos.y += 16;
+-                    dest.bltString(pos.x, pos.y, timeLeftBuf, Color::white);
+-                    pos.y += 16;
+-
+-                    // Draw the current production unit image.
+-                    drawUnitImage(dest, miniProductionRect.min + iXY(1,1), outpostStatus.unit_generation_type);
+-                }
+-
+-                //vsvUnitGenOn    = outpost_status.unit_generation_on_off;
+-
++                dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, &quot;Production Off&quot;, Color::white);
+             }
+-            break;
++            else
++            {
++                // Objective is on.
++                pos.x += unitImages.getWidth();
+ 
+-        case _objective_disposition_allie :
+-        case _objective_disposition_enemy :
+-        case _objective_disposition_unoccupied : {
+-                if( displayOutpostNames == true ) {
+-                    iXY objectiveScreenPos(objectiveBounds.min - gameViewRect.min);
++                sprintf(productionUnitBuf, &quot;Production: %s&quot;, getUnitName(obj-&gt;unit_generation_type));
++                checkMiniProductionRect(productionUnitBuf);
+ 
+-                    assert(screen-&gt;getDoesExist());
++                float tleft = obj-&gt;unit_generation_timer.getTimeLeft();
++                sprintf(timeLeftBuf, &quot;Time Left:  %01d:%02d&quot;,
++                        ((int)tleft) / 60,
++                        ((int)tleft) % 60);
++                checkMiniProductionRect(timeLeftBuf);
+ 
+-                    miniProductionRect.min   = objectiveScreenPos;
+-                    miniProductionRect.max.x = 0;
+-                    miniProductionRect.max.y = miniProductionRect.min.y + 20;
++                dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
+ 
+-                    miniProductionRect.max.x = miniProductionRect.min.x + 140;
++                dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, productionUnitBuf, Color::white);
++                pos.y += 16;
++                dest.bltString(pos.x, pos.y, timeLeftBuf, Color::white);
++                pos.y += 16;
+ 
+-                    iXY pos;
+-
+-                    pos.x = miniProductionRect.min.x + 4;
+-                    pos.y = miniProductionRect.min.y + 4;
+-
+-
+-                    // Make sure the name will fit reasonably in the area.
+-                    int length = strlen( objective_state-&gt;name );
+-                    if (length &gt; 20) {
+-                        strncpy(strBuf, (const char *) objective_state-&gt;name , 20);
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s...&quot;, strBuf);
+-
+-                    } else {
+-                        sprintf(outpostNameBuf, &quot;Outpost:    %s&quot;, (const char *) objective_state-&gt;name );
+-                    }
+-                    checkMiniProductionRect(outpostNameBuf);
+-
+-                    dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
+-
+-                    dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
+-                }
++                // Draw the current production unit image.
++                drawUnitImage(dest, miniProductionRect.min + iXY(1,1), obj-&gt;unit_generation_type);
+             }
+-            break;
+-
+         }
+-
++        else
++        {
++            dest.bltLookup(miniProductionRect, Palette::darkGray256.getColorArray());
++            dest.bltString(pos.x, pos.y, outpostNameBuf, Color::white);
++        }
+     }
+ 
+ } // end VehicleSelectionView::drawMiniProductionStatus
+
+Modified: trunk/netpanzer/support/macosx/make_appbundle.sh
+===================================================================
+--- trunk/netpanzer/support/macosx/make_appbundle.sh	2010-02-12 13:07:01 UTC (rev 1215)
++++ trunk/netpanzer/support/macosx/make_appbundle.sh	2010-05-25 16:27:27 UTC (rev 1216)
+@@ -41,7 +41,7 @@
+ echo &quot;.&quot;
+ 
+ echo &quot;Copying needed frameworks...&quot;
+-cp -R /Library/Frameworks/SDL{,_image}.framework &quot;${CONTENTSDIR}/Frameworks&quot;
++cp -R /Library/Frameworks/SDL{,_mixer}.framework &quot;${CONTENTSDIR}/Frameworks&quot;
+ 
+ echo &quot;Creating info files...&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000243.html">[Netpanzer-cvs] r1217 - in trunk/netpanzer: . src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Objectives	src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

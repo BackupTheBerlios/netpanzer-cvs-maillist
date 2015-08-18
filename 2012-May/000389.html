@@ -1,0 +1,581 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1365 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/Units	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1365%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/menu%20src/Lib/2D%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Units%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game&In-Reply-To=%3C20120516131150.43BCA55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000388.html">
+   <LINK REL="Next"  HREF="000390.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1365 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/Units	src/NetPanzer/Views/Components src/NetPanzer/Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1365%20-%20in%20trunk/netpanzer%3A%0A%09pics/backgrounds/menus/menu%20src/Lib/2D%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Units%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game&In-Reply-To=%3C20120516131150.43BCA55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1365 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/Units	src/NetPanzer/Views/Components src/NetPanzer/Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Wed May 16 15:11:50 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000388.html">[Netpanzer-cvs] r1364 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/Lib/2D src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000390.html">[Netpanzer-cvs] r1366 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#389">[ date ]</a>
+              <a href="thread.html#389">[ thread ]</a>
+              <a href="subject.html#389">[ subject ]</a>
+              <a href="author.html#389">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-05-16 15:11:49 +0200 (Wed, 16 May 2012)
+New Revision: 1365
+
+Added:
+   trunk/netpanzer/pics/backgrounds/menus/menu/vs.bmp
+Modified:
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/Lib/2D/Palette.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+Log:
+TeamMode : 
+ - Some bugs resolved
+ - Disable all command in prepare screen, only chat work
+ - better random camera move
+ - add vs logo in prepare screen
+ - player request change team in game only all 2 minutes
+
+Added: trunk/netpanzer/pics/backgrounds/menus/menu/vs.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/backgrounds/menus/menu/vs.bmp
+___________________________________________________________________
+Added: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -45,6 +45,7 @@
+ ColorTable Palette::gray128;
+ ColorTable Palette::gray256;
+ ColorTable Palette::darkGray256;
++ColorTable Palette::darkbrown256;
+ ColorTable Palette::brightness256;
+ ColorTable Palette::red32;
+ ColorTable Palette::green32;
+@@ -134,6 +135,15 @@
+         darkGray256.setColor(num, int(findNearestColor(c, c, c))); // dark gray
+     }
+ 
++    darkbrown256.init(256);
++    for (num = 0; num &lt; 256; num++) {
++        // the magic values are for palete color 33
++        int r = abs(color[num].r - 0x16)/4.5;
++        int g = abs(color[num].g - 0x1a)/4.5;
++        int b = abs(color[num].b - 0x19)/4.5;
++        darkbrown256.setColor(num, int(findNearestColor(0x16 + r,0x1a + g,0x19 + b)));
++    }
++
+     red256.init(256);
+     for (num = 0; num &lt; 256; num++) {
+         red256.setColor(num, int(findNearestColor(color[num].r, 0, 0))); 
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.hpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/Lib/2D/Palette.hpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -65,6 +65,7 @@
+     static ColorTable gray128;
+     static ColorTable gray256;
+     static ColorTable darkGray256;
++    static ColorTable darkbrown256;
+     static ColorTable brightness256;
+     static ColorTable red256;
+     static ColorTable green256;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -18,13 +18,26 @@
+ 
+ #include &quot;ViewCamera.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &lt;time.h&gt;
+ 
++char getmoveratio()
++{
++// return range (-3 -&gt; 3) without 0
++    char ratio = 0;
++    while (ratio == 0)
++    {
++        ratio = -3+rand()%7;
++    }
++    return ratio;
++}
++
+ ViewCamera::ViewCamera()
+ {
+     loc.x = 0;
+     loc.y = 0;
+-    move.x = 1;
+-    move.y = -1;
++    srand(time(NULL));
++    move.x = getmoveratio();
++    move.y = getmoveratio();
+ }
+ 
+ void ViewCamera::scrollPlusX( long scroll_increment )
+@@ -106,7 +119,7 @@
+     }
+     else
+     {
+-        move.y = -move.y;
++        move.y = getmoveratio();
+     }
+ 
+     if ( (view.x-(view_size.x/2) &gt;= 0) &amp;&amp; (view.x+(view_size.x/2) &lt;= map_size.x) )
+@@ -115,7 +128,7 @@
+     }
+     else
+     {
+-        move.x = -move.x;
++        move.x = getmoveratio();
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -1100,6 +1100,22 @@
+     working_list.validateList();
+ }
+ 
++void WorldInputCmdProcessor::processChat()
++{
++    switch( keyboard_input_mode ) {
++    case _keyboard_input_mode_command :
++        if ( (KeyboardInterface::getKeyPressed( SDLK_RETURN ) == true))
++        {
++            setKeyboardInputModeChatMesg();
++        }
++        break;
++
++    case _keyboard_input_mode_chat_mesg :
++        keyboardInputModeChatMesg();
++        break;
++    }
++}
++
+ bool
+ WorldInputCmdProcessor::getConsoleInputString(char *input_string)
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -109,6 +109,7 @@
+     WorldInputCmdProcessor();
+ 
+     void process(bool process_mouse = true);
++    void processChat();
+ 
+     void inFocus();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -27,6 +27,7 @@
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
++#include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/StringUtil.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+@@ -101,7 +102,6 @@
+ {
+     int team_id;
+     int lowTeam = 0, countPlayers = Teams_lists[ 0 ].countPlayers();
+-
+     for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
+     {
+         if (Teams_lists[ team_id ].countPlayers() &lt; countPlayers)
+@@ -340,7 +340,7 @@
+         ConsoleInterface::postMessage(Color::yellow, false, 0,
+                                       &quot;%s has changed to team %s.&quot;,
+                                       PlayerInterface::getPlayer(player_id)-&gt;getName().c_str(),
+-                                      Teams_lists[current_team].getName().c_str());
++                                      Teams_lists[team_idx].getName().c_str());
+ }
+ 
+ void TeamManager::PlayerRequestReady(PlayerID player_id)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -1,16 +1,16 @@
+ /*
+ Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+- 
++
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+- 
++
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+- 
++
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -28,6 +28,7 @@
+     static Uint8 max_Teams;
+ 
+ public:
++
+     static void initialize(const Uint8 _max_teams);
+     static Uint8 getTeamColor(Uint8 team_id);
+     static void reset();
+@@ -35,10 +36,13 @@
+     static void addPlayerinTeam(PlayerID player_id, Uint8 team_id);
+     static void BalancedTeam();
+     static void removePlayer(PlayerID player_id, Uint8 team_id);
+-    
++
+     static void cleanUp();
+ 
+-    static PlayerID getMaxteams(){return max_Teams;}
++    static PlayerID getMaxteams()
++    {
++        return max_Teams;
++    }
+     static iXY getPlayerSpawnPoint(PlayerID player_id);
+ 
+     static short getKills( Uint8 team_id );
+@@ -49,12 +53,12 @@
+     static bool testRuleScoreLimit( long score_limit );
+     static bool testRuleObjectiveRatio( float precentage );
+     static void drawFlag( Uint8 team_id, Surface &amp;dest, int x, int y);
+-    
++
+     static void PlayerrequestchangeTeam(PlayerID player_id, Uint8 newteam);
+     static void serverrequestchangeTeam(PlayerID player_id, Uint8 team_idx);
+     static void PlayerchangeTeam(PlayerID player_id, Uint8 team_idx);
+     static void SpawnTeams();
+-    
++
+     static bool CheckisPlayerReady();
+     static bool isPlayerReady(PlayerID player_id);
+     static void PlayerRequestReady(PlayerID player_id);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -397,6 +397,7 @@
+         {
+             unit_placement_matrix.getNextEmptyLoc( &amp;next_loc );
+             unit = createUnit(unit_type_index, next_loc, player_id);
++            if (unit == 0) return;
+             UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(), unit-&gt;id,
+                     next_loc.x, next_loc.y, unit-&gt;unit_state.unit_type);
+             if ( !encoder.encodeMessage(&amp;create_mesg, sizeof(create_mesg)) )
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cssButton.hpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -79,7 +79,7 @@
+         dirty = true;
+     }
+     
+-    bool isEnable()
++    bool isEnable() const
+     {
+         return enabled;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -23,17 +23,13 @@
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/TeamManager.hpp&quot;
+-#include &quot;Views/Components/cButton.hpp&quot;
++#include &quot;Util/Timer.hpp&quot;
++
+  
+- 
+ static const char * stats_format = &quot;%-20s%6i%7i%6i&quot;;
+ static Uint8 newteam = 0;
+- 
+-static void bChangeTeam()
+-{
+-    TeamManager::PlayerrequestchangeTeam(PlayerInterface::getLocalPlayerIndex(), newteam);
+-}
+- 
++static Timer chantetimer;
++
+ GTeamView::GTeamView() : GameTemplateView()
+ {
+     setSearchName(&quot;GTeamView&quot;);
+@@ -46,6 +42,8 @@
+     setBordered(false);
+  
+     loaded = false; 
++    chantetimer.changePeriod(2); //2 sec on start
++    chantetimer.reset();
+ }
+  
+ void GTeamView::init()
+@@ -58,24 +56,31 @@
+     firstrect.min.x = (viewrect.getSizeX()/2) - 350;
+     firstrect.min.y = (viewrect.getSizeY()/2) - 250;
+     firstrect.max.x = firstrect.min.x + 350;
+-    firstrect.max.y = firstrect.min.y + 500;
++    firstrect.max.y = firstrect.min.y + 400;
+  
+     secondrect.min.x = firstrect.max.x+30;
+     secondrect.min.y = firstrect.min.y;
+     secondrect.max.x = secondrect.min.x + 350;
+-    secondrect.max.y = secondrect.min.y + 500;
++    secondrect.max.y = firstrect.max.y;
+  
+-    addButtonCenterText( iXY(firstrect.max.x+2, firstrect.min.y+18), 28, &quot;&lt;-&gt;&quot;, &quot;&quot;, bChangeTeam);
++    changebutton = cssButton::createcssButton( &quot;changeteam&quot;, &quot; &gt;&gt; &quot;, iXY(firstrect.max.x+1, ((firstrect.getSizeY()/2)-10)), (secondrect.min.x-firstrect.max.x));
++    add(changebutton);
+     loaded = true;
++    if (!chantetimer.count()) changebutton-&gt;Disable();
+ }
+  
+ void GTeamView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+-    clientArea.BltRoundRect(firstrect, 14, Palette::darkGray256.getColorArray());
+-    clientArea.RoundRect(firstrect,14, Color::gray);
++    if (!changebutton-&gt;isEnable() &amp;&amp; chantetimer.count())
++    {
++        changebutton-&gt;Enable();
++    }
++
++    clientArea.BltRoundRect(firstrect, 14, Palette::darkbrown256.getColorArray());
++    clientArea.RoundRect(firstrect,14, 15);
+  
+-    clientArea.BltRoundRect(secondrect, 14, Palette::darkGray256.getColorArray());
+-    clientArea.RoundRect(secondrect,14, Color::gray);
++    clientArea.BltRoundRect(secondrect, 14, Palette::darkbrown256.getColorArray());
++    clientArea.RoundRect(secondrect,14, 15);
+  
+     drawTeams(clientArea);
+     View::doDraw(viewArea, clientArea);
+@@ -151,10 +156,12 @@
+             if (current_Team &gt; 0)
+             {
+                 newteam=0;
++                changebutton-&gt;setLabel(&quot;&lt;&lt;&quot;);
+             }
+             else
+             {
+                 newteam=1;
++                changebutton-&gt;setLabel(&quot;&gt;&gt;&quot;);
+             }
+         }
+         else
+@@ -196,4 +203,24 @@
+ {
+     COMMAND_PROCESSOR.process(false);
+ }
+- 
+\ No newline at end of file
++
++void GTeamView::onComponentClicked(Component* c)
++{
++    if ( c == changebutton &amp;&amp; chantetimer.count())
++    {
++        TeamManager::PlayerrequestchangeTeam(PlayerInterface::getLocalPlayerIndex(), newteam);
++        chantetimer.changePeriod(120); //2 minutes after first change
++        chantetimer.reset();
++        changebutton-&gt;Disable();
++    }
++    else
++    {
++        View::onComponentClicked(c);
++    }
++}
++void GTeamView::resize(const iXY &amp;size)
++{
++    View::resize(size);
++    init();
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.hpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -22,6 +22,7 @@
+ #include &lt;vector&gt;
+ #include &quot;GameTemplateView.hpp&quot;
+ #include &quot;2D/Surface.hpp&quot;
++#include &quot;Views/Components/cssButton.hpp&quot;
+ 
+ class PlayerState;
+ 
+@@ -34,6 +35,7 @@
+     iRect secondrect;
+     std::vector&lt;const PlayerState*&gt; states;
+     void drawTeams(Surface &amp;dest);
++    cssButton * changebutton;
+ 
+ public:
+     GTeamView();
+@@ -45,6 +47,8 @@
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
+     virtual void checkResolution(iXY oldResolution, iXY newResolution);
+     virtual void processEvents();
++    virtual void onComponentClicked(Component* c);
++    virtual void resize(const iXY &amp;size);
+ 
+     void init();
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.cpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -26,6 +26,8 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
++#include &quot;Interfaces/KeyboardInterface.hpp&quot;
++#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Views/Components/cButton.hpp&quot;
+ #include &quot;Views/Components/cssButton.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+@@ -45,6 +47,7 @@
+     setVisible(false);
+     setBordered(false);
+     menuImage.loadBMP(&quot;pics/backgrounds/menus/menu/canon.bmp&quot;);
++    vsImage.loadBMP(&quot;pics/backgrounds/menus/menu/vs.bmp&quot;);
+ 
+     loaded = false;
+ }
+@@ -61,7 +64,7 @@
+     rect.min.x = menuImageXY.x+ ((menuImage.getWidth()-500)/2);
+     rect.min.y = menuImageXY.y+menuImage.getHeight();
+     rect.max.x = rect.min.x+500;
+-    rect.max.y = rect.min.y+350;
++    rect.max.y = rect.min.y+330;
+ 
+     firstrect.min.x = rect.min.x+7;
+     firstrect.min.y = rect.min.y+7;
+@@ -77,7 +80,6 @@
+     add(changebutton);
+     readybutton = cssButton::createcssButton( &quot;ready&quot;, &quot;Ready&quot;, iXY(firstrect.max.x+10, (firstrect.min.y+85)), (secondrect.min.x-firstrect.max.x)-20);
+     add(readybutton);
+-
+     loaded = true;
+ }
+ 
+@@ -91,6 +93,7 @@
+     clientArea.RoundRect(secondrect,10, TeamManager::getTeamColor(1));
+     DrawInfo(clientArea);
+     drawTeams(clientArea);
++    vsImage.bltTrans(clientArea, firstrect.max.x+10, firstrect.max.y-vsImage.getHeight()-10);
+     View::doDraw(viewArea, clientArea);
+ }
+ 
+@@ -259,7 +262,7 @@
+ 
+ void PrepareTeam::processEvents()
+ {
+-    COMMAND_PROCESSOR.process(false);
++    COMMAND_PROCESSOR.processChat();
+ }
+ 
+ void PrepareTeam::onComponentClicked(Component* c)
+@@ -274,6 +277,10 @@
+         changebutton-&gt;Disable();
+         readybutton-&gt;Disable();
+     }
++    else
++    {
++        View::onComponentClicked(c);
++    }
+ }
+ 
+ void PrepareTeam::resize(const iXY &amp;size)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-05-14 15:52:41 UTC (rev 1364)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/PrepareTeam.hpp	2012-05-16 13:11:49 UTC (rev 1365)
+@@ -38,7 +38,7 @@
+     void drawTeams(Surface &amp;dest);
+     void DrawInfo(Surface &amp;dest);
+     iXY menuImageXY;
+-    Surface menuImage;
++    Surface menuImage, vsImage;
+     cssButton * changebutton;
+     cssButton * readybutton;
+ 
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000388.html">[Netpanzer-cvs] r1364 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/Lib/2D src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000390.html">[Netpanzer-cvs] r1366 - trunk/netpanzer/src/NetPanzer/Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#389">[ date ]</a>
+              <a href="thread.html#389">[ thread ]</a>
+              <a href="subject.html#389">[ subject ]</a>
+              <a href="author.html#389">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

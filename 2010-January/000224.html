@@ -1,0 +1,362 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1198 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1198%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Classes%20NetPanzer/Interfaces%20NetPanzer/Network&In-Reply-To=%3C201001231645.o0NGjq4G003766%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000223.html">
+   <LINK REL="Next"  HREF="000225.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1198 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Network</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1198%20-%20in%20trunk/netpanzer/src%3A%20Lib/Network%0A%09NetPanzer/Classes%20NetPanzer/Interfaces%20NetPanzer/Network&In-Reply-To=%3C201001231645.o0NGjq4G003766%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1198 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan 23 17:45:52 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000223.html">[Netpanzer-cvs] r1197 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000225.html">[Netpanzer-cvs] r1199 - in trunk/netpanzer: .	src/NetPanzer/Classes/Network support/macosx support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-23 17:45:36 +0100 (Sat, 23 Jan 2010)
+New Revision: 1198
+
+Modified:
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+Log:
+- allow to show/hide player names using key &quot;n&quot;
+- disable tcp nagle algorithm, should improve lag.
+
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -145,6 +145,21 @@
+ }
+ 
+ void
++SocketBase::setNoDelay() throw(NetworkException)
++{
++    SETSOCKOPT_PARAMTYPE val = 1;
++    int res = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &amp;val, sizeof(val));
++    if(res == SOCKET_ERROR) {
++        lastError = GET_NET_ERROR();
++        doClose();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't set TCP_NODELAY: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
++    }
++}
++
++
++void
+ SocketBase::doListen() throw(NetworkException)
+ {
+     int res = listen(sockfd, 20);
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -55,6 +55,7 @@
+     
+ 
+     void setReuseAddr() throw(NetworkException);
++    void setNoDelay() throw(NetworkException);
+     void doClose();
+     
+     void bindSocketTo(const Address&amp; toaddr) throw(NetworkException);
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -44,6 +44,7 @@
+ #include &lt;sys/socket.h&gt;
+ #include &lt;sys/types.h&gt;
+ #include &lt;netinet/in.h&gt;
++#include &lt;netinet/tcp.h&gt;
+ #include &lt;arpa/inet.h&gt;
+ #include &lt;netdb.h&gt;
+ #include &lt;fcntl.h&gt;
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -54,6 +54,7 @@
+         while ( (newsock=doAccept(newaddr)) != INVALID_SOCKET) {
+             newobserver = observer-&gt;onNewConnection(this, newaddr);
+             TCPSocket * newcon = new TCPSocket(newsock,newaddr,newobserver);
++            newcon-&gt;setNoDelay();
+             newcon-&gt;onConnected();
+         }
+     } catch (NetworkException e) {
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -41,6 +41,7 @@
+     : SocketBase(address,true), observer(o)
+ {
+     doConnect();
++    setNoDelay();
+ }
+ 
+ TCPSocket::~TCPSocket()
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionBoxSprite.cpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -103,7 +103,7 @@
+     } // ** box_state == true
+ 
+     // Draw the unit hitpoints.
+-    if ( gameconfig-&gt;drawunitdamage || (box_state == true) )
++    if ( GameConfig::interface_show_health || (box_state == true) )
+     {
+         // Draw a color coded hit bar.
+         Uint8 hitBarColor;
+@@ -139,20 +139,23 @@
+         //surface-&gt;drawHLine(min_abs.x, max_abs.y-3, max_abs.x+1, box_color);
+     }
+ 
+-    if ( gameconfig-&gt;drawunitflags == true )
++    if ( GameConfig::interface_show_flags == true )
+     {
+         //unit_flag.blt( *surface, iXY( min_abs.x, min_abs.y - unit_flag.getPix().y ) );
+         //surface-&gt;bltString(min_abs.x + 2, min_abs.y - 6, &quot;Panther1&quot;, Color::white);
+         unit_flag-&gt;blt( *surface, min_abs.x, min_abs.y-unit_flag-&gt;getHeight()-1 );
++    }
++
++    if ( GameConfig::interface_show_names == true )
++    {
+         if ( playerName.length() &gt; 0 )
+         {   // XXX dirty trick, I don't center the text, just &quot;by hand&quot;
+             surface-&gt;bltString(min_abs.x+unit_flag-&gt;getWidth() + 2,
+                            min_abs.y - unit_flag-&gt;getHeight() + 2 ,
+-                           playerName.c_str(), Color::white);
++                           playerName.c_str(), Color::gray224);
+         }
+     }
+ 
+-
+     /*
+     if ( (flag_visibility_state == true) &amp;&amp; (allie_state == true) )
+      { 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -293,12 +293,17 @@
+ 
+     if ( (KeyboardInterface::getKeyPressed( SDLK_f ) == true) )
+     {
+-        gameconfig-&gt;drawunitflags.toggle();
++        GameConfig::interface_show_flags = !GameConfig::interface_show_flags;
+     }
+     
++    if ( (KeyboardInterface::getKeyPressed( SDLK_n ) == true) )
++    {
++        GameConfig::interface_show_names = !GameConfig::interface_show_names;
++    }
++
+     if ( (KeyboardInterface::getKeyPressed( SDLK_d ) == true) )
+     {
+-        gameconfig-&gt;drawunitdamage.toggle();
++        GameConfig::interface_show_health = !GameConfig::interface_show_health;
+     }
+ 
+     if ( (KeyboardInterface::getKeyPressed( SDLK_RETURN ) == true)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -44,6 +44,9 @@
+ bool         GameConfig::video_usedirectx = true;
+ #endif
+ 
++bool GameConfig::interface_show_health = true;
++bool GameConfig::interface_show_flags = true;
++bool GameConfig::interface_show_names = true;
+ 
+ #define WRITE_BOOL(v) ((v)?&quot;true&quot;:&quot;false&quot;)
+ 
+@@ -78,16 +81,34 @@
+     {0,0}
+ };
+ 
++static const ScriptVarBindRecord interface_getters[] =
++{
++    { &quot;show_health&quot;,   GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_health },
++    { &quot;show_flags&quot;,    GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_flags },
++    { &quot;show_names&quot;,    GETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_names },
++    {0,0}
++};
++
++static const ScriptVarBindRecord interface_setters[] =
++{
++    { &quot;show_health&quot;,   SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_health },
++    { &quot;show_flags&quot;,    SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_flags },
++    { &quot;show_names&quot;,    SETSVTYPE_BOOLEAN, &amp;GameConfig::interface_show_names },
++    {0,0}
++};
++
+ void GameConfig::registerScript(const char * table_name)
+ {
+ //    ScriptManager::registerLib( table_name, video_methods);
+-    ScriptManager::bindStaticVariables(table_name, &quot;video&quot;, &quot;ConfigVideoMetaTable&quot;,
++    ScriptManager::bindStaticVariables(table_name, &quot;video&quot;,
++                                       &quot;ConfigVideoMetaTable&quot;,
+                                        video_getters, video_setters);
++    ScriptManager::bindStaticVariables(table_name, &quot;interface&quot;,
++                                       &quot;ConfigInterfaceMetaTable&quot;,
++                                       interface_getters, interface_setters);
+ 
+ }
+ 
+-
+-
+ GameConfig::GameConfig(const std::string&amp; configfile, bool usePhysFS)
+     // VariableName(&quot;Name&quot;, value [, minimum, maximum])
+     :
+@@ -133,9 +154,7 @@
+       vehicleselectioncolor(&quot;vehicleselectioncolor&quot;, _color_blue, 0, _color_last-1),
+       unitselectionmode(&quot;unitselectionmode&quot;, _unit_selection_box_draw_mode_rect_edges, 0, _unit_selection_box_draw_mode_last-1),
+       unitinfodrawlayer(&quot;unitinfodrawlayer&quot;, 0, 0, 1),
+-      drawunitdamage(&quot;drawunitdamage&quot;, true),
+       drawunitreload(&quot;drawunitreload&quot;, false),
+-      drawunitflags(&quot;drawunitflags&quot;, true),
+       consoletextdelay(&quot;consoletextdelay&quot;, 3, 1, 20),
+       consoletextusage(&quot;consoletextusage&quot;, 25, 1, 100),
+       scrollrate(&quot;scrollrate&quot;, 1000, 100, 10000),
+@@ -212,9 +231,7 @@
+     interfacesettings.push_back(&amp;vehicleselectioncolor);
+     interfacesettings.push_back(&amp;unitselectionmode);
+     interfacesettings.push_back(&amp;unitinfodrawlayer);
+-    interfacesettings.push_back(&amp;drawunitdamage);
+     interfacesettings.push_back(&amp;drawunitreload);
+-    interfacesettings.push_back(&amp;drawunitflags);
+     interfacesettings.push_back(&amp;consoletextdelay);
+     interfacesettings.push_back(&amp;consoletextusage);
+     interfacesettings.push_back(&amp;scrollrate);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -119,6 +119,10 @@
+     static bool         video_usedirectx;
+ #endif
+ 
++    static bool interface_show_health;
++    static bool interface_show_flags;
++    static bool interface_show_names;
++
+     // game Settings (there are not saved to disk)
+     ConfigInt       hostorjoin;         // 1=host, 2=join
+     ConfigBool      quickConnect;
+@@ -165,9 +169,7 @@
+     ConfigInt   vehicleselectioncolor;
+     ConfigInt   unitselectionmode;
+     ConfigInt   unitinfodrawlayer;
+-    ConfigBool  drawunitdamage;
+     ConfigBool  drawunitreload;
+-    ConfigBool  drawunitflags;
+     ConfigInt   consoletextdelay;
+     ConfigInt   consoletextusage;
+     ConfigInt   scrollrate;
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-01-23 13:35:01 UTC (rev 1197)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2010-01-23 16:45:36 UTC (rev 1198)
+@@ -103,22 +103,22 @@
+             }
+             memcpy(sendbuffer+sendpos, data, size);
+             sendpos += size;
+-            sendRemaining();
++//            sendRemaining(); // lets send later
+         }
+         else
+         {
+-            size_t s = socket-&gt;send(data, size);
+-            if ( s != size )
+-            {
+-                size_t remain = size-s;
+-                if ( remain &gt; sizeof(sendbuffer) )
++//            size_t s = socket-&gt;send(data, size); // lets send later
++//            if ( s != size )
++//            {
++//                size_t remain = size-s;
++                if ( size &gt; sizeof(sendbuffer) )
+                 {
+                     observer-&gt;onClientDisconected(this, &quot;Send data bigger than buffer, need to disconnect&quot;);
+                     return;
+                 }
+-                memcpy(sendbuffer, (char *)data+s, remain);
+-                sendpos = remain;
+-            }
++                memcpy(sendbuffer, (char *)data, size);
++                sendpos = size;
++//            }
+         }
+     }
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000223.html">[Netpanzer-cvs] r1197 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000225.html">[Netpanzer-cvs] r1199 - in trunk/netpanzer: .	src/NetPanzer/Classes/Network support/macosx support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

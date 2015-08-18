@@ -1,0 +1,494 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1014 - in trunk/netpanzer: . src/Lib/Network	src/Lib/physfs
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1014%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/Lib/physfs&In-Reply-To=%3C200712201652.lBKGqIvF031269%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000055.html">
+   <LINK REL="Next"  HREF="000057.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1014 - in trunk/netpanzer: . src/Lib/Network	src/Lib/physfs</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1014%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/Lib/physfs&In-Reply-To=%3C200712201652.lBKGqIvF031269%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1014 - in trunk/netpanzer: . src/Lib/Network	src/Lib/physfs">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec 20 17:52:18 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000055.html">[Netpanzer-cvs] r1013 - trunk/netpanzer/src/Lib/Network
+</A></li>
+        <LI>Next message: <A HREF="000057.html">[Netpanzer-cvs] r1015 - in trunk/netpanzer: . src/Lib/Util
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#56">[ date ]</a>
+              <a href="thread.html#56">[ thread ]</a>
+              <a href="subject.html#56">[ subject ]</a>
+              <a href="author.html#56">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-12-20 17:52:17 +0100 (Thu, 20 Dec 2007)
+New Revision: 1014
+
+Added:
+   trunk/netpanzer/src/Lib/physfs/Jamfile
+Removed:
+   trunk/netpanzer/src/Lib/Network/SocketSet.cpp
+Modified:
+   trunk/netpanzer/NetPanzer-windows.cbp
+   trunk/netpanzer/NetPanzer.cbp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+   trunk/netpanzer/src/Lib/Network/SocketSet.hpp
+Log:
+- looks like I forgot to add src/Lib/physfs/Jamfile to the repository
+- SocketManager autocleans bad sockets.
+
+Note: SocketManager now doesn't throw exceptions, if some error happen in 'select' it will print some error, needs to change that.
+
+
+Modified: trunk/netpanzer/NetPanzer-windows.cbp
+===================================================================
+--- trunk/netpanzer/NetPanzer-windows.cbp	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/NetPanzer-windows.cbp	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -87,7 +87,6 @@
+ 		&lt;Unit filename=&quot;src\Lib\Network\SocketHeaders.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\Network\SocketManager.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\Network\SocketManager.hpp&quot; /&gt;
+-		&lt;Unit filename=&quot;src\Lib\Network\SocketSet.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\Network\SocketSet.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\Network\TCPListenSocket.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src\Lib\Network\TCPListenSocket.hpp&quot; /&gt;
+
+Modified: trunk/netpanzer/NetPanzer.cbp
+===================================================================
+--- trunk/netpanzer/NetPanzer.cbp	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/NetPanzer.cbp	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -82,7 +82,6 @@
+ 		&lt;Unit filename=&quot;src/Lib/Network/SocketHeaders.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/Network/SocketManager.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/Network/SocketManager.hpp&quot; /&gt;
+-		&lt;Unit filename=&quot;src/Lib/Network/SocketSet.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/Network/SocketSet.hpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/Network/TCPListenSocket.cpp&quot; /&gt;
+ 		&lt;Unit filename=&quot;src/Lib/Network/TCPListenSocket.hpp&quot; /&gt;
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -32,6 +32,8 @@
+ #define IS_IGNORABLE_ERROR(code) (code==WSAEWOULDBLOCK)
+ #define IS_RECVFROM_IGNORABLE(code) ((code==WSAEWOULDBLOCK)||(code==WSAECONNRESET))
+ #define IS_SENDTO_IGNORABLE(code) ((code==WSAEWOULDBLOCK)||(code==WSAECONNRESET))
++#define IS_INVALID_SOCKET(code) (code==WSAENOTSOCK)
++#define IS_INTERRUPTED(code) (code==WSAEINTR)
+ #define SETSOCKOPT_PARAMTYPE char
+ #define SEND_FLAGS 0
+ #define RECV_FLAGS 0
+@@ -61,6 +63,8 @@
+ #define IS_IGNORABLE_ERROR(code) ((code==EAGAIN)||(code==EINTR))
+ #define IS_RECVFROM_IGNORABLE(code) ((code==EAGAIN)||(code==EINTR)||(code==ECONNREFUSED))
+ #define IS_SENDTO_IGNORABLE(code) ((code==EAGAIN)||(code==EWOULDBLOCK)||(code==EINTR)||(code==EPIPE)||(code==ECONNRESET))
++#define IS_INVALID_SOCKET(code) (code==EBADF)
++#define IS_INTERRUPTED(code) (code==EINTR)
+ #define SETSOCKOPT_PARAMTYPE int
+ #define SEND_FLAGS MSG_NOSIGNAL
+ #define RECV_FLAGS MSG_NOSIGNAL
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -16,7 +16,7 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include &lt;list&gt;
++#include &lt;sstream&gt;
+ #include &quot;SocketManager.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+@@ -32,27 +32,25 @@
+ {
+     SocketsIterator i;
+ 
+-    if (!newSockets.empty() || !deletedSockets.empty()) {
+-        if (!deletedSockets.empty()) {
+-            for (i = deletedSockets.begin(); i!=deletedSockets.end(); i++) {
+-                LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
+-                socketList.erase(*i);
+-                delete *i;
+-            }
+-            deletedSockets.clear();
++    if (!deletedSockets.empty()) {
++        for (i = deletedSockets.begin(); i!=deletedSockets.end(); i++) {
++            LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++            socketList.erase(*i);
++            delete *i;
+         }
++        deletedSockets.clear();
++    }
+ 
+-        if (!newSockets.empty()) {
+-            for (i = newSockets.begin(); i!=newSockets.end(); i++) {
+-                LOGGER.debug(&quot;SocketManager:: Adding socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
+-                socketList.insert(*i);
+-            }
+-            newSockets.clear();
++    if (!newSockets.empty()) {
++        for (i = newSockets.begin(); i!=newSockets.end(); i++) {
++            LOGGER.debug(&quot;SocketManager:: Adding socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++            socketList.insert(*i);
+         }
++        newSockets.clear();
+     }
+ 
+     // Make the socketset every time, not all OS works the same way
+-    SocketSet sset;
++    sset.clear();
+     for (i = socketList.begin(); i!=socketList.end(); i++) {
+         if ((*i)-&gt;isConnecting()) {
+             sset.addWrite(*i);
+@@ -61,19 +59,58 @@
+         }
+     }
+ 
+-    if (!sset.select(0))
++    int r = sset.select(0);
++    if ( !r ) // most common first
+         return;
++    
++    if ( r &gt; 0 ) {    
++        for (i = socketList.begin(); i!=socketList.end(); i++) {
++            if ((*i)-&gt;isConnecting()) {
++                if (sset.isWriteable(*i)) {
++                    (*i)-&gt;connectionFinished();
++                }
++            } else {
++                if (sset.dataAvailable(*i)) {
++                    (*i)-&gt;onDataReady();
++                }
++            }
++        }
++    } else { // some error happened
++        int error = sset.getError();
++        if ( IS_INVALID_SOCKET(error) ) {
++            removeInvalidSockets();
++        } else if ( !IS_INTERRUPTED(error) ) { // beware: is NOT interrupted
++            std::stringstream msg;
++            msg &lt;&lt; &quot;SocketManager: BAD BAD ERROR &quot; &lt;&lt; NETSTRERROR(error);
++            LOGGER.debug(msg.str().c_str());
++        }
++    }
++}
+ 
++void
++SocketManager::removeInvalidSockets()
++{
++    LOGGER.debug(&quot;Finding invalid sockets in the set...&quot;);
++    SocketsIterator i;
++    int error;
+     for (i = socketList.begin(); i!=socketList.end(); i++) {
++        sset.clear();
+         if ((*i)-&gt;isConnecting()) {
+-            if (sset.isWriteable(*i)) {
+-                sset.removeWrite(*i);
+-                sset.add(*i);
+-                (*i)-&gt;connectionFinished();
+-            }
++            sset.addWrite(*i);
+         } else {
+-            if (sset.dataAvailable(*i)) {
+-                (*i)-&gt;onDataReady();
++            sset.add(*i);
++        }
++
++        if ( sset.select() &lt; 0 ) {
++            error = GET_NET_ERROR();
++            if ( IS_INVALID_SOCKET(error) ) {
++                LOGGER.warning(&quot;SocketManager: FOUND Invalid socket, removing...&quot;);
++                (*i)-&gt;onSocketError();
++                removeSocket(*i);
++            } else {
++                std::stringstream msg;
++                msg &lt;&lt; &quot;SocketManager: Error while finding invalid sockets &quot; &lt;&lt; NETSTRERROR(error);
++                LOGGER.debug(msg.str().c_str());
+             }
+         }
+     }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -57,6 +57,8 @@
+             deletedSockets.insert(s);
+         }
+     }
++    
++    static void removeInvalidSockets();
+ 
+ private:
+     typedef set&lt;SocketBase *&gt; Sockets;
+
+Deleted: trunk/netpanzer/src/Lib/Network/SocketSet.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketSet.cpp	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/src/Lib/Network/SocketSet.cpp	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -1,96 +0,0 @@
+-/*
+-Copyright (C) 2004 by Matthias Braun &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">matze at braunis.de</A>&gt;
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-
+-#include &lt;sstream&gt;
+-
+-#include &quot;SocketHeaders.hpp&quot;
+-#include &quot;SocketSet.hpp&quot;
+-#include &quot;NetworkException.hpp&quot;
+-
+-namespace network
+-{
+-
+-SocketSet::SocketSet() : maxfd(0)
+-{
+-    FD_ZERO(&amp;readset);
+-    FD_ZERO(&amp;writeset);
+-}
+-
+-SocketSet::~SocketSet()
+-{
+-}
+-
+-void
+-SocketSet::clear()
+-{
+-    maxfd=0;
+-    FD_ZERO(&amp;readset);
+-    FD_ZERO(&amp;writeset);
+-}
+-
+-void
+-SocketSet::add(const SocketBase* socket)
+-{
+-    FD_SET(socket-&gt;sockfd, &amp;readset);
+-    SETMAXFD(maxfd,socket-&gt;sockfd);
+-}
+-
+-void
+-SocketSet::addWrite(const SocketBase* socket)
+-{
+-    FD_SET(socket-&gt;sockfd, &amp;writeset);
+-    SETMAXFD(maxfd,socket-&gt;sockfd);
+-}
+-
+-void
+-SocketSet::remove(const SocketBase* socket)
+-{
+-    FD_CLR(socket-&gt;sockfd, &amp;readset);
+-}
+-
+-void
+-SocketSet::removeWrite(const SocketBase* socket)
+-{
+-    FD_CLR(socket-&gt;sockfd, &amp;writeset);
+-}
+-
+-bool
+-SocketSet::select(unsigned int usec) throw(NetworkException)
+-{
+-    struct timeval timeout;
+-    timeout.tv_sec = usec/1000000;
+-    timeout.tv_usec = usec%1000000;
+-
+-#ifdef USE_WINSOCK
+-    if( (readset.fd_count==0) &amp;&amp; (writeset.fd_count==0) )
+-	return false;
+-#endif
+-    
+-    int res = ::select(maxfd+1, &amp;readset, &amp;writeset, 0, &amp;timeout);
+-    if ( res == SOCKET_ERROR ) {
+-        int error = GET_NET_ERROR();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Select failed: &quot; &lt;&lt; NETSTRERROR(error);
+-        throw NetworkException(msg.str());
+-    }
+-
+-    return res != 0;
+-}
+-
+-}
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketSet.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketSet.hpp	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/src/Lib/Network/SocketSet.hpp	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -20,7 +20,6 @@
+ 
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;SocketBase.hpp&quot;
+-#include &quot;NetworkException.hpp&quot;
+ #include &quot;Util/NoCopy.hpp&quot;
+ 
+ namespace network
+@@ -29,41 +28,81 @@
+ class SocketSet : public NoCopy
+ {
+ public:
+-    SocketSet();
+-    ~SocketSet();
++    SocketSet()
++    {
++        clear();
++    }
++    
++    ~SocketSet(){};
+ 
+-    void clear();
++    inline void clear()
++    {
++        FD_ZERO(&amp;readset);
++        FD_ZERO(&amp;writeset);
++        maxfd        = 0;
++        readset_ptr  = 0;
++        writeset_ptr = 0;
++    }
+     
+     /** add a socket to the set that should be watched */
+-    void add(const SocketBase* socket);
+-    void addWrite(const SocketBase* socket);
+-    
+-    /** removes a socket from the set */
+-    void remove(const SocketBase* socket);
+-    void removeWrite(const SocketBase* socket);
++    inline void add(const SocketBase* socket)
++    {
++        FD_SET(socket-&gt;sockfd, &amp;readset);
++        SETMAXFD(maxfd,socket-&gt;sockfd);
++        readset_ptr = &readset;
++    }
++
++    inline void addWrite(const SocketBase* socket)
++    {
++        FD_SET(socket-&gt;sockfd, &amp;writeset);
++        SETMAXFD(maxfd,socket-&gt;sockfd);
++        writeset_ptr = &writeset;
++    }
++
+     /** Waits for input on the sockets in the set until a socket has input or a
+      * timeout occurs. Returns false in case of timeout.
+      */
+-    bool select(unsigned int timeout_usec = 0) throw(NetworkException);
++    int select(unsigned int timeout_usec = 0)
++    {
++        if ( !readset_ptr &amp;&amp; !writeset_ptr )
++            return 0;
++
++        timeout.tv_sec = timeout_usec/1000000;
++        timeout.tv_usec = timeout_usec%1000000;
++        
++        int res = ::select(maxfd+1, readset_ptr, writeset_ptr, 0, &amp;timeout);
++        if ( res == SOCKET_ERROR ) {
++            select_error = GET_NET_ERROR();
++            return -1;
++        }
++
++        return res;
++    }
++
+     /** after a select call you can test with this function if a specific socket
+      * has data pending
+      */
+     
+-    bool dataAvailable(const SocketBase* socketbase) const
++    inline bool dataAvailable(const SocketBase* socketbase) const
+     {
+         return FD_ISSET(socketbase-&gt;sockfd, &amp;readset);
+     }
+     
+-    bool isWriteable(const SocketBase* socketbase) const
++    inline bool isWriteable(const SocketBase* socketbase) const
+     {
+         return FD_ISSET(socketbase-&gt;sockfd,&amp;writeset);
+     }
+     
++    inline int getError() const { return select_error; }
+     
+ private:
+     SOCKET maxfd;
+     fd_set readset;
+     fd_set writeset;
++    fd_set *readset_ptr;
++    fd_set *writeset_ptr;
++    struct timeval timeout;
++    int select_error;
+ };
+ 
+ }
+
+Added: trunk/netpanzer/src/Lib/physfs/Jamfile
+===================================================================
+--- trunk/netpanzer/src/Lib/physfs/Jamfile	2007-12-19 16:29:52 UTC (rev 1013)
++++ trunk/netpanzer/src/Lib/physfs/Jamfile	2007-12-20 16:52:17 UTC (rev 1014)
+@@ -0,0 +1,11 @@
++SubDir TOP src Lib physfs ;
++
++IncludeDir . ;
++
++SOURCES = [ Wildcard *.c *.h ] ;
++SOURCES += [ Wildcard archivers : *.c ] ;
++SOURCES += [ Wildcard platform : *.c *.cpp ] ;
++SOURCES += [ Wildcard zlib123 : *.c *.h ] ;
++
++Library npphysfs : $(SOURCES) : noinstall ;
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000055.html">[Netpanzer-cvs] r1013 - trunk/netpanzer/src/Lib/Network
+</A></li>
+	<LI>Next message: <A HREF="000057.html">[Netpanzer-cvs] r1015 - in trunk/netpanzer: . src/Lib/Util
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#56">[ date ]</a>
+              <a href="thread.html#56">[ thread ]</a>
+              <a href="subject.html#56">[ subject ]</a>
+              <a href="author.html#56">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

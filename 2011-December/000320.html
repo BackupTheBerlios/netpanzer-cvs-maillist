@@ -1,0 +1,926 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1294 - in trunk/netpanzer: pics/default scripts	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1294%20-%20in%20trunk/netpanzer%3A%20pics/default%20scripts%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu/Multi%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C20111201041548.772D74815C2%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000321.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1294 - in trunk/netpanzer: pics/default scripts	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1294%20-%20in%20trunk/netpanzer%3A%20pics/default%20scripts%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu/Multi%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C20111201041548.772D74815C2%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1294 - in trunk/netpanzer: pics/default scripts	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec  1 05:15:47 CET 2011</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000321.html">[Netpanzer-cvs] r1295 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Units NetPanzer/Views/Game NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#320">[ date ]</a>
+              <a href="thread.html#320">[ thread ]</a>
+              <a href="subject.html#320">[ subject ]</a>
+              <a href="author.html#320">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-01 05:15:47 +0100 (Thu, 01 Dec 2011)
+New Revision: 1294
+
+Added:
+   trunk/netpanzer/pics/default/lock.bmp
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp
+Log:
+Fix: showing IDs in the dedicated server console.
+
+New: Added password protection for private servers. Network protocol increased to 1104.
+
+The password is asked in the &quot;LoadingView&quot;.
+
+For quick connect there are two ways to ask for password:
+
+./netpanzer -c 1.2.3.4:3030 --password
+./netpanzer -c <A HREF="netpanzer://1.2.3.4:3030/p">netpanzer://1.2.3.4:3030/p</A>
+
+When --password or the url method with &quot;/p&quot; at the end is there, the LoadingView will ask for password before connecting to the server. The url way is usefull for the web server browser.
+
+The info socket also sends new parameter if password is needed:
+
+\password\{y,n}\
+
+when is 'y' it needs password, when is 'n' it doesn't.
+
+full example: gamename\netpanzer\protocol\1104\hostname\Player833\gameversion\svn-1293M\mapname\Cramped\mapcycle\Cramped, Tight Quarters, Two Villages\password\y\numplayers\0\maxplayers\8\empty\1\gamestyle\Objective\units_per_player\62\time\33\timelimit\50\fraglimit\500\objectivelimit\3\final\
+
+In the in game server broswer, the servers has a small &quot;red&quot; key on the left if they need password, this is pretty ugly but is the best I could do.
+
+The web serverbrowser should be modified to add to the netpanzer url &quot;/p&quot; at the end if the server requires password.
+
+Server admins can set the password with:
+/server gamepass &lt;new_password&gt;
+
+and can query the current password with:
+/server gamepass
+
+in the config file is saved as:
+game.gamepass = &quot;thesecretpassword&quot;
+
+extra note: I know I didn't want to add any new function for 0.8.4 ... but Mathias asked...
+
+
+
+Added: trunk/netpanzer/pics/default/lock.bmp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/netpanzer/pics/default/lock.bmp
+___________________________________________________________________
+Added: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -127,6 +127,20 @@
+         end
+     end,
+ 
++    gamepass_help = &quot;sets or get the password for connecting to the server&quot;,
++    gamepass = function(param, player)
++        if ( param == &quot;&quot; ) then
++            if ( config.game.gamepass == &quot;&quot; ) then
++                netpanzer.serversayto( player, &quot;There is no password set&quot;);
++            else
++                netpanzer.serversayto( player, &quot;Current game password: &quot; .. config.game.gamepass);
++            end
++        else
++            config.game.gamepass = param;
++            netpanzer.serversayto( player, &quot;Game password set to: &quot; .. config.game.gamepass);
++        end
++    end,
++
+     countdown_help = &quot;Do a countdown, use 'countdown &lt;time&gt; &lt;message&gt;'&quot;,
+     countdown = function(param, player)
+         local counttime, message = string.match(param, &quot;(%d+) *(.*)&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -75,7 +75,7 @@
+     failure_display_timer.changePeriod( 10 );
+     time_out_timer.changePeriod( _CLIENT_CONNECT_TIME_OUT_TIME );
+     time_out_counter = 0;
+-    connection_state = _connect_state_waiting_connect_start;
++    connection_state = _connect_state_waiting_link;
+ }
+ 
+ unsigned char ClientConnectDaemon::netMessageLinkAck(const NetMessage* message)
+@@ -114,8 +114,33 @@
+         failure_display_timer.reset();
+         break;
+ 
++    case _join_request_result_already_connected :
++        LoadingView::append( &quot;Link to Server FAILED!&quot; );
++        LoadingView::append( &quot;Your IP is already connected to this server&quot; );
++        LoadingView::append( &quot;The server limits multiple connections from same IP&quot; );
++        rval = _connect_state_connect_failure;
++        failure_display_timer.reset();
++        break;
++
++    case _join_request_result_wrong_password :
++        LoadingView::append( &quot;Link to Server FAILED!&quot; );
++        LoadingView::append( &quot;The password for server was wrong.&quot; );
++        rval = _connect_state_connect_failure;
++        failure_display_timer.reset();
++        break;
++
++    case _join_request_result_banned :
++        LoadingView::append( &quot;Link to Server FAILED!&quot; );
++        LoadingView::append( &quot;You are banned in this server&quot; );
++        rval = _connect_state_connect_failure;
++        failure_display_timer.reset();
++        break;
++
+     default:
+-        LOG ( (&quot;Unknown ACk result?!?&quot;) );
++        LoadingView::append( &quot;Link to Server FAILED!&quot; );
++        LoadingView::append( &quot;Unknown result sent from server&quot; );
++        rval = _connect_state_connect_failure;
++        failure_display_timer.reset();
+         break;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -38,6 +38,26 @@
+     protocol_version = htol32(version);
+ }
+ 
++void ClientConnectJoinRequest::setPassword(const NPString&amp; password)
++{
++    int copylen = std::min(password.size(), sizeof(this-&gt;password)-1);
++
++    if ( copylen &gt; 0 )
++    {
++        password.copy(this-&gt;password,copylen);
++    }
++
++    this-&gt;password[copylen] = 0;
++}
++
++void ClientConnectJoinRequest::getPassword(NPString&amp; password) const
++{
++    char pw[sizeof(this-&gt;password)];
++    memcpy(pw, this-&gt;password, sizeof(this-&gt;password));
++    pw[sizeof(pw)-1] = 0;
++    password.assign(pw);
++}
++
+ ClientConnectJoinRequestAck::ClientConnectJoinRequestAck()
+ {
+     message_class = _net_message_class_connect;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ConnectNetMessage.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -21,6 +21,7 @@
+ #include &lt;time.h&gt;
+ #include &quot;NetMessage.hpp&quot;
+ #include &quot;Classes/PlayerState.hpp&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+ enum { _net_message_id_connect_join_game_request,
+        _net_message_id_connect_join_game_request_ack,
+@@ -51,17 +52,22 @@
+ {
+ private:
+     Uint32 protocol_version;
++    char password[32];
+     
+ public:
+     ClientConnectJoinRequest();
+     Uint32 getProtocolVersion() const;
+     void setProtocolVersion(Uint32 version);
++    void setPassword( const NPString&amp; password );
++    void getPassword(NPString&amp; password) const;
++
+ } __attribute__((packed));
+ 
+ enum { _join_request_result_success,
+        _join_request_result_invalid_protocol,
+        _join_request_result_server_busy,
+        _join_request_result_already_connected,
++       _join_request_result_wrong_password,
+        _join_request_result_banned // XXX to be done
+      };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -58,6 +58,7 @@
+     connection_status = _connection_status_connected;
+ 
+     join_request.setProtocolVersion(NETPANZER_PROTOCOL_VERSION);
++    join_request.setPassword(password);
+ 
+     sendMessage( &amp;join_request, sizeof(ClientConnectJoinRequest));
+ }
+@@ -75,11 +76,12 @@
+     clientsocket=0;
+ }
+ 
+-bool NetworkClient::joinServer(const std::string&amp; server_name)
++bool NetworkClient::joinServer(const NPString&amp; server_name, const NPString&amp; password)
+ {
+     if ( clientsocket )
+         delete clientsocket;
+     clientsocket = 0;
++    this-&gt;password = password;
+     
+     LOG( (&quot;Trying to join server '%s'.\n&quot;, server_name.c_str()) );
+     try
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -18,7 +18,7 @@
+ #ifndef _NETWORK_CLIENT_HPP
+ #define _NETWORK_CLIENT_HPP
+ 
+-#include &lt;string&gt;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+ #include &quot;NetworkInterface.hpp&quot;
+ #include &quot;NetworkReturnCodes.hpp&quot;
+@@ -47,7 +47,7 @@
+     NetworkClient ();
+     virtual ~NetworkClient ();
+ 
+-    bool joinServer(const std::string&amp; server_name);
++    bool joinServer(const NPString&amp; server_name, const NPString&amp; password);
+     void partServer();
+ 
+     void sendMessage(const NetMessage* message, size_t size);
+@@ -60,6 +60,7 @@
+ 
+ private:
+     ClientSocket* clientsocket;
++    NPString password;
+ };
+ 
+ extern NetworkClient *CLIENT;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -792,18 +792,33 @@
+     ClientConnectJoinRequestAck join_request_ack;
+ 
+     join_request_ack.setResultCode(_join_request_result_success);
++    bool isbad = false;
++    NPString pass;
++    join_request_mesg-&gt;getPassword(pass);
+ 
+     if ( join_request_mesg-&gt;getProtocolVersion() != NETPANZER_PROTOCOL_VERSION )
+     {
+         join_request_ack.setResultCode(_join_request_result_invalid_protocol);
++        isbad = true;
+     }
+-    else
++
++    if ( !isbad &amp;&amp; GameConfig::game_gamepass-&gt;size() &gt; 0)
+     {
++        if ( GameConfig::game_gamepass-&gt;compare(pass) != 0 )
++        {
++            join_request_ack.setResultCode(_join_request_result_wrong_password);
++            isbad = true;
++        }
++    }
++
++    if ( !isbad )
++    {
+         if ( !ServerConnectDaemon::inConnectQueue( packet-&gt;fromClient ) )
+         {
+             if (connect_queue.size() &gt; 25)
+             {
+                 join_request_ack.setResultCode(_join_request_result_server_busy);
++                isbad = true;
+             }
+             else
+             {
+@@ -816,6 +831,11 @@
+     packet-&gt;fromClient-&gt;sendMessage(&amp;join_request_ack,
+                          sizeof(ClientConnectJoinRequestAck));
+     packet-&gt;fromClient-&gt;sendRemaining();
++
++    if ( isbad )
++    {
++        SERVER-&gt;dropClient(packet-&gt;fromClient);
++    }
+ }
+ 
+ void ServerConnectDaemon::processNetPacket(const NetPacket* packet)
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -19,7 +19,7 @@
+ #define __NETWORK_GLOBALS_HPP__
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+-#define NETPANZER_PROTOCOL_VERSION     1103
++#define NETPANZER_PROTOCOL_VERSION     1104
+ #define MASTERSERVER_PORT             28900
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -132,19 +132,19 @@
+     option&lt;std::string, true, false&gt; connect_option('c', &quot;connect&quot;,
+             &quot;Connect to the specified netpanzer server&quot;, &quot;&quot;);
+     commandline.add(&amp;connect_option);
+-    bool_option dedicated_option('d', &quot;dedicated&quot;,
+-            &quot;Run as dedicated server&quot;, false);
++    bool_option dedicated_option('d', &quot;dedicated&quot;, &quot;Run as dedicated server&quot;, false);
+     commandline.add(&amp;dedicated_option);
+-    option&lt;std::string, true, false&gt; bot_option('b', &quot;bot&quot;,
+-            &quot;Connect as bot to specific server&quot;, &quot;&quot;);
++    option&lt;std::string, true, false&gt; bot_option('b', &quot;bot&quot;, &quot;Connect as bot to specific server&quot;, &quot;&quot;);
+     commandline.add(&amp;bot_option);
++
++    bool_option need_password(0, &quot;password&quot;, &quot;Ask for password when connecting, only usefull on quick connect&quot;, false);
++    commandline.add(&amp;need_password);
++
+     option&lt;int&gt; port_option('p', &quot;port&quot;, &quot;Run server on specific port&quot;, 0);
+     commandline.add(&amp;port_option);
+-    bool_option debug_option('g', &quot;debug&quot;,
+-            &quot;Enable debug output&quot;, false);
++    bool_option debug_option('g', &quot;debug&quot;, &quot;Enable debug output&quot;, false);
+     commandline.add(&amp;debug_option);
+-    option&lt;std::string, true, false&gt; master_server_option('\0', &quot;master_server&quot;,
+-        &quot;Use 'none' if you dont want to use the master server&quot;, &quot;&quot;);
++    option&lt;std::string, true, false&gt; master_server_option('\0', &quot;master_server&quot;, &quot;Use 'none' if you dont want to use the master server&quot;, &quot;&quot;);
+     commandline.add(&amp;master_server_option);
+     option&lt;std::string, true, false&gt; game_config_option(0, &quot;game_config&quot;,
+         &quot;Which config file should be used (only files inside config directory)&quot;,
+@@ -274,9 +274,19 @@
+                 connecthost = connecthost.substr(12, connecthost.size()-12);
+                 std::string::size_type p = connecthost.find(&quot;/&quot;);
+                 if(p != std::string::npos) {
++                    if ( connecthost[p+1] == 'p' )
++                    {
++                        gameconfig-&gt;needPassword = true;
++                    }
+                     connecthost = connecthost.substr(0, p);
+                 }
+             }
++
++            if ( need_password.value() )
++            {
++                gameconfig-&gt;needPassword = true;
++            }
++
+             gameconfig-&gt;serverConnect = connecthost;
+             gameconfig-&gt;quickConnect = true;
+         }                                                               
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -82,7 +82,7 @@
+     GameManager::setNetPanzerGameOptions();
+     NetworkState::setNetworkStatus( _network_state_client );
+ 
+-    if (!CLIENT-&gt;joinServer(m_serverHost.c_str())) {
++    if (!CLIENT-&gt;joinServer(m_serverHost.c_str(), &quot;&quot;)) {
+         return false;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -140,7 +140,7 @@
+                     {
+                         //*Console::server
+                         std::cout
+-                            &lt;&lt; std::setw(3) &lt;&lt; i &lt;&lt; &quot; &quot;
++                            &lt;&lt; std::setw(3) &lt;&lt; static_cast&lt;int&gt;(i) &lt;&lt; &quot; &quot;
+                             &lt;&lt; std::setw(30) &lt;&lt; playerstate-&gt;getName() &lt;&lt; &quot; &quot;
+                             &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getKills() &lt;&lt; &quot; &quot;
+                             &lt;&lt; std::setw(4) &lt;&lt; playerstate-&gt;getLosses() &lt;&lt; &quot; &quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -56,6 +56,7 @@
+ NPString* GameConfig::game_unit_profiles = 0;
+ NPString* GameConfig::game_unit_spawnlist = 0;
+ NPString* GameConfig::game_adminpass = 0;
++NPString* GameConfig::game_gamepass = 0;
+ 
+ Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
+ 
+@@ -118,6 +119,7 @@
+     { &quot;unit_profiles&quot;,     GETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+     { &quot;unit_spawnlist&quot;,    GETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         GETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
++    { &quot;gamepass&quot;,          GETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
+     {0,0}
+ };
+ 
+@@ -131,6 +133,7 @@
+     { &quot;unit_profiles&quot;,     SETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+     { &quot;unit_spawnlist&quot;,    SETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         SETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
++    { &quot;gamepass&quot;,          SETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
+     {0,0}
+ };
+ 
+@@ -151,6 +154,11 @@
+         game_adminpass = new NPString(&quot;&quot;);
+     }
+ 
++    if ( ! game_gamepass )
++    {
++        game_gamepass = new NPString(&quot;&quot;);
++    }
++
+     ScriptManager::bindStaticVariables(table_name + &quot;.video&quot;,
+                                        &quot;ConfigVideoMetaTable&quot;,
+                                        video_getters, video_setters);
+@@ -170,6 +178,7 @@
+     :
+       hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
+       quickConnect(&quot;quickconnect&quot;, false),
++      needPassword(&quot;needpassword&quot;, false),
+       serverConnect(&quot;serverconnect&quot;, &quot;&quot;),
+     
+       playername(&quot;name&quot;, &quot;Player&quot;),
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -135,12 +135,14 @@
+     static NPString* game_unit_profiles; // &quot;,&quot; or space separated list of profiles to load
+     static NPString* game_unit_spawnlist; // &quot;,&quot; or space separated list with the numbers of each unit to spawn with
+     static NPString* game_adminpass;     // the secret password for admins
++    static NPString* game_gamepass;      // the secret password for entering game
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+ 
+     // game Settings (there are not saved to disk)
+     ConfigInt       hostorjoin;         // 1=host, 2=join
+     ConfigBool      quickConnect;
++    ConfigBool      needPassword;
+     ConfigString    serverConnect;      // server to connect to
+ 
+     // player settings
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -116,6 +116,7 @@
+     s &lt;&lt; statusHead
+       &lt;&lt; &quot;\\mapname\\&quot;    &lt;&lt; gameconfig-&gt;map
+       &lt;&lt; &quot;\\mapcycle\\&quot;   &lt;&lt; gameconfig-&gt;mapcycle
++      &lt;&lt; &quot;\\password\\&quot; &lt;&lt; (gameconfig-&gt;game_gamepass-&gt;size() == 0 ? 'n' : 'y')
+       &lt;&lt; &quot;\\numplayers\\&quot; &lt;&lt; (int)playingPlayers
+       &lt;&lt; &quot;\\maxplayers\\&quot; &lt;&lt; (int)maxPlayers;
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -180,7 +180,8 @@
+     Desktop::add(new LibView());
+     Desktop::add(new HelpScrollView());
+ 
+-    Desktop::add(new LoadingView());
++    LoadingView *lv = new LoadingView();
++    Desktop::add(lv);
+ 
+ 
+     Desktop::add(new MapSelectionView());
+@@ -208,6 +209,11 @@
+     Desktop::checkViewPositions(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+ 
+ 
++    if ( gameconfig-&gt;quickConnect &amp;&amp; gameconfig-&gt;needPassword )
++    {
++        lv-&gt;setNeedPassword(true);
++    }
++
+     //Test for new UI
+     //testpanel = new Panels::TestPanel(iXY(30, 60), &amp;fontManager);
+ }
+@@ -431,12 +437,16 @@
+     //reinitializeGameLogic();
+     NetworkState::setNetworkStatus( _network_state_client );
+ 
+-    CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect);
+     LoadingView::show();
++    LoadingView *lv = static_cast&lt;LoadingView*&gt;(Desktop::getView(&quot;LoadingView&quot;));
++    if ( ! lv-&gt;doesNeedPassword() )
++    {
++        CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect, &quot;&quot;);
++        ClientConnectDaemon::startConnectionProcess();
++        sound-&gt;playTankIdle();
++    }
++
+     ScriptManager::runFile(&quot;user_commands_load&quot;,&quot;scripts/usercommands.lua&quot;);
+-
+-    ClientConnectDaemon::startConnectionProcess();
+-    sound-&gt;playTankIdle();
+ }
+ 
+ bool PlayerGameManager::mainLoop()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -27,6 +27,8 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;InputEvent.hpp&quot;
+ 
++#include &lt;algorithm&gt;
++
+ const int RESIZE_WIDTH = 10;
+ const int RESIZE_XMIN  = RESIZE_WIDTH;
+ const int RESIZE_XMAX  = RESIZE_WIDTH * 3;
+@@ -1400,6 +1402,15 @@
+     return inputfield;
+ } // end addInputField
+ 
++void View::removeInputField(cInputField *cif)
++{
++    if ( cif )
++    {
++        inputFields.erase(std::remove(inputFields.begin(), inputFields.end(), cif), inputFields.end());
++        delete cif;
++    }
++}
++
+ //---------------------------------------------------------------------------
+ void View::add(DEFAULT_VIEW_BUTTON button)
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -29,6 +29,7 @@
+ #include &quot;MouseEvent.hpp&quot;
+ 
+ #include &lt;list&gt;
++#include &lt;algorithm&gt;
+ 
+ using namespace std;
+ 
+@@ -164,9 +165,11 @@
+ 
+     // Input Field Functions
+     cInputField* addInputField(const iXY &amp;pos, cInputFieldString *string, const char *excludedCharacters, const bool &amp;isSelected, const int maxCharCount);
++    void removeInputField(cInputField * cif);
+     int  findInputFieldContaining(const iXY &amp;pos);
+     void drawInputFields(Surface &amp;clientArea);
+ 
++
+     /////////////////////////////////
+     void draw(Surface&amp; drawon);
+     void showStatus(const char *string);
+@@ -256,6 +259,15 @@
+         focusComponent      = 0;
+     }
+ 
++    void removeComponent(Component *c)
++    {
++        components.erase(std::remove(components.begin(), components.end(), c), components.end());
++        if ( focusComponent == c )
++        {
++            focusComponent = 0;
++        }
++    }
++
+     // Accessor Functions.
+     inline const char *getSearchName() const
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -15,6 +15,8 @@
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Components/Label.hpp&quot;
++#include &quot;Classes/Network/NetworkClient.hpp&quot;
+ 
+ list&lt;string&gt; LoadingView::lines;
+ bool LoadingView::dirty = true;
+@@ -43,11 +45,17 @@
+     setDisplayStatusBar(false);
+     setVisible(false);
+     setBordered(false);
++    need_password = false;
++    password_str.init(&quot;&quot;, 31,31);
+ 
+     resize(800, 600);
+ 
+     addButtonCenterText(iXY(340, 15), 100, &quot;Abort&quot;, &quot;Cancel the joining of this game.&quot;, bAbort);
+ 
++
++    okButton = Button::createTextButton(&quot;OK&quot;, &quot;Enter&quot;, iXY(340,100), 100);
++    passwordLabel = new Label(340, 68, &quot;Game Password&quot;, Color::white);
++
+ }
+ 
+ 
+@@ -99,3 +107,42 @@
+     backgroundSurface.free();
+     surface.free();
+ }
++
++void
++LoadingView::setNeedPassword(bool need_password)
++{
++    if ( this-&gt;need_password != need_password )
++    {
++        this-&gt;need_password = need_password;
++        if ( need_password )
++        {
++            password_field = addInputField(iXY(175+88, 80), &amp;password_str, &quot;&quot;, true, 31);
++            add(okButton);
++            add(passwordLabel);
++        }
++        else
++        {
++            removeInputField(password_field);
++            removeComponent(okButton);
++            removeComponent(passwordLabel);
++            password_field = 0;
++        }
++    }
++}
++
++void
++LoadingView::onComponentClicked(Component* c)
++{
++    string cname = c-&gt;getName();
++    if ( !cname.compare(&quot;Button.OK&quot;) )
++    {
++        CLIENT-&gt;joinServer(gameconfig-&gt;serverConnect, NPString(password_str.getString()));
++        ClientConnectDaemon::startConnectionProcess();
++        sound-&gt;playTankIdle();
++        setNeedPassword(false);
++    }
++    else
++    {
++        View::onComponentClicked(c);
++    }
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -34,6 +34,8 @@
+ 
+ #define LINELIMIT 100
+ 
++class Label;
++
+ //---------------------------------------------------------------------------
+ class LoadingView : public View
+ {
+@@ -109,12 +111,22 @@
+     void doDraw(Surface &amp;viewArea, Surface &amp;clientArea);
+     void render();
+ 
++    void setNeedPassword(bool need_password);
++    bool doesNeedPassword() const { return need_password; }
++
++    void onComponentClicked(Component* c);
++
+ private:
+     static list&lt;string&gt; lines;
+     static bool dirty;
+ 
+     Surface backgroundSurface;
+     Surface surface;
++    bool need_password;
++    cInputFieldString password_str;
++    cInputField * password_field;
++    Button * okButton;
++    Label * passwordLabel;
+ };
+ 
+ #endif // end __LOADINGVIEW_HPP__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -72,6 +72,7 @@
+ 
+     if(gameconfig-&gt;hostorjoin == _game_session_join) {
+         gameconfig-&gt;serverConnect = IPAddressView::szServer.getString();
++        IPAddressView::szServer.setString(&quot;&quot;);
+     }
+     
+     serverlistview-&gt;endQuery();
+@@ -132,4 +133,4 @@
+         MenuTemplateView::onComponentClicked(c);
+     }
+ 
+-}
+\ No newline at end of file
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -24,7 +24,7 @@
+ 
+ ServerInfo::ServerInfo()
+     : port(0), status(QUERYING), players(0), maxplayers(0), ping(0),
+-      querystartticks(0), tryNum(0)
++      needs_password(false), querystartticks(0), tryNum(0)
+ {
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerInfo.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -51,6 +51,7 @@
+     std::string map;
+     int ping;
+     int protocol;
++    bool needs_password;
+ 
+     network::Address ipaddress;
+     Uint32 querystartticks;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -325,6 +325,8 @@
+         } else if(token == &quot;protocol&quot;) {
+             std::stringstream str(tokenizer.getNextToken());
+             str &gt;&gt; server-&gt;protocol;
++        } else if(token == &quot;password&quot;) {
++            server-&gt;needs_password = tokenizer.getNextToken().compare(&quot;y&quot;) == 0 ? true : false;
+         } else {
+             // handle more tokens...
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -29,7 +29,9 @@
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ 
++#include &quot;Views/Game/LoadingView.hpp&quot;
+ 
++
+ ServerListView* serverlistview = 0;
+ 
+ ServerListView::ServerListView()
+@@ -52,6 +54,8 @@
+     
+     // XXX ugly
+     serverlistview = this;
++
++    lock_image.loadBMP(&quot;pics/default/lock.bmp&quot;);
+ }
+ 
+ ServerListView::~ServerListView()
+@@ -165,7 +169,11 @@
+ 
+             char ssn[44];
+             SDL_strlcpy(ssn, server.name.c_str(), sizeof(ssn));
+-            clientArea.bltString(0,   y, ssn, textcolor);
++            if ( server.needs_password )
++            {
++                lock_image.blt(clientArea, 0, y);
++            }
++            clientArea.bltString(8,   y, ssn, textcolor);
+             clientArea.bltString(350, y, playerstr.str().c_str(), textcolor);
+             clientArea.bltString(400, y, server.map.c_str(), textcolor);
+             clientArea.bltString(550, y, pingstr.str().c_str(), textcolor);
+@@ -195,6 +203,12 @@
+     std::stringstream addr;
+     addr &lt;&lt; server.address &lt;&lt; ':' &lt;&lt; server.port;
+     IPAddressView::szServer.setString(addr.str());
++
++    LoadingView * lv = static_cast&lt;LoadingView*&gt;(Desktop::getView(&quot;LoadingView&quot;));
++    if ( lv )
++    {
++        lv-&gt;setNeedPassword(server.needs_password);
++    }
+     
+     return View::lMouseUp(down_pos, up_pos);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp	2011-11-29 16:53:37 UTC (rev 1293)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp	2011-12-01 04:15:47 UTC (rev 1294)
+@@ -39,6 +39,8 @@
+     masterserver::ServerList serverlist;
+     masterserver::ServerQueryThread* queryThread;
+ 
++    Surface lock_image;
++
+     static void buttonRefresh();
+ };
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000321.html">[Netpanzer-cvs] r1295 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Units NetPanzer/Views/Game NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#320">[ date ]</a>
+              <a href="thread.html#320">[ thread ]</a>
+              <a href="subject.html#320">[ subject ]</a>
+              <a href="author.html#320">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

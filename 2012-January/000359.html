@@ -1,0 +1,323 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1333 - in trunk/netpanzer: . src/Lib/2D	support/tools
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1333%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09support/tools&In-Reply-To=%3C20120111150748.1C3C1480D77%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000358.html">
+   <LINK REL="Next"  HREF="000360.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1333 - in trunk/netpanzer: . src/Lib/2D	support/tools</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1333%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09support/tools&In-Reply-To=%3C20120111150748.1C3C1480D77%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1333 - in trunk/netpanzer: . src/Lib/2D	support/tools">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jan 11 16:07:47 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000358.html">[Netpanzer-cvs] r1332 - in trunk/netpanzer: . src/NetPanzer/Units	support support/tools
+</A></li>
+        <LI>Next message: <A HREF="000360.html">[Netpanzer-cvs] r1334 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-11 16:07:47 +0100 (Wed, 11 Jan 2012)
+New Revision: 1333
+
+Added:
+   trunk/netpanzer/support/tools/bmp2pak.cpp
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/Lib/2D/PackedSurface.cpp
+   trunk/netpanzer/support/tools/pak2bmp.cpp
+Log:
+Added tool to convert from bmp (with the def file) to pak, make with 'scons bmp2pak'. Fixed little problem on pak2bmp if the pak path didn't have '/'. Fixed: Old netpanzer 'pack' and 'save' pak files functions was not doing the job as expected.
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-01-11 13:15:42 UTC (rev 1332)
++++ trunk/netpanzer/SConstruct	2012-01-11 15:07:47 UTC (rev 1333)
+@@ -249,7 +249,9 @@
+ netpanzer = env.Program( binpath+'netpanzer'+exeappend, env['NPSOURCES'])
+ 
+ pak2bmp = env.Program( binpath+'pak2bmp'+exeappend, 'support/tools/pak2bmp.cpp')
+-
+ Alias('pak2bmp',pak2bmp)
+ 
++bmp2pak = env.Program( binpath+'bmp2pak'+exeappend, 'support/tools/bmp2pak.cpp')
++Alias('bmp2pak',bmp2pak)
++
+ Default(netpanzer)
+
+Modified: trunk/netpanzer/src/Lib/2D/PackedSurface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/PackedSurface.cpp	2012-01-11 13:15:42 UTC (rev 1332)
++++ trunk/netpanzer/src/Lib/2D/PackedSurface.cpp	2012-01-11 15:07:47 UTC (rev 1333)
+@@ -168,6 +168,9 @@
+                 SpanHead *span = (SpanHead *)(packedDataChunk + curByteOffset);
+                 span-&gt;x1 = htol16(spanX1);
+                 span-&gt;len = htol16(spanLen);
++
++                // to make same files as old pak files, has to memset to 'cd'
++                memset(span+1,0xcd, newSize-curByteOffset-sizeof(SpanHead));
+                 memcpy(span + 1, &amp;rowPtr[spanX1], spanLen * sizeof(PIX));
+                 curByteOffset = newSize;
+             }
+@@ -258,6 +261,8 @@
+ 	file-&gt;writeSLE32(pix.x);
+ 	file-&gt;writeSLE32(pix.y);
+     
++        file-&gt;writeSLE32(frameCount);
++
+ 	// is this correct?!?
+ 	file-&gt;writeSLE32( *((Uint32*) (void*) (&amp;fps)) );
+ 
+
+Added: trunk/netpanzer/support/tools/bmp2pak.cpp
+===================================================================
+--- trunk/netpanzer/support/tools/bmp2pak.cpp	                        (rev 0)
++++ trunk/netpanzer/support/tools/bmp2pak.cpp	2012-01-11 15:07:47 UTC (rev 1333)
+@@ -0,0 +1,177 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &lt;cstdlib&gt;
++
++#include &quot;SDL.h&quot;
++
++#include &quot;Util/FileSystem.hpp&quot;
++#include &quot;2D/PackedSurface.hpp&quot;
++#include &quot;2D/Surface.hpp&quot;
++#include &quot;2D/Palette.hpp&quot;
++
++#include &lt;string&gt;
++#include &lt;sstream&gt;
++#include &lt;iomanip&gt;
++
++using namespace std;
++/*******************************************************************/
++// BEGIN hacks to avoid compiling everything just for this converter
++
++typedef const struct s_ScriptVarBindRecord ScriptVarBindRecord;
++struct lua_State;
++struct luaL_Reg;
++
++class ScriptManager
++{
++public:
++    static void runFileInTable(const NPString&amp; filename, const NPString&amp; table);
++    static void registerLib(const NPString&amp; libname, const luaL_Reg * functions);
++    static void bindStaticVariables(const NPString&amp; objectName,
++                                    const NPString&amp; metaName,
++                                    ScriptVarBindRecord * getters,
++                                    ScriptVarBindRecord * setters);
++};
++
++void ScriptManager::runFileInTable(const NPString &amp;filename, const NPString &amp;table)
++{
++    return;
++}
++
++void ScriptManager::registerLib(const NPString &amp;libname, const luaL_Reg *functions)
++{
++    return;
++}
++
++void ScriptManager::bindStaticVariables(const NPString &amp;objectName, const NPString &amp;metaName, ScriptVarBindRecord *getters, ScriptVarBindRecord *setters)
++{
++    return;
++}
++
++class ScriptHelper
++{
++public:
++    static int get_byte (lua_State *L, void *v);
++    static int set_byte (lua_State *L, void *v);
++};
++
++int ScriptHelper::get_byte(lua_State *L, void *v)
++{
++    return 0;
++}
++
++int ScriptHelper::set_byte(lua_State *L, void *v)
++{
++    return 0;
++}
++
++// END hacks
++/*******************************************************************/
++
++int main ( int argc, char** argv )
++{
++    printf(&quot;bmp2pak for NetPanzer V 1.0\n&quot;);
++    if (argc &lt; 3 )
++    {
++        printf(&quot;use: %s &lt;filename.def&gt; &lt;outfile.pak&gt;\n&quot;, argv[0]);
++        printf(&quot;note: even on windows the path must be separated by '/'\n&quot;);
++        printf(&quot;note2: the .bmp files has to be in same folder as .def file\n&quot;);
++        return 1;
++    }
++
++    string filename = argv[1];
++    string filename_noext = filename.substr(0,filename.size()-4);
++    string outfile = argv[2];
++
++    if ( ! PHYSFS_init(argv[0]) )
++    {
++        printf(&quot;Error initializing filesystem: %s&quot;, PHYSFS_getLastError());
++        return 1;
++    }
++
++    PHYSFS_addToSearchPath(PHYSFS_getBaseDir(), 1);
++    PHYSFS_setWriteDir(PHYSFS_getBaseDir());
++
++    FILE *f = fopen(filesystem::getRealWriteName(filename.c_str()).c_str(), &quot;r&quot;);
++    if ( !f )
++    {
++        printf(&quot;Error: cannot open def file %s\n&quot;, filename.c_str());
++        PHYSFS_deinit();
++        return 1;
++    }
++
++    int width = -1, height = -1;
++    int frames = -1;
++    float fps = -1;
++    int offset_x = -1, offset_y = -1;
++
++    bool isError = false;
++
++    isError = fscanf(f,&quot;size=%d,%d\n&quot;, &amp;width, &amp;height) != 2;
++    isError |= fscanf(f,&quot;frames=%d\n&quot;, &amp;frames) != 1;
++    isError |= fscanf(f,&quot;fps=%f\n&quot;, &amp;fps) != 1;
++    isError |= fscanf(f,&quot;offset=%d,%d\n&quot;, &amp;offset_x, &amp;offset_y) != 2;
++
++    fclose(f);
++
++    if ( isError )
++    {
++        printf(&quot;Error loading def file, check it\n&quot;);
++        PHYSFS_deinit();
++        return 1;
++    }
++
++    printf(&quot;size=%d,%d\n&quot;, width, height);
++    printf(&quot;frames=%d\n&quot;, frames);
++    printf(&quot;fps=%f\n&quot;, fps);
++    printf(&quot;offset=%d,%d\n&quot;, offset_x, offset_y);
++
++    Surface unpacked(width, height, frames);
++
++    unpacked.setFPS(fps);
++    unpacked.setOffsetX(offset_x);
++    unpacked.setOffsetY(offset_y);
++
++    Surface bmp;
++
++    for ( int n = 0; n &lt; frames; n++ )
++    {
++        std::stringstream bfile;
++        bfile &lt;&lt; filename_noext &lt;&lt; &quot;_&quot; &lt;&lt; n &lt;&lt; &quot;.bmp&quot;;
++
++        bmp.loadBMP(bfile.str().c_str());
++
++        printf(&quot;Loaded: %s\n&quot;, bfile.str().c_str());
++
++        unpacked.setFrame(n);
++        unpacked.fill(0);
++        bmp.blt(unpacked, 0, 0);
++    }
++
++
++    PackedSurface pak;
++    pak.pack(unpacked);
++    pak.setFPS(fps);
++    pak.save(outfile);
++
++    printf(&quot;Wrote to: %s\n&quot;, filesystem::getRealWriteName(outfile.c_str()).c_str());
++
++    PHYSFS_deinit();
++    printf(&quot;Exited cleanly\n&quot;);
++    return 0;
++}
+
+Modified: trunk/netpanzer/support/tools/pak2bmp.cpp
+===================================================================
+--- trunk/netpanzer/support/tools/pak2bmp.cpp	2012-01-11 13:15:42 UTC (rev 1332)
++++ trunk/netpanzer/support/tools/pak2bmp.cpp	2012-01-11 15:07:47 UTC (rev 1333)
+@@ -85,7 +85,7 @@
+ 
+ int main ( int argc, char** argv )
+ {
+-    printf(&quot;pak2bmp for NetPanzer V 1.0\n&quot;);
++    printf(&quot;pak2bmp for NetPanzer V 1.1\n&quot;);
+     if (argc &lt; 3 )
+     {
+         printf(&quot;use: %s &lt;filename&gt; &lt;output_folder&gt; [palette_file_optional]\n&quot;, argv[0]);
+@@ -98,7 +98,10 @@
+     }
+ 
+     string filename = argv[1];
+-    string filename_noext = filename.substr(filename.find_last_of('/'));
++
++    string::size_type last_slash = filename.find_last_of('/');
++
++    string filename_noext = filename.substr(last_slash != string::npos ? last_slash : 0);
+     filename_noext = filename_noext.substr(0,filename_noext.size()-4);
+     string palettefile = &quot;netp&quot;;
+     if ( argc &gt;= 4 )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000358.html">[Netpanzer-cvs] r1332 - in trunk/netpanzer: . src/NetPanzer/Units	support support/tools
+</A></li>
+	<LI>Next message: <A HREF="000360.html">[Netpanzer-cvs] r1334 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

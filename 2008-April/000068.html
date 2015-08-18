@@ -1,0 +1,1014 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1026 - in trunk/netpanzer: .	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1026%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu/Multi%0A%09src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200804271502.m3RF2DiT025669%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000067.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1026 - in trunk/netpanzer: .	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1026%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game%0A%09src/NetPanzer/Views/MainMenu/Multi%0A%09src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200804271502.m3RF2DiT025669%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1026 - in trunk/netpanzer: .	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Apr 27 17:02:13 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000067.html">[Netpanzer-cvs] r1025 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-04-27 17:01:39 +0200 (Sun, 27 Apr 2008)
+New Revision: 1026
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp
+Modified:
+   trunk/netpanzer/ChangeLog
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+Log:
+- View uses a list for components now
+- removed cLabel from View and created a Label component
+
+
+Modified: trunk/netpanzer/ChangeLog
+===================================================================
+--- trunk/netpanzer/ChangeLog	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/ChangeLog	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -2,6 +2,8 @@
+ - removed unused line in MenuTemplateView
+ - removed classes LobbyView, ProgressView and ConsoleLoadingView functionality
+   is done by LoadingView
++- View uses a list for components now.
++- removed cLabel from View and created a Label component
+ 
+ 16-Sep-2007 by Aaron Perez
+ - added a timer to the right click function to unselect units only if some
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -32,8 +32,8 @@
+ class Component : public NoCopy
+ {
+ protected:
+-    Uint8    background;
+-    Uint8    foreground;
++    PIX    background;
++    PIX    foreground;
+     iXY     size;
+     iXY     min;
+     Surface surface;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -23,6 +23,8 @@
+ #include &quot;Util/TimerInterface.hpp&quot;
+ #include &quot;Interfaces/MouseInterface.hpp&quot;
+ 
++#include &quot;Views/Components/Label.hpp&quot;
++
+ using std::min;
+ using std::max;
+ 
+@@ -618,8 +620,8 @@
+     resizeClientArea(iXY(320, 400));
+     moveTo(iXY(0, 0));
+ 
+-    addLabel(iXY(0, 0),   &quot;Name&quot;, Color::white);
+-    addLabel(iXY(200, 0), &quot;Status&quot;, Color::white);
++    add( new Label( 0, 0,   &quot;Name&quot;, Color::white) );
++    add( new Label( 200, 0, &quot;Status&quot;, Color::white) );
+ 
+ } // end DesktopView::DesktopView
+ 
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -0,0 +1,33 @@
++/*
++ Copyright (C) 2008 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++ 
++ This program is free software; you can redistribute it and/or modify
++ it under the terms of the GNU General Public License as published by
++ the Free Software Foundation; either version 2 of the License, or
++ (at your option) any later version.
++ 
++ This program is distributed in the hope that it will be useful,
++ but WITHOUT ANY WARRANTY; without even the implied warranty of
++ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ GNU General Public License for more details.
++ 
++ You should have received a copy of the GNU General Public License
++ along with this program; if not, write to the Free Software
++ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#include &quot;Label.hpp&quot;
++
++void
++Label::draw(Surface &amp;dest)
++{    
++    if ( shadowed )
++    {
++        dest.bltStringShadowed(min.x, min.y, text.c_str(), foreground, background);
++    }
++    else
++    {
++        dest.bltString(min.x, min.y, text.c_str(), foreground);
++    }
++}
++
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -0,0 +1,49 @@
++/*
++ Copyright (C) 2008 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++ 
++ This program is free software; you can redistribute it and/or modify
++ it under the terms of the GNU General Public License as published by
++ the Free Software Foundation; either version 2 of the License, or
++ (at your option) any later version.
++ 
++ This program is distributed in the hope that it will be useful,
++ but WITHOUT ANY WARRANTY; without even the implied warranty of
++ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ GNU General Public License for more details.
++ 
++ You should have received a copy of the GNU General Public License
++ along with this program; if not, write to the Free Software
++ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#ifndef _LABEL_HPP_
++#define _LABEL_HPP_
++
++#include &quot;Component.hpp&quot;
++#include &lt;string&gt;
++
++using namespace std;
++
++class Label:public Component
++{
++public:
++    Label(int x, int y, string t, PIX color, PIX bgcolor=Color::black, bool shadow=false)
++    {
++        text = t;
++        background = bgcolor;
++        foreground = color;
++        shadowed = shadow;
++        min.x = x;
++        min.y = y;
++    }
++    
++    void draw(Surface &amp;dest);
++    
++    void actionPerformed(const mMouseEvent &amp;me) {}
++    
++private:
++    string text;
++    bool shadowed;
++};
++
++#endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -19,6 +19,7 @@
+ 
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Components/Label.hpp&quot;
+ #include &quot;Interfaces/MouseInterface.hpp&quot;
+ #include &quot;Interfaces/KeyboardInterface.hpp&quot;
+ #include &quot;Types/fXY.hpp&quot;
+@@ -36,16 +37,10 @@
+ //---------------------------------------------------------------------------
+ void View::add(Component *component)
+ {
+-    assert(component != 0);
+-
+-    if (componentsUsedCount &lt; MAX_COMPONENT_COUNT - 1) {
+-        componentList[componentsUsedCount] = component;
+-        componentList[componentsUsedCount]-&gt;setParent(this);
+-        componentsUsedCount++;
+-    } else {
+-        throw Exception(&quot;ERROR: Trying to add more componentList than pre-allocated, increase the pre-allocated amount.&quot;);
++    if ( component ) {
++        components.push_back(component);
++        component-&gt;setParent(this);
+     }
+-
+ } // end View::add
+ 
+ // View
+@@ -89,7 +84,6 @@
+     
+     free(title);
+     free(subTitle);
+-    free(labels);
+     free(searchName);
+ } // end ~View::View
+ 
+@@ -102,7 +96,6 @@
+     min.zero();
+     max.zero();
+     status                =  0;
+-    numLabels             =  0;
+     pressedButton         = -1;
+     prevPressedButton     = -1;
+     highlightedButton     = -1;
+@@ -119,11 +112,8 @@
+     setSubTitle(&quot;donut&quot;);
+ 
+     //scrollBar             = 0;
+-    labels                = 0;
+-    componentsUsedCount   = 0;
+ 
+-    assert(MAX_COMPONENT_COUNT &gt; 0);
+-    memset(componentList, 0, sizeof(Component *) * MAX_COMPONENT_COUNT);
++    removeComponents();
+ 
+     moveAreaHeight  = DEFAULT_MOVE_AREA_HEIGHT;
+     borderSize      = DEFAULT_BORDER_SIZE;
+@@ -414,16 +404,14 @@
+ 
+     drawDefinedButtons(clientArea);
+     drawInputFields(clientArea);
+-    drawLabels(clientArea);
+     drawHighlightedButton(clientArea);
+     drawPressedButton(clientArea);
+ 
+     // Draw all non-selected components.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-
+-        if (componentList[i] != focusComponent) {
+-            componentList[i]-&gt;draw(clientArea);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++) {
++        if (*i != focusComponent) {
++            (*i)-&gt;draw(clientArea);
+         }
+     }
+ 
+@@ -444,18 +432,16 @@
+ //---------------------------------------------------------------------------
+ void View::doActivate()
+ {
+-    assert(this != 0);
+-
+     // Tell all the components the mouse entered the view.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-
+-        if (componentList[i]-&gt;contains(MouseInterface::getMousePosition())) {
+-            mMouseEvent me(componentList[i],
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {
++        if ((*i)-&gt;contains(MouseInterface::getMousePosition())) {
++            mMouseEvent me((*i),
+                 mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, 
+                 MouseInterface::getMouseX(), MouseInterface::getMouseY(), 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+             actionPerformed(me);
+         }
+@@ -468,15 +454,14 @@
+ //---------------------------------------------------------------------------
+ void View::doDeactivate()
+ {
+-    assert(this != 0);
+-
+-    // Tell all the components the mouse exited the view.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        mMouseEvent me(componentList[i],
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {
++        mMouseEvent me((*i),
+             mMouseEvent::MOUSE_EVENT_EXITED, now(), 0, 
+             MouseInterface::getMouseX(), MouseInterface::getMouseY(), 0, false);
+ 
+-        componentList[i]-&gt;actionPerformed(me);
++        (*i)-&gt;actionPerformed(me);
+ 
+         actionPerformed(me);
+     }
+@@ -642,27 +627,27 @@
+     highlightedButton     = findButtonContaining(newPos);
+ 
+     // Check all components for a clicked event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-
+-        bool containsPrev=componentList[i]-&gt;contains(prevPos);
+-        bool containsNew=componentList[i]-&gt;contains(newPos);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        bool containsPrev=(*i)-&gt;contains(prevPos);
++        bool containsNew=(*i)-&gt;contains(newPos);
+         if (containsPrev &amp;&amp; !containsNew) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_EXITED, now(), 0, newPos.x, newPos.y, 0, false);
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_EXITED, now(), 0, newPos.x, newPos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+             actionPerformed(me);
+         } else if (!containsPrev &amp;&amp; containsNew) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, newPos.x, newPos.y, 0, false);
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, newPos.x, newPos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+             actionPerformed(me);
+         } else if (containsNew &amp;&amp; newPos!=prevPos) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_MOVED, now(), 0, newPos.x, newPos.y, 0, false);
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_MOVED, now(), 0, newPos.x, newPos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+             actionPerformed(me);
+         }
+@@ -700,14 +685,15 @@
+     focusComponent = 0;
+ 
+     // Check all components for a pressed event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-        if (componentList[i]-&gt;contains(pos)) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_PRESSED, now(), InputEvent::BUTTON1_MASK, pos.x, pos.y, 0, false);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        if ((*i)-&gt;contains(pos)) {
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_PRESSED, now(), InputEvent::BUTTON1_MASK, pos.x, pos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+-            focusComponent = componentList[i];
++            focusComponent = (*i);
+ 
+             actionPerformed(me);
+         }
+@@ -736,26 +722,28 @@
+     pressedButton     = -1;
+ 
+     // Check all components for a clicked event.
+-    {for (int i = 0; i &lt; componentsUsedCount; i++)
+-        {
+-            assert(componentList[i] != 0);
+-            if (componentList[i]-&gt;contains(downPos) &amp;&amp; componentList[i]-&gt;contains(upPos)) {
+-                mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_CLICKED, now(), InputEvent::BUTTON1_MASK, upPos.x, upPos.y, 0, false);
++    {    
++        ComponentsIterator i;
++        for ( i=components.begin(); i != components.end(); i++)
++        {        
++            if ((*i)-&gt;contains(downPos) &amp;&amp; (*i)-&gt;contains(upPos)) {
++                mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_CLICKED, now(), InputEvent::BUTTON1_MASK, upPos.x, upPos.y, 0, false);
+ 
+-                componentList[i]-&gt;actionPerformed(me);
++                (*i)-&gt;actionPerformed(me);
+ 
+                 actionPerformed(me);
+             }
+         }}
+ 
+     // Report a mouse release to all components except for a clicked one.
+-    {for (int i = 0; i &lt; componentsUsedCount; i++)
+-        {
+-            assert(componentList[i] != 0);
+-            if (componentList[i]-&gt;contains(upPos)) {
+-                mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_RELEASED, now(), InputEvent::BUTTON1_MASK, upPos.x, upPos.y, 0, false);
++    {    
++        ComponentsIterator i;
++        for ( i=components.begin(); i != components.end(); i++)
++        {        
++            if ((*i)-&gt;contains(upPos)) {
++                mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_RELEASED, now(), InputEvent::BUTTON1_MASK, upPos.x, upPos.y, 0, false);
+ 
+-                componentList[i]-&gt;actionPerformed(me);
++                (*i)-&gt;actionPerformed(me);
+ 
+                 actionPerformed(me);
+             }
+@@ -775,14 +763,15 @@
+     //mouseMove(prevPos, newPos);
+ 
+     // Check all components for a dragged event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-        if (componentList[i]-&gt;contains(newPos) &amp;&amp; componentList[i]-&gt;contains(downPos) &amp;&amp; newPos!=prevPos) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_DRAGGED, now(), InputEvent::BUTTON1_MASK, newPos.x, newPos.y, 0, false);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        if ((*i)-&gt;contains(newPos) &amp;&amp; (*i)-&gt;contains(downPos) &amp;&amp; newPos!=prevPos) {
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_DRAGGED, now(), InputEvent::BUTTON1_MASK, newPos.x, newPos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+-            focusComponent = componentList[i];
++            focusComponent = (*i);
+ 
+             actionPerformed(me);
+         }
+@@ -805,14 +794,15 @@
+     focusComponent = 0;
+ 
+     // Check all components for a pressed event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-        if (componentList[i]-&gt;contains(pos)) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_PRESSED, now(), InputEvent::BUTTON2_MASK, pos.x, pos.y, 0, false);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        if ((*i)-&gt;contains(pos)) {
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_PRESSED, now(), InputEvent::BUTTON2_MASK, pos.x, pos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+-            focusComponent = componentList[i];
++            focusComponent = (*i);
+ 
+             actionPerformed(me);
+         }
+@@ -827,12 +817,13 @@
+     int reportRelease = true;
+ 
+     // Check all components for a clicked event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-        if (componentList[i]-&gt;contains(downPos) &amp;&amp; componentList[i]-&gt;contains(upPos)) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_CLICKED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        if ((*i)-&gt;contains(downPos) &amp;&amp; (*i)-&gt;contains(upPos)) {
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_CLICKED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+             reportRelease = false;
+ 
+@@ -844,12 +835,13 @@
+     // mouse press positions, then report a release to an
+     if (reportRelease) {
+         // Check all components for a release event.
+-        for (int i = 0; i &lt; componentsUsedCount; i++) {
+-            assert(componentList[i] != 0);
+-            if (componentList[i]-&gt;contains(upPos)) {
+-                mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_RELEASED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
++        ComponentsIterator i;
++        for ( i=components.begin(); i != components.end(); i++)
++        {        
++            if ((*i)-&gt;contains(upPos)) {
++                mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_RELEASED, now(), InputEvent::BUTTON2_MASK, upPos.x, upPos.y, 0, false);
+ 
+-                componentList[i]-&gt;actionPerformed(me);
++                (*i)-&gt;actionPerformed(me);
+ 
+                 reportRelease = false;
+ 
+@@ -874,14 +866,15 @@
+     focusComponent = 0;
+ 
+     // Check all components for a moved event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-        if (componentList[i]-&gt;contains(newPos)  &amp;&amp; componentList[i]-&gt;contains(downPos) &amp;&amp; newPos!=prevPos) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_DRAGGED, now(), InputEvent::BUTTON2_MASK, newPos.x, newPos.y, 0, false);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        if ((*i)-&gt;contains(newPos)  &amp;&amp; (*i)-&gt;contains(downPos) &amp;&amp; newPos!=prevPos) {
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_DRAGGED, now(), InputEvent::BUTTON2_MASK, newPos.x, newPos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+-            focusComponent = componentList[i];
++            focusComponent = (*i);
+ 
+             actionPerformed(me);
+         }
+@@ -904,12 +897,13 @@
+ void View::mouseEnter(const iXY &amp;pos)
+ {
+     // Check all components for a entered event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-        if (componentList[i]-&gt;contains(pos)) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, pos.x, pos.y, 0, false);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        if ((*i)-&gt;contains(pos)) {
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, pos.x, pos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+             actionPerformed(me);
+         }
+@@ -926,12 +920,13 @@
+     assert(this != 0);
+ 
+     // Check all components for a exited event.
+-    for (int i = 0; i &lt; componentsUsedCount; i++) {
+-        assert(componentList[i] != 0);
+-        if (componentList[i]-&gt;contains(pos)) {
+-            mMouseEvent me(componentList[i], mMouseEvent::MOUSE_EVENT_EXITED, now(), 0, pos.x, pos.y, 0, false);
++    ComponentsIterator i;
++    for ( i=components.begin(); i != components.end(); i++)
++    {        
++        if ((*i)-&gt;contains(pos)) {
++            mMouseEvent me((*i), mMouseEvent::MOUSE_EVENT_EXITED, now(), 0, pos.x, pos.y, 0, false);
+ 
+-            componentList[i]-&gt;actionPerformed(me);
++            (*i)-&gt;actionPerformed(me);
+ 
+             actionPerformed(me);
+         }
+@@ -953,71 +948,7 @@
+     //}
+ } // end scrollBarMove
+ 
+-// addLabel
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-void View::addLabel(const iXY &amp;pos, char *label, const PIX &amp;color)
+-{
+-    addLabel(pos, label, false, color, Color::black);
+ 
+-} // end addLabel
+-
+-// addLabelShadowed
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-void View::addLabelShadowed(const iXY &amp;pos, char *label, const PIX &amp;foreColor,
+-                            const PIX &amp;backColor)
+-{
+-    addLabel(pos, label, true, foreColor, backColor);
+-} // end addLabelShadowed
+-
+-// addLabel
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-void View::addLabel(const iXY &amp;pos, char *label, const bool &amp;isShadowed, const PIX &amp;foreColor,
+-                    const PIX &amp;backColor)
+-{
+-    labels = (cLabel *) realloc(labels, (numLabels+1)*sizeof(cLabel));
+-    if (labels == 0) throw Exception(&quot;ERROR: Unable to allocate label.&quot;);
+-
+-    labels[numLabels].label = strdup(label);
+-    assert(labels[numLabels].label != 0);
+-    labels[numLabels].foreColor  = foreColor;
+-    labels[numLabels].backColor  = backColor;
+-    labels[numLabels].isShadowed = isShadowed;
+-
+-    labels[numLabels].pos = pos;
+-    numLabels++;
+-
+-} // end View::addLabel
+-
+-// DRAW LABELS
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-void View::drawLabels(Surface &amp;clientArea)
+-{
+-    if (!clientArea.getDoesExist()) {
+-        throw Exception(&quot;ERROR: Client area does not exist.&quot;);
+-    }
+-
+-    for (int num = 0; num &lt; numLabels; num++) {
+-        if (labels[num].isShadowed) {
+-            clientArea.bltStringShadowed( labels[num].pos.x,
+-                                          labels[num].pos.y,
+-                                          labels[num].label,
+-                                          labels[num].foreColor,
+-                                          labels[num].backColor);
+-        } else clientArea.bltString( labels[num].pos.x,
+-                                     labels[num].pos.y,
+-                                     labels[num].label,
+-                                     labels[num].foreColor);
+-    }
+-} // end DRAW LABELS
+-
+ // drawDefinedButtons
+ //---------------------------------------------------------------------------
+ // Purpose:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -28,16 +28,10 @@
+ #include &quot;Component.hpp&quot;
+ #include &quot;MouseEvent.hpp&quot;
+ 
+-class cLabel
+-{
+-public:
+-    iXY   pos;
+-    char *label;
+-    Uint8  foreColor;
+-    Uint8  backColor;
+-    bool  isShadowed;
+-}; // end cLabel
++#include &lt;list&gt;
+ 
++using namespace std;
++
+ enum DEFAULT_VIEW_BUTTON
+ {
+     CLOSE_VIEW_BUTTON,
+@@ -52,13 +46,11 @@
+     void add(DEFAULT_VIEW_BUTTON button);
+ 
+ public:
+-    enum
+-    {
+-        MAX_COMPONENT_COUNT = 30
+-    };
+-
+-    Component *componentList[MAX_COMPONENT_COUNT];
+-    int        componentsUsedCount;
++    typedef list&lt;Component *&gt; ComponentList;
++    typedef ComponentList::iterator ComponentsIterator;
++    
++    ComponentList components;
++    
+     Component *focusComponent;
+ 
+     std::vector&lt;cButton*&gt;     buttons;
+@@ -107,8 +99,6 @@
+     char            *subTitle;
+     int              status;
+ 
+-    int              numLabels;
+-    cLabel          *labels;
+     char            *statusText;
+ 
+     enum { RESIZE_XMINSIZE = 15 };
+@@ -156,12 +146,6 @@
+ 
+     // Scroll bar functions.
+ 
+-    // cLabel Functions.
+-    void addLabel(const iXY &amp;pos, char *label, const PIX &amp;color);
+-    void addLabelShadowed(const iXY &amp;pos, char *label, const PIX &amp;foreColor, const PIX &amp;backColor);
+-    void addLabel(const iXY &amp;pos, char *label, const bool &amp;isShadowed, const PIX &amp;foreColor, const PIX &amp;backColor);
+-    void drawLabels(Surface &amp;clientArea);
+-
+     // cButton Functions.
+     void addButtonPackedSurface(const iXY &amp;pos, PackedSurface &amp;source, const char *toolTip, ITEM_FUNC leftClickFunc);
+     void addButtonCenterText(const iXY &amp;pos, const int &amp;xSize, const char *nName, const char *nToolTip, ITEM_FUNC nLeftClickFunc);
+@@ -272,11 +256,13 @@
+     }
+     void removeComponents()
+     {
+-        // Clear out all the previous component data.
+-        assert(MAX_COMPONENT_COUNT &gt; 0);
+-        memset(componentList, 0, sizeof(Component *) * MAX_COMPONENT_COUNT);
+-
+-        componentsUsedCount = 0;
++        ComponentsIterator i = components.begin();
++        while ( i != components.end() )
++        {
++            delete *i;
++            i++;
++        }
++        components.clear(); // XXX delete them?
+         focusComponent      = 0;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -28,6 +28,8 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/ObjectiveInterface.hpp&quot;
+ 
++#include &quot;Views/Components/Label.hpp&quot;
++
+ #include &quot;Classes/SelectionBoxSprite.hpp&quot;
+ 
+ // RankView
+@@ -52,20 +54,19 @@
+     // hardcoded for now
+     int CHAR_XPIX = 8;
+ 
+-    //addLabel(iXY nPos, char *nLabel, Uint8 color);
+     unsigned xOffset = 0;
+     unsigned yOffset = 16;
+-    addLabel(iXY(xOffset, yOffset), &quot;Name&quot;, Color::red);
++    add( new Label( xOffset, yOffset, &quot;Name&quot;, Color::red) );
+     xOffset += MAX_NAME_CHARS*CHAR_XPIX;
+-    addLabel(iXY(xOffset, yOffset), &quot;Flag&quot;, Color::red);
++    add( new Label( xOffset, yOffset, &quot;Flag&quot;, Color::red) );
+     xOffset += MAX_FLAG_CHARS*CHAR_XPIX;
+-    addLabel(iXY(xOffset, yOffset), &quot;Kills&quot;, Color::red);
++    add( new Label( xOffset, yOffset, &quot;Kills&quot;, Color::red) );
+     xOffset += MAX_KILLS_CHARS*CHAR_XPIX;
+-    addLabel(iXY(xOffset, yOffset), &quot;Losses&quot;, Color::red);
++    add( new Label( xOffset, yOffset, &quot;Losses&quot;, Color::red) );
+     xOffset += MAX_LOSSES_CHARS*CHAR_XPIX;
+-    addLabel(iXY(xOffset, yOffset), &quot;Points&quot;, Color::red);
++    add( new Label( xOffset, yOffset, &quot;Points&quot;, Color::red) );
+     xOffset += MAX_POINTS_CHARS*CHAR_XPIX;
+-    addLabel(iXY(xOffset, yOffset), &quot;Objective&quot;, Color::red);
++    add( new Label( xOffset, yOffset, &quot;Objective&quot;, Color::red) );
+     xOffset += MAX_POINTS_CHARS*CHAR_XPIX;
+ 
+     // Define the scrollBar fot this view.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -38,6 +38,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
++#include &quot;Views/Components/Label.hpp&quot;
+ 
+ 
+ Button VehicleSelectionView::buttonStaticDisplay;
+@@ -276,7 +277,7 @@
+     iXY pos(0 ,0);
+ 
+     pos.x = 0;
+-    addLabel(pos + iXY(2,2), &quot;Static Display:&quot;, Color::white);
++    add( new Label( pos.x+2, pos.y+2, &quot;Static Display:&quot;, Color::white) );
+ 
+     pos.x = getClientRect().getSizeX() - 100;
+     buttonStaticDisplay.setLabel(&quot;On&quot;);
+@@ -285,7 +286,7 @@
+     pos.y += yOffset;
+ 
+     pos.x = 0;
+-    addLabel(pos + iXY(2,2) , &quot;Power:&quot;, Color::white);
++    add( new Label( pos.x+2, pos.y+2, &quot;Power:&quot;, Color::white) );
+ 
+     pos.x = getClientRect().getSizeX() - 100;
+     buttonPower.setLabel(&quot;Off&quot;);
+@@ -297,19 +298,19 @@
+     int CHAR_XPIX = 8;
+     
+     pos.x = 0;
+-    addLabel(pos + iXY(2,2), &quot;Production:&quot;, Color::white);
++    add( new Label( pos.x+2, pos.y+2, &quot;Production:&quot;, Color::white) );
+     productionUnitPos.x = (strlen(&quot;Current Unit:&quot;) + 1) * CHAR_XPIX + 2;
+     productionUnitPos.y = pos.y + 2;
+     pos.y += yOffset;
+ 
+     pos.x = 0;
+-    addLabel(pos + iXY(2,2), &quot;Time:        &quot;, Color::white);
++    add( new Label( pos.x+2, pos.y+2, &quot;Time:        &quot;, Color::white) );
+     timeRequiredPos.x = (strlen(&quot;Time:        &quot;) + 1) * CHAR_XPIX + 2;
+     timeRequiredPos.y = pos.y + 2;
+     pos.y += yOffset;
+ 
+     pos.x = 0;
+-    addLabel(pos + iXY(2,2), &quot;Unit Built:   &quot;, Color::white);
++    add( new Label( pos.x+2, pos.y+2, &quot;Unit Built:   &quot;, Color::white) );
+     unitsBuiltPos.x = (strlen(&quot;Time:        &quot;) + 1) * CHAR_XPIX + 2;
+     unitsBuiltPos.y = pos.y + 2;
+     pos.y += yOffset;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -22,6 +22,7 @@
+ #include &quot;Particles/ParticleSystemGlobals.hpp&quot;
+ #include &quot;MapSelectionView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
++#include &quot;Views/Components/Label.hpp&quot;
+ 
+ int HostOptionsView::cloudCoverageCount = 1;
+ int HostOptionsView::windSpeed          = 1;
+@@ -300,7 +301,7 @@
+     int xControlStart = 270;
+ 
+     x = xTextStart;
+-    addLabelShadowed(iXY(x, y), &quot;Max Players&quot;, windowTextColor, windowTextColorShadow);
++    add( new Label(x, y, &quot;Max Players&quot;, windowTextColor, windowTextColorShadow, true) );
+     x += xControlStart;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreasePlayerCount);
+     x += arrowButtonWidth + meterWidth;
+@@ -308,7 +309,7 @@
+     y += yOffset;
+ 
+     x = xTextStart;
+-    addLabelShadowed(iXY(x, y), &quot;Game Max Unit Count&quot;, windowTextColor, windowTextColorShadow);
++    add( new Label(x, y, &quot;Game Max Unit Count&quot;, windowTextColor, windowTextColorShadow, true) );
+     x += xControlStart;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseMaxUnitCount);
+     x += arrowButtonWidth + meterWidth;
+@@ -316,7 +317,7 @@
+     y += yOffset;
+     /*
+     	x = xTextStart;
+-    	addLabelShadowed(iXY(x, y), &quot;Player Respawn Unit Count&quot;, windowTextColor, windowTextColorShadow);
++    	//addLabelShadowed(iXY(x, y), &quot;Player Respawn Unit Count&quot;, windowTextColor, windowTextColorShadow);
+     	x += xControlStart;
+     	addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseRespawnCount);
+     	x += arrowButtonWidth + meterWidth;
+@@ -340,7 +341,7 @@
+     //y += yOffset;
+ 
+     x = xTextStart;
+-    addLabelShadowed(iXY(x, y), &quot;Objective Capture Percent&quot;, windowTextColor, windowTextColorShadow);
++    add( new Label( x, y, &quot;Objective Capture Percent&quot;, windowTextColor, windowTextColorShadow, true) );
+     x += xControlStart;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseObjectiveCapturePercent);
+     x += arrowButtonWidth + meterWidth;
+@@ -348,7 +349,7 @@
+     y += yOffset;
+ 
+     x = xTextStart;
+-    addLabelShadowed(iXY(x, y), &quot;Time Limit&quot;, windowTextColor, windowTextColorShadow);
++    add( new Label( x, y, &quot;Time Limit&quot;, windowTextColor, windowTextColorShadow, true) );
+     x += xControlStart;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseTimeLimit);
+     x += arrowButtonWidth + meterWidth;
+@@ -356,7 +357,7 @@
+     y += yOffset;
+ 
+     x = xTextStart;
+-    addLabelShadowed(iXY(x, y), &quot;Frag Limit&quot;, windowTextColor, windowTextColorShadow);
++    add( new Label( x, y, &quot;Frag Limit&quot;, windowTextColor, windowTextColorShadow, true) );
+     x += xControlStart;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseFragLimit);
+     x += arrowButtonWidth + meterWidth;
+@@ -413,7 +414,7 @@
+ 
+     /*
+     	x = xTextStart;
+-    	addLabelShadowed(iXY(x, y), &quot;Allow Fog Of War&quot;, windowTextColor, windowTextColorShadow);
++    	//addLabelShadowed(iXY(x, y), &quot;Allow Fog Of War&quot;, windowTextColor, windowTextColorShadow);
+     	x += xControlStart;
+     	addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bSetAllowFogOfWarFalse);
+     	x += arrowButtonWidth + meterWidth;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -21,6 +21,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Components/Label.hpp&quot;
+ 
+ 
+ static void bIncreaseScrollRate()
+@@ -67,11 +68,11 @@
+     //----------------------------------------------------------------------
+ 
+     x = xTextStart;
+-    addLabel(iXY(x, y), &quot;OPTION                                               SETTING&quot;, viewHeadingColor);
++    add( new Label( x, y, &quot;OPTION                                               SETTING&quot;, viewHeadingColor) );
+     y += yOffset;
+ 
+     x = xTextStart;
+-    addLabel(iXY(x, y), &quot;Scroll Rate&quot;, Color::white);
++    add( new Label( x, y, &quot;Scroll Rate&quot;, Color::white) );
+     x = optionsMeterStartX;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseScrollRate);
+     x += optionsMeterWidth + arrowButtonWidth;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2008-04-27 11:56:53 UTC (rev 1025)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2008-04-27 15:01:39 UTC (rev 1026)
+@@ -21,6 +21,7 @@
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
++#include &quot;Views/Components/Label.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;System/SDLSound.hpp&quot;
+ #include &quot;System/DummySound.hpp&quot;
+@@ -102,12 +103,12 @@
+     //----------------------------------------------------------------------
+ 
+     x = xTextStart;
+-    addLabel(iXY(x, y), &quot;OPTION                                               SETTING&quot;, viewHeadingColor);
++    add( new Label( x, y, &quot;OPTION                                               SETTING&quot;, viewHeadingColor) );
+     y += yOffset;
+     //
+     
+     x = xTextStart;
+-    addLabel(iXY(x,y), &quot;Sound Status&quot;, Color::white);
++    add( new Label( x, y, &quot;Sound Status&quot;, Color::white) );
+     checkBoxSoundEnabled.setLabel(gameconfig-&gt;enablesound?&quot;Enabled&quot;:&quot;Disabled&quot;);
+     checkBoxSoundEnabled.setState(gameconfig-&gt;enablesound);
+     x += Surface::getTextLength(&quot;Sound Status: &quot;);
+@@ -117,7 +118,7 @@
+     y += yOffset;
+ 
+     x = xTextStart;
+-    addLabel(iXY(x, y), &quot;Sound Volume&quot;, Color::white);
++    add( new Label( x, y, &quot;Sound Volume&quot;, Color::white) );
+     x = optionsMeterStartX;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseSoundVolume);
+     x += optionsMeterWidth + arrowButtonWidth;
+@@ -126,7 +127,7 @@
+ 
+     y += yOffset; // add a little separation
+     x = xTextStart;
+-    addLabel(iXY(x,y), &quot;Music Status&quot;, Color::white);
++    add( new Label( x, y, &quot;Music Status&quot;, Color::white) );
+     checkBoxMusicEnabled.setLabel(gameconfig-&gt;enablemusic?&quot;Enabled&quot;:&quot;Disabled&quot;);
+     checkBoxMusicEnabled.setState(gameconfig-&gt;enablemusic);
+     x += Surface::getTextLength(&quot;Music Status: &quot;);
+@@ -136,7 +137,7 @@
+     y += yOffset;
+ 
+     x = xTextStart;
+-    addLabel(iXY(x, y), &quot;Music Volume&quot;, Color::white);
++    add( new Label( x, y, &quot;Music Volume&quot;, Color::white) );
+     x = optionsMeterStartX;
+     addButtonCenterText(iXY(x - 1, y), arrowButtonWidth, &quot;&lt;&quot;, &quot;&quot;, bDecreaseMusicVolume);
+     x += optionsMeterWidth + arrowButtonWidth;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000067.html">[Netpanzer-cvs] r1025 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1366 - trunk/netpanzer/src/NetPanzer/Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1366%20-%20trunk/netpanzer/src/NetPanzer/Interfaces&In-Reply-To=%3C20120516153643.19EAA55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000389.html">
+   <LINK REL="Next"  HREF="000391.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1366 - trunk/netpanzer/src/NetPanzer/Interfaces</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1366%20-%20trunk/netpanzer/src/NetPanzer/Interfaces&In-Reply-To=%3C20120516153643.19EAA55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1366 - trunk/netpanzer/src/NetPanzer/Interfaces">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Wed May 16 17:36:42 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000389.html">[Netpanzer-cvs] r1365 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/Units	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000391.html">[Netpanzer-cvs] r1367 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#390">[ date ]</a>
+              <a href="thread.html#390">[ thread ]</a>
+              <a href="subject.html#390">[ subject ]</a>
+              <a href="author.html#390">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-05-16 17:36:42 +0200 (Wed, 16 May 2012)
+New Revision: 1366
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+Log:
+TeamMode : 
+ - Resolve crash client in round over
+ - Resolve team winner in round over
+ - Resolve Objective team Winner
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-05-16 13:11:49 UTC (rev 1365)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-05-16 15:36:42 UTC (rev 1366)
+@@ -49,6 +49,7 @@
+        _map_cycle_server_state_load_unit_profiles,
+        _map_cycle_server_state_sync_profiles,
+        _map_cycle_server_state_respawn_players,
++       _map_cycle_server_restart_team,
+        _map_cycle_server_prepare_team
+      };
+  
+@@ -178,6 +179,13 @@
+             LoadingView::loadFinish();
+             map_cycle_fsm_client_respawn_ack_flag = false;
+             map_cycle_fsm_client_state = _map_cycle_client_idle;
++            if (GameConfig::game_teammode)
++            {
++                map_cycle_fsm_client_state = _map_cycle_client_prepare_team;
++                TeamManager::reset();
++                setStateServerprepareteam();
++                cooldown.reset();
++            }
+         }
+  
+         return;
+@@ -186,6 +194,7 @@
+ 
+     case _map_cycle_client_prepare_team :
+     {
++        LOGGER.warning(&quot;_map_cycle_client_prepare_team&quot;);
+         if (!Desktop::getVisible(&quot;PrepareTeam&quot;)&amp;&amp; !Desktop::getVisible(&quot;GFlagSelectionView&quot;))
+         {
+             TeamManager::reset();
+@@ -199,8 +208,9 @@
+  
+     case _map_cycle_client_team_start :
+     {
+-            Desktop::setVisibility(&quot;PrepareTeam&quot;, false);
+-            map_cycle_fsm_client_state = _map_cycle_client_idle;
++        LOGGER.warning(&quot;_map_cycle_client_team_start&quot;);
++        Desktop::setVisibility(&quot;PrepareTeam&quot;, false);
++        map_cycle_fsm_client_state = _map_cycle_client_idle;
+         return;
+     }
+     break;
+@@ -364,7 +374,6 @@
+     }
+     break;
+  
+- 
+     case _map_cycle_server_state_respawn_players :
+     {
+         SystemResetGameLogic reset_game_logic_mesg;
+@@ -382,11 +391,7 @@
+  
+         if (GameConfig::game_teammode)
+         {
+-            map_cycle_fsm_server_state = _map_cycle_server_prepare_team;
+-            TeamManager::reset();
+-            setStateServerprepareteam();
+-            GameControlCyclePrepareTeam prepare_team_mesg;
+-            SERVER-&gt;broadcastMessage(&amp;prepare_team_mesg, sizeof(GameControlCyclePrepareTeam));
++            map_cycle_fsm_server_state = _map_cycle_server_restart_team;
+         }
+         else
+         {
+@@ -396,7 +401,16 @@
+         ServerConnectDaemon::unlockConnectProcess();
+     }
+     break;
+-
++    
++    case _map_cycle_server_restart_team :
++    {
++        map_cycle_fsm_server_state = _map_cycle_server_prepare_team;
++        TeamManager::reset();
++        setStateServerprepareteam();
++        cooldown.reset();
++    }
++    break;
++    
+     case _map_cycle_server_prepare_team :
+     {
+         if (cooldown.count() || TeamManager::CheckisPlayerReady())
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-16 13:11:49 UTC (rev 1365)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-16 15:36:42 UTC (rev 1366)
+@@ -140,22 +140,22 @@
+ 
+ void TeamManager::reset()
+ {
+-    for ( PlayerID player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers()-1; ++player_index )
+-    {
+-        for ( PlayerID player_id = 1; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-        {
+-            PlayerState* state_id = PlayerInterface::getPlayer(player_id);
+-            PlayerState* state_index = PlayerInterface::getPlayer(player_index);
+-            if (state_id-&gt;isActive() &amp;&amp; state_index-&gt;isActive())
+-            {
+-                if (state_id-&gt;getTeamID() == state_index-&gt;getTeamID()
+-                        &amp;&amp; (player_id != player_index))
+-                {
+-                    PlayerInterface::allyplayers( player_id, player_index);
+-                }
+-            }
+-        }
+-    }
++//    for ( PlayerID player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers()-1; ++player_index )
++//    {
++//        for ( PlayerID player_id = 1; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++//        {
++//            PlayerState* state_id = PlayerInterface::getPlayer(player_id);
++//            PlayerState* state_index = PlayerInterface::getPlayer(player_index);
++//            if (state_id-&gt;isActive() &amp;&amp; state_index-&gt;isActive())
++//            {
++//                if (state_id-&gt;getTeamID() == state_index-&gt;getTeamID()
++//                        &amp;&amp; (player_id != player_index))
++//                {
++//                    PlayerInterface::allyplayers( player_id, player_index);
++//                }
++//            }
++//        }
++//    }
+     resetPlayerReady();
+ }
+ 
+@@ -227,7 +227,6 @@
+     case _gametype_timelimit:
+         for (Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
+         {
+-            Score = Teams_lists[team_id].getKills();
+             if (Score &lt; Teams_lists[team_id].getKills())
+             {
+                 teamWin = team_id;
+@@ -238,7 +237,6 @@
+     case _gametype_objective:
+         for (Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
+         {
+-            Score = Teams_lists[team_id].getTeamObjective();
+             if (Score &lt; Teams_lists[team_id].getTeamObjective())
+             {
+                 teamWin = team_id;
+@@ -272,17 +270,11 @@
+ 
+ bool TeamManager::testRuleObjectiveRatio( float precentage )
+ {
+-    ObjectiveID num_objectives = ObjectiveInterface::getObjectiveCount();
++    ObjectiveID max_objectives = ObjectiveInterface::getObjectiveLimit();
+ 
+-    int occupation_ratio = (int) ( ((float) num_objectives) * precentage  + 0.999);
+-    if (occupation_ratio == 0)
+-    {
+-        occupation_ratio = 1;
+-    }
+-
+     for (Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
+     {
+-        if ( Teams_lists[team_id].getTeamObjective() &gt;= occupation_ratio )
++        if ( Teams_lists[team_id].getTeamObjective() &gt;= max_objectives )
+         {
+             return true;
+         }
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000389.html">[Netpanzer-cvs] r1365 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/Units	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000391.html">[Netpanzer-cvs] r1367 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#390">[ date ]</a>
+              <a href="thread.html#390">[ thread ]</a>
+              <a href="subject.html#390">[ subject ]</a>
+              <a href="author.html#390">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,461 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1433 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject/private	src/Lib/2D/Components src/NetPanzer/Scenes/MainMenu
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2013-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1433%20-%20in%20trunk/netpanzer%3A%0A%09projects/netpanzer-svn-windows/nbproject/private%0A%09src/Lib/2D/Components%20src/NetPanzer/Scenes/MainMenu&In-Reply-To=%3C20130909160232.DA7E155B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000453.html">
+   <LINK REL="Next"  HREF="000455.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1433 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject/private	src/Lib/2D/Components src/NetPanzer/Scenes/MainMenu</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1433%20-%20in%20trunk/netpanzer%3A%0A%09projects/netpanzer-svn-windows/nbproject/private%0A%09src/Lib/2D/Components%20src/NetPanzer/Scenes/MainMenu&In-Reply-To=%3C20130909160232.DA7E155B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1433 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject/private	src/Lib/2D/Components src/NetPanzer/Scenes/MainMenu">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Mon Sep  9 18:02:32 CEST 2013</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000453.html">[Netpanzer-cvs] r1432 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src/Lib/2D	src/Lib/2D/Components src/Lib/Types	src/NetPanzer/Scenes/MainMenu src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000455.html">[Netpanzer-cvs] r1434 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src	src/Lib/2D src/NetPanzer/Actions	src/NetPanzer/Scenes/MainMenu src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#454">[ date ]</a>
+              <a href="thread.html#454">[ thread ]</a>
+              <a href="subject.html#454">[ subject ]</a>
+              <a href="author.html#454">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2013-09-09 18:02:32 +0200 (Mon, 09 Sep 2013)
+New Revision: 1433
+
+Modified:
+   trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml
+   trunk/netpanzer/src/Lib/2D/Components/Table.cpp
+   trunk/netpanzer/src/Lib/2D/Components/Table.hpp
+   trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.cpp
+   trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.hpp
+Log:
+Add row selection support to Table component.
+
+Modified: trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml
+===================================================================
+--- trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml	2013-09-08 23:58:04 UTC (rev 1432)
++++ trunk/netpanzer/projects/netpanzer-svn-windows/nbproject/private/private.xml	2013-09-09 16:02:32 UTC (rev 1433)
+@@ -16,7 +16,10 @@
+             &lt;file&gt;file:/C:/prog/netpanzer-svn/src/Lib/2D/Components/VScrollBar.hpp&lt;/file&gt;
+             &lt;file&gt;file:/C:/prog/netpanzer-svn/src/Lib/2D/Components/VScrollBar.cpp&lt;/file&gt;
+             &lt;file&gt;file:/C:/prog/netpanzer-svn/src/Lib/2D/Components/Table.cpp&lt;/file&gt;
++            &lt;file&gt;file:/C:/prog/netpanzer-svn/src/Lib/2D/ComponentLayer.cpp&lt;/file&gt;
++            &lt;file&gt;file:/C:/prog/netpanzer-svn/src/Lib/2D/Components/Button.cpp&lt;/file&gt;
+             &lt;file&gt;file:/C:/prog/netpanzer-svn/src/NetPanzer/Scenes/MainMenu/IntroLayer.hpp&lt;/file&gt;
++            &lt;file&gt;file:/C:/prog/netpanzer-svn/src/Lib/2D/Components/Button.hpp&lt;/file&gt;
+             &lt;file&gt;file:/C:/prog/netpanzer-svn/src/Lib/2D/Components/ScrollableList.cpp&lt;/file&gt;
+         &lt;/group&gt;
+     &lt;/open-files&gt;
+
+Modified: trunk/netpanzer/src/Lib/2D/Components/Table.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Components/Table.cpp	2013-09-08 23:58:04 UTC (rev 1432)
++++ trunk/netpanzer/src/Lib/2D/Components/Table.cpp	2013-09-09 16:02:32 UTC (rev 1433)
+@@ -76,10 +76,12 @@
+     scrollbar = new VScrollBar();
+     hoveringScrollbar = false;
+     selectingScrollbar = false;
++    firstRowIndex = 0;
+     firstRowTotalPosition = 0;
+     firstRowOffset = 0;
+     firstRowHeight = 0;
+     lastRowHeight = 0;
++    selectedRow = -1;
+ 
+     scrollbar-&gt;setComponentEvents(&amp;myEvents);
+     scrollbar-&gt;setChangeEvent(Events::ScrollChange);
+@@ -136,8 +138,15 @@
+         
+         int x = getLocationX();
+         
++        const int relativeSelectedRow = selectedRow - firstRowIndex;
++        
+         const RowPainter *p = painters[0];
+         
++        if ( relativeSelectedRow == 0 )
++        {
++            dest.fillRect(iRect(x, y, getWidth() - scrollbar-&gt;getWidth(), firstRowHeight), Color::gray);
++        }
++        
+         // draw first row, maybe cell are half drawn due to scrolling
+         for ( int c = 0, ce = columnDef.size(); c &lt; ce; c++ )
+         {
+@@ -154,6 +163,11 @@
+         for ( int n = 1, ne = painters.size()-1; n &lt; ne; n++ )
+         {
+             x = getLocationX();
++            if ( relativeSelectedRow == n )
++            {
++                dest.fillRect(iRect(x, y, getWidth() - scrollbar-&gt;getWidth(), rowHeight), Color::gray);
++            }
++
+             p = painters[n];
+             for ( int c = 0, ce = columnDef.size(); c &lt; ce; c++ )
+             {
+@@ -170,6 +184,11 @@
+         if ( painters.size() &gt;  1 )
+         {
+             x = getLocationX();
++            if ( relativeSelectedRow == (painters.size()-1) )
++            {
++                dest.fillRect(iRect(x, y, getWidth() - scrollbar-&gt;getWidth(), lastRowHeight), Color::gray);
++            }
++
+             cellArea.setHeight(lastRowHeight);
+             p = painters.back();
+             for ( int c = 0, ce = columnDef.size(); c &lt; ce; c++ )
+@@ -186,6 +205,18 @@
+ void Table::logic()
+ {
+     scrollbar-&gt;logic();
++    
++    int event;
++    while ( (event = myEvents.nextEvent()) ) switch ( event )
++    {
++        case Events::ScrollChange:
++//            LOGGER.warning(&quot;Scroll pos changed: %d&quot;, scrollSlider-&gt;getValue());
++            dirty = true;
++            break;
++    }
++    
++    myEvents.reset();
++    
+     if ( dirty )
+     {
+         const int rowcount = ds-&gt;getRowCount();
+@@ -193,17 +224,19 @@
+         if ( rowcount )
+         {
+             const int scrollpos = scrollbar-&gt;getValue();
+-            const int firstRow = scrollpos / rowHeight;
+-            const int froffset = scrollpos % rowHeight;
++            firstRowIndex = scrollpos / rowHeight;
++            firstRowOffset = scrollpos % rowHeight;
++            firstRowTotalPosition = firstRowIndex * rowHeight;
++            firstRowHeight = rowHeight - firstRowOffset;
+             
+             // @todo save the header height somewhere, or the visible height
+             const int endy = scrollpos + (getHeight() - TextRenderingSystem::line_height());
+             
+-            int y = scrollpos - froffset;
++            int y = scrollpos - firstRowOffset;
+             
+             // @todo optimize this, don't delete all
+             painters.deleteAll();
+-            for ( int n = firstRow, ne = rowcount; n &lt; ne; n++ )
++            for ( int n = firstRowIndex, ne = rowcount; n &lt; ne; n++ )
+             {
+                 RowPainter * p = ds-&gt;newRowPainter();
+                 ds-&gt;configureRowPainter(p, n);
+@@ -218,9 +251,6 @@
+             {
+                 lastRowHeight -= y - endy;
+             }
+-            
+-            firstRowHeight = rowHeight - froffset;
+-            firstRowOffset = froffset;
+ 
+         }
+         else
+@@ -283,6 +313,25 @@
+         scrollbar-&gt;onSelectStart();
+         selectingScrollbar = true;
+     }
++    else // as is not hovering the scrollbar, it must be either on header or over rows
++    {
++        const int my = GameInput::InputManager::getMouseY();
++        const int tdatay = my - (getLocationY() + TextRenderingSystem::line_height());
++        if ( (tdatay &gt;= 0) &amp;&amp; tdatay &lt; (rect.getHeight() - TextRenderingSystem::line_height()) )
++        {
++            const int total = firstRowTotalPosition + firstRowOffset + tdatay;
++            const int selrow = total / rowHeight;
++            if ( selrow &lt; ds-&gt;getRowCount() )
++            {
++                if ( changeEvent )
++                {
++                    events-&gt;push(changeEvent);
++                }
++                
++                selectedRow = selrow;
++            }
++        }
++    }
+ }
+ 
+ void Table::onSelectStop()
+
+Modified: trunk/netpanzer/src/Lib/2D/Components/Table.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Components/Table.hpp	2013-09-08 23:58:04 UTC (rev 1432)
++++ trunk/netpanzer/src/Lib/2D/Components/Table.hpp	2013-09-09 16:02:32 UTC (rev 1433)
+@@ -128,6 +128,11 @@
+      */
+     void addColumn(const UString&amp; text, const unsigned width);
+     
++    void setChangeEvent(const int e) { changeEvent = e; }
++    
++    int getSelectedIndex() const { return selectedRow; }
++    void clearSelection() { selectedRow = -1; } // XXX might need dirty in the future
++    
+     void setSize(const int x, const int y);
+     void setLocation(const int x, const int y);
+     
+@@ -170,6 +175,9 @@
+     /** Separation space in pixels between columns */
+     int intercolumnWidth;
+     
++    /** The index of the first visible row */
++    int firstRowIndex;
++    
+     /** Location of the first row on the whole scrollable view */
+     int firstRowTotalPosition; // @todo find a better name for this
+     
+@@ -185,6 +193,9 @@
+     /** Height of one row, updated from the DataSource */
+     int rowHeight;
+     
++    /** Selected row */
++    int selectedRow;
++    
+     /** Flag to notify the logic() code it needs to do some recalculation */
+     bool dirty;
+     
+@@ -208,6 +219,9 @@
+     
+     /** Scrollbar will send the change event here */
+     ComponentEvents myEvents;
++    
++    /** Selectiong change event code */
++    int changeEvent;
+ };
+ 
+ #endif	/* TABLE_HPP */
+
+Modified: trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.cpp	2013-09-08 23:58:04 UTC (rev 1432)
++++ trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.cpp	2013-09-09 16:02:32 UTC (rev 1433)
+@@ -36,6 +36,7 @@
+ #include &quot;2D/Components/Table.hpp&quot;
+ #include &quot;2D/Components/Button.hpp&quot;
+ #include &quot;2D/TextRenderingSystem.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ #endif
+ 
+ #define MENU_WIDTH  (640)
+@@ -48,22 +49,25 @@
+ #ifdef TEST_TABLE
+ 
+ #include &lt;vector&gt;
++#include &lt;string&gt;
+ 
+ struct Events
+ {
+     enum
+     {
+-        AddToTable = 1
++        AddToTable = 1,
++        TableSelectionChanged,
++        ClearSelection
+     };
+ };
+ 
+ class TestData
+ {
+ public:
+-    TestData(const UString&amp; s1, const UString&amp; s2, const UString &amp;s3)
++    TestData(const std::string&amp; s1, const std::string&amp; s2, const std::string &amp;s3)
+         : s1(s1), s2(s2), s3(s3)
+         {}
+-    UString s1, s2, s3;
++    std::string s1, s2, s3;
+ };
+ 
+ class TestRowPainter : public Table::RowPainter
+@@ -81,9 +85,9 @@
+     
+     void setData(const TestData&amp; data)
+     {
+-        c1.setText(data.s1);
+-        c2.setText(data.s2);
+-        c3.setText(data.s3);
++        c1.setText(data.s1.c_str());
++        c2.setText(data.s2.c_str());
++        c3.setText(data.s3.c_str());
+     }
+     
+     void paintCell(Surface&amp; dest, const int x, const int y, const iRect&amp; rect, const unsigned column) const
+@@ -107,23 +111,23 @@
+     std::vector&lt;TestData&gt; testrows;
+     TestDataSource() : Table::DataSource()
+     {
+-        testrows.push_back(TestData(UString(&quot;0,0&quot;),UString(&quot;0,1&quot;),UString(&quot;0,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;1,0&quot;),UString(&quot;1,1&quot;),UString(&quot;1,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;2,0&quot;),UString(&quot;2,1&quot;),UString(&quot;2,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;3,0&quot;),UString(&quot;3,1&quot;),UString(&quot;3,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;4,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;5,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;6,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;7,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;8,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;9,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;10,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;11,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;12,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;13,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;14,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;15,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
+-        testrows.push_back(TestData(UString(&quot;16,0&quot;),UString(&quot;4,1&quot;),UString(&quot;4,2&quot;)));
++        testrows.push_back(TestData(&quot;0,0&quot;,&quot;0,1&quot;,&quot;0,2&quot;));
++        testrows.push_back(TestData(&quot;1,0&quot;,&quot;1,1&quot;,&quot;1,2&quot;));
++        testrows.push_back(TestData(&quot;2,0&quot;,&quot;2,1&quot;,&quot;2,2&quot;));
++        testrows.push_back(TestData(&quot;3,0&quot;,&quot;3,1&quot;,&quot;3,2&quot;));
++        testrows.push_back(TestData(&quot;4,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;5,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;6,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;7,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;8,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;9,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;10,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;11,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;12,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;13,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;14,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;15,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
++        testrows.push_back(TestData(&quot;16,0&quot;,&quot;4,1&quot;,&quot;4,2&quot;));
+     }
+     
+     ~TestDataSource()
+@@ -131,12 +135,16 @@
+         
+     }
+     
+-    void addRow(const UString&amp; s1, const UString&amp; s2, const UString&amp; s3)
++    void addRow(const std::string&amp; s1, const std::string&amp; s2, const std::string&amp; s3)
+     {
+         testrows.push_back(TestData(s1,s2,s3));
+         notifyDataChanged();
+     }
+     
++    const TestData&amp; getRowData(const unsigned n)
++    {
++        return testrows[n];
++    }
+     
+     unsigned getRowCount() const
+     {
+@@ -201,12 +209,16 @@
+     table-&gt;addColumn(UString(&quot;Second Column&quot;), 175);
+     table-&gt;addColumn(UString(&quot;Thirth Column&quot;), 80);
+     
++    table-&gt;setChangeEvent(Events::TableSelectionChanged);
++    
+     tds.setTable(table);
+     
+     tableButton = Button::createNewSpecialButton(&quot;Add&quot;, iXY(0,0), 100);
+-//    tableButton = Button::createTextButton(&quot;Add&quot;, iXY(0,0), 100);
+     tableButton-&gt;setClickEvent(Events::AddToTable);
+     
++    clearTableButton = Button::createNewSpecialButton(&quot;Clear selection&quot;, iXY(0,0), 150);
++    clearTableButton-&gt;setClickEvent(Events::ClearSelection);
++    
+ #endif
+     
+     addComponent(area);
+@@ -215,6 +227,7 @@
+ #else
+     addComponent(table);
+     addComponent(tableButton);
++    addComponent(clearTableButton);
+ #endif
+ //    addComponent(label);
+ //    addComponent(input_field);
+@@ -241,6 +254,7 @@
+     table-&gt;setLocation(x, y);
+     y += table-&gt;getHeight();
+     tableButton-&gt;setLocation(x+250, y+50);
++    clearTableButton-&gt;setLocation(x+350, y+50);
+ #endif
+     
+ #ifdef TEST_INPUTFIELD
+@@ -256,9 +270,24 @@
+     while ( (event = component_events.nextEvent()) ) switch ( event )
+     {
+         case Events::AddToTable:
+-            tds.addRow(UString(&quot;Added col 1&quot;),UString(&quot;Added col 2&quot;),UString(&quot;Even more&quot;));
++            tds.addRow(&quot;Added col 1&quot;,&quot;Added col 2&quot;,&quot;Even more&quot;);
+             break;
+             
++        case Events::TableSelectionChanged:
++        {
++            int sindex = table-&gt;getSelectedIndex();
++            const TestData&amp; td = tds.getRowData(sindex);
++            LOGGER.warning(&quot;Row selected %d: '%s' '%s' '%s'&quot;, sindex, td.s1.c_str(), td.s2.c_str(), td.s3.c_str());
++        }
++            break;
++            
++        case Events::ClearSelection:
++        {
++            table-&gt;clearSelection();
++            LOGGER.warning(&quot;Unselected&quot;);
++        }
++            break;
++            
+     }
+ #endif
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.hpp	2013-09-08 23:58:04 UTC (rev 1432)
++++ trunk/netpanzer/src/NetPanzer/Scenes/MainMenu/IntroLayer.hpp	2013-09-09 16:02:32 UTC (rev 1433)
+@@ -62,6 +62,7 @@
+ #ifdef TEST_TABLE
+     Table       * table;
+     Button      * tableButton;
++    Button      * clearTableButton;
+ #endif
+     
+ #ifdef TEST_INPUTFIELD
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000453.html">[Netpanzer-cvs] r1432 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src/Lib/2D	src/Lib/2D/Components src/Lib/Types	src/NetPanzer/Scenes/MainMenu src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000455.html">[Netpanzer-cvs] r1434 - in trunk/netpanzer:	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private src	src/Lib/2D src/NetPanzer/Actions	src/NetPanzer/Scenes/MainMenu src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#454">[ date ]</a>
+              <a href="thread.html#454">[ thread ]</a>
+              <a href="subject.html#454">[ subject ]</a>
+              <a href="author.html#454">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

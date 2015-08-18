@@ -1,0 +1,323 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1252 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Scripts	src/NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1252%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111012121142.841394814A2%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000277.html">
+   <LINK REL="Next"  HREF="000279.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1252 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Scripts	src/NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1252%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111012121142.841394814A2%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1252 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Scripts	src/NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Oct 12 14:11:42 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000277.html">[Netpanzer-cvs] r1251 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Interfaces src/NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000279.html">[Netpanzer-cvs] r1253 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#278">[ date ]</a>
+              <a href="thread.html#278">[ thread ]</a>
+              <a href="subject.html#278">[ subject ]</a>
+              <a href="author.html#278">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-12 14:11:42 +0200 (Wed, 12 Oct 2011)
+New Revision: 1252
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/scripts/usercommands.lua
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+Log:
+- Added key 'c' to start a countdown of 5
+- fix problem with scripting sending nothing on &quot;say&quot; command
+- added 2 scripting facilities for admin only: listplayers and kick, doesn't need explanation.
+
+
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-10-11 12:21:33 UTC (rev 1251)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-10-12 12:11:42 UTC (rev 1252)
+@@ -7,10 +7,17 @@
+         end
+     end,
+ 
++    listplayers_help = &quot;List the players with their Id&quot;,
++    listplayers = function(param, player)
++        if param then
++            netpanzer.serversayto(player, &quot;List of players:&quot; .. netpanzer.listplayers());
++        end
++    end,
++
+     kick_help = &quot;Kicks a player, use the player number (starts in 0)&quot;,
+     kick = function(param, player)
+         if param then
+-            GameManager:kickPlayer(param);
++            netpanzer.kick(param);
+         end
+     end,
+ 
+@@ -50,29 +57,6 @@
+         end
+     end,
+ 
+-    listplayers_help = &quot;List the players&quot;,
+-    listplayers = function(param,player)
+-        local playerst;
+-        local out;
+-        for p = 0,PlayerInterface:getMaxPlayers()-1 do
+-            playerst = PlayerInterface:getPlayer(p);
+-            if playerst:isConnecting() then
+-                if out then
+-                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                else
+-                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[connecting:&quot;.. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                end
+-            elseif playerst:isActive() then
+-                if out then
+-                    out = out .. &quot;,&quot;.. p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                else
+-                    out = p .. &quot;:&quot; .. playerst:getName() .. &quot;[&quot; .. PlayerInterface:getPlayerIP(p) .. &quot;]&quot;;
+-                end
+-            end
+-        end
+-        netpanzer.serversayto(player, out);
+-    end,
+-
+     autokick_help = &quot;sets the idle time for kicking a player automatically&quot;,
+     autokick = function(param, player)
+         if ( param == &quot;&quot; ) then
+
+Modified: trunk/netpanzer/scripts/usercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/usercommands.lua	2011-10-11 12:21:33 UTC (rev 1251)
++++ trunk/netpanzer/scripts/usercommands.lua	2011-10-12 12:11:42 UTC (rev 1252)
+@@ -14,7 +14,7 @@
+         end
+     end,
+ 
+-    server_help = &quot;Sends the command to the server, no need to add '/' in command&quot;;
++    server_help = &quot;Sends the command to the server&quot;;
+     server = function(param)
+         if param then
+             netpanzer.say('/' .. param);
+@@ -52,30 +52,37 @@
+        netpanzer.quit();
+     end,
+ 
+-	-- doesn't work as expected, needs checking.
++    -- doesn't work as expected, needs checking.
+     --disconnect_help = &quot;Disconnects from current server.&quot;,
+     --disconnect = function(param)
+     --    GameManager:quitNetPanzerGame();
+     --end,
+ 
+-    info = function(param)
+-        ConsoleInterface:post( Color.cyan, false, 0, &quot;You are player: &quot; .. PlayerInterface:getLocalPlayerIndex());
+-        local ps = PlayerInterface:getLocalPlayer();
+-        ConsoleInterface:post( Color.cyan, true, ps:getFlag(), &quot;Your name is &quot; .. ps:getName());
+-        ConsoleInterface:post( Color.cyan, false, 0, &quot;Your id is &quot; .. ps:getID());
+-        local numOb = ps:getObjectivesHeld();
+-        if (numOb == 0) then ConsoleInterface:post( Color.cyan, false, 0, &quot;You have'nt bases&quot;)
+-        elseif (numOb == 1) then ConsoleInterface:post( Color.cyan, false, 0, &quot;You have 1 base&quot;)
+-    	else ConsoleInterface:post( Color.cyan, false, 0, &quot;You have &quot; .. numOb .. &quot; bases&quot;) end
+-    end,
+-
+     test = function(param)
+         netpanzer.scriptmessage(&quot;the thing is: &quot; .. config.game.unit_profiles);
+     end,
+     
+     countdown_help = &quot;Do a countdown.&quot;,
+     countdown = function(param)
+-        netpanzer.say(&quot;/countdown &quot; .. param);
++        local counttime, message = string.match(param, &quot;(%d+) *(.*)&quot;);
++        counttime = counttime or 5;
++        message = message or &quot;Countdown...&quot;;
++        local count = 0;
++        netpanzer.say(message .. &quot; &quot; .. counttime);
++
++        game.addTask(function()
++            count = count + game.frametime;
++            if count &gt; 1.0 then
++                count = count - 1.0;
++                counttime = counttime - 1;
++                if counttime == 0 then
++                    netpanzer.say(message .. &quot; FIGHT!!!!&quot;);
++                else
++                    netpanzer.say(message .. &quot; &quot; .. counttime);
++                end
++            end
++            return counttime == 0;
++        end);
+     end
+ 
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-11 12:21:33 UTC (rev 1251)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-12 12:11:42 UTC (rev 1252)
+@@ -345,6 +345,11 @@
+         GameConfig::interface_show_health = !GameConfig::interface_show_health;
+     }
+ 
++    if ( KeyboardInterface::getKeyPressed( SDLK_c ) == true )
++    {
++        ScriptManager::runUserCommand(&quot;countdown 5 Prepare to fight...&quot;);
++    }
++
+     if ( (KeyboardInterface::getKeyPressed( SDLK_RETURN ) == true)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_LALT ) == false)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_RALT ) == false))
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-10-11 12:21:33 UTC (rev 1251)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-10-12 12:11:42 UTC (rev 1252)
+@@ -24,7 +24,11 @@
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Classes/Network/NetworkServer.hpp&quot;
+ 
++#include &lt;sstream&gt;
++
+ static int npmodule_say (lua_State *L)
+ {
+     ChatInterface::say(lua_tolstring(L,1,0));
+@@ -52,31 +56,70 @@
+     }
+     else
+     {
+-        ChatInterface::serversayTo(n, lua_tolstring(L,2,0));
++        const char * str = lua_tolstring(L,2,0);
++        if ( str )
++        {
++            ChatInterface::serversayTo(n, str);
++        }
+     }
+     return 0;
+ }
+ 
++static int npmodule_scriptmessage (lua_State *L)
++{
++    ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;* %s&quot;, lua_tolstring(L,1,0) );
++    return 0;
++}
++
+ static int npmodule_quit (lua_State *L)
+ {
+     GameManager::exitNetPanzer();
+     return 0;
+ }
+ 
+-static int npmodule_scriptmessage (lua_State *L)
++static int npmodule_kick (lua_State *L)
+ {
+-    ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;* %s&quot;, lua_tolstring(L,1,0) );
++    int n = lua_tonumber(L, 1);
++    if ( !n &amp;&amp; ! lua_isnumber(L, 1) )
++    {
++        // TODO it is missing a parameter or it is not a number, do something
++    }
++    else
++    {
++        SERVER-&gt;kickClient(SERVER-&gt;getClientSocketByPlayerIndex((unsigned short)n));
++    }
+     return 0;
+ }
+ 
++static int npmodule_listPlayers (lua_State *L)
++{
++    std::stringstream ss(&quot;&quot;);
++
++    for ( int n = 0; n &lt; PlayerInterface::getMaxPlayers(); n++)
++    {
++        PlayerState *p = PlayerInterface::getPlayer(n);
++        if ( ! p-&gt;isFree() )
++        {
++            ss &lt;&lt; ' ' &lt;&lt; n &lt;&lt; &quot; - &quot;
++               &lt;&lt; (p-&gt;isAllocated() ? &quot;&lt;preconnect&gt;&quot; : p-&gt;getName())
++               &lt;&lt; &quot; |&quot;;
++        }
++    }
++
++    lua_pushstring( L, ss.str().c_str() );
++    return 1;
++}
++
+ static const luaL_Reg npmodule[] =
+ {
+-    {&quot;say&quot;,         npmodule_say},
+-    {&quot;teamsay&quot;,     npmodule_teamsay},
+-    {&quot;serversay&quot;,   npmodule_serversay},
+-    {&quot;serversayto&quot;, npmodule_serversayto},
+-    {&quot;quit&quot;,        npmodule_quit},
++    {&quot;say&quot;,           npmodule_say},
++    {&quot;teamsay&quot;,       npmodule_teamsay},
++    {&quot;serversay&quot;,     npmodule_serversay},
++    {&quot;serversayto&quot;,   npmodule_serversayto},
+     {&quot;scriptmessage&quot;, npmodule_scriptmessage},
++    {&quot;quit&quot;,          npmodule_quit},
++    {&quot;kick&quot;,          npmodule_kick},
++    {&quot;listplayers&quot;,   npmodule_listPlayers},
+     {NULL, NULL}
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2011-10-11 12:21:33 UTC (rev 1251)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2011-10-12 12:11:42 UTC (rev 1252)
+@@ -144,6 +144,7 @@
+     View::doDraw(viewArea, clientArea);
+ 
+ } // end FlagSelectionView::doDraw
++
+ void
+ FlagSelectionView::setSelectedFlag(FlagID code)
+ {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000277.html">[Netpanzer-cvs] r1251 - in trunk/netpanzer: scripts src/Lib/Util	src/NetPanzer/Classes src/NetPanzer/Interfaces src/NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000279.html">[Netpanzer-cvs] r1253 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#278">[ date ]</a>
+              <a href="thread.html#278">[ thread ]</a>
+              <a href="subject.html#278">[ subject ]</a>
+              <a href="author.html#278">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

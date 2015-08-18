@@ -1,0 +1,1354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r965 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r965%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Interfaces/unix%20src/NetPanzer/Network%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200704122308.l3CN8AY7001425%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000011.html">
+   <LINK REL="Next"  HREF="000013.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r965 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r965%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/Network%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Interfaces/unix%20src/NetPanzer/Network%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C200704122308.l3CN8AY7001425%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r965 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Interfaces/unix src/NetPanzer/Network	src/NetPanzer/Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Apr 13 01:08:10 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000011.html">[Netpanzer-cvs] r964 - in trunk/netpanzer/src: Lib/Network Lib/Util	NetPanzer/Classes NetPanzer/Classes/AI NetPanzer/Core	NetPanzer/Interfaces NetPanzer/Interfaces/unix	NetPanzer/Network NetPanzer/System NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+        <LI>Next message: <A HREF="000013.html">[Netpanzer-cvs] r966 - trunk/homepage
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-04-13 01:08:06 +0200 (Fri, 13 Apr 2007)
+New Revision: 965
+
+Modified:
+   trunk/netpanzer/BUGS
+   trunk/netpanzer/TODO
+   trunk/netpanzer/configure.ac
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+Log:
+Changes:
+- Added a send buffer, actually 32k it gets full some time, will need to check why, but it makes less clients to drop
+- Added checks in UDP code for some unchecked errors, it would make the client crash when browsing for servers (actually happened in Windows)
+- Added more information to the InfoSocket, the game version and the player points, still not used by server browsers.
+- Removed some compiling warnings
+- Fix problem that would make clients and servers to try to check out-of-map positions and fail an assert (and quit the game)
+- Fix problem in ServerSocket that would games to crash, creating empty players.
+- Disabled proxy functions until they are working
+- Fix problem when one player host a game (not dedicated) the first connected player wouldn't be able to move his units
+- Fix problem when receiving data from players, if the size (in the protocol) was incorrect it wouldn't receive anymore correct data from that player, and eventually disconnect
+- Fix problem when client connects to a server, if the server returns some error, like server full, the client would use 100% CPU for some seconds
+- Fix problem when syncing the units to a new player, if new tanks are created, this player would received it twice (one with sync command, one with create command). Now only send it once
+- Syncing units when a player connects to a game would re-sync all the units to all the players, now don't sync.
+- When Syncing units to a new player now less information and smaller packets are sent. Instead of Sync message a Create message is sent, as i found the information is the same and other information is Sync message was not used.
+
+
+Modified: trunk/netpanzer/BUGS
+===================================================================
+--- trunk/netpanzer/BUGS	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/BUGS	2007-04-12 23:08:06 UTC (rev 965)
+@@ -1,50 +1,17 @@
+ - sometimes 2 players spawn at the same place - hard to fix, low priority
+-- unit count is calculated incorrect (20 in server config - 9 units 
+-  available in game) - the unit count is simply hardcoded, it's not
+-  configurable yet
+ - it is reported that in timelimit mode games might end too early (ie. client
+   display 40/60 and game ends) - is it possible that the client time doesn't
+   sync correctly with server time?
+ - Astar sometimes calculates strange paths. Very obvious if you try to capture
+   and outpost from the left side: Your panzers will drive around it before
+   entering it.
+-- Clients aren't notified when the server closes - actually they are, but they
+-  aren't shutting down the game
+ - The no allies flag in the server config has no effect
+ - Clients pressing the Abort button when connecting leave a ghost on the server
+-which displays no IP.
++which displays no IP. (i think matze fixed this in 0.8.1)
+ -netpanzer fails on win98se
+ -setting allowallies=no in config has no effect
+-[22:43:23]      &lt;BenUrban&gt;      woohoo
+-[22:43:26]      &lt;BenUrban&gt;      caught SIGABRT
+-[22:43:30]      &lt;BenUrban&gt;      in debugger :D
+-[22:45:17]      &lt;BenUrban&gt;      UnitInterface::offloadGraphics(SpriteSorter &amp;)...
+-[22:45:41]      &lt;BenUrban&gt;      UnitInterface.cpp:274
+-[22:45:59]      &lt;BenUrban&gt;      t-&gt;unit-&gt;offloadGraphics(sorter);
+-[22:50:47]      &lt;BenUrban&gt;      Program received signal:  &quot;SIGABRT&quot;.
+-[22:50:47]      &lt;BenUrban&gt;      pure virtual method called
+-[22:50:49]      &lt;BenUrban&gt;      SIGH
+-[23:04:46]      &lt;BenUrban&gt;      virtual void offloadGraphics(SpriteSorter&amp; ) = 0;
+-[23:04:47]      &lt;BenUrban&gt;      hmm
+-[23:05:05]      *       BenUrban wonders if there's an easy way to inspect what class this particular object is
+-[23:06:28]      &lt;BenUrban&gt;      hmm
+-[23:06:34]      &lt;BenUrban&gt;      it says it's a UnitBase object
+-[23:07:02]      &lt;BenUrban&gt;      of unit_type 2...
+-[23:11:02]      &lt;BenUrban&gt;      hmm
+-[23:11:13]      &lt;BenUrban&gt;      it must be an actual UnitBase object
+-[23:11:26]      &lt;BenUrban&gt;      since the only direct subclass of UnitBase is Vehicle
+-[23:11:39]      &lt;BenUrban&gt;      and that does have an offloadGraphics method
+-[23:11:42]      &lt;BenUrban&gt;      so...
+-[23:11:45]      &lt;BenUrban&gt;      the question...
+-[23:11:59]      &lt;BenUrban&gt;      is why did the compilet allow it to create a UnitBase object?
+-[23:12:04]      &lt;BenUrban&gt;      *compiler
+-[23:12:07]      &lt;BenUrban&gt;      hmm
+-[23:12:18]      &lt;BenUrban&gt;      and where did it create it?
+-[23:16:29]      &lt;BenUrban&gt;      hmm
+-[23:27:09]      &lt;BenUrban&gt;      looks like it's supposed to be a Titan
+-[23:41:58]      *       BenUrban exited the debugger
+ 
+-
++-NOTE: next error would be cause by previously fixed error (maybe, lets see in future)
+ &lt;BenUrban&gt; have you encountered either of the pantom tank bugs yet MatzeB ?
+ &lt;MatzeB&gt; nope
+ &lt;BenUrban&gt; there's one where an actual tank is really there (apparently) but
+
+Modified: trunk/netpanzer/TODO
+===================================================================
+--- trunk/netpanzer/TODO	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/TODO	2007-04-12 23:08:06 UTC (rev 965)
+@@ -25,7 +25,7 @@
+ *** Network
+  * Analyse if TCP was really a good choice. Question:
+     - what happens if a client can't keep up with the bandwith, will it stall
+-      the server?
++      the server? (kromxp: no, it will be dropped from server)
+  * An UDP protocol would need to be designed (taking a look at TNL or raknet
+    would also be a good idea)
+ 
+@@ -38,6 +38,7 @@
+     - done
+  * the Server has a massive memory leak somewhere - might be fixed now
+  * impelement 'initialunits' param in PlayerUnitConfig::initialize()
++     - kromxp: this is done, but in other way.
+  * synchronize resources between server and clients, both should have same flags
+    collection and map. Let them automatically download these things.
+  * server console doesn't react really way with all the messages of players
+@@ -117,3 +118,5 @@
+    defend an objective would be things that come to mind
+  * make panzers always hit their targets instead of missing moving units?
+ 
++kromxp:
++   wow i have also many of the same ideas explained here.
+
+Modified: trunk/netpanzer/configure.ac
+===================================================================
+--- trunk/netpanzer/configure.ac	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/configure.ac	2007-04-12 23:08:06 UTC (rev 965)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [0.8.1], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [svn], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -63,6 +63,7 @@
+ SocketBase::SocketBase(SOCKET fd, const Address &amp;a) : sockfd(fd), addr(a)
+ {
+     SocketManager::addSocket(this);
++    _isConnecting=false;
+ }
+ 
+ void
+@@ -188,7 +189,7 @@
+         }
+         
+         if ( IS_IGNORABLE_ERROR(error) )
+-            return 0; // xxx WARNING should do something if can't send now
++            return 0;
+         
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: &quot;;
+@@ -233,6 +234,8 @@
+                 toaddr.getSockaddr(), toaddr.getSockaddrLen());
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
++        if ( IS_SENDTO_IGNORABLE(error) )
++            return 0;
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: &quot;;
+         printError(msg,error);
+@@ -248,11 +251,11 @@
+             fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
+     if(res == SOCKET_ERROR) {
+         int error = GET_NET_ERROR();
+-        if ( IS_IGNORABLE_ERROR(error) )
++        if ( IS_RECVFROM_IGNORABLE(error) )
+             return 0;
+ 
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Receive error: &quot; &lt;&lt; strerror(errno);
++        msg &lt;&lt; &quot;Receive error: &quot;;
+         printError(msg,error);
+         throw std::runtime_error(msg.str());
+     }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -28,7 +28,8 @@
+ #define IS_ACCEPT_IGNORABLE(code) ((code==WSAEWOULDBLOCK)||(code==WSAECONNRESET)||(code==WSAEINTR)||(code==WSAEINPROGRESS))
+ #define IS_DISCONECTED(code) ((code==WSAENETRESET)||(code==WSAECONNABORTED)||(code==WSAETIMEDOUT)||(code==WSAECONNRESET))
+ #define IS_IGNORABLE_ERROR(code) (code==WSAEWOULDBLOCK)
+-#define NETERROR_WOULDBLOCK WSAEWOULDBLOCK
++#define IS_RECVFROM_IGNORABLE(code) ((code==WSAEWOULDBLOCK)||(code==WSAECONNRESET))
++#define IS_SENDTO_IGNORABLE(code) ((code==WSAEWOULDBLOCK)||(code==WSAECONNRESET))
+ #define SETSOCKOPT_PARAMTYPE char
+ #define SEND_FLAGS 0
+ #define RECV_FLAGS 0
+@@ -53,7 +54,8 @@
+ #define IS_ACCEPT_IGNORABLE(code) ((code==EAGAIN)||(code==ECONNABORTED)||(code==EINTR))
+ #define IS_DISCONECTED(code) ((code==ECONNREFUSED)||(code==ECONNRESET)||(code==EPIPE)||(code==ENOTCONN))
+ #define IS_IGNORABLE_ERROR(code) ((code==EAGAIN)||(code==EINTR))
+-#define NETERROR_WOULDBLOCK EWOULDBLOCK
++#define IS_RECVFROM_IGNORABLE(code) ((code==EAGAIN)||(code==EINTR)||(code==ECONNREFUSED))
++#define IS_SENDTO_IGNORABLE(code) ((code==EAGAIN)||(code==EWOULDBLOCK)||(code==EINTR)||(code==EPIPE)||(code==ECONNRESET))
+ #define SETSOCKOPT_PARAMTYPE int
+ #define SEND_FLAGS MSG_NOSIGNAL
+ #define RECV_FLAGS MSG_NOSIGNAL
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -50,25 +50,15 @@
+     observer=0;
+ }
+ 
+-void
++size_t
+ TCPSocket::send(const void* data, size_t size)
+ {
+     int res = doSend(data,size);
+     if (!res &amp;&amp; !observer) // disconnected
+-        return;
+-    if(res != (int) size) {
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Send error: Couldn't send all data.&quot;;
+-        throw std::runtime_error(msg.str());
+-    }
++        return size; // as is disconnected, avoid catching of unsend data
++    return res;
+ }
+ 
+-/*size_t
+-TCPSocket::recv(void* buffer, size_t size)
+-{
+-    return doReceive(buffer,size);
+-}*/
+-
+ TCPSocket::TCPSocket()
+ {
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -47,7 +47,7 @@
+ 
+     void destroy();
+ 
+-    void send(const void* data, size_t datasize);
++    size_t send(const void* data, size_t datasize);
+     
+ protected:
+     ~TCPSocket();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ClientConnectDaemon.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -397,6 +397,7 @@
+                     lobbyView-&gt;toggleMainMenu();
+                     connection_state = _connect_state_idle;
+                 }
++                end_cycle = true;
+             }
+             break;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -60,6 +60,8 @@
+     virtual void partServer() = 0;
+ 
+     virtual void sendMessage(NetMessage* message, size_t size) = 0;
++    virtual void sendRemaining() = 0;
++
+     virtual bool getMessage(NetMessage *message) = 0;
+ 
+     virtual void checkIncoming() = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -65,7 +65,7 @@
+     void removeClientFromSendList(const PlayerID&amp; client_player_id);
+ 
+     virtual void openSession() = 0;
+-    virtual void hostSession(bool loopback = false) = 0;
++    virtual void hostSession() = 0;
+     virtual void closeSession() = 0;
+ 
+     virtual void sendMessage(NetMessage *message, size_t size) = 0;
+@@ -75,6 +75,7 @@
+             size_t size) {
+         sendMessage(player_id.getNetworkID(), message, size);
+     }
++    virtual void sendRemaining() = 0;
+ 
+     virtual bool getPacket(NetPacket* packet) = 0;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -46,16 +46,19 @@
+ std::list&lt;ConnectQueueElement&gt; ServerConnectDaemon::connect_queue;
+ Timer		    ServerConnectDaemon::time_out_timer;
+ int	            ServerConnectDaemon::time_out_counter;
++Timer               ServerConnectDaemon::sendunitpercent_timer;
+ UnitSync*           ServerConnectDaemon::connect_unit_sync = 0;
+ 
+ #define _SERVER_CONNECT_TIME_OUT_TIME (20.0)
+ #define _SERVER_CONNECT_RETRY_LIMIT   (5)
++#define _SENDUNITPERCENT_TIME (1)
+ 
+ 
+ void ServerConnectDaemon::initialize(unsigned long max_players)
+ {
+     (void) max_players;
+     time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
++    sendunitpercent_timer.changePeriod( _SENDUNITPERCENT_TIME );
+     connect_unit_sync = 0;
+ }
+ 
+@@ -63,6 +66,7 @@
+ {
+     (void) max_players;
+     time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
++    sendunitpercent_timer.changePeriod( _SENDUNITPERCENT_TIME );
+ }
+ 
+ void ServerConnectDaemon::shutdownConnectDaemon()
+@@ -432,6 +436,7 @@
+                 sizeof(ConnectProcessStateMessage));
+         delete connect_unit_sync;
+         connect_unit_sync = new UnitSync();
++        sendunitpercent_timer.reset();
+ 
+         state_mesg.setMessageEnum(_connect_state_message_sync_units);
+         SERVER-&gt;sendMessage( connect_player_id, &amp;state_mesg,
+@@ -463,16 +468,19 @@
+ 
+     // send a unit
+     if(connect_unit_sync-&gt;sendNextUnit(connect_player_id)) {
+-        state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
+-        state_mesg.setPercentComplete(percent_complete);
+-        SERVER-&gt;sendMessage(connect_player_id, &amp;state_mesg,
+-                sizeof(ConnectProcessStateMessage));
++        if ( sendunitpercent_timer.count() ) {
++            state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
++            state_mesg.setPercentComplete(percent_complete);
++            SERVER-&gt;sendMessage(connect_player_id, &amp;state_mesg,
++                    sizeof(ConnectProcessStateMessage));
++            sendunitpercent_timer.reset();
++        }
+         return true;
+     }
+ 
+     // Sending finished
+     state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
+-    state_mesg.setPercentComplete(percent_complete);
++    state_mesg.setPercentComplete(100);
+     SERVER-&gt;sendMessage( connect_player_id, &amp;state_mesg,
+             sizeof(ConnectProcessStateMessage));
+ 
+@@ -508,80 +516,39 @@
+ 
+     do {
+         switch ( connection_state ) {
+-        case connect_state_idle : {
+-                if ( connectStateIdle() ) {
+-                    end_cycle = true;
+-                } else {
+-                    end_cycle = false;
+-                }
++            case connect_state_idle:
++                end_cycle = connectStateIdle();
++                break;
+ 
+-            }
+-            break;
++            case connect_state_wait_for_connect_request:
++                end_cycle = connectStateWaitForConnectRequest( message );
++                break;
+ 
+-        case connect_state_wait_for_connect_request : {
+-                if ( connectStateWaitForConnectRequest( message ) ) {
+-                    end_cycle = true;
+-                } else {
+-                    end_cycle = false;
+-                }
+-            }
+-            break;
++            case connect_state_attempt_player_alloc:
++                end_cycle = connectStateAttemptPlayerAlloc();
++                break;
+ 
++            case  connect_state_wait_for_client_settings:
++                end_cycle = connectStateWaitForClientSettings( message );
++                break;
+ 
+-        case connect_state_attempt_player_alloc : {
+-                if ( connectStateAttemptPlayerAlloc( ) ) {
+-                    end_cycle = true;
+-                } else {
+-                    end_cycle = false;
+-                }
+-            }
+-            break;
++            case connect_state_wait_for_client_game_setup_ack:
++                end_cycle = connectStateWaitForClientGameSetupAck( message );
++                break;
+ 
++            case connect_state_player_state_sync:
++                end_cycle = connectStatePlayerStateSync();
++                break;
+ 
+-        case  connect_state_wait_for_client_settings : {
+-                if ( connectStateWaitForClientSettings( message ) ) {
+-                    end_cycle = true;
+-                } else {
+-                    end_cycle = false;
+-                }
+-            }
+-            break;
++            case connect_state_unit_sync:
++                end_cycle = connectStateUnitSync();
++                break;
+ 
+-        case connect_state_wait_for_client_game_setup_ack : {
+-                if ( connectStateWaitForClientGameSetupAck( message ) ) {
+-                    end_cycle = true;
+-                } else {
+-                    end_cycle = false;
+-                }
+-            }
+-            break;
++            default:
++                assert(&quot;Bad connection state&quot; == 0);
+ 
+-        case connect_state_player_state_sync : {
+-                if ( connectStatePlayerStateSync( ) ) {
+-                    end_cycle = true;
+-                } else {
+-                    end_cycle = false;
+-                }
+-            }
+-            break;
+-
+-        case connect_state_unit_sync : {
+-                if ( connectStateUnitSync( ) ) {
+-                    end_cycle = true;
+-                } else {
+-                    end_cycle = false;
+-                }
+-            }
+-            break;
+-
+-		default:
+-			assert(false);
+-
+         } // ** switch
+-
+     } while( end_cycle == false );
+-
+-
+ }
+ 
+ void ServerConnectDaemon::connectProcess(const NetMessage* message)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -58,6 +58,7 @@
+     static UnitSync*            connect_unit_sync;
+     static Timer		time_out_timer;
+     static int	                time_out_counter;
++    static Timer                sendunitpercent_timer;
+     static std::list&lt;ConnectQueueElement&gt; connect_queue;
+ 
+     static bool inConnectQueue( PlayerID &amp;new_player_id );
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -17,17 +17,24 @@
+ */
+ #include &lt;config.h&gt;
+ 
+-#include &lt;iostream&gt;
+-
+-#include &quot;PlayerInterface.hpp&quot;
+-#include &quot;MapInterface.hpp&quot;
+ #include &quot;UnitSync.hpp&quot;
+ #include &quot;Server.hpp&quot;
+ #include &quot;NetworkServer.hpp&quot;
++#include &quot;UnitInterface.hpp&quot;
++#include &quot;UnitBase.hpp&quot;
++#include &quot;MapInterface.hpp&quot;
++#include &quot;UnitNetMessage.hpp&quot;
+ 
++
++
++
+ UnitSync::UnitSync()
+-    : count(0), unitid(0)
++    : count(0), unitid(0), unitstosync(0), lastunit(0)
+ {
++    unitstosync = UnitInterface::getTotalUnitCount();
++    if ( unitstosync ) {
++        lastunit = UnitInterface::getUnits().rbegin()-&gt;first;
++    }
+ }
+ 
+ UnitSync::~UnitSync()
+@@ -35,15 +42,17 @@
+ 
+ int UnitSync::getPercentComplete() const
+ {
+-    return  int (
+-            100.0 / UnitInterface::getTotalUnitCount() * float(count));
++    if ( unitstosync )
++        return  (100 * count ) / unitstosync;
++    else
++        return 100;
+ }
+ 
+ bool UnitSync::sendNextUnit(PlayerID toplayer)
+ {
+     const UnitInterface::Units&amp; units = UnitInterface::getUnits();
+     UnitInterface::Units::const_iterator i = units.lower_bound(unitid);
+-    if(i == units.end()) {
++    if(i == units.end() || i-&gt;first &gt; lastunit ) {
+         return false;
+     }
+     
+@@ -53,14 +62,18 @@
+     iXY unit_map_loc;
+     MapInterface::pointXYtoMapXY(unit-&gt;unit_state.location, &amp;unit_map_loc);
+ 
+-    UnitIniSyncMessage sync_message(unit-&gt;unit_state.unit_type,
+-            unit-&gt;player-&gt;getID(), unit-&gt;id, unit_map_loc.x, unit_map_loc.y);
+-    sync_message.unit_state = unit-&gt;unit_state.getNetworkUnitState();
+-
+-    SERVER-&gt;sendMessage(toplayer, &amp;sync_message, sizeof(UnitIniSyncMessage));
+-
+-    unit-&gt;syncUnit();
++    UnitRemoteCreate create_message(unit-&gt;player-&gt;getID(),
++                                    unit-&gt;id,
++                                    unit_map_loc.x,
++                                    unit_map_loc.y,
++                                    unit-&gt;unit_state.unit_type);
++    SERVER-&gt;sendMessage(toplayer, &amp;create_message, sizeof(create_message));
++    
++    // XXX when send units to new players it also send sync command to all players
++    // This will change in future
++    //unit-&gt;syncUnit();
+     unitid++;
++    count++;
+ 
+     return true;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/UnitSync.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -18,8 +18,8 @@
+ #ifndef __UNITSYNC_HPP__
+ #define __UNITSYNC_HPP__
+ 
+-#include &quot;UnitInterface.hpp&quot;
+-#include &quot;UnitList.hpp&quot;
++
++#include &quot;PlayerID.hpp&quot;
+ #include &quot;UnitBase.hpp&quot;
+ 
+ class UnitSync
+@@ -28,10 +28,6 @@
+     UnitSync();
+     ~UnitSync();
+ 
+-    /** returns the percentage of units, the iterator has traveled so far
+-     * (the number might ne slightly inaccurate, but won't be bigger than
+-     * 100)
+-     */
+     int getPercentComplete() const;
+     
+     bool sendNextUnit(PlayerID playerid);
+@@ -39,6 +35,8 @@
+ private:
+     size_t count;
+     UnitID unitid;
++    size_t unitstosync;
++    UnitID lastunit;
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -244,10 +244,8 @@
+ //-----------------------------------------------------------------
+ void BaseGameManager::simLoop()
+ {
+-    //CLIENT-&gt;checkIncoming();
+     network::SocketManager::handleEvents();
+     
+-    //SERVER-&gt;checkIncoming();
+     if ( NetworkState::status == _network_state_server ) {
+         ServerMessageRouter::routeMessages();
+     } else {
+@@ -268,6 +266,10 @@
+     Particle2D::simAll();
+ 
+     GameControlRulesDaemon::updateGameControlFlow();
++    if ( SERVER )
++        SERVER-&gt;sendRemaining();
++    if ( CLIENT )
++        CLIENT-&gt;sendRemaining();
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::inputLoop()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -16,6 +16,8 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
++#include &quot;config.h&quot;
++
+ #include &quot;InfoSocket.hpp&quot;
+ #include &quot;Util/StringTokenizer.hpp&quot;
+ 
+@@ -41,7 +43,8 @@
+     // others I plan to be modificable while game is running.
+     stringstream s;
+     s &lt;&lt; &quot;gamename\\netpanzer\\protocol\\&quot; &lt;&lt; NETPANZER_PROTOCOL_VERSION
+-      &lt;&lt; &quot;\\hostname\\&quot; &lt;&lt; gameconfig-&gt;playername;
++      &lt;&lt; &quot;\\hostname\\&quot; &lt;&lt; gameconfig-&gt;playername
++      &lt;&lt; &quot;\\gameversion\\&quot; &lt;&lt; PACKAGE_VERSION;
+     statusHead = s.str();
+ }
+ 
+@@ -55,6 +58,7 @@
+ void
+ InfoSocket::onDataReceived(UDPSocket *s, const Address &amp;from, const char *data, const int len)
+ {
++    (void)s;
+     string querypacket(data,len);
+     StringTokenizer qtokenizer(querypacket, '\\');
+     
+@@ -110,6 +114,7 @@
+           &lt;&lt; &quot;\\kills_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getKills()
+           &lt;&lt; &quot;\\deaths_&quot; &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getLosses()
+           &lt;&lt; &quot;\\score_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getObjectivesHeld()
++          &lt;&lt; &quot;\\points_&quot;  &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; playerState-&gt;getTotal()
+           &lt;&lt; &quot;\\flag_&quot;   &lt;&lt; n &lt;&lt; &quot;\\&quot; &lt;&lt; (int) playerState-&gt;getFlag();
+         n++;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -325,7 +325,7 @@
+     progressView-&gt;open();
+     progressView-&gt;scrollAndUpdateDirect( &quot;Launching Server ...&quot; );
+     try {
+-        SERVER-&gt;hostSession(true);
++        SERVER-&gt;hostSession();
+ 
+         if((bool) gameconfig-&gt;publicServer &amp;&amp;
+                 (const std::string&amp;) gameconfig-&gt;masterservers != &quot;&quot;) {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TileInterface.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -41,7 +41,8 @@
+     int subPixY = worldY % tile_set.getTileYsize();
+ 
+     if(tileX &gt;= (int) MapInterface::getWidth()
+-            || tileY &gt;= (int) MapInterface::getHeight()) 
++            || tileY &gt;= (int) MapInterface::getHeight()
++            || tileX &lt; 0 || tileY &lt; 0 ) 
+     {
+         LOGGER.warning(&quot;query for worldpixcolor outside map (%d,%d)&quot;,
+                 worldX, worldY);
+@@ -59,7 +60,8 @@
+     int tileY = worldY / tile_set.getTileYsize();
+ 
+     if(tileX &gt;= (int) MapInterface::getWidth()
+-            || tileY &gt;= (int) MapInterface::getHeight()) 
++            || tileY &gt;= (int) MapInterface::getHeight()
++            || tileX &lt; 0 || tileY &lt; 0 ) 
+     {
+         LOGGER.warning(&quot;query for worldpixmovement outside map (%d,%d)&quot;,
+                 worldX, worldY);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -104,6 +104,7 @@
+ 
+ void UnitInterface::cleanUp()
+ {
++    // XXX why doesn't clean the unit_bucket_array?
+     delete[] playerUnitLists;
+     playerUnitLists = 0;
+ 
+@@ -762,7 +763,7 @@
+         unit-&gt;in_sync_flag = false;
+         addNewUnit(unit);
+     } catch(std::exception&amp; e) {
+-        std::cerr &lt;&lt; &quot;Couldn't sync unit: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;
++        LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't sync unit '%s'&quot;, e.what());
+     }
+ }
+ 
+@@ -816,7 +817,7 @@
+                 create_mesg-&gt;getUnitID());
+         addNewUnit(unit);
+     } catch(std::exception&amp; e) {
+-        std::cerr &lt;&lt; &quot;Couldn't create new unit: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;
++        LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Couldn't create new unit '%s'&quot;, e.what());
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -47,12 +47,13 @@
+ void
+ NetworkClientUnix::onClientConnected(ClientSocket *s)
+ {
+-
++    (void)s;
+ }
+ 
+ void
+ NetworkClientUnix::onClientDisconected(ClientSocket *s)
+ {
++    (void)s;
+     Desktop::setVisibility(&quot;DisconectedView&quot;, true);
+     delete clientsocket;
+     clientsocket=0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkClientUnix.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -31,6 +31,7 @@
+     virtual void partServer();
+ 
+     virtual void sendMessage(NetMessage* message, size_t size);
++    void sendRemaining() { if ( clientsocket ) clientsocket-&gt;sendRemaining(); };
+     virtual bool getMessage(NetMessage *message);
+ 
+     virtual void checkIncoming();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -35,7 +35,8 @@
+ 
+ NetworkServerUnix::~NetworkServerUnix()
+ {
+-    delete serversocket;
++    if ( serversocket )
++        delete serversocket;
+ }
+ 
+ std::string
+@@ -56,21 +57,21 @@
+ {}
+ 
+ void
+-NetworkServerUnix::hostSession(bool loopback)
++NetworkServerUnix::hostSession()
+ {
+-    delete serversocket;
++    if ( serversocket ) {
++        delete serversocket;
++        serversocket = 0;
++    }
+     serversocket = new ServerSocket(gameconfig-&gt;bindaddress,
+             gameconfig-&gt;serverport);
+-    if(loopback) {
+-        NetClientID id = serversocket-&gt;addLoopbackClient();
+-        assert(id == 0);
+-    }
+ }
+ 
+ void
+ NetworkServerUnix::closeSession()
+ {
+-    delete serversocket;
++    if ( serversocket )
++        delete serversocket;
+     serversocket = 0;
+ }
+ 
+@@ -147,7 +148,5 @@
+ NetworkServerUnix::checkIncoming()
+ {
+     cleanupClients();
+-    //if(serversocket)
+-        //serversocket-&gt;read();
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/unix/NetworkServerUnix.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -31,12 +31,13 @@
+     virtual ~NetworkServerUnix();
+ 
+     virtual void openSession();
+-    virtual void hostSession(bool loopback = false);
++    virtual void hostSession();
+     virtual void closeSession();
+ 
+     virtual void sendMessage(NetMessage *message, size_t size);
+     virtual void sendMessage(NetClientID network_id,
+             NetMessage *message, size_t size);
++    void sendRemaining() { if ( serversocket ) serversocket-&gt;sendRemaining(); };
+ 
+     virtual bool getPacket(NetPacket* message);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -18,7 +18,9 @@
+ */
+ #include &lt;config.h&gt;
+ #include &lt;string&gt;
++#include &lt;string.h&gt;
+ #include &lt;sstream&gt;
++#include &lt;stdexcept&gt;
+ 
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+@@ -30,8 +32,10 @@
+ #include &quot;Util/Endian.hpp&quot;
+ #include &quot;Network/Address.hpp&quot;
+ 
++using namespace std;
++
+ ClientSocket::ClientSocket(ClientSocketObserver *o, const std::string&amp; whole_servername)
+-    : observer(0), socket(0), tempoffset(0)
++    : observer(0), socket(0), sendpos(0), tempoffset(0)
+ {
+     try {
+         proxy.setProxy(gameconfig-&gt;proxyserver,
+@@ -50,13 +54,15 @@
+         
+         socket = new network::TCPSocket(serveraddr, this);
+ 
++#if 0
++// no proxy for now.
+         if(proxy.proxyserver != &quot;&quot;) {
+             proxy.sendProxyConnect(*socket, whole_servername);
+             LOGGER.info(&quot;%s connected via proxy %s&quot;,
+                     whole_servername.c_str(),
+                     proxy.proxyserver.c_str());
+         }
+-
++#endif
+         initId();
+         observer = o;
+     } catch(...) {
+@@ -66,7 +72,7 @@
+     }
+ }
+ ClientSocket::ClientSocket(ClientSocketObserver *o)
+-    : observer(0), socket(0), tempoffset(0)
++    : observer(o), socket(0), sendpos(0), tempoffset(0)
+ {
+     initId();
+     observer = o;
+@@ -75,7 +81,7 @@
+ void
+ ClientSocket::initId()
+ {
+-    static NetClientID curid=0;
++    static NetClientID curid=1;
+     id=curid++;
+ }
+ 
+@@ -87,22 +93,56 @@
+ 
+ void ClientSocket::sendMessage(const void* data, size_t size)
+ {
+-    if (socket)
+-        socket-&gt;send(data, size);
++    if (socket) {
++        if (sendpos) {
++            if (sendpos+size &gt; sizeof(sendbuffer)) {
++                stringstream errmsg;
++                errmsg &lt;&lt; &quot;send buffer full 1 [&quot; &lt;&lt; id &lt;&lt; &quot;]&quot;;
++                throw runtime_error(errmsg.str());
++            }
++            memcpy(sendbuffer+sendpos,data,size);
++            sendpos+=size;
++            sendRemaining();
++        } else {
++            size_t s = socket-&gt;send(data, size);
++            if ( s != size ) {
++                if (sendpos+size &gt; sizeof(sendbuffer)) {
++                    stringstream errmsg;
++                    errmsg &lt;&lt; &quot;send buffer full 2 [&quot; &lt;&lt; id &lt;&lt; &quot;]&quot;;
++                    throw runtime_error(errmsg.str());
++                }
++                memcpy(sendbuffer+sendpos,data,size);
++                sendpos+=size;
++            }
++        }
++    }        
+ }
+ 
+ void
++ClientSocket::sendRemaining()
++{
++    if ( socket &amp;&amp; sendpos ) {
++        size_t s = socket-&gt;send(sendbuffer, sendpos);
++        if (!s)
++            return;
++        if ( s != sendpos ) {
++            memmove(sendbuffer,sendbuffer+s,sendpos-s);
++            sendpos-=s;
++        } else
++            sendpos = 0;
++    }
++}
++
++void
+ ClientSocket::onDataReceived(network::TCPSocket * so, const char *data, const int len)
+ {
++    (void)so;
+     int dataptr = 0;
+     unsigned int remaining = len;
+     uint16_t packetsize=0;
+-//    LOGGER.warning(&quot;Len is [%d]&quot;,len);
+     while (remaining) {
+-        //LOGGER.warning(&quot;-tempoffset[%d], remaining[%d], dataptr[%d]&quot;, tempoffset,remaining,dataptr);
+         if ( !tempoffset ) {
+             if ( remaining &gt;= sizeof(NetMessage) &amp;&amp; remaining &gt;= (packetsize=htol16(*((uint16_t*)(data+dataptr))) ) ){
+-                //LOGGER.warning(&quot;--Packet size is [%d]&quot;,packetsize);
+                 if ( packetsize &lt; sizeof(NetMessage) )
+                     packetsize = sizeof(NetMessage);
+                 if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+@@ -110,12 +150,10 @@
+                     break; // received a wrong packet size
+                 }
+                 
+-                //LOGGER.warning(&quot;---Sending packet [%d]&quot;,packetsize);
+                 EnqueueIncomingPacket(data+dataptr, packetsize, 0, id);
+                 remaining-=packetsize;
+                 dataptr+=packetsize;
+-            } else { // XXX check someone funny doesn't send a big msg
+-                //LOGGER.warning(&quot;--half packet start, remaining[%d]&quot;,remaining);
++            } else {
+                 if ( remaining &gt; _MAX_NET_PACKET_SIZE ) {
+                     // The only possibility of getting in here is...
+                     LOGGER.warning(&quot;Received wrong packetsize (remaining) [%d]&quot;,remaining);
+@@ -129,7 +167,7 @@
+         } else {
+             if ( tempoffset &lt; sizeof(NetMessage) ) {
+                 // copy the needed until netMessage
+-                LOGGER.warning(&quot;--Reading more for head&quot;);
++                LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Reading more for head&quot;, id);
+                 unsigned int needsize = sizeof(NetMessage)-tempoffset;
+                 unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
+                 memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+@@ -142,7 +180,7 @@
+                 packetsize=htol16(*((uint16_t*)tempbuffer));
+                 LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Head ok, size[%d]&quot;, id, packetsize);
+                 if ( packetsize &lt; sizeof(NetMessage) )
+-                    break;
++                    packetsize = sizeof(NetMessage);
+ 
+                 if ( packetsize &gt; _MAX_NET_PACKET_SIZE ) {
+                     LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Received wrong packetsize (half) [%d]&quot;, id, packetsize);
+@@ -151,7 +189,6 @@
+                 }
+                 
+                 if ( (tempoffset &lt; packetsize) &amp;&amp; remaining ) {
+-                    LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) need more packet and has remaining&quot;, id);
+                     unsigned int needsize = packetsize-tempoffset;
+                     unsigned int tocopy = (remaining&gt;needsize)?needsize:remaining;
+                     memcpy(tempbuffer+tempoffset, data+dataptr, tocopy);
+@@ -161,14 +198,12 @@
+                 }
+                 
+                 if ( tempoffset == packetsize ) {
+-                    LOGGER.warning(&quot;ClientSocket::onDataReceived(%d) Sending half packet [%d]&quot;, id, packetsize);
+                     EnqueueIncomingPacket(tempbuffer, packetsize, 0, id);
+                     tempoffset = 0;
+                 }
+             }
+         }
+     } // while
+-//    LOGGER.warning(&quot;Len was [%d], remainin&quot;,len);
+ }
+ 
+ void
+@@ -182,6 +217,7 @@
+ void
+ ClientSocket::onDisconected(network::TCPSocket *so)
+ {
++    (void)so;
+     LOGGER.warning(&quot;ClientSocket:: Disconected NetId[%d]!&quot;, id);
+     socket=0;
+     observer-&gt;onClientDisconected(this);
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -25,6 +25,7 @@
+ #include &quot;Network/TCPSocket.hpp&quot;
+ 
+ class ClientSocket;
++#define SEND_BUFFER_LEN 32768
+ 
+ class ClientSocketObserver
+ {
+@@ -46,6 +47,7 @@
+ 
+     //void read();
+     void sendMessage(const void* data, size_t datasize);
++    void sendRemaining();
+     ProxyServer proxy;
+ 
+     NetClientID getId() { return id; };
+@@ -61,6 +63,8 @@
+     ClientSocketObserver * observer;
+     network::TCPSocket* socket;
+ 
++    char sendbuffer[SEND_BUFFER_LEN];
++    unsigned int sendpos;
+     char tempbuffer[_MAX_NET_PACKET_SIZE];
+     uint16_t tempoffset;
+     NetClientID id;
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Network/ServerSocket.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -16,35 +16,21 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ #include &lt;config.h&gt;
+-
+-#include &lt;string.h&gt;
+-#include &lt;assert.h&gt;
+-#include &lt;sstream&gt;
+-#include &quot;Util/Log.hpp&quot;
+ #include &quot;ServerSocket.hpp&quot;
+-
++#include &quot;ClientSocket.hpp&quot;
+ #include &quot;ClientServerNetMessage.hpp&quot;
+ #include &quot;NetworkInterface.hpp&quot;
+-#include &quot;NetPacket.hpp&quot;
+-#include &quot;NetMessage.hpp&quot;
+-#include &quot;NetworkGlobals.hpp&quot;
+-#include &quot;GameConfig.hpp&quot;
+-#include &quot;PlayerInterface.hpp&quot;
+-#include &quot;Client.hpp&quot;
+-#include &quot;ConsoleInterface.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ 
+-#include &quot;ClientSocket.hpp&quot;
+ 
+-
+-ServerSocket::ServerSocket(const std::string&amp; bindaddress, uint16_t port)
++ServerSocket::ServerSocket(const string&amp; bindaddress, uint16_t port)
+         : socket(0)
+ {
+   
+     try {
+-        network::Address addr
+-            = network::Address::resolve(bindaddress, port);        
+-        socket = new network::TCPListenSocket(addr, this);
++        Address addr = Address::resolve(bindaddress, port);        
++        socket = new TCPListenSocket(addr, this);
+ 
+     } catch(...) {
+         if (socket)
+@@ -58,7 +44,7 @@
+     if (socket)
+         socket-&gt;destroy();
+     
+-    std::map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.begin();
++    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.begin();
+     while ( ci != clients.end() ) {
+         delete ci-&gt;second;
+         ci++;
+@@ -66,16 +52,18 @@
+     clients.clear();
+ }
+ 
+-network::TCPSocketObserver *
+-ServerSocket::onNewConnection(network::TCPListenSocket *so, const network::Address &amp;fromaddr)
++TCPSocketObserver *
++ServerSocket::onNewConnection(TCPListenSocket *so, const Address &amp;fromaddr)
+ {
++    (void)so;
++    (void)fromaddr;
+     return new ClientSocket(this);
+ }
+ 
+ void
+ ServerSocket::onClientConnected(ClientSocket *s)
+ {
+-    LOGGER.warning(&quot;Client Connected [%d]&quot;, s-&gt;getId());
++    LOGGER.debug(&quot;ServerSocket::onClientConnected() [%d]&quot;, s-&gt;getId());
+     clients[s-&gt;getId()] = s;
+     TransportClientAccept clientacceptmessage;
+     clientacceptmessage.setSize(sizeof(TransportClientAccept));
+@@ -86,7 +74,7 @@
+ void
+ ServerSocket::onClientDisconected(ClientSocket *s)
+ {
+-    LOGGER.warning(&quot;Client Disconnected [%d]&quot;, s-&gt;getId());
++    LOGGER.debug(&quot;ServerSocket::onClientDisconnected() [%d]&quot;, s-&gt;getId());
+     clients.erase(s-&gt;getId());
+     delete s;
+ }
+@@ -101,35 +89,37 @@
+     return s-&gt;getIPAddress();
+ }
+ 
+-NetClientID
+-ServerSocket::addLoopbackClient()
+-{
+-    //SocketClient* client = clientlist-&gt;add(this, 0);
+-    //return client-&gt;id;
+-    return 0;
+-}
+-
+ void
+ ServerSocket::sendMessage(NetClientID toclient, const void* data, size_t datasize)
+ {
+-    ClientSocket *cs = clients[toclient];
+-    if ( !cs ) {
++    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.find(toclient);
++    if ( ci == clients.end() ) {
+         throw Exception(&quot;message sent to unknown client.&quot;);
+     }
+ 
+-    cs-&gt;sendMessage(data, datasize);
++    ci-&gt;second-&gt;sendMessage(data, datasize);
+ }
+ 
+ void
+ ServerSocket::disconectClient(NetClientID c)
+ {
+-    LOGGER.warning(&quot;Disconecting client [%d]&quot;, c);
+-    ClientSocket *s = clients[c];
+-    if ( s ) {
+-        delete s;
+-        clients.erase(c);
++    LOGGER.debug(&quot;ServerSocket::disconectClient() [%d]&quot;, c);
++    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.find(c);
++    if ( ci != clients.end() ) {
++        delete ci-&gt;second;
++        clients.erase(ci);
+     } else {
+-        LOGGER.warning(&quot;Disconecting unknown client [%d]&quot;, c);
++        LOGGER.warning(&quot;ServerSocket::disconectClient() Disconecting unknown client [%d]&quot;, c);
+     }
+ }
+ 
++void
++ServerSocket::sendRemaining()
++{
++    map&lt;NetClientID, ClientSocket *&gt;::iterator ci = clients.begin();
++    while ( ci != clients.end() ) {
++        ci-&gt;second-&gt;sendRemaining();
++        ci++;
++    }
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Network/ServerSocket.hpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -15,45 +15,41 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-#ifndef _UNIXSERVER_H
+-#define _UNIXSERVER_H
++#ifndef _SERVERSOCKET_H
++#define _SERVERSOCKET_H
+ 
+ #include &lt;map&gt;
+ #include &lt;stdint.h&gt;
+ #include &quot;Network/TCPListenSocket.hpp&quot;
+ #include &quot;ClientSocket.hpp&quot;
+ 
++using namespace network;
++using namespace std;
+ 
+-class ServerSocket : public network::TCPListenSocketObserver, public ClientSocketObserver
++class ServerSocket : public TCPListenSocketObserver, public ClientSocketObserver
+ {
+ public:
+-    ServerSocket(const std::string&amp; bindaddress, uint16_t port);
++    ServerSocket(const string&amp; bindaddress, uint16_t port);
+     ~ServerSocket();
+ 
+-    void read();
+     void sendMessage(NetClientID toclient, const void* data,
+             size_t datasize);
+     void removeClient(NetClientID clientid);
+-    NetClientID addLoopbackClient();
+ 
+-    std::string getClientIP(NetClientID);
++    string getClientIP(NetClientID);
+     void disconectClient(NetClientID c);
++    void sendRemaining();
+ 
+ protected:
+-    network::TCPSocketObserver * onNewConnection(network::TCPListenSocket *so,const network::Address &amp;fromaddr);
++    network::TCPSocketObserver * onNewConnection(TCPListenSocket *so,const Address &amp;fromaddr);
+     void onClientConnected(ClientSocket *s);
+     void onClientDisconected(ClientSocket *s);
+     friend class SocketClient;
+-    //void closeConnection(SocketClient* client);
+ 
+ private:
+-    //void acceptNewClients();
+-    //void readTCP();
+-    //void readClientTCP(SocketClient* client);
++    TCPListenSocket * socket;
++    map&lt;NetClientID, ClientSocket *&gt; clients;
+ 
+-    network::TCPListenSocket * socket;
+-    std::map&lt;NetClientID, ClientSocket *&gt; clients;
+-    //ClientList * clientlist;
+ };
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-04-02 11:55:35 UTC (rev 964)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2007-04-12 23:08:06 UTC (rev 965)
+@@ -268,6 +268,7 @@
+ void
+ ServerQueryThread::onDataReceived(network::UDPSocket *s, const network::Address&amp; from, const char *data, const int len)
+ {
++    (void)s;
+     stringstream fromaddress;
+     fromaddress &lt;&lt; from.getIP() &lt;&lt; &quot;:&quot; &lt;&lt; from.getPort();
+     
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000011.html">[Netpanzer-cvs] r964 - in trunk/netpanzer/src: Lib/Network Lib/Util	NetPanzer/Classes NetPanzer/Classes/AI NetPanzer/Core	NetPanzer/Interfaces NetPanzer/Interfaces/unix	NetPanzer/Network NetPanzer/System NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Multi/MasterServer
+</A></li>
+	<LI>Next message: <A HREF="000013.html">[Netpanzer-cvs] r966 - trunk/homepage
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

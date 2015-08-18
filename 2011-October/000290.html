@@ -1,0 +1,722 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1264 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1264%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Interfaces%20NetPanzer/Views/Game%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111019120518.2380D480F4B%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000289.html">
+   <LINK REL="Next"  HREF="000291.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1264 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1264%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Interfaces%20NetPanzer/Views/Game%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111019120518.2380D480F4B%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1264 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Views/Game	NetPanzer/Views/MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Wed Oct 19 14:05:17 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000289.html">[Netpanzer-cvs] r1263 - in trunk/netpanzer/src/NetPanzer/Views: .	MainMenu MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000291.html">[Netpanzer-cvs] r1265 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#290">[ date ]</a>
+              <a href="thread.html#290">[ thread ]</a>
+              <a href="subject.html#290">[ subject ]</a>
+              <a href="author.html#290">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-10-19 14:05:17 +0200 (Wed, 19 Oct 2011)
+New Revision: 1264
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp
+Modified:
+   trunk/netpanzer/src/Lib/2D/Palette.cpp
+   trunk/netpanzer/src/Lib/2D/Palette.hpp
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+Log:
+Add some drawing function (cirecle, roundrect...)
+Add end of round screen
+Add some palette for transparency
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.cpp	2011-10-17 10:42:02 UTC (rev 1263)
++++ trunk/netpanzer/src/Lib/2D/Palette.cpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -56,6 +56,10 @@
+ ColorTable Palette::red32;
+ ColorTable Palette::green32;
+ ColorTable Palette::blue32;
++ColorTable Palette::red256;
++ColorTable Palette::green256;
++ColorTable Palette::blue256;
++ColorTable Palette::lightorange256;
+ //ColorTable Palette::earth256;
+ SDL_Color   Palette::color[PALETTE_LENGTH];
+ SDL_Color   Palette::originalColor[PALETTE_LENGTH];
+@@ -137,6 +141,25 @@
+         darkGray256.setColor(num, int(findNearestColor(c, c, c))); // dark gray
+     }
+ 
++    red256.init(256);
++    for (num = 0; num &lt; 256; num++) {
++        red256.setColor(num, int(findNearestColor(color[num].r, 0, 0))); 
++    }
++    
++    blue256.init(256);
++    for (num = 0; num &lt; 256; num++) {
++        blue256.setColor(num, int(findNearestColor(0,0,color[num].b))); 
++    }
++
++    green256.init(256);
++    for (num = 0; num &lt; 256; num++) {
++        green256.setColor(num, int(findNearestColor(0, color[num].g/1.2, 0))); 
++    }
++    
++    lightorange256.init(256);
++    for (num = 0; num &lt; 256; num++) {
++        lightorange256.setColor(num, int(findNearestColor(color[num].r, color[num].r/1.1f,0)));
++    }
+     /*// 64 shades of gray.
+     for (num = 0; num &lt; 64; num++)
+     {
+
+Modified: trunk/netpanzer/src/Lib/2D/Palette.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Palette.hpp	2011-10-17 10:42:02 UTC (rev 1263)
++++ trunk/netpanzer/src/Lib/2D/Palette.hpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -66,9 +66,13 @@
+     static ColorTable gray256;
+     static ColorTable darkGray256;
+     static ColorTable brightness256;
++    static ColorTable red256;
++    static ColorTable green256;
++    static ColorTable blue256;
+     static ColorTable red32;
+     static ColorTable green32;
+     static ColorTable blue32;
++    static ColorTable lightorange256;
+ 
+     //static ColorTable earth256;  // Earth colors from sea 2 land 2 mountain 2 snow.
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-10-17 10:42:02 UTC (rev 1263)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -1688,3 +1688,148 @@
+     drawVLine(rect.min.x, rect.max.y - 1, rect.max.y - cornerLength, color);
+ 
+ } // end Surface::drawBoxCorners
++
++void Surface::circle(int cx, int cy, int radius, PIX color)
++{
++  int d, y, x;
++
++  d = 3 - (2 * radius);
++  x = 0;
++  y = radius;
++
++  while (y &gt;= x) {
++    putPixel(cx + x, cy + y, color);// down right corner
++    putPixel(cx + y, cy + x, color);// down right corner
++    putPixel(cx - x, cy + y, color);// up left corner
++    putPixel(cx - y, cy + x, color);// up left corner
++    putPixel(cx + x, cy - y, color);// up right corner
++    putPixel(cx + y, cy - x, color);// up right corner
++    putPixel(cx - x, cy - y, color);// down left corner
++    putPixel(cx - y, cy - x, color);// down left corner
++
++    if (d &lt; 0)
++      d = d + (4 * x) + 6;
++    else {
++      d = d + 4 * (x - y) + 10;
++      y--;
++    }
++    x++;
++  }
++}
++
++void Surface::FillCircle(int cx, int cy, int radius, PIX color)
++{
++  int d, y, x;
++
++  d = 3 - (2 * radius);
++  x = 0;
++  y = radius;
++
++  while (y &gt;= x) {
++    drawHLine(cx - x, cy - y,cx+ (x + 1), color);
++    drawHLine(cx - x, cy + y,cx+ (x + 1), color);
++    drawHLine(cx - y, cy - x,cx+ (y + 1), color);
++    drawHLine(cx - y, cy + x,cx+ (y + 1), color);
++
++    if (d &lt; 0)
++      d = d + (4 * x) + 6;
++    else {
++      d = d + 4 * (x - y) + 10;
++      y--;
++    }
++    x++;
++  }
++}
++
++void Surface::RoundRect(iRect rect, int radius, PIX color)
++{
++    int d, y, x;
++
++    d = 3 - (2 * radius);
++    x = 0;
++    y = radius;
++
++    if ( !getWidth() || !getHeight() ) return;
++
++    orderCoords(rect);
++
++    // Check for trivial rejection
++    if      (rect.max.x &lt;  0)     return;
++    else if (rect.max.y &lt;  0)     return;
++    else if (rect.min.x &gt;= (int)getWidth()) return;
++    else if (rect.min.y &gt;= (int)getHeight()) return;
++
++    // Check for clipping
++    if (rect.min.x &lt;  0)     rect.min.x = 0;
++    if (rect.min.y &lt;  0)     rect.min.y = 0;
++    if (rect.max.x &gt;= (int)getWidth())  rect.max.x = getWidth() - 1;
++    if (rect.max.y &gt;= (int)getHeight()) rect.max.y = getHeight() - 1;
++
++    drawHLine(rect.min.x+radius, rect.min.y, rect.max.x-radius,   color);
++    drawHLine(rect.min.x+radius, rect.max.y, rect.max.x+1-radius, color);
++    drawVLine(rect.min.x, rect.min.y+radius, rect.max.y-radius,   color);
++    drawVLine(rect.max.x, rect.min.y+radius, rect.max.y-radius,   color);
++
++  while (y &gt;= x) {
++    putPixel((rect.max.x-radius) + x, (rect.max.y-radius) + y, color);// down right corner
++    putPixel((rect.max.x-radius) + y, (rect.max.y-radius) + x, color);// down right corner
++    putPixel((rect.min.x+radius) - x, (rect.max.y-radius) + y, color);// down left corner
++    putPixel((rect.min.x+radius) - y, (rect.max.y-radius) + x, color);// down left corner
++    putPixel((rect.max.x-radius) + x, (rect.min.y+radius) - y, color);// up right corner
++    putPixel((rect.max.x-radius) + y, (rect.min.y+radius) - x, color);// up right corner
++    putPixel((rect.min.x+radius) - x, (rect.min.y+radius) - y, color);// up left corner
++    putPixel((rect.min.x+radius) - y, (rect.min.y+radius) - x, color);// up left corner
++//
++    if (d &lt; 0)
++      d = d + (4 * x) + 6;
++    else {
++      d = d + 4 * (x - y) + 10;
++      y--;
++    }
++    x++;
++  }
++}
++
++void Surface::FillRoundRect(iRect rect, int radius, PIX color)
++{
++    int d, y, x;
++
++    d = 3 - (2 * radius);
++    x = 0;
++    y = radius;
++
++    if ( !getWidth() || !getHeight() ) return;
++
++    orderCoords(rect);
++
++    // Check for trivial rejection
++    if      (rect.max.x &lt;  0)     return;
++    else if (rect.max.y &lt;  0)     return;
++    else if (rect.min.x &gt;= (int)getWidth()) return;
++    else if (rect.min.y &gt;= (int)getHeight()) return;
++
++    // Check for clipping
++    if (rect.min.x &lt;  0)     rect.min.x = 0;
++    if (rect.min.y &lt;  0)     rect.min.y = 0;
++    if (rect.max.x &gt;= (int)getWidth())  rect.max.x = getWidth() - 1;
++    if (rect.max.y &gt;= (int)getHeight()) rect.max.y = getHeight() - 1;
++
++    fillRect(iRect(rect.min.x,rect.min.y+radius,
++                   rect.max.x,rect.max.y-radius), color);
++
++  while (y &gt;= x) {
++    drawHLine((rect.min.x+radius) - x, (rect.min.y+radius) - y,(rect.max.x-radius)+ x, color);//up
++    drawHLine((rect.min.x+radius) - x, (rect.max.y-radius) + y,(rect.max.x-radius)+ x, color);//down
++    drawHLine((rect.min.x+radius) - y, (rect.min.y+radius) - x,(rect.max.x-radius)+ y, color);//up
++    drawHLine((rect.min.x+radius) - y, (rect.max.y-radius) + x,(rect.max.x-radius)+ y, color);//down
++
++    if (d &lt; 0)
++      d = d + (4 * x) + 6;
++    else {
++      d = d + 4 * (x - y) + 10;
++      y--;
++    }
++    x++;
++  }
++}
++
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2011-10-17 10:42:02 UTC (rev 1263)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -234,6 +234,11 @@
+         return getTextLength(text.c_str());
+     }
+ 
++    void circle(int cx, int cy, int radius, PIX color);
++    void FillCircle(int cx, int cy, int radius, PIX color);
++    void RoundRect(iRect rect, int radius, PIX color);
++    void FillRoundRect(iRect rect, int radius, PIX color);
++    
+     void frameToBuffer(Uint8* dest, size_t dest_len)
+     {
+         size_t frame_len = getPitch()*getHeight();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2011-10-17 10:42:02 UTC (rev 1263)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -173,11 +173,11 @@
+ 
+                 ServerConnectDaemon::lockConnectProcess();
+ 
+-                view_control.set(&quot;RankView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
++                view_control.set(&quot;EndRoundView&quot;, _view_control_flag_visible_on | _view_control_flag_close_all );
+ 
+                 if ( GameControlRulesDaemon::execution_mode == _execution_mode_loop_back_server ) {
+                     Desktop::setVisibility(&quot;GameView&quot;, true);
+-                    Desktop::setVisibility(&quot;RankView&quot;, true );
++                    Desktop::setVisibility(&quot;EndRoundView&quot;, true );
+                 }
+ 
+                 SERVER-&gt;broadcastMessage(&amp;view_control, sizeof(SystemViewControl));
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-10-17 10:42:02 UTC (rev 1263)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -81,6 +81,7 @@
+ #include &quot;Views/MainMenu/Options/VisualsView.hpp&quot;
+ 
+ #include &quot;Views/Game/RankView.hpp&quot;
++#include &quot;Views/Game/EndRoundView.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ #include &quot;Views/Game/CodeStatsView.hpp&quot;
+ #include &quot;Views/Game/LibView.hpp&quot;
+@@ -177,6 +178,7 @@
+ 
+     Desktop::add(new GameView());
+     Desktop::add(new RankView());
++    Desktop::add(new EndRoundView());
+     Desktop::add(new VehicleSelectionView());
+     Desktop::add(new MiniMapView() );
+     Desktop::add(new CodeStatsView());
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -0,0 +1,265 @@
++/*
++Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;Resources/ResourceManager.hpp&quot;
++
++#include &lt;vector&gt;
++#include &lt;algorithm&gt;
++
++#include &quot;Util/Exception.hpp&quot;
++#include &quot;EndRoundView.hpp&quot;
++#include &quot;Views/GameViewGlobals.hpp&quot;
++#include &quot;Classes/ScreenSurface.hpp&quot;
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
++#include &quot;Classes/Network/NetworkClient.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Objectives/ObjectiveInterface.hpp&quot;
++
++#include &quot;Views/Components/Label.hpp&quot;
++#include &quot;Views/Components/ViewGlobals.hpp&quot;
++
++#define HEADER_HEIGHT 70
++#define ENTRY_HEIGHT 20
++
++#define TABLE_BORDER 2
++#define TABLE_BORDER_START (HEADER_HEIGHT+TABLE_BORDER)
++#define TABLE_START (HEADER_HEIGHT + TABLE_BORDER)
++
++#define ALLY_START 4
++#define FLAG_START 26
++// characters * character width
++#define NAME_START (6*8)
++
++#define TABLE_HEADER_PIX_LEN (52*8)
++
++#define WINDOW_WIDTH (TABLE_HEADER_PIX_LEN + ((DEFAULT_BORDER_SIZE+TABLE_BORDER) * 2 ) + 14+2)
++
++static const char * table_header =
++        &quot;      Name                 Frags Deaths Points Objs.&quot;;
++
++static const char * stats_format = &quot;%-20s%6i%7i%7i%6i&quot;;
++
++EndRoundView::EndRoundView() : SpecialButtonView()
++{
++    setSearchName(&quot;EndRoundView&quot;);
++//    setTitle(&quot;Round is over&quot;);
++//    setSubTitle(&quot;&quot;);
++
++    setAllowResize(false);
++    int x = (screen-&gt;getWidth() / 2) - 250;
++    moveTo(iXY(x,10));
++    resize(iXY(500, 500));
++    checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
++
++    allyImage.loadBMP(&quot;pics/default/ally.bmp&quot;);
++    allyRequestImage.loadBMP(&quot;pics/default/allyRequest.bmp&quot;);
++    allyOtherImage.loadBMP(&quot;pics/default/allyOther.bmp&quot;);
++    noAllyImage.loadBMP(&quot;pics/default/noAlly.bmp&quot;);
++    colorImage.loadBMP(&quot;pics/default/playerColor.bmp&quot;);
++
++    selected_line = -1;
++
++} // end EndRoundView::EndRoundView
++
++// doDraw
++//---------------------------------------------------------------------------
++void EndRoundView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++{
++    unsigned int flagHeight = ResourceManager::getFlag(0)-&gt;getHeight();
++    RectWinner = getClientRect();
++    RectWinner.min.x = RectWinner.min.y = 0;
++    RectStates = RectWinner;
++    RectWinner.max.y = HEADER_HEIGHT-10;
++    clientArea.bltLookup(RectWinner, Palette::green256.getColorArray());
++    clientArea.drawRect(RectWinner, Color::gray);
++
++    RectStates.min.y = HEADER_HEIGHT;
++    
++    clientArea.bltLookup(RectStates, Palette::brightness256.getColorArray());
++    clientArea.drawRect(RectStates, Color::gray);
++    
++    drawPlayerStats(clientArea, flagHeight);
++
++    //View::doDraw(viewArea, clientArea);
++} // end doDraw
++
++class StatesSortByFrags
++    : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
++{
++public:
++    bool operator() (const PlayerState* state1, const PlayerState* state2) {
++        if(state1-&gt;getKills() &gt; state2-&gt;getKills())
++            return true;
++        if(state1-&gt;getLosses() &lt; state2-&gt;getLosses())
++            return true;
++        return false;
++    }
++};
++
++class StatesSortByObjectives
++    : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
++{
++public:
++    bool operator() (const PlayerState* state1, const PlayerState* state2) {
++        return state1-&gt;getObjectivesHeld() &gt; state2-&gt;getObjectivesHeld();
++    }
++};
++
++
++// drawPlayerStats
++//---------------------------------------------------------------------------
++// Purpose:
++//---------------------------------------------------------------------------
++void EndRoundView::drawPlayerStats(Surface &amp;dest, unsigned int flagHeight)
++{
++    char statBuf[256];
++
++    states.clear();
++    PlayerID i;
++    for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
++    {
++        PlayerState* state = PlayerInterface::getPlayer(i);
++        if(state-&gt;getStatus() != _player_state_active)
++            continue;
++        states.push_back(state);
++    }
++
++    switch(gameconfig-&gt;gametype) {
++        case _gametype_objective:
++            std::sort(states.begin(), states.end(), StatesSortByObjectives());
++            break;
++        case _gametype_timelimit:
++        case _gametype_fraglimit:
++            std::sort(states.begin(), states.end(), StatesSortByFrags());
++            break;
++    }
++
++    const PlayerState* Winner = states.front();
++    snprintf(statBuf, sizeof(statBuf),
++            &quot;Winner is %s&quot;, Winner-&gt;getName().substr(0,20).c_str());
++    dest.bltStringCenteredInRect(RectWinner,statBuf, Color::yellow);
++
++
++    int cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
++    int flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
++    Surface * flag = 0;
++    int cur_state = 0;
++
++    dest.bltString(0, cur_line_pos, table_header, Color::gray);
++    cur_line_pos += ENTRY_HEIGHT;
++    flag_pos += ENTRY_HEIGHT;
++    ++cur_state;
++    for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
++            i != states.end(); ++i) {
++        const PlayerState* state = *i;
++
++        snprintf(statBuf, sizeof(statBuf),
++                stats_format, state-&gt;getName().substr(0,20).c_str(),
++                state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
++                state-&gt;getObjectivesHeld());
++        dest.bltStringShadowed(NAME_START, cur_line_pos, statBuf,
++                               (cur_state == selected_line)?Color::yellow:Color::gray224,
++                               Color::gray64);
++        
++        flag = ResourceManager::getFlag(state-&gt;getFlag());
++        flag-&gt;blt( dest, FLAG_START, flag_pos );
++        if ( state-&gt;getID() != PlayerInterface::getLocalPlayerIndex() )
++        {
++            // XXX ALLY
++            bool meWithHim = PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), state-&gt;getID());
++            bool himWithMe = PlayerInterface::isSingleAllied(state-&gt;getID(), PlayerInterface::getLocalPlayerIndex());            
++            if ( meWithHim &amp;&amp; himWithMe )
++            {
++                allyImage.bltTrans(dest, ALLY_START, flag_pos );
++            }
++            else if ( meWithHim )
++            {
++                allyRequestImage.bltTrans(dest, ALLY_START, flag_pos );
++            }
++            else if ( himWithMe )
++            {
++                allyOtherImage.bltTrans(dest, ALLY_START, flag_pos );
++            }
++            else
++            {
++                noAllyImage.bltTrans(dest, ALLY_START, flag_pos );
++            }
++        }
++
++        colorImage.bltTransColor(dest, TABLE_HEADER_PIX_LEN+5, flag_pos, state-&gt;getColor());
++
++        cur_line_pos += ENTRY_HEIGHT;
++        flag_pos += ENTRY_HEIGHT;
++        ++cur_state;
++    }
++
++}
++
++void EndRoundView::notifyMoveTo()
++{
++}
++
++void EndRoundView::lMouseDown(const iXY&amp; pos)
++{
++    // XXX ALLY
++    if ( pos.x &gt;= 4 &amp;&amp; pos.x &lt;= 24 &amp;&amp; pos.y &gt;= TABLE_START )
++    {
++        unsigned int ypos = pos.y - TABLE_START;
++        unsigned int linepos = ypos / ENTRY_HEIGHT;
++        if ( linepos &lt; states.size() )
++        {
++            unsigned int destplayer = states[linepos]-&gt;getID();
++            unsigned int localplayer = PlayerInterface::getLocalPlayerIndex();
++            if ( destplayer != localplayer )
++            {
++                PlayerAllianceRequest allie_request;
++
++                if ( PlayerInterface::isSingleAllied(localplayer, destplayer) )
++                {
++                    allie_request.set( localplayer, destplayer, _player_break_alliance);
++                }
++                else
++                {
++                    allie_request.set( localplayer, destplayer, _player_make_alliance);
++                }
++
++                CLIENT-&gt;sendMessage( &amp;allie_request, sizeof(PlayerAllianceRequest));
++            }
++        }
++    }
++}
++
++void EndRoundView::mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos)
++{
++    selected_line = -1;
++    if ( newPos.y &gt;= TABLE_START )
++    {
++        selected_line = (newPos.y-TABLE_START) / ENTRY_HEIGHT;
++    }
++}
++
++void EndRoundView::doActivate()
++{
++    selected_line = -1;
++}
++
++void EndRoundView::doDeactivate()
++{
++    selected_line = -1;
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.hpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -0,0 +1,67 @@
++/*
++Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
++ 
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++ 
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++ 
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++
++#ifndef __EndRoundView_hpp__
++#define __EndRoundView_hpp__
++
++#include &lt;vector&gt;
++#include &quot;2D/Surface.hpp&quot;
++#include &quot;Views/MainMenu/SpecialButtonView.hpp&quot;
++
++class PlayerState;
++
++//---------------------------------------------------------------------------
++class EndRoundView : public SpecialButtonView
++{
++private:
++    int viewableMessageCount;
++    enum { ITEM_GAP_SPACE = 10 };
++    void drawPlayerStats(Surface &amp;dest, unsigned int flagHeight);
++
++    Surface allyImage;
++    Surface allyRequestImage;
++    Surface allyOtherImage;
++    Surface noAllyImage;
++    Surface colorImage;
++    std::vector&lt;const PlayerState*&gt; states;
++    int selected_line;
++    iRect RectWinner;
++    iRect RectStates;
++public:
++    EndRoundView();
++    virtual ~EndRoundView()
++    {
++    }
++
++    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void notifyMoveTo();
++
++protected:
++    virtual void lMouseDown(const iXY &amp;pos);
++    virtual void mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos);
++    virtual void doActivate();
++    virtual void doDeactivate();
++    void drawTitle(Surface &amp;windowArea)
++    {
++    }
++//    virtual void processEvents();
++}
++; // end _WIN
++
++#endif // end __EndRoundView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-10-17 10:42:02 UTC (rev 1263)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2011-10-19 12:05:17 UTC (rev 1264)
+@@ -51,19 +51,6 @@
+ // Button functions.
+ /////////////////////////////////////////////////////////////////////////////
+ 
+-static void bBack()
+-{
+-    if (gameconfig-&gt;hostorjoin == _game_session_join) {
+-        CLIENT-&gt;partServer();
+-    } else
+-        if (gameconfig-&gt;hostorjoin == _game_session_host) {
+-            SERVER-&gt;closeSession();
+-        }
+-
+-    Desktop::setVisibilityAllWindows(false);
+-    Desktop::setVisibility(&quot;GetSessionView&quot;, true);
+-}
+-
+ static void bNext()
+ {
+     if ((const std::string&amp;) gameconfig-&gt;playername == &quot;&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000289.html">[Netpanzer-cvs] r1263 - in trunk/netpanzer/src/NetPanzer/Views: .	MainMenu MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000291.html">[Netpanzer-cvs] r1265 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#290">[ date ]</a>
+              <a href="thread.html#290">[ thread ]</a>
+              <a href="subject.html#290">[ subject ]</a>
+              <a href="author.html#290">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

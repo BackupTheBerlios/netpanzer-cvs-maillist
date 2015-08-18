@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r994 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r994%20-%20in%20branches/netpanzer-0.8%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game&In-Reply-To=%3C200706281105.l5SB5igH032029%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000038.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r994 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Views/Components src/NetPanzer/Views/Game</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r994%20-%20in%20branches/netpanzer-0.8%3A%20.%20src/Lib/2D%0A%09src/NetPanzer/Views/Components%20src/NetPanzer/Views/Game&In-Reply-To=%3C200706281105.l5SB5igH032029%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r994 - in branches/netpanzer-0.8: . src/Lib/2D	src/NetPanzer/Views/Components src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 28 13:05:44 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000038.html">[Netpanzer-cvs] r993 - in branches/netpanzer-0.8/src/NetPanzer:	Network Views/MainMenu/Multi
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#39">[ date ]</a>
+              <a href="thread.html#39">[ thread ]</a>
+              <a href="subject.html#39">[ subject ]</a>
+              <a href="author.html#39">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-06-28 13:05:41 +0200 (Thu, 28 Jun 2007)
+New Revision: 994
+
+Modified:
+   branches/netpanzer-0.8/configure.ac
+   branches/netpanzer-0.8/src/Lib/2D/Surface.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.cpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.hpp
+   branches/netpanzer-0.8/src/NetPanzer/Views/Game/RankView.cpp
+Log:
+Fix 'tab bug' problem (drawing out of bounds)
+Fix small memory leak
+
+
+Modified: branches/netpanzer-0.8/configure.ac
+===================================================================
+--- branches/netpanzer-0.8/configure.ac	2007-06-16 19:08:11 UTC (rev 993)
++++ branches/netpanzer-0.8/configure.ac	2007-06-28 11:05:41 UTC (rev 994)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [0.8.2-rc6], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [0.8.2-rc7], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: branches/netpanzer-0.8/src/Lib/2D/Surface.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/Lib/2D/Surface.cpp	2007-06-16 19:08:11 UTC (rev 993)
++++ branches/netpanzer-0.8/src/Lib/2D/Surface.cpp	2007-06-28 11:05:41 UTC (rev 994)
+@@ -286,8 +286,16 @@
+     myMem      = false;
+     frame0     = source.pixPtr(bounds.min.x, bounds.min.y);
+     mem	       = frame0;
+-    twidth     = bounds.getSizeX();
+-    theight    = bounds.getSizeY();
++    if ( (unsigned int)bounds.max.x &gt; source.getWidth() )
++        twidth = source.getWidth() - bounds.min.x;
++    else
++        twidth     = bounds.getSizeX();
++        
++    if ( (unsigned int)bounds.max.y &gt; source.getHeight() )
++        theight = source.getHeight() - bounds.min.y;
++    else
++        theight    = bounds.getSizeY();
++        
+     tpitch     = source.getPitch();
+     numFrames  = source.getNumFrames();
+     fps        = source.getFPS();
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.cpp	2007-06-16 19:08:11 UTC (rev 993)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.cpp	2007-06-28 11:05:41 UTC (rev 994)
+@@ -177,14 +177,18 @@
+ 
+ // setExcludedCharacters
+ //--------------------------------------------------------------------------
+-void cInputField::setExcludedCharacters(const char *excludedCharacters)
++void cInputField::setExcludedCharacters(const char *exChars)
+ {
+-    this-&gt;excludedCharacters = new char [strlen(excludedCharacters) + 1];
+-    if (this-&gt;excludedCharacters == 0) {
++    if ( excludedCharacters ) {
++        delete excludedCharacters;
++        excludedCharacters = 0;
++    }
++    excludedCharacters = new char [strlen(exChars) + 1];
++    if (excludedCharacters == 0) {
+         throw Exception(&quot;ERROR: Unable to allocate cInputField excludedCharacters.&quot;);
+     }
+ 
+-    strcpy(this-&gt;excludedCharacters, excludedCharacters);
++    strcpy(excludedCharacters, exChars);
+ } // setExcludedCharacters
+ 
+ // addChar
+@@ -247,12 +251,11 @@
+ 
+     case SDLK_RIGHT: {
+             size_t length = strlen(destString);
+-            if(++cursorPos &gt; length) {
+-                if (cursorPos &gt; maxCharCount) {
+-                    cursorPos = maxCharCount - 1;
+-                } else {
+-                    cursorPos = length;
+-                }
++            ++cursorPos;
++            if ( cursorPos &gt;= maxCharCount ) {
++                cursorPos = maxCharCount - 1;
++            } else if ( cursorPos &gt; length ) {
++                cursorPos = length;
+             }
+         }
+         break;
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.hpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.hpp	2007-06-16 19:08:11 UTC (rev 993)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/Components/cInputField.hpp	2007-06-28 11:05:41 UTC (rev 994)
+@@ -104,7 +104,7 @@
+     void setPos(iXY pos);
+     void setInputFieldString(cInputFieldString *string);
+     void setTextAction(ACTION_FUNC_PTR func);
+-    void setExcludedCharacters(const char *excludedCharacters);
++    void setExcludedCharacters(const char *exChars);
+     void addChar(int newChar);
+     void addExtendedChar(int newExtendedChar);
+    void draw(Surface &amp;dest);
+
+Modified: branches/netpanzer-0.8/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- branches/netpanzer-0.8/src/NetPanzer/Views/Game/RankView.cpp	2007-06-16 19:08:11 UTC (rev 993)
++++ branches/netpanzer-0.8/src/NetPanzer/Views/Game/RankView.cpp	2007-06-28 11:05:41 UTC (rev 994)
+@@ -82,8 +82,13 @@
+     // make sure the window is big enough for all players
+     unsigned int CHAR_YPIX = Surface::getFontHeight();
+     unsigned int entryheight = std::max(CHAR_YPIX, UNIT_FLAGS_SURFACE.getHeight()) + 2;
+-    resize(iXY(450, 60 + entryheight * PlayerInterface::countPlayers()));
++    unsigned int newheight = 60 + entryheight * PlayerInterface::countPlayers();
+     
++    if ( newheight != (unsigned int)getSizeY() ) {
++        resize(iXY(450, newheight));
++        return; // this frame draws nothing
++    }
++    
+     bltViewBackground(viewArea);
+ 
+     clientArea.drawButtonBorder(
+@@ -151,15 +156,12 @@
+     iXY offset(2, 40);
+     iXY flagOffset(162, 40 + (int(CHAR_YPIX - UNIT_FLAGS_SURFACE.getHeight()))/2);
+ 
+-    char shortname[21];
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i) {
+         const PlayerState* state = *i;
+ 
+-	SDL_strlcpy(shortname,state-&gt;getName().c_str(),sizeof(shortname));
+-
+         snprintf(statBuf, sizeof(statBuf),
+-                &quot;%-20s%10i%7i%6i%10i&quot;, shortname,
++                &quot;%-20s%10i%7i%6i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+         dest.bltString(offset.x, offset.y, statBuf, state-&gt;getColor());
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000038.html">[Netpanzer-cvs] r993 - in branches/netpanzer-0.8/src/NetPanzer:	Network Views/MainMenu/Multi
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#39">[ date ]</a>
+              <a href="thread.html#39">[ thread ]</a>
+              <a href="subject.html#39">[ subject ]</a>
+              <a href="author.html#39">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

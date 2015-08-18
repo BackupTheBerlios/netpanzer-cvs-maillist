@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1337 - in trunk/netpanzer: .	src/NetPanzer/Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1337%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Interfaces&In-Reply-To=%3C20120115152634.3F2C2482422%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000362.html">
+   <LINK REL="Next"  HREF="000364.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1337 - in trunk/netpanzer: .	src/NetPanzer/Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1337%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Interfaces&In-Reply-To=%3C20120115152634.3F2C2482422%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1337 - in trunk/netpanzer: .	src/NetPanzer/Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 15 16:26:33 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000362.html">[Netpanzer-cvs] r1336 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+        <LI>Next message: <A HREF="000364.html">[Netpanzer-cvs] r1338 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Objectives PowerUps System	Units Views Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi Views/MainMenu/Multi/MasterServer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#363">[ date ]</a>
+              <a href="thread.html#363">[ thread ]</a>
+              <a href="subject.html#363">[ subject ]</a>
+              <a href="author.html#363">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-15 16:26:33 +0100 (Sun, 15 Jan 2012)
+New Revision: 1337
+
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+Log:
+fix compiling on mac os x
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-01-13 10:02:05 UTC (rev 1336)
++++ trunk/netpanzer/SConstruct	2012-01-15 15:26:33 UTC (rev 1337)
+@@ -171,7 +171,7 @@
+ if thisplatform == 'darwin':
+     env.Append( CPPPATH = ['/Library/Frameworks/SDL.framework/Headers',
+                            '/Library/Frameworks/SDL_mixer.framework/Headers' ] )
+- 
++    networkenv.Append( CPPPATH = ['/Library/Frameworks/SDL.framework/Headers'] )
+     if env['universal'] != 'false':
+ 		env.Append( CCFLAGS = [ '-arch', 'ppc', '-arch', 'i386' ] )
+ 		luaenv.Append( CCFLAGS = [ '-arch', 'ppc', '-arch', 'i386' ] )
+@@ -184,7 +184,6 @@
+         physfsenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
+         networkenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
+         env.Append( LINKFLAGS = [ '-arch', 'i386' ] )
+-	
+     env.AppendUnique(FRAMEWORKS=Split('SDL SDL_mixer Cocoa IOKit'))
+     env.Append( NPSOURCES =  ['support/macosx/SDLMain.m'] )
+ elif thisplatform == 'win32':
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2012-01-13 10:02:05 UTC (rev 1336)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2012-01-15 15:26:33 UTC (rev 1337)
+@@ -81,7 +81,7 @@
+     for ( line_loop = 0; line_loop &lt; console_size; line_loop++ )
+     {
+         line_list[ line_loop ].color = Color::white;
+-        line_list[ line_loop ].string[0] = 0;
++        line_list[ line_loop ].str[0] = 0;
+         line_list[ line_loop ].life_timer.changePeriod( 30 );
+         line_list[ line_loop ].visible = false;
+     }
+@@ -140,9 +140,9 @@
+             else
+                 line_index = (line_index - 1) % console_size;
+ 
+-            memset(line_list[ line_index ].string, 0, sizeof(ConsoleLine::string));
+-            strncpy( line_list[ line_index ].string, temp_str_ptr, max_char_per_line);
+-            line_list[ line_index ].string[ max_char_per_line ] = 0;
++            memset(line_list[ line_index ].str, 0, 256);
++            strncpy( line_list[ line_index ].str, temp_str_ptr, max_char_per_line);
++            line_list[ line_index ].str[ max_char_per_line ] = 0;
+ 
+             line_list[ line_index ].color = msgcolor;
+             line_list[ line_index ].visible = true;
+@@ -160,7 +160,7 @@
+     else
+         line_index = (line_index - 1) % console_size;
+ 
+-    strcpy( line_list[ line_index ].string, temp_str_ptr );
++    strcpy( line_list[ line_index ].str, temp_str_ptr );
+ 
+     line_list[ line_index ].color = msgcolor;
+     line_list[ line_index ].visible = true;
+@@ -216,7 +216,7 @@
+                 flagextrax = 0;
+             }
+             // XXX some values by hand
+-            surface.bltStringShadowed(current_line.x + flagextrax, current_line.y+4, line_list[ index ].string, line_list[ index ].color, Color::black );
++            surface.bltStringShadowed(current_line.x + flagextrax, current_line.y+4, line_list[ index ].str, line_list[ index ].color, Color::black );
+ 
+             current_line.y = current_line.y - line_offset.y;
+         }
+@@ -272,9 +272,9 @@
+     strcpy( inputPrompt, prompt );
+ }
+ 
+-void ConsoleInterface::getInputString( char *string )
++void ConsoleInterface::getInputString( char *str )
+ {
+-    strcpy( string, inputString );
++    strcpy( str, inputString );
+ }
+ 
+ void ConsoleInterface::addChar(int newChar)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2012-01-13 10:02:05 UTC (rev 1336)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.hpp	2012-01-15 15:26:33 UTC (rev 1337)
+@@ -32,7 +32,7 @@
+     PIX     color;
+     bool    hasFlag;
+     FlagID  flag;
+-    char    string[256];
++    char    str[256];
+     Timer   life_timer;
+ };
+ 
+@@ -83,7 +83,7 @@
+     static void resetInputString( const char *prompt );
+     static void addChar(int newChar);
+     static void addExtendedChar(int newExtendedChar);
+-    static void getInputString( char *string );
++    static void getInputString( char *str );
+ };
+ 
+ #endif // ** _CONSOLEINTERFACE_HPP
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000362.html">[Netpanzer-cvs] r1336 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+	<LI>Next message: <A HREF="000364.html">[Netpanzer-cvs] r1338 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Objectives PowerUps System	Units Views Views/Components Views/Game Views/MainMenu	Views/MainMenu/Multi Views/MainMenu/Multi/MasterServer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#363">[ date ]</a>
+              <a href="thread.html#363">[ thread ]</a>
+              <a href="subject.html#363">[ subject ]</a>
+              <a href="author.html#363">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

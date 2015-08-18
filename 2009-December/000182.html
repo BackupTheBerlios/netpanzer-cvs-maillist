@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1154 - in trunk/netpanzer: . pics/particles/lights	src/NetPanzer/Particles src/NetPanzer/Weapons
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1154%20-%20in%20trunk/netpanzer%3A%20.%20pics/particles/lights%0A%09src/NetPanzer/Particles%20src/NetPanzer/Weapons&In-Reply-To=%3C200912291247.nBTClUBZ001688%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000181.html">
+   <LINK REL="Next"  HREF="000183.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1154 - in trunk/netpanzer: . pics/particles/lights	src/NetPanzer/Particles src/NetPanzer/Weapons</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1154%20-%20in%20trunk/netpanzer%3A%20.%20pics/particles/lights%0A%09src/NetPanzer/Particles%20src/NetPanzer/Weapons&In-Reply-To=%3C200912291247.nBTClUBZ001688%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1154 - in trunk/netpanzer: . pics/particles/lights	src/NetPanzer/Particles src/NetPanzer/Weapons">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 29 13:47:30 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000181.html">[Netpanzer-cvs] r1153 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000183.html">[Netpanzer-cvs] r1155 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#182">[ date ]</a>
+              <a href="thread.html#182">[ thread ]</a>
+              <a href="subject.html#182">[ subject ]</a>
+              <a href="author.html#182">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-12-29 13:47:15 +0100 (Tue, 29 Dec 2009)
+New Revision: 1154
+
+Added:
+   trunk/netpanzer/autogen.sh
+Modified:
+   trunk/netpanzer/pics/particles/lights/flash2.png
+   trunk/netpanzer/pics/particles/lights/missleThrust.png
+   trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.hpp
+Log:
+- Added Fu's modified lights.
+- Added Adam85's autogen.sh to warn about new build method.
+- Fixed position of light particles.
+- Added generation of shadows for the bullets and missles
+
+
+Added: trunk/netpanzer/autogen.sh
+===================================================================
+--- trunk/netpanzer/autogen.sh	2009-12-28 12:08:14 UTC (rev 1153)
++++ trunk/netpanzer/autogen.sh	2009-12-29 12:47:15 UTC (rev 1154)
+@@ -0,0 +1,10 @@
++#!/bin/sh
++#Netpanzer (netpanzer.org) autogen script
++echo &quot;\nNetPanzer&quot;;
++echo &quot;===============================\n&quot;;
++echo &quot;After revision 1129 netpanzer uses scons script for compile.\n&quot;
++echo &quot;To get scons visit; <A HREF="http://www.scons.org,\nor">http://www.scons.org,\nor</A> if You use linux fedora or ubuntu get it typing in consol;\n&quot;
++echo &quot;\tsudo apt-get install scons -for ubuntu distro\n&quot;;
++echo &quot;\tyum install scons -for fedora distro\n&quot;;
++echo &quot;When You get scons then just type comand \&quot;scons\&quot; in consol.\n&quot;;
++echo &quot;===============================\n&quot;;
+
+
+Property changes on: trunk/netpanzer/autogen.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Modified: trunk/netpanzer/pics/particles/lights/flash2.png
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/pics/particles/lights/missleThrust.png
+===================================================================
+(Binary files differ)
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2009-12-28 12:08:14 UTC (rev 1153)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2009-12-29 12:47:15 UTC (rev 1154)
+@@ -46,8 +46,9 @@
+ //---------------------------------------------------------------------------
+ void FlashParticle2D::init()
+ {
+-    staticPackedFlash.loadPNGSheet(&quot;pics/particles/lights/flash2.png&quot;, 240, 149, 20);
++    staticPackedFlash.loadPNGSheet(&quot;pics/particles/lights/flash2.png&quot;, 240, 194, 20);
+     staticPackedFlash.setColorkey();
++//    staticPackedFlash.setAlpha();
+ //    staticPackedFlash.setOffsetCenter();
+ //    staticPackedFlash.brigthenFrames();
+ } // end FlashParticle2D::init
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2009-12-28 12:08:14 UTC (rev 1153)
++++ trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2009-12-29 12:47:15 UTC (rev 1154)
+@@ -43,11 +43,11 @@
+     // Set the correct missle type.
+     if ( size ) {
+         shell.setData(gMissleMediumPackedSurface);
+-        shellShadow.setData(gMissleMediumPackedSurface);
++        shellShadow.setData(gMissleMediumShadowSurface);
+ 
+     } else {
+         shell.setData(gMissleSmallPackedSurface);
+-        shellShadow.setData(gMissleSmallPackedSurface);
++        shellShadow.setData(gMissleSmallShadowSurface);
+     }
+ 
+     shell.setFrame(getGoalAngle(start, end));
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2009-12-28 12:08:14 UTC (rev 1153)
++++ trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2009-12-29 12:47:15 UTC (rev 1154)
+@@ -53,7 +53,7 @@
+     shell.setDrawModeSolid();
+ 
+     shellShadow.setDrawModeBlend(64); // dark little
+-    shellShadow.setData(gShellPackedSurface);
++    shellShadow.setData(gShellShadowSurface);
+     shellShadow.setFrame(getGoalAngle(start, end));
+     shellShadow.setLayer(weaponShadowLayer);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2009-12-28 12:08:14 UTC (rev 1153)
++++ trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2009-12-29 12:47:15 UTC (rev 1154)
+@@ -46,14 +46,17 @@
+ //    gShellPackedSurface.loadPAK(&quot;pics/particles/shells/pak/shells.pak&quot;);
+ 
+     gMissleMediumPackedSurface.loadPNGSheet(&quot;pics/particles/missles/misslesMedium.png&quot;, 14, 14, 360);
++    gMissleMediumShadowSurface.createShadow(gMissleMediumPackedSurface);
+     gMissleMediumPackedSurface.setColorkey();
+ //    gMissleMediumPackedSurface.setOffsetCenter();
+ 
+     gMissleSmallPackedSurface.loadPNGSheet(&quot;pics/particles/missles/misslesSmall.png&quot;, 14, 14, 360);
++    gMissleSmallShadowSurface.createShadow(gMissleSmallPackedSurface);
+     gMissleSmallPackedSurface.setColorkey();
+ //    gMissleSmallPackedSurface.setOffsetCenter();
+ 
+     gShellPackedSurface.loadPNGSheet(&quot;pics/particles/shells/shells.png&quot;, 14, 14, 360);
++    gShellShadowSurface.createShadow(gShellPackedSurface);
+     gShellPackedSurface.setColorkey();
+ //    gShellPackedSurface.setOffsetCenter();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp	2009-12-28 12:08:14 UTC (rev 1153)
++++ trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.cpp	2009-12-29 12:47:15 UTC (rev 1154)
+@@ -27,8 +27,11 @@
+ int gBulletVelocity    = 60;
+ 
+ Surface gShellPackedSurface;
++Surface gShellShadowSurface;
+ Surface gMissleSmallPackedSurface;
++Surface gMissleSmallShadowSurface;
+ Surface gMissleMediumPackedSurface;
++Surface gMissleMediumShadowSurface;
+ Surface gMissleThrustPackedSurface;
+ Surface gMissleGroundLightPackedSurface;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.hpp	2009-12-28 12:08:14 UTC (rev 1153)
++++ trunk/netpanzer/src/NetPanzer/Weapons/WeaponGlobals.hpp	2009-12-29 12:47:15 UTC (rev 1154)
+@@ -27,8 +27,11 @@
+ extern int gBulletVelocity;
+ 
+ extern Surface gShellPackedSurface;
++extern Surface gShellShadowSurface;
+ extern Surface gMissleSmallPackedSurface;
++extern Surface gMissleSmallShadowSurface;
+ extern Surface gMissleMediumPackedSurface;
++extern Surface gMissleMediumShadowSurface;
+ extern Surface gMissleThrustPackedSurface;
+ extern Surface gMissleGroundLightPackedSurface;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000181.html">[Netpanzer-cvs] r1153 - in trunk/netpanzer: scripts	src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts	src/NetPanzer/Scripts/toluapkg src/NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000183.html">[Netpanzer-cvs] r1155 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#182">[ date ]</a>
+              <a href="thread.html#182">[ thread ]</a>
+              <a href="subject.html#182">[ subject ]</a>
+              <a href="author.html#182">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

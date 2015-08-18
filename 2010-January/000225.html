@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1199 - in trunk/netpanzer: .	src/NetPanzer/Classes/Network support/macosx support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1199%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Classes/Network%20support/macosx%20support/scripts&In-Reply-To=%3C201001231717.o0NHHf0U013279%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000224.html">
+   <LINK REL="Next"  HREF="000226.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1199 - in trunk/netpanzer: .	src/NetPanzer/Classes/Network support/macosx support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1199%20-%20in%20trunk/netpanzer%3A%20.%0A%09src/NetPanzer/Classes/Network%20support/macosx%20support/scripts&In-Reply-To=%3C201001231717.o0NHHf0U013279%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1199 - in trunk/netpanzer: .	src/NetPanzer/Classes/Network support/macosx support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan 23 18:17:41 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000224.html">[Netpanzer-cvs] r1198 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Network
+</A></li>
+        <LI>Next message: <A HREF="000226.html">[Netpanzer-cvs] r1200 - in trunk/netpanzer: src/Lib/Network	support/macosx support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#225">[ date ]</a>
+              <a href="thread.html#225">[ thread ]</a>
+              <a href="subject.html#225">[ subject ]</a>
+              <a href="author.html#225">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-23 18:17:14 +0100 (Sat, 23 Jan 2010)
+New Revision: 1199
+
+Added:
+   trunk/netpanzer/support/scripts/make-all-binary.sh
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/support/macosx/make_appbundle.sh
+Log:
+- fix not finishing connections
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2010-01-23 16:45:36 UTC (rev 1198)
++++ trunk/netpanzer/SConstruct	2010-01-23 17:17:14 UTC (rev 1199)
+@@ -62,6 +62,7 @@
+     ('mode','set compile mode to debug or release','release'),
+     ('datadir','define the extra directory where the netpanzer will look for data files, usefull for linux distributions, defaults to no extra directory',''),
+     ('sdlconfig','sets the sdl-config full path', 'sdl-config'),
++    ('universal','builds universal app in Max OS X(default false, other value is true)', 'false'),
+     ('crosslinuxcompilerprefix', 'sets the prefix for the cross linux compiler, example: i686-pc-linux-gnu-', ''),
+     ('crossmingwcompilerprefix', 'sets the prefix for the cross mingw compiler, example: i686-mingw32-', ''),
+     ('crosslinuxsdlconfig','sets the sdl-config full path for linux cross compiler', 'sdl-config'),
+@@ -212,11 +213,14 @@
+ if thisplatform == 'darwin':
+     env.Append( CPPPATH = ['/Library/Frameworks/SDL.framework/Headers',
+                            '/Library/Frameworks/SDL_mixer.framework/Headers' ] )
+-#    env.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
+-#    luaenv.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
+-#    physfsenv.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
+-#    networkenv.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
+-#    env.Append( LINKFLAGS = [ '-mmacosx-version-min=10.4', '-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
++                           
++    if env['universal'] != 'false':
++		env.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
++		luaenv.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
++		physfsenv.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
++		networkenv.Append( CCFLAGS = [ '-isysroot', '/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
++		env.Append( LINKFLAGS = [ '-mmacosx-version-min=10.4', '-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk', '-arch', 'ppc', '-arch', 'i386' ] )
++		
+     env.AppendUnique(FRAMEWORKS=Split('SDL SDL_mixer Cocoa IOKit'))
+     env.Append( NPSOURCES =  ['support/macosx/SDLMain.m'] )
+ elif thisplatform == 'win32':
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-01-23 16:45:36 UTC (rev 1198)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2010-01-23 17:17:14 UTC (rev 1199)
+@@ -317,6 +317,7 @@
+     ClientMesgConnectAck connect_ack_mesg;
+     connect_ack_mesg.setSize(sizeof(ClientMesgConnectAck));
+     s-&gt;sendMessage( &amp;connect_ack_mesg,sizeof(ClientMesgConnectAck));
++    s-&gt;sendRemaining();
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-01-23 16:45:36 UTC (rev 1198)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2010-01-23 17:17:14 UTC (rev 1199)
+@@ -112,7 +112,7 @@
+         process_update.setQueuePosition(queue_position);
+ 
+         (*i)-&gt;sendMessage( &amp;process_update, sizeof(ConnectProcessUpdate));
+-
++        (*i)-&gt;sendRemaining();
+         queue_position++;
+     }
+ 
+@@ -157,6 +157,7 @@
+     join_request_ack.setSize(sizeof(ClientConnectJoinRequestAck));
+     packet-&gt;fromClient-&gt;sendMessage(&amp;join_request_ack,
+                          sizeof(ClientConnectJoinRequestAck));
++    packet-&gt;fromClient-&gt;sendRemaining();
+ }
+ 
+ void ServerConnectDaemon::processNetPacket(const NetPacket* packet)
+@@ -222,7 +223,7 @@
+         
+         connect_client-&gt;sendMessage( &amp;start_connect,
+                                      sizeof(ClientConnectStartConnect));
+-
++        connect_client-&gt;sendRemaining();
+         time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
+         time_out_timer.reset();
+         time_out_counter = 0;
+@@ -257,7 +258,7 @@
+         connect_result.setSize(sizeof(ClientConnectResult));
+         connect_client-&gt;sendMessage( &amp;connect_result,
+                                      sizeof(ClientConnectResult));
+-
++        connect_client-&gt;sendRemaining();
+         if ( connection_state != connect_state_idle )
+         {
+             connection_state = connect_state_wait_for_client_settings;
+@@ -296,6 +297,7 @@
+             server_game_setup-&gt;setSize(sizeof(ConnectMesgServerGameSettings));
+             connect_client-&gt;sendMessage( server_game_setup,
+                                          sizeof(ConnectMesgServerGameSettings));
++            connect_client-&gt;sendRemaining();
+             delete server_game_setup;
+ 
+             time_out_timer.reset();
+@@ -336,7 +338,7 @@
+             state_mesg.setSize(sizeof(ConnectProcessStateMessage));
+             connect_client-&gt;sendMessage( &amp;state_mesg,
+                                          sizeof(ConnectProcessStateMessage));
+-
++            connect_client-&gt;sendRemaining();
+             if(connection_state != connect_state_idle)
+             {
+                 connection_state = connect_state_player_state_sync;
+@@ -388,7 +390,8 @@
+     state_mesg.setPercentComplete(percent_complete);
+     state_mesg.setSize(sizeof(ConnectProcessStateMessage));
+     connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(ConnectProcessStateMessage));
+-    
++    connect_client-&gt;sendRemaining();
++
+     if ( percent_complete == 100 )
+     {
+         delete connect_unit_sync;
+
+Modified: trunk/netpanzer/support/macosx/make_appbundle.sh
+===================================================================
+--- trunk/netpanzer/support/macosx/make_appbundle.sh	2010-01-23 16:45:36 UTC (rev 1198)
++++ trunk/netpanzer/support/macosx/make_appbundle.sh	2010-01-23 17:17:14 UTC (rev 1199)
+@@ -1,15 +1,25 @@
+ #! /bin/bash
+ 
++if [ ! -f RELEASE_VERSION ]; then
++    echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
++    exit 1
++fi
++
++VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
+ RELEASEDIR=&quot;releases&quot;
+ APPNAME=&quot;NetPanzer&quot;
+ BASEDMG=&quot;support/macosx/basedmg.dmg&quot;
+ TEMPDMG=&quot;${RELEASEDIR}/tempdmg.dmg&quot;
+-FINALDMG=&quot;${RELEASEDIR}/NetPanzer.dmg&quot;
++FINALDMG=&quot;${RELEASEDIR}/NetPanzer-${VERSION}.dmg&quot;
+ DMGROOT=&quot;${RELEASEDIR}/MacOS_DMGROOT&quot;
+ DMGDOC=&quot;${DMGROOT}/Documentation&quot;
+ APPDIR=&quot;${DMGROOT}/${APPNAME}.app&quot;
+ CONTENTSDIR=&quot;${APPDIR}/Contents&quot;
+ 
++echo &quot;Compiling Mac version ${VERSION}&quot;
++
++scons universal=true
++
+ echo &quot;Cleaning work folder&quot;
+ [ ! -d ${RELEASEDIR} ] &amp;&amp; mkdir ${RELEASEDIR}
+ 
+
+Added: trunk/netpanzer/support/scripts/make-all-binary.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/make-all-binary.sh	2010-01-23 16:45:36 UTC (rev 1198)
++++ trunk/netpanzer/support/scripts/make-all-binary.sh	2010-01-23 17:17:14 UTC (rev 1199)
+@@ -0,0 +1,61 @@
++#! /bin/bash
++
++if [ ! -f RELEASE_VERSION ]; then
++    echo &quot;ERROR: RELEASE_VERSION file missing, cannot create&quot;
++    exit 1
++fi
++
++RELEASEDIR=&quot;releases&quot;
++VERSION=&quot;`&lt;RELEASE_VERSION`&quot;
++NPDEST=/tmp/netpanzer
++ZIPNAME=&quot;netpanzer-${VERSION}.zip&quot;
++LINEXENAME=&quot;build/crosslinux/release/netpanzer&quot;
++WINEXENAME=&quot;build/crossmingw/release/netpanzer.exe&quot;
++
++PATH=$PATH:/usr/local/gcc/i686-linux/bin/
++
++echo &quot;Compiling Linux version ${VERSION}&quot;
++
++mkdir -p build/crosslinux/{release,debug}/libs
++ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/release/libs/libstdc++.a
++ln -s &quot;`i686-linux-g++ -print-file-name=libstdc++.a`&quot; build/crosslinux/debug/libs/libstdc++.a
++
++scons crosslinux \
++      crosslinuxcompilerprefix=i686-linux- \
++      crosslinuxsdlconfig=/usr/local/gcc/i686-linux/bin/sdl-config
++
++i686-linux-strip &quot;${LINEXENAME}&quot;
++
++[ -d &quot;${NPDEST}&quot; ] &amp;&amp; rm -rf &quot;${NPDEST}&quot;
++
++mkdir -p &quot;${NPDEST}&quot;
++cp &quot;${LINEXENAME}&quot; &quot;${NPDEST}&quot;
++
++echo &quot;Compiling Windows version ${VERSION}&quot;
++
++scons crossmingw \
++      crossmingwcompilerprefix=i686-mingw32-\
++      crossmingwsdlconfig=/usr/local/gcc/mingw-3.4.5/bin/sdl-config
++
++i686-mingw32-strip &quot;${WINEXENAME}&quot;
++
++cp &quot;${WINEXENAME}&quot; &quot;${NPDEST}&quot;
++
++support/scripts/copy_datafiles.sh &quot;${NPDEST}&quot;
++support/scripts/copy_docfiles.sh &quot;${NPDEST}&quot;
++
++cp /usr/local/gcc/mingw-3.4.5/usr/bin/SDL.dll &quot;${NPDEST}&quot;
++cp /usr/local/gcc/mingw-3.4.5/usr/lib/*.dll &quot;${NPDEST}&quot;
++
++[ ! -d &quot;${RELEASEDIR}&quot; ] &amp;&amp; mkdir &quot;${RELEASEDIR}&quot;
++
++find &quot;${NPDEST}&quot; -name &quot;*/.*&quot; -exec rm -f &quot;{}&quot; \;
++
++pushd &quot;${NPDEST}/..&quot;
++zip -9r &quot;${ZIPNAME}&quot; `basename &quot;${NPDEST}&quot;`
++popd
++
++[ -f &quot;${RELEASEDIR}/${ZIPNAME}&quot; ] &amp;&amp; rm -f &quot;${RELEASEDIR}/${ZIPNAME}&quot;
++
++mv &quot;${NPDEST}/../${ZIPNAME}&quot; &quot;${RELEASEDIR}&quot;
++rm -rf &quot;${NPDEST}&quot;
+
+
+Property changes on: trunk/netpanzer/support/scripts/make-all-binary.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000224.html">[Netpanzer-cvs] r1198 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Network
+</A></li>
+	<LI>Next message: <A HREF="000226.html">[Netpanzer-cvs] r1200 - in trunk/netpanzer: src/Lib/Network	support/macosx support/scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#225">[ date ]</a>
+              <a href="thread.html#225">[ thread ]</a>
+              <a href="subject.html#225">[ subject ]</a>
+              <a href="author.html#225">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

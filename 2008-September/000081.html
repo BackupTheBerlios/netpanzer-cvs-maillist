@@ -1,0 +1,555 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1041 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1041%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200809031055.m83AtU9o010644%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000080.html">
+   <LINK REL="Next"  HREF="000082.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1041 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1041%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces&In-Reply-To=%3C200809031055.m83AtU9o010644%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1041 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep  3 12:55:30 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000080.html">[Netpanzer-cvs] r1040 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Network
+</A></li>
+        <LI>Next message: <A HREF="000082.html">[Netpanzer-cvs] r1042 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-03 12:55:14 +0200 (Wed, 03 Sep 2008)
+New Revision: 1041
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+Log:
+- Removed small class PowerUpState and added the values to PowerUp class
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp	2008-09-02 15:00:38 UTC (rev 1040)
++++ trunk/netpanzer/src/NetPanzer/Classes/BonusUnitPowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
+@@ -43,10 +43,10 @@
+     bonus_unit_type = rand() % UnitProfileInterface::getNumUnitTypes();
+ 
+     bonus_unit_animation.setData( BONUS_POWERUP_ANIM );
+-    bonus_unit_animation.setAttrib( powerup_state.world_loc, iXY(0,0), 5 );
++    bonus_unit_animation.setAttrib( world_loc, iXY(0,0), 5 );
+ 
+     bonus_unit_animation_shadow.setData( BONUS_POWERUP_ANIM_SHADOW );
+-    bonus_unit_animation_shadow.setAttrib( powerup_state.world_loc, iXY(0,0), 4 );
++    bonus_unit_animation_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+     bonus_unit_animation_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+ 
+ }
+@@ -55,18 +55,19 @@
+ void BonusUnitPowerUp::spawnBonusUnits( UnitID &amp;unit_id )
+ {
+     PlacementMatrix placement_matrix;
+-    iXY map_loc;
++    iXY map_pos;
+ 
+     sound-&gt;playPowerUpSound();
+ 
+     UnitBase* unit = UnitInterface::getUnit(unit_id);
+ 
+-    MapInterface::pointXYtoMapXY( unit-&gt;unit_state.location, &amp;map_loc );
++    MapInterface::pointXYtoMapXY( unit-&gt;unit_state.location, &amp;map_pos );
+ 
+-    placement_matrix.reset( map_loc );
++    placement_matrix.reset( map_pos );
+ 
+ 
+-    for( int i = 0; i &lt; 9; i++ ) {
++    for( int i = 0; i &lt; 9; i++ )
++    {
+         UnitBase *new_unit;
+         iXY spawn_loc;
+ 
+@@ -76,7 +77,8 @@
+                                              spawn_loc,
+                                              unit-&gt;player-&gt;getID() );
+ 
+-        if ( new_unit != 0 ) {
++        if ( new_unit != 0 )
++        {
+             UnitRemoteCreate create_mesg(new_unit-&gt;player-&gt;getID(),
+                     new_unit-&gt;id, spawn_loc.x, spawn_loc.y, bonus_unit_type);
+             SERVER-&gt;broadcastMessage( &amp;create_mesg, sizeof( UnitRemoteCreate ));
+@@ -85,12 +87,13 @@
+     }
+ 
+     PowerUpHitMesg hit_mesg;
+-    hit_mesg.set( powerup_state.ID, unit-&gt;player-&gt;getID() );
++    hit_mesg.set( ID, unit-&gt;player-&gt;getID() );
+     SERVER-&gt;broadcastMessage( &amp;hit_mesg, sizeof( PowerUpHitMesg ));
+ 
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
++    life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+-    if(unit-&gt;player == PlayerInterface::getLocalPlayer()) {
++    if(unit-&gt;player == PlayerInterface::getLocalPlayer())
++    {
+         ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT A BONUS UNITS POWERUP&quot; );
+     }
+ }
+@@ -99,9 +102,12 @@
+ {
+     UnitID unit_id;
+ 
+-    if ( NetworkState::status == _network_state_server ) {
+-        if ( powerup_state.life_cycle_state == _power_up_lifecycle_state_active ) {
+-            if( isPowerUpHit( &amp;unit_id ) == true ) {
++    if ( NetworkState::status == _network_state_server )
++    {
++        if ( life_cycle_state == _power_up_lifecycle_state_active )
++        {
++            if( isPowerUpHit( &amp;unit_id ) == true )
++            {
+                 spawnBonusUnits( unit_id );
+             }
+         }
+@@ -120,7 +126,7 @@
+ void BonusUnitPowerUp::onHit( PowerUpHitMesg *message  )
+ {
+     sound-&gt;playPowerUpSound();
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
++    life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+     if( PlayerInterface::getLocalPlayerIndex() == message-&gt;getPlayerID() )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp	2008-09-02 15:00:38 UTC (rev 1040)
++++ trunk/netpanzer/src/NetPanzer/Classes/EnemyRadarPowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
+@@ -41,10 +41,10 @@
+         : PowerUp( map_loc, type )
+ {
+     enemy_radar_animation.setData( ENEMY_RADAR_POWERUP_ANIM );
+-    enemy_radar_animation.setAttrib( powerup_state.world_loc, iXY(0,0), 5 );
++    enemy_radar_animation.setAttrib( world_loc, iXY(0,0), 5 );
+ 
+     enemy_radar_animation_shadow.setData( ENEMY_RADAR_POWERUP_ANIM_SHADOW );
+-    enemy_radar_animation_shadow.setAttrib( powerup_state.world_loc, iXY(0,0), 4 );
++    enemy_radar_animation_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+     enemy_radar_animation_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+ 
+ }
+@@ -56,16 +56,17 @@
+ 
+     UnitBase* unit = UnitInterface::getUnit(unit_id);
+ 
+-    if(unit-&gt;player == PlayerInterface::getLocalPlayer()) {
++    if(unit-&gt;player == PlayerInterface::getLocalPlayer())
++    {
+         MiniMapInterface::setShowEnemyRadar( 180 );
+         ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT AN ENEMY RADAR POWERUP&quot; );
+     }
+ 
+     PowerUpHitMesg hit_mesg;
+-    hit_mesg.set(powerup_state.ID, unit-&gt;player-&gt;getID());
++    hit_mesg.set( ID, unit-&gt;player-&gt;getID());
+     SERVER-&gt;broadcastMessage( &amp;hit_mesg, sizeof( PowerUpHitMesg ));
+ 
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
++    life_cycle_state = _power_up_lifecycle_state_inactive;
+ }
+ 
+ void
+@@ -73,9 +74,12 @@
+ {
+     UnitID unit_id;
+ 
+-    if ( NetworkState::status == _network_state_server ) {
+-        if ( powerup_state.life_cycle_state == _power_up_lifecycle_state_active ) {
+-            if( isPowerUpHit( &amp;unit_id ) == true ) {
++    if ( NetworkState::status == _network_state_server )
++    {
++        if ( life_cycle_state == _power_up_lifecycle_state_active )
++        {
++            if( isPowerUpHit( &amp;unit_id ) == true )
++            {
+                 setRadar( unit_id );
+             }
+         }
+@@ -104,5 +108,5 @@
+         ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT AN ENEMY RADAR POWERUP&quot; );
+     }
+ 
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
++    life_cycle_state = _power_up_lifecycle_state_inactive;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp	2008-09-02 15:00:38 UTC (rev 1040)
++++ trunk/netpanzer/src/NetPanzer/Classes/PowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
+@@ -24,33 +24,33 @@
+ 
+ PowerUp::PowerUp()
+ {
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_active;
++    life_cycle_state = _power_up_lifecycle_state_active;
+ }
+ 
+ PowerUp::PowerUp(iXY map_loc, int ID, int type)
+ {
+-    powerup_state.map_loc = map_loc;
+-    powerup_state.ID = ID;
+-    powerup_state.type = type;
++    this-&gt;map_loc = map_loc;
++    this-&gt;ID = ID;
++    this-&gt;type = type;
+ 
+-    MapInterface::mapXYtoPointXY( map_loc, &amp;(powerup_state.world_loc) );
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_active;
++    MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
++    this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
+ }
+ 
+ PowerUp::PowerUp(iXY map_loc, int type)
+ {
+-    powerup_state.map_loc = map_loc;
+-    powerup_state.ID = -1;
+-    powerup_state.type = type;
++    this-&gt;map_loc = map_loc;
++    this-&gt;ID = -1;
++    this-&gt;type = type;
+ 
+-    MapInterface::mapXYtoPointXY( map_loc, &amp;(powerup_state.world_loc) );
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_active;
++    MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
++    this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
+ }
+ 
+ bool PowerUp::isPowerUpHit(UnitID *unit_id)
+ {
+-    if(UnitBlackBoard::unitOccupiesLoc(powerup_state.map_loc) == true) {
+-        if( UnitInterface::queryUnitAtMapLoc(powerup_state.map_loc, unit_id) == true) {
++    if(UnitBlackBoard::unitOccupiesLoc(map_loc) == true) {
++        if( UnitInterface::queryUnitAtMapLoc(map_loc, unit_id) == true) {
+             return true;
+         }
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp	2008-09-02 15:00:38 UTC (rev 1040)
++++ trunk/netpanzer/src/NetPanzer/Classes/PowerUp.hpp	2008-09-03 10:55:14 UTC (rev 1041)
+@@ -25,30 +25,24 @@
+        _power_up_lifecycle_state_inactive
+      };
+ 
+-class PowerUpState
+-{
+-public:
+-    iXY map_loc;
+-    iXY world_loc;
+-    int      ID;
+-    int      type;
+-    int      life_cycle_state;
+-};
+-
+ class PowerUp
+ {
+ protected:
+     bool isPowerUpHit( UnitID *unit_id );
+ 
+ public:
+-    PowerUpState powerup_state;
++    iXY     map_loc;
++    iXY     world_loc;
++    int     ID;
++    int     type;
++    int     life_cycle_state;
+ 
+ public:
+     PowerUp();
+     PowerUp(iXY map_loc, int ID, int type);
+     PowerUp(iXY map_loc, int type);
+-	virtual ~PowerUp()
+-	{ }
++    virtual ~PowerUp()
++    { }
+ 
+     virtual void updateState()
+     { }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp	2008-09-02 15:00:38 UTC (rev 1040)
++++ trunk/netpanzer/src/NetPanzer/Classes/UnitPowerUp.cpp	2008-09-03 10:55:14 UTC (rev 1041)
+@@ -53,17 +53,17 @@
+ {
+     unit_powerup_type = rand() % _unit_powerup_enum_count;
+     unit_powerup_animation.setData( UNIT_POWERUP_ANIM );
+-    unit_powerup_animation.setAttrib( powerup_state.world_loc, iXY(0,0), 5 );
++    unit_powerup_animation.setAttrib( world_loc, iXY(0,0), 5 );
+ 
+     unit_powerup_animation_shadow.setData( UNIT_POWERUP_ANIM_SHADOW );
+-    unit_powerup_animation_shadow.setAttrib( powerup_state.world_loc, iXY(0,0), 4 );
++    unit_powerup_animation_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+     unit_powerup_animation_shadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALot);
+ 
+ }
+ 
+ void UnitPowerUp::powerUpHitPoints( UnitState *unit_state)
+ {
+-    /*
++    /* wtf someone did test lua here before!!!
+     lua_Object hit_points;
+ 
+     lua_pushnumber( (double) (unit_state-&gt;hit_points) );
+@@ -135,41 +135,42 @@
+ 
+     UnitBase* unit = UnitInterface::getUnit( unit_id );
+ 
+-    switch( unit_powerup_type ) {
+-    case _unit_powerup_hitpoints :
+-        powerUpHitPoints( &amp;(unit-&gt;unit_state) );
+-        break;
++    switch( unit_powerup_type )
++    {
++        case _unit_powerup_hitpoints:
++            powerUpHitPoints( &amp;(unit-&gt;unit_state) );
++            break;
+ 
+-    case _unit_powerup_range :
+-        powerUpRange( &amp;(unit-&gt;unit_state) );
+-        break;
++        case _unit_powerup_range:
++            powerUpRange( &amp;(unit-&gt;unit_state) );
++            break;
+ 
+-    case _unit_powerup_firepower :
+-        powerUpFirePower( &amp;(unit-&gt;unit_state) );
+-        break;
++        case _unit_powerup_firepower:
++            powerUpFirePower( &amp;(unit-&gt;unit_state) );
++            break;
+ 
+-    case _unit_powerup_speed :
+-        powerUpSpeed( &amp;(unit-&gt;unit_state) );
+-        break;
++        case _unit_powerup_speed:
++            powerUpSpeed( &amp;(unit-&gt;unit_state) );
++            break;
+ 
+-    case _unit_powerup_repair :
+-        powerUpRepair( &amp;(unit-&gt;unit_state) );
+-        break;
++        case _unit_powerup_repair:
++            powerUpRepair( &amp;(unit-&gt;unit_state) );
++            break;
+ 
+-    case _unit_powerup_reload :
+-        powerUpReload( &amp;(unit-&gt;unit_state) );
+-        break;
++        case _unit_powerup_reload:
++            powerUpReload( &amp;(unit-&gt;unit_state) );
++            break;
+ 
+-    case _unit_powerup_destruct :
+-        powerUpDestruct( unit_id );
+-        break;
++        case _unit_powerup_destruct:
++            powerUpDestruct( unit_id );
++            break;
+     }
+ 
+     PowerUpHitMesg hit_mesg;
+-    hit_mesg.set(powerup_state.ID, unit-&gt;player-&gt;getID(), unit_powerup_type);
++    hit_mesg.set(ID, unit-&gt;player-&gt;getID(), unit_powerup_type);
+     SERVER-&gt;broadcastMessage(&amp;hit_mesg, sizeof(PowerUpHitMesg));
+ 
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
++    life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+     if(unit-&gt;player == PlayerInterface::getLocalPlayer()) {
+         ConsoleInterface::postMessage(Color::unitAqua, &quot;YOU GOT A %s POWERUP&quot;, powerupTypeToString( unit_powerup_type ) );
+@@ -178,27 +179,28 @@
+ 
+ char * UnitPowerUp::powerupTypeToString( int type )
+ {
+-    switch( type ) {
+-    case _unit_powerup_hitpoints :
+-        return( &quot;UNIT HITPOINTS&quot; );
++    switch( type )
++    {
++        case _unit_powerup_hitpoints:
++            return( &quot;UNIT HITPOINTS&quot; );
+ 
+-    case _unit_powerup_range :
+-        return( &quot;UNIT WEAPON RANGE&quot; );
++        case _unit_powerup_range:
++            return( &quot;UNIT WEAPON RANGE&quot; );
+ 
+-    case _unit_powerup_firepower :
+-        return( &quot;UNIT FIREPOWER&quot; );
++        case _unit_powerup_firepower:
++            return( &quot;UNIT FIREPOWER&quot; );
+ 
+-    case _unit_powerup_speed :
+-        return( &quot;UNIT SPEED&quot; );
++        case _unit_powerup_speed:
++            return( &quot;UNIT SPEED&quot; );
+ 
+-    case _unit_powerup_repair :
+-        return( &quot;UNIT REPAIR&quot; );
++        case _unit_powerup_repair:
++            return( &quot;UNIT REPAIR&quot; );
+ 
+-    case _unit_powerup_reload :
+-        return( &quot;UNIT RELOAD TIME&quot; );
++        case _unit_powerup_reload:
++            return( &quot;UNIT RELOAD TIME&quot; );
+ 
+-    case _unit_powerup_destruct :
+-        return( &quot;UNIT DESTRUCT&quot; );
++        case _unit_powerup_destruct:
++            return( &quot;UNIT DESTRUCT&quot; );
+     }
+ 
+     return(&quot;&quot;);
+@@ -209,9 +211,12 @@
+ {
+     UnitID unit_id;
+ 
+-    if ( NetworkState::status == _network_state_server ) {
+-        if ( powerup_state.life_cycle_state == _power_up_lifecycle_state_active ) {
+-            if( isPowerUpHit( &amp;unit_id ) == true ) {
++    if ( NetworkState::status == _network_state_server )
++    {
++        if ( life_cycle_state == _power_up_lifecycle_state_active )
++        {
++            if( isPowerUpHit( &amp;unit_id ) == true )
++            {
+                 selectPowerUp( unit_id );
+             }
+         }
+@@ -230,7 +235,7 @@
+ void UnitPowerUp::onHit( PowerUpHitMesg *message  )
+ {
+     sound-&gt;playPowerUpSound();
+-    powerup_state.life_cycle_state = _power_up_lifecycle_state_inactive;
++    life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+     if( PlayerInterface::getLocalPlayerIndex() == message-&gt;getPlayerID() )
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2008-09-02 15:00:38 UTC (rev 1040)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2008-09-03 10:55:14 UTC (rev 1041)
+@@ -70,7 +70,7 @@
+ {
+     for(iterator i=begin(); i!=end(); i++) {
+         PowerUp* powerup = *i;
+-        if(powerup-&gt;powerup_state.ID == ID)
++        if(powerup-&gt;ID == ID)
+             return powerup;
+     }
+ 
+@@ -79,7 +79,7 @@
+ 
+ void PowerUpList::addWithID(PowerUp *powerup)
+ {
+-    powerup-&gt;powerup_state.ID = id_counter++;
++    powerup-&gt;ID = id_counter++;
+     push_back(powerup);
+ }
+ 
+@@ -144,9 +144,9 @@
+ 
+         powerup_list.addWithID(power_up);
+ 
+-        create_mesg.set( power_up-&gt;powerup_state.map_loc,
+-                         power_up-&gt;powerup_state.ID,
+-                         power_up-&gt;powerup_state.type
++        create_mesg.set( power_up-&gt;map_loc,
++                         power_up-&gt;ID,
++                         power_up-&gt;type
+                        );
+ 
+         SERVER-&gt;broadcastMessage(&amp;create_mesg, sizeof(PowerUpCreateMesg));
+@@ -215,7 +215,7 @@
+     {
+         PowerUp* powerup = *i;
+ 
+-        if(powerup-&gt;powerup_state.life_cycle_state ==
++        if(powerup-&gt;life_cycle_state ==
+                 _power_up_lifecycle_state_inactive) {
+             delete powerup;
+             i = powerup_list.erase(i);
+@@ -270,7 +270,7 @@
+         return;
+     }
+ 
+-    power_up-&gt;powerup_state.ID = create_mesg-&gt;getID();
++    power_up-&gt;ID = create_mesg-&gt;getID();
+ 
+     powerup_list.push_back(power_up);
+ }
+@@ -315,9 +315,9 @@
+         PowerUp* powerup_ptr = *i;
+ 
+         PowerUpCreateMesg create_mesg;
+-        create_mesg.set( powerup_ptr-&gt;powerup_state.map_loc,
+-                         powerup_ptr-&gt;powerup_state.ID,
+-                         powerup_ptr-&gt;powerup_state.type
++        create_mesg.set( powerup_ptr-&gt;map_loc,
++                         powerup_ptr-&gt;ID,
++                         powerup_ptr-&gt;type
+                        );
+         create_mesg.setSize(sizeof(PowerUpCreateMesg));
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000080.html">[Netpanzer-cvs] r1040 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Network
+</A></li>
+	<LI>Next message: <A HREF="000082.html">[Netpanzer-cvs] r1042 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

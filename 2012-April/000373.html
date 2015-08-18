@@ -1,0 +1,760 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1349 - trunk/netpanzer/src/NetPanzer/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1349%20-%20trunk/netpanzer/src/NetPanzer/Network&In-Reply-To=%3C20120405164732.1422755B10%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000372.html">
+   <LINK REL="Next"  HREF="000374.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1349 - trunk/netpanzer/src/NetPanzer/Network</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1349%20-%20trunk/netpanzer/src/NetPanzer/Network&In-Reply-To=%3C20120405164732.1422755B10%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1349 - trunk/netpanzer/src/NetPanzer/Network">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Thu Apr  5 18:47:31 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000372.html">[Netpanzer-cvs] r1348 - trunk/netpanzer/src/Lib/ArrayUtil
+</A></li>
+        <LI>Next message: <A HREF="000374.html">[Netpanzer-cvs] r1350 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-04-05 18:47:31 +0200 (Thu, 05 Apr 2012)
+New Revision: 1349
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Network/NewsGetter.cpp
+   trunk/netpanzer/src/NetPanzer/Network/NewsGetter.hpp
+Log:
+Added HTTPClientSocket which odly enough, handles HTTP Client communications, other classes can easily extend this one, for example the news getter
+
+Added: trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp	2012-04-05 16:47:31 UTC (rev 1349)
+@@ -0,0 +1,325 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;HTTPClientSocket.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++#include &lt;sstream&gt;
++
++HTTPClientSocket::HTTPClientSocket()
++{
++    request_method = &quot;GET&quot;;
++    port = &quot;80&quot;;
++}
++
++HTTPClientSocket::~HTTPClientSocket()
++{
++
++}
++
++void HTTPClientSocket::setMethod(const std::string &amp;method)
++{
++    this-&gt;request_method.assign(method);
++}
++
++void HTTPClientSocket::setHeader(const std::string &amp;name, const std::string &amp;value)
++{
++    request_headers[name] = value;
++}
++
++void HTTPClientSocket::setContent(const std::vector&lt;uint8_t&gt; request_content)
++{
++    this-&gt;request_content.assign(request_content.begin(), request_content.end());
++
++    std::stringstream ss;
++    ss &lt;&lt; request_content.size();
++    request_headers[&quot;content-length&quot;] = ss.str();
++}
++
++void HTTPClientSocket::setHost(const std::string &amp;host)
++{
++    this-&gt;host.assign(host);
++}
++
++void HTTPClientSocket::setPort(const std::string &amp;port)
++{
++    this-&gt;port.assign(port);
++}
++
++void HTTPClientSocket::setPath(const std::string &amp;path)
++{
++    this-&gt;path.assign(path);
++}
++
++void HTTPClientSocket::doRequest()
++{
++    try
++    {
++        socket = new network::TCPSocket(host, port , this);
++        state = RESPONSE_PROTO;
++    }
++    catch (...)
++    {
++        if ( socket )
++        {
++            socket-&gt;destroy();
++        }
++        throw;
++    }
++}
++
++void HTTPClientSocket::onConnected(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPClientSocket connected&quot;);
++    std::stringstream ss;
++
++    ss &lt;&lt; request_method &lt;&lt; &quot; <A HREF="http://">http://</A>&quot; &lt;&lt; host &lt;&lt; ':' &lt;&lt; port &lt;&lt; path &lt;&lt; &quot; HTTP/1.1\r\n&quot;
++       &lt;&lt; &quot;Host: &quot; &lt;&lt; host &lt;&lt; ':' &lt;&lt; port &lt;&lt; &quot;\r\n&quot;
++       &lt;&lt; &quot;Connection: close\r\n&quot;;
++
++    for ( headers::iterator i = request_headers.begin(); i != request_headers.end(); i++ )
++    {
++        LOGGER.warning(&quot;adding header [%s]:[%s]&quot;, i-&gt;first.c_str(), i-&gt;second.c_str());
++        ss &lt;&lt; i-&gt;first &lt;&lt; &quot;: &quot; &lt;&lt; i-&gt;second &lt;&lt; &quot;\r\n&quot;;
++    }
++
++    ss &lt;&lt; &quot;\r\n&quot;;
++
++    std::string t(ss.str());
++
++    LOGGER.warning(&quot;Going to send:\n%s\n[END]&quot;, t.c_str());
++
++    socket-&gt;send(t.c_str(), t.length());
++}
++
++void HTTPClientSocket::onDisconected(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPClientSocket disconnected&quot;);
++    socket = 0;
++}
++
++void HTTPClientSocket::onSocketError(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPClientSocket error&quot;);
++    socket = 0;
++}
++
++void HTTPClientSocket::onDataReceived(network::TCPSocket *so, const char *data, const int len)
++{
++    int mlen = len;
++    do
++    {
++        _handleReceivedByte(*data);
++        data++;
++    } while ( --mlen );
++}
++
++void HTTPClientSocket::_handleReceivedByte(uint8_t data)
++{
++    switch (state)
++    {
++        case ERROR:
++            break;
++        case IDLE:
++            break;
++        case RESPONSE_PROTO:
++            if ( ! isspace(data) )
++            {
++                token.append(1, tolower(data));
++            }
++            else
++            {
++                if ( token.compare(&quot;http/1.1&quot;) )
++                {
++                    LOGGER.warning(&quot;Received protocol is not 'HTTP/1.1'&quot;);
++                }
++                response_version = token;
++                token.clear();
++                content_length = 0;
++                content.clear();
++                state = RESPONSE_CODE;
++            }
++            break;
++        case RESPONSE_CODE:
++            if ( token.size() &lt; 3 )
++            {
++                if ( isdigit(data) )
++                {
++                    token.append(1, data);
++                }
++                else
++                {
++                    LOGGER.warning(&quot;Wrong response code, is not a digit&quot;);
++                    state = ERROR;
++                }
++            }
++            else
++            {
++                if ( ! isspace(data) )
++                {
++                    LOGGER.warning(&quot;Wrong response code, doesn't end in space&quot;);
++                }
++
++                response_code_str = token;
++                std::stringstream ss(token);
++                ss &gt;&gt; response_code;
++
++                token.clear();
++                state = RESPONSE_TEXT;
++            }
++            break;
++        case RESPONSE_TEXT:
++            token.append(1, data); // actualy \r\n shouldn't be in the text
++            if ( data == '\n' )
++            {
++                while ( !token.empty() &amp;&amp; isspace(*token.rbegin()) )
++                {
++                    token.resize(token.size()-1);
++                }
++                response_description = token;
++                state = HEADER_BEGIN;
++                token.clear();
++            }
++            break;
++        case HEADER_ENDING:
++            if ( data == 10 )
++            {
++                token.clear();
++                state = _handleHeaders();
++            }
++            else
++            {
++                state = ERROR;
++            }
++            break;
++        case HEADER_BEGIN:
++            if ( data == 13 )
++            {
++                state = HEADER_ENDING;
++                break;
++            }
++            token.clear();
++            state = HEADER_NAME;
++            // fall through, it is begin of name
++        case HEADER_NAME:
++            if ( data == ':' )
++            {
++                header_name = token;
++                token.clear();
++                state = HEADER_SKIP_SPACE;
++            }
++            else
++            {
++                token.append(1, tolower(data));
++            }
++            break;
++        case HEADER_SKIP_SPACE:
++            if ( isspace(data) )
++            {
++                break;
++            }
++            state = HEADER_VALUE;
++            // fall through, it is not space
++
++        case HEADER_VALUE:
++            if ( data == '\n' )
++            {
++                while ( !token.empty() &amp;&amp; isspace(*token.rbegin()) )
++                {
++                    token.resize(token.size()-1);
++                }
++                response_headers[header_name] = token;
++                // handle header here
++                state = HEADER_BEGIN;
++            }
++            else
++            {
++                token.append(1,data);
++            }
++            break;
++        case RECEIVING_DATA:
++            content.append(1,data);
++            if ( --content_length &lt;= 0 )
++            {
++                onContentFinished();
++                socket-&gt;destroy();
++                state = IDLE;
++            }
++            break;
++    }
++}
++
++HTTPClientSocket::STATE HTTPClientSocket::_handleHeaders()
++{
++
++    LOGGER.warning(&quot;Received: [%s] [%s/%d] [%s]&quot;,
++                   response_version.c_str(),
++                   response_code_str.c_str(),
++                   response_code,
++                   response_description.c_str());
++
++    for ( headers::iterator i = response_headers.begin(); i != response_headers.end(); i++ )
++    {
++        LOGGER.warning(&quot;received header [%s]:[%s]&quot;, i-&gt;first.c_str(), i-&gt;second.c_str());
++    }
++
++
++    headers::iterator clength = response_headers.find(&quot;content-length&quot;);
++    if ( clength != response_headers.end() )
++    {
++        std::stringstream ss(clength-&gt;second);
++        ss &gt;&gt; content_length;
++    }
++
++    if ( response_code &lt; 100 )
++    {
++        return ERROR; // this is bad server
++    }
++    else if ( response_code &lt; 200 )
++    {
++        return RESPONSE_PROTO;
++    }
++    else if ( response_code &lt; 300 )
++    {
++        if ( response_code == 204 ) // no content
++            return IDLE;
++
++        if ( content_length &gt; 0 )
++            return RECEIVING_DATA;
++
++        return IDLE;
++    }
++    else if ( response_code &lt; 400 )
++    {
++        return IDLE; // this is a redirect
++    }
++    else if ( response_code &lt; 500 )
++    {
++        return ERROR; // this is client error
++    }
++    else if ( response_code &lt; 600 )
++    {
++        return ERROR; // this is server error
++    }
++    else
++    {
++        return ERROR; // this is bad server
++    }
++
++
++}
+
+Added: trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp	                        (rev 0)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp	2012-04-05 16:47:31 UTC (rev 1349)
+@@ -0,0 +1,95 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef HTTPCLIENTSOCKET_HPP
++#define HTTPCLIENTSOCKET_HPP
++
++#include &quot;Network/TCPSocket.hpp&quot;
++#include &lt;vector&gt;
++#include &lt;string&gt;
++#include &lt;map&gt;
++#include &lt;stdint.h&gt;
++
++class HTTPClientSocket : public network::TCPSocketObserver
++{
++public:
++    HTTPClientSocket();
++    virtual ~HTTPClientSocket();
++
++    void setMethod(const std::string&amp; method);
++    void setHeader(const std::string&amp; name, const std::string&amp; value);
++    void setContent(const std::vector&lt;uint8_t&gt; request_content);
++    void setHost(const std::string&amp; host);
++    void setPort(const std::string&amp; port);
++    void setPath(const std::string&amp; path);
++    void doRequest();
++
++protected:
++    void onDataReceived(network::TCPSocket *so, const char *data, const int len);
++    void onConnected(network::TCPSocket *so);
++    void onDisconected(network::TCPSocket *so);
++    void onSocketError(network::TCPSocket *so);
++
++    virtual void onContentFinished() {}
++
++    std::string content;
++
++private:
++    network::TCPSocket * socket;
++    std::string host;
++    std::string port;
++    std::string path;
++
++    enum STATE
++    {
++        ERROR,
++        IDLE,
++        RESPONSE_PROTO,
++        RESPONSE_CODE,
++        RESPONSE_TEXT,
++        HEADER_ENDING,
++        HEADER_BEGIN,
++        HEADER_NAME,
++        HEADER_SKIP_SPACE,
++        HEADER_VALUE,
++        RECEIVING_DATA
++    } state;
++
++    std::string token;
++    std::string header_name;
++
++    std::string response_version;
++    std::string response_code_str;
++    std::string response_description;
++    int response_code;
++    int content_length;
++
++    typedef std::map&lt;std::string, std::string&gt; headers;
++
++    std::string request_method;
++    headers request_headers;
++
++    headers response_headers;
++
++    std::vector&lt;uint8_t&gt; request_content;
++
++    void _handleReceivedByte(uint8_t data);
++    STATE _handleHeaders();
++};
++
++#endif // HTTPCLIENTSOCKET_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/NewsGetter.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/NewsGetter.cpp	2012-04-05 10:41:21 UTC (rev 1348)
++++ trunk/netpanzer/src/NetPanzer/Network/NewsGetter.cpp	2012-04-05 16:47:31 UTC (rev 1349)
+@@ -17,185 +17,27 @@
+ */
+ 
+ #include &quot;NewsGetter.hpp&quot;
+-#include &quot;Network/Address.hpp&quot;
+-#include &lt;sstream&gt;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ #include &quot;Views/MainMenu/MainMenuView.hpp&quot;
+ 
+-static const char req[] = &quot;GET <A HREF="http://netpanzer.org/npnews.txt">http://netpanzer.org/npnews.txt</A> HTTP/1.1\r\n&quot;
+-                          &quot;Host: netpanzer.org\r\n&quot;
+-                          &quot;Connection: close\r\n&quot;
+-                          &quot;\r\n&quot;;
+-
+ NewsGetter::NewsGetter()
+ {
+-    try
+-    {
+-        LOGGER.debug(&quot;New news getter&quot;);
+-        network::Address address = network::Address::resolve(&quot;netpanzer.org&quot;, 80, true, false);
+-        socket = new network::TCPSocket(address, this);
+-        state = RESPONSE_LINE;
+-        wanted_len = -1;
+-    }
+-    catch (...)
+-    {
+-        if ( socket )
+-        {
+-            socket-&gt;destroy();
+-        }
+-        throw;
+-    }
++    LOGGER.debug(&quot;New news getter&quot;);
++    setHost(&quot;netpanzer.org&quot;);
++    setPort(&quot;80&quot;);
++    setPath(&quot;/npnews.txt&quot;);
++    doRequest();
+ }
+ 
+-void NewsGetter::onConnected(network::TCPSocket *so)
+-{
+-    LOGGER.debug(&quot;news getter connected, sending&quot;);
+-    socket-&gt;send(req, sizeof(req)-1);
+-}
+-
+-void NewsGetter::onDisconected(network::TCPSocket *so)
+-{
+-    LOGGER.debug(&quot;news getter disconnected&quot;);
+-    socket = 0;
+-}
+-
+ void NewsGetter::onSocketError(network::TCPSocket *so)
+ {
++    HTTPClientSocket::onSocketError(so);
+     LOGGER.debug(&quot;news getter error&quot;);
+     MainMenuView::setNews(&quot;Error loading news&quot;);
+-    socket = 0;
+ }
+ 
+-void NewsGetter::onDataReceived(network::TCPSocket *so, const char *data, const int len)
++void NewsGetter::onContentFinished()
+ {
+-    int mlen = len;
+-    do
+-    {
+-        handleReceivedByte(*data);
+-        data++;
+-    } while ( --mlen );
++    MainMenuView::setNews(content);
+ }
+-
+-void NewsGetter::handleReceivedByte(unsigned char data)
+-{
+-    switch ( state )
+-    {
+-        case ERROR:
+-            break;
+-        case RESPONSE_LINE:
+-            if ( isspace(data) )
+-            {
+-                token.clear();
+-                state = RESPONSE_CODE;
+-            }
+-            break;
+-        case RESPONSE_CODE:
+-            if ( token.size() &lt; 3 )
+-            {
+-                if ( isdigit(data) )
+-                {
+-                    token.append(1, data);
+-                }
+-                else
+-                {
+-                    LOGGER.warning(&quot;Wrong response code, is not a digit&quot;);
+-                    state = ERROR;
+-                }
+-            }
+-            else
+-            {
+-                if ( isspace(data) )
+-                {
+-                    token.clear();
+-                    state = RESPONSE_TEXT;
+-                }
+-                else
+-                {
+-                    LOGGER.warning(&quot;Wrong response code, doesn't end in space&quot;);
+-                    state = ERROR;
+-                }
+-            }
+-            break;
+-        case RESPONSE_TEXT:
+-            if ( data == '\n' )
+-            {
+-                state = HEADER_BEGIN;
+-            }
+-            break;
+-        case HEADER_BEGIN:
+-            if ( data == 13 ) break;
+-            else if ( data == 10 )
+-            {
+-                token.clear();
+-                news.clear();
+-                state = RECEIVING_DATA;
+-                break;
+-            }
+-            state = HEADER_NAME;
+-            // fall through, it is begin of name
+-        case HEADER_NAME:
+-            if ( data == ':' )
+-            {
+-                header_name = token;
+-                token.clear();
+-                state = HEADER_SKIP_SPACE;
+-            }
+-            else
+-            {
+-                token.append(1, tolower(data));
+-            }
+-            break;
+-        case HEADER_SKIP_SPACE:
+-            if ( isspace(data) )
+-            {
+-                break;
+-            }
+-            state = HEADER_VALUE;
+-            // fall through, it is not space
+-
+-        case HEADER_VALUE:
+-            if ( data == '\n' )
+-            {
+-                handleHeader();
+-                // handle header here
+-                state = HEADER_BEGIN;
+-                token.clear();
+-            }
+-            else
+-            {
+-                token.append(1,data);
+-            }
+-            break;
+-        case RECEIVING_DATA:
+-            news.append(1, data);
+-            if ( --wanted_len &lt;= 0 )
+-            {
+-                onResponseFinished();
+-                state = IGNORE;
+-            }
+-            break;
+-        case IGNORE:
+-            break;
+-    }
+-}
+-
+-void NewsGetter::onResponseFinished()
+-{
+-    MainMenuView::setNews(news);
+-    socket-&gt;destroy();
+-    socket = 0;
+-}
+-
+-void NewsGetter::handleHeader()
+-{
+-    if ( header_name == &quot;content-length&quot; )
+-    {
+-        std::stringstream siz;
+-        siz &lt;&lt; token;
+-        siz &gt;&gt; wanted_len;
+-        LOGGER.warning(&quot;Wants %d&quot;, wanted_len);
+-    }
+-}
+-
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/NewsGetter.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/NewsGetter.hpp	2012-04-05 10:41:21 UTC (rev 1348)
++++ trunk/netpanzer/src/NetPanzer/Network/NewsGetter.hpp	2012-04-05 16:47:31 UTC (rev 1349)
+@@ -19,45 +19,17 @@
+ #ifndef NEWSGETTER_HPP
+ #define NEWSGETTER_HPP
+ 
+-#include &quot;Network/TCPSocket.hpp&quot;
+-#include &lt;string&gt;
++#include &quot;HTTPClientSocket.hpp&quot;
+ 
+-class NewsGetter : public network::TCPSocketObserver
++class NewsGetter : public HTTPClientSocket
+ {
+ public:
+     NewsGetter();
+     ~NewsGetter() {}
+-    void onDataReceived(network::TCPSocket *so, const char *data, const int len);
+-    void onConnected(network::TCPSocket *so);
+-    void onDisconected(network::TCPSocket *so);
+-    void onSocketError(network::TCPSocket *so);
+ 
+ private:
+-    network::TCPSocket * socket;
+-    enum
+-    {
+-        ERROR,
+-        RESPONSE_LINE,
+-        RESPONSE_CODE,
+-        RESPONSE_TEXT,
+-        HEADER_BEGIN,
+-        HEADER_NAME,
+-        HEADER_SKIP_SPACE,
+-        HEADER_VALUE,
+-        RECEIVING_DATA,
+-        IGNORE
+-    } state;
+-
+-    std::string token;
+-    std::string header_name;
+-    std::string news;
+-
+-    int wanted_len;
+-
+-    void handleReceivedByte(unsigned char data);
+-    void onResponseFinished();
+-    void handleHeader();
+-
++    void onContentFinished();
++    void onSocketError(network::TCPSocket *so);
+ };
+ 
+ #endif // NEWSGETTER_HPP
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000372.html">[Netpanzer-cvs] r1348 - trunk/netpanzer/src/Lib/ArrayUtil
+</A></li>
+	<LI>Next message: <A HREF="000374.html">[Netpanzer-cvs] r1350 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

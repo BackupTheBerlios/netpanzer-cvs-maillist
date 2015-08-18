@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1279 - in trunk/netpanzer/src/NetPanzer/Views: .	Components MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1279%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%20.%0A%09Components%20MainMenu/Multi&In-Reply-To=%3C20111111204406.DF6804811EB%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000304.html">
+   <LINK REL="Next"  HREF="000306.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1279 - in trunk/netpanzer/src/NetPanzer/Views: .	Components MainMenu/Multi</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1279%20-%20in%20trunk/netpanzer/src/NetPanzer/Views%3A%20.%0A%09Components%20MainMenu/Multi&In-Reply-To=%3C20111111204406.DF6804811EB%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1279 - in trunk/netpanzer/src/NetPanzer/Views: .	Components MainMenu/Multi">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov 11 21:44:06 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000304.html">[Netpanzer-cvs] r1278 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000306.html">[Netpanzer-cvs] r1280 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Components	NetPanzer/Views/Game NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#305">[ date ]</a>
+              <a href="thread.html#305">[ thread ]</a>
+              <a href="subject.html#305">[ subject ]</a>
+              <a href="author.html#305">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-11-11 21:44:06 +0100 (Fri, 11 Nov 2011)
+New Revision: 1279
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+Log:
+Resize imputfield
+Change button play position
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2011-11-11 20:16:01 UTC (rev 1278)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2011-11-11 20:44:06 UTC (rev 1279)
+@@ -166,7 +166,7 @@
+ 
+     iXY size;
+     // XXX (8 is hardcoded here...)
+-    size.x = string-&gt;maxWidth * 8 + 8;
++    size.x = (string-&gt;maxWidth+1) * 8 + 8;
+     size.y = Surface::getFontHeight() + 4;
+ 
+     bounds.max = bounds.min + size;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2011-11-11 20:16:01 UTC (rev 1278)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2011-11-11 20:44:06 UTC (rev 1279)
+@@ -28,7 +28,7 @@
+ iXY hostPos(joinPos.x+ButonWidth, 7);
+ iXY optionsPos(hostPos.x+ButonWidth, 7);
+ iXY helpPos(optionsPos.x+ButonWidth, 7);
+-iXY nextPos(joinPos.x, helpPos.y+ButonHeight*2);
++iXY nextPos(helpPos.x-55, helpPos.y+ButonHeight*7);
+ iXY exitPos(optionsPos.x+ButonWidth, 573);
+ iXY creditsPos(0, 0);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2011-11-11 20:44:06 UTC (rev 1279)
+@@ -38,7 +38,7 @@
+     moveTo(iXY(bodyTextRect.min.x, bodyTextRect.min.y + 50));
+ 
+     iXY  area_size = iXY(
+-            30 * 8 + 16,
++            31 * 8 + 16,
+             Surface::getFontHeight() + 4 + 8);
+     resizeClientArea(area_size);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2011-11-11 20:16:01 UTC (rev 1278)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2011-11-11 20:44:06 UTC (rev 1279)
+@@ -40,7 +40,7 @@
+     // The plus 8 for x and 4 for y are what I put in input field.  Add function to find out,
+     // inpit field dimension.
+     int CHAR_XPIX = 8; // XXX hardcoded :-/
+-    resizeClientArea(INPUT_FIELD_CHARACTERS * CHAR_XPIX + 8 + BORDER_SPACE * 2, Surface::getFontHeight() + 4 + BORDER_SPACE * 2);
++    resizeClientArea((INPUT_FIELD_CHARACTERS+1) * CHAR_XPIX + 8 + BORDER_SPACE * 2, Surface::getFontHeight() + 4 + BORDER_SPACE * 2);
+ 
+     init();
+ } // end PlayerNameView::PlayerNameView
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000304.html">[Netpanzer-cvs] r1278 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game Views/MainMenu Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000306.html">[Netpanzer-cvs] r1280 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Views NetPanzer/Views/Components	NetPanzer/Views/Game NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#305">[ date ]</a>
+              <a href="thread.html#305">[ thread ]</a>
+              <a href="subject.html#305">[ subject ]</a>
+              <a href="author.html#305">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

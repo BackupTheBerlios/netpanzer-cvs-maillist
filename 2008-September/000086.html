@@ -1,0 +1,712 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1047 - in trunk/netpanzer/src/NetPanzer: . Classes	Objectives
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1047%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20.%20Classes%0A%09Objectives&In-Reply-To=%3C200809091540.m89FeeWj026535%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000085.html">
+   <LINK REL="Next"  HREF="000087.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1047 - in trunk/netpanzer/src/NetPanzer: . Classes	Objectives</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1047%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20.%20Classes%0A%09Objectives&In-Reply-To=%3C200809091540.m89FeeWj026535%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1047 - in trunk/netpanzer/src/NetPanzer: . Classes	Objectives">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep  9 17:40:40 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000085.html">[Netpanzer-cvs] r1046 - in trunk/netpanzer: . nbproject	src/NetPanzer src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/PowerUps	src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000087.html">[Netpanzer-cvs] r1048 - in trunk/netpanzer/src/NetPanzer:	Interfaces Objectives
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-09 17:40:26 +0200 (Tue, 09 Sep 2008)
+New Revision: 1047
+
+Added:
+   trunk/netpanzer/src/NetPanzer/Objectives/
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp
+Removed:
+   trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Objective.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Outpost.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Jamfile
+Log:
+- Moved objectives (outpost) classes to src/NetPanzer/Objectives
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp	2008-09-09 15:27:38 UTC (rev 1046)
++++ trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp	2008-09-09 15:40:26 UTC (rev 1047)
+@@ -1,121 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-#include &quot;Classes/Objective.hpp&quot;
+-#include &quot;Outpost.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+-#include &quot;Interfaces/UnitProfileInterface.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-
+-Objective::Objective(ObjectiveID ID, iXY location, BoundBox area)
+-{
+-    objective_state.ID = ID;
+-    objective_state.selection_state = false;
+-    objective_state.location = location;
+-    objective_state.capture_area = area;
+-    objective_state.objective_status = _objective_status_null;
+-    objective_state.occupation_status = _occupation_status_unoccupied;
+-    objective_state.occupying_player = 0;
+-}
+-
+-void
+-Objective::objectiveMesgUpdateOccupation(const ObjectiveMessage* message)
+-{
+-    const UpdateOccupationsStatus *occupation_update
+-        = (const UpdateOccupationsStatus *) message;
+-
+-    objective_state.occupation_status = occupation_update-&gt;occupation_status;
+-    objective_state.occupying_player
+-        = PlayerInterface::getPlayer(occupation_update-&gt;getOccupyingPlayerID());
+-
+-    Outpost* outpost = dynamic_cast&lt;Outpost*&gt; (this);
+-    if(outpost) {
+-        outpost-&gt;unit_generation_on_flag = occupation_update-&gt;unit_gen_on;
+-        outpost-&gt;unit_generation_type = occupation_update-&gt;unit_type;
+-        UnitProfile* profile =
+-            UnitProfileInterface::getUnitProfile(
+-                    outpost-&gt;unit_generation_type );
+-        outpost-&gt;unit_generation_timer.changePeriod((float)profile-&gt;regen_time);
+-        outpost-&gt;unit_generation_timer.setTimeLeft(
+-                float(occupation_update-&gt;getTimeLeft()) / 128.0);
+-    }
+-
+-    if( objective_state.occupation_status != _occupation_status_unoccupied ) {
+-        PlayerState *player_state = objective_state.occupying_player;
+-        
+-        ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has been occupied by '%s'&quot;,
+-                objective_state.name, player_state-&gt;getName().c_str() );
+-    }
+-}
+-
+-void
+-Objective::objectiveMesgSync(const ObjectiveMessage* message)
+-{
+-    const SyncObjective *sync_mesg = (const SyncObjective*) message;
+-
+-    if(sync_mesg-&gt;getOccupyingPlayerID() &gt;= PlayerInterface::getMaxPlayers()) {
+-        LOGGER.warning(&quot;Malformed ObjectvieMesgSync&quot;);
+-        return;
+-    }
+-
+-    objective_state.objective_status = sync_mesg-&gt;objective_status;
+-    objective_state.occupation_status = sync_mesg-&gt;occupation_status;
+-    if(objective_state.occupation_status != _occupation_status_unoccupied) {
+-        objective_state.occupying_player =
+-            PlayerInterface::getPlayer(sync_mesg-&gt;getOccupyingPlayerID());
+-    } else {
+-        objective_state.occupying_player = 0;
+-    }
+-}
+-
+-void Objective::getSyncData(SyncObjective&amp; objective_sync_mesg)
+-{
+-    Uint16 player_id = 0;
+-    if(objective_state.occupation_status != _occupation_status_unoccupied
+-            &amp;&amp; objective_state.occupying_player) {
+-        player_id = objective_state.occupying_player-&gt;getID();
+-    }
+-    objective_sync_mesg.set(objective_state.ID,
+-                            objective_state.objective_status,
+-                            objective_state.occupation_status,
+-                            player_id);
+-}
+-
+-
+-void Objective::processMessage(const ObjectiveMessage* message)
+-{
+-    switch(message-&gt;message_type) {
+-        case _objective_mesg_update_occupation:
+-            objectiveMesgUpdateOccupation(message);
+-            break;
+-
+-        case _objective_mesg_sync_objective:
+-            objectiveMesgSync(message);
+-            break;
+-
+-        case _objective_mesg_change_unit_generation:
+-        case _objective_mesg_disown_player_objective:
+-        case _objective_mesg_change_output_location:
+-            break;
+-
+-        default:
+-            LOGGER.warning(&quot;Unknown ObjectiveMessage received (type %d)&quot;,
+-                    message-&gt;message_type);
+-    }
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Objective.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Objective.hpp	2008-09-09 15:27:38 UTC (rev 1046)
++++ trunk/netpanzer/src/NetPanzer/Classes/Objective.hpp	2008-09-09 15:40:26 UTC (rev 1047)
+@@ -1,90 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _OBJECTIVE_HPP
+-#define _OBJECTIVE_HPP
+-
+-#include &quot;Core/CoreTypes.hpp&quot;
+-#include &quot;ArrayUtil/BoundBox.hpp&quot;
+-#include &quot;SpriteSorter.hpp&quot;
+-#include &quot;Classes/PlayerState.hpp&quot;
+-#include &quot;Classes/ObjectiveMessageTypes.hpp&quot;
+-
+-enum { _objective_status_null };
+-
+-enum { _occupation_status_unoccupied,
+-       _occupation_status_occupied
+-     };
+-
+-
+-class ObjectiveState
+-{
+-public:
+-    ObjectiveID   ID;
+-    bool          selection_state;
+-    iRect         selection_box;
+-    unsigned char outpost_type;
+-    char          name[64];
+-    iXY           location;
+-    BoundBox      capture_area;
+-    BoundBox      area;
+-    unsigned char objective_status;
+-    unsigned char occupation_status;
+-    PlayerState*  occupying_player;
+-
+-    inline bool isBounded( iXY &amp;test )
+-    {
+-        return( capture_area.bounds( location, test ) );
+-    }
+-};
+-
+-
+-class OutpostStatus
+-{
+-public:
+-    unsigned short unit_generation_type;
+-    bool           unit_generation_on_off;
+-    float          unit_generation_time;
+-    float          unit_generation_time_remaining;
+-    iXY unit_collection_loc;
+-};
+-
+-class Objective
+-{
+-protected:
+-    void objectiveMesgUpdateOccupation(const ObjectiveMessage* message);
+-    void objectiveMesgSync(const ObjectiveMessage* message);
+-
+-public:
+-    ObjectiveState objective_state;
+-
+-    Objective(ObjectiveID ID, iXY location, BoundBox area );
+-    virtual ~Objective()
+-    { }
+-
+-    void getSyncData( SyncObjective &amp;objective_sync_mesg );
+-
+-    virtual void processMessage(const ObjectiveMessage* message);
+-
+-    virtual void updateStatus()
+-    { }
+-
+-    virtual void offloadGraphics(SpriteSorter&amp; )
+-    { }
+-};
+-
+-#endif // ** _OBJECTIVE_HPP
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp	2008-09-09 15:27:38 UTC (rev 1046)
++++ trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp	2008-09-09 15:40:26 UTC (rev 1047)
+@@ -1,303 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#include &lt;config.h&gt;
+-#include &quot;Outpost.hpp&quot;
+-
+-#include &quot;Interfaces/UnitInterface.hpp&quot;
+-#include &quot;Interfaces/UnitProfileInterface.hpp&quot;
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/MapInterface.hpp&quot;
+-#include &quot;Interfaces/ConsoleInterface.hpp&quot;
+-
+-#include &quot;Classes/Network/NetworkServer.hpp&quot;
+-#include &quot;Classes/Network/NetworkState.hpp&quot;
+-#include &quot;Classes/Network/UnitNetMessage.hpp&quot;
+-#include &quot;Classes/Network/ObjectiveNetMessage.hpp&quot;
+-#include &quot;Classes/UnitMessageTypes.hpp&quot;
+-
+-Outpost::Outpost( ObjectiveID ID, iXY location, BoundBox area )
+-        : Objective( ID, location, area )
+-{
+-    MapInterface::pointXYtoMapXY( location, &amp;outpost_map_loc );
+-    objective_state.selection_box.max = location + iXY( 64, 32 );
+-    objective_state.selection_box.min = location + iXY( -224, -128 );
+-    objective_state.area.min = iXY( -400, -144 );
+-    objective_state.area.max = iXY(  400,  240 );
+-    objective_state.outpost_type = 0;
+-    
+-
+-    unit_generation_type = 0;
+-    occupation_status_timer.changePeriod( 3 );
+-    unit_generation_timer.changePeriod( 1 );
+-    unit_collection_loc = outpost_map_loc + iXY( 13, 13 );
+-    unit_generation_loc = iXY( 1, 3 );
+-    occupation_pad_offset = iXY( 224, 48 );
+-    unit_generation_on_flag = false;
+-
+-    select_box.setAttrib( location, 3 );
+-    select_box.setBoxAttributes( area, 252 );
+-}
+-
+-void
+-Outpost::attemptOccupationChange(UnitID unit_id)
+-{
+-    ObjectiveOccupationUpdate update_mesg;
+-    int player_status;
+-
+-    UnitBase* unit = UnitInterface::getUnit(unit_id);
+-    PlayerState* player = unit-&gt;player;
+-    player_status = player-&gt;getStatus();
+-
+-    if ( objective_state.occupation_status == _occupation_status_unoccupied ) {
+-        if ( player_status == _player_state_active ) {
+-            objective_state.occupying_player = player;
+-            objective_state.occupation_status = _occupation_status_occupied;
+-
+-            update_mesg.status_update.set(objective_state.ID,
+-                        objective_state.occupation_status,
+-                        objective_state.occupying_player-&gt;getID(),
+-                        unit_generation_on_flag,
+-                        unit_generation_type,
+-                        Uint32(unit_generation_timer.getTimeLeft() * 128.0));
+-            SERVER-&gt;broadcastMessage(&amp;update_mesg, sizeof(ObjectiveOccupationUpdate));
+-
+-            const PlayerState *player_state = objective_state.occupying_player;
+-            ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has been occupied by '%s'&quot;,
+-                    objective_state.name, player_state-&gt;getName().c_str() );
+-        }
+-    } else {
+-        if (objective_state.occupying_player != player) {
+-            if( player_status == _player_state_active  ) {
+-                objective_state.occupying_player = player;
+-                objective_state.occupation_status = _occupation_status_occupied;
+-                update_mesg.status_update.set(
+-                        objective_state.ID,
+-                        objective_state.occupation_status,
+-                        objective_state.occupying_player-&gt;getID(),
+-                        unit_generation_on_flag,
+-                        unit_generation_type,
+-                        Uint32(unit_generation_timer.getTimeLeft() * 128));
+-                SERVER-&gt;broadcastMessage(&amp;update_mesg,
+-                        sizeof(ObjectiveOccupationUpdate));
+-                const PlayerState *player = objective_state.occupying_player;
+-                ConsoleInterface::postMessage(Color::cyan, &quot;'%s' has been occupied by '%s'&quot;,
+-                        objective_state.name, player-&gt;getName().c_str() );
+-            }
+-        }
+-    }
+-}
+-
+-void
+-Outpost::checkOccupationStatus()
+-{
+-    if( occupation_status_timer.count()  )	//
+-    {
+-        UnitBase *unit_ptr;
+-        iRect bounding_area;
+-        iXY occupation_pad_loc;
+-
+-        occupation_pad_loc = objective_state.location + occupation_pad_offset;
+-        bounding_area = objective_state.capture_area.getAbsRect( occupation_pad_loc );
+-
+-
+-        UnitInterface::queryClosestUnit( &amp;unit_ptr,
+-                                          bounding_area,
+-                                          occupation_pad_loc
+-                                        );
+-
+-        if ( unit_ptr != 0 )
+-        {
+-            iXY unit_loc;
+-            unit_loc = unit_ptr-&gt;unit_state.location;
+-            if ( objective_state.capture_area.bounds( occupation_pad_loc, unit_loc ) ) {
+-                attemptOccupationChange( unit_ptr-&gt;id );
+-            }
+-
+-        } // ** if unit_ptr != 0
+-
+-    } // ** if occupation_status_timer.count()
+-
+-}
+-
+-void
+-Outpost::generateUnits()
+-{   // XXX CHECK
+-    if ( NetworkState::status == _network_state_server )
+-    {
+-        if ( (unit_generation_on_flag == true) &amp;&amp;
+-            (objective_state.occupation_status == _occupation_status_occupied) )
+-        {
+-            if( (unit_generation_timer.count() == true) )
+-            {
+-                UnitBase *unit;
+-                iXY gen_loc;
+-                gen_loc = outpost_map_loc + unit_generation_loc;
+-
+-                unit = UnitInterface::createUnit(unit_generation_type,
+-                        gen_loc, objective_state.occupying_player-&gt;getID());
+-
+-                if ( unit != 0 )
+-                {
+-                    UnitRemoteCreate create_mesg(unit-&gt;player-&gt;getID(),
+-                            unit-&gt;id, gen_loc.x, gen_loc.y,
+-                            unit_generation_type);
+-                    SERVER-&gt;broadcastMessage(&amp;create_mesg, sizeof(UnitRemoteCreate));
+-
+-                    UMesgAICommand ai_command;
+-                    PlacementMatrix placement_matrix;
+-                    iXY collection_loc, loc;
+-
+-                    collection_loc = /*outpost_map_loc +*/ unit_collection_loc;
+-
+-                    placement_matrix.reset( collection_loc );
+-                    placement_matrix.getNextEmptyLoc( &amp;loc );
+-
+-                    ai_command.setHeader( unit-&gt;id, _umesg_flag_unique );
+-                    ai_command.setMoveToLoc( loc );
+-                    UnitInterface::sendMessage( &amp;ai_command );
+-                }
+-            } // ** if
+-        } // ** if
+-    } // ** if ( objective_state.occupation_status == _occupation_status_unoccupied )
+-    else
+-    {
+-        if( (unit_generation_timer.count() == true) )
+-        {
+-            unit_generation_timer.reset();
+-        }
+-    }
+-
+-}
+-
+-void
+-Outpost::updateStatus()
+-{
+-    if ( NetworkState::status == _network_state_server ) {
+-        checkOccupationStatus();
+-    }
+-
+-    generateUnits();
+-
+-}
+-
+-void
+-Outpost::objectiveMesgChangeOutputLocation(const ObjectiveMessage* message)
+-{
+-    ChangeOutputLocation *msg;
+-    msg = (ChangeOutputLocation *) message;
+-    iXY temp;
+-    MapInterface::pointXYtoMapXY(iXY(msg-&gt;getPointX(), msg-&gt;getPointY()),
+-            &amp;temp );
+-    unit_collection_loc = temp;
+-}
+-
+-void
+-Outpost::objectiveMesgChangeUnitGeneration(const ObjectiveMessage* message)
+-{
+-    ChangeUnitGeneration *unit_gen_mesg;
+-    UnitProfile *profile;
+-
+-    unit_gen_mesg = (ChangeUnitGeneration *) message;
+-
+-    unit_generation_type = unit_gen_mesg-&gt;unit_type;
+-    unit_generation_on_flag = unit_gen_mesg-&gt;unit_gen_on;
+-
+-    profile = UnitProfileInterface::getUnitProfile( unit_generation_type );
+-    unit_generation_timer.changePeriod( (float) profile-&gt;regen_time );
+-}
+-
+-void
+-Outpost::objectiveMesgDisownPlayerObjective(const ObjectiveMessage* message)
+-{
+-    const DisownPlayerObjective *disown_mesg =
+-        (const DisownPlayerObjective *) message;
+-
+-    if( objective_state.occupation_status == _occupation_status_occupied ) {
+-        if (disown_mesg-&gt;getDisownedPlayerID() ==
+-                objective_state.occupying_player-&gt;getID() ) {
+-            objective_state.occupation_status = _occupation_status_unoccupied;
+-
+-            ObjectiveOccupationUpdate update_mesg;
+-            update_mesg.status_update.set( objective_state.ID,
+-                                           objective_state.occupation_status,
+-                                           0,
+-                                           false,
+-                                           0,
+-                                           0);
+-
+-            SERVER-&gt;broadcastMessage(&amp;update_mesg, sizeof(ObjectiveOccupationUpdate));
+-
+-            unit_generation_type = 0;
+-            UnitProfile *profile
+-                = UnitProfileInterface::getUnitProfile( unit_generation_type );
+-            unit_generation_timer.changePeriod( (float) profile-&gt;regen_time );
+-            unit_generation_on_flag = false;
+-        }
+-    }
+-}
+-
+-void
+-Outpost::getOutpostStatus( OutpostStatus &amp;status )
+-{
+-    UnitProfile *profile;
+-
+-    status.unit_generation_type = unit_generation_type;
+-    status.unit_generation_on_off = unit_generation_on_flag;
+-    status.unit_collection_loc = unit_collection_loc;
+-
+-    profile = UnitProfileInterface::getUnitProfile( unit_generation_type );
+-    if ( profile )
+-        status.unit_generation_time = (float) profile-&gt;regen_time;
+-    else
+-        status.unit_generation_time = 0;
+-
+-    if ( unit_generation_on_flag == true ) {
+-        status.unit_generation_time_remaining = unit_generation_timer.getTimeLeft();
+-    } else {
+-        status.unit_generation_time_remaining = 0;
+-    }
+-
+-}
+-
+-void
+-Outpost::processMessage(const ObjectiveMessage* message)
+-{
+-    switch(message-&gt;message_type) {
+-        case _objective_mesg_change_unit_generation:
+-            objectiveMesgChangeUnitGeneration(message);
+-            break;
+-
+-        case _objective_mesg_disown_player_objective:
+-            objectiveMesgDisownPlayerObjective(message);
+-            break;
+-            
+-        case _objective_mesg_change_output_location:
+-            objectiveMesgChangeOutputLocation(message);
+-            break;
+-    }
+-
+-    Objective::processMessage(message);
+-}
+-
+-void
+-Outpost::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-    if( objective_state.selection_state == true ) {
+-        sorter.addSprite( &amp;select_box );
+-    }
+-}
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Outpost.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Outpost.hpp	2008-09-09 15:27:38 UTC (rev 1046)
++++ trunk/netpanzer/src/NetPanzer/Classes/Outpost.hpp	2008-09-09 15:40:26 UTC (rev 1047)
+@@ -1,72 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _OUTPOST_HPP
+-#define _OUTPOST_HPP
+-
+-#include &quot;Classes/Objective.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
+-#include &quot;Classes/SelectionBoxSprite.hpp&quot;
+-#include &quot;Classes/UnitBase.hpp&quot;
+-
+-class Outpost : public Objective
+-{
+-private:
+-    unsigned char outpost_state;
+-    iXY outpost_map_loc;
+-    iXY unit_generation_loc;
+-    iXY unit_collection_loc;
+-    iXY occupation_pad_offset;
+-public:
+-    unsigned short unit_generation_type;
+-    bool unit_generation_on_flag;
+-
+-private:
+-    SelectionBoxSprite select_box;
+-
+-public:
+-    Timer occupation_status_timer;
+-    Timer unit_generation_timer;
+-
+-private:
+-    void attemptOccupationChange(UnitID unit_id);
+-
+-    void checkOccupationStatus( void );
+-
+-    void generateUnits( void );
+-
+-    // ** Message Handlers **
+-    void objectiveMesgChangeUnitGeneration(const ObjectiveMessage* message);
+-    void objectiveMesgDisownPlayerObjective(const ObjectiveMessage* message);
+-    void objectiveMesgChangeOutputLocation(const ObjectiveMessage* message);
+-
+-public:
+-
+-    Outpost( ObjectiveID ID, iXY location, BoundBox area );
+-
+-    void getOutpostStatus( OutpostStatus &amp;status );
+-
+-    virtual void processMessage(const ObjectiveMessage* message);
+-
+-    virtual void updateStatus();
+-
+-    virtual void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-};
+-
+-#endif // ** _OUTPOST_HPP
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Jamfile
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Jamfile	2008-09-09 15:27:38 UTC (rev 1046)
++++ trunk/netpanzer/src/NetPanzer/Jamfile	2008-09-09 15:40:26 UTC (rev 1047)
+@@ -20,6 +20,7 @@
+     Bot
+     System
+     PowerUps
++    Objectives
+ #    Panels
+ ;
+ 
+
+Copied: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp (from rev 1046, trunk/netpanzer/src/NetPanzer/Classes/Objective.cpp)
+
+Copied: trunk/netpanzer/src/NetPanzer/Objectives/Objective.hpp (from rev 1046, trunk/netpanzer/src/NetPanzer/Classes/Objective.hpp)
+
+Copied: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.cpp (from rev 1046, trunk/netpanzer/src/NetPanzer/Classes/Outpost.cpp)
+
+Copied: trunk/netpanzer/src/NetPanzer/Objectives/Outpost.hpp (from rev 1046, trunk/netpanzer/src/NetPanzer/Classes/Outpost.hpp)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000085.html">[Netpanzer-cvs] r1046 - in trunk/netpanzer: . nbproject	src/NetPanzer src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/PowerUps	src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000087.html">[Netpanzer-cvs] r1048 - in trunk/netpanzer/src/NetPanzer:	Interfaces Objectives
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

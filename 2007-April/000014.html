@@ -1,0 +1,1722 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r967 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Network src/Lib/optionmm src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Particles	src/NetPanzer/Views src/NetPanzer/Views/Components	src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r967%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/Lib/Network%20src/Lib/optionmm%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Particles%0A%09src/NetPanzer/Views%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C200704161336.l3GDamXN019514%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000013.html">
+   <LINK REL="Next"  HREF="000015.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r967 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Network src/Lib/optionmm src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Particles	src/NetPanzer/Views src/NetPanzer/Views/Components	src/NetPanzer/Views/Game</H1>
+    <B>kromxp at BerliOS</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r967%20-%20in%20trunk/netpanzer%3A%20.%20src/Lib/2D%0A%09src/Lib/Network%20src/Lib/optionmm%20src/NetPanzer/Classes%0A%09src/NetPanzer/Classes/Network%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Particles%0A%09src/NetPanzer/Views%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C200704161336.l3GDamXN019514%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r967 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Network src/Lib/optionmm src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Particles	src/NetPanzer/Views src/NetPanzer/Views/Components	src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Apr 16 15:36:48 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000013.html">[Netpanzer-cvs] r966 - trunk/homepage
+</A></li>
+        <LI>Next message: <A HREF="000015.html">[Netpanzer-cvs] r968 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2007-04-16 15:36:42 +0200 (Mon, 16 Apr 2007)
+New Revision: 967
+
+Added:
+   trunk/netpanzer/src/Lib/Network/NetworkException.hpp
+Modified:
+   trunk/netpanzer/configure.ac
+   trunk/netpanzer/src/Lib/2D/DigitText.hpp
+   trunk/netpanzer/src/Lib/Network/Address.cpp
+   trunk/netpanzer/src/Lib/Network/Address.hpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+   trunk/netpanzer/src/Lib/optionmm/command_line.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/UnitOpcodes.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MouseEvent.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+Log:
+- Create NetworkException class to handle networking errors
+- Review/modify networking functions (still more to do)
+- Until all servers are updated to newer versions, check for creation of the same unit twice in client code (new servers only send this once)
+- Removed warnings/errors when compiling with -pedantic flag
+- Heartbeat: Fix problem when conecting to 'unreachable' servers (example: without network cable/connection)
+- ObjectiveInterface: Fix memory leak
+- PlayerUnitConfig: Use int instead of char for unit counts
+- ServerConnectDaemon: Modify code to be smaller/clearer (does the same)
+
+
+Modified: trunk/netpanzer/configure.ac
+===================================================================
+--- trunk/netpanzer/configure.ac	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/configure.ac	2007-04-16 13:36:42 UTC (rev 967)
+@@ -4,7 +4,7 @@
+ #----------------------------------------------------------------------------
+ AC_PREREQ([2.54])
+ 
+-AC_INIT([netpanzer], [svn], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
++AC_INIT([netpanzer], [svn-r967], [<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">netpanzer-devel at lists.berlios.org</A>])
+ AC_CONFIG_SRCDIR([mk/jam/build.jam])
+ AC_CONFIG_AUX_DIR([mk/autoconf])
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/DigitText.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/DigitText.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/2D/DigitText.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -27,7 +27,7 @@
+     NORMAL_TRANS,
+     NO_SPACE_TRANS,
+     NORMAL_SOLID,
+-    NO_SPACE_SOLID,
++    NO_SPACE_SOLID
+ };
+ 
+ class DigitText
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/Address.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -17,11 +17,12 @@
+ */
+ #include &lt;config.h&gt;
+ 
+-#include &lt;stdexcept&gt;
+ #include &lt;sstream&gt;
++#include &lt;string&gt;
++#include &lt;string.h&gt;
+ 
+-#include &quot;SocketHeaders.hpp&quot;
+ #include &quot;Address.hpp&quot;
++#include &quot;NetworkException.hpp&quot;
+ 
+ namespace network
+ {
+@@ -75,6 +76,7 @@
+ 
+ Address
+ Address::resolve(const std::string&amp; name, uint16_t port)
++    throw(NetworkException)
+ {
+     // TODO: make a better resolver (ex: getaddrinfo)
+     Address result;
+@@ -87,17 +89,15 @@
+ 
+     struct hostent* hentry = gethostbyname(name.c_str());
+     if(!hentry) {
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't resolve address '&quot; &lt;&lt; name;
+ #ifdef USE_WINSOCK
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't resolve address '&quot; &lt;&lt; name &lt;&lt; &quot;' (code &quot;
+-            &lt;&lt; WSAGetLastError() &lt;&lt; &quot;)&quot;;
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;' (code &quot; &lt;&lt; WSAGetLastError() &lt;&lt; &quot;)&quot;;
+ #else
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't resolve address '&quot; &lt;&lt; name &lt;&lt; &quot;': &quot;
+-            &lt;&lt; hstrerror(h_errno);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;': &quot; &lt;&lt; hstrerror(h_errno);
+ #endif
++        throw NetworkException(msg.str());
++
+     }
+     // XXX quick hack to get it working until get full ss support
+     ((struct sockaddr_in &amp;)result.ss).sin_addr.s_addr = ((struct in_addr*) hentry-&gt;h_addr)-&gt;s_addr;
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/Address.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -19,7 +19,7 @@
+ #define __ADDRESS_HPP__
+ 
+ #include &quot;SocketHeaders.hpp&quot;
+-#include &lt;stdint.h&gt;
++#include &quot;NetworkException.hpp&quot;
+ #include &lt;string&gt;
+ 
+ namespace network
+@@ -34,7 +34,7 @@
+     /** resolves a hostname or IP-Number together with a port and returns a
+      * new Address object.
+      */
+-    static Address resolve(const std::string&amp; name, uint16_t port);
++    static Address resolve(const std::string&amp; name, uint16_t port) throw(NetworkException);
+ 
+     /** returns the ip address of this Address as string */
+     std::string getIP() const;
+
+Added: trunk/netpanzer/src/Lib/Network/NetworkException.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/NetworkException.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/NetworkException.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -0,0 +1,35 @@
++/*
++Copyright (C) 2007 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef _NETWORKEXCEPTION_HPP
++#define _NETWORKEXCEPTION_HPP
++
++#include &lt;exception&gt;
++#include &lt;string&gt;
++
++class NetworkException : public std::exception
++{
++protected:
++    std::string errormsg;
++public:
++    NetworkException(const std::string&amp; s) : errormsg(s) {};
++    virtual ~NetworkException() throw() {};
++    virtual const char * what() const throw() { return errormsg.c_str(); };
++};
++
++#endif
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -21,8 +21,9 @@
+ using namespace std;
+ 
+ #include &lt;sstream&gt;
+-#include &lt;stdexcept&gt;
++#include &lt;string.h&gt;
+ 
++#include &quot;NetworkException.hpp&quot;
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;SocketManager.hpp&quot;
+@@ -32,6 +33,9 @@
+ {
+ 
+ #ifdef USE_WINSOCK
++
++#define NETSTRERROR(x) &quot;Winsock error: &quot; &lt;&lt; x
++
+ class WinSockInit {
+ public:
+     WinSockInit() {
+@@ -49,35 +53,37 @@
+     }
+ };
+ WinSockInit _WinSockInit;
++#else
++  // if not windows
++  #define NETSTRERROR(x) strerror(x)
+ #endif
+ 
+-SocketBase::SocketBase()
+-{
+-}
+-
+ SocketBase::~SocketBase()
+ {
+-    //doClose();
++
+ }
+ 
+-SocketBase::SocketBase(SOCKET fd, const Address &amp;a) : sockfd(fd), addr(a)
++SocketBase::SocketBase(const Address &amp;a, bool isTcp)
++    throw(NetworkException)
++    : addr(a)
+ {
++    create(isTcp);
+     SocketManager::addSocket(this);
++    setNonBlocking();
+     _isConnecting=false;
+ }
+ 
+-void
+-SocketBase::printError(std::ostream&amp; out, int e)
++SocketBase::SocketBase(SOCKET fd, const Address &amp;a)
++    throw(NetworkException)
++    : sockfd(fd), addr(a)
+ {
+-#ifdef USE_WINSOCK
+-    out &lt;&lt; &quot;Winsock error &quot; &lt;&lt; e;
+-#else
+-    out &lt;&lt; strerror(e);
+-#endif
++    SocketManager::addSocket(this);
++    setNonBlocking();
++    _isConnecting=false;
+ }
+ 
+ void
+-SocketBase::create(bool tcp)
++SocketBase::create (bool tcp) throw(NetworkException)
+ {
+     if(tcp) {
+         sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+@@ -88,135 +94,130 @@
+     LOGGER.debug(&quot;SocketBase:: Create [%s:%d] socket&quot;, (tcp)?&quot;tcp&quot;:&quot;udp&quot;,sockfd);
+     
+     if(sockfd == INVALID_SOCKET) {
+-        int error = GET_NET_ERROR();
+-	std::stringstream msg;
+-	msg &lt;&lt; &quot;Couldn't create socket: &quot;;
+-        printError(msg,error);
+-	throw std::runtime_error(msg.str());
++        lastError = GET_NET_ERROR();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't create socket: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+-    _isConnecting = false;
+-    SocketManager::addSocket(this);
+ }
+ 
+ void
+-SocketBase::bindSocketTo(const Address&amp; toaddr)
++SocketBase::setNonBlocking() throw(NetworkException)
+ {
++    int res;
++#ifdef USE_WINSOCK
++    unsigned long mode = 1;
++    res = ioctlsocket(sockfd, FIONBIO, &amp;mode);
++#else
++    res = fcntl(sockfd, F_SETFL, O_NONBLOCK);
++#endif
++    if ( res == SOCKET_ERROR ) {
++        lastError = GET_NET_ERROR();
++        doClose();
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't set socket to nonblocking mode: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
++    }
++}
++
++void
++SocketBase::bindSocketTo(const Address&amp; toaddr) throw(NetworkException)
++{
+     int res = bind(sockfd, toaddr.getSockaddr(), toaddr.getSockaddrLen());
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
++        lastError = GET_NET_ERROR();
++        doClose();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+             &lt;&lt; toaddr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; toaddr.getPort()
+-            &lt;&lt; &quot;: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());           
++            &lt;&lt; &quot;: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());           
+     }
+ }
+ 
+ void
+-SocketBase::setReuseAddr()
++SocketBase::setReuseAddr() throw(NetworkException)
+ {
+     SETSOCKOPT_PARAMTYPE val = 1;
+     int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
++        lastError = GET_NET_ERROR();
++        doClose();
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't set SO_REUSEADDR: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;Couldn't set SO_REUSEADDR: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+ }
+ 
+ void
+-SocketBase::setNonBlocking()
++SocketBase::doListen() throw(NetworkException)
+ {
+-    int res;
+-#ifdef USE_WINSOCK
+-    unsigned long mode = 1;
+-    res = ioctlsocket(sockfd, FIONBIO, &amp;mode);
+-#else
+-    res = fcntl(sockfd, F_SETFL, O_NONBLOCK);
+-#endif
+-    if ( res == SOCKET_ERROR ) {
+-        int error = GET_NET_ERROR();
+-	std::stringstream msg;
+-	msg &lt;&lt; &quot;Couldn't set socket to nonblocking mode: &quot;;
+-        printError(msg,error);
+-	throw std::runtime_error(msg.str());
+-    }
+-}
+-
+-void
+-SocketBase::doListen()
+-{
+     int res = listen(sockfd, 20);
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
++        lastError = GET_NET_ERROR();
++        doClose();
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't listen on socket: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;Couldn't listen on socket: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+ }
+ 
+ void
+-SocketBase::doConnect()
++SocketBase::doConnect() throw(NetworkException)
+ {
+     int res = connect(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        if (IS_CONNECT_INPROGRESS(error)) {
++        lastError = GET_NET_ERROR();
++        if (IS_CONNECT_INPROGRESS(lastError)) {
+             _isConnecting = true;
+             return;
+         }
++        doClose();
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Couldn't connect to '&quot; &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot;
+-            &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++            &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+ }
+ 
+ int
+-SocketBase::doSend(const void* data, size_t len)
++SocketBase::doSend(const void* data, size_t len) throw(NetworkException)
+ {
+     int res = send(sockfd, (const char*) data, len, SEND_FLAGS);
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        if ( IS_DISCONECTED(error) ) {
++        lastError = GET_NET_ERROR();
++        if ( IS_DISCONECTED(lastError) ) {
+             onDisconected();
+             return 0;
+         }
+         
+-        if ( IS_IGNORABLE_ERROR(error) )
++        if ( IS_IGNORABLE_ERROR(lastError) )
+             return 0;
+         
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Send error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;Send error: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+     return res;
+ }
+ 
+ int
+-SocketBase::doReceive(void* buffer, size_t len)
++SocketBase::doReceive(void* buffer, size_t len) throw(NetworkException)
+ {
+     int res = recv(sockfd, (char*) buffer, len, RECV_FLAGS);
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        if ( IS_DISCONECTED(error) ) {
++        lastError = GET_NET_ERROR();
++        if ( IS_DISCONECTED(lastError) ) {
+             onDisconected();
+             return 0;
+         }
+         
+-        if ( IS_IGNORABLE_ERROR(error) )
++        if ( IS_IGNORABLE_ERROR(lastError) )
+             return 0;
+ 
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Read error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;Read error: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+     
+     if (!res) {
+@@ -228,53 +229,50 @@
+ }
+ 
+ int
+-SocketBase::doSendTo(const Address&amp; toaddr, const void* data, size_t len)
++SocketBase::doSendTo(const Address&amp; toaddr, const void* data, size_t len) throw(NetworkException)
+ {
+     int res = sendto(sockfd, (const char*) data, len, SEND_FLAGS,
+                 toaddr.getSockaddr(), toaddr.getSockaddrLen());
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        if ( IS_SENDTO_IGNORABLE(error) )
++        lastError = GET_NET_ERROR();
++        if ( IS_SENDTO_IGNORABLE(lastError) )
+             return 0;
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Send error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;Send error: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+     return res;
+ }
+ 
+ size_t
+-SocketBase::doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len)
++SocketBase::doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len) throw(NetworkException)
+ {
+     int res = recvfrom(sockfd, (char*) buffer, len, RECV_FLAGS,
+             fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
+     if(res == SOCKET_ERROR) {
+-        int error = GET_NET_ERROR();
+-        if ( IS_RECVFROM_IGNORABLE(error) )
++        lastError = GET_NET_ERROR();
++        if ( IS_RECVFROM_IGNORABLE(lastError) )
+             return 0;
+ 
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Receive error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;Receive error: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+     return res;
+ }
+ 
+ SOCKET
+-SocketBase::doAccept(Address&amp; fromaddr)
++SocketBase::doAccept(Address&amp; fromaddr) throw(NetworkException)
+ {
+     SOCKET newsock;
+     newsock= accept(sockfd, fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
+     if (newsock == INVALID_SOCKET) {
+-        int error = GET_NET_ERROR();
+-        if ( IS_ACCEPT_IGNORABLE(error) )
++        lastError = GET_NET_ERROR();
++        if ( IS_ACCEPT_IGNORABLE(lastError) )
+             return INVALID_SOCKET; // XXX this could be better
+         std::stringstream msg;
+-        msg &lt;&lt; &quot;Accept error: &quot;;
+-        printError(msg,error);
+-        throw std::runtime_error(msg.str());
++        msg &lt;&lt; &quot;Accept error: &quot; &lt;&lt; NETSTRERROR(lastError);
++        throw NetworkException(msg.str());
+     }
+     return newsock;
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -19,6 +19,8 @@
+ #define __SOCKETBASE_HPP__
+ 
+ #include &lt;iostream&gt;
++#include &lt;stdexcept&gt;
++#include &quot;NetworkException.hpp&quot;
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;Address.hpp&quot;
+ #include &quot;Util/NoCopy.hpp&quot;
+@@ -37,37 +39,35 @@
+ 
+     bool isConnecting() { return _isConnecting; };
+ protected:
+-    SocketBase();
+-    SocketBase(const Address &amp;a) : addr(a) {};
+-    SocketBase(SOCKET fd, const Address &amp;a);
+-    
++    friend class SocketSet;
++    friend class SocketManager;
++
+     virtual ~SocketBase();
+     
++    SocketBase(const Address &amp;a, bool isTcp) throw(NetworkException);
++    SocketBase(SOCKET fd, const Address &amp;a) throw(NetworkException);
++        
+     virtual void onDataReady() = 0;
+     virtual void onDisconected() {};
+     virtual void onConnected() {};
+     virtual void destroy() = 0;
+ 
+-protected:
+-    friend class SocketSet;
+-    friend class SocketManager;
+-    void create(bool tcp);
+-    void setNonBlocking();
++    void setReuseAddr() throw(NetworkException);
+     void doClose();
+-    void printError(std::ostream&amp; out, int e);
+     
+-    void bindSocketTo(const Address&amp; toaddr);
+-    void bindSocket() { bindSocketTo(addr); };
+-    void setReuseAddr();
+-    void doListen();
+-    void doConnect();
+-    int  doSend(const void* data, size_t len);
+-    int  doReceive(void* buffer, size_t len);
+-    int  doSendTo(const Address&amp; toaddr, const void* data, size_t len);
+-    size_t  doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len);
+-    SOCKET doAccept(Address&amp; fromaddr);
++    void bindSocketTo(const Address&amp; toaddr) throw(NetworkException);
++    void bindSocket() throw(NetworkException) { bindSocketTo(addr); };
++    void doListen() throw(NetworkException);
++    void doConnect() throw(NetworkException);
++    int  doSend(const void* data, size_t len) throw(NetworkException);
++    int  doReceive(void* buffer, size_t len) throw(NetworkException);
++    int  doSendTo(const Address&amp; toaddr, const void* data, size_t len) throw(NetworkException);
++    size_t  doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len) throw(NetworkException);
++    SOCKET doAccept(Address&amp; fromaddr) throw(NetworkException);
+     
+ private:
++    void create(bool tcp) throw(NetworkException);
++    void setNonBlocking() throw(NetworkException);
+     
+     void connectionFinished() 
+     {
+@@ -78,6 +78,7 @@
+     bool _isConnecting;
+     SOCKET sockfd;
+     Address addr;
++    int lastError;
+ };
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -33,14 +33,6 @@
+     list&lt;SocketBase *&gt;::iterator i;
+ 
+     if (!newSockets.empty() || !deletedSockets.empty()) {
+-        if (!newSockets.empty()) {
+-            for (i = newSockets.begin(); i!=newSockets.end(); i++) {
+-                LOGGER.debug(&quot;SocketManager:: Adding socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
+-                socketList.push_front(*i);
+-            }
+-            newSockets.clear();
+-        }
+-
+         if (!deletedSockets.empty()) {
+             for (i = deletedSockets.begin(); i!=deletedSockets.end(); i++) {
+                 LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
+@@ -50,6 +42,13 @@
+             deletedSockets.clear();
+         }
+ 
++        if (!newSockets.empty()) {
++            for (i = newSockets.begin(); i!=newSockets.end(); i++) {
++                LOGGER.debug(&quot;SocketManager:: Adding socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
++                socketList.push_front(*i);
++            }
++            newSockets.clear();
++        }
+ 
+         sset.clear();
+         for (i = socketList.begin(); i!=socketList.end(); i++) {
+@@ -63,8 +62,6 @@
+         }
+     }
+     
+-    //std::cout &lt;&lt; &quot;NUM SOCKETS &quot; &lt;&lt; socketList.size() &lt;&lt; endl;
+- 
+     if (!sset.select(0))
+         return;
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -45,6 +45,16 @@
+     
+     static void removeSocket(SocketBase *s)
+     {
++        if ( !newSockets.empty() ) {
++            list&lt;SocketBase *&gt;::iterator i = newSockets.begin();
++            while (i != newSockets.end()) {
++                if ( *i == s ) {
++                    newSockets.erase(i);
++                    return;
++                }
++                i++;
++            }
++        }
+         deletedSockets.push_front(s);
+     }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -17,38 +17,24 @@
+ */
+ #include &lt;config.h&gt;
+ 
+-#include &lt;sstream&gt;
+-#include &lt;stdexcept&gt;
+-
+-#include &quot;SocketHeaders.hpp&quot;
+-#include &quot;TCPSocket.hpp&quot;
+ #include &quot;TCPListenSocket.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ 
+ namespace network
+ {
+     
+ TCPListenSocket::TCPListenSocket(const Address&amp; newaddr, TCPListenSocketObserver *o)
+-    : SocketBase(newaddr)
++    : SocketBase(newaddr,true), observer(o)
+ {
+-    observer = o;
+-    try {
+-        create(true);
+-        setReuseAddr();
+-        bindSocket();
+-        doListen();
+-        setNonBlocking();
+-    } catch(...) {
+-        doClose();
+-        throw;
+-    }
++    setReuseAddr();
++    bindSocket();
++    doListen();
+ }
+ 
+ void
+ TCPListenSocket::destroy()
+ {
+-    
+-    
+-    
++    doClose();
+ }
+ 
+ void
+@@ -57,13 +43,14 @@
+     Address newaddr;
+     SOCKET newsock;
+     TCPSocketObserver * newobserver;
+-    while ( (newsock=doAccept(newaddr)) != INVALID_SOCKET) {
+-        
+-        newobserver = observer-&gt;onNewConnection(this, newaddr);
+-        TCPSocket * newcon = new TCPSocket(newsock,newaddr,newobserver);
+-        newcon-&gt;setNonBlocking();
+-        newcon-&gt;onConnected();
+-        
++    try {
++        while ( (newsock=doAccept(newaddr)) != INVALID_SOCKET) {
++            newobserver = observer-&gt;onNewConnection(this, newaddr);
++            TCPSocket * newcon = new TCPSocket(newsock,newaddr,newobserver);
++            newcon-&gt;onConnected();
++        }
++    } catch (NetworkException e) {
++        LOGGER.warning(&quot;Error Accepting new connections: '%s'&quot;, e.what());
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/TCPListenSocket.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -18,9 +18,9 @@
+ #ifndef __TCPLISTENSOCKET_HPP__
+ #define __TCPLISTENSOCKET_HPP__
+ 
+-#include &lt;assert.h&gt;
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;TCPSocket.hpp&quot;
++#include &quot;NetworkException.hpp&quot;
+ 
+ namespace network
+ {
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -23,35 +23,38 @@
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;Address.hpp&quot;
+ #include &quot;TCPSocket.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ 
++
+ namespace network
+ {
+ 
+-void
+-TCPSocket::init(bool blocking)
++TCPSocket::TCPSocket(SOCKET fd, const Address&amp; newaddr, TCPSocketObserver *o)
++    throw(NetworkException)
++    : SocketBase(fd,newaddr), observer(o)
+ {
+-    try {
+-        doConnect();
+-        if(!blocking)
+-            setNonBlocking();
+-    } catch(...) {
+-        doClose();
+-        throw;
+-    }
++
+ }
+ 
++TCPSocket::TCPSocket(const Address&amp; address, TCPSocketObserver *o)
++    throw(NetworkException)
++    : SocketBase(address,true), observer(o)
++{
++    doConnect();
++}
++
+ TCPSocket::~TCPSocket()
+ { }
+ 
+ void
+ TCPSocket::destroy()
+ {
+-    doClose();
+     observer=0;
++    doClose();
+ }
+ 
+ size_t
+-TCPSocket::send(const void* data, size_t size)
++TCPSocket::send(const void* data, size_t size) throw(NetworkException)
+ {
+     int res = doSend(data,size);
+     if (!res &amp;&amp; !observer) // disconnected
+@@ -59,24 +62,6 @@
+     return res;
+ }
+ 
+-TCPSocket::TCPSocket()
+-{
+-}
+-
+-TCPSocket::TCPSocket(SOCKET fd, const Address&amp; newaddr, TCPSocketObserver *o) 
+-    : SocketBase(fd,newaddr)
+-{
+-    observer=o;
+-}
+-
+-TCPSocket::TCPSocket(const Address&amp; address, TCPSocketObserver *o) : SocketBase(address)
+-{
+-    observer=o;
+-    create(true);
+-    setNonBlocking();
+-    doConnect();
+- }
+-
+ void
+ TCPSocket::onConnected()
+ {
+@@ -97,11 +82,11 @@
+ {
+     char buffer[4096];
+     int len;
+-    len = doReceive(buffer,sizeof(buffer));
+-    if (len) {
+-        if (observer)
++    do {
++        len = doReceive(buffer,sizeof(buffer));
++        if (len &amp;&amp; observer)
+             observer-&gt;onDataReceived(this, buffer,len);
+-    }
++    } while (len &amp;&amp; observer);
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -43,11 +43,11 @@
+ //    TCPSocket(const Address&amp; bindaddr, const Address&amp; address, bool blocking = true);
+ 
+ 
+-    TCPSocket(const Address&amp; address, TCPSocketObserver *o);
++    TCPSocket(const Address&amp; address, TCPSocketObserver *o) throw(NetworkException);
+ 
+     void destroy();
+ 
+-    size_t send(const void* data, size_t datasize);
++    size_t send(const void* data, size_t datasize) throw(NetworkException);
+     
+ protected:
+     ~TCPSocket();
+@@ -58,11 +58,8 @@
+ private:
+     friend class TCPListenSocket;
+ 
+-    TCPSocket();
+-    TCPSocket(SOCKET fd, const Address&amp; addr, TCPSocketObserver *o);
++    TCPSocket(SOCKET fd, const Address&amp; addr, TCPSocketObserver *o) throw(NetworkException);
+ 
+-    void init(bool blocking);
+-    
+     TCPSocketObserver *observer;
+ };
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -15,33 +15,28 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
++
+ #include &lt;config.h&gt;
+ 
++#include &quot;UDPSocket.hpp&quot;
+ #include &lt;sstream&gt;
+-#include &lt;stdexcept&gt;
+ 
+-#include &quot;SocketHeaders.hpp&quot;
+-#include &quot;UDPSocket.hpp&quot;
+-#include &quot;Address.hpp&quot;
+ 
+ namespace network
+ {
+ 
+-//UDPSocket::UDPSocket(bool blocking) : SocketBase(Address::ANY) { init(blocking); }
+-
+-//UDPSocket::UDPSocket(const Address&amp; bindaddr, bool blocking) : SocketBase(bindaddr) { init(blocking); }
+-
+-UDPSocket::UDPSocket(UDPSocketObserver *o) : SocketBase(Address::ANY)
++UDPSocket::UDPSocket(UDPSocketObserver *o)
++    throw(NetworkException) 
++    : SocketBase(Address::ANY,false), observer(o)
+ {
+-    observer=o;
+-    init(false);
++    bindSocket();
+ }
+ 
+ UDPSocket::UDPSocket(const Address&amp; bindaddr, UDPSocketObserver *o)
+-    : SocketBase(bindaddr)
++    throw(NetworkException)
++    : SocketBase(bindaddr,false), observer(o)
+ {
+-    observer=o;
+-    init(false);
++    bindSocket();
+ }
+ 
+ UDPSocket::~UDPSocket()
+@@ -56,37 +51,17 @@
+ }
+ 
+ void
+-UDPSocket::init(bool blocking)
+-{
+-    create(false);
+-
+-    try {
+-        bindSocket();
+-        if(!blocking)
+-            setNonBlocking();
+-    } catch(...) {
+-        doClose();
+-        throw;
+-    }
+-}
+-
+-void
+ UDPSocket::send(const Address&amp; toaddr, const void* data, size_t datasize)
++    throw(NetworkException)
+ {
+     int res = doSendTo(toaddr,data,datasize);
+     if(res != (int) datasize) {
+         std::stringstream msg;
+         msg &lt;&lt; &quot;Send error: not all data sent.&quot;;
+-        throw std::runtime_error(msg.str());
++        throw NetworkException(msg.str());
+     }
+ }
+ 
+-size_t
+-UDPSocket::recv(Address&amp; fromaddr, void* buffer, size_t bufsize)
+-{
+-    return doReceiveFrom(fromaddr,buffer,bufsize);
+-}
+-
+ void
+ UDPSocket::onDataReady()
+ {
+@@ -97,7 +72,7 @@
+         len=doReceiveFrom(a,buffer,sizeof(buffer));
+         if (len &amp;&amp; observer)
+             observer-&gt;onDataReceived(this,a,buffer,len);
+-    } while (len);
++    } while (len &amp;&amp; observer);
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -18,10 +18,9 @@
+ #ifndef __UDPSOCKET_HPP__
+ #define __UDPSOCKET_HPP__
+ 
+-#include &lt;stdint.h&gt;
+-#include &lt;string.h&gt;
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;Address.hpp&quot;
++#include &quot;NetworkException.hpp&quot;
+ 
+ namespace network
+ {
+@@ -46,23 +45,19 @@
+      */
+ //    UDPSocket(bool blocking = true);
+ //    UDPSocket(const Address&amp; bindaddr, bool blocking = true);
+-    UDPSocket(UDPSocketObserver *o);
+-    UDPSocket(const Address&amp; bindaddr, UDPSocketObserver *o);
++    UDPSocket(UDPSocketObserver *o) throw(NetworkException);
++    UDPSocket(const Address&amp; bindaddr, UDPSocketObserver *o) throw(NetworkException);
+ 
+     void destroy();
+ 
+     /** send data to the specified address */
+-    void send(const Address&amp; toaddr, const void* data, size_t datasize);
+-    /** receives data from socket. Returns the number of bytes read and stores
+-     * the address of the client who sent the data in addr.
+-     */
+-    size_t recv(Address&amp; fromaddr, void* buffer, size_t bufsize);
++    void send(const Address&amp; toaddr, const void* data, size_t datasize) throw(NetworkException);
++
+ protected:
+     ~UDPSocket();
+     void onDataReady();
+ 
+ private:
+-    void init(bool blocking);
+     UDPSocketObserver *observer;
+ };
+ 
+
+Modified: trunk/netpanzer/src/Lib/optionmm/command_line.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/optionmm/command_line.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/Lib/optionmm/command_line.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -218,7 +218,6 @@
+         x.flip();
+     }
+ #endif
+-
+ };
+ 
+ /// Explit specialisatation as a typedef
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -24,7 +24,7 @@
+        _net_message_id_player_sync_state,
+        _net_message_id_player_score_update,
+        _net_message_id_player_alliance_request,
+-       _net_message_id_player_alliance_update,
++       _net_message_id_player_alliance_update
+      };
+ 
+ #ifdef MSVC
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -269,64 +269,35 @@
+ bool ServerConnectDaemon::connectStateWaitForConnectRequest(
+         const NetMessage* message)
+ {
+-    if (message != 0) {
+-        if ( message-&gt;message_id == _net_message_id_client_connect_request ) {
+-            connection_state = connect_state_attempt_player_alloc;
+-            return false;
+-        } else {
+-            if ( time_out_timer.count() ) {
+-                resetConnectFsm();
+-                return true;
+-            }
++    if (message &amp;&amp; message-&gt;message_id == _net_message_id_client_connect_request ) {
+ 
+-            return true;
+-        }
++        ClientConnectResult connect_result;
++        connect_player_state = PlayerInterface::allocateNewPlayer();
+ 
+-    } // ** if ( message != 0 )
+-    else {
+-        if ( time_out_timer.count() ) {
++        if ( connect_player_state == 0 ) {
++            connect_result.result_code = _connect_result_server_full;
+             resetConnectFsm();
+-            return true;
++        } else {
++            connect_result.result_code = _connect_result_success;
++            time_out_timer.reset();
+         }
+ 
+-        return true;
+-    }
++        SERVER-&gt;sendMessage( connect_player_id, &amp;connect_result,
++                                                sizeof(ClientConnectResult));
+ 
+-    return true;
+-}
++        if ( connection_state != connect_state_idle )
++            connection_state = connect_state_wait_for_client_settings;
+ 
+-bool ServerConnectDaemon::connectStateAttemptPlayerAlloc()
+-{
+-    ClientConnectResult connect_result;
+-    connect_player_state = PlayerInterface::allocateNewPlayer();
+-
+-    if ( connect_player_state == 0 ) {
+-        connect_result.result_code = _connect_result_server_full;
+-
+-        SERVER-&gt;sendMessage( connect_player_id, &amp;connect_result,
+-                                            sizeof(ClientConnectResult));
++    } else if ( time_out_timer.count() )
+         resetConnectFsm();
+-        return true;
+-    } else {
+-        connect_result.result_code = _connect_result_success;
+ 
+-        SERVER-&gt;sendMessage( connect_player_id, &amp;connect_result,
+-                                            sizeof(ClientConnectResult));
+-
+-        time_out_timer.reset();
+-		if(connection_state != connect_state_idle) {
+-			connection_state = connect_state_wait_for_client_settings;
+-		}
+-        return true;
+-    }
+-
++    return true;
+ }
+ 
+ bool ServerConnectDaemon::connectStateWaitForClientSettings(
+         const NetMessage* message )
+ {
+-    if ( message != 0 ) {
+-        if ( message-&gt;message_id == _net_message_id_connect_client_settings ) {
++    if ( message &amp;&amp; message-&gt;message_id == _net_message_id_connect_client_settings ) {
+             ConnectClientSettings *client_setting;
+ 
+             client_setting = (ConnectClientSettings *) message;
+@@ -356,23 +327,11 @@
+ 				connection_state = connect_state_wait_for_client_game_setup_ack;
+ 			}
+             return true;
+-        } else {
+-            if ( time_out_timer.count() ) {
+-                connect_player_state-&gt;setStatus( _player_state_free );
+-                resetConnectFsm();
+-                return true;
+-            }
++    }
+ 
+-            return true;
+-        }
+-    } else {
+-        if ( time_out_timer.count() ) {
+-            connect_player_state-&gt;setStatus( _player_state_free );
+-            resetConnectFsm();
+-            return true;
+-        }
+-
+-        return true;
++    if ( time_out_timer.count() ) {
++        connect_player_state-&gt;setStatus( _player_state_free );
++        resetConnectFsm();
+     }
+ 
+     return true;
+@@ -397,28 +356,16 @@
+ 			if(connection_state != connect_state_idle) {
+ 				connection_state = connect_state_player_state_sync;
+ 			}
+-        } else
+-            if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ping ) {
+-                time_out_timer.reset();
+-                return true;
+-            } else {
+-                if ( time_out_timer.count() ) {
+-                    connect_player_state-&gt;setStatus( _player_state_free );
+-                    resetConnectFsm();
+-                    return true;
+-                }
+-
+-                return true;
+-            }
+-
+-    } else {
+-        if ( time_out_timer.count() ) {
+-            connect_player_state-&gt;setStatus( _player_state_free );
+-            resetConnectFsm();
++			return true;
++        } else if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ping ) {
++            time_out_timer.reset();
+             return true;
+         }
++    }
+ 
+-        return true;
++    if ( time_out_timer.count() ) {
++        connect_player_state-&gt;setStatus( _player_state_free );
++        resetConnectFsm();
+     }
+ 
+     return true;
+@@ -524,10 +471,6 @@
+                 end_cycle = connectStateWaitForConnectRequest( message );
+                 break;
+ 
+-            case connect_state_attempt_player_alloc:
+-                end_cycle = connectStateAttemptPlayerAlloc();
+-                break;
+-
+             case  connect_state_wait_for_client_settings:
+                 end_cycle = connectStateWaitForClientSettings( message );
+                 break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -44,11 +44,10 @@
+ 	enum ConnectionState {
+ 		connect_state_idle,
+ 	 	connect_state_wait_for_connect_request,
+-	  	connect_state_attempt_player_alloc,
+ 	   	connect_state_wait_for_client_settings,
+ 		connect_state_wait_for_client_game_setup_ack,
+ 		connect_state_player_state_sync,
+-		connect_state_unit_sync,
++		connect_state_unit_sync
+      };
+ 
+     static ConnectionState      connection_state;
+@@ -79,7 +78,6 @@
+     // ** FSM States
+     static bool connectStateIdle();
+     static bool connectStateWaitForConnectRequest(const NetMessage* message);
+-    static bool connectStateAttemptPlayerAlloc();
+     static bool connectStateWaitForClientSettings(const NetMessage* message);
+     static bool connectStateWaitForClientGameSetupAck(const NetMessage* message);
+     static bool connectStatePlayerStateSync();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -56,12 +56,12 @@
+ {
+ }
+ 
+-void PlayerUnitConfig::initialize( unsigned char max_allowed_units )
++void PlayerUnitConfig::initialize()
+ {
+-    PlayerUnitConfig::max_allowed_units = gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers;
+-    memset( unit_spawn_list, 0, sizeof( unsigned char ) * _MAX_UNIT_TYPES );
+-    unsigned char rem_units = PlayerUnitConfig::max_allowed_units;
+-    unsigned char numunits;
++    max_allowed_units = gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers;
++    memset( unit_spawn_list, 0, sizeof(unit_spawn_list));
++    int rem_units = max_allowed_units;
++    unsigned int numunits;
+ 
+     numunits = (rem_units &lt; gameconfig-&gt;archer)?rem_units:gameconfig-&gt;archer;
+     rem_units-=numunits;
+@@ -106,10 +106,10 @@
+     unit_color = 0;
+ }
+ 
+-unsigned char PlayerUnitConfig::unitTotal( void )
++unsigned int PlayerUnitConfig::unitTotal( void )
+ {
+-    unsigned char total = 0;
+-    unsigned char i;
++    unsigned int total = 0;
++    unsigned int i;
+ 
+     for( i = 0; i &lt; _MAX_UNIT_TYPES; i++ ) {
+         total += unit_spawn_list[ i ];
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerUnitConfig.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -30,14 +30,14 @@
+ class PlayerUnitConfig : public UnitGameInfo
+ {
+ protected:
+-    unsigned char max_allowed_units;
+-    unsigned char unit_spawn_list[ _MAX_UNIT_TYPES ];
++    unsigned int max_allowed_units;
++    unsigned int unit_spawn_list[ _MAX_UNIT_TYPES ];
+     char unit_color;
+ 
+ public:
+     PlayerUnitConfig();
+ 
+-    void initialize( unsigned char max_allowed_units = 5);
++    void initialize();
+ 
+     inline unsigned char getSpawnUnitCount( unsigned char unit_type ) const
+     {
+@@ -61,17 +61,12 @@
+         }
+     }
+ 
+-    inline void setMaxAllowedUnits( unsigned char max_allowed_units )
++    inline unsigned int getMaxAllowedUnits( void ) const
+     {
+-        PlayerUnitConfig::max_allowed_units = max_allowed_units;
+-    }
+-
+-    inline unsigned char getMaxAllowedUnits( void ) const
+-    {
+         return( max_allowed_units );
+     }
+ 
+-    unsigned char unitTotal( void );
++    unsigned int unitTotal( void );
+ 
+     inline char getUnitColor( void ) const
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/Sprite.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -174,7 +174,7 @@
+     enum DRAW_MODE
+     {
+         BLEND,
+-        SOLID,
++        SOLID
+     };
+ 
+     ColorTable *colorTable;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/UnitOpcodes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/UnitOpcodes.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/UnitOpcodes.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -78,7 +78,7 @@
+     }
+ } __attribute__((packed));
+ 
+-ASSERT_SIZE(UnitOpcode, sizeof(UnitOpcodeStruct)-7);
++ASSERT_SIZE(UnitOpcode, sizeof(UnitOpcodeStruct)-7)
+ 
+ #define _UNIT_OPCODE_MOVE 1
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -64,7 +64,7 @@
+ 
+ enum { _keyboard_input_mode_command,
+        _keyboard_input_mode_chat_mesg,
+-       _keyboard_input_mode_allie_mesg,
++       _keyboard_input_mode_allie_mesg
+      };
+ 
+ short WorldInputCmdProcessor::selected_objective_id = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -36,7 +36,7 @@
+ #include &lt;optionmm/command_line.hpp&gt;
+ 
+ #include &quot;Util/Log.hpp&quot;
+-#include &quot;Util/Exception.hpp&quot;
++//#include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+ 
+ #include &quot;BaseGameManager.hpp&quot;
+@@ -310,7 +310,7 @@
+ // stack backtrace
+ #if !defined(DEBUG) || defined(WIN32)
+     catch(std::exception&amp; e) {
+-        LOGGER.warning(&quot;An unexpected exception occured: %s\nShutdown needed.&quot;,
++        LOGGER.warning(&quot;An unexpected exception occured: '%s'\nShutdown needed.&quot;,
+                 e.what());
+         shutdown();
+         return 1;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -110,9 +110,17 @@
+ {
+     vector&lt;Address&gt;::iterator iter = mslist.begin();
+     while ( iter != mslist.end() ) {
+-        TCPSocket *s = new TCPSocket(*iter, this);
+-        MasterserverInfo * msi = new MasterserverInfo();
+-        masterservers[s]=msi;
++        TCPSocket *s = 0;
++        MasterserverInfo *msi = 0;
++        try {
++            s = new TCPSocket(*iter, this);
++            msi = new MasterserverInfo();
++            masterservers[s]=msi;
++        } catch (NetworkException e) {
++            LOGGER.warning(&quot;Error '%s' connecting to masterserver '%s'&quot;, e.what(), (*iter).getIP().c_str());
++            if (msi)
++                delete msi;
++        }
+         iter++;
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ObjectiveInterface.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -401,16 +401,16 @@
+ {
+     ObjectiveSyncMesg sync_mesg;
+ 
+-    NetMessageEncoder* encoder = new NetMessageEncoder(connect_player);
++    NetMessageEncoder encoder(connect_player);
+ 
+     std::vector&lt;Objective*&gt;::iterator i;
+     for(i = objective_list.begin(); i != objective_list.end(); ++i) {
+         (*i)-&gt;getSyncData( sync_mesg.sync_data );
+ 
+-        encoder-&gt;encodeMessage(&amp;sync_mesg, sizeof(ObjectiveSyncMesg));
++        encoder.encodeMessage(&amp;sync_mesg, sizeof(ObjectiveSyncMesg));
+     }
+ 
+-    encoder-&gt;sendEncodedMessage();
++    encoder.sendEncodedMessage();
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PowerUpInterface.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -46,7 +46,7 @@
+ 
+ enum { _powerup_bonus_units,
+        _powerup_unit,
+-       _powerup_enemy_radar,
++       _powerup_enemy_radar
+      };
+ 
+ int  powerup_probability_table[3] = { _powerup_unit,
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/UnitInterface.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -757,6 +757,12 @@
+         = (const UnitIniSyncMessage *) net_message;
+ 
+     try {
++        std::map&lt;UnitID, UnitBase*&gt;::iterator uit = units.find(sync_message-&gt;getUnitID());
++        if ( uit != units.end() ) {
++            LOGGER.warning(&quot;UnitInterface::unitSyncMessage() Received an existing unit [%d]&quot;,
++                            sync_message-&gt;getUnitID());
++            return;
++        }
+         UnitBase* unit = newUnit(sync_message-&gt;unit_type,
+                 iXY(sync_message-&gt;getLocX(), sync_message-&gt;getLocY()),
+                 sync_message-&gt;getPlayerID(), sync_message-&gt;getUnitID());
+@@ -811,6 +817,12 @@
+     uint16_t player_index = create_mesg-&gt;getPlayerID();
+ 
+     try {
++        std::map&lt;UnitID, UnitBase*&gt;::iterator uit = units.find(create_mesg-&gt;getUnitID());
++        if ( uit != units.end() ) {
++            LOGGER.warning(&quot;UnitInterface::unitCreateMessage() Received an existing unit [%d]&quot;,
++                            create_mesg-&gt;getUnitID());
++            return;
++        }
+         UnitBase* unit = newUnit(create_mesg-&gt;unit_type,
+                 iXY(create_mesg-&gt;getLocX(), create_mesg-&gt;getLocY()),
+                 player_index,
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -36,7 +36,7 @@
+     //dirtKickSurface.setTo(dirtKickSprite);
+ 
+ }
+-; // end DirtKickParticle2D::DirtKickParticle2D
++ // end DirtKickParticle2D::DirtKickParticle2D
+ 
+ // init
+ //---------------------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -56,7 +56,7 @@
+ 
+     // Check for accelerated flames.
+     packedSurface.setFPS(getFPS(explosionFPS, 0));
+-}; // end FlameParticle2D::FlameParticle2D
++} // end FlameParticle2D::FlameParticle2D
+ 
+ // loadPakFiles
+ //---------------------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleSystemGlobals.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -30,7 +30,7 @@
+ enum
+ {
+     BLT_TO_SURFACE,
+-    BLT_TO_SPRITE_SORTER,
++    BLT_TO_SPRITE_SORTER
+ };
+ 
+ enum PUFF_TYPE
+@@ -38,14 +38,14 @@
+     LIGHT,
+     DARK,
+     SMOKE,
+-    DIRT,
++    DIRT
+ };
+ 
+ enum EXPLOSION_TYPE
+ {
+     GROUND,
+     PLAYER,
+-    NONPLAYER,
++    NONPLAYER
+ };
+ 
+ // All Particles.
+@@ -95,7 +95,7 @@
+     enum MUZZLE_TYPE
+     {
+         SINGLE,
+-        TRIPLE,
++        TRIPLE
+     };
+ 
+     int    speedMin;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -38,7 +38,7 @@
+ #endif
+ 
+ }
+-; // end RadarPingParticle2D::RadarPingParticle2D
++ // end RadarPingParticle2D::RadarPingParticle2D
+ 
+ // init
+ //---------------------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -60,7 +60,7 @@
+         CENTER_ALIGNMENT,
+         LEFT_ALIGNMENT,
+         RIGHT_ALIGNMENT,
+-        TOP_ALIGNMENT,
++        TOP_ALIGNMENT
+     };
+ 
+     Component()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MouseEvent.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MouseEvent.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MouseEvent.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -40,7 +40,7 @@
+         MOUSE_EVENT_EXITED,
+         MOUSE_EVENT_MOVED,
+         MOUSE_EVENT_PRESSED,
+-        MOUSE_EVENT_RELEASED,
++        MOUSE_EVENT_RELEASED
+     };
+ 
+     mMouseEvent(Component *source, int id, TimeStamp when, int modifiers, int x, int y, int clickCount, bool popupTrigger)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -48,7 +48,7 @@
+ enum DEFAULT_VIEW_BUTTON
+ {
+     CLOSE_VIEW_BUTTON,
+-    MINMAX_VIEW_BUTTON,
++    MINMAX_VIEW_BUTTON
+ };
+ 
+ class View : public iRect
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -29,7 +29,7 @@
+ {
+     LIBVIEW_MODE_SURFACE_INFO,
+     LIBVIEW_MODE_PARTICLE_INFO,
+-    LIBVIEW_MODE_ENVIRONMENT_INFO,
++    LIBVIEW_MODE_ENVIRONMENT_INFO
+ };
+ 
+ //--------------------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -32,7 +32,7 @@
+     MAP_BLEND_DARK_GRAY,
+     MAP_BLEND_GREEN,
+     MAP_BLACK,
+-    MAP_TRANSPARENT,
++    MAP_TRANSPARENT
+ };
+ 
+ //---------------------------------------------------------------------------
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2007-04-16 13:10:56 UTC (rev 966)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2007-04-16 13:36:42 UTC (rev 967)
+@@ -65,7 +65,7 @@
+     VIEW_BACKGROUND_LIGHT_GRAY_BLEND,
+     VIEW_BACKGROUND_SOLID_BLACK,
+     VIEW_BACKGROUND_TRANSPARENT,
+-    VIEW_BACKGROUND_COUNT,
++    VIEW_BACKGROUND_COUNT
+ };
+ 
+ void bltViewBackground(Surface &amp;dest);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000013.html">[Netpanzer-cvs] r966 - trunk/homepage
+</A></li>
+	<LI>Next message: <A HREF="000015.html">[Netpanzer-cvs] r968 - in trunk/netpanzer: . src/Lib/Network	src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

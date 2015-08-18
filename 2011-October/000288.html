@@ -1,0 +1,1346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1262 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1262%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Network&In-Reply-To=%3C20111015174610.5A9A04814EB%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000287.html">
+   <LINK REL="Next"  HREF="000289.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1262 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1262%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Network&In-Reply-To=%3C20111015174610.5A9A04814EB%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1262 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Network">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Oct 15 19:46:10 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000287.html">[Netpanzer-cvs] r1261 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+        <LI>Next message: <A HREF="000289.html">[Netpanzer-cvs] r1263 - in trunk/netpanzer/src/NetPanzer/Views: .	MainMenu MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#288">[ date ]</a>
+              <a href="thread.html#288">[ thread ]</a>
+              <a href="subject.html#288">[ subject ]</a>
+              <a href="author.html#288">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-15 19:46:09 +0200 (Sat, 15 Oct 2011)
+New Revision: 1262
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+Log:
+Rewrote the ServerConnectDaemon state machine, in theory should be easier to read and to add more states in the connection process, each state is clearly separated with its 'enter/process/message/leave' methods
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-15 01:11:43 UTC (rev 1261)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-10-15 17:46:09 UTC (rev 1262)
+@@ -21,6 +21,8 @@
+ #include &quot;NetworkServer.hpp&quot;
+ #include &quot;NetMessage.hpp&quot;
+ #include &quot;NetMessageEncoder.hpp&quot;
++
++#include &quot;Classes/PlayerState.hpp&quot;
+ #include &quot;PlayerNetMessage.hpp&quot;
+ #include &quot;ConnectNetMessage.hpp&quot;
+ #include &quot;SystemNetMessage.hpp&quot;
+@@ -49,406 +51,585 @@
+     connect_state_unit_profile_sync,
+     connect_state_player_state_sync,
+     connect_state_sync_flags,
+-    connect_state_unit_sync
+- };
++    connect_state_unit_sync,
++    connect_state_finish_connect
++};
+ 
++bool                connection_lock_state = false;
++ClientSocket      * connect_client;
++Timer		    time_out_timer;
++int	            time_out_counter;
++Timer               sendunitpercent_timer;
++int                 sync_count = 0;
++int                 sync_end = 0;
++int                 sync_total = 0;
++int                 sync_done = 0;
+ 
+-ServerConnectDaemon::ConnectQueue ServerConnectDaemon::connect_queue;
++typedef std::list&lt;ClientSocket *&gt; ConnectQueue;
++typedef ConnectQueue::iterator ConnectQueueIterator;
++static ConnectQueue connect_queue;
+ 
+-int                 ServerConnectDaemon::connection_state = connect_state_idle;
+-bool                ServerConnectDaemon::connection_lock_state = false;
+-ClientSocket      * ServerConnectDaemon::connect_client;
+-Timer		    ServerConnectDaemon::time_out_timer;
+-int	            ServerConnectDaemon::time_out_counter;
+-Timer               ServerConnectDaemon::sendunitpercent_timer;
+-int                 ServerConnectDaemon::sync_count = 0;
+-int                 ServerConnectDaemon::sync_end = 0;
+-int                 ServerConnectDaemon::sync_total = 0;
+-int                 ServerConnectDaemon::sync_done = 0;
+ 
+ #define _SERVER_CONNECT_TIME_OUT_TIME (20.0)
+ #define _SERVER_CONNECT_RETRY_LIMIT   (5)
+ #define _SENDUNITPERCENT_TIME (1)
+ 
+-
+-void ServerConnectDaemon::initialize(unsigned long max_players)
++static void sendConnectionAlert(ClientSocket * client)
+ {
+-    (void) max_players;
+-    time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
+-    sendunitpercent_timer.changePeriod( _SENDUNITPERCENT_TIME );
+-}
++    SystemConnectAlert connect_alert;
+ 
+-void ServerConnectDaemon::startConnectDaemon( unsigned long max_players )
+-{
+-    (void) max_players;
+-    time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
+-    sendunitpercent_timer.changePeriod( _SENDUNITPERCENT_TIME );
+-}
++    PlayerState *player_state = 0;
+ 
+-void ServerConnectDaemon::shutdownConnectDaemon()
+-{
+-    ConnectMesgNetPanzerServerDisconnect server_disconnect;
++    player_state = PlayerInterface::getPlayer( client-&gt;getPlayerIndex() );
+ 
+-    SERVER-&gt;broadcastMessage( &amp;server_disconnect,
+-                         sizeof(ConnectMesgNetPanzerServerDisconnect));
+-}
++    connect_alert.set( client-&gt;getPlayerIndex(), _connect_alert_mesg_connect );
+ 
+-bool ServerConnectDaemon::inConnectQueue( ClientSocket *client )
+-{
+-    if ( (connection_state != connect_state_idle) &amp;&amp;
+-         (connect_client == client)
+-       )
++    ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
++                                  &quot;'%s' [%s] has joined the game.&quot;,
++                                  player_state-&gt;getName().c_str(),
++                                  client-&gt;getFullIPAddress().c_str() );
++
++    player_state-&gt;resetAutokick();
++
++    if ( ((std::string)gameconfig-&gt;motd).length() &gt; 0 )
+     {
+-        return true;
++        ChatInterface::serversayTo(client-&gt;getPlayerIndex(), gameconfig-&gt;motd.c_str());
+     }
+-    
+-    ConnectQueueIterator i;
+-    i = std::find(connect_queue.begin(), connect_queue.end(), client);
+-    if ( i != connect_queue.end() )
+-    {
+-        return true;
+-    }
+-    
+-    return false;
++
++    SERVER-&gt;broadcastMessage( &amp;connect_alert, sizeof(SystemConnectAlert));
+ }
+ 
+-void ServerConnectDaemon::updateQueuedClients()
++template&lt;typename T&gt;
++class State
+ {
+-    unsigned long queue_position = 1;
+-    ConnectProcessUpdate process_update;
++public:
++    T state;
++    State() : state((T)0) {};
++    virtual ~State() {}
+ 
+-    ConnectQueueIterator i;
+-    for(i = connect_queue.begin(); i != connect_queue.end(); ++i)
++    virtual void enter() {}
++    virtual T process() { return state; }
++    virtual T message(const NetMessage *msg) { (void)msg; return state;}
++    virtual void leave() {}
++};
++
++template&lt;typename T&gt;
++class StateMachine
++{
++private:
++    std::vector&lt;State&lt;T&gt; *&gt; states;
++    State&lt;T&gt; * current;
++    T state;
++
++public:
++    StateMachine() : current(0) {}
++    ~StateMachine()
+     {
+-        process_update.setQueuePosition(queue_position);
+-
+-        (*i)-&gt;sendMessage( &amp;process_update, sizeof(ConnectProcessUpdate));
+-        (*i)-&gt;sendRemaining();
+-        queue_position++;
++        for (int i = 0; i &lt; states.size(); i++)
++        {
++            delete states[i];
++        }
++        states.clear();
+     }
+ 
+-}
++    bool isState(T state) { return this-&gt;state == state; }
+ 
+-void ServerConnectDaemon::netPacketClientDisconnect(const NetPacket *packet)
+-{
+-    // nothing, useless, remove
+-}
++    void addState(State&lt;T&gt; * st)
++    {
++        st-&gt;state = (T)states.size();
++        states.push_back(st);
++    }
+ 
+-void ServerConnectDaemon::netPacketClientJoinRequest(const NetPacket* packet)
+-{
+-    const ClientConnectJoinRequest* join_request_mesg
+-        = (const ClientConnectJoinRequest *) packet-&gt;getNetMessage();
+-    ClientConnectJoinRequestAck join_request_ack;
++    void enterState(T state)
++    {
++        this-&gt;state = state;
++        current = states[state];
++        current-&gt;enter();
++    }
+ 
+-    join_request_ack.setResultCode(_join_request_result_success);
++    void switchState(T state)
++    {
++        current-&gt;leave();
++        enterState(state);
++    }
+ 
+-    if ( join_request_mesg-&gt;getProtocolVersion() != NETPANZER_PROTOCOL_VERSION )
++    void process()
+     {
+-        join_request_ack.setResultCode(_join_request_result_invalid_protocol);
++        T new_state = current-&gt;process();
++        if ( new_state != state )
++        {
++            switchState(new_state);
++        }
+     }
+-    else
++
++    void message(const NetMessage* msg)
+     {
+-        if ( !inConnectQueue( packet-&gt;fromClient ) )
++        T new_state = current-&gt;message(msg);
++        if ( new_state != state )
+         {
+-            if (connect_queue.size() &gt; 25)
+-            {
+-                join_request_ack.setResultCode(_join_request_result_server_busy);
+-            }
+-            else
+-            {
+-                connect_queue.push_back(packet-&gt;fromClient);
+-            }
++            switchState(new_state);
+         }
+     }
++};
+ 
+-    join_request_ack.setServerProtocolVersion(NETPANZER_PROTOCOL_VERSION);
+-    packet-&gt;fromClient-&gt;sendMessage(&amp;join_request_ack,
+-                         sizeof(ClientConnectJoinRequestAck));
+-    packet-&gt;fromClient-&gt;sendRemaining();
+-}
+-
+-void ServerConnectDaemon::processNetPacket(const NetPacket* packet)
++template&lt;typename T&gt;
++class StateIdle : public State&lt;T&gt;
+ {
+-    const NetMessage* message = packet-&gt;getNetMessage();
++public:
++    virtual T process()
++    {
++        if ( !connect_queue.empty() &amp;&amp; connection_lock_state == false )
++        {
++            connect_client = connect_queue.front();
++            connect_queue.pop_front();
+ 
+-    switch(message-&gt;message_id) {
+-        case _net_message_id_connect_netPanzer_client_disconnect:
+-            netPacketClientDisconnect(packet);
+-            break;
++            ClientConnectStartConnect start_connect;
+ 
+-        case _net_message_id_connect_join_game_request:
+-            netPacketClientJoinRequest(packet);
+-            break;
++            connect_client-&gt;sendMessage( &amp;start_connect,
++                                         sizeof(ClientConnectStartConnect));
+ 
+-        default :
+-            connectFsm(message);
+-            break;
++            connect_client-&gt;sendRemaining();
++
++            return connect_state_wait_for_connect_request;
++        }
++        return this-&gt;state;
+     }
+-}
+ 
+-void ServerConnectDaemon::sendConnectionAlert(ClientSocket * client)
+-{
+-    SystemConnectAlert connect_alert;
+-    
+-    PlayerState *player_state = 0;
++    virtual void leave()
++    {
++        unsigned long queue_position = 1;
+ 
+-    player_state = PlayerInterface::getPlayer( client-&gt;getPlayerIndex() );
++        ConnectProcessUpdate process_update;
+ 
+-    connect_alert.set( client-&gt;getPlayerIndex(), _connect_alert_mesg_connect );
+-    
+-    ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(), 
+-                                  &quot;'%s' [%s] has joined the game.&quot;,
+-                                  player_state-&gt;getName().c_str(),
+-                                  client-&gt;getFullIPAddress().c_str() );
++        ConnectQueueIterator i;
++        for(i = connect_queue.begin(); i != connect_queue.end(); ++i)
++        {
++            process_update.setQueuePosition(queue_position);
+ 
+-    player_state-&gt;resetAutokick();
++            (*i)-&gt;sendMessage( &amp;process_update, sizeof(ConnectProcessUpdate));
++            (*i)-&gt;sendRemaining();
++            queue_position++;
++        }
++    }
++};
+ 
+-    if ( ((std::string)gameconfig-&gt;motd).length() &gt; 0 )
++template&lt;typename T&gt;
++class StateWaitConnectRequest : public State&lt;T&gt;
++{
++public:
++    virtual void enter() { time_out_timer.reset(); }
++
++    virtual T process()
+     {
+-    	ChatInterface::serversayTo(client-&gt;getPlayerIndex(), gameconfig-&gt;motd.c_str());
++        return time_out_timer.count() ? connect_state_idle : State&lt;T&gt;::state;
+     }
+ 
+-    SERVER-&gt;broadcastMessage( &amp;connect_alert, sizeof(SystemConnectAlert));
+-}
++    virtual T message(const NetMessage* msg)
++    {
++        T new_state = connect_state_idle;
++        if ( msg-&gt;message_id == _net_message_id_client_connect_request )
++        {
++            ClientConnectResult connect_result;
+ 
+-void ServerConnectDaemon::resetConnectFsm()
+-{
+-    connection_state = connect_state_idle;
+-    time_out_timer.reset();
+-    time_out_counter = 0;
+-}
++            PlayerState * player = PlayerInterface::allocateNewPlayer();
++            if ( player == 0 )
++            {
++                connect_result.result_code = _connect_result_server_full;
++            }
++            else
++            {
++                connect_result.result_code = _connect_result_success;
++                connect_client-&gt;player_id = player-&gt;getID();
++                new_state = connect_state_wait_for_client_settings;
++            }
+ 
++            connect_client-&gt;sendMessage( &amp;connect_result,
++                                         sizeof(ClientConnectResult));
++            connect_client-&gt;sendRemaining();
++        }
+ 
+-void ServerConnectDaemon::connectStateIdle()
++        return new_state;
++    }
++};
++
++template&lt;typename T&gt;
++class StateWaitClientSettings : public State&lt;T&gt;
+ {
+-    if (!connect_queue.empty() &amp;&amp; (connection_lock_state == false))
++private:
++    PlayerState * player;
++public:
++    virtual void enter()
+     {
+-        connect_client = connect_queue.front();
+-        connect_queue.pop_front();
+-        connection_state  = connect_state_wait_for_connect_request;
+-
+-        ClientConnectStartConnect start_connect;
+-        
+-        connect_client-&gt;sendMessage( &amp;start_connect,
+-                                     sizeof(ClientConnectStartConnect));
+-        connect_client-&gt;sendRemaining();
+-        time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
++        player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+         time_out_timer.reset();
+-        time_out_counter = 0;
+-
+-        updateQueuedClients();
+     }
+-}
+ 
+-
+-void ServerConnectDaemon::connectStateWaitForConnectRequest(
+-        const NetMessage* message)
+-{
+-    if (message &amp;&amp; message-&gt;message_id == _net_message_id_client_connect_request )
++    virtual T process()
+     {
+-
+-        ClientConnectResult connect_result;
+-        PlayerState * player = PlayerInterface::allocateNewPlayer();
+-
+-        if ( player == 0 )
++        if ( time_out_timer.count() )
+         {
+-            connect_result.result_code = _connect_result_server_full;
+-            resetConnectFsm();
++            player-&gt;setStatus( _player_state_free );
++            return connect_state_idle;
+         }
+-        else
+-        {
+-            connect_result.result_code = _connect_result_success;
+-            time_out_timer.reset();
+-            connect_client-&gt;player_id = player-&gt;getID();
+-        }
+-        connect_client-&gt;sendMessage( &amp;connect_result,
+-                                     sizeof(ClientConnectResult));
+-        connect_client-&gt;sendRemaining();
+-        if ( connection_state != connect_state_idle )
+-        {
+-            connection_state = connect_state_wait_for_client_settings;
+-        }
++        return State&lt;T&gt;::state;
+     }
+-    else if ( time_out_timer.count() )
+-    {
+-        resetConnectFsm();
+-    }
+-}
+ 
+-void ServerConnectDaemon::connectStateWaitForClientSettings(
+-        const NetMessage* message )
+-{
+-    PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+-    
+-    if ( message &amp;&amp; message-&gt;message_id == _net_message_id_connect_client_settings )
++    virtual T message(const NetMessage* msg)
+     {
++        if ( msg-&gt;message_id == _net_message_id_connect_client_settings )
++        {
+             ConnectClientSettings *client_setting;
+ 
+-            client_setting = (ConnectClientSettings *) message;
++            client_setting = (ConnectClientSettings *) msg;
++
+             player-&gt;setName( client_setting-&gt;player_name );
+-            ResourceManager::updateFlagData(connect_client-&gt;getPlayerIndex(),
++
++            ResourceManager::updateFlagData(player-&gt;getID(),
+                                             client_setting-&gt;player_flag,
+-                                            sizeof(ConnectClientSettings::player_flag) );
++                                            sizeof(client_setting-&gt;player_flag) );
+ 
+             player-&gt;setStatus( _player_state_connecting );
+ 
+             // ** send server game setting map, units, player, etc.
+             ConnectMesgServerGameSettings* server_game_setup
+                 = GameManager::getServerGameSetup();
++
+             connect_client-&gt;sendMessage( server_game_setup,
+                                          sizeof(ConnectMesgServerGameSettings));
+             connect_client-&gt;sendRemaining();
+             delete server_game_setup;
+ 
+-            time_out_timer.reset();
+-            if(connection_state != connect_state_idle)
+-            {
+-                connection_state = connect_state_wait_for_client_game_setup_ack;
+-            }
++            return connect_state_wait_for_client_game_setup_ack;
++        }
++        return State&lt;T&gt;::state;
+     }
+-    else if ( time_out_timer.count() )
++};
++
++template&lt;typename T&gt;
++class StateWaitClientGameSetupAck : public State&lt;T&gt;
++{
++private:
++    PlayerState * player;
++public:
++    virtual void enter()
+     {
+-        player-&gt;setStatus( _player_state_free );
+-        resetConnectFsm();
++        player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
++        time_out_timer.reset();
+     }
+-}
+ 
+-void ServerConnectDaemon::connectStateWaitForClientGameSetupAck(
+-        const NetMessage* message )
+-{
+-    PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+-    if ( message != 0 )
++    virtual T process()
+     {
+-        if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ack )
++        if ( time_out_timer.count() )
+         {
+-            PlayerConnectID player_connect_mesg(connect_client-&gt;getPlayerIndex());
++            player-&gt;setStatus( _player_state_free );
++            return connect_state_idle;
++        }
++        return State&lt;T&gt;::state;
++    }
++
++    virtual T message(const NetMessage* msg)
++    {
++        if ( msg-&gt;message_id == _net_message_id_connect_client_game_setup_ack )
++        {
++            PlayerConnectID player_connect_mesg(player-&gt;getID());
+             connect_client-&gt;sendMessage( &amp;player_connect_mesg,
+                                          sizeof(PlayerConnectID));
+-            
+-            ConnectProcessStateMessage state_mesg;
+-            state_mesg.setMessageEnum(_connect_state_message_sync_unit_profiles);
+-            state_mesg.setPercentComplete(0);
+-            connect_client-&gt;sendMessage( &amp;state_mesg,
+-                                         sizeof(ConnectProcessStateMessage));
+-            connect_client-&gt;sendRemaining();
+-            if(connection_state != connect_state_idle)
+-            {
+-                sync_count = 0;
+-                sync_end = UnitProfileInterface::getNumUnitTypes();
+-                connection_state = connect_state_unit_profile_sync;
+-            }
++
++            return connect_state_unit_profile_sync;
+         }
+-        else if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
++        else if ( msg-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
+         {
+             time_out_timer.reset();
+         }
++        return State&lt;T&gt;::state;
+     }
+-    else if ( time_out_timer.count() )
++};
++
++template&lt;typename T&gt;
++class StateUnitProfileSync : public State&lt;T&gt;
++{
++private:
++    PlayerState * player;
++    int sync_count;
++    int sync_end;
++
++    bool sendNextProfile()
+     {
+-        player-&gt;setStatus( _player_state_free );
+-        resetConnectFsm();
++        Uint8 data[ _MAX_NET_PACKET_SIZE ];
++        NetMessage *pmsg = (NetMessage*)&data;
++        int len = UnitProfileInterface::fillProfileSyncMessage(pmsg, sync_count++);
++        connect_client-&gt;sendMessage(data, len);
++        connect_client-&gt;sendRemaining();
++
++        return sync_count == sync_end;
+     }
+-}
+ 
+-void ServerConnectDaemon::connectStateUnitProfileSync( const NetMessage* message )
+-{
+-    PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+-    if ( message != 0 || sync_count == 0)
++public:
++    virtual void enter()
+     {
+-        if ( sync_count == 0 || message-&gt;message_id == _net_message_id_connect_client_send_next_unit_profile )
++        player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
++
++        ConnectProcessStateMessage state_mesg;
++        state_mesg.setMessageEnum(_connect_state_message_sync_unit_profiles);
++        state_mesg.setPercentComplete(0);
++        connect_client-&gt;sendMessage( &amp;state_mesg,
++                                     sizeof(ConnectProcessStateMessage));
++        connect_client-&gt;sendRemaining();
++
++        sync_count = 0;
++        sync_end = UnitProfileInterface::getNumUnitTypes();
++
++        time_out_timer.reset();
++    }
++
++    virtual T process()
++    {
++        if ( sync_count == 0 &amp;&amp; sendNextProfile() )
+         {
+-            Uint8 data[ _MAX_NET_PACKET_SIZE ];
+-            NetMessage *pmsg = (NetMessage*)&data;
+-            int len = UnitProfileInterface::fillProfileSyncMessage(pmsg, sync_count++);
+-            connect_client-&gt;sendMessage(data, len);
+-            connect_client-&gt;sendRemaining();
++            return connect_state_player_state_sync;
++        }
++        else if ( time_out_timer.count() )
++        {
++            player-&gt;setStatus( _player_state_free );
++            return connect_state_idle;
++        }
++        return State&lt;T&gt;::state;
++    }
+ 
+-            if ( sync_count == sync_end &amp;&amp; connection_state != connect_state_idle )
++    virtual T message(const NetMessage* msg)
++    {
++        if ( msg-&gt;message_id == _net_message_id_connect_client_send_next_unit_profile )
++        {
++            if ( sendNextProfile() )
+             {
+-                ConnectProcessStateMessage state_mesg;
+-                state_mesg.setMessageEnum(_connect_state_message_sync_player_info);
+-                state_mesg.setPercentComplete(0);
+-                connect_client-&gt;sendMessage( &amp;state_mesg,
+-                                             sizeof(ConnectProcessStateMessage));
+-                connect_client-&gt;sendRemaining();
+-
+-                sync_count = 0;
+-                sync_end = PlayerInterface::getMaxPlayers();
+-                connection_state = connect_state_player_state_sync;
++                return connect_state_player_state_sync;
+             }
+         }
+-        else if ( message-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
++        else if ( msg-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
+         {
+             time_out_timer.reset();
+         }
++        return State&lt;T&gt;::state;
+     }
+-    else if ( time_out_timer.count() )
++};
++
++template&lt;typename T&gt;
++class StatePlayerSync : public State&lt;T&gt;
++{
++private:
++    PlayerState * player;
++    int sync_count;
++    int sync_end;
++
++    bool sendNextPlayers()
+     {
+-        player-&gt;setStatus( _player_state_free );
+-        resetConnectFsm();
++        NetMessageEncoder encoder;
++        PlayerStateSync pss;
++
++        do
++        {
++            PlayerInterface::getPlayer(sync_count)-&gt;getNetworkPlayerState(pss.player_state);
++            if ( ! encoder.encodeMessage(&amp;pss, sizeof(pss)) )
++            {
++                break;
++            }
++        } while ( ++sync_count &lt; sync_end );
++
++        connect_client-&gt;sendMessage(encoder.getEncodedMessage(),
++                                    encoder.getEncodedLen());
++
++        sendStatePercent();
++
++        connect_client-&gt;sendRemaining();
++
++        return sync_count == sync_end;
+     }
+-}
+ 
+-void ServerConnectDaemon::connectStatePlayerStateSync()
+-{
+-    ConnectProcessStateMessage state_mesg;
++    void sendStatePercent()
++    {
++        ConnectProcessStateMessage state_mesg;
+ 
+-    NetMessageEncoder encoder;
+-    PlayerStateSync pss;
++        state_mesg.setMessageEnum(_connect_state_message_sync_player_info_percent);
++        state_mesg.setPercentComplete((sync_count*100)/sync_end);
+ 
+-    do
++        connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
++    }
++
++public:
++    virtual void enter()
+     {
+-        PlayerInterface::getPlayer(sync_count)-&gt;getNetworkPlayerState(pss.player_state);
+-        if ( ! encoder.encodeMessage(&amp;pss, sizeof(pss)) )
++        player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
++
++        ConnectProcessStateMessage state_mesg;
++        state_mesg.setMessageEnum(_connect_state_message_sync_player_info);
++        state_mesg.setPercentComplete(0);
++        connect_client-&gt;sendMessage( &amp;state_mesg,
++                                     sizeof(ConnectProcessStateMessage));
++        connect_client-&gt;sendRemaining();
++
++        sync_count = 0;
++        sync_end = PlayerInterface::getMaxPlayers();
++
++        time_out_timer.reset();
++    }
++
++    virtual T process()
++    {
++        if ( sendNextPlayers() )
+         {
+-            break;
++            return connect_state_sync_flags;
+         }
+-    } while ( ++sync_count &lt; sync_end );
++        else if ( time_out_timer.count() )
++        {
++            player-&gt;setStatus( _player_state_free );
++            return connect_state_idle;
++        }
++        return State&lt;T&gt;::state;
++    }
+ 
+-    // here encoder *always* has something
+-    connect_client-&gt;sendMessage(encoder.getEncodedMessage(),
+-                                encoder.getEncodedLen());
+-    
+-    state_mesg.setMessageEnum(_connect_state_message_sync_player_info_percent);
+-    state_mesg.setPercentComplete((sync_count*100)/sync_end);
++    virtual T message(const NetMessage* msg)
++    {
++        if ( msg-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
++        {
++            time_out_timer.reset();
++        }
++        return State&lt;T&gt;::state;
++    }
++};
+ 
+-    connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
+-    connect_client-&gt;sendRemaining();
++template&lt;typename T&gt;
++class StateFlagSync : public State&lt;T&gt;
++{
++private:
++    PlayerState * player;
++    int sync_count;
++    int sync_end;
+ 
+-    if ( sync_count == sync_end )
++    bool sendNextFlag()
+     {
+-        sync_count = 0;
+-        sync_done = 0;
+-        sync_total = PlayerInterface::countPlayers();
+-        // sync_end = current value = max players;
+-        
+-        connection_state = connect_state_sync_flags;
++        while ( sync_count &lt; sync_end &amp;&amp; ! PlayerInterface::isPlayerActive(sync_count) )
++        {
++            sync_count += 1;
++        }
++
++        if ( sync_count &lt; sync_end &amp;&amp; PlayerInterface::isPlayerActive(sync_count) )
++        {
++            PlayerFlagSync pfs;
++            pfs.player_id = sync_count;
++            ResourceManager::getFlag(sync_count)-&gt;frameToBuffer(pfs.player_flag, sizeof(pfs.player_flag));
++
++            connect_client-&gt;sendMessage(&amp;pfs, sizeof(pfs));
++            connect_client-&gt;sendRemaining();
++
++            sync_count += 1;
++        }
++
++        return sync_count == sync_end;
+     }
+-}
+ 
+-void ServerConnectDaemon::connectStateSyncFlags()
+-{
+-    ConnectProcessStateMessage state_mesg;
++public:
++    virtual void enter()
++    {
++        player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+ 
+-    NetMessageEncoder encoder;
++        sync_count = 0;
++        sync_end = PlayerInterface::getMaxPlayers();
+ 
+-    while ( sync_count &lt; sync_end &amp;&amp; ! PlayerInterface::isPlayerActive(sync_count) )
++        time_out_timer.reset();
++    }
++
++    virtual T process()
+     {
+-        sync_count += 1;
++        if ( sendNextFlag() )
++        {
++            return connect_state_unit_sync;
++        }
++        else if ( time_out_timer.count() )
++        {
++            player-&gt;setStatus( _player_state_free );
++            return connect_state_idle;
++        }
++        return State&lt;T&gt;::state;
+     }
+ 
+-    if ( sync_count &lt; sync_end &amp;&amp; PlayerInterface::isPlayerActive(sync_count) )
++    virtual T message(const NetMessage* msg)
+     {
+-        PlayerFlagSync pfs;
+-        pfs.player_id = sync_count;
+-        ResourceManager::getFlag(sync_count)-&gt;frameToBuffer(pfs.player_flag, sizeof(pfs.player_flag));
+-        connect_client-&gt;sendMessage(&amp;pfs, sizeof(pfs));
+-        sync_done += 1;
+-        sync_count += 1;
++        if ( msg-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
++        {
++            time_out_timer.reset();
++        }
++        return State&lt;T&gt;::state;
+     }
++};
+ 
+-    if ( sync_done == sync_total )
++template&lt;typename T&gt;
++class StateUnitSync : public State&lt;T&gt;
++{
++private:
++    PlayerState * player;
++    int sync_count;
++    int sync_end;
++    int sync_done;
++    int sync_total;
++
++    bool sendNextUnits()
+     {
++        NetMessageEncoder encoder;
++        UnitInterface::Units::const_iterator i;
++        iXY unit_map_loc;
++        UnitBase* unit;
++
++        do
++        {
++            i = UnitInterface::getUnits().lower_bound(sync_count);
++            if ( i == UnitInterface::getUnits().end() || i-&gt;first &gt;= sync_end )
++            {
++                sync_count = sync_end;
++                sync_done = sync_total;
++                break;
++            }
++
++            unit = i-&gt;second;
++            MapInterface::pointXYtoMapXY(unit-&gt;unit_state.location, &amp;unit_map_loc);
++            UnitRemoteCreate urc(unit-&gt;player-&gt;getID(),
++                                 unit-&gt;id,
++                                 unit_map_loc.x,
++                                 unit_map_loc.y,
++                                 unit-&gt;unit_state.unit_type);
++
++            if ( ! encoder.encodeMessage(&amp;urc, sizeof(urc)) )
++            {
++                break;
++            }
++
++            sync_done += 1;
++            sync_count = i-&gt;first + 1;
++
++        } while ( sync_count &lt; sync_end );
++
++        connect_client-&gt;sendMessage(encoder.getEncodedMessage(),
++                                    encoder.getEncodedLen());
++
++        if ( sync_count &lt; sync_end )
++        {
++            if ( sendunitpercent_timer.count() )
++            {
++                ConnectProcessStateMessage state_mesg;
++                state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
++                state_mesg.setPercentComplete((sync_done*100)/sync_total);
++                connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
++                sendunitpercent_timer.reset();
++            }
++        }
++
++        return sync_count == sync_end;
++    }
++
++public:
++    virtual void enter()
++    {
++        player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
++
+         sync_count = 0;
+         sync_done = 0;
+         sync_end = 0;
+@@ -461,11 +642,8 @@
+ 
+         sync_end += 1;
+ 
+-        sendunitpercent_timer.reset();
+-
++        ConnectProcessStateMessage state_mesg;
+         state_mesg.setMessageEnum(_connect_state_message_sync_units);
+-
+-        // size of message already set
+         connect_client-&gt;sendMessage( &amp;state_mesg,
+                                      sizeof(ConnectProcessStateMessage));
+ 
+@@ -475,153 +653,188 @@
+         PlayerStateSync player_state_update( p-&gt;getNetworkPlayerState() );
+         SERVER-&gt;broadcastMessage(&amp;player_state_update, sizeof(PlayerStateSync));
+ 
+-        if(connection_state != connect_state_idle)
+-        {
+-            connection_state = connect_state_unit_sync;
+-        }
++        sendunitpercent_timer.reset();
++        time_out_timer.reset();
+     }
+-}
+ 
+-void ServerConnectDaemon::connectStateUnitSync()
+-{
+-    ConnectProcessStateMessage state_mesg;
+-    
+-    NetMessageEncoder encoder;
+-    UnitInterface::Units::const_iterator i;
+-    iXY unit_map_loc;
+-    UnitBase* unit;
+-
+-    do
++    virtual T process()
+     {
+-        i = UnitInterface::getUnits().lower_bound(sync_count);
+-        if ( i == UnitInterface::getUnits().end() || i-&gt;first &gt;= sync_end )
++        if ( sendNextUnits() )
+         {
+-            sync_count = sync_end;
+-            sync_done = sync_total;
+-            break;
++            return connect_state_finish_connect;
+         }
++        return State&lt;T&gt;::state;
++    }
+ 
+-        unit = i-&gt;second;
+-        MapInterface::pointXYtoMapXY(unit-&gt;unit_state.location, &amp;unit_map_loc);
+-        UnitRemoteCreate urc(unit-&gt;player-&gt;getID(),
+-                             unit-&gt;id,
+-                             unit_map_loc.x,
+-                             unit_map_loc.y,
+-                             unit-&gt;unit_state.unit_type);
+-
+-        if ( ! encoder.encodeMessage(&amp;urc, sizeof(urc)) )
++    virtual T message(const NetMessage* msg)
++    {
++        if ( msg-&gt;message_id == _net_message_id_connect_client_game_setup_ping )
+         {
+-            break;
++            time_out_timer.reset();
+         }
++        return State&lt;T&gt;::state;
++    }
+ 
+-        sync_done += 1;
+-        sync_count = i-&gt;first + 1;
++    virtual void leave()
++    {
++        ConnectProcessStateMessage state_mesg;
+ 
+-    } while ( sync_count &lt; sync_end );
++        state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
++        state_mesg.setPercentComplete(100);
++        connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
+ 
+-    // here encoder *always* has something
+-    connect_client-&gt;sendMessage(encoder.getEncodedMessage(),
+-                                encoder.getEncodedLen());
++        UnitSyncIntegrityCheck unit_integrity_check_mesg;
++        connect_client-&gt;sendMessage( &amp;unit_integrity_check_mesg,
++                                     sizeof(UnitSyncIntegrityCheck));
++    }
++};
+ 
+-    if ( sync_count &lt; sync_end )
++template&lt;typename T&gt;
++class StateFinishConnect : public State&lt;T&gt;
++{
++public:
++    virtual T process()
+     {
+-        if ( sendunitpercent_timer.count() )
+-        {
+-            state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
+-            state_mesg.setPercentComplete((sync_done*100)/sync_total);
+-            connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
+-            sendunitpercent_timer.reset();
+-        }
+-        return;
+-    }
++        ObjectiveInterface::syncObjectives( connect_client );
+ 
+-    // Sending finished
+-    state_mesg.setMessageEnum(_connect_state_message_sync_units_percent);
+-    state_mesg.setPercentComplete(100);
+-    connect_client-&gt;sendMessage( &amp;state_mesg, sizeof(state_mesg));
++        PowerUpInterface::syncPowerUps( connect_client );
+ 
+-    UnitSyncIntegrityCheck unit_integrity_check_mesg;
+-    connect_client-&gt;sendMessage( &amp;unit_integrity_check_mesg,
+-                                 sizeof(UnitSyncIntegrityCheck));
++        PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
+ 
+-    ObjectiveInterface::syncObjectives( connect_client );
++        player-&gt;setStatus( _player_state_active );
+ 
+-    PowerUpInterface::syncPowerUps( connect_client );
++        PlayerFlagSync pfs;
++        pfs.player_id = connect_client-&gt;player_id;
++        ResourceManager::getFlag(connect_client-&gt;player_id)-&gt;frameToBuffer(pfs.player_flag, sizeof(pfs.player_flag));
++        SERVER-&gt;broadcastMessage(&amp;pfs, sizeof(pfs));
+ 
+-    //GameManager::spawnPlayer( connect_client-&gt;getPlayerIndex() );
++        PlayerStateSync player_state_update
++            (player-&gt;getNetworkPlayerState());
+ 
+-    PlayerState * player = PlayerInterface::getPlayer(connect_client-&gt;getPlayerIndex());
++        SERVER-&gt;broadcastMessage( &amp;player_state_update, sizeof(PlayerStateSync));
+ 
+-    player-&gt;setStatus( _player_state_active );
++        ConnectProcessStateMessage state_mesg;
++        state_mesg.setMessageEnum(_connect_state_sync_complete);
++        connect_client-&gt;sendMessage( &amp;state_mesg,
++                                     sizeof(ConnectProcessStateMessage));
++        sendConnectionAlert( connect_client );
+ 
+-    PlayerFlagSync pfs;
+-    pfs.player_id = connect_client-&gt;player_id;
+-    ResourceManager::getFlag(connect_client-&gt;player_id)-&gt;frameToBuffer(pfs.player_flag, sizeof(pfs.player_flag));
+-    SERVER-&gt;broadcastMessage(&amp;pfs, sizeof(pfs));
++        return connect_state_idle;
++    }
++};
+ 
+-    PlayerStateSync player_state_update
+-        (player-&gt;getNetworkPlayerState());
++static StateMachine&lt;ConnectionState&gt;* fsm = 0;
+ 
+-    SERVER-&gt;broadcastMessage( &amp;player_state_update, sizeof(PlayerStateSync));
++void ServerConnectDaemon::initialize(unsigned long max_players)
++{
++    (void) max_players;
++    time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
++    sendunitpercent_timer.changePeriod( _SENDUNITPERCENT_TIME );
++    fsm = new StateMachine&lt;ConnectionState&gt;();
+ 
+-    state_mesg.setMessageEnum(_connect_state_sync_complete);
+-    // size already set
+-    connect_client-&gt;sendMessage( &amp;state_mesg,
+-                                 sizeof(ConnectProcessStateMessage));
+-    sendConnectionAlert( connect_client );
++    fsm-&gt;addState(new StateIdle&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateWaitConnectRequest&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateWaitClientSettings&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateWaitClientGameSetupAck&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateUnitProfileSync&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StatePlayerSync&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateFlagSync&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateUnitSync&lt;ConnectionState&gt;());
++    fsm-&gt;addState(new StateFinishConnect&lt;ConnectionState&gt;());
+ 
+-    connection_state = connect_state_idle;
++    fsm-&gt;enterState(connect_state_idle);
++
+ }
+ 
+-void ServerConnectDaemon::connectFsm(const NetMessage* message)
++void ServerConnectDaemon::startConnectDaemon( unsigned long max_players )
+ {
+-    switch ( connection_state )
++    (void) max_players;
++    time_out_timer.changePeriod( _SERVER_CONNECT_TIME_OUT_TIME );
++    sendunitpercent_timer.changePeriod( _SENDUNITPERCENT_TIME );
++    fsm-&gt;enterState(connect_state_idle);
++}
++
++void ServerConnectDaemon::shutdownConnectDaemon()
++{
++    ConnectMesgNetPanzerServerDisconnect server_disconnect;
++
++    SERVER-&gt;broadcastMessage( &amp;server_disconnect,
++                         sizeof(ConnectMesgNetPanzerServerDisconnect));
++}
++
++bool ServerConnectDaemon::inConnectQueue( ClientSocket *client )
++{
++    if ( ! fsm-&gt;isState(connect_state_idle)
++       &amp;&amp; connect_client == client )
+     {
+-        case connect_state_idle:
+-            connectStateIdle();
+-            break;
++        return true;
++    }
++    
++    ConnectQueueIterator i;
++    i = std::find(connect_queue.begin(), connect_queue.end(), client);
++    return i != connect_queue.end();
++}
+ 
+-        case connect_state_wait_for_connect_request:
+-            connectStateWaitForConnectRequest( message );
+-            break;
++static void netPacketClientDisconnect(const NetPacket *packet)
++{
++    // nothing, useless, remove
++}
+ 
+-        case  connect_state_wait_for_client_settings:
+-            connectStateWaitForClientSettings( message );
+-            break;
++static void netPacketClientJoinRequest(const NetPacket* packet)
++{
++    const ClientConnectJoinRequest* join_request_mesg
++        = (const ClientConnectJoinRequest *) packet-&gt;getNetMessage();
++    ClientConnectJoinRequestAck join_request_ack;
+ 
+-        case connect_state_wait_for_client_game_setup_ack:
+-            connectStateWaitForClientGameSetupAck( message );
+-            break;
++    join_request_ack.setResultCode(_join_request_result_success);
+ 
+-        case connect_state_unit_profile_sync:
+-            connectStateUnitProfileSync( message );
+-            break;
++    if ( join_request_mesg-&gt;getProtocolVersion() != NETPANZER_PROTOCOL_VERSION )
++    {
++        join_request_ack.setResultCode(_join_request_result_invalid_protocol);
++    }
++    else
++    {
++        if ( !ServerConnectDaemon::inConnectQueue( packet-&gt;fromClient ) )
++        {
++            if (connect_queue.size() &gt; 25)
++            {
++                join_request_ack.setResultCode(_join_request_result_server_busy);
++            }
++            else
++            {
++                connect_queue.push_back(packet-&gt;fromClient);
++            }
++        }
++    }
+ 
+-        case connect_state_player_state_sync:
+-            connectStatePlayerStateSync();
++    join_request_ack.setServerProtocolVersion(NETPANZER_PROTOCOL_VERSION);
++    packet-&gt;fromClient-&gt;sendMessage(&amp;join_request_ack,
++                         sizeof(ClientConnectJoinRequestAck));
++    packet-&gt;fromClient-&gt;sendRemaining();
++}
++
++void ServerConnectDaemon::processNetPacket(const NetPacket* packet)
++{
++    const NetMessage* message = packet-&gt;getNetMessage();
++
++    switch(message-&gt;message_id) {
++        case _net_message_id_connect_netPanzer_client_disconnect:
++            netPacketClientDisconnect(packet);
+             break;
+ 
+-        case connect_state_sync_flags:
+-            connectStateSyncFlags();
++        case _net_message_id_connect_join_game_request:
++            netPacketClientJoinRequest(packet);
+             break;
+ 
+-        case connect_state_unit_sync:
+-            connectStateUnitSync();
++        default :
++            fsm-&gt;message(message);
+             break;
+-
+-        default:
+-            assert(&quot;Bad connection state&quot; == 0);
+-    } // ** switch
++    }
+ }
+ 
+-void ServerConnectDaemon::connectProcess(const NetMessage* message)
+-{
+-    connectFsm( message );
+-}
+-
+ void ServerConnectDaemon::connectProcess()
+ {
+-    connectFsm( 0 );
++    fsm-&gt;process();
+ }
+ 
+ void
+@@ -631,7 +844,7 @@
+     
+     if( connect_client == client )
+     {
+-        connection_state = connect_state_idle;
++        fsm-&gt;enterState(connect_state_idle);
+     }    
+ }
+ 
+@@ -652,5 +865,5 @@
+ 
+ bool ServerConnectDaemon::isConnecting()
+ {
+-    return connection_state != connect_state_idle;
++    return ! fsm-&gt;isState(connect_state_idle);
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2011-10-15 01:11:43 UTC (rev 1261)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.hpp	2011-10-15 17:46:09 UTC (rev 1262)
+@@ -18,54 +18,11 @@
+ #ifndef _SERVERCONNECTDAEMON_HPP
+ #define _SERVERCONNECTDAEMON_HPP
+ 
+-#include &lt;list&gt;
++class ClientSocket;
++class NetPacket;
+ 
+-#include &quot;Classes/PlayerState.hpp&quot;
+-#include &quot;ArrayUtil/QueueTemplate.hpp&quot;
+-#include &quot;Classes/Network/NetPacket.hpp&quot;
+-#include &quot;Network/ClientSocket.hpp&quot;
+-#include &quot;Util/Timer.hpp&quot;
+-
+ class ServerConnectDaemon
+ {
+-protected:
+-    static int          connection_state;
+-    static bool         connection_lock_state;
+-    static ClientSocket *connect_client;
+-    static Timer	time_out_timer;
+-    static int	        time_out_counter;
+-    static Timer        sendunitpercent_timer;
+-    static int          sync_count;
+-    static int          sync_end;
+-    static int          sync_total;
+-    static int          sync_done;
+-    
+-    typedef std::list&lt;ClientSocket *&gt; ConnectQueue;
+-    typedef ConnectQueue::iterator ConnectQueueIterator;
+-    static ConnectQueue connect_queue;
+-    
+-    static void connectFsm(const NetMessage* message);
+-    static void connectProcess(const NetMessage* message);
+-
+-    static void updateQueuedClients();
+-
+-    static void netPacketClientDisconnect(const NetPacket* packet);
+-    static void netPacketClientJoinRequest(const NetPacket* packet);
+-
+-    static void sendConnectionAlert( ClientSocket * client );
+-
+-    static void resetConnectFsm();
+-
+-    // ** FSM States
+-    static void connectStateIdle();
+-    static void connectStateWaitForConnectRequest(const NetMessage* message);
+-    static void connectStateWaitForClientSettings(const NetMessage* message);
+-    static void connectStateWaitForClientGameSetupAck(const NetMessage* message);
+-    static void connectStateUnitProfileSync( const NetMessage* message);
+-    static void connectStatePlayerStateSync();
+-    static void connectStateSyncFlags();
+-    static void connectStateUnitSync();
+-
+ public:
+     static void initialize( unsigned long max_players );
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2011-10-15 01:11:43 UTC (rev 1261)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.hpp	2011-10-15 17:46:09 UTC (rev 1262)
+@@ -77,7 +77,7 @@
+     char tempbuffer[_MAX_NET_PACKET_SIZE];
+     Uint16 tempoffset;
+     int id;
+-    PlayerID player_id;
++public:    PlayerID player_id;
+ };
+ 
+ #endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000287.html">[Netpanzer-cvs] r1261 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+	<LI>Next message: <A HREF="000289.html">[Netpanzer-cvs] r1263 - in trunk/netpanzer/src/NetPanzer/Views: .	MainMenu MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#288">[ date ]</a>
+              <a href="thread.html#288">[ thread ]</a>
+              <a href="subject.html#288">[ subject ]</a>
+              <a href="author.html#288">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

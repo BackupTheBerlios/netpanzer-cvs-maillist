@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1065 - in trunk/netpanzer/src/NetPanzer:	Interfaces Units Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1065%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Units%20Views/Game&In-Reply-To=%3C200809210251.m8L2pJnK004983%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000100.html">
+   <LINK REL="Next"  HREF="000102.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1065 - in trunk/netpanzer/src/NetPanzer:	Interfaces Units Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1065%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Units%20Views/Game&In-Reply-To=%3C200809210251.m8L2pJnK004983%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1065 - in trunk/netpanzer/src/NetPanzer:	Interfaces Units Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 21 04:51:19 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000100.html">[Netpanzer-cvs] r1064 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+        <LI>Next message: <A HREF="000102.html">[Netpanzer-cvs] r1066 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2008-09-21 04:51:00 +0200 (Sun, 21 Sep 2008)
+New Revision: 1065
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+Log:
+- Removed some static variables that was causing sigsegv (miniMapView and btw others)
+- Removed the mouse click test message
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -190,7 +190,6 @@
+     WorldViewInterface::setCameraSize( mode_res.x, mode_res.y);
+     delete screen;
+     screen = new ScreenSurface(Screen, mode_res.x, mode_res.y);
+-    gameView.setSize(mode_res);
+ 
+     Desktop::checkResolution(old_res, mode_res);
+     Desktop::checkViewPositions(mode_res);
+@@ -286,8 +285,6 @@
+     temp_path.append(&quot;.opt&quot;);
+     ObjectiveInterface::loadObjectiveList( temp_path.c_str() );
+ 
+-    if(screen)
+-        miniMapView.init();
+     ParticleInterface::initParticleSystems();
+ 
+     ParticleInterface::addCloudParticle(gameconfig-&gt;cloudcoverage);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -126,7 +126,7 @@
+ {
+     if ( clickcount &amp;&amp; clicktimer.isTimeOut() )
+     {
+-        LOGGER.warning(&quot;Mouse click count and release count = %d, %d&quot;, clickcount, releasecount);
++        //LOGGER.warning(&quot;Mouse click count and release count = %d, %d&quot;, clickcount, releasecount);
+         clickcount=0;
+         releasecount=0;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -173,11 +173,10 @@
+ {
+     GameManager::loadPalette(&quot;netp&quot;);
+ 
+-    gameView.init();
+-    Desktop::add( &amp;gameView );
++    Desktop::add(new GameView());
+     Desktop::add(new RankView());
+     Desktop::add(new VehicleSelectionView());
+-    Desktop::add( &amp;miniMapView );
++    Desktop::add(new MiniMapView() );
+     Desktop::add(new CodeStatsView());
+     Desktop::add(new LibView());
+     Desktop::add(new HelpScrollView());
+@@ -200,8 +199,7 @@
+     Desktop::add(new InterfaceView());
+     Desktop::add(new FlagSelectionView());
+     Desktop::add(new HostOptionsView());
+-    PlayerNameView *playernameview=new PlayerNameView();
+-    Desktop::add(playernameview);
++    Desktop::add(new PlayerNameView());
+     Desktop::add(new ResignView());
+     Desktop::add(new AreYouSureResignView());
+     Desktop::add(new AreYouSureExitView());
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -862,7 +862,8 @@
+ 
+         case _aiFsmMoveToLoc_wait_clear_loc : {
+ 
+-                if ( external_ai_event == _external_event_pending_unit_destruct  ) {
++                if ( external_ai_event == _external_event_pending_unit_destruct  )
++                {
+                     // External Event: This unit is about to be deleted
+                     // Action : Exit fsm gracefully
+                     aiFsmMoveToLoc_OnExitCleanUp();
+@@ -870,48 +871,57 @@
+                     external_ai_event = _external_event_null;
+                     ai_command_state = _ai_command_idle;
+                     end_cycle = true;
+-                } else
+-                    if ( pending_AI_comm == true ) {
++                }
++                else if ( pending_AI_comm == true )
++                {
+                         // External Event: A new AI command is pending
+                         // Action: Allow command transition to occur
+                         ai_fsm_transition_complete = true;
+                         aiFsmMoveToLoc_OnExitCleanUp();
+                         end_cycle = true;
+-                    } else  // NextSquareOccupied: does the next square contain a abstruction
+-                        if ( UnitBlackBoard::unitOccupiesLoc( aiFsmMoveToLoc_next_loc ) == true ) {
+-                            // Rule: NextSquareOccupied is true
+-                            // Action: Check Wait Timer
++                }
++                else  // NextSquareOccupied: does the next square contain a abstruction
++                    if ( UnitBlackBoard::unitOccupiesLoc( aiFsmMoveToLoc_next_loc ) == true )
++                {
++                    // Rule: NextSquareOccupied is true
++                    // Action: Check Wait Timer
+ 
+-                            if ( aiFsmMoveToLoc_wait_timer.count() ) {
+-                                // Rule: NextSquareOccupied is true AND WaitTimer is finished
+-                                // Action: Preform path update
++                    if ( aiFsmMoveToLoc_wait_timer.count() )
++                    {
++                        // Rule: NextSquareOccupied is true AND WaitTimer is finished
++                        // Action: Preform path update
+ 
+-                                if ( aiFsmMoveToLoc_next_loc == aiFsmMoveToLoc_goal ) {
++                        if ( aiFsmMoveToLoc_next_loc == aiFsmMoveToLoc_goal )
++                        {
+ 
+-                                    UnitInterface::unit_placement_matrix.reset( aiFsmMoveToLoc_goal );
+-                                    UnitInterface::unit_placement_matrix.getNextEmptyLoc( &amp;aiFsmMoveToLoc_goal );
++                            UnitInterface::unit_placement_matrix.reset( aiFsmMoveToLoc_goal );
++                            UnitInterface::unit_placement_matrix.getNextEmptyLoc( &amp;aiFsmMoveToLoc_goal );
+ 
+-                                    PathRequest path_request;
+-                                    path_request.set(id, aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_goal, 0, &amp;path, _path_request_full );
+-                                    PathScheduler::requestPath( path_request );
+-                                } else {
+-                                    PathRequest path_request;
+-                                    path_request.set(id, aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_goal, 0, &amp;path, _path_request_update );
+-                                    PathScheduler::requestPath( path_request );
+-                                }
++                            PathRequest path_request;
++                            path_request.set(id, aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_goal, 0, &amp;path, _path_request_full );
++                            PathScheduler::requestPath( path_request );
++                        }
++                        else
++                        {
++                            PathRequest path_request;
++                            path_request.set(id, aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_goal, 0, &amp;path, _path_request_update );
++                            PathScheduler::requestPath( path_request );
++                        }
+ 
+-                                aiFsmMoveToLoc_state = _aiFsmMoveToLoc_path_generate;
+-                            }
++                        aiFsmMoveToLoc_state = _aiFsmMoveToLoc_path_generate;
++                    }
+ 
+-                            end_cycle = true;
+-                        } else {
+-                            // Rule: NextSquareOccupied is false
+-                            // Action: Begin move to next square
+-                            UnitBlackBoard::markUnitLoc( aiFsmMoveToLoc_next_loc );
+-                            setFsmMoveMapSquare( aiFsmMoveToLoc_next_square );
++                    end_cycle = true;
++                }
++                else
++                {
++                    // Rule: NextSquareOccupied is false
++                    // Action: Begin move to next square
++                    UnitBlackBoard::markUnitLoc( aiFsmMoveToLoc_next_loc );
++                    setFsmMoveMapSquare( aiFsmMoveToLoc_next_square );
+ 
+-                            aiFsmMoveToLoc_state = _aiFsmMoveToLoc_move_wait;
+-                        }
++                    aiFsmMoveToLoc_state = _aiFsmMoveToLoc_move_wait;
++                }
+ 
+             }
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -48,10 +48,8 @@
+ #include &quot;Views/Components/InfoBar.hpp&quot;
+ #include &quot;Views/Components/MiniMap.hpp&quot;
+ 
+-GameView gameView;
+ int GameView::gDrawSolidBackground = 0;
+ 
+-
+ // GameView
+ //---------------------------------------------------------------------------
+ GameView::GameView() : View()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -43,6 +43,4 @@
+     void drawMap(Surface &amp;window);
+ }; // end GameView
+ 
+-extern GameView gameView;
+-
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -20,8 +20,6 @@
+ #include &quot;MiniMapView.hpp&quot;
+ #include &quot;Views/Components/MiniMap.hpp&quot;
+ 
+-MiniMapView miniMapView;
+-
+ // MiniMapView
+ //---------------------------------------------------------------------------
+ MiniMapView::MiniMapView() : GameTemplateView()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2008-09-20 16:56:48 UTC (rev 1064)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2008-09-21 02:51:00 UTC (rev 1065)
+@@ -41,6 +41,4 @@
+ private:
+ }; // end MiniMapView
+ 
+-extern MiniMapView miniMapView;
+-
+ #endif // end __MiniMapView_hpp__
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000100.html">[Netpanzer-cvs] r1064 -	trunk/netpanzer/src/NetPanzer/Classes/Network
+</A></li>
+	<LI>Next message: <A HREF="000102.html">[Netpanzer-cvs] r1066 - trunk/netpanzer/src/NetPanzer/Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

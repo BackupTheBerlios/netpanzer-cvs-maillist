@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1269 - in trunk/netpanzer/src: Lib/2D Lib/Util	NetPanzer/Views/Components NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1269%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%20Lib/Util%0A%09NetPanzer/Views/Components%20NetPanzer/Views/MainMenu%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111025150559.EB3B94813FD%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000294.html">
+   <LINK REL="Next"  HREF="000296.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1269 - in trunk/netpanzer/src: Lib/2D Lib/Util	NetPanzer/Views/Components NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1269%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%20Lib/Util%0A%09NetPanzer/Views/Components%20NetPanzer/Views/MainMenu%0A%09NetPanzer/Views/MainMenu/Multi&In-Reply-To=%3C20111025150559.EB3B94813FD%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1269 - in trunk/netpanzer/src: Lib/2D Lib/Util	NetPanzer/Views/Components NetPanzer/Views/MainMenu	NetPanzer/Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 25 17:05:59 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000294.html">[Netpanzer-cvs] r1268 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Interfaces	src/NetPanzer/Views src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000296.html">[Netpanzer-cvs] r1270 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#295">[ date ]</a>
+              <a href="thread.html#295">[ thread ]</a>
+              <a href="subject.html#295">[ subject ]</a>
+              <a href="author.html#295">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-25 17:05:59 +0200 (Tue, 25 Oct 2011)
+New Revision: 1269
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/Lib/Util/StringUtil.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.hpp
+Log:
+Deleted unused functions
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -1622,38 +1622,6 @@
+ 
+ } // end Surface::bltStringInBox
+ 
+-// mapFromPalette
+-//--------------------------------------------------------------------------
+-// Purpose: Maps this image from the specified palette to the current palette.
+-//--------------------------------------------------------------------------
+-void Surface::mapFromPalette(const std::string&amp; oldPalette)
+-{
+-    // Load the source palette.
+-    Uint8     bestFitArray[256];
+-    SDL_Color sourceColor[256];
+-
+-    try {
+-        std::string filename = &quot;wads/&quot; + oldPalette + &quot;.act&quot;;
+-	std::auto_ptr&lt;filesystem::ReadFile&gt; file(
+-                filesystem::openRead(filename));
+-
+-	for (int i = 0; i &lt; 256; i++) {
+-	    file-&gt;read(&amp;sourceColor[i], 3, 1);
+-	}
+-
+-	for (int i = 0; i &lt; 256; i++) {
+-	    bestFitArray[i] = Palette::findNearestColor(sourceColor[i].r,sourceColor[i].g,sourceColor[i].b);
+-	}
+-
+-	for (size_t x = 0; x &lt; (size_t) (getWidth() * getHeight() * getNumFrames()); x++) {
+-	    frame0[x] = bestFitArray[frame0[x]];
+-	}
+-    } catch(std::exception&amp; e) {
+-	throw Exception(&quot;Error while reading palette '%s': %s&quot;,
+-		oldPalette.c_str(), e.what());
+-    }
+-} // end Surface::mapFromPalette
+-
+ // drawBoxCorners
+ //--------------------------------------------------------------------------
+ // Purpose: Draws lines in the corners of the surface of the specified length
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -214,8 +214,6 @@
+ 
+     void loadBMP(const char *fileName, bool needAlloc = true);
+ 
+-    void mapFromPalette(const std::string&amp; oldPalette);
+-
+     void drawBoxCorners(const iRect &amp;rect, int cornerLength, PIX color);
+     void drawBoxCorners(const iXY &amp;min, const iXY &amp;max,
+             int cornerLength, PIX color)
+
+Modified: trunk/netpanzer/src/Lib/Util/StringUtil.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/StringUtil.cpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/Lib/Util/StringUtil.cpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -44,7 +44,7 @@
+ {
+     parameters.clear();
+ 
+-    static char* limiters[] = { &quot;, \t&quot;, &quot;\&quot;&quot; };
++    static const char* limiters[] = { &quot;, \t&quot;, &quot;\&quot;&quot; };
+ 
+     NPString::size_type start = 0;
+     NPString::size_type end = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -1015,13 +1015,6 @@
+ 
+ } // end drawHighlightedButton
+ 
+-void View::addButtonPackedSurface(const iXY &amp;pos, PackedSurface &amp;source, const char *toolTip, ITEM_FUNC leftClickFunc)
+-{
+-    cButton* button = new cButton;
+-    button-&gt;createPacked(pos, source, toolTip, leftClickFunc);
+-    buttons.push_back(button);
+-}
+-
+ // addButtonCenterText
+ //---------------------------------------------------------------------------
+ // Purpose: Adds a centered type button to the list of buttons.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -148,8 +148,6 @@
+     // Scroll bar functions.
+ 
+     // cButton Functions.
+-    void addButtonPackedSurface(const iXY &amp;pos, PackedSurface &amp;source, const char *toolTip, ITEM_FUNC leftClickFunc);
+-    void addButtonSurface(const iXY &amp;pos, std::string cname, const char *toolTip, ITEM_FUNC leftClickFunc);
+     void addButtonCenterText(const iXY &amp;pos, const int &amp;xSize, const char *nName, const char *nToolTip, ITEM_FUNC nLeftClickFunc);
+     /*!FIXME!*/ void drawDefinedButtons   (Surface &amp;clientArea);
+     void drawHighlightedButton(Surface &amp;clientArea);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -110,7 +110,6 @@
+ 
+     ResourceManager::loadAllFlags(game_flags, flag_names);
+     menu_flags.copy(game_flags);
+-    menu_flags.mapFromPalette(&quot;netp&quot;);
+ 
+     unsigned int max_flags = menu_flags.getNumFrames();
+     for (unsigned int i = 0; i &lt; max_flags; ++i)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -241,10 +241,6 @@
+ 	}	
+     }
+ 
+-    for (size_t i = 0; i &lt; mapList.size(); i++) {
+-        mapList[i]-&gt;thumbnail.mapFromPalette(&quot;netp&quot;);
+-    }
+-
+     if (mapList.size() == 0) {
+         throw Exception(&quot;ERROR: No maps in map directory&quot;);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.cpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -24,30 +24,6 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+-// addSpecialButton
+-//---------------------------------------------------------------------------
+-void SpecialButtonView::addSpecialButton(const iXY &amp;pos, const char *,
+-        const char *fileString, ITEM_FUNC function)
+-{
+-    char strBuf[256];
+-
+-    std::string prefix;
+-
+-    // Check to see which type of button to load since we have multiple palettes.
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
+-        prefix = &quot;inGame&quot;;
+-    } else {
+-        prefix = &quot;inMenus&quot;;
+-    }
+-
+-    sprintf(strBuf, &quot;pics/backgrounds/menus/buttons/default/pak/%s%s.pak&quot;,
+-            prefix.c_str(), fileString);
+-
+-    PackedSurface tempPack;
+-    tempPack.load(strBuf);
+-    addButtonPackedSurface(pos, tempPack, &quot;&quot;, function);
+-} // end SpecialButtonView::addSpecialButton
+-
+ // mouseMove
+ //--------------------------------------------------------------------------
+ void SpecialButtonView::mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.hpp	2011-10-25 14:38:51 UTC (rev 1268)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/SpecialButtonView.hpp	2011-10-25 15:05:59 UTC (rev 1269)
+@@ -23,13 +23,6 @@
+ //--------------------------------------------------------------------------
+ class SpecialButtonView : public RMouseHackView
+ {
+-protected:
+-    void addSpecialButton(const iXY &amp;pos, const char *labelString, ITEM_FUNC function)
+-    {
+-        addSpecialButton(pos, labelString, labelString, function);
+-    }
+-    void addSpecialButton(const iXY &amp;pos, const char *labelString, const char *fileString, ITEM_FUNC function);
+-
+ public:
+     SpecialButtonView() : RMouseHackView()
+     {}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000294.html">[Netpanzer-cvs] r1268 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Interfaces	src/NetPanzer/Views src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000296.html">[Netpanzer-cvs] r1270 - in trunk/netpanzer/src/NetPanzer/Views:	Components MainMenu/Multi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#295">[ date ]</a>
+              <a href="thread.html#295">[ thread ]</a>
+              <a href="subject.html#295">[ subject ]</a>
+              <a href="author.html#295">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

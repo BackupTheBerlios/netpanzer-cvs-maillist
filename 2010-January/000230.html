@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1204 - in trunk/netpanzer/src/NetPanzer:	Interfaces System Views/Components
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1204%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20System%20Views/Components&In-Reply-To=%3C201001301536.o0UFa96b020668%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000229.html">
+   <LINK REL="Next"  HREF="000231.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1204 - in trunk/netpanzer/src/NetPanzer:	Interfaces System Views/Components</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1204%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20System%20Views/Components&In-Reply-To=%3C201001301536.o0UFa96b020668%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1204 - in trunk/netpanzer/src/NetPanzer:	Interfaces System Views/Components">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Jan 30 16:36:09 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000229.html">[Netpanzer-cvs] r1203 - in trunk/netpanzer: . pics/default	src/Lib/2D src/Lib/Network src/Lib/Util src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Resources	src/NetPanzer/System src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000231.html">[Netpanzer-cvs] r1205 - trunk/netpanzer/src/NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#230">[ date ]</a>
+              <a href="thread.html#230">[ thread ]</a>
+              <a href="subject.html#230">[ subject ]</a>
+              <a href="author.html#230">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-30 16:35:59 +0100 (Sat, 30 Jan 2010)
+New Revision: 1204
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+Log:
+- Use different colors in the info bar
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-30 14:46:47 UTC (rev 1203)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-30 15:35:59 UTC (rev 1204)
+@@ -222,7 +222,7 @@
+     {
+         switch(gametype) {
+         case _gametype_objective :
+-            return( &quot;Objective&quot; );
++            return( &quot;Objective &quot; );
+         case _gametype_fraglimit :
+             return( &quot;Frag Limit&quot; );
+         case _gametype_timelimit :
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-30 14:46:47 UTC (rev 1203)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-30 15:35:59 UTC (rev 1204)
+@@ -25,6 +25,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
++#include &quot;Util/NTimer.hpp&quot;
+ #include &quot;SDLVideo.hpp&quot;
+ #include &lt;stdlib.h&gt;
+ 
+@@ -202,7 +203,13 @@
+ void SDLVideo::doScreenshoot()
+ {
+     // this is called blind faith
++    static NTimer timer(1000);
+ 
++    if ( ! timer.isTimeOut() )
++    {
++        return;
++    }
++
+     filesystem::mkdir(&quot;screenshoots&quot;);
+ 
+     char buf[256];
+@@ -213,5 +220,6 @@
+     std::string bmpfile = filesystem::getRealWriteName(buf);
+     SDL_SaveBMP(backBuffer, bmpfile.c_str());
+     ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;Screenshoot saved as: %s&quot;, buf);
++    timer.reset();
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2010-01-30 14:46:47 UTC (rev 1203)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2010-01-30 15:35:59 UTC (rev 1204)
+@@ -26,6 +26,21 @@
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ 
++
++static const PIX titles_color = 206; // #6d78c1 more or less &quot;slate blue&quot;
++static const char* titles =
++        &quot;game              units           frags             objs.           time               FPS&quot;;
++
++static const PIX format_color = 249; // #d9d9ff
++static const char* format =
++        &quot;     %s         %3d/%-3d         %4d/%-4d         %3d/%-3d        %02d:%02d/%02d:%02d       %.2f&quot;;
++
++static const PIX bars_color = 185; // #6f906d
++static const char* bars =
++        &quot;                |               |                 |               |                  |&quot;;
++
++
++
+ void
+ InfoBar::draw(Surface &amp;dest)
+ {
+@@ -35,8 +50,8 @@
+     char buf[512];
+     
+     snprintf(buf, sizeof(buf),
+-
+-             &quot;game %s | units %3d/%-3d | frags %4d/%-4d | objs. %3d/%-3d | time %02d:%02d/%02d:%02d | FPS %.2f&quot;,
++             format,
++//             &quot;game %s | units %3d/%-3d | frags %4d/%-4d | objs. %3d/%-3d | time %02d:%02d/%02d:%02d | FPS %.2f&quot;,
+              gameconfig-&gt;getGameTypeString(),
+              
+              int(UnitInterface::getUnitCount(PlayerInterface::getLocalPlayerIndex())),
+@@ -55,7 +70,12 @@
+              
+              TimerInterface::getFPSAvg()
+              );
++    int posx = position.x + 2;
++    int posy = position.y + 2;
++    dest.bltStringShadowed(posx, posy, titles, titles_color, Color::black);
++    dest.bltStringShadowed(posx, posy, bars, bars_color, Color::black);
++    dest.bltStringShadowed(posx, posy, buf, format_color, Color::black);
+     
+-    dest.bltStringShadowed(position.x+2,position.y+2,buf,Color::white, Color::black);
++//    dest.bltStringShadowed(position.x+2,position.y+2,buf,Color::white, Color::black);
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000229.html">[Netpanzer-cvs] r1203 - in trunk/netpanzer: . pics/default	src/Lib/2D src/Lib/Network src/Lib/Util src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/PowerUps src/NetPanzer/Resources	src/NetPanzer/System src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000231.html">[Netpanzer-cvs] r1205 - trunk/netpanzer/src/NetPanzer/Views/MainMenu
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#230">[ date ]</a>
+              <a href="thread.html#230">[ thread ]</a>
+              <a href="subject.html#230">[ subject ]</a>
+              <a href="author.html#230">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

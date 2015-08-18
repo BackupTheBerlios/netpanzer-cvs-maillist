@@ -1,0 +1,1230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1119 - in trunk/netpanzer/src/NetPanzer: Particles	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1119%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Particles%0A%09Views/Components%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C200903301632.n2UGWP14013553%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000147.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1119 - in trunk/netpanzer/src/NetPanzer: Particles	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1119%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Particles%0A%09Views/Components%20Views/Game%20Views/MainMenu%20Views/MainMenu/Multi&In-Reply-To=%3C200903301632.n2UGWP14013553%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1119 - in trunk/netpanzer/src/NetPanzer: Particles	Views/Components Views/Game Views/MainMenu Views/MainMenu/Multi">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Mon Mar 30 18:32:25 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000147.html">[Netpanzer-cvs] r1118 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#148">[ date ]</a>
+              <a href="thread.html#148">[ thread ]</a>
+              <a href="subject.html#148">[ subject ]</a>
+              <a href="author.html#148">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-03-30 18:31:51 +0200 (Mon, 30 Mar 2009)
+New Revision: 1119
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp
+Log:
+- removed lots of code not used in Desktop and View
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -24,7 +24,6 @@
+ ParticleTweakView::ParticleTweakView() : View()
+ {
+     setTitle(&quot;ParticleTweakView&quot;);
+-    setAllowResize(false);
+     setAllowMove(true);
+     setDisplayStatusBar(true);
+     setVisible(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -28,11 +28,8 @@
+ using std::min;
+ using std::max;
+ 
+-float     Desktop::totalMouseDownTime   = 0.0;
+-float     Desktop::currentMouseDownTime = 0.0;
+ std::vector&lt;View*&gt; Desktop::views;
+ View     *Desktop::focus;
+-int       Desktop::mouseActions;
+ iXY       Desktop::lMouseDownPos;
+ iXY       Desktop::rMouseDownPos;
+ iXY       Desktop::prevMousePos;
+@@ -43,10 +40,6 @@
+ View     *Desktop::prevMouseView;
+ View     *Desktop::lMouseView;
+ View     *Desktop::rMouseView;
+-TimeStamp Desktop::lDoubleClickDeadline;
+-TimeStamp Desktop::rDoubleClickDeadline;
+-float     Desktop::doubleClickTime = 0.15f;
+-int       Desktop::mouseMoveStatus = 0;
+ 
+ 
+ /////////////////////////////////////////////////////////////////////////////
+@@ -60,12 +53,7 @@
+ Desktop::Desktop()
+ {
+     focus        = 0;
+-    mouseActions = 0;
+     prevButton   = 0;
+-
+-    // Set the double click deadlines to 1 minute ago, so we don't
+-    // double click on the first press
+-    lDoubleClickDeadline = rDoubleClickDeadline = now() - 60;
+ } // end Desktop constructor
+ 
+ // manage
+@@ -118,116 +106,23 @@
+             // where it got pressed.
+             lMouseDownPos = mousePos;
+ 
+-            // Is this a double click? **FIX THE DOUBLE CLICK SENSITIVITY**
++            lMouseView = mouseView;
+             if (lMouseView != 0)
+             {
+-                // XXX what is this? ;-) commented out to avoid warning
+-                //int shit = 123456789;
+-
+-            }
+-            else
+-            {
+-                // Not a double click.  See what window we're over
+-                lMouseView = mouseView;
+-                if (lMouseView != 0)
++                lMouseView-&gt;lMouseDown(lMouseView-&gt;getScreenToClientPos(mousePos));
++                if (focus != lMouseView)
+                 {
+-                    lMouseView-&gt;lMouseDown(lMouseView-&gt;getScreenToClientPos(mousePos));
+-                    if (focus != lMouseView)
+-                    {
+-                        activate(lMouseView);
+-                    }
+-                    // We are over a window.  Get the standard mouse actions for that
+-                    // window at this mouse position.
+-
+-                    // mouseActionOffset is relative to the current window
+-                    mouseActionOffset = mousePos - lMouseView-&gt;min;
+-                    mouseActions      = lMouseView-&gt;getMouseActions(mouseActionOffset);
+-                    if (mouseActions != 0)
+-                    {
+-                        // A standard mouse action is supposed to happen here.  Remember
+-                        // what that action is, and record the offset of the mouse from
+-                        // the window, so the distance we move the mouse is the distance
+-                        // the window gets resized, etc. exactly.
+-
+-                        if (lMouseView-&gt;status &amp; View::STATUS_ALLOW_RESIZE)
+-                        {
+-                            if (mouseActions &amp; View::MA_RESIZE_LEFT)
+-                            {
+-                                mouseActionOffset.x = mousePos.x - lMouseView-&gt;min.x;
+-                            }
+-                            else if (mouseActions &amp; View::MA_RESIZE_RIGHT)
+-                            {
+-                                mouseActionOffset.x = lMouseView-&gt;max.x - mousePos.x;
+-                            }
+-
+-                            if (mouseActions &amp; View::MA_RESIZE_TOP)
+-                            {
+-                                mouseActionOffset.y = mousePos.y - lMouseView-&gt;min.y;
+-                            }
+-                            else if (mouseActions &amp; View::MA_RESIZE_BOTTOM)
+-                            {
+-                                mouseActionOffset.y = lMouseView-&gt;max.y - mousePos.y;
+-                            }
+-                        }
+-
+-                        doMouseActions(mousePos);
+-
+-                    }
+-                    else
+-                    {
+-                        // No standard mouse actions.  Tell the window that the mouse
+-                        // just got pressed.
+-                    }
++                    activate(lMouseView);
+                 }
+             }
+         }
+         else
+         {
+-            // The mouse was down before and is still down.  Are we performing
+-            // and standard window actions?
+-
+-            if (lMouseView != 0 &amp;&amp; mouseActions != 0)
++            // The mouse was down before and is still down.
++            if (lMouseView != 0)
+             {
+-                //throw Exception(&quot;Double click!&quot;);
+-
+-                // Yes - it's a double click.  Inform the window as such.
+-                //lMouseView-&gt;lMouseDouble(lMouseView-&gt;getScreenToClientPos(mousePos));
+-
+-                // We're doing some standard mouse actions.  Do them.
+-                doMouseActions(mousePos);
++                lMouseView-&gt;lMouseDrag(lMouseView-&gt;getScreenToClientPos(lMouseDownPos), lMouseView-&gt;getScreenToClientPos(prevMousePos), lMouseView-&gt;getScreenToClientPos(mousePos));
+             }
+-            else
+-            {
+-                //currentMouseDownTime += TimerInterface::getTimeSlice();
+-                //totalMouseDownTime   += TimerInterface::getTimeSlice();
+-                //
+-                //if (totalMouseDownTime &gt; 2.0f &amp;&amp; totalMouseDownTime &lt; 0.5f)
+-                //{
+-                //	if (currentMouseDownTime &gt; 0.4f)
+-                //	{
+-                //		currentMouseDownTime = 0.0f;
+-                //		lMouseView-&gt;lMouseUp(lMouseView-&gt;getScreenToClientPos(lMouseDownPos), lMouseView-&gt;getScreenToClientPos(mousePos));
+-                //		lMouseView-&gt;lMouseDown(lMouseView-&gt;getScreenToClientPos(mousePos));
+-                //	}
+-                //}
+-                //else if (totalMouseDownTime &gt;= 5.0f)
+-                //{
+-                //	if (currentMouseDownTime &gt; 0.1f)
+-                //	{
+-                //		currentMouseDownTime = 0.0f;
+-                //		lMouseView-&gt;lMouseUp(lMouseView-&gt;getScreenToClientPos(lMouseDownPos), lMouseView-&gt;getScreenToClientPos(mousePos));
+-                //		lMouseView-&gt;lMouseDown(lMouseView-&gt;getScreenToClientPos(mousePos));
+-                //	}
+-                //}
+-
+-                // No standard mouse actions.  Tell the window where the mouse
+-                // was originally clicked that the mouse is being dragged over
+-                // it.
+-                if (lMouseView != 0)
+-                {
+-                    lMouseView-&gt;lMouseDrag(lMouseView-&gt;getScreenToClientPos(lMouseDownPos), lMouseView-&gt;getScreenToClientPos(prevMousePos), lMouseView-&gt;getScreenToClientPos(mousePos));
+-                }
+-            }
+         }
+     }
+     else
+@@ -242,13 +137,9 @@
+             {
+                 lMouseView-&gt;lMouseUp(lMouseView-&gt;getScreenToClientPos(lMouseDownPos), lMouseView-&gt;getScreenToClientPos(mousePos));
+             }
+-            // Set double click deadline
+-            lDoubleClickDeadline = now() + doubleClickTime;
+         }
+ 
+-        //LOG((&quot;Button released - clearing lMouseView and mouseActions&quot;));
+         lMouseView = 0;
+-        mouseActions = 0;
+     }
+ 
+     //////////////////////////////////////////////////////////////////////////
+@@ -267,33 +158,16 @@
+             // where it got pressed.
+             rMouseDownPos = mousePos;
+ 
+-            // Is this a double click? **FIX THE DOUBLE CLICK SENSITIVITY**
+-            if (rMouseView != 0 &amp;&amp; now() &lt;= rDoubleClickDeadline &amp;&amp; 0)
++            rMouseView = mouseView;
++            if (rMouseView != 0)
+             {
+-                //throw Exception(&quot;Double click!&quot;);
+-
+-                // Yes - it's a double click.  Inform the window as such.
+-                rMouseView-&gt;rMouseDouble(rMouseView-&gt;getScreenToClientPos(mousePos));
++                rMouseView-&gt;rMouseDown(rMouseView-&gt;getScreenToClientPos(mousePos));
+             }
+-            else
+-            {
+-                // Not a double click.  See what window we're over.
+-                rMouseView = mouseView;
+-                if (rMouseView != 0)
+-                {
+-                    // No standard mouse actions.  Tell the window that the mouse
+-                    // just got pressed.
+-                    rMouseView-&gt;rMouseDown(rMouseView-&gt;getScreenToClientPos(mousePos));
+-                }
+-            }
+         }
+         else
+         {
+             // The mouse was down before and is still down.
+ 
+-            // No standard mouse actions.  Tell the window where the mouse
+-            // was originally clicked that the mouse is being dragged over
+-            // it.
+             if (rMouseView != 0)
+             {
+                 rMouseView-&gt;rMouseDrag(rMouseView-&gt;getScreenToClientPos(rMouseDownPos), rMouseView-&gt;getScreenToClientPos(prevMousePos), rMouseView-&gt;getScreenToClientPos(mousePos));
+@@ -312,9 +186,6 @@
+             {
+                 rMouseView-&gt;rMouseUp(rMouseView-&gt;getScreenToClientPos(rMouseDownPos), rMouseView-&gt;getScreenToClientPos(mousePos));
+             }
+-
+-            // Set double click deadline
+-            rDoubleClickDeadline = now() + doubleClickTime;
+         }
+         rMouseView = 0;
+     }
+@@ -528,63 +399,6 @@
+ 
+ }
+ 
+-// doMouseActions
+-//--------------------------------------------------------------------------
+-// Purpose:
+-//--------------------------------------------------------------------------
+-void Desktop::doMouseActions(const iXY &amp;mousePos)
+-{
+-    if (lMouseView == 0) return;
+-
+-    if (mouseActions &amp; View::MA_MOVE)
+-    {
+-        // Move the window
+-        // XXX need to check for screen size
+-        //lMouseView-&gt;moveTo(mousePos - mouseActionOffset);
+-    }
+-    else if (mouseActions &amp; View::MA_SCROLL_BAR)
+-    {
+-        lMouseView-&gt;scrollBarMove(lMouseView-&gt;getScreenToClientPos(prevMousePos), lMouseView-&gt;getScreenToClientPos(mousePos));
+-    }
+-    else if (lMouseView-&gt;getResize())
+-    {
+-        // Resize the window and move it if necessary
+-        iXY resizeMin(lMouseView-&gt;min);
+-        iXY resizeMax(lMouseView-&gt;max);
+-
+-        if (mouseActions &amp; View::MA_RESIZE_LEFT)
+-        {
+-            resizeMin.x = min(	mousePos.x - mouseActionOffset.x,
+-                               lMouseView-&gt;max.x - View::RESIZE_XMINSIZE);
+-        }
+-        
+-        if (mouseActions &amp; View::MA_RESIZE_TOP)
+-        {
+-            resizeMin.y = min(	mousePos.y + mouseActionOffset.y,
+-                               lMouseView-&gt;max.y - View::RESIZE_XMINSIZE);
+-        }
+-        
+-        if (mouseActions &amp; View::MA_RESIZE_RIGHT)
+-        {
+-            resizeMax.x = max(	mousePos.x + mouseActionOffset.x,
+-                               lMouseView-&gt;min.x + View::RESIZE_XMINSIZE);
+-        }
+-        
+-        if (mouseActions &amp; View::MA_RESIZE_BOTTOM)
+-        {
+-            resizeMax.y = max(	mousePos.y + mouseActionOffset.y,
+-                               lMouseView-&gt;min.y + View::RESIZE_YMINSIZE);
+-        }
+-
+-        // XXX
+-        /*
+-        lMouseView-&gt;moveTo(resizeMin);
+-        lMouseView-&gt;resize(resizeMax - resizeMin);
+-        */
+-    }
+-
+-} // end Desktop::doMouseActions
+-
+ // getViewCount
+ //--------------------------------------------------------------------------
+ // Purpose: Returns the number of windows in the window manager.
+@@ -678,7 +492,6 @@
+     setTitle(&quot;View Status&quot;);
+     setSubTitle(&quot; - F3&quot;);
+ 
+-    setAllowResize(false);
+     setDisplayStatusBar(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -29,18 +29,9 @@
+ 
+ class Desktop
+ {
+-private: // Variables
+-    enum { RESIZE_NONE,
+-           RESIZE_TOPLEFT,
+-           RESIZE_TOPRIGHT,
+-           RESIZE_BOTTOMLEFT,
+-           RESIZE_BOTTOMRIGHT };
+-
+-    static float      totalMouseDownTime;
+-    static float      currentMouseDownTime;
++private:
+     static std::vector&lt;View*&gt; views;
+     static View      *focus;
+-    static int        mouseActions;
+     static iXY        lMouseDownPos;
+     static iXY        rMouseDownPos;
+     static iXY        prevMousePos;
+@@ -50,29 +41,11 @@
+     static View      *rMouseView;
+     static View      *mouseView;
+     static View      *prevMouseView;
+-    static TimeStamp  lDoubleClickDeadline;
+-    static TimeStamp  rDoubleClickDeadline;
+-    static float      doubleClickTime;
+-    static int        mouseMoveStatus;
+ 
+-    // Movement events. MOVE THIS OUT OF THIS CLASS!  INTO GAME_WIN.
+-    enum { MM_LEFT  = (1U &lt;&lt; 0) };
+-    enum { MM_RIGHT = (1U &lt;&lt; 1) };
+-    enum { MM_UP    = (1U &lt;&lt; 2) };
+-    enum { MM_DOWN  = (1U &lt;&lt; 3) };
++    static iXY mouseActionOffset;
+ 
+-    // The following are used when the window is moved using move()
+-    static iXY mouseActionOffset; // The displacement from the mouse press to th window
+-
+-private: // Functions
+-    static void isMouseInBox(int mouseX, int mouseY, int x1, int y1, int x2, int y2);
+-
+-    static unsigned isMouseOverResizeArea(int mouseX, int mouseY);
+-    static bool     isMouseOverMoveArea  (int mouseX, int mouseY);
+-
+-    static bool   isMouseInView(int mouseX, int mouseY);
++private:
+     static View *findViewContaining(iXY p);
+-    static void   doMouseActions(const iXY &amp;mousePos);
+ 
+ public:
+     Desktop();
+@@ -87,15 +60,11 @@
+     static void remove(View *view);
+     static void draw();
+ 
+-    static iXY      getMouseActionOffset  ()
+-    {
+-        return mouseActionOffset;
+-    }
+     static void     resetMouseActionOffset()
+     {
+         mouseActionOffset.zero();
+     }
+-
++    
+     static int         getViewCount();
+     static const char *getViewTitle(int viewNum);
+     static const char *getViewSearchName(int viewNum);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -101,22 +101,17 @@
+     setTitle(&quot;donut&quot;);
+     setSubTitle(&quot;donut&quot;);
+ 
+-    //scrollBar             = 0;
+-
+     removeComponents();
+ 
+     moveAreaHeight  = DEFAULT_MOVE_AREA_HEIGHT;
+     borderSize      = DEFAULT_BORDER_SIZE;
+     snapToTolerance = DEFAULT_SNAP_TOLERANCE;
+ 
+-    setAllowResize(true);
+     setAllowMove(true);
+     setBordered(true);
+     setVisible(false);
+     setDisplayStatusBar(false);
+     setAlwaysOnBottom(false);
+-
+-    //setScrollBar(false);
+ } // end reset
+ 
+ // drawBorder
+@@ -149,180 +144,6 @@
+ 
+     screen-&gt;bltStringCenteredInRect(r, strBuf, getActive() ? activeWindowTitleTextColor : inactiveWindowTitleTextColor);
+ 
+-    if (getResize()) {
+-        {
+-            // Bottom-Left resize.
+-            iXY verticalPos(min.x + borderSize, min.y + getSizeY() - borderSize - moveAreaHeight + 1);
+-            iXY horizontalPos(min.x + borderSize + moveAreaHeight - 1, min.y + getSizeY() - borderSize);
+-
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::white);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray224);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray192);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x--;
+-        }
+-
+-        // Top-Left resize.
+-        {
+-            iXY verticalPos(min.x + borderSize, min.y + borderSize + moveAreaHeight - 1);
+-            iXY horizontalPos(min.x + borderSize + moveAreaHeight - 1, min.y + borderSize);
+-
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::white);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray224);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray192);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x--;
+-        }
+-
+-        // Top-Right resize.
+-        {
+-            iXY verticalPos(min.x + getSizeX() - borderSize, min.y + borderSize + moveAreaHeight - 1);
+-            iXY horizontalPos(min.x + getSizeX() - borderSize - moveAreaHeight, min.y + borderSize - 1);
+-
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::white);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray224);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray192);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y--;
+-            horizontalPos.x++;
+-        }
+-
+-        // Bottom-Right resize.
+-        {
+-            iXY verticalPos(min.x + getSizeX() - borderSize, min.y + getSizeY() - borderSize - moveAreaHeight + 1);
+-            iXY horizontalPos(min.x + getSizeX() - borderSize - moveAreaHeight + 1, min.y + getSizeY() - borderSize);
+-
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::white);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray224);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray192);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-            screen-&gt;drawLine(verticalPos, horizontalPos, Color::gray160);
+-            verticalPos.y++;
+-            horizontalPos.x++;
+-        }
+-    }
+-
+ } // end View::drawTitle
+ 
+ // draw
+@@ -366,8 +187,6 @@
+ 
+     doDeactivate();
+ 
+-    highlightedButton     = -1;
+-    prevHighlightedButton = -1;
+     selectedInputField    = -1;
+ 
+ } // end View::deactivate
+@@ -386,18 +205,22 @@
+ 
+     // Draw all non-selected components.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++) {
+-        if (*i != focusComponent) {
++    for ( i=components.begin(); i != components.end(); ++i)
++    {
++        if (*i != focusComponent)
++        {
+             (*i)-&gt;draw(clientRect.min.x, clientRect.min.y, *screen);
+         }
+     }
+ 
+     // Now draw the selected component.
+-    if (focusComponent != 0) {
++    if (focusComponent != 0)
++    {
+         focusComponent-&gt;draw(clientRect.min.x, clientRect.min.y, *screen);
+     }
+ 
+-    if (getBordered()) {
++    if (getBordered())
++    {
+         drawTitle();
+         drawBorder();
+     }
+@@ -411,9 +234,10 @@
+ {
+     // Tell all the components the mouse entered the view.
+     ComponentsIterator i;
+-    for ( i=components.begin(); i != components.end(); i++)
++    for ( i=components.begin(); i != components.end(); ++i)
+     {
+-        if ((*i)-&gt;contains(MouseInterface::getMousePosition())) {
++        if ((*i)-&gt;contains(MouseInterface::getMousePosition()))
++        {
+             mMouseEvent me((*i),
+                 mMouseEvent::MOUSE_EVENT_ENTERED, now(), 0, 
+                 MouseInterface::getMouseX(), MouseInterface::getMouseY(), 0, false);
+@@ -444,73 +268,6 @@
+     }
+ } // end View::doDeactivate
+ 
+-
+-// getMouseActions
+-//---------------------------------------------------------------------------
+-// Purpose: Find the actions associated with the position of the mouse arrow
+-//          cursor in the window.
+-//---------------------------------------------------------------------------
+-int View::getMouseActions(const iXY &amp;pos) const
+-{
+-    assert(this != 0);
+-
+-    int actions = 0;
+-
+-    if (!getVisible() || !getActive()) {
+-        return actions;
+-    }
+-
+-    if (!getBordered()) {
+-        return actions;
+-    }
+-
+-    if (getResize()) {
+-        // Now lets check for a window resize
+-        iXY minOff;
+-        iXY maxOff;
+-
+-        minOff.x = abs(pos.x); maxOff.x = abs(pos.x - getSizeX());
+-        minOff.y = abs(pos.y); maxOff.y = abs(pos.y - getSizeY());
+-
+-        // Check the left,  then the right
+-        if      (minOff.x &lt; RESIZE_XMIN) actions |= MA_RESIZE_LEFT;
+-        else if (maxOff.x &lt; RESIZE_XMIN) actions |= MA_RESIZE_RIGHT;
+-
+-        // Check the top, then the bottom
+-        if      (minOff.y &lt; RESIZE_YMIN) actions |= MA_RESIZE_TOP;
+-        else if (maxOff.y &lt; RESIZE_YMIN) actions |= MA_RESIZE_BOTTOM;
+-
+-        // If a left or right was turned on, then give more area for selecting the
+-        // resize area
+-        if (actions &amp; (MA_RESIZE_LEFT | MA_RESIZE_RIGHT)) {
+-            if      (minOff.y &lt; RESIZE_YMAX) actions |= MA_RESIZE_TOP;
+-            else if (maxOff.y &lt; RESIZE_YMAX) actions |= MA_RESIZE_BOTTOM;
+-        }
+-
+-        if (actions &amp; (MA_RESIZE_TOP | MA_RESIZE_BOTTOM)) {
+-            if      (minOff.x &lt; RESIZE_XMAX) actions |= MA_RESIZE_LEFT;
+-            else if (maxOff.x &lt; RESIZE_XMAX) actions |= MA_RESIZE_RIGHT;
+-        }
+-    }
+-
+-    // Check for moving the window via the move area.
+-    if (getAllowMove()) {
+-        //iRect titleBar(borderSize, borderSize, getSizeX()-borderSize, borderSize + moveAreaHeight);
+-        iRect titleBar(borderSize, borderSize, getSizeX() - borderSize, borderSize + moveAreaHeight);
+-        if (titleBar.contains(pos)) return actions |= MA_MOVE;
+-    }
+-
+-    // Check for moving the window via the status bar.
+-    //if (getAllowMove())
+-    //{
+-    //	//iRect titleBar(borderSize, borderSize, getSizeX()-borderSize, borderSize + moveAreaHeight);
+-    //	iRect titleBar(borderSize, getSizeY() - borderSize - DEFAULT_STATUS_BAR_HEIGHT, getSizeX() - borderSize, getSizeY() - borderSize);
+-    //	if (titleBar.contains(pos)) return actions |= MA_MOVE;
+-    //}
+-
+-    return actions;
+-} // end getMouseActions
+-
+ // getScreenToClientPos
+ //---------------------------------------------------------------------------
+ // Purpose: Finds the position of the mouse in the client area of a window.
+@@ -841,20 +598,6 @@
+ 
+ } // end View::mouseExit
+ 
+-// scrollBarMove
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-void View::scrollBarMove(const iXY &amp;prevPos, const iXY &amp;newPos)
+-{
+-    (void) prevPos;
+-    (void) newPos;
+-    //if (scrollBar != 0)
+-    //{
+-    //	scrollBar-&gt;actionPerformed(newPos);
+-    //}
+-} // end scrollBarMove
+-
+ // drawInputFields
+ //---------------------------------------------------------------------------
+ // Purpose:
+@@ -1060,16 +803,6 @@
+     Desktop::toggleVisibility(searchName);
+ } // end toggleView
+ 
+-// setAllowResize
+-//---------------------------------------------------------------------------
+-// Purpose: Allows this view to be resized or not.
+-//---------------------------------------------------------------------------
+-void View::setAllowResize(const bool &amp;newStatus)
+-{
+-    if (newStatus == true) status |=  STATUS_ALLOW_RESIZE;
+-    else                   status &amp;= ~STATUS_ALLOW_RESIZE;
+-} // end setAllowResize
+-
+ // setDisplayStatusBar
+ //---------------------------------------------------------------------------
+ // Purpose: Displays a status bar in the view or not.
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -55,23 +55,6 @@
+         MAX_WINDOW_CLIENT_YSIZE = 458
+     };
+ 
+-    int getPressedButton()
+-    {
+-        return pressedButton;
+-    }
+-    int getPrevPressedButton()
+-    {
+-        return prevPressedButton;
+-    }
+-    int getHighlightedButton()
+-    {
+-        return highlightedButton;
+-    }
+-    int getPrevHighlightedButton()
+-    {
+-        return prevHighlightedButton;
+-    }
+-
+     // Hack city, should be protected???????
+     void setAlwaysOnBottom(const bool &amp;newStatus);
+     void setVisible(const bool &amp;newStatus);
+@@ -140,17 +123,7 @@
+     {
+         return status &amp; STATUS_DISPLAY_STATUS_BAR;
+     }
+-    inline int getResize() const
+-    {
+-        return status &amp; STATUS_ALLOW_RESIZE;
+-    }
+-    inline int getScrollBar() const
+-    {
+-        return status &amp; STATUS_SCROLL_BAR;
+-    }
+ 
+-    virtual int getMouseActions(const iXY &amp;p) const;
+-
+     iRect getClientRect() const;
+ 
+     void drawString(int x, int y, const char * str, const PIX&amp; color);
+@@ -172,11 +145,6 @@
+     virtual void     actionPerformed(mMouseEvent )
+     {}
+ 
+-    int              pressedButton;
+-    int              prevPressedButton;
+-    int              highlightedButton;
+-    int              prevHighlightedButton;
+-
+     int              selectedInputField;
+     char            *searchName;
+     char            *title;
+@@ -185,50 +153,24 @@
+ 
+     char            *statusText;
+ 
+-    enum { RESIZE_XMINSIZE = 15 };
+-    enum { RESIZE_YMINSIZE = 15 };
+-
+     // Status items
+     enum { STATUS_ACTIVE             = (1U &lt;&lt; 0) };
+     enum { STATUS_VISIBLE            = (1U &lt;&lt; 1) };
+-    enum { STATUS_ALLOW_RESIZE       = (1U &lt;&lt; 2) };
+-    enum { STATUS_ALLOW_MOVE         = (1U &lt;&lt; 3) };
+-    enum { STATUS_ALWAYS_ON_BOTTOM   = (1U &lt;&lt; 4) };
+-    enum { STATUS_BORDERED           = (1U &lt;&lt; 5) };
+-    enum { STATUS_DISPLAY_STATUS_BAR = (1U &lt;&lt; 6) };
+-    enum { STATUS_SCROLL_BAR         = (1U &lt;&lt; 7) };
++    enum { STATUS_ALLOW_MOVE         = (1U &lt;&lt; 2) };
++    enum { STATUS_ALWAYS_ON_BOTTOM   = (1U &lt;&lt; 3) };
++    enum { STATUS_BORDERED           = (1U &lt;&lt; 4) };
++    enum { STATUS_DISPLAY_STATUS_BAR = (1U &lt;&lt; 5) };
+ 
+-    // Mouse actions
+-    enum { MA_RESIZE_TOP    = (1U &lt;&lt;  0) };
+-    enum { MA_RESIZE_LEFT   = (1U &lt;&lt;  1) };
+-    enum { MA_RESIZE_BOTTOM = (1U &lt;&lt;  2) };
+-    enum { MA_RESIZE_RIGHT  = (1U &lt;&lt;  3) };
+-    enum { MA_MOVE          = (1U &lt;&lt;  4) };
+-    enum { MA_CLOSE         = (1U &lt;&lt;  5) };
+-    enum { MA_MINIMIZE      = (1U &lt;&lt;  6) };
+-    enum { MA_MAXIMIZE      = (1U &lt;&lt;  7) };
+-    enum { MA_RESTORE       = (1U &lt;&lt;  8) };
+-    enum { MA_IMAGE_TILES   = (1U &lt;&lt;  9) };
+-    enum { MA_SCROLL_BAR    = (1U &lt;&lt; 10) };
+-    enum { MA_MOUSE_ENTER   = (1U &lt;&lt; 11) };
+-    enum { MA_MOUSE_EXIT    = (1U &lt;&lt; 12) };
+-
+     void        reset     ();
+     void        activate  ();
+     void        deactivate();
+ 
+-    typedef void (*ITEM_FUNC)(void);
+-
+     // View Status Functions.
+-    void setAllowResize     (const bool &amp;newStatus);
+     void setDisplayStatusBar(const bool &amp;newStatus);
+     void setBordered        (const bool &amp;newStatus);
+     void setAllowMove       (const bool &amp;newStatus);
+     void setActive          (const bool &amp;newStatus);
+-    //void setScrollBar       (const bool &amp;newStatus);
+ 
+-    // Scroll bar functions.
+-
+     // SearchName, Title, and SubTitle functions.
+     void  setSearchName(const char *searchName);
+     void  setTitle(const char *title);
+@@ -270,7 +212,6 @@
+     virtual void mouseEnter(const iXY &amp;pos);
+     virtual void mouseExit(const iXY &amp;pos);
+     //virtual void keyUp();
+-    void scrollBarMove(const iXY &amp;prevpos, const iXY &amp;newpos);
+ 
+     void resize(const iXY &amp;size);
+     inline void resize(const int &amp;x, const int &amp;y)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -45,7 +45,6 @@
+ void AreYouSureExitView::init()
+ {
+     setBordered(false);
+-    setAllowResize(false);
+     setDisplayStatusBar(false);
+ 
+     resize(screen-&gt;getWidth(), screen-&gt;getHeight());
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -53,7 +53,6 @@
+ void AreYouSureResignView::init()
+ {
+     setBordered(false);
+-    setAllowResize(false);
+     setDisplayStatusBar(false);
+ 
+     resize(screen-&gt;getWidth(), screen-&gt;getHeight());
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -55,7 +55,6 @@
+     setTitle(&quot;CodeStatsView&quot;);
+     setSubTitle(&quot; - F4&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(true);
+     setDisplayStatusBar(true);
+     setVisible(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -48,7 +48,6 @@
+ DisconectedView::init()
+ {
+     setBordered(true);
+-    setAllowResize(false);
+ 
+     resize(screen-&gt;getWidth(),screen-&gt;getHeight());
+     moveTo(0,0);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -55,7 +55,6 @@
+ 
+     setBordered(false);
+     setAlwaysOnBottom(true);
+-    setAllowResize(false);
+     setDisplayStatusBar(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -31,7 +31,6 @@
+     setTitle(&quot;Help Information&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+ 
+     moveTo(bodyTextRect.min);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -53,7 +53,6 @@
+     setTitle(&quot;Lib Stats&quot;);
+     setSubTitle(&quot; - F5&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(true);
+     setDisplayStatusBar(false);
+     setVisible(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -32,7 +32,6 @@
+     setTitle(&quot;Loading Progress&quot;);
+     setSubTitle(&quot;&quot;);
+     
+-    setAllowResize(false);
+     setAllowMove(false);
+     setDisplayStatusBar(false);
+     setVisible(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -29,7 +29,6 @@
+     setSearchName(&quot;MiniMapView&quot;);
+     setTitle(&quot;MiniMapView&quot;);
+     setSubTitle(&quot;&quot;);
+-    setAllowResize(false);
+     setDisplayStatusBar(false);
+     setVisible(false);
+     setAllowMove(true);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -40,7 +40,6 @@
+     setTitle(&quot;Rankings&quot;);
+     setSubTitle(&quot; - TAB&quot;);
+ 
+-    setAllowResize(false);
+     moveTo(gameconfig-&gt;rankposition);
+     resize(iXY(450, 200));
+     checkArea(iXY(screen-&gt;getWidth(),screen-&gt;getHeight()));
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -164,7 +164,6 @@
+     setTitle(&quot;Unit Production&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setVisible(false);
+     setBordered(true);
+     setDisplayStatusBar(true);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -61,7 +61,6 @@
+     setTitle(&quot;MenuTemplate&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setVisible(false);
+     setAllowMove(false);
+     setDisplayStatusBar(false);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -37,8 +37,6 @@
+     float curTitleFlashTime;  // Where am I at in the flash?
+     float titleFlashTimeHalf; // Time it takes for a half flash.
+ 
+-    typedef void (*ITEM_FUNC)(void);
+-
+     void onComponentClicked(Component *c);
+ public:
+     MenuTemplateView();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -46,7 +46,6 @@
+     setTitle(&quot;Flag Selection&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -210,7 +210,6 @@
+     setTitle(&quot;Host Options&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -31,7 +31,6 @@
+     setTitle(&quot;Server IP Address&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -47,7 +47,6 @@
+     setTitle(&quot;Map Selection&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -31,7 +31,6 @@
+     setTitle(&quot;Player Name&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -48,7 +48,6 @@
+     moveTo(bodyTextRect.min + iXY(0, 170));
+     resize(bodyTextRect.max - bodyTextRect.min - iXY(0,170));
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+     setVisible(false);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp	2009-03-30 14:54:04 UTC (rev 1118)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp	2009-03-30 16:31:51 UTC (rev 1119)
+@@ -28,7 +28,6 @@
+     setTitle(&quot;Selects Your Units&quot;);
+     setSubTitle(&quot;&quot;);
+ 
+-    setAllowResize(false);
+     setAllowMove(false);
+     setDisplayStatusBar(true);
+     setVisible(false);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000147.html">[Netpanzer-cvs] r1118 - in trunk/netpanzer:	pics/backgrounds/menus/menu src/Lib/2D	src/NetPanzer/Interfaces src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#148">[ date ]</a>
+              <a href="thread.html#148">[ thread ]</a>
+              <a href="subject.html#148">[ subject ]</a>
+              <a href="author.html#148">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

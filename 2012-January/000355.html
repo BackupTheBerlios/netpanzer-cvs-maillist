@@ -1,0 +1,2307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1329 - in trunk/netpanzer: . scripts	src/Lib/Network src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Scripts	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Multi/MasterServer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1329%20-%20in%20trunk/netpanzer%3A%20.%20scripts%0A%09src/Lib/Network%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Network%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C20120108174301.0ED514812DE%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000354.html">
+   <LINK REL="Next"  HREF="000356.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1329 - in trunk/netpanzer: . scripts	src/Lib/Network src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Scripts	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Multi/MasterServer</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1329%20-%20in%20trunk/netpanzer%3A%20.%20scripts%0A%09src/Lib/Network%20src/NetPanzer/Classes/Network%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Network%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/MainMenu/Multi/MasterServer&In-Reply-To=%3C20120108174301.0ED514812DE%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1329 - in trunk/netpanzer: . scripts	src/Lib/Network src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Network src/NetPanzer/Scripts	src/NetPanzer/Views/Components	src/NetPanzer/Views/MainMenu/Multi/MasterServer">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan  8 18:43:00 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000354.html">[Netpanzer-cvs] r1328 - trunk/netpanzer/scripts
+</A></li>
+        <LI>Next message: <A HREF="000356.html">[Netpanzer-cvs] r1330 - trunk/netpanzer/src/Lib/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#355">[ date ]</a>
+              <a href="thread.html#355">[ thread ]</a>
+              <a href="subject.html#355">[ subject ]</a>
+              <a href="author.html#355">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-01-08 18:43:00 +0100 (Sun, 08 Jan 2012)
+New Revision: 1329
+
+Added:
+   trunk/netpanzer/src/Lib/Network/NetworkManager.cpp
+   trunk/netpanzer/src/Lib/Network/NetworkManager.hpp
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/Lib/Network/Address.cpp
+   trunk/netpanzer/src/Lib/Network/Address.hpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+   trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+   trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+   trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+   trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+   trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+Log:
+- added new admin command: destroyunits &lt;player id&gt;
+- (internal) some DNS resolution is asynchronous now, when you click on &quot;refresh&quot; button now the game doesn't hang for a few moments. This is needed for other functions.
+- (internal) rewrote some parts of the networking code to use state machimes
+- use different configuration files for server and client
+- remove some old unused configuration variables from the .ini files.
+- modified the compilation parameters for windows (cross compilation), using high compiler optimizations would cause the server to crash when kicking someone.
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/SConstruct	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -98,7 +98,8 @@
+     crossmingwenv.Replace( AR = env['crossmingwcompilerprefix'] + crossmingwenv['AR'] )
+     crossmingwenv.Replace( RANLIB = env['crossmingwcompilerprefix'] + crossmingwenv['RANLIB'] )
+     crossmingwenv.Replace( RC = env['crossmingwcompilerprefix'] + crossmingwenv['RC'] )
+-    crossmingwenv.Append( CCFLAGS = [ '-Dsocklen_t=int' ] )
++    crossmingwenv.Append( CCFLAGS = [ '-D_WIN32_WINNT=0x0501' ] )
++#    crossmingwenv.Append( CCFLAGS = [ '-Dsocklen_t=int' ] )
+     crossmingwenv.Append( LDFLAGS = [ '-mwindows' ] )
+     crossmingwenv.Append( LIBS = [ 'ws2_32', 'mingw32' ] )
+     crossmingwenv['WINICON'] = crossmingwenv.RES( 'support/icon/npicon.rc' )
+@@ -143,7 +144,9 @@
+ else:
+     env.Append(CCFLAGS = ['-O2','-s'])
+     env['FINALEXENAME'] = 'netpanzer'
+-    crossmingwenv.Append(CCFLAGS = ['-O2','-s'])
++    crossmingwenv.Append(CCFLAGS = ['-O1', '-s'])
++# -O2 causes the dedicated server to crash on windows
++#    crossmingwenv.Append(CCFLAGS = ['-O2','-s'])
+     crossmingwenv['FINALEXENAME'] = crossmingwenv['FINALBUILDDIR'] + 'netpanzer'
+     crosslinuxenv.Append(CCFLAGS = ['-O2','-s'])
+     crosslinuxenv['FINALEXENAME'] = crosslinuxenv['FINALBUILDDIR'] + 'netpanzer'
+@@ -245,6 +248,7 @@
+ 
+ # for crossmingw platform
+ if 'crossmingw' in COMMAND_LINE_TARGETS:
++    crossmingwnetworkenv.ParseConfig(env['crossmingwsdlconfig'] + ' --cflags --libs')
+     crossmingwenv.ParseConfig(env['crossmingwsdlconfig'] + ' --cflags --libs')
+     crossmingwenv.Prepend( _LIBFLAGS = [ '-L/usr/local/lib', '/usr/local/lib/SDL_mixer.lib' ] )
+ #    crossmingwenv.Append( NPLIBS = [ '/usr/local/lib/SDL_mixer.lib' ] )
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/scripts/initialize.lua	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -1,8 +1,4 @@
+---LOGGER:log(&quot;Script initialization&quot;);
+ 
+---LOGGER:log(&quot;Video Config: &quot; .. config.video.width .. &quot; x &quot; .. config.video.height)
+---LOGGER:log(&quot;Fullscreen: &quot; .. tostring(config.video.fullscreen))
+-
+ function pairs(t)
+     local mt = getmetatable(t)
+     local iter = mt and mt.__next or next
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/scripts/servercommands.lua	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -27,7 +27,6 @@
+ base_modes[1] = &quot;Helipad capture&quot;;
+ base_modes[2] = &quot;Full base capture&quot;;
+ 
+-
+ ServerCommands =
+ {
+     say_help = &quot;Says something to all players as server.&quot;,
+@@ -254,5 +253,17 @@
+             netpanzer.syncflagtimer();
+             netpanzer.serversayto( player, &quot;flagtimer time was set to &quot; .. config.game.changeflagtime);
+         end
++    end,
++
++    destroyunits_help = &quot;destroy some player units&quot;,
++    destroyunits = function(param, player)
++        if ( param == &quot;&quot; ) then
++            netpanzer.serversayto( player, &quot;You need to specify the player number to destroy units&quot;);
++        else
++            netpanzer.destroyplayerunits(param);
++            netpanzer.serversayto( player, &quot;The units should be history&quot;);
++        end
+     end
++
++
+ };
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/Address.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -24,14 +24,20 @@
+ #include &quot;Address.hpp&quot;
+ #include &quot;NetworkException.hpp&quot;
+ 
++#include &quot;Util/Log.hpp&quot;
++
+ namespace network
+ {
+ 
+-Address Address::ANY;
++Address Address::ANY(false, true);
+ 
+-Address::Address()
++Address::Address(bool isTcp, bool forBinding)
+ {
+     memset(&amp;ss, 0, sizeof(ss));
++    status = ST_OK;
++    socktype = isTcp ? SOCK_STREAM : SOCK_DGRAM;
++    protocol = isTcp ? IPPROTO_TCP : IPPROTO_UDP;
++    this-&gt;forBinding = forBinding;
+     ss_len=sizeof(ss);
+     ss.ss_family = AF_INET;
+     //addr.sin_addr.s_addr = INADDR_ANY;
+@@ -40,16 +46,36 @@
+ Address::Address(const Address&amp; other)
+ {
+     memcpy(&amp;ss, &amp;other.ss, sizeof(ss));
+-    ss_len=other.ss_len;
++    ss_len = other.ss_len;
++    str_host = other.str_host;
++    str_port = other.str_port;
++    status = other.status;
++    socktype = other.socktype;
++    protocol = other.protocol;
++    forBinding = other.forBinding;
+ }
+ 
+ void
++Address::setParams(const std::string &amp;host, const std::string &amp;port)
++{
++    str_host = host;
++    str_port = port;
++    status = ST_UNRESOLVED;
++}
++
++void
+ Address::operator=(const Address&amp; other)
+ {
+     if(&amp;other == this) // ignore self assignment
+         return;
+     memcpy(&amp;ss, &amp;other.ss, sizeof(ss));
+     ss_len=other.ss_len;
++    str_host = other.str_host;
++    str_port = other.str_port;
++    status = other.status;
++    socktype = other.socktype;
++    protocol = other.protocol;
++    forBinding = other.forBinding;
+ }
+ 
+ bool
+@@ -74,16 +100,68 @@
+     return ntohs(((struct sockaddr_in &amp;)ss).sin_port);
+ }
+ 
++void
++Address::setPort(unsigned short port)
++{
++    ((struct sockaddr_in &amp;)ss).sin_port = htons(port);
++}
++
+ Address
+-Address::resolve(const std::string&amp; name, unsigned short port)
++Address::resolve(const std::string&amp; name, unsigned short port, bool isTcp, bool forBinding)
+     throw(NetworkException)
+ {
+-    // TODO: make a better resolver (ex: getaddrinfo)
++    LOGGER.debug(&quot;Address:: Resolving '%s':%u&quot;, name.c_str(), port);
++    Address result(isTcp, forBinding);
++
++    struct addrinfo hints;
++    struct addrinfo *firstaddress = 0;
++
++    memset(&amp;hints, 0, sizeof(hints));
++    hints.ai_family = AF_INET;
++
++    hints.ai_socktype = result.socktype;
++    hints.ai_protocol = result.protocol;
++    if ( result.forBinding )
++    {
++        hints.ai_flags = AI_PASSIVE;
++    }
++
++    std::stringstream po;
++    po &lt;&lt; port;
++
++    int res = getaddrinfo(name.size() &gt; 0 ? name.c_str() : 0, po.str().c_str(), &amp;hints, &amp;firstaddress);
++    if ( res )
++    {
++        std::stringstream msg;
++        msg &lt;&lt; &quot;Couldn't resolve address '&quot; &lt;&lt; name;
++        if (res == EAI_NONAME)
++        {
++             msg &lt;&lt; &quot;' Name not found&quot;;
++        }
++        else
++        {
++            msg &lt;&lt; &quot;' some other error&quot;;
++        }
++
++        if ( firstaddress ) freeaddrinfo(firstaddress);
++
++        throw NetworkException(msg.str());
++    }
++
++    result.ss_len = firstaddress-&gt;ai_addrlen;
++    memcpy(&amp;result.ss, firstaddress-&gt;ai_addr, firstaddress-&gt;ai_addrlen);
++
++    freeaddrinfo(firstaddress);
++
++    return result;
++
++#if 0
+     Address result;
+-    // XXX quick hack to get it working until get full ss support
+-    ((struct sockaddr_in &amp;)result.ss).sin_port = htons(port);
++
++    result.setPort(port);
+     
+-    if(name == &quot;&quot;) {
++    if(name == &quot;&quot;)
++    {
+         return result;
+     }
+ 
+@@ -99,10 +177,11 @@
+         throw NetworkException(msg.str());
+ 
+     }
+-    // XXX quick hack to get it working until get full ss support
++
+     ((struct sockaddr_in &amp;)result.ss).sin_addr.s_addr = ((struct in_addr*) hentry-&gt;h_addr)-&gt;s_addr;
+ 
+     return result;
++#endif
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/Address.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/Address.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/Address.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -28,22 +28,37 @@
+ class Address
+ {
+ public:
+-    Address();
++
++    enum A_STATUS
++    {
++        ST_ERROR,
++        ST_UNRESOLVED,
++        ST_WAITING,
++        ST_RESOLVING,
++        ST_OK
++    };
++
++    Address(bool isTcp = true, bool forBinding = true);
+     Address(const Address&amp; other);
+-    
+-    /** resolves a hostname or IP-Number together with a port and returns a
+-     * new Address object.
+-     */
+-    static Address resolve(const std::string&amp; name, unsigned short port) throw(NetworkException);
+ 
+-    /** returns the ip address of this Address as string */
++    void setParams(const std::string&amp; host, const std::string&amp; port);
++
++    static Address resolve(const std::string&amp; name, unsigned short port, bool isTcp = true, bool forBinding = false) throw(NetworkException);
++
+     std::string getIP() const;
++
+     /** returns the port of this address */
+     unsigned short getPort() const;
++    void setPort(unsigned short port);
+ 
+     void operator=(const Address&amp; other);
+     bool operator==(const Address&amp; other) const;
+ 
++    bool compareDest(const Address&amp; other) const
++    {
++        return str_host == other.str_host &amp;&amp; str_port == other.str_port;
++    }
++
+     struct sockaddr * getSockaddr() const { return (struct sockaddr *)&ss; };
+     socklen_t getSockaddrLen() const
+     {
+@@ -58,6 +73,16 @@
+     static Address ANY;
+ 
+ private:
++    friend class NetworkManager;
++    friend class SocketBase;
++    friend class SocketManager;
++
++    enum A_STATUS status;
++    std::string str_host;
++    std::string str_port;
++    int socktype;
++    int protocol;
++    bool forBinding;
+     socklen_t ss_len;
+     struct sockaddr_storage ss;
+ };
+
+Added: trunk/netpanzer/src/Lib/Network/NetworkManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/NetworkManager.cpp	                        (rev 0)
++++ trunk/netpanzer/src/Lib/Network/NetworkManager.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -0,0 +1,241 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;NetworkManager.hpp&quot;
++#include &quot;SocketHeaders.hpp&quot;
++#include &quot;SocketManager.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++#include &lt;list&gt;
++
++#include &lt;map&gt;
++#include &quot;SDL.h&quot;
++
++namespace network
++{
++
++static bool network_running = false;
++
++static SDL_Thread * resolverThread = 0;
++static SDL_sem * semaphore = 0;
++
++static Address thread_work;
++static int to_resolve = 0;
++
++static bool resolving = false;
++static std::list&lt;Address&gt; rqueue;
++
++static bool resolver_busy = false;
++int NetworkManager::resolver_worker(void *data)
++{
++    (void)data;
++    while ( network_running )
++    {
++        resolver_busy = false;
++        SDL_SemWait(semaphore);
++        if ( ! network_running ) break;
++
++        struct addrinfo hints;
++        struct addrinfo *firstaddress = 0;
++
++        memset(&amp;hints, 0, sizeof(hints));
++        hints.ai_family = AF_INET;
++        hints.ai_socktype = thread_work.socktype;
++        hints.ai_protocol = thread_work.protocol;
++        if ( thread_work.forBinding )
++        {
++            hints.ai_flags = AI_PASSIVE;
++        }
++
++        hints.ai_flags |= AI_NUMERICSERV;
++
++        int res = getaddrinfo(thread_work.str_host.size() &gt; 0 ? thread_work.str_host.c_str() : 0,
++                              thread_work.str_port.c_str(),
++                              &amp;hints, &amp;firstaddress);
++        if ( res )
++        {
++            freeaddrinfo(firstaddress);
++            thread_work.status = Address::ST_ERROR;
++        }
++        else
++        {
++            thread_work.ss_len = firstaddress-&gt;ai_addrlen;
++            memcpy(&amp;thread_work.ss, firstaddress-&gt;ai_addr, firstaddress-&gt;ai_addrlen);
++            freeaddrinfo(firstaddress);
++
++            thread_work.status = Address::ST_OK;
++        }
++    }
++    return 0;
++}
++
++
++bool NetworkManager::initialize()
++{
++#ifdef _WIN32
++    WSADATA wsaData;
++    WORD wVers = MAKEWORD(2, 0);
++    int rc = WSAStartup(wVers, &amp;wsaData);
++    if(rc != 0) {
++        fprintf(stderr, &quot;Failed to initialize winsock: %d\n&quot;, rc);
++        return false;
++    }
++#endif
++
++    network_running = true;
++    semaphore = SDL_CreateSemaphore(0);
++    resolverThread = SDL_CreateThread(resolver_worker, 0);
++
++    return true;
++}
++
++void NetworkManager::cleanUp()
++{
++    network_running = false;
++
++    SDL_SemPost(semaphore);
++    int st;
++    SDL_WaitThread(resolverThread, &amp;st);
++
++    SDL_DestroySemaphore(semaphore);
++    semaphore = 0;
++    resolverThread = 0;
++
++    rqueue.clear();
++
++#ifdef _WIN32
++    WSACleanup();
++#endif
++}
++
++void NetworkManager::run()
++{
++    if ( resolving &amp;&amp; ! resolver_busy ) // finished resolv
++    {
++        resolving = false;
++        bool found_wanted = false;
++        for ( std::list&lt;Address&gt;::iterator i = rqueue.begin(); i != rqueue.end(); i++ )
++        {
++            if ( thread_work.compareDest(*i) )
++            {
++                (*i) = thread_work;
++                found_wanted = true;
++                break;
++            }
++        }
++
++        --to_resolve;
++        resolving = false;
++
++        if ( ! found_wanted )
++        {
++            LOGGER.warning(&quot;Resolved something unwanted&quot;);
++        }
++    }
++
++    if ( to_resolve &gt; 0 &amp;&amp; ! resolving )
++    {
++        bool found_waiting = false;
++        for ( std::list&lt;Address&gt;::iterator i = rqueue.begin(); i != rqueue.end(); i++ )
++        {
++            if ( (*i).status == Address::ST_WAITING )
++            {
++                (*i).status = Address::ST_RESOLVING;
++                thread_work = (*i);
++                found_waiting = true;
++                break;
++            }
++        }
++
++        resolver_busy = true;
++        resolving = true;
++        SDL_SemPost(semaphore);
++
++        if ( ! found_waiting )
++        {
++            LOGGER.warning(&quot;to_resolve has something but there is no waiting here&quot;);
++        }
++    }
++
++    SocketManager::handleEvents();
++}
++
++int NetworkManager::queryAddress(Address &amp;address)
++{
++    struct addrinfo hints;
++    struct addrinfo *firstaddress = 0;
++
++    memset(&amp;hints, 0, sizeof(hints));
++    hints.ai_family = AF_INET;
++    hints.ai_socktype = address.socktype;
++    hints.ai_protocol = address.protocol;
++    if ( address.forBinding )
++    {
++        hints.ai_flags = AI_PASSIVE;
++    }
++
++    hints.ai_flags |= AI_NUMERICHOST|AI_NUMERICSERV;
++
++    int res = getaddrinfo(address.str_host.size() &gt; 0 ? address.str_host.c_str() : 0,
++                          address.str_port.c_str(),
++                          &amp;hints, &amp;firstaddress);
++    if ( res )
++    {
++        freeaddrinfo(firstaddress);
++
++        for ( std::list&lt;Address&gt;::iterator i = rqueue.begin(); i != rqueue.end(); i++ )
++        {
++            if ( address.compareDest(*i) )
++            {
++                switch ( (*i).status )
++                {
++                    case Address::ST_OK :
++                        address.ss_len = (*i).ss_len;
++                        memcpy(&amp;address.ss, &amp;(*i).ss, (*i).ss_len);
++                        // fall through
++
++                    case Address::ST_ERROR :
++                        address.status = (*i).status;
++                        rqueue.erase(i);
++                        break;
++
++                    default:
++                        address.status = (*i).status;
++
++                }
++
++                return address.status;
++            }
++        }
++        address.status = Address::ST_WAITING;
++        rqueue.push_back(address);
++        ++to_resolve;
++    }
++    else
++    {
++        address.ss_len = firstaddress-&gt;ai_addrlen;
++        memcpy(&amp;address.ss, firstaddress-&gt;ai_addr, firstaddress-&gt;ai_addrlen);
++        freeaddrinfo(firstaddress);
++
++        address.status = Address::ST_OK;
++    }
++
++    return address.status;
++}
++
++} // namespace
+
+Added: trunk/netpanzer/src/Lib/Network/NetworkManager.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/NetworkManager.hpp	                        (rev 0)
++++ trunk/netpanzer/src/Lib/Network/NetworkManager.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -0,0 +1,42 @@
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef NETWORKMANAGER_HPP
++#define NETWORKMANAGER_HPP
++
++namespace network
++{
++
++class Address;
++
++class NetworkManager
++{
++public:
++    static bool initialize();
++    static void cleanUp();
++
++    static void run();
++
++    static int queryAddress(Address&amp; address);
++
++private:
++    static int resolver_worker(void *);
++};
++
++}
++#endif // NETWORKMANAGER_HPP
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -27,277 +27,377 @@
+ #include &quot;SocketHeaders.hpp&quot;
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;SocketManager.hpp&quot;
++#include &quot;NetworkManager.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ namespace network
+ {
+ 
+-#ifdef _WIN32
+-
+-class WinSockInit {
+-public:
+-    WinSockInit() {
+-        WSADATA wsaData;
+-        WORD wVers = MAKEWORD(2, 0);
+-        int rc = WSAStartup(wVers, &amp;wsaData);
+-        if(rc != 0) {
+-	    fprintf(stderr, &quot;Failed to initialize winsock: %d\n&quot;, rc);
+-	    exit(1);
+-        }
+-    }
+-
+-    ~WinSockInit() {
+-	WSACleanup();
+-    }
++const char * SocketBase::state_str[] =
++{
++    &quot;ST_ERROR&quot;,
++    &quot;UNINITIALIZED&quot;,
++    &quot;RESOLVING&quot;,
++    &quot;RESOLVED&quot;,
++    &quot;CREATED&quot;,
++    &quot;CONFIGURED&quot;,
++    &quot;BOUND&quot;,
++    &quot;LISTENING&quot;,
++    &quot;CONNECTING&quot;,
++    &quot;CONNECTED&quot;,
++    &quot;DESTROYING&quot;
+ };
+-WinSockInit _WinSockInit;
+-#endif
+ 
+-SocketBase::~SocketBase()
++SocketBase::SocketBase()
+ {
+-    // XXX this might be needed if sockets doesn't close nicely
+-//    int tmp;
+-//    while ( recv(sockfd, (char*)&amp;tmp, sizeof(tmp), RECV_FLAGS) &gt; 0 ) ; // read until there is no more.
+-    shutdown(sockfd, SHUTDOWN_BOTH);
+-    closesocket(sockfd);
++    state = UNINITIALIZED;
++    disconnectTimer.setTimeOut(500);
+ }
+ 
+ SocketBase::SocketBase(const Address &amp;a, bool isTcp)
+     throw(NetworkException)
+     : addr(a)
+ {
+-    create(isTcp);
+-    SocketManager::addSocket(this);
++    state = RESOLVED;
++    create();
+     setNonBlocking();
+-    _isConnecting=false;
+     disconnectTimer.setTimeOut(500);
++    state = CONFIGURED;
+ }
+ 
+ SocketBase::SocketBase(SOCKET fd, const Address &amp;a)
+     throw(NetworkException)
+     : sockfd(fd), addr(a)
+ {
++    state = CONNECTED;
+     SocketManager::addSocket(this);
+     setNonBlocking();
+-    _isConnecting=false;
+     disconnectTimer.setTimeOut(500);
+ }
+ 
++SocketBase::~SocketBase()
++{
++    // XXX this might be needed if sockets doesn't close nicely
++//    int tmp;
++//    while ( recv(sockfd, (char*)&amp;tmp, sizeof(tmp), RECV_FLAGS) &gt; 0 ) ; // read until there is no more.
++    shutdown(sockfd, SHUTDOWN_BOTH);
++    closesocket(sockfd);
++}
++
+ void
+-SocketBase::create (bool tcp) throw(NetworkException)
++SocketBase::setAddress(const Address &amp;a)
+ {
+-    if(tcp) {
+-        sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+-    } else {
+-        sockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+-    }
++    addr = a;
++    state = RESOLVING;
++    SocketManager::addSocket(this);
++}
+ 
+-    LOGGER.debug(&quot;SocketBase:: Create [%s:%d] socket&quot;, (tcp)?&quot;tcp&quot;:&quot;udp&quot;,sockfd);
+-    
+-    if(sockfd == INVALID_SOCKET) {
+-        lastError = GET_NET_ERROR();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't create socket: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        throw NetworkException(msg.str());
++void
++SocketBase::create () throw(NetworkException)
++{
++    if ( state == RESOLVED )
++    {
++        sockfd = socket(PF_INET, addr.socktype, addr.protocol);
++
++        LOGGER.debug(&quot;SocketBase:: Create [%s:%d] socket&quot;, (addr.socktype == SOCK_STREAM)?&quot;tcp&quot;:&quot;udp&quot;,sockfd);
++
++        if(sockfd == INVALID_SOCKET)
++        {
++            lastError = GET_NET_ERROR();
++            std::stringstream msg;
++            msg &lt;&lt; &quot;Couldn't create socket: &quot; &lt;&lt; NETSTRERROR(lastError);
++            throw NetworkException(msg.str());
++        }
++        state = CREATED;
+     }
++    else
++    {
++        LOGGER.warning(&quot;Trying to recreate a socket [%s]&quot;, getStateString());
++    }
+ }
+ 
+ void
+ SocketBase::setNonBlocking() throw(NetworkException)
+ {
+-    int res;
++    if ( state &gt;= CREATED )
++    {
++        int res;
+ #ifdef _WIN32
+-    unsigned long mode = 1;
+-    res = ioctlsocket(sockfd, FIONBIO, &amp;mode);
++        unsigned long mode = 1;
++        res = ioctlsocket(sockfd, FIONBIO, &amp;mode);
+ #else
+-    res = fcntl(sockfd, F_SETFL, O_NONBLOCK);
++        res = fcntl(sockfd, F_SETFL, O_NONBLOCK);
+ #endif
+-    if ( res == SOCKET_ERROR ) {
+-        lastError = GET_NET_ERROR();
+-//        doClose();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't set socket to nonblocking mode: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++        if ( res == SOCKET_ERROR ) {
++            lastError = GET_NET_ERROR();
++    //        doClose();
++            std::stringstream msg;
++            msg &lt;&lt; &quot;Couldn't set socket to nonblocking mode: &quot; &lt;&lt; NETSTRERROR(lastError);
++            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++        }
+     }
++    else
++    {
++        LOGGER.warning(&quot;Trying to configure uncreated socket [%s]&quot;, getStateString());
++    }
+ }
+ 
+ void
+ SocketBase::bindSocketTo(const Address&amp; toaddr) throw(NetworkException)
+ {
+-    int res = bind(sockfd, toaddr.getSockaddr(), toaddr.getSockaddrLen());
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-        doClose();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
+-            &lt;&lt; toaddr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; toaddr.getPort()
+-            &lt;&lt; &quot;: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        throw NetworkException(msg.str());
++    if ( state == CONFIGURED )
++    {
++        int res = bind(sockfd, toaddr.getSockaddr(), toaddr.getSockaddrLen());
++        if(res == SOCKET_ERROR) {
++            lastError = GET_NET_ERROR();
++            doClose();
++            std::stringstream msg;
++            msg &lt;&lt; &quot;Couldn't bind socket to address '&quot;
++                &lt;&lt; toaddr.getIP() &lt;&lt; &quot;' port &quot; &lt;&lt; toaddr.getPort()
++                &lt;&lt; &quot;: &quot; &lt;&lt; NETSTRERROR(lastError);
++            throw NetworkException(msg.str());
++        }
++        SocketManager::addSocket(this);
++        state = BOUND;
+     }
++    else
++    {
++        LOGGER.warning(&quot;Trying to bind to a socket != CONFIGURED [%s]&quot;, getStateString());
++    }
+ }
+ 
+ void
+ SocketBase::setReuseAddr() throw(NetworkException)
+ {
+-    SETSOCKOPT_PARAMTYPE val = 1;
+-    int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-//        doClose();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't set SO_REUSEADDR: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++    if ( state == CONFIGURED )
++    {
++        SETSOCKOPT_PARAMTYPE val = 1;
++        int res = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;val, sizeof(val));
++        if(res == SOCKET_ERROR) {
++            lastError = GET_NET_ERROR();
++    //        doClose();
++            std::stringstream msg;
++            msg &lt;&lt; &quot;Couldn't set SO_REUSEADDR: &quot; &lt;&lt; NETSTRERROR(lastError);
++            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++        }
+     }
++    else
++    {
++        LOGGER.warning(&quot;Trying to set reuse addr on an unconfigured socket [%s]&quot;, getStateString());
++    }
+ }
+ 
+ void
+ SocketBase::setNoDelay() throw(NetworkException)
+ {
+-    SETSOCKOPT_PARAMTYPE val = 1;
+-    int res = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &amp;val, sizeof(val));
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-//        doClose();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't set TCP_NODELAY: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++    if ( state &gt;= CONFIGURED )
++    {
++        SETSOCKOPT_PARAMTYPE val = 1;
++        int res = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &amp;val, sizeof(val));
++        if(res == SOCKET_ERROR) {
++            lastError = GET_NET_ERROR();
++    //        doClose();
++            std::stringstream msg;
++            msg &lt;&lt; &quot;Couldn't set TCP_NODELAY: &quot; &lt;&lt; NETSTRERROR(lastError);
++            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++        }
+     }
++    else
++    {
++        LOGGER.warning(&quot;Trying to set nodelay on an unconfigured socket [%s]&quot;, getStateString());
++    }
+ }
+ 
+-
+ void
+ SocketBase::doListen() throw(NetworkException)
+ {
+-    int res = listen(sockfd, 20);
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-        doClose();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't listen on socket: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        throw NetworkException(msg.str());
++    if ( state == BOUND )
++    {
++        int res = listen(sockfd, 20);
++        if(res == SOCKET_ERROR) {
++            lastError = GET_NET_ERROR();
++            doClose();
++            std::stringstream msg;
++            msg &lt;&lt; &quot;Couldn't listen on socket: &quot; &lt;&lt; NETSTRERROR(lastError);
++            throw NetworkException(msg.str());
++        }
++        state = LISTENING;
+     }
++    else
++    {
++        LOGGER.warning(&quot;Trying to listen on an unbound socket [%s]&quot;, getStateString());
++    }
+ }
+ 
+ void
+ SocketBase::doConnect() throw(NetworkException)
+ {
+-    int res = connect(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-        if (IS_CONNECT_INPROGRESS(lastError)) {
+-            _isConnecting = true;
+-            return;
++    if ( state == CONFIGURED )
++    {
++        int res = connect(sockfd, addr.getSockaddr(), addr.getSockaddrLen());
++        if(res == SOCKET_ERROR)
++        {
++            lastError = GET_NET_ERROR();
++            if ( !IS_CONNECT_INPROGRESS(lastError) )
++            {
++                doClose();
++                std::stringstream msg;
++                msg &lt;&lt; &quot;Couldn't connect to '&quot; &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot;
++                    &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot; &lt;&lt; NETSTRERROR(lastError);
++                throw NetworkException(msg.str());
++            }
+         }
+-        doClose();
+-        std::stringstream msg;
+-        msg &lt;&lt; &quot;Couldn't connect to '&quot; &lt;&lt; addr.getIP() &lt;&lt; &quot;' port &quot;
+-            &lt;&lt; addr.getPort() &lt;&lt; &quot;: &quot; &lt;&lt; NETSTRERROR(lastError);
+-        throw NetworkException(msg.str());
++        state = CONNECTING;
++        SocketManager::addSocket(this);
+     }
++    else
++    {
++        LOGGER.warning(&quot;Trying to connect to an unconfigured socket [%s]&quot;, getStateString());
++    }
+ }
+ 
+ int
+ SocketBase::doSend(const void* data, size_t len) throw(NetworkException)
+ {
+-    int res = send(sockfd, (const char*) data, len, SEND_FLAGS);
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-        if ( IS_IGNORABLE_ERROR(lastError) )
++    if ( state == CONNECTED )
++    {
++        int res = send(sockfd, (const char*) data, len, SEND_FLAGS);
++        if(res == SOCKET_ERROR) {
++            lastError = GET_NET_ERROR();
++            if ( IS_IGNORABLE_ERROR(lastError) )
++                return 0;
++
++            if ( ! IS_DISCONECTED(lastError) ) {
++                std::stringstream msg;
++                msg &lt;&lt; &quot;Send error: &quot; &lt;&lt; NETSTRERROR(lastError);
++                LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++            }
++
++            onDisconected();
+             return 0;
+-
+-        if ( ! IS_DISCONECTED(lastError) ) {
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Send error: &quot; &lt;&lt; NETSTRERROR(lastError);
+-            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
+         }
+-        
+-        onDisconected();
+-        return 0;
++        return res;
+     }
+-    return res;
++    else
++    {
++        LOGGER.warning(&quot;Trying to send to unconected socket [%s]&quot;, getStateString());
++    }
++    return 0;
+ }
+ 
+ int
+ SocketBase::doReceive(void* buffer, size_t len) throw(NetworkException)
+ {
+-    int res = recv(sockfd, (char*) buffer, len, RECV_FLAGS);
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-        if ( IS_IGNORABLE_ERROR(lastError) )
++    if ( state == CONNECTED )
++    {
++        int res = recv(sockfd, (char*) buffer, len, RECV_FLAGS);
++        if(res == SOCKET_ERROR) {
++            lastError = GET_NET_ERROR();
++            if ( IS_IGNORABLE_ERROR(lastError) )
++                return 0;
++
++            if ( ! IS_DISCONECTED(lastError) ) {
++                std::stringstream msg;
++                msg &lt;&lt; &quot;Read error: &quot; &lt;&lt; NETSTRERROR(lastError);
++                LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++            }
++
++            onDisconected();
+             return 0;
++        }
+ 
+-        if ( ! IS_DISCONECTED(lastError) ) {
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Read error: &quot; &lt;&lt; NETSTRERROR(lastError);
+-            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++        if (!res) {
++            LOGGER.debug(&quot;SocketBase::doReceive Disconected from server&quot;);
++            onDisconected();
+         }
+ 
+-        onDisconected();
+-        return 0;
++        return res;
+     }
+-    
+-    if (!res) {
+-        LOGGER.debug(&quot;SocketBase::doReceive Disconected from server&quot;);
+-        onDisconected();
++    else
++    {
++        LOGGER.warning(&quot;Trying to receive on unconected socket [%s]&quot;, getStateString());
+     }
+-    
+-    return res;
++    return 0;
+ }
+ 
+ int
+ SocketBase::doSendTo(const Address&amp; toaddr, const void* data, size_t len) throw(NetworkException)
+ {
+-    int res = sendto(sockfd, (const char*) data, len, SEND_FLAGS,
+-                toaddr.getSockaddr(), toaddr.getSockaddrLen());
+-    if(res == SOCKET_ERROR) {
+-        lastError = GET_NET_ERROR();
+-        if ( ! IS_SENDTO_IGNORABLE(lastError) )
+-        {
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Send error: &quot; &lt;&lt; NETSTRERROR(lastError);
+-            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++    if ( state == BOUND )
++    {
++        int res = sendto(sockfd, (const char*) data, len, SEND_FLAGS,
++                    toaddr.getSockaddr(), toaddr.getSockaddrLen());
++        if(res == SOCKET_ERROR) {
++            lastError = GET_NET_ERROR();
++            if ( ! IS_SENDTO_IGNORABLE(lastError) )
++            {
++                std::stringstream msg;
++                msg &lt;&lt; &quot;Send error: &quot; &lt;&lt; NETSTRERROR(lastError);
++                LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++            }
++            return 0;
+         }
+-        return 0;
++        return res;
+     }
+-    return res;
++    else
++    {
++        LOGGER.warning(&quot;Trying to sendto in an unbound socket [%s]&quot;, getStateString());
++    }
++    return 0;
+ }
+ 
+ size_t
+ SocketBase::doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len) throw(NetworkException)
+ {
+-    int res = recvfrom(sockfd, (char*) buffer, len, RECV_FLAGS,
+-            fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
+-    if ( res == SOCKET_ERROR )
++    if ( state == BOUND || state == CONNECTED )
+     {
+-        lastError = GET_NET_ERROR();
+-        if ( ! IS_RECVFROM_IGNORABLE(lastError) )
++        int res = recvfrom(sockfd, (char*) buffer, len, RECV_FLAGS,
++                fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
++        if ( res == SOCKET_ERROR )
+         {
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Receive error: &quot; &lt;&lt; NETSTRERROR(lastError);
+-            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++            lastError = GET_NET_ERROR();
++            if ( ! IS_RECVFROM_IGNORABLE(lastError) )
++            {
++                std::stringstream msg;
++                msg &lt;&lt; &quot;ReceiveFrom error: &quot; &lt;&lt; NETSTRERROR(lastError);
++                LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++            }
++
++            return 0;
+         }
+-
+-        return 0;
++        return res;
+     }
+-    return res;
++    else
++    {
++        LOGGER.warning(&quot;Trying to receivefrom on an not bound or conected socket [%s]&quot;, getStateString());
++    }
++    return 0;
+ }
+ 
+ SOCKET
+ SocketBase::doAccept(Address&amp; fromaddr) throw(NetworkException)
+ {
+-    SOCKET newsock;
+-    newsock= accept(sockfd, fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
+-    if ( newsock == INVALID_SOCKET )
++    if ( state == LISTENING )
+     {
+-        lastError = GET_NET_ERROR();
+-        if ( ! IS_ACCEPT_IGNORABLE(lastError) )
++        SOCKET newsock;
++        newsock= accept(sockfd, fromaddr.getSockaddr(), fromaddr.getSockaddrLenPointer());
++        if ( newsock == INVALID_SOCKET )
+         {
+-            std::stringstream msg;
+-            msg &lt;&lt; &quot;Accept error: &quot; &lt;&lt; NETSTRERROR(lastError);
+-            LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++            lastError = GET_NET_ERROR();
++            if ( ! IS_ACCEPT_IGNORABLE(lastError) )
++            {
++                std::stringstream msg;
++                msg &lt;&lt; &quot;Accept error: &quot; &lt;&lt; NETSTRERROR(lastError);
++                LOGGER.warning(&quot;%s&quot;, msg.str().c_str());
++            }
+         }
++        return newsock;
+     }
+-    return newsock;
++    else
++    {
++        LOGGER.warning(&quot;Trying to accept on an unlistening socket [%s]&quot;, getStateString());
++    }
++    return SOCKET_ERROR;
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketBase.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/SocketBase.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -38,22 +38,24 @@
+         return addr;
+     }
+ 
+-    bool isConnecting() { return _isConnecting; };
+ protected:
+     friend class SocketSet;
+     friend class SocketManager;
+ 
+     virtual ~SocketBase();
+     
++    SocketBase();
+     SocketBase(const Address &amp;a, bool isTcp) throw(NetworkException);
+     SocketBase(SOCKET fd, const Address &amp;a) throw(NetworkException);
+         
+     virtual void onDataReady() = 0;
+-    virtual void onDisconected() {};
+-    virtual void onConnected() {};
++    virtual void onDisconected() {}
++    virtual void onConnected() { state = CONNECTED; }
++    virtual void onResolved() { state = RESOLVED; }
+     virtual void onSocketError() = 0;
+     virtual void destroy() = 0;
+     
++    void setAddress(const Address &amp;a);
+ 
+     void setReuseAddr() throw(NetworkException);
+     void setNoDelay() throw(NetworkException);
+@@ -69,21 +71,42 @@
+     size_t  doReceiveFrom(Address&amp; fromaddr, void* buffer, size_t len) throw(NetworkException);
+     SOCKET doAccept(Address&amp; fromaddr) throw(NetworkException);
+     
++    void setConfigured() { state = CONFIGURED; }
++
++    void create() throw(NetworkException);
++    void setNonBlocking() throw(NetworkException);
+ private:
+-    void create(bool tcp) throw(NetworkException);
+-    void setNonBlocking() throw(NetworkException);
++
++    enum {
++        ST_ERROR,
++        UNINITIALIZED,
++        RESOLVING,
++        RESOLVED,
++        CREATED,
++        CONFIGURED,
++        BOUND,
++        LISTENING,
++        CONNECTING,
++        CONNECTED,
++        DESTROYING
++    };
++
++    static const char *state_str[];
++    const char * getStateString() { return state_str[state]; }
++
+     
+-    void connectionFinished() 
++    void connectionFinished()
+     {
+-        _isConnecting = false;
+         onConnected();
+     };
+     
+-    bool _isConnecting;
++    int state;
+     SOCKET sockfd;
+     Address addr;
+     int lastError;
+ 
++
++
+     NTimer disconnectTimer;
+ };
+ 
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/SocketHeaders.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -19,7 +19,8 @@
+ #define __SOCKETHEADERS_HPP__
+ 
+ #ifdef _WIN32
+-#include &lt;winsock2.h&gt;
++//#//include &lt;winsock2.h&gt;
++#include &lt;ws2tcpip.h&gt;
+ 
+ #define SHUTDOWN_BOTH SD_BOTH
+ #define GET_NET_ERROR() WSAGetLastError()
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -18,6 +18,7 @@
+ 
+ #include &lt;sstream&gt;
+ #include &quot;SocketManager.hpp&quot;
++#include &quot;NetworkManager.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ #include &lt;cstdio&gt;
+@@ -28,7 +29,6 @@
+ 
+ SocketManager::Sockets SocketManager::socketList;
+ SocketManager::Sockets SocketManager::newSockets;
+-SocketManager::Sockets SocketManager::deletedSockets;
+ SocketSet SocketManager::sset;
+ 
+ void
+@@ -36,22 +36,6 @@
+ {
+     SocketsIterator i;
+ 
+-    if (!deletedSockets.empty())
+-    {
+-        for (i = deletedSockets.begin(); i!=deletedSockets.end(); )
+-        {
+-            SocketsIterator current = i++;
+-            socketList.erase(*current);
+-            if ( (*current)-&gt;disconnectTimer.isTimeOut() )
+-            {
+-                LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,(*current)-&gt;sockfd, (unsigned long)(*current));
+-                delete *current;
+-                deletedSockets.erase(current);
+-            }
+-        }
+-
+-    }
+-
+     if (!newSockets.empty()) {
+         for (i = newSockets.begin(); i!=newSockets.end(); i++) {
+             LOGGER.debug(&quot;SocketManager:: Adding socket [%d,%08lx]&quot;,(*i)-&gt;sockfd, (unsigned long)(*i));
+@@ -62,11 +46,45 @@
+ 
+     // Make the socketset every time, not all OS works the same way
+     sset.clear();
+-    for (i = socketList.begin(); i!=socketList.end(); i++) {
+-        if ((*i)-&gt;isConnecting()) {
+-            sset.addWrite(*i);
+-        } else {
+-            sset.add(*i);
++    SocketBase *sb = 0;
++    for ( SocketsIterator i = socketList.begin(), i_next = i, i_end = socketList.end();
++          i != i_end; i = i_next)
++    {
++        ++i_next;
++        sb = (*i);
++        switch ( sb-&gt;state )
++        {
++            case SocketBase::RESOLVING :
++                switch ( NetworkManager::queryAddress(sb-&gt;addr)  )
++                {
++                    case Address::ST_OK :
++                        sb-&gt;onResolved();
++                        break;
++
++                    case Address::ST_ERROR :
++                        sb-&gt;onSocketError();
++                        break;
++                }
++                break;
++
++            case SocketBase::CONNECTING :
++                sset.addWrite(sb);
++                break;
++
++            case SocketBase::BOUND:
++            case SocketBase::LISTENING :
++            case SocketBase::CONNECTED :
++                sset.add(*i);
++                break;
++
++            case SocketBase::DESTROYING :
++                if ( sb-&gt;disconnectTimer.isTimeOut() )
++                {
++                    LOGGER.debug(&quot;SocketManager:: Removing socket [%d,%08lx]&quot;,sb-&gt;sockfd, (unsigned long)sb);
++                    delete sb;
++                    socketList.erase(i);
++                }
++                break;
+         }
+     }
+ 
+@@ -74,23 +92,51 @@
+     if ( !r ) // most common first
+         return;
+     
+-    if ( r &gt; 0 ) {    
+-        for (i = socketList.begin(); i!=socketList.end(); i++) {
+-            if ((*i)-&gt;isConnecting()) {
+-                if (sset.isWriteable(*i)) {
+-                    (*i)-&gt;connectionFinished();
+-                }
+-            } else {
+-                if (sset.dataAvailable(*i)) {
+-                    (*i)-&gt;onDataReady();
+-                }
++    if ( r &gt; 0 )
++    {
++        for ( SocketsIterator i = socketList.begin(), i_next = i, i_end = socketList.end();
++              i != i_end; i = i_next)
++        {
++            ++i_next;
++            sb = (*i);
++            switch ( sb-&gt;state )
++            {
++                case SocketBase::CONNECTING :
++                    if ( sset.isWriteable(sb) )
++                    {
++                        sb-&gt;connectionFinished();
++                    }
++                    break;
++
++                case SocketBase::BOUND:
++                case SocketBase::LISTENING :
++                case SocketBase::CONNECTED :
++                    if ( sset.dataAvailable(sb) )
++                    {
++                        sb-&gt;onDataReady();
++                    }
++                    break;
++
++                case SocketBase::DESTROYING :
++                    if ( sb-&gt;disconnectTimer.isTimeOut() )
++                    {
++                        LOGGER.debug(&quot;SocketManager:: Removing socket2 [%d,%08lx]&quot;,sb-&gt;sockfd, (unsigned long)sb);
++                        delete sb;
++                        socketList.erase(i);
++                    }
++                    break;
+             }
+         }
+-    } else { // some error happened
++    }
++    else  // some error happened
++    {
+         int error = sset.getError();
+-        if ( IS_INVALID_SOCKET(error) ) {
++        if ( IS_INVALID_SOCKET(error) )
++        {
+             removeInvalidSockets();
+-        } else if ( !IS_INTERRUPTED(error) ) { // beware: is NOT interrupted
++        }
++        else if ( !IS_INTERRUPTED(error) ) // beware: is NOT interrupted
++        {
+             std::stringstream msg;
+             msg &lt;&lt; NETSTRERROR(error);
+             LOGGER.debug(&quot;SocketManager: BAD BAD ERROR %s&quot;, msg.str().c_str());
+@@ -102,29 +148,53 @@
+ SocketManager::removeInvalidSockets()
+ {
+     LOGGER.debug(&quot;Finding invalid sockets in the set...&quot;);
+-    SocketsIterator i;
+-    int error;
+-    for (i = socketList.begin(); i!=socketList.end(); i++) {
++    SocketBase *sb;
++
++    for ( SocketsIterator i = socketList.begin(), i_next = i, i_end = socketList.end();
++          i != i_end; i = i_next)
++    {
++        ++i_next;
++        sb = (*i);
+         sset.clear();
+-        if ((*i)-&gt;isConnecting()) {
+-            sset.addWrite(*i);
+-        } else {
+-            sset.add(*i);
++        switch ( sb-&gt;state )
++        {
++            case SocketBase::CONNECTING :
++                if ( sset.isWriteable(sb) )
++                {
++                    sb-&gt;connectionFinished();
++                }
++                break;
++
++            case SocketBase::BOUND:
++            case SocketBase::LISTENING :
++            case SocketBase::CONNECTED :
++                if ( sset.dataAvailable(sb) )
++                {
++                    sb-&gt;onDataReady();
++                }
++                break;
++            default:
++                continue;
+         }
+ 
+-        if ( sset.select() &lt; 0 ) {
+-            error = GET_NET_ERROR();
+-            if ( IS_INVALID_SOCKET(error) ) {
++        if ( sset.select() &lt; 0 )
++        {
++            int error = GET_NET_ERROR();
++            if ( IS_INVALID_SOCKET(error) )
++            {
+                 LOGGER.warning(&quot;SocketManager: FOUND Invalid socket, removing...&quot;);
+-                (*i)-&gt;onSocketError();
+-                removeSocket(*i);
+-            } else {
++                sb-&gt;onSocketError();
++                removeSocket(sb);
++            }
++            else
++            {
+                 std::stringstream msg;
+                 msg &lt;&lt; NETSTRERROR(error);
+                 LOGGER.debug(&quot;SocketManager: Error while finding invalid sockets %s&quot;, msg.str().c_str());
+             }
+         }
+     }
++
+ }
+ 
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/SocketManager.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/SocketManager.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -40,23 +40,12 @@
+     friend class SocketBase; // the only allowed to add/remove
+     static void addSocket(SocketBase *s)
+     {
+-        SocketsIterator i = deletedSockets.find(s);
+-        if ( i != deletedSockets.end() ) {
+-            deletedSockets.erase(i);
+-        } else {
+-            newSockets.insert(s);
+-        }
++        newSockets.insert(s);
+     }
+     
+     static void removeSocket(SocketBase *s)
+     {
+-        SocketsIterator i = newSockets.find(s);
+-        if ( i != newSockets.end() ) {
+-            newSockets.erase(i);
+-        } else {
+-            deletedSockets.insert(s);
+-            s-&gt;disconnectTimer.reset();
+-        }
++        s-&gt;state = SocketBase::DESTROYING;
+     }
+     
+     static void removeInvalidSockets();
+@@ -68,7 +57,6 @@
+     static SocketSet sset;
+     static Sockets socketList;
+     static Sockets newSockets;
+-    static Sockets deletedSockets;
+ };
+ 
+ } // namespace
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -33,7 +33,16 @@
+     throw(NetworkException)
+     : SocketBase(fd,newaddr), observer(o)
+ {
++    // nothing, socket is added to SocketManager because is already connected.
++}
+ 
++TCPSocket::TCPSocket(const std::string &amp;host, const std::string &amp;port, TCPSocketObserver *o)
++    throw(NetworkException)
++    : SocketBase(), observer(o)
++{
++    Address a(true, false);
++    a.setParams(host, port);
++    setAddress(a);
+ }
+ 
+ TCPSocket::TCPSocket(const Address&amp; address, TCPSocketObserver *o)
+@@ -48,6 +57,17 @@
+ { }
+ 
+ void
++TCPSocket::onResolved()
++{
++    SocketBase::onResolved();
++    create();
++    setNonBlocking();
++    setConfigured();
++    doConnect();
++    setNoDelay();
++}
++
++void
+ TCPSocket::destroy()
+ {
+     observer=0;
+@@ -66,6 +86,7 @@
+ void
+ TCPSocket::onConnected()
+ {
++    SocketBase::onConnected();
+     if (observer)
+         observer-&gt;onConnected(this);
+ }
+
+Modified: trunk/netpanzer/src/Lib/Network/TCPSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/TCPSocket.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -21,6 +21,8 @@
+ #include &quot;SocketBase.hpp&quot;
+ #include &quot;Address.hpp&quot;
+ 
++#include &lt;string&gt;
++
+ namespace network
+ {
+ 
+@@ -45,6 +47,7 @@
+ 
+ 
+     TCPSocket(const Address&amp; address, TCPSocketObserver *o) throw(NetworkException);
++    TCPSocket(const std::string&amp; host,const std::string&amp; port, TCPSocketObserver *o) throw(NetworkException);
+ 
+     void destroy();
+ 
+@@ -56,6 +59,7 @@
+     void onConnected();
+     void onDisconected();
+     void onSocketError();
++    void onResolved();
+     
+ private:
+     friend class TCPListenSocket;
+
+Modified: trunk/netpanzer/src/Lib/Network/UDPSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/Lib/Network/UDPSocket.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -27,7 +27,7 @@
+ 
+ UDPSocket::UDPSocket(UDPSocketObserver *o)
+     throw(NetworkException) 
+-    : SocketBase(Address::ANY,false), observer(o)
++    : SocketBase(Address::ANY, false), observer(o)
+ {
+     bindSocket();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -147,11 +147,6 @@
+     return false;
+ }
+ 
+-void NetworkClient::checkIncoming()
+-{
+-   // nothing
+-}
+-
+ void
+ NetworkClient::sendRemaining()
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkClient.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -55,9 +55,6 @@
+ 
+     bool getPacket(NetPacket *packet);
+ 
+-
+-    void checkIncoming();
+-
+ private:
+     ClientSocket* clientsocket;
+     NPString password;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/NetworkServer.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -106,7 +106,8 @@
+     try
+     {
+         Address addr = Address::resolve(gameconfig-&gt;bindaddress,
+-                                        gameconfig-&gt;serverport);
++                                        gameconfig-&gt;serverport,
++                                        true, true ); // tcp for binding
+         
+         socket = new TCPListenSocket(addr, this);
+ 
+@@ -397,11 +398,8 @@
+                                       player-&gt;getName().c_str());
+         }
+ 
+-
+         ObjectiveInterface::disownPlayerObjectives( player_index );
+-
+         UnitInterface::destroyPlayerUnits( player_index );
+-
+         PlayerInterface::disconnectPlayerCleanup( player_index );    
+ 
+         if ( sendalert )
+@@ -419,13 +417,9 @@
+             {
+                 scmsg.set( player_index, _connect_alert_mesg_client_drop );
+             }
+-
+             SERVER-&gt;broadcastMessage(&amp;scmsg, sizeof(scmsg));
+         }
+     }
+-    
+-
+-//    LOGGER.warning(&quot;NetworkServer::onClientDisconected( %d, '%s')&quot;, s-&gt;getId(), msg);
+ }
+ 
+ ClientSocket *
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -42,6 +42,7 @@
+ #include &quot;Util/Log.hpp&quot;
+ //#include &quot;Util/Exception.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
++#include &quot;Network/NetworkManager.hpp&quot;
+ 
+ #include &quot;Interfaces/BaseGameManager.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+@@ -311,6 +312,7 @@
+ //-----------------------------------------------------------------
+ int netpanzer_main(int argc, char** argv)
+ {
++    network::NetworkManager::initialize();
+     ScriptManager::initialize();
+     
+     //ScriptManager::runStr(&quot;LuaInitialize&quot;,&quot;print('Lua is working just fine');&quot;);
+@@ -351,7 +353,7 @@
+ #endif
+     
+     ScriptManager::close();
+-    
++    network::NetworkManager::cleanUp();
+     return 0;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -58,7 +58,7 @@
+ #include &quot;Particles/Physics.hpp&quot;
+ #include &quot;Util/TimerInterface.hpp&quot;
+ 
+-#include &quot;Network/SocketManager.hpp&quot;
++#include &quot;Network/NetworkManager.hpp&quot;
+ 
+ #include &quot;Scripts/ScriptManager.hpp&quot;
+ 
+@@ -95,9 +95,9 @@
+ void BaseGameManager::initializeGameConfig(const std::string&amp; configfile)
+ {
+     if(configfile == &quot;&quot;)
+-        gameconfig = new GameConfig(&quot;config/netpanzer.ini&quot;);
++        gameconfig = new GameConfig(&quot;config/netpanzer.ini&quot;, &quot;/config/client.cfg&quot;);
+     else
+-        gameconfig = new GameConfig(configfile, false);
++        gameconfig = new GameConfig(configfile, &quot;/config/client.cfg&quot;, false);
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::shutdownGameConfig()
+@@ -205,7 +205,6 @@
+ bool BaseGameManager::mainLoop()
+ {
+     TimerInterface::start();
+-
+     inputLoop();
+     graphicsLoop();
+     simLoop();
+@@ -236,14 +235,13 @@
+ {
+     if ( SERVER )
+         SERVER-&gt;cleanUpClientList();
+-    network::SocketManager::handleEvents();
+ 
++
+     if ( NetworkState::status == _network_state_server ) {
+         ServerMessageRouter::routeMessages();
+     } else {
+         ClientMessageRouter::routeMessages();
+     }
+-
+     NetworkState::updateNetworkStats();
+ 
+     UnitInterface::updateUnitStatus();
+@@ -269,6 +267,7 @@
+ //-----------------------------------------------------------------
+ void BaseGameManager::inputLoop()
+ {
++    network::NetworkManager::run();
+ }
+ //-----------------------------------------------------------------
+ void BaseGameManager::graphicsLoop()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BotGameManager.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -56,9 +56,9 @@
+ void BotGameManager::initializeGameConfig(const std::string&amp; configfile)
+ {
+     if(configfile == &quot;&quot;)
+-        gameconfig = new GameConfig(&quot;/config/netpanzer-bot.ini&quot;);
++        gameconfig = new GameConfig(&quot;/config/netpanzer-bot.ini&quot;, &quot;/config/bot.cfg&quot;);
+     else
+-        gameconfig = new GameConfig(configfile, false);
++        gameconfig = new GameConfig(configfile, &quot;/config/bot.cfg&quot;, false);
+ }
+ //-----------------------------------------------------------------
+ void BotGameManager::initializeInputDevices()
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -90,9 +90,9 @@
+ void DedicatedGameManager::initializeGameConfig(const std::string&amp; configfile)
+ {
+     if(configfile == &quot;&quot;)
+-        gameconfig = new GameConfig(&quot;/config/netpanzer-dedicated.ini&quot;);
++        gameconfig = new GameConfig(&quot;/config/netpanzer-dedicated.ini&quot;, &quot;/config/server.cfg&quot;);
+     else
+-        gameconfig = new GameConfig(configfile, false);
++        gameconfig = new GameConfig(configfile, &quot;/config/server.cfg&quot;, false);
+ }
+ //-----------------------------------------------------------------
+ void DedicatedGameManager::initializeInputDevices()
+@@ -172,12 +172,13 @@
+                     std::cout &lt;&lt; &quot;Unknown player.&quot; &lt;&lt; std::endl;
+                     break;
+                 }
+-                SERVER-&gt;dropClient(SERVER-&gt;getClientSocketByPlayerIndex(id));
++                SERVER-&gt;kickClient(SERVER-&gt;getClientSocketByPlayerIndex(id));
+                 break;
+         }
+         commandqueue.pop();
+     }
+     SDL_mutexV(commandqueue_mutex);
++    BaseGameManager::inputLoop();
+ }
+ 
+ bool
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -176,7 +176,7 @@
+ 
+ }
+ 
+-GameConfig::GameConfig(const std::string&amp; configfile, bool usePhysFS)
++GameConfig::GameConfig(const std::string&amp; configfile, const std::string&amp; luaconfigfile,bool usePhysFS)
+     // VariableName(&quot;Name&quot;, value [, minimum, maximum])
+     :
+       hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
+@@ -188,9 +188,6 @@
+       masterservers(&quot;masterservers&quot;, &quot;masterserver.netpanzer.org, masterserver2.netpanzer.org, masterserver.netpanzer.info&quot;),
+       
+       serverport(&quot;serverport&quot;, NETPANZER_DEFAULT_PORT_TCP,0,65535),
+-      proxyserver(&quot;proxyserver&quot;,&quot;&quot;),
+-      proxyserveruser(&quot;proxyserveruser&quot;,&quot;&quot;),
+-      proxyserverpass(&quot;proxyserverpass&quot;,&quot;&quot;),
+       bindaddress(&quot;bindaddress&quot;, &quot;&quot;),
+       gametype(&quot;gametype&quot;, _gametype_objective, 0, _gametype_last-1),
+       maxplayers(&quot;maxplayers&quot;, 8, 1, 25),
+@@ -216,35 +213,24 @@
+       enableeffects(&quot;effects&quot;, true),
+       effectsvolume(&quot;effectsvolume&quot;, 100, 0, 100),
+       
+-      unitcolor(&quot;unitcolor&quot;, 0, 0, _color_last-1),
+       attacknotificationtime(&quot;attacknotificationtime&quot;, 5, 0, 100),
+       vehicleselectioncolor(&quot;vehicleselectioncolor&quot;, _color_blue, 0, _color_last-1),
+       unitselectionmode(&quot;unitselectionmode&quot;, _unit_selection_box_draw_mode_rect_edges, 0, _unit_selection_box_draw_mode_last-1),
+       unitinfodrawlayer(&quot;unitinfodrawlayer&quot;, 0, 0, 1),
+-      drawunitreload(&quot;drawunitreload&quot;, false),
+-      consoletextdelay(&quot;consoletextdelay&quot;, 3, 1, 20),
+-      consoletextusage(&quot;consoletextusage&quot;, 25, 1, 100),
+       scrollrate(&quot;scrollrate&quot;, 1000, 100, 10000),
+-      minimapposition(&quot;minimapposition&quot;, iXY(0,0)),
+-      minimapsize(&quot;minimapsize&quot;, iXY(194,194)),
+-      minimapdrawtype(&quot;minimapdrawtype&quot;, 0),
+-      gameinfoposition(&quot;gameinfoposition&quot;, iXY(0,0)),
+-      toolbarposition(&quot;toolbarposition&quot;, iXY(0,0)),
+       rankposition(&quot;rankposition&quot;, iXY(0,0)),
+       viewdrawbackgroundmode(&quot;viewdrawbackgroundmode&quot;,(int)VIEW_BACKGROUND_DARK_GRAY_BLEND),
+                   
+-      radar_displayclouds(&quot;displayclouds&quot;, false),
+       radar_playerunitcolor(&quot;playerunitcolor&quot;, _color_aqua, 0, _color_last-1),
+       radar_selectedunitcolor(&quot;selectedunitcolor&quot;, _color_white, 0, _color_last-1),
+       radar_alliedunitcolor(&quot;alliedunitcolor&quot;, _color_orange, 0, _color_last-1),
+       radar_playeroutpostcolor(&quot;playeroutpostcolor&quot;, _color_blue, 0, _color_last-1),
+       radar_alliedoutpostcolor(&quot;alliedoutpostcolor&quot;, _color_orange, 0, _color_last),
+       radar_enemyoutpostcolor(&quot;enemyoutpostcolor&quot;, _color_red, 0, _color_last-1),
+-      radar_unitsize(&quot;unitsize&quot;, _mini_map_unit_size_small, 0, _mini_map_unit_size_last-1),
+-      radar_objectivedrawmode(&quot;objectivedrawmode&quot;, _mini_map_objective_draw_mode_outline_rect, 0, _mini_map_objective_draw_mode_last-1),
+-      radar_resizerate(&quot;resizerate&quot;, 400, 10, 1000)
++      radar_unitsize(&quot;unitsize&quot;, _mini_map_unit_size_small, 0, _mini_map_unit_size_last-1)
+ {
+     this-&gt;configfile = configfile;
++    this-&gt;luaconfigfile = luaconfigfile;
+     this-&gt;usePhysFS = usePhysFS;
+ 
+     std::stringstream default_player;
+@@ -252,9 +238,6 @@
+     playername=default_player.str();
+     playersettings.push_back(&amp;playername);
+     playersettings.push_back(&amp;masterservers);
+-    playersettings.push_back(&amp;proxyserver);
+-    playersettings.push_back(&amp;proxyserveruser);
+-    playersettings.push_back(&amp;proxyserverpass);
+ 
+     serversettings.push_back(&amp;serverport);
+     serversettings.push_back(&amp;bindaddress);
+@@ -269,7 +252,6 @@
+     serversettings.push_back(&amp;cloudcoverage);
+     serversettings.push_back(&amp;respawntype);
+     serversettings.push_back(&amp;windspeed);
+-    //serversettings.push_back(&amp;map);
+     serversettings.push_back(&amp;mapcycle);
+     serversettings.push_back(&amp;motd);
+     serversettings.push_back(&amp;logging);
+@@ -281,32 +263,20 @@
+     soundsettings.push_back(&amp;enableeffects);
+     soundsettings.push_back(&amp;effectsvolume);
+ 
+-    interfacesettings.push_back(&amp;unitcolor);
+     interfacesettings.push_back(&amp;attacknotificationtime);
+     interfacesettings.push_back(&amp;vehicleselectioncolor);
+     interfacesettings.push_back(&amp;unitselectionmode);
+     interfacesettings.push_back(&amp;unitinfodrawlayer);
+-    interfacesettings.push_back(&amp;drawunitreload);
+-    interfacesettings.push_back(&amp;consoletextdelay);
+-    interfacesettings.push_back(&amp;consoletextusage);
+     interfacesettings.push_back(&amp;scrollrate);
+-    interfacesettings.push_back(&amp;minimapposition);
+-    interfacesettings.push_back(&amp;minimapsize);
+-    interfacesettings.push_back(&amp;minimapdrawtype);
+-    interfacesettings.push_back(&amp;gameinfoposition);
+-    interfacesettings.push_back(&amp;toolbarposition);
+     interfacesettings.push_back(&amp;rankposition);
+     interfacesettings.push_back(&amp;viewdrawbackgroundmode);
+ 
+-    radarsettings.push_back(&amp;radar_displayclouds);
+     radarsettings.push_back(&amp;radar_playerunitcolor);
+     radarsettings.push_back(&amp;radar_alliedunitcolor);
+     radarsettings.push_back(&amp;radar_playeroutpostcolor);
+     radarsettings.push_back(&amp;radar_alliedoutpostcolor);
+     radarsettings.push_back(&amp;radar_enemyoutpostcolor);
+     radarsettings.push_back(&amp;radar_unitsize);
+-    radarsettings.push_back(&amp;radar_objectivedrawmode);
+-    radarsettings.push_back(&amp;radar_resizerate);
+     
+     try {
+         loadConfig();
+@@ -327,7 +297,7 @@
+ 
+ void GameConfig::loadConfig()
+ {
+-    ScriptManager::loadConfigFile(&quot;config/config.cfg&quot;, &quot;config&quot;);
++    ScriptManager::loadConfigFile(luaconfigfile.c_str(), &quot;config&quot;);
+ 
+     INI::Store inifile;
+     if(usePhysFS) {
+@@ -466,7 +436,7 @@
+         return;
+     }
+ 
+-    OFileStream out(&quot;config/config.cfg&quot;);
++    OFileStream out(luaconfigfile.c_str());
+     out &lt;&lt; lua_tostring(L, -1) &lt;&lt; std::endl;
+     lua_pop(L, 1);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -106,7 +106,7 @@
+ class GameConfig : public NoCopy
+ {
+ public:
+-    GameConfig(const std::string&amp; configfile, bool usePhysFS = true);
++    GameConfig(const std::string&amp; configfile, const std::string&amp; luaconfigfile, bool usePhysFS = true);
+     ~GameConfig();
+ 
+     void loadConfig();
+@@ -152,9 +152,6 @@
+ 
+     // server settings
+     ConfigInt    serverport;
+-    ConfigString proxyserver;
+-    ConfigString proxyserveruser;
+-    ConfigString proxyserverpass;
+     ConfigString bindaddress;
+     ConfigInt    gametype;             //Objectives, FragLimit, TimeLimit
+     ConfigInt    maxplayers;
+@@ -181,25 +178,15 @@
+     ConfigInt   effectsvolume;
+    
+     // interface settings
+-    ConfigInt   unitcolor;
+     ConfigInt   attacknotificationtime;
+     ConfigInt   vehicleselectioncolor;
+     ConfigInt   unitselectionmode;
+     ConfigInt   unitinfodrawlayer;
+-    ConfigBool  drawunitreload;
+-    ConfigInt   consoletextdelay;
+-    ConfigInt   consoletextusage;
+     ConfigInt   scrollrate;
+-    ConfigXY    minimapposition;
+-    ConfigXY    minimapsize;
+-    ConfigInt   minimapdrawtype;
+-    ConfigXY    gameinfoposition;
+-    ConfigXY    toolbarposition;
+     ConfigXY    rankposition;
+     ConfigInt   viewdrawbackgroundmode;
+ 
+     // radar settings
+-    ConfigBool  radar_displayclouds;
+     ConfigInt   radar_playerunitcolor;
+     ConfigInt   radar_selectedunitcolor;
+     ConfigInt   radar_alliedunitcolor;
+@@ -207,8 +194,6 @@
+     ConfigInt   radar_alliedoutpostcolor;
+     ConfigInt   radar_enemyoutpostcolor;
+     ConfigInt   radar_unitsize;
+-    ConfigInt   radar_objectivedrawmode;
+-    ConfigInt   radar_resizerate;
+     
+ public:
+     const char* getGameTypeString() const
+@@ -251,11 +236,6 @@
+         return( &quot;Unknown&quot; );
+     }
+ 
+-    PIX getUnitColor() const
+-    {
+-        return colorEnumToPix(unitcolor);
+-    }
+-
+     PIX getPlayerRadarUnitColor() const
+     {
+         return( colorEnumToPix( radar_playerunitcolor ) );
+@@ -306,6 +286,7 @@
+     static void registerScript(const NPString&amp; table_name);
+ 
+     std::string configfile;
++    std::string luaconfigfile;
+     bool usePhysFS;
+ 
+     PIX colorEnumToPix(int color_enum) const
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Heartbeat.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -49,7 +49,7 @@
+     string servname;
+     while( (servname = removeSurroundingSpaces(mstokenizer.getNextToken())) != &quot;&quot;) {
+         try {
+-            Address addr = Address::resolve(servname, MASTERSERVER_PORT);
++            Address addr = Address::resolve(servname, MASTERSERVER_PORT, true, false);
+             mslist.push_back(addr);
+         } catch (runtime_error e) {
+             LOGGER.warning(&quot;Bad masterserver address: %s&quot;, e.what());
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -39,7 +39,7 @@
+ 
+ InfoSocket::InfoSocket(int p) : socket(0)
+ {
+-    Address addr = Address::resolve( gameconfig-&gt;bindaddress, p);
++    Address addr = Address::resolve( gameconfig-&gt;bindaddress, p, false, true);
+     socket = new network::UDPSocket(addr,this);
+     
+     // This parameters are fixed always
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -225,6 +225,8 @@
+                MouseInterface::getMouseY(), MouseInterface::getButtonMask());
+ 
+     COMMAND_PROCESSOR.updateScrollStatus( MouseInterface::getMousePosition() );
++
++    BaseGameManager::inputLoop();
+ }
+ //-----------------------------------------------------------------
+ void PlayerGameManager::graphicsLoop()
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Network/ClientSocket.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -38,16 +38,16 @@
+     : observer(0), socket(0), sendpos(0), tempoffset(0), player_id(INVALID_PLAYER_ID)
+ {
+     try {
+-        proxy.setProxy(gameconfig-&gt;proxyserver,
+-                gameconfig-&gt;proxyserveruser,
+-                gameconfig-&gt;proxyserverpass);
++//        proxy.setProxy(gameconfig-&gt;proxyserver,
++//                gameconfig-&gt;proxyserveruser,
++//                gameconfig-&gt;proxyserverpass);
+     
+         // resolve server name
+         int port = NETPANZER_DEFAULT_PORT_TCP;
+         std::string servername;
+-        const char *server= proxy.proxyserver != &quot;&quot;
+-                ? proxy.proxyserver.c_str() : whole_servername.c_str();
+-        UtilInterface::splitServerPort(server, servername, &amp;port);
++//        const char *server= proxy.proxyserver != &quot;&quot;
++//                ? proxy.proxyserver.c_str() : whole_servername.c_str();
++        UtilInterface::splitServerPort(whole_servername, servername, &amp;port);
+ 
+         network::Address serveraddr 
+             = network::Address::resolve(servername, port);
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -27,6 +27,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapsManager.hpp&quot;
+ #include &quot;Interfaces/GameControlRulesDaemon.hpp&quot;
++#include &quot;Units/UnitInterface.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Util/FileSystem.hpp&quot;
+ 
+@@ -237,6 +238,23 @@
+     return 0;
+ }
+ 
++static int npmodule_destroyPlayerUnits(lua_State *L)
++{
++    int n = lua_tonumber(L, 1);
++    if ( !n &amp;&amp; ! lua_isnumber(L, 1) )
++    {
++        // TODO it is missing a parameter or it is not a number, do something
++    }
++    else
++    {
++        if ( n &gt;= 0 &amp;&amp; n &lt; PlayerInterface::getMaxPlayers() )
++        {
++            UnitInterface::destroyPlayerUnits( n );
++        }
++    }
++    return 0;
++}
++
+ static const luaL_Reg npmodule[] =
+ {
+     {&quot;say&quot;,           npmodule_say},
+@@ -251,6 +269,7 @@
+     {&quot;listmaps&quot;,      npmodule_listMaps},
+     {&quot;listprofiles&quot;,  npmodule_listProfiles},
+     {&quot;syncflagtimer&quot;, npmodule_SyncFlagTimer},
++    {&quot;destroyplayerunits&quot;, npmodule_destroyPlayerUnits},
+     {NULL, NULL}
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Button.hpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -171,4 +171,3 @@
+ }; // end Button
+ 
+ #endif // end __Button_hpp__
+-  
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -190,17 +190,8 @@
+         map_rect.max.x = int(float(objective_rect.max.x/32) / xratio)+position.x;
+         map_rect.max.y = int(float(objective_rect.max.y/32) / yratio)+position.y;
+ 
+-        // Removed black borders to the text.
+-//        if (gameconfig-&gt;radar_objectivedrawmode == _mini_map_objective_draw_mode_solid_rect) {
+-//            map_surface.fillRect( map_rect, color);
+-//        } else if (gameconfig-&gt;radar_objectivedrawmode == _mini_map_objective_draw_mode_outline_rect) {
+-            dest.drawRect( map_rect, color);
+-            dest.drawRect( iRect(map_rect.min.x + 1, map_rect.min.y + 1, map_rect.max.x - 1, map_rect.max.y - 1), color );
+-            //}
+-            //else if (gameconfig-&gt;radar_objectivedrawmode == _mini_map_objective_draw_mode_player_flag)
+-            //{
+-            //map_surface.fillRect( map_rect, color );
+-//        }
++        dest.drawRect( map_rect, color);
++        dest.drawRect( iRect(map_rect.min.x + 1, map_rect.min.y + 1, map_rect.max.x - 1, map_rect.max.y - 1), color );
+ 
+         //LOG((&quot;%d&quot;, obj_state.outpost_type));
+         if ( obj-&gt;occupying_player == PlayerInterface::getLocalPlayer() )
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2012-01-05 12:18:26 UTC (rev 1328)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MasterServer/ServerQueryThread.cpp	2012-01-08 17:43:00 UTC (rev 1329)
+@@ -31,8 +31,9 @@
+ #include &quot;Util/Log.hpp&quot;
+ #include &quot;Util/StringUtil.hpp&quot;
+ 
+-static const size_t MAX_QUERIES = 3;
+-static const Uint32 QUERY_TIMEOUT = 5 * 1000;
++static const size_t MAX_QUERIES = 4;
++static const Uint32 QUERY_TIMEOUT = 3 * 1000;
++static const Uint32 MS_TIMEOUT = 12 * 1000;
+ 
+ namespace masterserver
+ {
+@@ -102,10 +103,11 @@
+             std::string masterserverip = masterservers.back();
+             masterservers.pop_back();
+             
+-            network::Address ip
+-                = network::Address::resolve(masterserverip, 28900);
++//            network::Address ip
++//                = network::Address::resolve(masterserverip, 28900);
+ 
+-            network::TCPSocket *s = new network::TCPSocket(ip, this);
++//            network::TCPSocket *s = new network::TCPSocket(ip, this);
++            network::TCPSocket *s = new network::TCPSocket(masterserverip, &quot;28900&quot;, this);
+             MSInfo * msi = new MSInfo();
+             querying_msdata[s]=msi;
+             running = true;
+@@ -353,7 +355,7 @@
+     
+     map&lt;network::TCPSocket *,MSInfo *&gt;::iterator msiter;
+     for (msiter=querying_msdata.begin(); msiter!=querying_msdata.end(); msiter++) {
+-        if ( now - msiter-&gt;second-&gt;lastTicks &gt; QUERY_TIMEOUT ) {
++        if ( now - msiter-&gt;second-&gt;lastTicks &gt; MS_TIMEOUT ) {
+             LOGGER.warning(&quot;Masterserver [%s] timeout&quot;, msiter-&gt;first-&gt;getAddress().getIP().c_str());
+             delete msiter-&gt;second;
+             msiter-&gt;first-&gt;destroy();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000354.html">[Netpanzer-cvs] r1328 - trunk/netpanzer/scripts
+</A></li>
+	<LI>Next message: <A HREF="000356.html">[Netpanzer-cvs] r1330 - trunk/netpanzer/src/Lib/Network
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#355">[ date ]</a>
+              <a href="thread.html#355">[ thread ]</a>
+              <a href="subject.html#355">[ subject ]</a>
+              <a href="author.html#355">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

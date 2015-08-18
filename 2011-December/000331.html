@@ -1,0 +1,446 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1305 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1305%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C20111212133645.F3B5C4825AD%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000330.html">
+   <LINK REL="Next"  HREF="000332.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1305 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Game</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1305%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Classes%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/System%0A%09src/NetPanzer/Views/Game&In-Reply-To=%3C20111212133645.F3B5C4825AD%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1305 - in trunk/netpanzer: . src/NetPanzer/Classes	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Game">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec 12 14:36:45 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000330.html">[Netpanzer-cvs] r1304 - in trunk/netpanzer: src/Lib/2D support/icon
+</A></li>
+        <LI>Next message: <A HREF="000332.html">[Netpanzer-cvs] r1306 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#331">[ date ]</a>
+              <a href="thread.html#331">[ thread ]</a>
+              <a href="subject.html#331">[ subject ]</a>
+              <a href="author.html#331">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-12-12 14:36:45 +0100 (Mon, 12 Dec 2011)
+New Revision: 1305
+
+Modified:
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+Log:
+ - Enable unicode for all key
+ - add backround on libview
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2011-12-07 12:39:47 UTC (rev 1304)
++++ trunk/netpanzer/SConstruct	2011-12-12 13:36:45 UTC (rev 1305)
+@@ -157,12 +157,15 @@
+ luaenv = env.Clone()
+ physfsenv = env.Clone()
+ networkenv = env.Clone()
++mixerenv = env.Clone()
+ 
+ crossmingwluaenv = crossmingwenv.Clone()
++crossmingwmixerenv = crossmingwenv.Clone()
+ crossmingwphysfsenv = crossmingwenv.Clone()
+ crossmingwnetworkenv = crossmingwenv.Clone()
+ 
+ crosslinuxluaenv = crosslinuxenv.Clone()
++crosslinuxmixerenv = crosslinuxenv.Clone()
+ crosslinuxphysfsenv = crosslinuxenv.Clone()
+ crosslinuxnetworkenv = crosslinuxenv.Clone()
+ 
+@@ -205,9 +208,9 @@
+ # Configure Environments
+ ################################################################
+ 
+-env.Append(           CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/Lib/physfs', 'src/Lib/lua'] )
+-crossmingwenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/Lib/physfs', 'src/Lib/lua'] )
+-crosslinuxenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/Lib/physfs', 'src/Lib/lua'] )
++env.Append(           CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/Lib/physfs', 'src/Lib/lua', 'src/SDL_mixer-1.2.11'] )
++crossmingwenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/Lib/physfs', 'src/Lib/lua', 'src/SDL_mixer-1.2.11'] )
++crosslinuxenv.Append( CPPPATH = [ '.', 'src/Lib', 'src/NetPanzer', 'src/Lib/physfs', 'src/Lib/lua', 'src/SDL_mixer-1.2.11'] )
+ 
+ # for this platform
+ if thisplatform == 'darwin':
+@@ -217,12 +220,13 @@
+     if env['universal'] != 'false':
+ 		env.Append( CCFLAGS = [ '-arch', 'ppc', '-arch', 'i386' ] )
+ 		luaenv.Append( CCFLAGS = [ '-arch', 'ppc', '-arch', 'i386' ] )
++		mixerenv.Append( CCFLAGS = [ '-arch', 'ppc', '-arch', 'i386' ] )
+ 		physfsenv.Append( CCFLAGS = [ '-arch', 'ppc', '-arch', 'i386' ] )
+ 		networkenv.Append( CCFLAGS = [ '-arch', 'ppc', '-arch', 'i386' ] )
+ 		env.Append( LINKFLAGS = [ '-mmacosx-version-min=10.4', '-arch', 'ppc', '-arch', 'i386' ] )
+     else:
+         env.Append( CCFLAGS = [ '-arch', 'i386' ] )
+-        luaenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
++        mixerenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
+         physfsenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
+         networkenv.Append( CCFLAGS = [ '-arch', 'i386' ] )
+         env.Append( LINKFLAGS = [ '-arch', 'i386' ] )
+@@ -272,6 +276,14 @@
+ MakeStaticLib(crossmingwluaenv, 'nplua', 'lua', '*.c')
+ MakeStaticLib(crosslinuxluaenv, 'nplua', 'lua', '*.c')
+ 
++# BUILDS SDL_Mixer
++mixerenv.Append(           CPPPATH = [ 'src/SDL_mixer-1.2.11'] )
++crossmingwmixerenv.Append( CPPPATH = [ 'src/SDL_mixer-1.2.11'] )
++crosslinuxmixerenv.Append( CPPPATH = [ 'src/SDL_mixer-1.2.11'] )
++MakeStaticLib(          mixerenv, 'npmixer', 'mixer', '*.c')
++MakeStaticLib(crossmingwmixerenv, 'npmixer', 'mixer', '*.c')
++MakeStaticLib(crosslinuxmixerenv, 'npmixer', 'mixer', '*.c')
++
+ # BUILDS PHYSFS
+ physfsenv.Append( CFLAGS = [ '-DPHYSFS_SUPPORTS_ZIP=1', '-DZ_PREFIX=1', '-DPHYSFS_NO_CDROM_SUPPORT=1' ] )
+ physfsenv.Append( CPPPATH = [ 'src/Lib/physfs', 'src/Lib/physfs/zlib123' ] )
+@@ -322,9 +334,9 @@
+     
+ crosslinuxenv.Append( NPSOURCES = globSources(crosslinuxenv, 'src/NetPanzer', npdirs, &quot;*.cpp&quot;) )
+ 
+-env.Append(           NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
+-crossmingwenv.Append( NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
+-crosslinuxenv.Append( NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs'] )
++env.Append(           NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs', 'npmixer'] )
++crossmingwenv.Append( NPLIBS = ['npmixer','nplua','np2d','npnetwork','nplibs','npphysfs'] )
++crosslinuxenv.Append( NPLIBS = ['nplua','np2d','npnetwork','nplibs','npphysfs', 'npmixer'] )
+ 
+ if env.has_key('LIBS'):
+     env.Append( NPLIBS = env['LIBS'] )
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-07 12:39:47 UTC (rev 1304)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-12 13:36:45 UTC (rev 1305)
+@@ -236,7 +236,7 @@
+         // XXX ALLY
+         if ( ! PlayerInterface::isAllied(unit-&gt;player-&gt;getID(), PlayerInterface::getLocalPlayerIndex() ) )
+         {
+-            if ( KeyboardInterface::getKeyState(SDLK_a) )
++            if ( KeyboardInterface::isCharPressed('A') )
+             {
+                 if ( PlayerInterface::isSingleAllied(PlayerInterface::getLocalPlayerIndex(), unit-&gt;player-&gt;getID() ) )
+                 {
+@@ -256,7 +256,7 @@
+         }
+         else
+         {
+-            if ( KeyboardInterface::getKeyState(SDLK_a) )
++            if ( KeyboardInterface::isCharPressed('A') )
+             {
+                 return _cursor_break_allie;
+             }
+@@ -329,27 +329,38 @@
+ void
+ WorldInputCmdProcessor::evaluateKeyCommands()
+ {
+-    if ( (KeyboardInterface::getKeyPressed( SDLK_o ) == true) )
++    if (KeyboardInterface::isCharPressed('B') 
++       &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() ) 
+     {
++        Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
++    }
++    
++    if (KeyboardInterface::isCharPressed('M')) 
++    {
++        Desktop::toggleVisibility( &quot;MiniMapView&quot; );
++    }
++    
++    if ( KeyboardInterface::isCharPressed('O') )
++    {
+         toggleDisplayOutpostNames();
+     }
+ 
+-    if ( (KeyboardInterface::getKeyPressed( SDLK_f ) == true) )
++    if ( KeyboardInterface::isCharPressed('F') )
+     {
+         GameConfig::interface_show_flags = !GameConfig::interface_show_flags;
+     }
+ 
+-    if ( (KeyboardInterface::getKeyPressed( SDLK_n ) == true) )
++    if ( KeyboardInterface::isCharPressed('N') )
+     {
+         GameConfig::interface_show_names = !GameConfig::interface_show_names;
+     }
+ 
+-    if ( (KeyboardInterface::getKeyPressed( SDLK_d ) == true) )
++    if ( KeyboardInterface::isCharPressed('D') )
+     {
+         GameConfig::interface_show_health = !GameConfig::interface_show_health;
+     }
+ 
+-    if ( KeyboardInterface::getKeyPressed( SDLK_c ) == true )
++    if ( KeyboardInterface::isCharPressed('C') )
+     {
+         static NTimer spamtimer(5000);
+         if (spamtimer.isTimeOut())
+@@ -359,6 +370,27 @@
+         }
+     }
+ 
++    if (KeyboardInterface::getKeyPressed(SDLK_F1)) {
++        Desktop::toggleVisibility( &quot;HelpScrollView&quot; );
++    }
++    
++    if (KeyboardInterface::getKeyPressed(SDLK_TAB) ) {
++        Desktop::toggleVisibility( &quot;RankView&quot; );
++    }
++    
++    if (KeyboardInterface::getKeyPressed(SDLK_F3)) {
++        Desktop::toggleVisibility( &quot;DesktopView&quot; );
++    }
++    
++    if (KeyboardInterface::getKeyPressed(SDLK_F4)) {
++        Desktop::toggleVisibility( &quot;CodeStatsView&quot; );
++    }
++    
++    if (KeyboardInterface::getKeyPressed( SDLK_F5 )) {
++        //  DEBUG VIEW
++        Desktop::toggleVisibility( &quot;LibView&quot; );
++    }
++
+     if ( (KeyboardInterface::getKeyPressed( SDLK_RETURN ) == true)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_LALT ) == false)
+             &amp;&amp; (KeyboardInterface::getKeyState( SDLK_RALT ) == false))
+@@ -368,7 +400,7 @@
+ 
+     if ( ( KeyboardInterface::getKeyState( SDLK_LCTRL ) ||
+             KeyboardInterface::getKeyState( SDLK_RCTRL ) )
+-            &amp;&amp; (KeyboardInterface::getKeyPressed( SDLK_a ) == true) )
++            &amp;&amp; (KeyboardInterface::isCharPressed('A') ))
+     {
+         setKeyboardInputModeAllieChatMesg();
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp	2011-12-07 12:39:47 UTC (rev 1304)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/KeyboardInterface.hpp	2011-12-12 13:36:45 UTC (rev 1305)
+@@ -19,6 +19,7 @@
+ #define _KEYBOARDINTERFACE_HPP
+ 
+ #include &quot;SDL.h&quot;
++#include &quot;Util/Log.hpp&quot;
+ #include &lt;string.h&gt;
+ 
+ #define _CHAR_BUFFER_SIZE 256
+@@ -82,7 +83,24 @@
+ 
+         return true;
+     }
++   
++   static inline bool isCharPressed(char c)
++    {
++        if ( char_buffer_front == char_buffer_rear )
++            return false;
+ 
++        int buffer_front;
++    
++        buffer_front = ( char_buffer_front + 1 ) &amp; _CHAR_BUFFER_MOD;
++        if (char_buffer[ buffer_front ] == 0)
++        {
++            buffer_front = ( char_buffer_front + 2 ) &amp; _CHAR_BUFFER_MOD;
++        }
++        char car = toupper(char_buffer[ buffer_front ]);
++        if (c == car) return true;
++        return false;
++    }
++
+     static inline void putChar(int c)
+     {
+         char_buffer[ (char_buffer_rear + 1) &amp; _CHAR_BUFFER_MOD ] = c;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-07 12:39:47 UTC (rev 1304)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-12 13:36:45 UTC (rev 1305)
+@@ -508,73 +508,41 @@
+ //-----------------------------------------------------------------
+ void PlayerGameManager::processSystemKeys()
+ {
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
+-        if (KeyboardInterface::getKeyPressed( SDLK_F12 )){
+-            showNewPanel = !showNewPanel;
+-        }
+-        
+-        if (KeyboardInterface::getKeyPressed( SDLK_F5 )) {
+-            //  DEBUG VIEW
+-            Desktop::toggleVisibility( &quot;LibView&quot; );
+-        }
+-    }
+-
+-    if ( KeyboardInterface::getKeyState(SDLK_F9) )
++    if (Desktop::getVisible(&quot;GameView&quot;)) 
+     {
+-        Screen-&gt;doScreenshoot();
+-    }
+ 
+-    if (KeyboardInterface::getKeyState( SDLK_LALT ) ||
+-            KeyboardInterface::getKeyState( SDLK_RALT )) {
+-        if (KeyboardInterface::getKeyPressed(SDLK_RETURN)) {
+-            GameConfig::video_fullscreen = !GameConfig::video_fullscreen;
+-            GameManager::setVideoMode();
+-        }
+-    } // ** LFT_ALT or RGT_ALT pressed
++        if (KeyboardInterface::getKeyState( SDLK_LALT ) ||
++                KeyboardInterface::getKeyState( SDLK_RALT )) {
++            if (KeyboardInterface::getKeyPressed(SDLK_RETURN)) {
++                GameConfig::video_fullscreen = !GameConfig::video_fullscreen;
++                GameManager::setVideoMode();
++            }
++        } // ** LFT_ALT or RGT_ALT pressed
+ 
+-    if (Desktop::getView(&quot;GameView&quot;)-&gt;getVisible()) {
+-        if (KeyboardInterface::getKeyPressed(SDLK_m)) {
+-            Desktop::toggleVisibility( &quot;MiniMapView&quot; );
++        if ( KeyboardInterface::getKeyState(SDLK_F9) )
++        {
++            Screen-&gt;doScreenshoot();
+         }
+-        if (KeyboardInterface::getKeyPressed(SDLK_b)
+-           &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() ) {
+-            Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
+-        }
+-        if (KeyboardInterface::getKeyPressed(SDLK_TAB) ) {
+-            Desktop::toggleVisibility( &quot;RankView&quot; );
+-        }
+-        if (KeyboardInterface::getKeyPressed(SDLK_F3)) {
+-            Desktop::toggleVisibility( &quot;DesktopView&quot; );
+-        }
+-        if (KeyboardInterface::getKeyPressed(SDLK_F4)) {
+-            Desktop::toggleVisibility( &quot;CodeStatsView&quot; );
+-        }
+-        if (KeyboardInterface::getKeyPressed(SDLK_F1)) {
+-            Desktop::toggleVisibility( &quot;HelpScrollView&quot; );
+-        }
+ 
+         if (KeyboardInterface::getKeyPressed(SDLK_ESCAPE)) {
+-            if (Desktop::getView(&quot;GameView&quot;)-&gt;getVisible())
++            if (!Desktop::getView(&quot;OptionsView&quot;)-&gt;getVisible())
+             {
+-                if (!Desktop::getView(&quot;OptionsView&quot;)-&gt;getVisible())
+-                {
+-                    
+-                    View *v = Desktop::getView(&quot;OptionsView&quot;);
+-                    assert(v != 0);
+-                    ((OptionsTemplateView *)v)-&gt;initButtons();
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
++                
++                View *v = Desktop::getView(&quot;OptionsView&quot;);
++                assert(v != 0);
++                ((OptionsTemplateView *)v)-&gt;initButtons();
++                ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(false);
+ 
+-                    Desktop::setVisibility(&quot;OptionsView&quot;, true);
+-                    Desktop::setActiveView(&quot;OptionsView&quot;);
+-                }
+-                else
+-                {
+-                    View *v = Desktop::getView(&quot;OptionsView&quot;);
+-                    assert(v != 0);
+-                    ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
+-                    ((OptionsTemplateView *)v)-&gt;setVisible(false);
+-                }
++                Desktop::setVisibility(&quot;OptionsView&quot;, true);
++                Desktop::setActiveView(&quot;OptionsView&quot;);
+             }
++            else
++            {
++                View *v = Desktop::getView(&quot;OptionsView&quot;);
++                assert(v != 0);
++                ((OptionsTemplateView *)v)-&gt;setAlwaysOnBottom(true);
++                ((OptionsTemplateView *)v)-&gt;setVisible(false);
++            }
+         }
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2011-12-07 12:39:47 UTC (rev 1304)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2011-12-12 13:36:45 UTC (rev 1305)
+@@ -25,6 +25,7 @@
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/GameManager.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
+ 
+ bool handleSDLEvents()
+ {
+@@ -54,7 +55,11 @@
+                     // it's not a normal char put the 0 into the char buffer to
+                     // indicate extended chars...
+                     KeyboardInterface::putChar(0);
+-                    KeyboardInterface::putChar(event.key.keysym.sym);
++                    c = (event.key.keysym.unicode &amp; 0x7F) + 96;
++                    // if key into a to z then put unicode and 96
++                    if ((event.key.keysym.sym &gt; 96) &amp;&amp; (event.key.keysym.sym &lt; 123)) 
++                        KeyboardInterface::putChar(c);
++                    else KeyboardInterface::putChar(event.key.keysym.sym);
+                 }
+                 break;
+             }
+@@ -77,4 +82,4 @@
+     }
+ 
+     return false;
+-}
++}
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2011-12-07 12:39:47 UTC (rev 1304)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2011-12-12 13:36:45 UTC (rev 1305)
+@@ -135,6 +135,7 @@
+     int x       =   5;
+     int y       = 135;
+     //int yOffset =  15;
++    bltViewBackground(viewArea);
+ 
+     switch(displayMode) {
+     case LIBVIEW_MODE_SURFACE_INFO: {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000330.html">[Netpanzer-cvs] r1304 - in trunk/netpanzer: src/Lib/2D support/icon
+</A></li>
+	<LI>Next message: <A HREF="000332.html">[Netpanzer-cvs] r1306 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#331">[ date ]</a>
+              <a href="thread.html#331">[ thread ]</a>
+              <a href="subject.html#331">[ subject ]</a>
+              <a href="author.html#331">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

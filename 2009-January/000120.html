@@ -1,0 +1,4790 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1088 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Particles NetPanzer/Views	NetPanzer/Views/Components NetPanzer/Views/Game	NetPanzer/Views/MainMenu NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Options
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1088%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Interfaces%20NetPanzer/Particles%20NetPanzer/Views%0A%09NetPanzer/Views/Components%20NetPanzer/Views/Game%0A%09NetPanzer/Views/MainMenu%20NetPanzer/Views/MainMenu/Multi%0A%09NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200901290833.n0T8XAxv030781%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000119.html">
+   <LINK REL="Next"  HREF="000121.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1088 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Particles NetPanzer/Views	NetPanzer/Views/Components NetPanzer/Views/Game	NetPanzer/Views/MainMenu NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Options</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1088%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Interfaces%20NetPanzer/Particles%20NetPanzer/Views%0A%09NetPanzer/Views/Components%20NetPanzer/Views/Game%0A%09NetPanzer/Views/MainMenu%20NetPanzer/Views/MainMenu/Multi%0A%09NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200901290833.n0T8XAxv030781%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1088 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Interfaces NetPanzer/Particles NetPanzer/Views	NetPanzer/Views/Components NetPanzer/Views/Game	NetPanzer/Views/MainMenu NetPanzer/Views/MainMenu/Multi	NetPanzer/Views/MainMenu/Options">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Jan 29 09:33:10 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000119.html">[Netpanzer-cvs] r1087 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Util src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/MainMenu/Options
+</A></li>
+        <LI>Next message: <A HREF="000121.html">[Netpanzer-cvs] r1089 - in trunk/netpanzer: nbproject	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#120">[ date ]</a>
+              <a href="thread.html#120">[ thread ]</a>
+              <a href="subject.html#120">[ subject ]</a>
+              <a href="author.html#120">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-01-29 09:30:59 +0100 (Thu, 29 Jan 2009)
+New Revision: 1088
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/Particle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+   trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.hpp
+Log:
+- Reworked all the game views to not use custom surfaces.
+- Removed Surface::setTo() family of functions.
+Notes:
+This version has lots of changes, is likely to have some glitches when drawing something. Is work in progress, but need to commit to avoid lost track of changes.
+
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -274,66 +274,6 @@
+ 
+ } // end Surface::resize
+ 
+-// setTo
+-//---------------------------------------------------------------------------
+-// Purpose: Maps a Surface's coordinates to an existing surface.  This can
+-//          save you from having to allocate memory for every single surface.
+-//          You can just draw everything onto one surface in the given bounds.
+-//---------------------------------------------------------------------------
+-void Surface::setTo(const Surface &amp;source, iRect bounds)
+-{
+-    assert(source.getDoesExist());
+-    assert(this != 0);
+-
+-    free();
+-    orderCoords(bounds);
+-
+-    myMem      = false;
+-    frame0     = source.pixPtr(bounds.min.x, bounds.min.y);
+-    mem	       = frame0;
+-    if ( (unsigned int)bounds.max.x &gt; source.getWidth() )
+-        twidth = source.getWidth() - bounds.min.x;
+-    else
+-        twidth     = bounds.getSizeX();
+-        
+-    if ( (unsigned int)bounds.max.y &gt; source.getHeight() )
+-        theight = source.getHeight() - bounds.min.y;
+-    else
+-        theight    = bounds.getSizeY();
+-        
+-    tpitch     = source.getPitch();
+-    numFrames  = source.getNumFrames();
+-    fps        = source.getFPS();
+-    
+-    doesExist  = source.getDoesExist();
+-
+-} // end Surface::setTo
+-
+-// setTo
+-//---------------------------------------------------------------------------
+-// Purpose: Maps the calling surface to some specified coordinates of the
+-//          another Surface.
+-//---------------------------------------------------------------------------
+-void Surface::setTo(const Surface &amp;source)
+-{
+-    assert(this != 0);
+-    assert(source.getDoesExist());
+-
+-    free();
+-
+-    myMem      = false;
+-    frame0     = source.getFrame0();
+-    mem        = frame0;
+-    twidth     = source.getWidth();
+-    theight    = source.getHeight();
+-    tpitch     = source.getPitch();
+-    numFrames  = source.getNumFrames();
+-    fps        = source.getFPS();
+-    offset     = source.getOffset();
+-    doesExist  = source.getDoesExist();
+-
+-} // end Surface::setTo
+-
+ // grab
+ //---------------------------------------------------------------------------
+ // Purpose: Copies a section from another Surface.
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -146,16 +146,12 @@
+     
+     void resize(int xPix, int yPix);
+ 
+-    void setTo(const Surface &amp;s, iRect bounds);
+-    void setTo(const Surface &amp;source);
+-
+     void blt(Surface &amp;dest, int x, int y) const;
+     void bltTrans(Surface &amp;dest, int x, int y) const;
+     void bltTransColor(Surface &amp;dest, int x, int y, const PIX &amp;color) const;
+     void bltScale(const Surface &amp;source, const iRect &amp;destRect);
+     void bltLookup(const iRect &amp;destRect, const PIX table[]);
+ 
+-
+     void drawHLine(int x1, int y,  int x2, const PIX &amp;color);
+     void drawVLine(int x,  int y1, int y2, const PIX &amp;color);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -454,43 +454,59 @@
+ //-----------------------------------------------------------------
+ void PlayerGameManager::processSystemKeys()
+ {
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
+-        if (KeyboardInterface::getKeyPressed( SDLK_F12 )){
++    if (Desktop::getVisible(&quot;GameView&quot;))
++    {
++        if (KeyboardInterface::getKeyPressed( SDLK_F12 ))
++        {
+             showNewPanel = !showNewPanel;
+         }
+         
+-        if (KeyboardInterface::getKeyPressed( SDLK_F5 )) {
++        if (KeyboardInterface::getKeyPressed( SDLK_F5 ))
++        {
+             //  DEBUG VIEW
+             Desktop::toggleVisibility( &quot;LibView&quot; );
+         }
+     }
+ 
+     if (KeyboardInterface::getKeyState( SDLK_LALT ) ||
+-            KeyboardInterface::getKeyState( SDLK_RALT )) {
+-        if (KeyboardInterface::getKeyPressed(SDLK_RETURN)) {
++            KeyboardInterface::getKeyState( SDLK_RALT ))
++    {
++        if (KeyboardInterface::getKeyPressed(SDLK_RETURN))
++        {
+             gameconfig-&gt;fullscreen.toggle();
+             GameManager::setVideoMode();
+         }
+     } // ** LFT_ALT or RGT_ALT pressed
+ 
+-    if (Desktop::getView(&quot;GameView&quot;)-&gt;getVisible()) {
+-        if (KeyboardInterface::getKeyPressed(SDLK_m)) {
++    if (Desktop::getView(&quot;GameView&quot;)-&gt;getVisible())
++    {
++        if (KeyboardInterface::getKeyPressed(SDLK_m))
++        {
+             Desktop::toggleVisibility( &quot;MiniMapView&quot; );
+         }
+-        if (KeyboardInterface::getKeyPressed(SDLK_TAB) ) {
++        
++        if (KeyboardInterface::getKeyPressed(SDLK_TAB) )
++        {
+             Desktop::toggleVisibility( &quot;RankView&quot; );
+         }
+-        if (KeyboardInterface::getKeyPressed(SDLK_F3)) {
++        
++        if (KeyboardInterface::getKeyPressed(SDLK_F3))
++        {
+             Desktop::toggleVisibility( &quot;DesktopView&quot; );
+         }
+-        if (KeyboardInterface::getKeyPressed(SDLK_F4)) {
++        
++        if (KeyboardInterface::getKeyPressed(SDLK_F4))
++        {
+             Desktop::toggleVisibility( &quot;CodeStatsView&quot; );
+         }
+-        if (KeyboardInterface::getKeyPressed(SDLK_F1)) {
++        
++        if (KeyboardInterface::getKeyPressed(SDLK_F1))
++        {
+             Desktop::toggleVisibility( &quot;HelpScrollView&quot; );
+         }
+ 
+-        if (KeyboardInterface::getKeyPressed(SDLK_ESCAPE)) {
++        if (KeyboardInterface::getKeyPressed(SDLK_ESCAPE))
++        {
+             if (Desktop::getView(&quot;GameView&quot;)-&gt;getVisible())
+             {
+                 if (!Desktop::getView(&quot;OptionsView&quot;)-&gt;getVisible() &amp;&amp;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -111,7 +111,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void ChunkTrajectoryParticle2D::draw(const Surface&amp; , SpriteSorter &amp;sorter)
++void ChunkTrajectoryParticle2D::draw(SpriteSorter &amp;sorter)
+ {
+     assert(this != 0);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -65,7 +65,7 @@
+                                int         canHaveSmoke   = 1);
+ 
+     virtual void sim();
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ 
+     static void init();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -145,7 +145,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void CloudParticle2D::draw(const Surface&amp;, SpriteSorter &amp;sorter)
++void CloudParticle2D::draw(SpriteSorter &amp;sorter)
+ {
+     packedSurface.setAttrib(iXY(int(pos.x), int(pos.z)), layer);
+     sorter.addSprite(&amp;packedSurface);
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -46,7 +46,7 @@
+     static void init();
+ 
+     virtual void sim();
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ };
+ 
+ #endif // __CloudParticle2D_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -89,7 +89,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void CraterParticle2D::draw(const Surface&amp;, SpriteSorter &amp;sorter)
++void CraterParticle2D::draw(SpriteSorter &amp;sorter)
+ {
+     if (!isAlive) {
+         return;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/CraterParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -52,7 +52,7 @@
+ 
+ protected:
+ 
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+     virtual void sim();
+ 
+     // Statistic data.
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -56,7 +56,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void DirtKickParticle2D::draw(const Surface&amp;, SpriteSorter&amp;)
++void DirtKickParticle2D::draw(SpriteSorter&amp;)
+ {
+     // XXX
+     //assert(dirtKickSurface.getDoesExist());
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/DirtKickParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -33,7 +33,7 @@
+ protected:
+     static Surface dirtKickSprite;
+ 
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ };
+ 
+ #endif // __DirtKickParticle2D_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -106,9 +106,8 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void FireParticleSystem2D::draw(const Surface &amp;dest, SpriteSorter &amp;sorter)
++void FireParticleSystem2D::draw(SpriteSorter &amp;sorter)
+ {
+-    (void) dest;
+     (void) sorter;
+     for (int num = 0; num &lt; 100; num++) {
+         //dest.fillRect(100, 100, 110, 110, Color::red);
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/FireParticleSystem2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -45,7 +45,7 @@
+     void reset();
+ 
+     virtual void sim();
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ 
+ }
+ ; // end FireParticleSystem2D
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -84,7 +84,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void FlameParticle2D::draw(const Surface&amp;, SpriteSorter&amp; sorter)
++void FlameParticle2D::draw(SpriteSorter&amp; sorter)
+ {
+     if (!isAlive) {
+         return;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlameParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -40,7 +40,7 @@
+     static PackedSurfaceList staticPackedExplosion0;
+     static PackedSurfaceList staticPackedExplosion1;
+ 
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ 
+     static void loadPakFiles();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -51,7 +51,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void FlashParticle2D::draw(const Surface&amp;, SpriteSorter&amp; sorter)
++void FlashParticle2D::draw(SpriteSorter&amp; sorter)
+ {
+     if (!isAlive) {
+         return;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/FlashParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -45,7 +45,7 @@
+     // the images aspect ratio.
+     bool  singleFrame;
+ 
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+     virtual void sim();
+ 
+ }; // end FlashParticle2D
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -220,7 +220,7 @@
+ 
+ // drawAll
+ //---------------------------------------------------------------------------
+-void Particle2D::drawAll(const Surface &amp;clientArea, SpriteSorter &amp;sorter)
++void Particle2D::drawAll(SpriteSorter &amp;sorter)
+ {
+     // Go through and draw all the particles.
+     Particle2D *e = zParticle2D-&gt;next;
+@@ -229,7 +229,7 @@
+ 
+     while (e != zParticle2D) {
+         nextPtr = e-&gt;next;
+-        e-&gt;draw(clientArea, sorter);
++        e-&gt;draw( sorter);
+         e = nextPtr;
+     }
+ } // end Particle2D::drawAll
+@@ -238,7 +238,7 @@
+ //---------------------------------------------------------------------------
+ // Purpose: Draws a single particle, no simulation.
+ //---------------------------------------------------------------------------
+-void Particle2D::draw(const Surface&amp;, SpriteSorter&amp;)
++void Particle2D::draw(SpriteSorter&amp;)
+ {} // end draw
+ 
+ // Particle2D::sim
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/Particle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/Particle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/Particle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -49,11 +49,11 @@
+         Particle2D::bltTo = bltTo;
+     }
+ 
+-    static  void drawAll(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    static  void drawAll(SpriteSorter &amp;sorter);
+     static  void removeAll();
+     static  void simAll();
+ 
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+     virtual void sim();
+ 
+     void *operator new(size_t numBytes);  // Overloaded for static array.
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -158,7 +158,7 @@
+ 
+ // drawAll
+ //---------------------------------------------------------------------------
+-void ParticleSystem2D::drawAll(const Surface &amp;clientArea, SpriteSorter &amp;sorter)
++void ParticleSystem2D::drawAll(SpriteSorter &amp;sorter)
+ {
+     // Go through and draw all the particle systems.
+     ParticleSystem2D *e = zParticleSystem2D-&gt;next;
+@@ -166,7 +166,7 @@
+ 
+     while (e != zParticleSystem2D) {
+         nextPtr = e-&gt;next;
+-        e-&gt;draw(clientArea, sorter);
++        e-&gt;draw( sorter);
+         e = nextPtr;
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleSystem2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -52,7 +52,7 @@
+ 
+     static void  removeAll();
+     static void  simAll();
+-    static void  drawAll(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    static void  drawAll(SpriteSorter &amp;sorter);
+     static int   getParticleSystemCount()
+     {
+         return particleSystemCount;
+@@ -84,7 +84,7 @@
+     void reset();
+ 
+     virtual void sim();
+-    virtual void draw(const Surface&amp;, SpriteSorter&amp;)
++    virtual void draw(SpriteSorter&amp;)
+     {}
+ 
+     void insertMe();
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -30,15 +30,15 @@
+     setVisible(false);
+ 
+     moveTo(0, 0);
+-    resizeClientArea(640, 480);
++    resize(640, 480);
+ 
+ } // end ParticleTweakView::ParticleTweakView
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void ParticleTweakView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void ParticleTweakView::doDraw()
+ {
+-    viewArea.fill(Color::black);
++    fill(Color::black);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end ParticleTweakView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleTweakView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -29,7 +29,7 @@
+ public:
+     ParticleTweakView();
+ 
+-    virtual void doDraw (Surface &amp;viewArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ }; // end ParticleTweakView
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -126,7 +126,7 @@
+ //---------------------------------------------------------------------------
+ // Purpose: Draws a single puff particle, no simulation.
+ //---------------------------------------------------------------------------
+-void PuffParticle2D::draw(const Surface&amp;, SpriteSorter &amp;sorter)
++void PuffParticle2D::draw(SpriteSorter &amp;sorter)
+ {
+     if (!packedSurface.nextFrame()) {
+         isAlive = false;
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -88,7 +88,7 @@
+     static  void init();
+     static  void loadPAKFiles();
+     static  void loadTILFiles();
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ 
+ }
+ ; // end PuffParticle2D
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -52,9 +52,8 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void RadarPingParticle2D::draw(const Surface &amp;dest, SpriteSorter &amp;sorter)
++void RadarPingParticle2D::draw(SpriteSorter &amp;sorter)
+ {
+-    (void) dest;
+     (void) sorter;
+     // XXX
+ #if 0
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/RadarPingParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -38,7 +38,7 @@
+ 
+     float FPS;
+ 
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ 
+ }
+ ; // end RadarPingParticle2D
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -81,7 +81,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void SnowParticleSystem2D::draw(const Surface&amp;, SpriteSorter&amp;)
++void SnowParticleSystem2D::draw( SpriteSorter&amp;)
+ {
+     //for (unsigned num = 0; num &lt; NUM_SNOW_PARTICLES; num++)
+     //	snowParticles[num].draw(dest);
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/SnowParticleSystem2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -46,7 +46,7 @@
+     void reset();
+ 
+     virtual void sim();
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ 
+ }
+ ; // end SnowParticleSystem2D
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -53,7 +53,7 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void SparkParticle2D::draw(const Surface&amp;, SpriteSorter &amp;sorter)
++void SparkParticle2D::draw(SpriteSorter &amp;sorter)
+ {
+     if (!isAlive) return;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/SparkParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -32,7 +32,7 @@
+     float           curFrame;
+ 
+     static void init();
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
++    virtual void draw(SpriteSorter &amp;sorter);
+ }
+ ; // end SparkParticle2D
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Particles/TrajectoryParticle2D.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -41,7 +41,7 @@
+                           int         dieAtMidFlight = 0);
+ 
+     virtual void sim();
+-    virtual void draw(const Surface&amp;, SpriteSorter&amp;)
++    virtual void draw(SpriteSorter&amp;)
+     {}
+ 
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -163,9 +163,12 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void Choice::draw(Surface &amp;dest)
++void Choice::draw( int posx, int posy, Surface &amp;dest)
+ {
+-    Surface s;
++    iXY oldpos = position;
++    position.x += posx;
++    position.y += posy;
++
+     iRect   r;
+ 
+     // Draw the label.
+@@ -181,36 +184,37 @@
+ 
+     getBounds(r);
+ 
+-    s.setTo(dest, r);
+-
+     // Draw the border.
+-    s.drawRect(iRect(0, 0, s.getWidth() - 2, s.getHeight() - 2), Color::gray96);
+-    s.drawRect(iRect(1, 1, s.getWidth() - 1, s.getHeight() - 1), Color::white);
+-    s.fillRect(iRect(1, 1, s.getWidth() - 2, s.getHeight() - 2), Color::terreVerte);
++    dest.drawRect(iRect(r.min.x    , r.min.y    , r.max.x - 2, r.max.y - 2), Color::gray96);
++    dest.drawRect(iRect(r.min.x + 1, r.min.y + 1, r.max.x - 1, r.max.y - 1), Color::white);
++    dest.fillRect(iRect(r.min.x + 1, r.min.y + 1, r.max.x - 2, r.max.y - 2), Color::terreVerte);
+ 
+     if (!isOpen)	{
+-        s.bltStringShadowedCenter(choiceList[index].c_str(), Color::white, Color::black);
++        // xxx change to correct position
++        dest.bltStringCenteredInRect(r, choiceList[index].c_str(), Color::white);
++        //dest.bltStringShadowedCenter(choiceList[index].c_str(), Color::white, Color::black);
+     } else {
+         r = iRect(position.x, position.y, position.x + size.x, position.y + ChoiceItemHeight);
+ 
+         size_t count = choiceList.size();
+ 
+-        for (size_t i = 0; i &lt; count; i++) {
+-            s.setTo(dest, r);
+-
+-            if (i == mouseover) {
++        for (size_t i = 0; i &lt; count; i++)
++        {
++            if (i == mouseover)
++            {
+                 // Higlight the selected item.
+-                s.fill(Color::white);
+-                s.bltStringCenter(choiceList[i].c_str(), Color::black);
++                dest.fillRect(r, Color::white);
++                dest.bltStringCenteredInRect(r,choiceList[i].c_str(), Color::black);
+ 
+             } else {
+-                s.bltStringShadowedCenter(choiceList[i].c_str(), Color::white, Color::black);
++                dest.bltStringCenteredInRect(r,choiceList[i].c_str(), Color::white);
+             }
+ 
+             r.translate(iXY(0, ChoiceItemHeight));
+         }
+     }
+     //isOpen = 0;
++    position = oldpos;
+ } // end Choice::draw
+ 
+ // add
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Choice.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -69,7 +69,7 @@
+         callback = newcallback;
+     }
+ 
+-    virtual void draw(Surface &amp;dest);
++    virtual void draw( int posx, int posy, Surface &amp;dest);
+     virtual void render()
+     {
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Component.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -117,7 +117,7 @@
+     void setLocation(const iXY &amp;p) { setLocation(p.x, p.y); }
+     void setName(const std::string&amp; name) { Component::componentName = name; }
+ 
+-    virtual void draw(Surface &amp;dest)
++    virtual void draw(int posx, int posy, Surface &amp;dest)
+     {
+         iRect bounds;
+         getBounds(bounds);
+@@ -125,7 +125,7 @@
+         if ( dirty )
+             render();
+         
+-        surface.blt(dest, bounds.min.x, bounds.min.y);
++        surface.blt(dest, posx + bounds.min.x, posy + bounds.min.y);
+     }
+     
+     virtual void render() = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -84,16 +84,21 @@
+     mouseView = findViewContaining(mousePos);
+ 
+     // Check for mouseEnter and mouseExit.
+-    if (mouseView != prevMouseView) {
+-        if (mouseView != 0) {
++    if (mouseView != prevMouseView)
++    {
++        if (mouseView != 0)
++        {
+             mouseView-&gt;mouseEnter(mouseView-&gt;getScreenToClientPos(mousePos));
+         }
+-        if (prevMouseView != 0) {
++
++        if (prevMouseView != 0)
++        {
+             prevMouseView-&gt;mouseExit(prevMouseView-&gt;getScreenToClientPos(mousePos));
+         }
+     }
+ 
+-    if (mouseView != 0) {
++    if (mouseView != 0)
++    {
+         mouseView-&gt;mouseMove(mouseView-&gt;getScreenToClientPos(prevMousePos), mouseView-&gt;getScreenToClientPos(mousePos));
+     }
+ 
+@@ -103,25 +108,32 @@
+     //
+     //////////////////////////////////////////////////////////////////////////
+ 
+-    if (curButton &amp; MouseInterface::left_button_mask) {
++    if (curButton &amp; MouseInterface::left_button_mask)
++    {
+         // The button is down.  See if it just got pressed, or if it was pressed
+         // before and is being dragged.
+-        if (!(prevButton &amp; MouseInterface::left_button_mask)) {
++        if (!(prevButton &amp; MouseInterface::left_button_mask))
++        {
+             // The mouse button just got pressed. Remember the initial place
+             // where it got pressed.
+             lMouseDownPos = mousePos;
+ 
+             // Is this a double click? **FIX THE DOUBLE CLICK SENSITIVITY**
+-            if (lMouseView != 0) {
++            if (lMouseView != 0)
++            {
+                 // XXX what is this? ;-) commented out to avoid warning
+                 //int shit = 123456789;
+ 
+-            } else {
++            }
++            else
++            {
+                 // Not a double click.  See what window we're over
+                 lMouseView = mouseView;
+-                if (lMouseView != 0) {
++                if (lMouseView != 0)
++                {
+                     lMouseView-&gt;lMouseDown(lMouseView-&gt;getScreenToClientPos(mousePos));
+-                    if (focus != lMouseView) {
++                    if (focus != lMouseView)
++                    {
+                         activate(lMouseView);
+                     }
+                     // We are over a window.  Get the standard mouse actions for that
+@@ -130,39 +142,52 @@
+                     // mouseActionOffset is relative to the current window
+                     mouseActionOffset = mousePos - lMouseView-&gt;min;
+                     mouseActions      = lMouseView-&gt;getMouseActions(mouseActionOffset);
+-                    if (mouseActions != 0) {
++                    if (mouseActions != 0)
++                    {
+                         // A standard mouse action is supposed to happen here.  Remember
+                         // what that action is, and record the offset of the mouse from
+                         // the window, so the distance we move the mouse is the distance
+                         // the window gets resized, etc. exactly.
+ 
+-                        if (lMouseView-&gt;status &amp; View::STATUS_ALLOW_RESIZE) {
+-                            if (mouseActions &amp; View::MA_RESIZE_LEFT) {
++                        if (lMouseView-&gt;status &amp; View::STATUS_ALLOW_RESIZE)
++                        {
++                            if (mouseActions &amp; View::MA_RESIZE_LEFT)
++                            {
+                                 mouseActionOffset.x = mousePos.x - lMouseView-&gt;min.x;
+-                            } else if (mouseActions &amp; View::MA_RESIZE_RIGHT) {
++                            }
++                            else if (mouseActions &amp; View::MA_RESIZE_RIGHT)
++                            {
+                                 mouseActionOffset.x = lMouseView-&gt;max.x - mousePos.x;
+                             }
+ 
+-                            if (mouseActions &amp; View::MA_RESIZE_TOP) {
++                            if (mouseActions &amp; View::MA_RESIZE_TOP)
++                            {
+                                 mouseActionOffset.y = mousePos.y - lMouseView-&gt;min.y;
+-                            } else if (mouseActions &amp; View::MA_RESIZE_BOTTOM) {
++                            }
++                            else if (mouseActions &amp; View::MA_RESIZE_BOTTOM)
++                            {
+                                 mouseActionOffset.y = lMouseView-&gt;max.y - mousePos.y;
+                             }
+                         }
+ 
+                         doMouseActions(mousePos);
+ 
+-                    } else {
++                    }
++                    else
++                    {
+                         // No standard mouse actions.  Tell the window that the mouse
+                         // just got pressed.
+                     }
+                 }
+             }
+-        } else {
++        }
++        else
++        {
+             // The mouse was down before and is still down.  Are we performing
+             // and standard window actions?
+ 
+-            if (lMouseView != 0 &amp;&amp; mouseActions != 0) {
++            if (lMouseView != 0 &amp;&amp; mouseActions != 0)
++            {
+                 //throw Exception(&quot;Double click!&quot;);
+ 
+                 // Yes - it's a double click.  Inform the window as such.
+@@ -170,7 +195,9 @@
+ 
+                 // We're doing some standard mouse actions.  Do them.
+                 doMouseActions(mousePos);
+-            } else {
++            }
++            else
++            {
+                 //currentMouseDownTime += TimerInterface::getTimeSlice();
+                 //totalMouseDownTime   += TimerInterface::getTimeSlice();
+                 //
+@@ -196,18 +223,23 @@
+                 // No standard mouse actions.  Tell the window where the mouse
+                 // was originally clicked that the mouse is being dragged over
+                 // it.
+-                if (lMouseView != 0) {
++                if (lMouseView != 0)
++                {
+                     lMouseView-&gt;lMouseDrag(lMouseView-&gt;getScreenToClientPos(lMouseDownPos), lMouseView-&gt;getScreenToClientPos(prevMousePos), lMouseView-&gt;getScreenToClientPos(mousePos));
+                 }
+             }
+         }
+-    } else {
++    }
++    else
++    {
+         // The mouse button is up.
+         //See if it just got released, or if it was up before.
+-        if (prevButton &amp; MouseInterface::left_button_mask) {
++        if (prevButton &amp; MouseInterface::left_button_mask)
++        {
+             // The mouse button just got released.  If it was on top of a window
+             // before, then tell the window that the button was released
+-            if (lMouseView != 0) {
++            if (lMouseView != 0)
++            {
+                 lMouseView-&gt;lMouseUp(lMouseView-&gt;getScreenToClientPos(lMouseDownPos), lMouseView-&gt;getScreenToClientPos(mousePos));
+             }
+             // Set double click deadline
+@@ -225,46 +257,59 @@
+     //
+     //////////////////////////////////////////////////////////////////////////
+ 
+-    if (curButton &amp; MouseInterface::right_button_mask) {
++    if (curButton &amp; MouseInterface::right_button_mask)
++    {
+         // The button is down.  See if it just got pressed, or if it was pressed
+         // before and is being dragged.
+-        if (!(prevButton &amp; MouseInterface::right_button_mask)) {
++        if (!(prevButton &amp; MouseInterface::right_button_mask))
++        {
+             // The mouse button just got pressed. Remember the initial place
+             // where it got pressed.
+             rMouseDownPos = mousePos;
+ 
+             // Is this a double click? **FIX THE DOUBLE CLICK SENSITIVITY**
+-            if (rMouseView != 0 &amp;&amp; now() &lt;= rDoubleClickDeadline &amp;&amp; 0) {
++            if (rMouseView != 0 &amp;&amp; now() &lt;= rDoubleClickDeadline &amp;&amp; 0)
++            {
+                 //throw Exception(&quot;Double click!&quot;);
+ 
+                 // Yes - it's a double click.  Inform the window as such.
+                 rMouseView-&gt;rMouseDouble(rMouseView-&gt;getScreenToClientPos(mousePos));
+-            } else {
++            }
++            else
++            {
+                 // Not a double click.  See what window we're over.
+                 rMouseView = mouseView;
+-                if (rMouseView != 0) {
++                if (rMouseView != 0)
++                {
+                     // No standard mouse actions.  Tell the window that the mouse
+                     // just got pressed.
+                     rMouseView-&gt;rMouseDown(rMouseView-&gt;getScreenToClientPos(mousePos));
+                 }
+             }
+-        } else {
++        }
++        else
++        {
+             // The mouse was down before and is still down.
+ 
+             // No standard mouse actions.  Tell the window where the mouse
+             // was originally clicked that the mouse is being dragged over
+             // it.
+-            if (rMouseView != 0) {
++            if (rMouseView != 0)
++            {
+                 rMouseView-&gt;rMouseDrag(rMouseView-&gt;getScreenToClientPos(rMouseDownPos), rMouseView-&gt;getScreenToClientPos(prevMousePos), rMouseView-&gt;getScreenToClientPos(mousePos));
+             }
+         }
+-    } else {
++    }
++    else
++    {
+         // The mouse button is up.
+         //See if it just got released, or if it was up before.
+-        if (prevButton &amp; MouseInterface::right_button_mask) {
++        if (prevButton &amp; MouseInterface::right_button_mask)
++        {
+             // The mouse button just got released.  If it was on top of a window
+             // before, then tell the window that the button was released
+-            if (rMouseView != 0) {
++            if (rMouseView != 0)
++            {
+                 rMouseView-&gt;rMouseUp(rMouseView-&gt;getScreenToClientPos(rMouseDownPos), rMouseView-&gt;getScreenToClientPos(mousePos));
+             }
+ 
+@@ -279,11 +324,13 @@
+ 
+     //mouseView = findViewContaining(mousePos);
+     unsigned effActions = mouseActions;
+-    if (mouseView != 0 &amp;&amp; effActions == 0) {
++    if (mouseView != 0 &amp;&amp; effActions == 0)
++    {
+         effActions = mouseView-&gt;getMouseActions(mousePos-mouseView-&gt;min);
+     }
+ 
+-    if (focus != 0) {
++    if (focus != 0)
++    {
+         focus-&gt;processEvents();
+         KeyboardInterface::flushCharBuffer();
+     }
+@@ -297,7 +344,8 @@
+ void Desktop::draw(Surface&amp; surface)
+ {
+     std::vector&lt;View*&gt;::reverse_iterator i;
+-    for(i = views.rbegin(); i != views.rend(); i++) {
++    for(i = views.rbegin(); i != views.rend(); i++)
++    {
+         (*i)-&gt;draw(surface);
+     }
+ } // end draw
+@@ -312,7 +360,9 @@
+     LOGGER.warning(&quot;Desktop:add(%p) name=%s&quot;, view, view-&gt;searchName);
+     views.push_back(view);
+     if (autoActivate)
++    {
+         activate(view);
++    }
+ } // end add
+ 
+ // remove
+@@ -322,7 +372,9 @@
+ void Desktop::remove(View *view)
+ {
+     if ( view )
++    {
+         std::remove(views.begin(), views.end(), view);
++    }
+ } // end add
+ 
+ 
+@@ -336,16 +388,23 @@
+ 
+     // If the top window equals the window to activate, then nothing needs to
+     // be done.
+-    if (focus != view) {
+-        if (focus != 0)	{
++    if (focus != view)
++    {
++        if (focus != 0)
++        {
+             focus-&gt;deactivate();
+         }
+ 
+-         if (!(view-&gt;getAlwaysOnBottom())) {
+-            for(size_t i = 0; i&lt;views.size(); i++) {
+-                if(views[i] == view) {
++         if (!(view-&gt;getAlwaysOnBottom()))
++         {
++            for(size_t i = 0; i&lt;views.size(); i++)
++            {
++                if(views[i] == view)
++                {
+                     for(size_t i2 = i; i2 &gt;= 1; i2--)
++                    {
+                         views[i2] = views[i2-1];
++                    }
+                     views[0] = view;
+                     break;
+                 }
+@@ -484,30 +543,42 @@
+ {
+     if (lMouseView == 0) return;
+ 
+-    if (mouseActions &amp; View::MA_MOVE) {
++    if (mouseActions &amp; View::MA_MOVE)
++    {
+         // Move the window
+         // XXX need to check for screen size
+         //lMouseView-&gt;moveTo(mousePos - mouseActionOffset);
+-    } else if (mouseActions &amp; View::MA_SCROLL_BAR) {
++    }
++    else if (mouseActions &amp; View::MA_SCROLL_BAR)
++    {
+         lMouseView-&gt;scrollBarMove(lMouseView-&gt;getScreenToClientPos(prevMousePos), lMouseView-&gt;getScreenToClientPos(mousePos));
+-    } else if (lMouseView-&gt;getResize()) {
++    }
++    else if (lMouseView-&gt;getResize())
++    {
+         // Resize the window and move it if necessary
+         iXY resizeMin(lMouseView-&gt;min);
+         iXY resizeMax(lMouseView-&gt;max);
+ 
+-        if (mouseActions &amp; View::MA_RESIZE_LEFT) {
++        if (mouseActions &amp; View::MA_RESIZE_LEFT)
++        {
+             resizeMin.x = min(	mousePos.x - mouseActionOffset.x,
+                                lMouseView-&gt;max.x - View::RESIZE_XMINSIZE);
+         }
+-        if (mouseActions &amp; View::MA_RESIZE_TOP) {
++        
++        if (mouseActions &amp; View::MA_RESIZE_TOP)
++        {
+             resizeMin.y = min(	mousePos.y + mouseActionOffset.y,
+                                lMouseView-&gt;max.y - View::RESIZE_XMINSIZE);
+         }
+-        if (mouseActions &amp; View::MA_RESIZE_RIGHT) {
++        
++        if (mouseActions &amp; View::MA_RESIZE_RIGHT)
++        {
+             resizeMax.x = max(	mousePos.x + mouseActionOffset.x,
+                                lMouseView-&gt;min.x + View::RESIZE_XMINSIZE);
+         }
+-        if (mouseActions &amp; View::MA_RESIZE_BOTTOM) {
++        
++        if (mouseActions &amp; View::MA_RESIZE_BOTTOM)
++        {
+             resizeMax.y = max(	mousePos.y + mouseActionOffset.y,
+                                lMouseView-&gt;min.y + View::RESIZE_YMINSIZE);
+         }
+@@ -618,8 +689,8 @@
+     setDisplayStatusBar(false);
+     setVisible(false);
+ 
+-    resizeClientArea(iXY(320, 400));
+     moveTo(iXY(0, 0));
++    resize(iXY(320, 400));
+ 
+     add( new Label( 0, 0,   &quot;Name&quot;, Color::white) );
+     add( new Label( 200, 0, &quot;Status&quot;, Color::white) );
+@@ -628,15 +699,15 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void DesktopView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void DesktopView::doDraw()
+ {
+-    viewArea.fill(Color::black);
++    fill(Color::black);
+ 
+     int yOffset = 10;
+     char strBuf[256];
+ 
+     for (int i = 0; i &lt; Desktop::getViewCount(); i++) {
+-        clientArea.bltString(0, yOffset, Desktop::getViewSearchName(i), Color::white);
++        drawString(0, yOffset, Desktop::getViewSearchName(i), Color::white);
+ 
+         if (Desktop::getViewStatus(Desktop::getViewSearchName(i)) &amp; STATUS_VISIBLE) {
+             sprintf(strBuf, &quot;STATUS_VISIBLE&quot;);
+@@ -645,12 +716,12 @@
+             sprintf(strBuf, &quot;INVISIBLE&quot;);
+         }
+ 
+-        clientArea.bltString(200, yOffset, strBuf, Color::white);
++        drawString(200, yOffset, strBuf, Color::white);
+ 
+         yOffset += Surface::getFontHeight();
+     }
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end doDraw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -174,7 +174,7 @@
+ public:
+     DesktopView();
+ 
+-    virtual void doDraw(Surface &amp;viewArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void rMouseDrag(const iXY &amp;downPos, const iXY &amp;prevPos, const iXY &amp;newPos);
+     virtual void doActivate();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -27,8 +27,12 @@
+ #include &quot;Interfaces/GameManager.hpp&quot;
+ 
+ void
+-InfoBar::draw(Surface &amp;dest)
++InfoBar::draw( int posx, int posy, Surface &amp;dest)
+ {
++    iXY oldpos = position;
++    position.x += posx;
++    position.y += posy;
++
+     iRect r(position.x, position.y, dest.getWidth(), position.y+12);
+     dest.bltLookup(r, Palette::darkGray256.getColorArray());
+ 
+@@ -57,5 +61,5 @@
+              );
+     
+     dest.bltStringShadowed(position.x+2,position.y+2,buf,Color::white, Color::black);
+-
++    position = oldpos;
+ }
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/InfoBar.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -32,7 +32,7 @@
+         position.y = y;
+     }
+     
+-    void draw(Surface &amp;dest);
++    void draw( int posx, int posy, Surface &amp;dest);
+     
+     virtual void render()
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Label.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -19,15 +19,15 @@
+ #include &quot;Label.hpp&quot;
+ 
+ void
+-Label::draw(Surface &amp;dest)
++Label::draw( int posx, int posy, Surface &amp;dest)
+ {    
+     if ( shadowed )
+     {
+-        dest.bltStringShadowed(position.x, position.y, text.c_str(), foreground, background);
++        dest.bltStringShadowed(posx + position.x, posy + position.y, text.c_str(), foreground, background);
+     }
+     else
+     {
+-        dest.bltString(position.x, position.y, text.c_str(), foreground);
++        dest.bltString(posx + position.x, posy + position.y, text.c_str(), foreground);
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Label.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -37,7 +37,7 @@
+         position.y = y;
+     }
+     
+-    void draw(Surface &amp;dest);
++    void draw( int posx, int posy, Surface &amp;dest);
+     
+     virtual void render()
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -57,13 +57,18 @@
+ }
+ 
+ void
+-MiniMap::draw(Surface &amp;dest)
++MiniMap::draw( int posx, int posy, Surface &amp;dest)
+ {
+     //regenerate();
+-    surface.blt(dest,position.x, position.y);
++    iXY oldpos(position);
++    position.x += posx;
++    position.y += posy;
++
++    surface.blt(dest, position.x, position.y);
+     drawObjectives(dest);
+     drawUnits(dest);
+     drawWorldAndMouseBox(dest);
++    position = oldpos;
+ }
+ 
+ void
+@@ -305,8 +310,8 @@
+     if ( mouseinside )
+     {
+         iXY size(world_win.getSize());
+-        world_win.min = mousepos - (size/2);
+-        world_win.max = world_win.min + size;
++        world_win.min = (mousepos - (size/2)) + position;
++        world_win.max = (world_win.min + size);
+         dest.drawBoxCorners(world_win, 5, Color::red);
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -31,7 +31,7 @@
+     MiniMap(int x, int y, int w, int h);
+     virtual ~MiniMap();
+     
+-    void draw(Surface &amp;dest);
++    void draw( int posx, int posy, Surface &amp;dest);
+     
+     virtual void render()
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -129,8 +129,12 @@
+ 
+ // draw
+ //---------------------------------------------------------------------------
+-void ScrollBar::draw(Surface &amp;dest)
++void ScrollBar::draw( int posx, int posy, Surface &amp;dest)
+ {
++    iXY oldpos = position;
++    position.x += posx;
++    position.y += posy;
++
+     setLocation();
+     setSize();
+ 
+@@ -162,7 +166,6 @@
+ 
+         iRect r(drawMin, drawMin + size);
+ 
+-        surface.setTo(dest, r);
+         //surface.fill(Color::gray128);
+         //surface.shade(Color::white);
+ 
+@@ -171,15 +174,15 @@
+             int midHandlePos = (int) (float(size.y) * percent);
+ 
+             r = iRect(0, midHandlePos, size.x, midHandlePos);
+-            surface.fillRect(r, Color::gray128);
+-            surface.drawButtonBorder(r, Color::gray64, Color::gray192);
++            dest.fillRect(r, Color::gray128);
++            dest.drawButtonBorder(r, Color::gray64, Color::gray192);
+ 
+         } else if (orientation == HORIZONTAL) {
+             int midHandlePos = (int) (float(size.x) * percent);
+ 
+             r = iRect(midHandlePos, 0, midHandlePos, size.y);
+-            surface.fillRect(r, Color::gray128);
+-            surface.drawButtonBorder(r, Color::gray64, Color::gray192);
++            dest.fillRect(r, Color::gray128);
++            dest.drawButtonBorder(r, Color::gray64, Color::gray192);
+ 
+         } else {
+             assert(false);
+@@ -249,7 +252,7 @@
+         //surface.fill(background);
+         //surface.shade(Color::red);
+     }
+-
++    position = oldpos;
+ } // end ScrollBar::draw
+ 
+ // clicked
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/ScrollBar.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -114,7 +114,7 @@
+         ScrollBar::viewableAmount = viewableAmount;
+     }
+ 
+-    virtual void draw(Surface &amp;dest);
++    virtual void draw( int posx, int posy, Surface &amp;dest);
+     virtual void render()
+     {
+         
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -17,6 +17,8 @@
+ */
+ #include &lt;config.h&gt;
+ 
++#include &quot;2D/Color.hpp&quot;
++
+ #include &quot;Views/Components/View.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+ #include &quot;Views/Components/Label.hpp&quot;
+@@ -26,6 +28,9 @@
+ #include &quot;ViewGlobals.hpp&quot;
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;InputEvent.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Views/GameViewGlobals.hpp&quot;
++#include &quot;2D/Palette.hpp&quot;
+ 
+ const int RESIZE_WIDTH = 10;
+ const int RESIZE_XMIN  = RESIZE_WIDTH;
+@@ -136,8 +141,7 @@
+ void View::drawBorder(Surface &amp;viewArea)
+ {
+     assert(this != 0);
+-    
+-    viewArea.drawWindowsBorder();
++    currentscreen-&gt;drawRect(iRect(min, max), Color::darkGray);
+ } // end drawBorder
+ 
+ // drawTitle
+@@ -150,23 +154,21 @@
+     assert(this != 0);
+ 
+     iRect r(borderSize, borderSize, getSizeX() - borderSize, borderSize + moveAreaHeight - 1);
++    r.translate(min);
+ 
+-    Surface s;
+-    s.setTo(viewArea, r);
++    viewArea.fillRect(r, getActive() ? activeWindowTitleBodyColor : inactiveWindowTitleBodyColor);
+ 
+-    s.fill(getActive() ? activeWindowTitleBodyColor : inactiveWindowTitleBodyColor);
+-
+     char strBuf[256];
+ 
+     sprintf(strBuf, &quot;%s%s&quot;, title, subTitle);
+ 
+-    s.bltStringCenter(strBuf, getActive() ? activeWindowTitleTextColor : inactiveWindowTitleTextColor);
++    viewArea.bltStringCenteredInRect(r, strBuf, getActive() ? activeWindowTitleTextColor : inactiveWindowTitleTextColor);
+ 
+     if (getResize()) {
+         {
+             // Bottom-Left resize.
+-            iXY verticalPos(borderSize, getSizeY() - borderSize - moveAreaHeight + 1);
+-            iXY horizontalPos(borderSize + moveAreaHeight - 1, getSizeY() - borderSize);
++            iXY verticalPos(min.x + borderSize, min.y + getSizeY() - borderSize - moveAreaHeight + 1);
++            iXY horizontalPos(min.x + borderSize + moveAreaHeight - 1, min.y + getSizeY() - borderSize);
+ 
+             viewArea.drawLine(verticalPos, horizontalPos, Color::white);
+             verticalPos.y++;
+@@ -208,8 +210,8 @@
+ 
+         // Top-Left resize.
+         {
+-            iXY verticalPos(borderSize, borderSize + moveAreaHeight - 1);
+-            iXY horizontalPos(borderSize + moveAreaHeight - 1, borderSize);
++            iXY verticalPos(min.x + borderSize, min.y + borderSize + moveAreaHeight - 1);
++            iXY horizontalPos(min.x + borderSize + moveAreaHeight - 1, min.y + borderSize);
+ 
+             viewArea.drawLine(verticalPos, horizontalPos, Color::white);
+             verticalPos.y--;
+@@ -251,8 +253,8 @@
+ 
+         // Top-Right resize.
+         {
+-            iXY verticalPos(getSizeX() - borderSize, borderSize + moveAreaHeight - 1);
+-            iXY horizontalPos(getSizeX() - borderSize - moveAreaHeight, borderSize - 1);
++            iXY verticalPos(min.x + getSizeX() - borderSize, min.y + borderSize + moveAreaHeight - 1);
++            iXY horizontalPos(min.x + getSizeX() - borderSize - moveAreaHeight, min.y + borderSize - 1);
+ 
+             viewArea.drawLine(verticalPos, horizontalPos, Color::white);
+             verticalPos.y--;
+@@ -294,8 +296,8 @@
+ 
+         // Bottom-Right resize.
+         {
+-            iXY verticalPos(getSizeX() - borderSize, getSizeY() - borderSize - moveAreaHeight + 1);
+-            iXY horizontalPos(getSizeX() - borderSize - moveAreaHeight + 1, getSizeY() - borderSize);
++            iXY verticalPos(min.x + getSizeX() - borderSize, min.y + getSizeY() - borderSize - moveAreaHeight + 1);
++            iXY horizontalPos(min.x + getSizeX() - borderSize - moveAreaHeight + 1, min.y + getSizeY() - borderSize);
+ 
+             viewArea.drawLine(verticalPos, horizontalPos, Color::white);
+             verticalPos.y++;
+@@ -342,17 +344,11 @@
+ //---------------------------------------------------------------------------
+ void View::draw(Surface&amp; surface)
+ {
+-    assert(this != 0);
+-
+     if (!getVisible())
+         return;
+ 
+     currentscreen = &surface; // hack
+-    Surface* viewarea = getViewArea(surface);
+-    Surface* clientarea = getClientArea(surface);
+-    doDraw(*viewarea, *clientarea);
+-    delete viewarea;
+-    delete clientarea;
++    doDraw();
+ } // end draw
+ 
+ // activate
+@@ -396,33 +392,33 @@
+ //---------------------------------------------------------------------------
+ // Purpose: Default implementation - draws all the componentList of the window.
+ //---------------------------------------------------------------------------
+-void View::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void View::doDraw()
+ {
+     if (getShowStatus()) {
+-        drawStatus(clientArea);
++        drawStatus(*currentscreen);
+     }
+ 
+-    drawDefinedButtons(clientArea);
+-    drawInputFields(clientArea);
+-    drawHighlightedButton(clientArea);
+-    drawPressedButton(clientArea);
++    drawDefinedButtons();
++    drawInputFields();
++    drawHighlightedButton();
++    drawPressedButton();
+ 
+     // Draw all non-selected components.
+     ComponentsIterator i;
+     for ( i=components.begin(); i != components.end(); i++) {
+         if (*i != focusComponent) {
+-            (*i)-&gt;draw(clientArea);
++            (*i)-&gt;draw(clientRect.min.x, clientRect.min.y, *currentscreen);
+         }
+     }
+ 
+     // Now draw the selected component.
+     if (focusComponent != 0) {
+-        focusComponent-&gt;draw(clientArea);
++        focusComponent-&gt;draw(clientRect.min.x, clientRect.min.y, *currentscreen);
+     }
+ 
+     if (getBordered()) {
+-        drawTitle(viewArea);
+-        drawBorder(viewArea);
++        drawTitle(*currentscreen);
++        drawBorder(*currentscreen);
+     }
+ } // end View::doDraw
+ 
+@@ -542,14 +538,7 @@
+ //---------------------------------------------------------------------------
+ iXY View::getScreenToClientPos(const iXY &amp;pos)
+ {
+-    assert(this != 0);
+-
+-    if (getBordered()) {
+-        return iXY( pos.x - (min.x + borderSize),
+-                    pos.y - (min.y + borderSize + moveAreaHeight));
+-    }
+-
+-    return getScreenToViewPos(pos);
++    return pos-clientRect.min;
+ } // end View::getScreenToClientPos
+ 
+ // getScreenToViewPos
+@@ -562,58 +551,16 @@
+ {
+     assert(this != 0);
+ 
+-    return iXY(pos.x - min.x, pos.y - min.y);
++    return pos-min;
+ } // end getScreenToViewPos
+ 
+-// getViewArea
+-//---------------------------------------------------------------------------
+-// Purpose: Returns a Surface of the view's dimensions.
+-//---------------------------------------------------------------------------
+-Surface* View::getViewArea(Surface&amp; dest)
+-{
+-    assert(this != 0);
+-
+-    iRect rect(min, max);
+-    Surface *ns;
+-    ns = new Surface();
+-    ns-&gt;setTo(dest,rect);
+-    return ns;
+-} // end View::getViewArea
+-
+-// getClientArea
+-//---------------------------------------------------------------------------
+-// Purpose:
+-//---------------------------------------------------------------------------
+-Surface* View::getClientArea(Surface&amp; dest)
+-{
+-    Surface* viewarea = getViewArea(dest);
+-    if (getBordered()) {
+-        iRect rect( borderSize, borderSize+moveAreaHeight,
+-                    getSizeX() - borderSize, getSizeY() - borderSize );
+-        Surface *ns = new Surface();
+-        ns-&gt;setTo(*viewarea, rect);
+-        delete viewarea;
+-        return ns;
+-    }
+-
+-    return viewarea;
+-} // end View::getClientArea
+-
+ // getClientRect
+ //---------------------------------------------------------------------------
+ // Purpose:
+ //---------------------------------------------------------------------------
+ iRect View::getClientRect() const
+ {
+-    if (getBordered()) {
+-        return iRect( borderSize,
+-                      borderSize + moveAreaHeight,
+-                      getSizeX() - borderSize,
+-                      getSizeY() - borderSize);
+-    }
+-
+-    return iRect(0, 0, getSizeX(), getSizeY());
+-
++    return clientRect;
+ } // end View::getClientRect
+ 
+ // mouseMove
+@@ -953,12 +900,12 @@
+ //---------------------------------------------------------------------------
+ // Purpose:
+ //---------------------------------------------------------------------------
+-void View::drawDefinedButtons(Surface &amp;clientArea)
++void View::drawDefinedButtons()
+ {
+     std::vector&lt;cButton*&gt;::iterator i;
+     for(i = buttons.begin(); i != buttons.end(); i++) {
+         cButton* button = *i;
+-        button-&gt;topSurface.blt(clientArea, button-&gt;getBounds().min);
++        button-&gt;topSurface.blt(*currentscreen, clientRect.min + button-&gt;getBounds().min);
+     }
+ } // end drawDefinedButtons
+ 
+@@ -966,14 +913,17 @@
+ //---------------------------------------------------------------------------
+ // Purpose:
+ //---------------------------------------------------------------------------
+-void View::drawInputFields(Surface &amp;clientArea)
++void View::drawInputFields()
+ {
+     for (size_t num = 0; num &lt; inputFields.size(); num++) {
+         if (num == (size_t) selectedInputField) {
+-            inputFields[num]-&gt;drawHighlighted(clientArea);
++            inputFields[num]-&gt;drawHighlighted();
+         } else {
+-            inputFields[num]-&gt;draw(clientArea);
++            inputFields[num]-&gt;draw();
+         }
++        inputFields[num]-&gt;inputFieldSurface.blt(*currentscreen,
++                            clientRect.min.x + inputFields[num]-&gt;bounds.min.x,
++                            clientRect.min.y + inputFields[num]-&gt;bounds.min.y);
+     }
+ } // end drawInputFields
+ 
+@@ -981,7 +931,7 @@
+ //---------------------------------------------------------------------------
+ // Purpose: Draws the correct image frame for the currently highlighted button.
+ //---------------------------------------------------------------------------
+-void View::drawHighlightedButton(Surface &amp;clientArea)
++void View::drawHighlightedButton()
+ {
+     assert(this != 0);
+ 
+@@ -989,10 +939,10 @@
+         return;
+     } else if (buttons[highlightedButton]-&gt;topSurface.getFrameCount() &lt; 2) {
+         cButton* button = buttons[highlightedButton];
+-        clientArea.drawRect(iRect(button-&gt;getBounds().min.x,
+-                                  button-&gt;getBounds().min.y,
+-                                  button-&gt;getBounds().max.x,
+-                                  button-&gt;getBounds().max.y),
++        currentscreen-&gt;drawRect(iRect(clientRect.min.x + button-&gt;getBounds().min.x,
++                                  clientRect.min.y + button-&gt;getBounds().min.y,
++                                  clientRect.max.x + button-&gt;getBounds().max.x,
++                                  clientRect.max.y + button-&gt;getBounds().max.y),
+                             Color::red);
+         return;
+     }
+@@ -1007,9 +957,9 @@
+ 
+     // Change to the highlight button frame.
+     buttons[highlightedButton]-&gt;topSurface.setFrame(1);
+-    buttons[highlightedButton]-&gt;topSurface.blt(clientArea,
+-            iXY(buttons[highlightedButton]-&gt;getBounds().min.x,
+-                buttons[highlightedButton]-&gt;getBounds().min.y));
++    buttons[highlightedButton]-&gt;topSurface.blt(*currentscreen,
++            iXY(clientRect.min.x + buttons[highlightedButton]-&gt;getBounds().min.x,
++                clientRect.min.y + buttons[highlightedButton]-&gt;getBounds().min.y));
+     buttons[highlightedButton]-&gt;topSurface.setFrame(0);
+ 
+ } // end drawHighlightedButton
+@@ -1115,23 +1065,14 @@
+ //---------------------------------------------------------------------------
+ void View::drawStatus(Surface &amp;dest)
+ {
+-    // Draw the status bar.
+-    iRect clientRect(getClientRect());
++    iRect r( min.x, max.y - DEFAULT_STATUS_BAR_HEIGHT, max.x, max.y);
+ 
+-    iRect r(0,
+-            clientRect.getSizeY() - DEFAULT_STATUS_BAR_HEIGHT,
+-            clientRect.getSizeX(),
+-            clientRect.getSizeY());
++    currentscreen-&gt;fillRect(r, Color::gray192);
+ 
+-    Surface s;
+-    s.setTo(dest, r);
+-    s.fill(Color::gray192);
+-
+     // Draw the status text.
+     if (statusText != 0) {
+         int pos = (DEFAULT_STATUS_BAR_HEIGHT - Surface::getFontHeight()) &gt;&gt; 1;
+-
+-        s.bltString(pos, pos, statusText, Color::black);
++        currentscreen-&gt;bltString(r.min.x + pos, r.min.y + pos, statusText, Color::black);
+     }
+ } // end View::drawStatus
+ 
+@@ -1174,7 +1115,7 @@
+ //---------------------------------------------------------------------------
+ // Purpose: Draws the selected button.
+ //---------------------------------------------------------------------------
+-void View::drawPressedButton(Surface &amp;clientArea)
++void View::drawPressedButton()
+ {
+     assert(this != 0);
+ 
+@@ -1184,9 +1125,9 @@
+ 
+     // Chage to the highlight button frame.
+     buttons[pressedButton]-&gt;topSurface.setFrame(2);
+-    buttons[pressedButton]-&gt;topSurface.blt(clientArea,
+-            iXY(buttons[pressedButton]-&gt;getBounds().min.x,
+-                buttons[pressedButton]-&gt;getBounds().min.y));
++    buttons[pressedButton]-&gt;topSurface.blt(*currentscreen,
++            iXY(clientRect.min.x + buttons[pressedButton]-&gt;getBounds().min.x,
++                clientRect.min.y + buttons[pressedButton]-&gt;getBounds().min.y));
+     buttons[pressedButton]-&gt;topSurface.setFrame(0);
+ } // drawPressedButton
+ 
+@@ -1196,11 +1137,14 @@
+ //---------------------------------------------------------------------------
+ void View::checkResolution(iXY oldResolution, iXY newResolution)
+ {
+-        iXY size = getSize();
+-
+-        min.x += (newResolution.x - oldResolution.x)/2;
+-        min.y += (newResolution.y - oldResolution.y)/2;
+-        max = min + size;
++//        iXY size = getSize();
++//
++//        min.x += (newResolution.x - oldResolution.x)/2;
++//        min.y += (newResolution.y - oldResolution.y)/2;
++//        max = min + size;
++    iXY newpos = min + ((newResolution-oldResolution) / 2);
++    //newpos -= getSize() / 2;
++    moveTo(newpos);
+ } // end checkResolution
+ 
+ void View::checkArea(iXY viewarea)
+@@ -1216,27 +1160,6 @@
+         moveTo(min.x, viewarea.y - getSize().y);
+ }
+ 
+-// RESIZE CLIENT AREA
+-//---------------------------------------------------------------------------
+-// Purpose: Resize the client area of the window.  The window area will be
+-//          resized accordingly.
+-//---------------------------------------------------------------------------
+-void View::resizeClientArea(const iXY &amp;size)
+-{
+-    // These variables constitue the gap space needed for the window borders and
+-    // move area.
+-    int xExtra = borderSize * 2;
+-    int yExtra = xExtra + moveAreaHeight;
+-
+-    iXY destSize(size);
+-
+-    // Add the area for the borders and move area.
+-    destSize.x += xExtra;
+-    destSize.y += yExtra;
+-
+-    resize(destSize);
+-} // end View::resizeClientArea
+-
+ // RESIZE
+ //---------------------------------------------------------------------------
+ // Purpose: Resizes the current window to the specified size.
+@@ -1244,7 +1167,24 @@
+ void View::resize(const iXY &amp;size)
+ {
+     iXY destSize(size);
++    clientRect.min = min;
++    clientRect.max = min + size;
+ 
++    if ( getBordered() )
++    {
++        clientRect.min.x += borderSize;
++        clientRect.min.y += borderSize + moveAreaHeight;
++        clientRect.max.x += borderSize;
++        clientRect.max.y += borderSize + moveAreaHeight;
++        destSize.x += borderSize * 2;
++        destSize.y += (borderSize * 2) + moveAreaHeight;
++    }
++
++    if ( getShowStatus() )
++    {
++        destSize.y += DEFAULT_STATUS_BAR_HEIGHT;
++    }
++
+     max = min + destSize;
+ } // end View::resize
+ 
+@@ -1279,9 +1219,12 @@
+ //---------------------------------------------------------------------------
+ void View::moveTo(iXY destMin)
+ {
+-    iXY size = getSize();
+-    min = destMin;
+-    max = min + size;
++    iXY diff = destMin - min;
++    min += diff;
++    max += diff;
++    clientRect.min += diff;
++    clientRect.max += diff;
++
+ } // end moveTo
+ 
+ // toggleView
+@@ -1415,3 +1358,101 @@
+     }
+ }
+ 
++void
++View::drawString(int x, int y, const char * str, const PIX&amp; color)
++{
++    x += clientRect.min.x;
++    y += clientRect.min.y;
++    currentscreen-&gt;bltString(x, y, str, color);
++}
++
++void
++View::drawStringCenter(const char* string, PIX color)
++{
++    currentscreen-&gt;bltStringCenteredInRect(clientRect, string, color);
++}
++
++void
++View::drawStringInBox( const iRect &amp;rect, const char *string, PIX color, int gapSpace, bool drawBox)
++{
++    iRect r(rect);
++    r.translate(clientRect.min);
++    currentscreen-&gt;bltStringInBox(r, string, color, gapSpace, drawBox);
++}
++
++void
++View::drawStringShadowed(int x, int y, const char *str, const PIX &amp;textColor, const PIX &amp;shadowColor)
++{
++    x += clientRect.min.x;
++    y += clientRect.min.y;
++    currentscreen-&gt;bltStringShadowed( x, y, str, textColor, shadowColor);
++}
++
++void
++View::drawImage( Surface &amp;s, int x, int y)
++{
++    s.blt(*currentscreen, clientRect.min.x + x, clientRect.min.y + y );
++}
++
++void
++View::drawImageTrans( Surface &amp;s, int x, int y)
++{
++    s.bltTrans(*currentscreen, clientRect.min.x + x, clientRect.min.y + y );
++}
++
++void
++View::drawTransRect(const iRect &amp;destRect, const PIX table[])
++{
++    iRect r(destRect);
++    r.translate(clientRect.min);
++    currentscreen-&gt;bltLookup(r,table);
++}
++
++void
++View::drawButtonBorder(iRect bounds, PIX topLeftColor, PIX bottomRightColor)
++{
++    bounds.translate(clientRect.min);
++    currentscreen-&gt;drawButtonBorder(bounds, topLeftColor, bottomRightColor);
++}
++
++void
++View::fill(const PIX&amp; color)
++{
++    currentscreen-&gt;fillRect(clientRect, color);
++}
++
++void
++View::drawRect(iRect bounds, const PIX&amp; color)
++{
++    bounds.translate(clientRect.min);
++    currentscreen-&gt;drawRect(bounds, color);
++}
++
++void
++View::fillRect(iRect bounds, const PIX&amp; color)
++{
++    bounds.translate(clientRect.min);
++    currentscreen-&gt;fillRect(bounds, color);
++}
++
++void
++View::drawViewBackground()
++{
++    if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_DARK_GRAY_BLEND)
++    {
++        currentscreen-&gt;bltLookup(*this, Palette::darkGray256.getColorArray());
++    }
++    else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_LIGHT_GRAY_BLEND)
++    {
++        currentscreen-&gt;bltLookup(*this, Palette::gray256.getColorArray());
++    }
++    else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_SOLID_BLACK)
++    {
++        currentscreen-&gt;fillRect(*this, Color::black);
++    }
++    else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_TRANSPARENT)
++    {
++        // nothing, so transparent
++    }
++
++}
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/View.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -45,7 +45,6 @@
+     void add(Component *Component);
+     void add(DEFAULT_VIEW_BUTTON button);
+ 
+-public:
+     typedef list&lt;Component *&gt; ComponentList;
+     typedef ComponentList::iterator ComponentsIterator;
+     
+@@ -82,11 +81,108 @@
+         return prevHighlightedButton;
+     }
+ 
++    // Hack city, should be protected???????
++    void setAlwaysOnBottom(const bool &amp;newStatus);
++    void setVisible(const bool &amp;newStatus);
++
++    View();
++    View(const iXY &amp;pos, const iXY &amp;size, const char *title);
++    virtual ~View();
++
++    enum { DEFAULT_MOVE_AREA_HEIGHT  = 12 };
++    enum { DEFAULT_STATUS_BAR_HEIGHT = 16 };
++    enum { DEFAULT_BORDER_SIZE       =  3 };
++    enum { DEFAULT_SNAP_TOLERANCE    = 20 };
++
++    void moveTo(iXY destMin);
++    inline void moveTo(const int &amp;x, const int &amp;y)
++    {
++        moveTo(iXY(x, y));
++    }
++    void removeAllButtons()
++    {
++        buttons.clear(); // XXX LEAK
++    }
++    void removeComponents()
++    {
++        ComponentsIterator i = components.begin();
++        while ( i != components.end() )
++        {
++            Component *c = *i;
++            i++;
++            delete c;
++        }
++        components.clear();
++        focusComponent      = 0;
++    }
++
++    // Accessor Functions.
++    inline const char *getSearchName() const
++    {
++        return searchName;
++    }
++    inline const char *getTitle() const
++    {
++        return title;
++    }
++    inline const char *getSubTitle() const
++    {
++        return subTitle;
++    }
++
++    inline int getActive() const
++    {
++        return status &amp; STATUS_ACTIVE;
++    }
++    inline int getVisible() const
++    {
++        return status &amp; STATUS_VISIBLE;
++    }
++    inline int getAllowMove() const
++    {
++        return status &amp; STATUS_ALLOW_MOVE;
++    }
++    inline int getBordered() const
++    {
++        return status &amp; STATUS_BORDERED;
++    }
++    inline int getAlwaysOnBottom() const
++    {
++        return status &amp; STATUS_ALWAYS_ON_BOTTOM;
++    }
++    inline int getShowStatus() const
++    {
++        return status &amp; STATUS_DISPLAY_STATUS_BAR;
++    }
++    inline int getResize() const
++    {
++        return status &amp; STATUS_ALLOW_RESIZE;
++    }
++    inline int getScrollBar() const
++    {
++        return status &amp; STATUS_SCROLL_BAR;
++    }
++
++    virtual int getMouseActions(const iXY &amp;p) const;
++
++    iRect getClientRect() const;
++
++    void drawString(int x, int y, const char * str, const PIX&amp; color);
++    void drawStringCenter(const char *string, PIX color);
++    void drawStringInBox( const iRect &amp;rect, const char *string, PIX color, int gapSpace = 14, bool drawBox = false);
++    void drawStringShadowed(int x, int y, const char *str, const PIX &amp;textColor, const PIX &amp;shadowColor);
++    void drawImage( Surface &amp;s, int x, int y);
++    void drawImageTrans( Surface &amp;s, int x, int y);
++    void drawTransRect(const iRect &amp;destRect, const PIX table[]);
++    void drawButtonBorder(iRect bounds, PIX topLeftColor, PIX bottomRightColor);
++    void drawRect(iRect bounds, const PIX &amp;color);
++    void drawViewBackground();
++    void fill(const PIX &amp;color);
++    void fillRect(iRect bounds, const PIX &amp;color);
++    
+ protected:
+     virtual void     actionPerformed(mMouseEvent )
+     {}
+-    Surface*         getViewArea(Surface&amp; dest);
+-    virtual Surface* getClientArea(Surface&amp; dest);
+ 
+     int              pressedButton;
+     int              prevPressedButton;
+@@ -133,7 +229,6 @@
+     void        activate  ();
+     void        deactivate();
+ 
+-protected:
+     typedef void (*ITEM_FUNC)(void);
+ 
+     // View Status Functions.
+@@ -149,9 +244,9 @@
+     // cButton Functions.
+     void addButtonPackedSurface(const iXY &amp;pos, PackedSurface &amp;source, const char *toolTip, ITEM_FUNC leftClickFunc);
+     void addButtonCenterText(const iXY &amp;pos, const int &amp;xSize, const char *nName, const char *nToolTip, ITEM_FUNC nLeftClickFunc);
+-    /*!FIXME!*/ void drawDefinedButtons   (Surface &amp;clientArea);
+-    void drawHighlightedButton(Surface &amp;clientArea);
+-    void drawPressedButton(Surface &amp;clientArea);
++    /*!FIXME!*/ void drawDefinedButtons   ();
++    void drawHighlightedButton();
++    void drawPressedButton();
+     void setPressedButton(const int &amp;cButton);
+     void setHighlightedButton(const int &amp;cButton);
+     int  findButtonContaining(const iXY &amp;pos);
+@@ -165,7 +260,7 @@
+     // Input Field Functions
+     cInputField* addInputField(const iXY &amp;pos, cInputFieldString *string, const char *excludedCharacters, const bool &amp;isSelected);
+     int  findInputFieldContaining(const iXY &amp;pos);
+-    void drawInputFields(Surface &amp;clientArea);
++    void drawInputFields();
+ 
+     /////////////////////////////////
+     void draw(Surface&amp; drawon);
+@@ -180,7 +275,7 @@
+ 
+     // These options can be modified on a per View type basis
+     virtual void drawBorder(Surface &amp;windowArea);
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+     virtual void doDeactivate();
+     virtual void mouseMove(const iXY &amp;prevPos, const iXY &amp;newPos);
+@@ -205,12 +300,6 @@
+         resize(iXY(x, y));
+     }
+ 
+-    void resizeClientArea(const iXY &amp;size);
+-    inline void resizeClientArea(const int &amp;x, const int &amp;y)
+-    {
+-        resizeClientArea(iXY(x, y));
+-    }
+-
+     virtual void processEvents();
+ 
+     int moveAreaHeight;
+@@ -218,94 +307,7 @@
+     int snapToTolerance;
+ 
+     Surface* currentscreen; // HACK
+-
+-public:
+-    // Hack city, should be protected???????
+-    void setAlwaysOnBottom(const bool &amp;newStatus);
+-    void setVisible(const bool &amp;newStatus);
+-
+-
+-    View();
+-    View(const iXY &amp;pos, const iXY &amp;size, const char *title);
+-    virtual ~View();
+-
+-    enum { DEFAULT_MOVE_AREA_HEIGHT  = 12 };
+-    enum { DEFAULT_STATUS_BAR_HEIGHT = 16 };
+-    enum { DEFAULT_BORDER_SIZE       =  3 };
+-    enum { DEFAULT_SNAP_TOLERANCE    = 20 };
+-
+-    void moveTo(iXY destMin);
+-    inline void moveTo(const int &amp;x, const int &amp;y)
+-    {
+-        moveTo(iXY(x, y));
+-    }
+-    void removeAllButtons()
+-    {
+-        buttons.clear(); // XXX LEAK
+-    }
+-    void removeComponents()
+-    {
+-        ComponentsIterator i = components.begin();
+-        while ( i != components.end() )
+-        {
+-            Component *c = *i;
+-            i++;
+-            delete c;
+-        }
+-        components.clear();
+-        focusComponent      = 0;
+-    }
+-
+-    // Accessor Functions.
+-    inline const char *getSearchName() const
+-    {
+-        return searchName;
+-    }
+-    inline const char *getTitle() const
+-    {
+-        return title;
+-    }
+-    inline const char *getSubTitle() const
+-    {
+-        return subTitle;
+-    }
+-
+-    inline int getActive() const
+-    {
+-        return status &amp; STATUS_ACTIVE;
+-    }
+-    inline int getVisible() const
+-    {
+-        return status &amp; STATUS_VISIBLE;
+-    }
+-    inline int getAllowMove() const
+-    {
+-        return status &amp; STATUS_ALLOW_MOVE;
+-    }
+-    inline int getBordered() const
+-    {
+-        return status &amp; STATUS_BORDERED;
+-    }
+-    inline int getAlwaysOnBottom() const
+-    {
+-        return status &amp; STATUS_ALWAYS_ON_BOTTOM;
+-    }
+-    inline int getShowStatus() const
+-    {
+-        return status &amp; STATUS_DISPLAY_STATUS_BAR;
+-    }
+-    inline int getResize() const
+-    {
+-        return status &amp; STATUS_ALLOW_RESIZE;
+-    }
+-    inline int getScrollBar() const
+-    {
+-        return status &amp; STATUS_SCROLL_BAR;
+-    }
+-
+-    virtual int getMouseActions(const iXY &amp;p) const;
+-
+-    iRect getClientRect() const;
++    iRect clientRect;
+ };
+ 
+ #endif // end __View_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -312,7 +312,7 @@
+ 
+ // draw
+ //--------------------------------------------------------------------------
+-void cInputField::draw(Surface &amp;dest)
++void cInputField::draw()
+ {
+     checkCursor();
+     checkRepeat();
+@@ -320,12 +320,12 @@
+     inputFieldSurface.fill(Color::black);
+     inputFieldSurface.drawButtonBorder(Color::white, Color::gray64);
+     inputFieldSurface.bltString(4, 2, destString+strDisplayStart, Color::white);
+-    inputFieldSurface.blt(dest, pos.x, pos.y);
++    //inputFieldSurface.blt(dest, pos.x, pos.y);
+ } // draw
+ 
+ // drawHighlighted
+ //--------------------------------------------------------------------------
+-void cInputField::drawHighlighted(Surface &amp;dest)
++void cInputField::drawHighlighted()
+ {
+     checkCursor();
+     checkRepeat();
+@@ -353,7 +353,7 @@
+         }
+     }
+ 
+-    inputFieldSurface.blt(dest, pos.x, pos.y);
++    //inputFieldSurface.blt(dest, pos.x, pos.y);
+ } // drawHighlighted
+ 
+ // checkCursor
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/cInputField.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -107,12 +107,13 @@
+     void setExcludedCharacters(const char *exChars);
+     void addChar(int newChar);
+     void addExtendedChar(int newExtendedChar);
+-   void draw(Surface &amp;dest);
+-    void drawHighlighted(Surface &amp;dest);
++    void draw();
++    void drawHighlighted();
+     void checkCursor();
+     void resetString();     // reset string position
+ 
+ private:
++    friend class View;
+     iXY      pos;
+     size_t   maxCharCount;
+     int     strDisplayStart;  // which char to start displaying from
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -76,16 +76,14 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void AreYouSureExitView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void AreYouSureExitView::doDraw()
+ {
+-    iRect r(min, max);
+-
+-    viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
++    drawTransRect(*this, Palette::darkGray256.getColorArray());
+     //viewArea.drawButtonBorder(r, Color::lightGreen, Color::darkGreen);
+ 
+-    viewArea.bltStringCenter(&quot;Are you sure you wish to exit netPanzer?&quot;, Color::white);
++    drawStringCenter(&quot;Are you sure you wish to exit netPanzer?&quot;, Color::white);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end AreYouSureExitView::doDraw
+ 
+ // doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureExitView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -30,7 +30,7 @@
+ public:
+     AreYouSureExitView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+ }; // end AreYouSureExitView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -146,16 +146,16 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void AreYouSureResignView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void AreYouSureResignView::doDraw()
+ {
+-    iRect r(min, max);
++    //iRect r(min, max);
+ 
+-    viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
++    drawTransRect(*this, Palette::darkGray256.getColorArray());
+     //viewArea.drawButtonBorder(r, Color::lightGreen, Color::darkGreen);
+ 
+-    viewArea.bltStringCenter(&quot;Are you sure you wish to Resign?&quot;, Color::white);
++    drawStringCenter(&quot;Are you sure you wish to Resign?&quot;, Color::white);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end AreYouSureResignView::doDraw
+ 
+ // doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/AreYouSureResignView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -30,7 +30,7 @@
+ public:
+     AreYouSureResignView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+ }; // end AreYouSureResignView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -119,7 +119,7 @@
+     long bXOffset;
+     INFO_AREA_Y_OFFSET = 2;
+ 
+-    resizeClientArea(area_size);
++    resize(area_size);
+ 
+     bXOffset = area_size.x / 3;
+     addButtonCenterText(iXY(0, INFO_AREA_Y_OFFSET), bXOffset,  &quot;Net&quot;, &quot;&quot;, buttonNetwork);
+@@ -154,25 +154,25 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void CodeStatsView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void CodeStatsView::doDraw()
+ {
+-    bltViewBackground(viewArea);
++    drawViewBackground();
+ 
+     switch( display_mode ) {
+     case _display_mode_network_stats :
+-        drawNetworkStats( clientArea );
++        drawNetworkStats();
+         break;
+ 
+     case _display_mode_sorter_stats :
+-        drawSorterStats( clientArea );
++        drawSorterStats();
+         break;
+ 
+     case _display_mode_pathing_stats :
+-        drawPathingStats( clientArea );
++        drawPathingStats();
+         break;
+ 
+     case _display_mode_unit_stats :
+-        drawUnitStats( clientArea );
++        drawUnitStats();
+         break;
+     }
+ 
+@@ -183,12 +183,12 @@
+ 
+     clientArea.bltString(2, INFO_AREA_Y_OFFSET - 18, strBuf, Color::white);
+     */
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end CodeStatsView::doDraw
+ 
+ //---------------------------------------------------------------------------
+-void CodeStatsView::drawNetworkStats(Surface &amp;clientArea)
++void CodeStatsView::drawNetworkStats()
+ {
+ 
+     char strBuf[256];
+@@ -197,58 +197,58 @@
+ 
+     sprintf(strBuf, &quot;Packets&quot; );
+ 
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Sent %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::packets_sent,
+             NetworkState::packets_sent_per_sec,
+             ((float) NetworkState::packets_sent) / ((float) NetworkState::packets_sent_time) );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Recv %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::packets_received,
+             NetworkState::packets_received_per_sec,
+             ((float) NetworkState::packets_received) / ((float) NetworkState::packets_received_time) );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Bytes&quot; );
+ 
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Sent %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::bytes_sent,
+             NetworkState::bytes_sent_per_sec,
+             ((float) NetworkState::bytes_sent) / ((float) NetworkState::packets_sent_time) );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Recv %ld, %.4f 1/s, %.4f Avg&quot;,NetworkState::bytes_received,
+             NetworkState::bytes_received_per_sec,
+             ((float) NetworkState::bytes_received) / ((float) NetworkState::packets_received_time) );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Opcodes&quot; );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Sent : %ld, %.4f 1/s &quot;, NetworkState::opcodes_sent,
+             NetworkState::opcodes_sent_per_sec );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Recv : %ld, %.4f 1/s&quot;, NetworkState::opcodes_received,
+             NetworkState::opcodes_received_per_sec );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+@@ -258,12 +258,12 @@
+         sprintf(strBuf, &quot;Ping Time: NA&quot; );
+     }
+ 
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+     str_loc.y += 12;
+ }
+ 
+ //---------------------------------------------------------------------------
+-void CodeStatsView::drawSorterStats(Surface &amp;clientArea)
++void CodeStatsView::drawSorterStats()
+ {
+ 
+     char strBuf[256];
+@@ -271,20 +271,20 @@
+     iXY str_loc(2, INFO_AREA_Y_OFFSET);
+ 
+     sprintf(strBuf, &quot;Sorter&quot; );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     for ( unsigned long i = 0; i &lt; _MAX_HEIGHT_LEVELS; i++ ) {
+         sprintf(strBuf, &quot;Level %lu : %lu  &quot;, i, SPRITE_SORTER.getMaxSprites( i ) );
+-        clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++        drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+         str_loc.y += 12;
+     }
+ 
+ }
+ 
+ //---------------------------------------------------------------------------
+-void CodeStatsView::drawPathingStats(Surface &amp;clientArea)
++void CodeStatsView::drawPathingStats()
+ {
+ 
+     char strBuf[256];
+@@ -292,53 +292,53 @@
+     iXY str_loc(2, INFO_AREA_Y_OFFSET);
+ 
+     sprintf(strBuf, &quot;Pathing&quot; );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;A* Time: %.6f s&quot;, PathingState::astar_gen_time );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;A* Avg: %.6f s&quot;, PathingState::getAverageAstarPathTime() );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;A* Total: %.6f s&quot;, PathingState::astar_gen_time_total );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Path Length: %ld &quot;, PathingState::path_length );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Paths: %lu &quot;, PathingState::path_gen_count );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Updates: %lu &quot;, PathingState::update_gen_count );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Cache Hits: %lu &quot;, PathingState::path_cache_hits );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+     sprintf(strBuf, &quot;Cache Misses: %lu &quot;, PathingState::path_cache_misses );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ }
+ 
+ //---------------------------------------------------------------------------
+-void CodeStatsView::drawUnitStats(Surface &amp;clientArea)
++void CodeStatsView::drawUnitStats()
+ {
+ 
+     char strBuf[256];
+@@ -349,7 +349,7 @@
+     iXY str_loc(2, INFO_AREA_Y_OFFSET);
+ 
+     sprintf(strBuf, &quot;Units&quot; );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+@@ -361,12 +361,12 @@
+         total += units;
+ 
+         sprintf(strBuf, &quot;Player %d : %lu  &quot;, i, units);
+-        clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++        drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+         str_loc.y += 12;
+     }
+ 
+     sprintf(strBuf, &quot;UnitTotal : %d&quot;, total );
+-    clientArea.bltString(str_loc.x, str_loc.y, strBuf, Color::white);
++    drawString(str_loc.x, str_loc.y, strBuf, Color::white);
+ 
+     str_loc.y += 12;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/CodeStatsView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -30,15 +30,15 @@
+ class CodeStatsView : public GameTemplateView
+ {
+ protected:
+-    void drawNetworkStats(Surface &amp;clientArea);
+-    void drawSorterStats(Surface &amp;clientArea);
+-    void drawPathingStats(Surface &amp;clientArea);
+-    void drawUnitStats(Surface &amp;clientArea );
++    void drawNetworkStats();
++    void drawSorterStats();
++    void drawPathingStats();
++    void drawUnitStats();
+ 
+ public:
+     CodeStatsView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ }; // end CodeStatsView
+ 
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -129,14 +129,12 @@
+ }
+ 
+ void
+-DisconectedView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++DisconectedView::doDraw()
+ {
+-    iRect r(min, max);
++    drawTransRect(*this, Palette::darkGray256.getColorArray());
++    drawStringCenter(disconectMsg.c_str(), Color::white);
+ 
+-    viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+-    viewArea.bltStringCenter(disconectMsg.c_str(), Color::white);
+-
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/DisconectedView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -34,7 +34,7 @@
+ public:
+     DisconectedView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+     void setMsg(const char * msg) { disconectMsg=msg; }
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -95,15 +95,15 @@
+ }
+ // doDraw
+ //---------------------------------------------------------------------------
+-void GameView::doDraw(Surface &amp;va, Surface &amp;clientArea)
++void GameView::doDraw()
+ {
+     // Added for debugging, accesible through LibView.
+     //screen-&gt;fill(0);
+ 
+     if (gDrawSolidBackground) {
+-        screen-&gt;fill(250);
++        fill(250);
+     } else {
+-        drawMap(clientArea);
++        drawMap(*currentscreen);
+     }
+ 
+     // Added for debugging, accesible through LibView.
+@@ -117,24 +117,24 @@
+     SPRITE_SORTER.reset(world_win);
+ 
+     PackedSurface::totalDrawCount = 0;
+-    ParticleSystem2D::drawAll(clientArea, SPRITE_SORTER );
+-    Particle2D::drawAll(clientArea, SPRITE_SORTER );
++    ParticleSystem2D::drawAll( SPRITE_SORTER );
++    Particle2D::drawAll( SPRITE_SORTER );
+ 
+     UnitInterface::offloadGraphics( SPRITE_SORTER );
+     ProjectileInterface::offloadGraphics( SPRITE_SORTER );
+     ObjectiveInterface::offloadGraphics( SPRITE_SORTER );
+     PowerUpInterface::offloadGraphics( SPRITE_SORTER );
+ 
+-    SPRITE_SORTER.blitLists(&amp;clientArea);
++    SPRITE_SORTER.blitLists(currentscreen);
+ 
+-    VehicleSelectionView::drawMiniProductionStatus(clientArea);
++    VehicleSelectionView::drawMiniProductionStatus(*currentscreen);
+ 
+     COMMAND_PROCESSOR.draw();
+ 
+     // Make sure the console info is the last thing drawn.
+-    ConsoleInterface::update(clientArea);
++    ConsoleInterface::update(*currentscreen);
+     
+-    View::doDraw(va, clientArea);
++    View::doDraw();
+ } // end GameView::doDraw
+ 
+ // lMouseDown
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -37,7 +37,7 @@
+     void checkResolution(iXY oldResolution, iXY newResolution);
+ 
+ private:
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     //virtual void mouseEnter(const iXY &amp;pos);
+     virtual void mouseMove(const iXY &amp; prevPos, const iXY &amp;newPos);
+     void drawMap(Surface &amp;window);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -132,16 +132,17 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void HelpScrollView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void HelpScrollView::doDraw()
+ {
+-    if (Desktop::getVisible(&quot;GameView&quot;)) {
+-        bltViewBackground(viewArea);
++    if (Desktop::getVisible(&quot;GameView&quot;))
++    {
++        drawViewBackground();
+     }
+ 
+-    drawHelpText(clientArea, 0, 0);
++    drawHelpText( 0, 0);
+ 
+-    clientArea.bltString(   4,
+-                            clientArea.getHeight() - Surface::getFontHeight(),
++    drawString(   4,
++                            clientRect.getSizeY() - Surface::getFontHeight(),
+                             &quot;Note: Use the right mouse button to accomplish fast mouse clicking.&quot;,
+                             Color::white);
+ 
+@@ -149,12 +150,12 @@
+     //sprintf(strBuf, &quot;%d&quot;, scrollBar-&gt;getValue());
+     //clientArea.bltStringCenter(strBuf, Color::red);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end HelpScrollView::doDraw
+ 
+ // drawHelpText
+ //--------------------------------------------------------------------------
+-void HelpScrollView::drawHelpText(Surface &amp;dest, const int &amp;, const int &amp;)
++void HelpScrollView::drawHelpText( const int &amp;, const int &amp;)
+ {
+     PIX color   = Color::white;
+ 
+@@ -170,7 +171,7 @@
+     //
+     int curIndex = 0;
+     for (int i = topViewableItem; i &lt; topViewableItem + maxViewableItems; i++) {
+-        dest.bltString(1, 6 + curIndex * (TEXT_GAP_SPACE +
++        drawString(1, 6 + curIndex * (TEXT_GAP_SPACE +
+                     Surface::getFontHeight()), text[i].c_str(), color);
+         curIndex++;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -35,7 +35,7 @@
+     int rows;
+ 
+     int  maxYOffset;
+-    void drawHelpText(Surface &amp;dest, const int &amp;x, const int &amp;y);
++    void drawHelpText( const int &amp;x, const int &amp;y);
+ 
+     ScrollBar *scrollBar;
+     std::vector&lt;std::string&gt; text;
+@@ -56,7 +56,7 @@
+         delete scrollBar;
+     }
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void actionPerformed(mMouseEvent me);
+     virtual void doActivate();
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -128,7 +128,7 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void LibView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void LibView::doDraw()
+ {
+     //bltViewBackground(viewArea);
+ 
+@@ -138,102 +138,102 @@
+ 
+     switch(displayMode) {
+     case LIBVIEW_MODE_SURFACE_INFO: {
+-            drawSurfaceInfo(clientArea, iXY(x, y));
++            drawSurfaceInfo( iXY(x, y));
+         }
+         break;
+     case LIBVIEW_MODE_PARTICLE_INFO: {
+-            drawParticleInfo(clientArea, iXY(x, y));
++            drawParticleInfo( iXY(x, y));
+         }
+         break;
+     case LIBVIEW_MODE_ENVIRONMENT_INFO: {
+-            drawEnvironmentInfo(clientArea, iXY(x, y));
++            drawEnvironmentInfo( iXY(x, y));
+         }
+         break;
+     }
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end LibView::doDraw
+ 
+ //--------------------------------------------------------------------------
+-void LibView::drawSurfaceInfo(Surface &amp;dest, iXY pos)
++void LibView::drawSurfaceInfo( iXY pos)
+ {
+     int  yOffset = 15;
+ 
+     char strBuf[256];
+ 
+-    dest.bltString(pos.x, pos.y, &quot;-- Surface Info --&quot;, Color::green);
++    drawString(pos.x, pos.y, &quot;-- Surface Info --&quot;, Color::green);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Alive Count: %d&quot;, Surface::getTotalSurfaceCount());
+-    dest.bltString(pos.x, pos.y, strBuf, Color::white);
++    drawString(pos.x, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Mem: %d b, %d k, %3.2f MG&quot;, Surface::getTotalByteCount(), Surface::getTotalByteCount() / 1024, float(Surface::getTotalByteCount()) / 1024.0f / 1024.0f);
+-    dest.bltString(pos.x, pos.y, strBuf, Color::white);
++    drawString(pos.x, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+-    dest.bltString(pos.x, pos.y, &quot;-- Packed Surface Info --&quot;, Color::green);
++    drawString(pos.x, pos.y, &quot;-- Packed Surface Info --&quot;, Color::green);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Alive Count: %d&quot;, PackedSurface::getTotalSurfaceCount());
+-    dest.bltString(pos.x, pos.y, strBuf, Color::white);
++    drawString(pos.x, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Draw Count:  %d&quot;, PackedSurface::totalDrawCount);
+-    dest.bltString(pos.x, pos.y, strBuf, Color::white);
++    drawString(pos.x, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Mem: %d b, %d k, %3.2f MG&quot;, PackedSurface::getTotalByteCount(), PackedSurface::getTotalByteCount() / 1024, float(PackedSurface::getTotalByteCount()) / 1024.0f / 1024.0f);
+-    dest.bltString(pos.x, pos.y, strBuf, Color::white);
++    drawString(pos.x, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+-    dest.bltString(pos.x, pos.y, &quot;-- ColorTable Info --&quot;, Color::green);
++    drawString(pos.x, pos.y, &quot;-- ColorTable Info --&quot;, Color::green);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Count:     %d&quot;, ColorTable::getTotalColorArrayCount());
+-    dest.bltString(pos.x, pos.y, strBuf, Color::white);
++    drawString(pos.x, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Mem: %d b, %d k, %3.2f MG&quot;, ColorTable::getTotalByteCount(), ColorTable::getTotalByteCount() / 1024, float(ColorTable::getTotalByteCount()) / 1024.0f / 1024.0f);
+-    dest.bltString(pos.x, pos.y, strBuf, Color::white);
++    drawString(pos.x, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ }
+ 
+ //--------------------------------------------------------------------------
+-void LibView::drawParticleInfo(Surface &amp;dest, iXY pos)
++void LibView::drawParticleInfo( iXY pos)
+ {
+     int  yOffset = 15;
+     int  xOffset = 15;
+ 
+     char strBuf[256];
+ 
+-    dest.bltString(pos.x, pos.y, &quot;-- Particle Info --&quot;, Color::green);
++    drawString(pos.x, pos.y, &quot;-- Particle Info --&quot;, Color::green);
+     pos.y += yOffset;
+ 
+-    dest.bltString(pos.x, pos.y, &quot;This frame count&quot;, Color::yellow);
++    drawString(pos.x, pos.y, &quot;This frame count&quot;, Color::yellow);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Particle Systems: %d&quot;, ParticleSystem2D::getParticleSystemCount());
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Particles:        %d&quot;, Particle2D::getFrameCount());
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+-    dest.bltString(pos.x, pos.y, &quot;Peak count&quot;, Color::yellow);
++    drawString(pos.x, pos.y, &quot;Peak count&quot;, Color::yellow);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Particle Systems: %d&quot;, ParticleSystem2D::getPeakParticleSystemCount());
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Particles:        %d&quot;, Particle2D::getPeakCount());
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+-    dest.bltString(pos.x, pos.y, &quot;Crater info&quot;, Color::yellow);
++    drawString(pos.x, pos.y, &quot;Crater info&quot;, Color::yellow);
+     pos.y += yOffset;
+ 
+     float hitCount;
+@@ -243,36 +243,36 @@
+     hitCount  = CraterParticle2D::getCacheHitCount();
+ 
+     sprintf(strBuf, &quot;Cache Miss:                %d (%%%2.2f)&quot;, int(missCount), 100.0f * (missCount / (hitCount + missCount)));
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Cache Hit:                 %d (%%%2.2f)&quot;, int(hitCount), 100.0f * (hitCount / (hitCount + missCount)));
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     missCount = ParticleInterface::getExplosionFlameFlashCullMissCount();
+     hitCount  = ParticleInterface::getExplosionFlameFlashCullHitCount();
+ 
+-    dest.bltString(pos.x, pos.y, &quot;Cull info&quot;, Color::yellow);
++    drawString(pos.x, pos.y, &quot;Cull info&quot;, Color::yellow);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Explosion Flame Flash Miss:%d (%%%2.2f)&quot;, int(missCount), 100.0f * (missCount / (hitCount + missCount)));
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Explosion Flame Flash Hit: %d (%%%2.2f)&quot;, int(hitCount), 100.0f * (hitCount / (hitCount + missCount)));
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     missCount = ParticleInterface::getMuzzleSystemCullMissCount();
+     hitCount  = ParticleInterface::getMuzzleSystemCullHitCount();
+ 
+     sprintf(strBuf, &quot;Muzzle System Miss:        %d (%%%2.2f)&quot;, int(missCount), 100.0f * (missCount / (hitCount + missCount)));
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ 
+     sprintf(strBuf, &quot;Muzzle System Hit:         %d (%%%2.2f)&quot;, int(hitCount), 100.0f * (hitCount / (hitCount + missCount)));
+-    dest.bltString(pos.x + xOffset, pos.y, strBuf, Color::white);
++    drawString(pos.x + xOffset, pos.y, strBuf, Color::white);
+     pos.y += yOffset;
+ }
+ 
+@@ -293,26 +293,26 @@
+ 
+ // drawEnvironmentInfo
+ //---------------------------------------------------------------------------
+-void LibView::drawEnvironmentInfo(Surface &amp;dest, iXY pos)
++void LibView::drawEnvironmentInfo( iXY pos)
+ {
+     int  yOffset = 15;
+     //int  xOffset = 15;
+ 
+     char strBuf[256];
+ 
+-    dest.bltString(pos.x, pos.y, &quot;-- Environment Info --&quot;, Color::green);
++    drawString(pos.x, pos.y, &quot;-- Environment Info --&quot;, Color::green);
+     pos.y += yOffset;
+ 
+     int windSpeed = gameconfig-&gt;windspeed;
+     sprintf(strBuf, &quot;Wind:   %s (%d pix/sec)&quot;,
+             HostOptionsView::windSpeedString.c_str(), windSpeed);
+-    dest.bltString(pos.x, pos.y, strBuf, Color::yellow);
++    drawString(pos.x, pos.y, strBuf, Color::yellow);
+     pos.y += yOffset;
+ 
+     int cloudCount = gameconfig-&gt;cloudcoverage;
+     sprintf(strBuf, &quot;Clouds: %s (%d allocated)&quot;,
+             HostOptionsView::cloudCoverageString.c_str(), cloudCount);
+-    dest.bltString(pos.x, pos.y, strBuf, Color::yellow);
++    drawString(pos.x, pos.y, strBuf, Color::yellow);
+     pos.y += yOffset;
+ 
+ } // end LibView::drawEnvironmentInfo
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LibView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -36,9 +36,9 @@
+ class LibView : public GameTemplateView
+ {
+ protected:
+-    void drawSurfaceInfo(Surface &amp;clientArea, iXY pos);
+-    void drawParticleInfo(Surface &amp;clientArea, iXY pos);
+-    void drawEnvironmentInfo(Surface &amp;dest, iXY pos);
++    void drawSurfaceInfo( iXY pos);
++    void drawParticleInfo( iXY pos);
++    void drawEnvironmentInfo( iXY pos);
+ 
+     CheckBox * checkBoxAllowParticleGeneration;
+     CheckBox * checkBoxAllowTimeSlice;
+@@ -54,7 +54,7 @@
+     virtual ~LibView()
+     {}
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void rMouseDrag(const iXY &amp;downPos, const iXY &amp;prevPos, const iXY &amp;newPos);
+     virtual void doActivate();
+     virtual void actionPerformed(mMouseEvent me);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -52,7 +52,7 @@
+ 
+ 
+ void
+-LoadingView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++LoadingView::doDraw()
+ {
+     if ( Palette::getName() != &quot;netpmenu&quot; )
+     {
+@@ -63,10 +63,10 @@
+         render();
+     
+     screen-&gt;fill(Color::black);
+-    backgroundSurface.blt(clientArea, 0, 0);
+-    surface.blt(clientArea, 179, 153);
++    drawImage(backgroundSurface, 0, 0);
++    drawImage(surface, 179, 153);
+     
+-    View::doDraw(viewArea, clientArea);    
++    View::doDraw();    
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/LoadingView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -92,7 +92,7 @@
+     virtual void doActivate();
+     virtual void doDeactivate();
+     
+-    void doDraw(Surface &amp;viewArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     void render();
+     
+ private:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -56,10 +56,10 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void MiniMapView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void MiniMapView::doDraw()
+ {
+     // border
+-    viewArea.drawRect(iRect(0,0,viewArea.getWidth(), viewArea.getHeight()),Color::gray);
++    drawRect(iRect(0,0,clientRect.getSizeX(), clientRect.getSizeY()),Color::gray);
+     
+-    GameTemplateView::doDraw(viewArea, clientArea);
++    GameTemplateView::doDraw();
+ } // end doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -33,7 +33,7 @@
+ 
+     void init();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ 
+ protected:
+     void checkResolution(iXY oldResolution, iXY newResolution);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -78,7 +78,7 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void RankView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void RankView::doDraw()
+ {
+     // make sure the window is big enough for all players
+     unsigned int CHAR_YPIX = Surface::getFontHeight();
+@@ -86,20 +86,20 @@
+     unsigned int entryheight = std::max(CHAR_YPIX, flagHeight) + 2;
+     unsigned int newheight = 60 + entryheight * PlayerInterface::countPlayers();
+     
+-    if ( newheight != (unsigned int)getSizeY() ) {
++    if ( newheight != (unsigned int)clientRect.getSizeY() ) {
+         resize(iXY(450, newheight));
+         return; // this frame draws nothing
+     }
+     
+-    bltViewBackground(viewArea);
++    drawViewBackground();
+ 
+-    clientArea.drawButtonBorder(
+-            iRect(0, 26, getClientRect().getSize().x - 1,
+-                getClientRect().getSize().y - 1), Color::gray64, Color::white);
++    drawButtonBorder(
++            iRect(0, 26, clientRect.getSize().x - 1,
++                clientRect.getSize().y - 1), Color::gray64, Color::white);
+ 
+-    drawPlayerStats(clientArea, flagHeight);
++    drawPlayerStats( flagHeight);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end doDraw
+ 
+ class StatesSortByFrags
+@@ -129,7 +129,7 @@
+ //---------------------------------------------------------------------------
+ // Purpose:
+ //---------------------------------------------------------------------------
+-void RankView::drawPlayerStats(Surface &amp;dest, unsigned int flagHeight)
++void RankView::drawPlayerStats( unsigned int flagHeight)
+ {
+     char statBuf[256];
+ 
+@@ -165,10 +165,10 @@
+                 &quot;%-20s%10i%7i%6i%10i&quot;, state-&gt;getName().substr(0,20).c_str(),
+                 state-&gt;getKills(), state-&gt;getLosses(), state-&gt;getTotal(),
+                 state-&gt;getObjectivesHeld());
+-        dest.bltStringShadowed(offset.x, offset.y, statBuf, state-&gt;getColor(), Color::gray64);
++        drawStringShadowed(offset.x, offset.y, statBuf, state-&gt;getColor(), Color::gray64);
+         
+         flag = ResourceManager::getFlag(state-&gt;getFlag());
+-        flag-&gt;blt( dest, flagOffset.x, flagOffset.y );
++        drawImage( *flag, flagOffset.x, flagOffset.y );
+ 
+         offset.y += entryHeight;
+         flagOffset.y += entryHeight;        
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/RankView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -32,7 +32,7 @@
+ private:
+     int viewableMessageCount;
+     enum { ITEM_GAP_SPACE = 10 };
+-    void drawPlayerStats(Surface &amp;dest, unsigned int flagHeight);
++    void drawPlayerStats( unsigned int flagHeight);
+ 
+     ScrollBar *scrollBar;
+ 
+@@ -43,7 +43,7 @@
+         delete scrollBar;
+     }
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void notifyMoveTo();
+ }
+ ; // end _WIN
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -83,14 +83,14 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void ResignView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void ResignView::doDraw()
+ {
+-    iRect r(0, 0, currentscreen-&gt;getWidth(), currentscreen-&gt;getHeight());
++    //iRect r(0, 0, currentscreen-&gt;getWidth(), currentscreen-&gt;getHeight());
+ 
+-    currentscreen-&gt;bltLookup(r, Palette::darkGray256.getColorArray());
+-    currentscreen-&gt;drawButtonBorder(r, Color::lightGreen, Color::darkGreen);
++    drawTransRect(*this, Palette::darkGray256.getColorArray());
++    drawButtonBorder(*this, Color::lightGreen, Color::darkGreen);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end ResignView::doDraw
+ 
+ // doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/ResignView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -30,7 +30,7 @@
+ public:
+     ResignView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+ }; // end ResignView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -174,7 +174,7 @@
+     const int yOffset  = 15;
+     const int gapSpace =  1;
+ 
+-    resizeClientArea(48 * 5 + gapSpace * 4, 198 + 84);
++    resize(48 * 5 + gapSpace * 4, 198 + 84);
+ 
+     // Power status.
+     iXY pos(0 ,0);
+@@ -299,7 +299,7 @@
+ 
+ // doDraw
+ //--------------------------------------------------------------------------
+-void VehicleSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void VehicleSelectionView::doDraw()
+ {
+     if ( ObjectiveInterface::getObjectiveState(CURRENT_SELECTED_OUTPOST_ID)-&gt;occupying_player != PlayerInterface::getLocalPlayer() )
+     {
+@@ -377,7 +377,7 @@
+             // Draw the name of the outpost.
+         }}
+ 
+-    bltViewBackground(viewArea);
++    drawViewBackground();
+ 
+     OutpostStatus outpost_status;
+ 
+@@ -386,7 +386,7 @@
+     if (vsvUnitGenOn)
+     {
+         sprintf(strBuf, &quot;%s&quot;, getUnitName(vsvSelectedUnit));
+-        clientArea.bltString(   productionUnitPos.x, productionUnitPos.y, 
++        drawString(   productionUnitPos.x, productionUnitPos.y,
+                                 strBuf, color);
+ 
+         sprintf(strBuf, &quot;%01d:%02d/%01d:%02d&quot;,
+@@ -395,30 +395,30 @@
+                     ((int)outpost_status.unit_generation_time) / 60,
+                     ((int)outpost_status.unit_generation_time) % 60);
+          
+-        clientArea.bltString(   timeRequiredPos.x, timeRequiredPos.y, 
++        drawString(   timeRequiredPos.x, timeRequiredPos.y,
+                                 strBuf, color);
+     }
+     else
+     {
+         sprintf(strBuf, &quot;power off&quot;);
+-        clientArea.bltString(   productionUnitPos.x, productionUnitPos.y, 
++        drawString(   productionUnitPos.x, productionUnitPos.y,
+                                 strBuf, color);
+ 
+         sprintf(strBuf, &quot;power off&quot;);
+-        clientArea.bltString(   timeRequiredPos.x, timeRequiredPos.y, 
++        drawString(   timeRequiredPos.x, timeRequiredPos.y,
+                                 strBuf, color);
+     }
+ 
+     int unitPerPlayer = gameconfig-&gt;maxunits / gameconfig-&gt;maxplayers;
+     sprintf(strBuf, &quot;%d/%d&quot;, int(UnitInterface::getUnitCount(PlayerInterface::getLocalPlayerIndex())), unitPerPlayer);
+-    clientArea.bltString(unitsBuiltPos.x, unitsBuiltPos.y, strBuf, color);
++    drawString(unitsBuiltPos.x, unitsBuiltPos.y, strBuf, color);
+ 
+-    drawUnitProfileInfo(clientArea, iXY(0, unitProfileDataY), highlightedUnitType);
++    drawUnitProfileInfo( iXY(0, unitProfileDataY), highlightedUnitType);
+ 
+     //sprintf(strBuf, &quot;%01d:%02d&quot;, ( (int) outpost_status.unit_generation_time_remaining ) / 60, ( (int) outpost_status.unit_generation_time_remaining) % 60 );
+     //clientArea.bltString(timeRemainingPos, strBuf, color);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end VehicleSelectionView::doDraw
+ 
+@@ -739,7 +739,7 @@
+ 
+ } // end VehicleSelectionView::checkMaxValues
+ 
+-void VehicleSelectionView::drawUnitProfileInfo(Surface &amp;dest, const iXY &amp;pos, short int unitType)
++void VehicleSelectionView::drawUnitProfileInfo( const iXY &amp;pos, short int unitType)
+ {
+     if (unitType == -1) {
+         return;
+@@ -752,36 +752,36 @@
+     const int barOffset = 105;
+     int       barLength = getClientRect().getSizeX() - barOffset;
+ 
+-    dest.bltStringShadowed(loc.x, loc.y, &quot;Hit Points&quot;, Color::white, Color::black);
+-    drawBar(dest, iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;hit_points) / float(maxHitPoints));
++    drawStringShadowed(loc.x, loc.y, &quot;Hit Points&quot;, Color::white, Color::black);
++    drawBar(iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;hit_points) / float(maxHitPoints));
+     loc.y += gapSpace;
+ 
+-    dest.bltStringShadowed(loc.x, loc.y, &quot;Attack Power&quot;, Color::white, Color::black);
+-    drawBar(dest, iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;attack_factor) / float(maxAttackFactor));
++    drawStringShadowed(loc.x, loc.y, &quot;Attack Power&quot;, Color::white, Color::black);
++    drawBar(iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;attack_factor) / float(maxAttackFactor));
+     loc.y += gapSpace;
+ 
+-    dest.bltStringShadowed(loc.x, loc.y, &quot;Attack Range&quot;, Color::white, Color::black);
+-    drawBar(dest, iXY(loc.x + barOffset, loc.y), barLength, float(sqrt(profile-&gt;attack_range)) / float(maxAttackRange));
++    drawStringShadowed(loc.x, loc.y, &quot;Attack Range&quot;, Color::white, Color::black);
++    drawBar(iXY(loc.x + barOffset, loc.y), barLength, float(sqrt(profile-&gt;attack_range)) / float(maxAttackRange));
+     loc.y += gapSpace;
+ 
+-    dest.bltStringShadowed(loc.x, loc.y, &quot;Defend Range&quot;, Color::white, Color::black);
+-    drawBar(dest, iXY(loc.x + barOffset, loc.y), barLength, float(sqrt(profile-&gt;defend_range)) / float(maxDefendRange));
++    drawStringShadowed(loc.x, loc.y, &quot;Defend Range&quot;, Color::white, Color::black);
++    drawBar(iXY(loc.x + barOffset, loc.y), barLength, float(sqrt(profile-&gt;defend_range)) / float(maxDefendRange));
+     loc.y += gapSpace;
+ 
+-    dest.bltStringShadowed(loc.x, loc.y, &quot;Speed&quot;, Color::white, Color::black);
+-    drawBar(dest, iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;speed_factor + profile-&gt;speed_rate) / float(maxTotalSpeed));
++    drawStringShadowed(loc.x, loc.y, &quot;Speed&quot;, Color::white, Color::black);
++    drawBar(iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;speed_factor + profile-&gt;speed_rate) / float(maxTotalSpeed));
+     loc.y += gapSpace;
+ 
+-    dest.bltStringShadowed(loc.x, loc.y, &quot;Reload Time&quot;, Color::white, Color::black);
+-    drawBar(dest, iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;reload_time) / float(maxReloadTime));
++    drawStringShadowed(loc.x, loc.y, &quot;Reload Time&quot;, Color::white, Color::black);
++    drawBar(iXY(loc.x + barOffset, loc.y), barLength, float(profile-&gt;reload_time) / float(maxReloadTime));
+     loc.y += gapSpace;
+ }
+ 
+-void VehicleSelectionView::drawBar(Surface &amp;dest, const iXY &amp;pos, int length, float percent)
++void VehicleSelectionView::drawBar( const iXY &amp;pos, int length, float percent)
+ {
+     iXY size(int(float(length) * percent), Surface::getFontHeight());
+ 
+-    dest.fillRect(iRect(pos.x, pos.y, pos.x + size.x, pos.y + size.y), Color::red);
++    fillRect(iRect(pos.x, pos.y, pos.x + size.x, pos.y + size.y), Color::red);
+ }
+ 
+ // actionPerformed
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -82,8 +82,8 @@
+     int  getUnitRegenTime(unsigned short unitType);
+     void checkMaxValues(const UnitProfile &amp;profile);
+     void getProfileData();
+-    void drawBar(Surface &amp;dest, const iXY &amp;pos, int length, float percent);
+-    void drawUnitProfileInfo(Surface &amp;dest, const iXY &amp;pos, short int unitType);
++    void drawBar( const iXY &amp;pos, int length, float percent);
++    void drawUnitProfileInfo( const iXY &amp;pos, short int unitType);
+ 
+     iXY            productionUnitPos;
+     iXY            timeRequiredPos;
+@@ -100,7 +100,7 @@
+     {}
+ 
+     virtual void        doActivate();
+-    virtual void        doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void        mouseMove(const iXY &amp;prevPos, const iXY &amp;newPos);
+     static  const char *getUnitName(int unitType);
+     static  void        drawMiniProductionStatus(Surface &amp;dest);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -56,21 +56,3 @@
+ iRect bodyTextRect(27, 72, 620, 430);
+ 
+ bool gDrawGameHelp          = false;
+-
+-//--------------------------------------------------------------------------
+-void bltViewBackground(Surface &amp;dest)
+-{
+-    bltBlendRect(dest, dest.getRect());
+-}
+-
+-//--------------------------------------------------------------------------
+-void bltBlendRect(Surface &amp;dest, const iRect &amp;r)
+-{
+-    if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_DARK_GRAY_BLEND) {
+-        dest.bltLookup(r, Palette::darkGray256.getColorArray());
+-    } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_LIGHT_GRAY_BLEND) {
+-        dest.bltLookup(r, Palette::gray256.getColorArray());
+-    } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_SOLID_BLACK) {
+-        dest.fillRect(r, Color::black);
+-    } else if (gameconfig-&gt;viewdrawbackgroundmode == VIEW_BACKGROUND_TRANSPARENT) {}
+-}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/GameViewGlobals.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -68,9 +68,6 @@
+     VIEW_BACKGROUND_COUNT
+ };
+ 
+-void bltViewBackground(Surface &amp;dest);
+-void bltBlendRect(Surface &amp;dest, const iRect &amp;r);
+-
+ // Is the game help currently open?
+ extern bool gDrawGameHelp;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -33,9 +33,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void HelpView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void HelpView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ } // end HelpView::doDraw
+ 
+ // doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/HelpView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -31,7 +31,7 @@
+ public:
+     HelpView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+     virtual void doDeactivate();
+ }; // end HelpView
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -39,9 +39,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void MainMenuView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void MainMenuView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+     static char text[] =
+         &quot;This is NetPanzer version &quot; PACKAGE_VERSION
+@@ -61,5 +61,5 @@
+         &quot;Related Tools:\n&quot;
+         &quot;   Tobias Blerch, Ingo Ruhnke\n&quot;;
+ 
+-    viewArea.bltStringInBox(bodyTextRect, text, Color::white, 12);
++    drawStringInBox(bodyTextRect, text, Color::white, 12);
+ } // end MainMenuView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -28,7 +28,7 @@
+ public:
+     MainMenuView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ }; // end MainMenuView
+ 
+ #endif // end __MainMenuView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -17,6 +17,8 @@
+ */
+ #include &lt;config.h&gt;
+ 
++#include &quot;Types/iRect.hpp&quot;
++
+ #include &quot;Views/MainMenu/MenuTemplateView.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Views/Components/Desktop.hpp&quot;
+@@ -204,14 +206,17 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void MenuTemplateView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void MenuTemplateView::doDraw()
+ {
+     //setWorldRect();
+     if (Desktop::getVisible(&quot;GameView&quot;)) {
+ 	// When ingame, tint the game into gray
+-        clientArea.bltLookup(getClientRect(), Palette::darkGray256.getColorArray());
+-        clientArea.drawWindowsBorder();
+-
++        //r.translate(min);
++        //drawTransRect(clientRect, Palette::darkGray256.getColorArray());
++        //clientArea.drawWindowsBorder();
++        drawViewBackground();
++        drawRect(iRect(0,0,clientRect.getSizeX(), clientRect.getSizeY()), Color::gray64);
++        
+     } else {
+ 	// When in mainmenu, make background dark and draw menu image
+         if(screen-&gt;getWidth() &gt; 640 ||
+@@ -220,16 +225,17 @@
+         
+         // Set the following to get does exist.
+         if (backgroundSurface.getNumFrames() &gt; 0) {
+-            backgroundSurface.blt(viewArea, 0, 0);
++            drawImage( backgroundSurface, 0, 0);
+         } else {
+             throw Exception(&quot;Where is the background surface?&quot;);
+         }
+ 
+         //titlePackedSurface.blt(clientArea, bodyTextRect.min.x, 390);
+-        titlePackedSurface.bltBlend(clientArea, bodyTextRect.min.x, 390, Palette::colorTable6040);
++        //titlePackedSurface.bltBlend(clientArea, bodyTextRect.min.x, 390, Palette::colorTable6040);
++        titlePackedSurface.bltBlend(*currentscreen, min.x + 40, min.y+390, Palette::colorTable6040);
+     }
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end doDraw
+ 
+ // doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -44,7 +44,7 @@
+ public:
+     MenuTemplateView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+     virtual void doDeactivate();
+     virtual void processEvents();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -93,7 +93,7 @@
+     moveTo(bodyTextRect.min.x + bodyTextRect.getSizeX() / 2 + 10 + 30,
+            bodyTextRect.min.y + 50);
+ 
+-    resizeClientArea(bodyTextRect.getSizeX() / 2 - 10 - 30, 108);
++    resize(bodyTextRect.getSizeX() / 2 - 10 - 30, 108);
+ 
+     init();
+ 
+@@ -160,7 +160,7 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void FlagSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void FlagSelectionView::doDraw()
+ {
+     //iRect r(getViewRect());
+     //viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+@@ -169,15 +169,16 @@
+     sprintf(strBuf, &quot;Current:&quot;);
+     int CHAR_XPIX = 8; // XXX hardcoded
+     
+-    clientArea.bltStringShadowed(
+-            BORDER_SPACE,
+-            BORDER_SPACE + (playerFlag.getHeight() - Surface::getFontHeight()) / 2,
++    drawStringShadowed(
++            min.x + BORDER_SPACE,
++            min.y + BORDER_SPACE + (playerFlag.getHeight() - Surface::getFontHeight()) / 2,
+             strBuf, windowTextColor, windowTextColorShadow);
+     
+-    playerFlag.blt(clientArea, BORDER_SPACE + strlen(strBuf) * CHAR_XPIX + BORDER_SPACE, BORDER_SPACE);
++    drawImage(playerFlag, min.x + BORDER_SPACE + strlen(strBuf) * CHAR_XPIX + BORDER_SPACE, min.y + BORDER_SPACE);
+ 
+-    View::doDraw(viewArea, clientArea);
+ 
++    View::doDraw();
++
+ } // end FlagSelectionView::doDraw
+ void
+ FlagSelectionView::setSelectedFlag(string &amp;fname)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/FlagSelectionView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -44,7 +44,7 @@
+         return playerFlagSelected;
+     }
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     //virtual int  lMouseUp(const iXY &amp;downPos, const iXY &amp;upPos);
+     //virtual void drawBorder(Surface&amp; )
+     //{}
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -112,32 +112,32 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void GetSessionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void GetSessionView::doDraw()
+ {
+     if (previousSessionType != gameconfig-&gt;hostorjoin) {
+         loadTitleSurface();
+     }
+ 
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+-    drawInfo(clientArea);
++    drawInfo();
+ 
+ } // end GetSessionView::doDraw
+ 
+ //---------------------------------------------------------------------------
+-void GetSessionView::drawInfo(Surface &amp;dest)
++void GetSessionView::drawInfo()
+ {
+     int connectionType = gameconfig-&gt;hostorjoin;
+ 
+     if (connectionType == _game_session_host) {
+-        drawHostInfo(dest, bodyTextRect);
++        drawHostInfo(bodyTextRect);
+     } else if (connectionType == _game_session_join) {
+-        drawJoinInfo(dest, bodyTextRect);
++        drawJoinInfo(bodyTextRect);
+     }
+ }
+ 
+ //---------------------------------------------------------------------------
+-void GetSessionView::drawHostInfo(Surface &amp;dest, const iRect &amp;rect)
++void GetSessionView::drawHostInfo( const iRect &amp;rect)
+ {
+     static char	tcpipInfo[] =
+         &quot;HOSTING INTERNET GAMES\n&quot;
+@@ -154,11 +154,11 @@
+         &quot;\n&quot;
+         &quot;Click the Next button to proceed&quot;;
+ 
+-    dest.bltStringInBox(rect, tcpipInfo, Color::white, 12);
++    drawStringInBox(rect, tcpipInfo, Color::white, 12);
+ }
+ 
+ //---------------------------------------------------------------------------
+-void GetSessionView::drawJoinInfo(Surface &amp;dest, const iRect &amp;rect)
++void GetSessionView::drawJoinInfo( const iRect &amp;rect)
+ {
+     static char	tcpipInfo[] =
+         &quot;JOINING LAN OR INTERNET GAMES\n&quot;
+@@ -174,7 +174,7 @@
+         &quot;Click the Next button to proceed.&quot;;
+ 
+ 
+-    dest.bltStringInBox(rect, tcpipInfo, Color::white, 12);
++    drawStringInBox(rect, tcpipInfo, Color::white, 12);
+ }
+ 
+ // doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/GetSessionView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -29,9 +29,9 @@
+ class GetSessionView : public MenuTemplateView
+ {
+ protected:
+-    void drawHostInfo(Surface &amp;dest, const iRect &amp;rect);
+-    void drawJoinInfo(Surface &amp;dest, const iRect &amp;rect);
+-    void drawInfo(Surface &amp;dest);
++    void drawHostInfo(const iRect &amp;rect);
++    void drawJoinInfo(const iRect &amp;rect);
++    void drawInfo();
+ 
+     virtual void loadBackgroundSurface();
+     virtual void loadTitleSurface();
+@@ -39,7 +39,7 @@
+ public:
+     GetSessionView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+ }; // end GetSessionView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -120,11 +120,11 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void HostJoinTemplateView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void HostJoinTemplateView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end doDraw
+ 
+ // doActivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostJoinTemplateView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -41,7 +41,7 @@
+ 
+     HostJoinTemplateView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doActivate();
+ }; // end HostJoinTemplateView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -266,7 +266,7 @@
+     setVisible(false);
+ 
+     moveTo(bodyTextRect.min.x, bodyTextRect.min.y + 190);
+-    resizeClientArea(bodyTextRect.getSizeX(), 168);
++    resize(bodyTextRect.getSizeX(), 168);
+ 
+     addMeterButtons(iXY(BORDER_SPACE, BORDER_SPACE));
+ 
+@@ -274,15 +274,15 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void HostOptionsView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void HostOptionsView::doDraw()
+ {
+-    drawMeterInfo(clientArea, iXY(BORDER_SPACE, BORDER_SPACE));
++    drawMeterInfo(iXY(BORDER_SPACE, BORDER_SPACE));
+ 
+-    clientArea.bltString( 4, clientArea.getHeight() - Surface::getFontHeight(),
++    drawString( 4, clientRect.getSizeY() - Surface::getFontHeight(),
+                     &quot;Note: Use the right mouse button to accomplish fast mouse clicking.&quot;,
+                     Color::white);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end HostOptionsView::doDraw
+ 
+@@ -424,7 +424,7 @@
+ 
+ // drawMeterInfo
+ //---------------------------------------------------------------------------
+-void HostOptionsView::drawMeterInfo(Surface &amp;dest, const iXY &amp;pos)
++void HostOptionsView::drawMeterInfo( const iXY &amp;pos)
+ {
+     char strBuf[256];
+ 
+@@ -441,7 +441,7 @@
+     tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+     sprintf(strBuf, &quot;%d&quot;, getCurMaxPlayersCount());
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(dest, x, y);
++    drawImage(tempSurface, x, y);
+ 
+     // Game Max Unit Count
+     y += yOffset;
+@@ -449,7 +449,7 @@
+     tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+     sprintf(strBuf, &quot;%d - %d max per player&quot;, getCurMaxUnitCount(), getCurMaxUnitCount() / getCurMaxPlayersCount());
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(dest, x, y);
++    drawImage(tempSurface, x, y);
+     /*
+     	// Respawn Unit Count
+     	y += yOffset;
+@@ -489,21 +489,21 @@
+         sprintf(strBuf, &quot;Map Data Needed&quot;);
+     }
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(dest, x, y);
++    drawImage(tempSurface, x, y);
+ 
+     y += yOffset;
+     tempSurface.fill(meterColor);
+     tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+     sprintf(strBuf, &quot;%d:%d&quot;, getTimeLimitHours(), getTimeLimitMinutes() );
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(dest, x, y);
++    drawImage(tempSurface, x, y);
+ 
+     y += yOffset;
+     tempSurface.fill(meterColor);
+     tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+     sprintf(strBuf, &quot;%d Frags&quot;, getFragLimit() );
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(dest, x, y);
++    drawImage(tempSurface, x, y);
+ 
+ 
+     /*
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostOptionsView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -29,7 +29,7 @@
+ {
+ private:
+     void addMeterButtons(const iXY &amp;pos);
+-    void drawMeterInfo(Surface &amp;dest, const iXY &amp;pos);
++    void drawMeterInfo( const iXY &amp;pos);
+ 
+     static int cloudCoverageCount;
+     static int windSpeed;
+@@ -50,7 +50,7 @@
+     virtual ~HostOptionsView()
+     {}
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void drawBorder(Surface&amp; )
+     {}
+     virtual void actionPerformed(mMouseEvent me);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -85,9 +85,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void HostView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void HostView::doDraw()
+ {
+-    HostJoinTemplateView::doDraw(viewArea, clientArea);
++    HostJoinTemplateView::doDraw();
+ 
+     /*
+     	char strBuf[256];
+@@ -119,7 +119,7 @@
+     	sprintf(strBuf, &quot;%3d&quot;, gameconfig-&gt;GetNumberPlayers());
+     	clientArea.bltString(x + 125, y, strBuf, Color::white);
+     */
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end HostView::doDraw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/HostView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -42,7 +42,7 @@
+ public:
+     HostView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ }; // end HostView
+ 
+ #endif // end __HostView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -40,7 +40,7 @@
+     iXY  area_size = iXY(
+             30 * 8 + 16,
+             Surface::getFontHeight() + 4 + 8);
+-    resizeClientArea(area_size);
++    resize(area_size);
+ 
+     Init();
+ } // end IPAddressView constructor
+@@ -53,9 +53,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void IPAddressView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void IPAddressView::doDraw()
+ {
+-    clientArea.fill(Color::black);
+-    View::doDraw(viewArea, clientArea);
++    fill(Color::black);
++    View::doDraw();
+ } // end IPAddressView::doDraw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/IPAddressView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -31,7 +31,7 @@
+ 
+  void Init();
+ 
+- virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea); 
++ virtual void doDraw();
+ }; // end IPAddressView
+ 
+ #endif // end __IPAddressView_h__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -35,9 +35,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void JoinView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void JoinView::doDraw()
+ {
+-    HostJoinTemplateView::doDraw(viewArea, clientArea);
++    HostJoinTemplateView::doDraw();
+ } // end JoinView::doDraw
+ 
+ // doDeactivate
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/JoinView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -32,7 +32,7 @@
+ public:
+     JoinView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void doDeactivate();
+ }; // end JoinView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -78,7 +78,7 @@
+ 
+     moveTo(bodyTextRect.min.x, bodyTextRect.min.y + 50);
+ 
+-    resizeClientArea(bodyTextRect.getSizeX() / 2 - 10 + 30, MAP_SIZE + BORDER_SPACE * 2);
++    resize(bodyTextRect.getSizeX() / 2 - 10 + 30, MAP_SIZE + BORDER_SPACE * 2);
+ 
+     init();
+ 
+@@ -111,7 +111,7 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void MapSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void MapSelectionView::doDraw()
+ {
+     //iRect r(getViewRect());
+     //viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+@@ -122,19 +122,20 @@
+         int result = loadMaps();
+ 
+         if (result == 0) {
+-            clientArea.bltStringCenter(&quot;No Maps Found&quot;, Color::white);
++            drawStringCenter(&quot;No Maps Found&quot;, Color::white);
+         } else if (result == 1) {
+-            clientArea.bltStringCenter(&quot;Outpost file error&quot;, Color::white);
++            drawStringCenter(&quot;Outpost file error&quot;, Color::white);
+         }
+     }
+ 
+     if (mapList.size() &gt; 0) {
+         // Since maps were found, draw the selected map.
+-        mapList[curMap]-&gt;thumbnail.blt(clientArea, BORDER_SPACE, BORDER_SPACE);
+-        drawCurMapInfo(clientArea, iXY(MAP_SIZE + BORDER_SPACE * 2, BORDER_SPACE));
++        drawImage(mapList[curMap]-&gt;thumbnail, BORDER_SPACE, BORDER_SPACE);
++        //mapList[curMap]-&gt;thumbnail.blt(clientArea, BORDER_SPACE, BORDER_SPACE);
++        drawCurMapInfo(iXY(MAP_SIZE + BORDER_SPACE * 2, BORDER_SPACE));
+     }
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end MapSelectionView::doDraw
+ 
+@@ -258,7 +259,7 @@
+ 
+ // drawCurMapInfo
+ //---------------------------------------------------------------------------
+-void MapSelectionView::drawCurMapInfo(Surface &amp;dest, const iXY &amp;pos)
++void MapSelectionView::drawCurMapInfo( const iXY &amp;pos)
+ {
+     // Draw the text.
+     char strBuf[256];
+@@ -269,16 +270,16 @@
+     const int yOffset = 15;
+ 
+     sprintf(strBuf, &quot;Name:       %s&quot;, mapList[curMap]-&gt;name.c_str());
+-    dest.bltStringShadowed(x, y, strBuf, windowTextColor, windowTextColorShadow);
++    drawStringShadowed(x, y, strBuf, windowTextColor, windowTextColorShadow);
+     y += yOffset;
+ 
+     int sizeX = (mapList[curMap]-&gt;cells.y * 32) / 480;
+     int sizeY = (mapList[curMap]-&gt;cells.x * 32) / 640;
+     sprintf(strBuf, &quot;Size:       %d x %d&quot;, sizeX, sizeY);
+-    dest.bltStringShadowed(x, y, strBuf, windowTextColor, windowTextColorShadow);
++    drawStringShadowed(x, y, strBuf, windowTextColor, windowTextColorShadow);
+     y += yOffset;
+ 
+     sprintf(strBuf, &quot;Objectives: %d&quot;, mapList[curMap]-&gt;objectiveCount);
+-    dest.bltStringShadowed(x, y, strBuf, windowTextColor, windowTextColorShadow);
++    drawStringShadowed(x, y, strBuf, windowTextColor, windowTextColorShadow);
+ 
+ } // end MapSelectionView::drawMapInfo
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/MapSelectionView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -46,13 +46,13 @@
+     enum { BORDER_SPACE =   4 };
+     enum { MAP_SIZE     = 100 };
+     int  loadMaps();
+-    void drawCurMapInfo(Surface &amp;dest, const iXY &amp;pos);
++    void drawCurMapInfo( const iXY &amp;pos);
+ 
+ public:
+     MapSelectionView();
+     ~MapSelectionView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void drawBorder(Surface&amp; )
+     {}
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -40,7 +40,7 @@
+     // The plus 8 for x and 4 for y are what I put in input field.  Add function to find out,
+     // inpit field dimension.
+     int CHAR_XPIX = 8; // XXX hardcoded :-/
+-    resizeClientArea(INPUT_FIELD_CHARACTERS * CHAR_XPIX + 8 + BORDER_SPACE * 2, Surface::getFontHeight() + 4 + BORDER_SPACE * 2);
++    resize(INPUT_FIELD_CHARACTERS * CHAR_XPIX + 8 + BORDER_SPACE * 2, Surface::getFontHeight() + 4 + BORDER_SPACE * 2);
+ 
+     init();
+ } // end PlayerNameView::PlayerNameView
+@@ -62,12 +62,12 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void PlayerNameView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void PlayerNameView::doDraw()
+ {
+     //iRect r(getViewRect());
+     //viewArea.bltLookup(r, Palette::darkGray256.getColorArray());
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ } // end PlayerNameView::doDraw
+ 
+ void PlayerNameView::textChanged(cInputField* input)
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/PlayerNameView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -28,7 +28,7 @@
+     PlayerNameView();
+     virtual ~PlayerNameView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void drawBorder(Surface&amp;)
+     {}
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -40,7 +40,7 @@
+     setSubTitle(&quot;&quot;);
+ 
+     moveTo(bodyTextRect.min + iXY(0, 170));
+-    resizeClientArea(bodyTextRect.max - bodyTextRect.min - iXY(0,170));
++    resize(bodyTextRect.max - bodyTextRect.min - iXY(0,170));
+ 
+     setAllowResize(false);
+     setAllowMove(false);
+@@ -107,9 +107,9 @@
+ }
+ 
+ void
+-ServerListView::doDraw(Surface&amp; windowArea, Surface&amp; clientArea)
++ServerListView::doDraw()
+ {
+-    clientArea.fill(Color::black);
++    fill(Color::black);
+     
+     if(queryThread &amp;&amp; queryThread-&gt;isRunning()) {
+         queryThread-&gt;checkTimeOuts();
+@@ -122,8 +122,8 @@
+         } else {
+             msg = &quot;Resolving masterserver address&quot;;
+         }
+-        clientArea.bltString(0, 0, msg, Color::white);
+-        View::doDraw(windowArea, clientArea);
++        drawString(0, 0, msg, Color::white);
++        View::doDraw();
+         return;
+     }
+ 
+@@ -133,17 +133,17 @@
+         const masterserver::ServerInfo&amp; server = *(*i);
+ 
+         if(server.status == masterserver::ServerInfo::QUERYING) {
+-            clientArea.bltString(0,   y, server.address.c_str(), Color::gray);
+-            clientArea.bltString(140, y, &quot;querying...&quot;, Color::gray);
++            drawString(0,   y, server.address.c_str(), Color::gray);
++            drawString(140, y, &quot;querying...&quot;, Color::gray);
+         } else if(server.status == masterserver::ServerInfo::TIMEOUT) {
+-            clientArea.bltString(0,   y, server.address.c_str(), Color::gray);
+-            clientArea.bltString(140, y, &quot;timeout&quot;, Color::gray);
++            drawString(0,   y, server.address.c_str(), Color::gray);
++            drawString(140, y, &quot;timeout&quot;, Color::gray);
+         } else if(server.protocol &lt; NETPANZER_PROTOCOL_VERSION) {
+-            clientArea.bltString(0,   y, server.address.c_str(), Color::gray);
+-            clientArea.bltString(140, y, &quot;server protocol too old&quot;, Color::gray);
++            drawString(0,   y, server.address.c_str(), Color::gray);
++            drawString(140, y, &quot;server protocol too old&quot;, Color::gray);
+         } else if(server.protocol &gt; NETPANZER_PROTOCOL_VERSION) {
+-            clientArea.bltString(0,   y, server.address.c_str(), Color::gray);
+-            clientArea.bltString(140, y, &quot;server protocol too new&quot;, Color::gray);
++            drawString(0,   y, server.address.c_str(), Color::gray);
++            drawString(140, y, &quot;server protocol too new&quot;, Color::gray);
+         } else {
+             std::stringstream playerstr;
+             playerstr &lt;&lt; server.players &lt;&lt; &quot;/&quot; &lt;&lt; server.maxplayers;
+@@ -158,26 +158,26 @@
+             
+             if (servaddr.str()==IPAddressView::szServer.getString()) {
+                 textcolor = Color::yellow;
+-                clientArea.fillRect(
+-                    iRect(0,y,clientArea.getWidth(),y+Surface::getFontHeight()),
++                fillRect(
++                    iRect(0,y,clientRect.getSizeX(),y+Surface::getFontHeight()),
+                     Color::blue);
+             }
+ 
+             char ssn[44];
+             SDL_strlcpy(ssn, server.name.c_str(), sizeof(ssn));
+-            clientArea.bltString(0,   y, ssn, textcolor);
+-            clientArea.bltString(350, y, playerstr.str().c_str(), textcolor);
+-            clientArea.bltString(400, y, server.map.c_str(), textcolor);
+-            clientArea.bltString(550, y, pingstr.str().c_str(), textcolor);
++            drawString(0,   y, ssn, textcolor);
++            drawString(350, y, playerstr.str().c_str(), textcolor);
++            drawString(400, y, server.map.c_str(), textcolor);
++            drawString(550, y, pingstr.str().c_str(), textcolor);
+ 
+         }
+ 
+         y += Surface::getFontHeight();
+-        if(y &gt;= clientArea.getHeight())
++        if(y &gt;= clientRect.getSizeY())
+             break;                             
+     }
+ 
+-    View::doDraw(windowArea, clientArea);
++    View::doDraw();
+ }
+ 
+ int
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/ServerListView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -32,7 +32,7 @@
+     void refresh();
+     void endQuery();
+         
+-    virtual void doDraw(Surface&amp; windowArea, Surface&amp; clientArea);
++    virtual void doDraw();
+     virtual int lMouseUp(const iXY&amp; up_pos, const iXY&amp; down_pos);
+ 
+ private:
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -104,7 +104,7 @@
+     fuckingSurface.create(packedTurret.getWidth(), packedTurret.getHeight(), 1);
+     fuckingSurface.fill(0);
+ 
+-    resizeClientArea(packedTurret.getWidth(), packedTurret.getHeight());
++    resize(packedTurret.getWidth(), packedTurret.getHeight());
+ 
+     int size = packedTurret.getWidth() / 2;
+     addButtonCenterText(iXY(0, 0), size, &quot;Up&quot;, &quot;&quot;, bIncreaseBrightness);
+@@ -117,7 +117,7 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void UnitColorView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void UnitColorView::doDraw()
+ {
+     //unitSurface.fill(0);
+ 
+@@ -129,14 +129,14 @@
+     packedTurret.blt(fuckingSurface, 0, 0);
+     fuckingSurface.bltLookup(fuckingSurface.getRect(), colorTable-&gt;getColorArray());
+ 
+-    grassSurface.blt(clientArea, 0, 0);
+-    fuckingSurface.bltTrans(clientArea, 0, 0);
++    drawImage(grassSurface, 0, 0);
++    drawImageTrans(fuckingSurface, 0, 0);
+ 
+     char strBuf[256];
+     sprintf(strBuf, &quot;%1.3f of %1.3f&quot;, grayPercent, maxPercent);
+-    clientArea.bltString(2, fuckingSurface.getHeight() - Surface::getFontHeight() - 1, strBuf, Color::white);
++    drawString(2, fuckingSurface.getHeight() - Surface::getFontHeight() - 1, strBuf, Color::white);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end UnitColorView::doDraw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitColorView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -35,7 +35,7 @@
+ public:
+     UnitColorView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void rMouseDown  (const iXY &amp;pos);
+     virtual void rMouseUp    (const iXY &amp;downPos, const iXY &amp;upPos);
+     virtual void rMouseDrag  (const iXY &amp;downPos, const iXY &amp;prevPos, const iXY &amp;newPos);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -50,12 +50,12 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void UnitSelectionView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void UnitSelectionView::doDraw()
+ {
+     char strBuf[256];
+     sprintf(strBuf, &quot;%d&quot;, scrollBar-&gt;getValue());
+-    clientArea.bltStringCenter(strBuf, Color::white);
++    drawStringCenter(strBuf, Color::white);
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end UnitSelectionView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Multi/UnitSelectionView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -38,7 +38,7 @@
+         delete scrollBar;
+     }
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ }; // end UnitSelectionView
+ 
+ #endif // end __UnitSelectionView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -66,9 +66,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void ControlsView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void ControlsView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+     //char strBuf[256];
+     //
+@@ -92,7 +92,7 @@
+     //tempSurface.blt(clientArea, x, y);
+     //
+     //y += yOffset;
+-    clientArea.bltStringCenter(&quot;Not available for preview&quot;, Color::white);
++    drawStringCenter(&quot;Not available for preview&quot;, Color::white);
+ 
+ } // end ControlsView::doDraw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/ControlsView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -41,7 +41,7 @@
+ public:
+     ControlsView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void initButtons();
+ }; // end ControlsView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -82,9 +82,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void InterfaceView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void InterfaceView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+     char strBuf[256];
+ 
+@@ -100,7 +100,7 @@
+     sprintf(strBuf, &quot;%d %%&quot;, int((float(getScrollRate()) / 
+                     float(gameconfig-&gt;scrollrate.getMax())) * 100.0f));
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(clientArea, x, y);
++    drawImage(tempSurface, x, y);
+ } // end InterfaceView::doDraw
+ 
+ // loadTitleSurface
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/InterfaceView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -40,7 +40,7 @@
+ public:
+     InterfaceView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void initButtons();
+ }; // end InterfaceView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -166,9 +166,9 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void SoundView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void SoundView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+     char strBuf[256];
+     
+@@ -187,7 +187,7 @@
+     tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+     sprintf(strBuf, &quot;%d %%&quot;, getSoundVolume());
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(clientArea, x, y);
++    drawImage(tempSurface, x, y);
+ 
+     // Music Volume
+     y += yOffset*3;
+@@ -195,7 +195,7 @@
+     tempSurface.drawButtonBorder(meterTopLeftBorderColor, meterBottomRightBorderColor);
+     sprintf(strBuf, &quot;%d %%&quot;, getMusicVolume());
+     tempSurface.bltStringCenter(strBuf, meterTextColor);
+-    tempSurface.blt(clientArea, x, y);
++    drawImage(tempSurface, x, y);
+ 
+     //clientArea.bltStringCenter(&quot;Not available for preview&quot;, Color::white);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/SoundView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -44,7 +44,7 @@
+ public:
+     SoundView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void initButtons();
+     virtual void stateChanged(Component* source);
+ }; // end SoundView
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -157,11 +157,11 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void VisualsView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void VisualsView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+-    View::doDraw(viewArea, clientArea);
++    View::doDraw();
+ 
+ } // end VisualsView::doDraw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -75,7 +75,7 @@
+ public:
+     VisualsView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void processEvents();
+     virtual void initButtons();
+     virtual void stateChanged(Component* source);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -101,11 +101,11 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void OptionsTemplateView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void OptionsTemplateView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+-    clientArea.bltStringCenter(&quot;Select your option category above&quot;, Color::white);
++    drawStringCenter(&quot;Select your option category above&quot;, Color::white);
+ 
+ } // end OptionsTemplateView::doDraw
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OptionsTemplateView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -32,7 +32,7 @@
+ public:
+     OptionsTemplateView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+     virtual void initButtons();
+ }; // end OptionsTemplateView
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -33,10 +33,10 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void OrderingView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void OrderingView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+-    clientArea.bltString(bodyTextRect.min.x, bodyTextRect.min.y, &quot;Skip!  Waiting on you!&quot;, Color::white);
++    drawString(bodyTextRect.min.x, bodyTextRect.min.y, &quot;Skip!  Waiting on you!&quot;, Color::white);
+ 
+ } // end OrderingView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/OrderingView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -28,7 +28,7 @@
+ public:
+     OrderingView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ }; // end OrderingView
+ 
+ #endif // end __OrderingView_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.cpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -33,10 +33,10 @@
+ 
+ // doDraw
+ //---------------------------------------------------------------------------
+-void SkirmishView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
++void SkirmishView::doDraw()
+ {
+-    MenuTemplateView::doDraw(viewArea, clientArea);
++    MenuTemplateView::doDraw();
+ 
+-    clientArea.bltString(100, 200, &quot;Umm... complete me!&quot;, Color::white);
++    drawString(100, 200, &quot;Umm... complete me!&quot;, Color::white);
+ 
+ } // end SkirmishView::doDraw
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.hpp	2009-01-20 16:17:03 UTC (rev 1087)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/SkirmishView.hpp	2009-01-29 08:30:59 UTC (rev 1088)
+@@ -28,7 +28,7 @@
+ public:
+     SkirmishView();
+ 
+-    virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void doDraw();
+ }; // end SkirmishView
+ 
+ #endif // end __SkirmishView_hpp__
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000119.html">[Netpanzer-cvs] r1087 - in trunk/netpanzer: . src/Lib/2D	src/Lib/Util src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Objectives src/NetPanzer/Views/MainMenu/Options
+</A></li>
+	<LI>Next message: <A HREF="000121.html">[Netpanzer-cvs] r1089 - in trunk/netpanzer: nbproject	src/NetPanzer/Interfaces src/NetPanzer/System	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#120">[ date ]</a>
+              <a href="thread.html#120">[ thread ]</a>
+              <a href="subject.html#120">[ subject ]</a>
+              <a href="author.html#120">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

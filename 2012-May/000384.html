@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1360 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1360%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120504153710.4E81755B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000383.html">
+   <LINK REL="Next"  HREF="000385.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1360 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1360%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120504153710.4E81755B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1360 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Fri May  4 17:37:10 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000383.html">[Netpanzer-cvs] r1359 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000385.html">[Netpanzer-cvs] r1361 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#384">[ date ]</a>
+              <a href="thread.html#384">[ thread ]</a>
+              <a href="subject.html#384">[ subject ]</a>
+              <a href="author.html#384">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-05-04 17:37:09 +0200 (Fri, 04 May 2012)
+New Revision: 1360
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+Log:
+Resolve bug focus on minimap
+TeamMode : 
+ - respawn player when change team
+ - check balanced team after one player disconnect, switch one player if needed.
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2012-05-03 08:16:01 UTC (rev 1359)
++++ trunk/netpanzer/src/NetPanzer/Classes/PlayerState.cpp	2012-05-04 15:37:09 UTC (rev 1360)
+@@ -140,9 +140,9 @@
+ 
+ void PlayerState::setName(const std::string&amp; newname)
+ {
+-    if ( newname.length() &gt; 25 )
++    if ( newname.length() &gt; 15 )
+     {
+-        name = newname.substr(0,25);
++        name = newname.substr(0,15);
+     }
+     else
+     {
+@@ -170,9 +170,9 @@
+                 std::string strnum=ssnamenum.str();
+                 
+                 std::string::size_type newlen = newname.length();
+-                if ( newlen+strnum.length() &gt; 63 )
++                if ( newlen+strnum.length() &gt; 15 )
+                 {
+-                    newlen -= strnum.length() - (63 - newlen);  
++                    newlen -= strnum.length() - (15 - newlen);  
+                 }
+                 
+                 name = newname.substr(0,newlen)+strnum;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-05-03 08:16:01 UTC (rev 1359)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-05-04 15:37:09 UTC (rev 1360)
+@@ -28,9 +28,9 @@
+ 
+ void Team::setName(const std::string&amp; newname)
+ {
+-    if ( newname.length() &gt; 25 )
++    if ( newname.length() &gt; 15 )
+     {
+-        name = newname.substr(0,25);
++        name = newname.substr(0,15);
+     }
+     else
+     {
+@@ -101,6 +101,27 @@
+     return count;
+ }
+ 
++PlayerID Team::getrandomplayer() const
++{
++    PlayerID count = 0;
++    PlayerID player_id, result;
++    Uint8 player = rand()%countPlayers();
++    
++    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
++        {
++            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID) 
++            {
++                if (count == player) return player_id;
++                count++;
++                result = player_id;
++            }
++        }
++    }
++    return result; // default return the last
++}
++
+ void Team::loadFlag(const char *fileName)
+ {
+     Flag.loadBMP(fileName);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp	2012-05-03 08:16:01 UTC (rev 1359)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp	2012-05-04 15:37:09 UTC (rev 1360)
+@@ -41,6 +41,7 @@
+     void cleanUp();
+     Uint8 getID() const { return teamID; }
+     PlayerID countPlayers() const;
++    PlayerID getrandomplayer() const;
+     void loadFlag(const char *fileName);
+     void drawFlag(Surface &amp;dest, int x, int y) const;
+     short getKills() const;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-03 08:16:01 UTC (rev 1359)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-04 15:37:09 UTC (rev 1360)
+@@ -18,6 +18,7 @@
+ 
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;Interfaces/Team.hpp&quot;
+@@ -79,6 +80,31 @@
+     Teams_lists[ lowTeam ].addPlayer(player_id);
+ }
+ 
++void TeamManager::BalancedTeam()
++{
++    int team_id;
++    int lowTeam = 0, highTeam = 0;
++    int minPlayers = Teams_lists[ 0 ].countPlayers(), maxPlayers = 0;
++
++    for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        if (Teams_lists[ team_id ].countPlayers() &lt; minPlayers)
++        {
++            minPlayers = Teams_lists[ team_id ].countPlayers();
++            lowTeam = team_id;
++        }
++        if (Teams_lists[ team_id ].countPlayers() &gt; maxPlayers)
++        {
++            maxPlayers = Teams_lists[ team_id ].countPlayers();
++            highTeam = team_id;
++        }
++    }
++    if ((maxPlayers - minPlayers) &gt; 1)
++    {
++        serverrequestchangeTeam(Teams_lists[ highTeam ].getrandomplayer(), lowTeam);
++    }
++}
++
+ void TeamManager::reset()
+ {
+     for ( PlayerID player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers()-1; ++player_index )
+@@ -241,12 +267,14 @@
+ {
+     Uint8 current_team = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
+ 
+-    if ( (Teams_lists[newteam].countPlayers() &lt; Teams_lists[current_team].countPlayers())
+-            &amp;&amp; (Teams_lists[newteam].countPlayers() &gt; 0))
++    if ( (Teams_lists[newteam].countPlayers() &lt; Teams_lists[current_team].countPlayers()))
+     {
+         Teams_lists[current_team].removePlayer(player_id);
+         Teams_lists[newteam].addPlayer(player_id);
+         PlayerTeamRequest Changeteam_request;
++        
++        UnitInterface::destroyPlayerUnits(player_id);
++        GameManager::spawnPlayer( player_id );
+ 
+         Changeteam_request.set(player_id, newteam, change_team_Accepted);
+         SERVER-&gt;broadcastMessage( &amp;Changeteam_request, sizeof(PlayerTeamRequest));
+@@ -256,6 +284,7 @@
+ void TeamManager::PlayerchangeTeam(PlayerID player_id, Uint8 team_idx)
+ {
+     Uint8 current_team = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
++
+     Teams_lists[current_team].removePlayer(player_id);
+     Teams_lists[team_idx].addPlayer(player_id);
+     ConsoleInterface::postMessage(Color::yellow, false, 0,
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-05-03 08:16:01 UTC (rev 1359)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-05-04 15:37:09 UTC (rev 1360)
+@@ -32,6 +32,7 @@
+     static void reset();
+     static void addPlayer(PlayerID player_id);
+     static void addPlayerinTeam(PlayerID player_id, Uint8 team_id);
++    static void BalancedTeam();
+     static void removePlayer(PlayerID player_id, Uint8 team_id);
+     
+     static void cleanUp();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2012-05-03 08:16:01 UTC (rev 1359)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.cpp	2012-05-04 15:37:09 UTC (rev 1360)
+@@ -19,6 +19,7 @@
+ 
+ #include &quot;MiniMapView.hpp&quot;
+ #include &quot;Views/Components/MiniMap.hpp&quot;
++#include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+ 
+ // MiniMapView
+ //---------------------------------------------------------------------------
+@@ -63,3 +64,9 @@
+     
+     GameTemplateView::doDraw(viewArea, clientArea);
+ } // end doDraw
++
++void MiniMapView::processEvents()
++{
++    COMMAND_PROCESSOR.process(false);
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2012-05-03 08:16:01 UTC (rev 1359)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/MiniMapView.hpp	2012-05-04 15:37:09 UTC (rev 1360)
+@@ -34,6 +34,7 @@
+     void init();
+ 
+     virtual void doDraw(Surface &amp;windowArea, Surface &amp;clientArea);
++    virtual void processEvents();
+ 
+ protected:
+     void checkResolution(iXY oldResolution, iXY newResolution);
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000383.html">[Netpanzer-cvs] r1359 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000385.html">[Netpanzer-cvs] r1361 - in trunk/netpanzer:	pics/backgrounds/menus/buttons/default	pics/backgrounds/menus/menu src/NetPanzer/Classes	src/NetPanzer/Classes/Network src/NetPanzer/Interfaces	src/NetPanzer/Views/Components src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#384">[ date ]</a>
+              <a href="thread.html#384">[ thread ]</a>
+              <a href="subject.html#384">[ subject ]</a>
+              <a href="author.html#384">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

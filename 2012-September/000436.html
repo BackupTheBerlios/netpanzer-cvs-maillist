@@ -1,0 +1,540 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1412 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1412%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces&In-Reply-To=%3C20120921081018.8CF9C55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000435.html">
+   <LINK REL="Next"  HREF="000437.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1412 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1412%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces&In-Reply-To=%3C20120921081018.8CF9C55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1412 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Fri Sep 21 10:10:18 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000435.html">[Netpanzer-cvs] r1411 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components
+</A></li>
+        <LI>Next message: <A HREF="000437.html">[Netpanzer-cvs] r1413 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#436">[ date ]</a>
+              <a href="thread.html#436">[ thread ]</a>
+              <a href="subject.html#436">[ subject ]</a>
+              <a href="author.html#436">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-09-21 10:10:18 +0200 (Fri, 21 Sep 2012)
+New Revision: 1412
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+Log:
+Team mode:
+- Change red team color
+- Resolve score bug
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2012-09-19 22:18:29 UTC (rev 1411)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2012-09-21 08:10:18 UTC (rev 1412)
+@@ -327,7 +327,7 @@
+ 
+     void setLosses(short Losses)
+     {
+-        TeamKills = Losses;
++        TeamLosses = Losses;
+     }
+     short getLosses() const
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-09-19 22:18:29 UTC (rev 1411)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-09-21 08:10:18 UTC (rev 1412)
+@@ -303,8 +303,7 @@
+                 }
+                 catch(std::exception&amp; e)
+                 {
+-                    LoadingView::append(
+-                        &quot;Error while loading map:&quot;);
++                    LoadingView::append(&quot;Error while loading map:&quot;);
+                     LoadingView::append(e.what());
+                     map_cycle_fsm_server_state = _map_cycle_server_state_idle;
+                     return;
+@@ -525,7 +524,6 @@
+                 int game_minutes = GameManager::getGameTime() / 60;
+                 if( game_minutes &gt;= GameConfig::game_timelimit )
+                     onTimelimitGameCompleted();
+-                LOGGER.warning(&quot;%d&quot;, (int)GameManager::getGameTime() / 60);
+             }
+             else
+             {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-09-19 22:18:29 UTC (rev 1411)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-09-21 08:10:18 UTC (rev 1412)
+@@ -1,199 +1,200 @@
+-/*
+-Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#include &quot;Interfaces/PlayerInterface.hpp&quot;
+-#include &quot;Interfaces/Team.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-#include &quot;2D/Surface.hpp&quot;
+-
+-void Team::initialize(const Uint8 id)
+-{
+-    teamID = id;
+-}
+-
+-void Team::setName(const std::string&amp; newname)
+-{
+-    if ( newname.length() &gt; 15 )
+-    {
+-        name = newname.substr(0,15);
+-    }
+-    else
+-    {
+-        name = newname;
+-    }
+-}
+-
+-const std::string&amp; Team::getName() const
+-{
+-    return name;
+-}
+-
+-void Team::setColor(const Uint8 newcolor)
+-{
+-    teamColor = newcolor;
+-}
+-
+-void Team::addPlayer(PlayerID new_player)
+-{
+-    for ( PlayerID player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-    {
+-        PlayerState* state = PlayerInterface::getPlayer(player_id);
+-        if (state-&gt;isActive())
+-        {
+-            if (state-&gt;getTeamID() == teamID
+-                &amp;&amp; (player_id != new_player)) 
+-            {
+-                PlayerInterface::allyplayers( player_id, new_player);
+-            }
+-        }
+-    }
+-    PlayerInterface::getPlayer(new_player)-&gt;setTeamID(teamID);
+-}
+-
+-void Team::removePlayer(PlayerID old_player)
+-{
+-    for ( PlayerID player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-    {
+-        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
+-        {
+-            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID) 
+-            {
+-                PlayerInterface::unallyplayers( old_player, player_id);
+-            }
+-        }
+-    }
+-    PlayerInterface::getPlayer(old_player)-&gt;setTeamID(0xFF);
+-}
+-
+-void Team::cleanUp()
+-{
+-}
+-
+-PlayerID Team::countPlayers() const
+-{
+-    PlayerID count = 0;
+-    PlayerID player_id;
+-    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-    {
+-        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
+-        {
+-            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID) 
+-            {
+-                count++;
+-            }
+-        }
+-    }
+-    return count;
+-}
+-
+-PlayerID Team::getrandomplayer() const
+-{
+-    PlayerID count = 0;
+-    PlayerID player_id, result =0;
+-    Uint8 player = rand()%countPlayers();
+-    
+-    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-    {
+-        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
+-        {
+-            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID) 
+-            {
+-                if (count == player) return player_id;
+-                count++;
+-                result = player_id;
+-            }
+-        }
+-    }
+-    return result; // default return the last
+-}
+-
+-void Team::loadFlag(const char *fileName)
+-{
+-    Flag.loadBMP(fileName);
+-}
+-
+-void Team::drawFlag(Surface &amp;dest, int x, int y) const
+-{
+-    Flag.bltTrans(dest, x, y);
+-}
+-
+-short Team::getKills() const
+-{
+-    return kills;
+-}
+-
+-short Team::getLosses() const
+-{
+-    return losses;
+-}
+-
+-short Team::getTeamObjective() const
+-{
+-    short TeamObjective = 0;
+-    PlayerID player_id;
+-    
+-    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-    {
+-        PlayerState* state = PlayerInterface::getPlayer(player_id);
+-        if (state-&gt;isActive())
+-        {
+-            if (state-&gt;getTeamID() == teamID) 
+-            {
+-                TeamObjective += state-&gt;getObjectivesHeld();
+-            }
+-        }
+-    }
+-    return TeamObjective;
+-}
+-void Team::incKills()
+-{
+-    if ( stats_locked == true )
+-        return;
+-    kills++;
+-}
+-
+-void Team::incLosses()
+-{
+-    if ( stats_locked == true )
+-        return;
+-    losses++;
+-}
+-
+-void Team::lockStats()
+-{
+-    stats_locked = true;
+-}
+-
+-void Team::unlockStats()
+-{
+-    stats_locked = false;
+-}
+-
+-void Team::resetStats()
+-{
+-    kills  = 0;
+-    losses = 0;
+-    stats_locked = false;
+-}
+-
+-void Team::syncScore(short newKills, short newLosses)
+-{
+-    kills = newKills;
+-    losses = newLosses;
+-}
+-
++/*
++Copyright (C) 2012 Netpanzer Team. (www.netpanzer.org), Laurent Jacques
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;Interfaces/PlayerInterface.hpp&quot;
++#include &quot;Interfaces/Team.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++#include &quot;2D/Surface.hpp&quot;
++
++void Team::initialize(const Uint8 id)
++{
++    teamID = id;
++    resetStats();
++}
++
++void Team::setName(const std::string&amp; newname)
++{
++    if ( newname.length() &gt; 15 )
++    {
++        name = newname.substr(0,15);
++    }
++    else
++    {
++        name = newname;
++    }
++}
++
++const std::string&amp; Team::getName() const
++{
++    return name;
++}
++
++void Team::setColor(const Uint8 newcolor)
++{
++    teamColor = newcolor;
++}
++
++void Team::addPlayer(PlayerID new_player)
++{
++    for ( PlayerID player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        PlayerState* state = PlayerInterface::getPlayer(player_id);
++        if (state-&gt;isActive())
++        {
++            if (state-&gt;getTeamID() == teamID
++                &amp;&amp; (player_id != new_player))
++            {
++                PlayerInterface::allyplayers( player_id, new_player);
++            }
++        }
++    }
++    PlayerInterface::getPlayer(new_player)-&gt;setTeamID(teamID);
++}
++
++void Team::removePlayer(PlayerID old_player)
++{
++    for ( PlayerID player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
++        {
++            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID)
++            {
++                PlayerInterface::unallyplayers( old_player, player_id);
++            }
++        }
++    }
++    PlayerInterface::getPlayer(old_player)-&gt;setTeamID(0xFF);
++}
++
++void Team::cleanUp()
++{
++}
++
++PlayerID Team::countPlayers() const
++{
++    PlayerID count = 0;
++    PlayerID player_id;
++    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
++        {
++            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID)
++            {
++                count++;
++            }
++        }
++    }
++    return count;
++}
++
++PlayerID Team::getrandomplayer() const
++{
++    PlayerID count = 0;
++    PlayerID player_id, result =0;
++    Uint8 player = rand()%countPlayers();
++
++    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
++        {
++            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID)
++            {
++                if (count == player) return player_id;
++                count++;
++                result = player_id;
++            }
++        }
++    }
++    return result; // default return the last
++}
++
++void Team::loadFlag(const char *fileName)
++{
++    Flag.loadBMP(fileName);
++}
++
++void Team::drawFlag(Surface &amp;dest, int x, int y) const
++{
++    Flag.bltTrans(dest, x, y);
++}
++
++short Team::getKills() const
++{
++    return kills;
++}
++
++short Team::getLosses() const
++{
++    return losses;
++}
++
++short Team::getTeamObjective() const
++{
++    short TeamObjective = 0;
++    PlayerID player_id;
++
++    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
++    {
++        PlayerState* state = PlayerInterface::getPlayer(player_id);
++        if (state-&gt;isActive())
++        {
++            if (state-&gt;getTeamID() == teamID)
++            {
++                TeamObjective += state-&gt;getObjectivesHeld();
++            }
++        }
++    }
++    return TeamObjective;
++}
++void Team::incKills()
++{
++    if ( stats_locked == true )
++        return;
++    kills++;
++}
++
++void Team::incLosses()
++{
++    if ( stats_locked == true )
++        return;
++    losses++;
++}
++
++void Team::lockStats()
++{
++    stats_locked = true;
++}
++
++void Team::unlockStats()
++{
++    stats_locked = false;
++}
++
++void Team::resetStats()
++{
++    kills  = 0;
++    losses = 0;
++    stats_locked = false;
++}
++
++void Team::syncScore(short newKills, short newLosses)
++{
++    kills = newKills;
++    losses = newLosses;
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-09-19 22:18:29 UTC (rev 1411)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-09-21 08:10:18 UTC (rev 1412)
+@@ -74,7 +74,7 @@
+ void TeamManager::initialize(const Uint8 _max_teams)
+ {
+     char txtBuf[256];
+-    Uint8 colorsteam[4] = {Color::yellow, 208, Color::green, Color::cyan};
++    Uint8 colorsteam[4] = {Color::yellow, 197, Color::green, Color::cyan};
+     max_Teams = _max_teams;
+ 
+     delete[] Teams_lists;
+@@ -421,7 +421,7 @@
+     TeamScoreSync score_Sync;
+     for (Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
+     {
+-        score_Sync.set( getKills(team_id), getLosses(team_id), team_id);
++        score_Sync.set(team_id, getKills(team_id), getLosses(team_id));
+         SERVER-&gt;broadcastMessage(&amp;score_Sync, sizeof(TeamScoreSync));
+     }
+ }
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000435.html">[Netpanzer-cvs] r1411 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces Views/Components
+</A></li>
+	<LI>Next message: <A HREF="000437.html">[Netpanzer-cvs] r1413 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#436">[ date ]</a>
+              <a href="thread.html#436">[ thread ]</a>
+              <a href="subject.html#436">[ subject ]</a>
+              <a href="author.html#436">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

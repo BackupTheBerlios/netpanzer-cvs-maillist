@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1133 - in trunk/netpanzer: src/NetPanzer/Core	support support/macosx support/scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-June/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1133%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Core%0A%09support%20support/macosx%20support/scripts&In-Reply-To=%3C200906281352.n5SDqbxp013277%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000161.html">
+   <LINK REL="Next"  HREF="000163.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1133 - in trunk/netpanzer: src/NetPanzer/Core	support support/macosx support/scripts</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1133%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Core%0A%09support%20support/macosx%20support/scripts&In-Reply-To=%3C200906281352.n5SDqbxp013277%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1133 - in trunk/netpanzer: src/NetPanzer/Core	support support/macosx support/scripts">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Jun 28 15:52:37 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000161.html">[Netpanzer-cvs] r1132 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000163.html">[Netpanzer-cvs] r1134 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#162">[ date ]</a>
+              <a href="thread.html#162">[ thread ]</a>
+              <a href="subject.html#162">[ subject ]</a>
+              <a href="author.html#162">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-06-28 15:52:25 +0200 (Sun, 28 Jun 2009)
+New Revision: 1133
+
+Added:
+   trunk/netpanzer/support/scripts/
+   trunk/netpanzer/support/scripts/copy_datafiles.sh
+   trunk/netpanzer/support/scripts/copy_docfiles.sh
+   trunk/netpanzer/support/scripts/netpanzer-update-datadir.pl
+Modified:
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/support/macosx/make_appbundle.sh
+Log:
+- created scripts to copy netpanzer data and doc to some destinations
+- new: to find its data files, netpanzer will also look at a stub added to end of the executable. This stub can be changed with the new script 'support/scripts/netpanzer-update-datadir.pl' (in perl, who doesn't have perl installed?) only used for non windows systems. This is usefull for distributions and for making installable packages for operating systems (not windows) where the user can select any directory for installation.
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2009-06-28 06:33:36 UTC (rev 1132)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2009-06-28 13:52:25 UTC (rev 1133)
+@@ -182,7 +182,7 @@
+ #ifdef NP_DATADIR
+     try
+     {
+-	filesystem::addToSearchPath(NP_DATADIR);
++		filesystem::addToSearchPath(NP_DATADIR);
+     }
+     catch(...)
+     { }
+@@ -223,7 +223,33 @@
+     { }
+ #endif
+ 
+-    
++#ifndef WIN32
++    // Handle &quot;datadir=&quot; at the end of the executable file to find the data dir.
++	{
++		FILE *f = fopen(argv[0], &quot;r&quot;);
++		if ( f )
++		{
++			char extradata[257];
++			fseek(f, -256, SEEK_END);
++			fread(extradata, 256, 1, f);
++			extradata[256]=0;
++			if ( !strncmp(extradata,&quot;datadir=&quot;, 8) )
++			{
++				for ( int bytepos=255; bytepos&gt;8 &amp;&amp; extradata[bytepos]==' '; --bytepos )
++				{
++					extradata[bytepos]=0;
++				}
++				try
++				{
++					filesystem::addToSearchPath(extradata+8);
++				}
++				catch(...)
++				{ }
++			}
++			fclose(f);
++		}
++	}
++#endif
+ 
+ #ifdef WIN32
+     // SDL redirects stdout and stderr to 2 textfiles, better open a new console
+
+Modified: trunk/netpanzer/support/macosx/make_appbundle.sh
+===================================================================
+--- trunk/netpanzer/support/macosx/make_appbundle.sh	2009-06-28 06:33:36 UTC (rev 1132)
++++ trunk/netpanzer/support/macosx/make_appbundle.sh	2009-06-28 13:52:25 UTC (rev 1133)
+@@ -22,17 +22,9 @@
+ 
+ mkdir &quot;${CONTENTSDIR}&quot; &quot;${CONTENTSDIR}&quot;/{Frameworks,MacOS,Resources}
+ 
+-echo -n &quot;Copying files&quot;
+-find cache maps pics powerups scripts sound units wads ! -type d  ! -path '*/.svn/*' ! -iname '.DS_Store' -print | \
+-	while read fname; do 
+-		DNAME=&quot;`dirname \&quot;${fname}\&quot;`&quot;
+-		[ ! -d &quot;${CONTENTSDIR}/Resources/${DNAME}&quot; ] &amp;&amp; mkdir -p &quot;${CONTENTSDIR}/Resources/${DNAME}&quot;
+-		cp &quot;${fname}&quot; &quot;${CONTENTSDIR}/Resources/${fname}&quot;
+-		echo -n &quot;.&quot;
+-	done
+-	
+-cp BUGS ChangeLog COPYING LICENSE-physfs.txt README README-zlib123.txt RELNOTES TODO &quot;${DMGDOC}&quot;
+-echo -n &quot;.&quot;
++support/scripts/copy_datafiles.sh &quot;${CONTENTSDIR}/Resources&quot;
++support/scripts/copy_docfiles.sh &quot;${DMGDOC}&quot;
++
+ cp support/icon/netpanzer.icns &quot;${CONTENTSDIR}/Resources&quot;
+ echo -n &quot;.&quot;
+ cp netpanzer &quot;${CONTENTSDIR}/MacOS/&quot;
+
+Added: trunk/netpanzer/support/scripts/copy_datafiles.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/copy_datafiles.sh	2009-06-28 06:33:36 UTC (rev 1132)
++++ trunk/netpanzer/support/scripts/copy_datafiles.sh	2009-06-28 13:52:25 UTC (rev 1133)
+@@ -0,0 +1,21 @@
++#! /bin/bash
++
++if [ -z &quot;$1&quot; ]; then
++	echo &quot;Error: missing destination, use: $0 &lt;destination/dir&gt;&quot;
++	exit 1
++fi
++
++DESTDIR=&quot;$1&quot;
++
++[ ! -d &quot;${DESTDIR}&quot; ] &amp;&amp; mkdir -p &quot;${DESTDIR}&quot;
++
++echo -n &quot;Copying files&quot;
++find cache maps pics powerups scripts sound units wads ! -type d  ! -path '*/.svn/*' ! -iname '.DS_Store' -print | \
++	while read fname; do 
++		DNAME=&quot;`dirname \&quot;${fname}\&quot;`&quot;
++		[ ! -d &quot;${DESTDIR}/${DNAME}&quot; ] &amp;&amp; mkdir -p &quot;${DESTDIR}/${DNAME}&quot;
++		cp &quot;${fname}&quot; &quot;${DESTDIR}/${fname}&quot;
++		echo -n &quot;.&quot;
++	done
++
++echo &quot;.&quot;
+\ No newline at end of file
+
+
+Property changes on: trunk/netpanzer/support/scripts/copy_datafiles.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/netpanzer/support/scripts/copy_docfiles.sh
+===================================================================
+--- trunk/netpanzer/support/scripts/copy_docfiles.sh	2009-06-28 06:33:36 UTC (rev 1132)
++++ trunk/netpanzer/support/scripts/copy_docfiles.sh	2009-06-28 13:52:25 UTC (rev 1133)
+@@ -0,0 +1,14 @@
++#! /bin/bash
++
++if [ -z &quot;$1&quot; ]; then
++	echo &quot;Error: missing destination, use: $0 &lt;destination/dir&gt;&quot;
++	exit 1
++fi
++
++DESTDIR=&quot;$1&quot;
++
++[ ! -d &quot;${DESTDIR}&quot; ] &amp;&amp; mkdir -p &quot;${DESTDIR}&quot;
++
++echo -n &quot;Copying files&quot;
++cp BUGS ChangeLog COPYING LICENSE-physfs.txt README README-zlib123.txt RELNOTES TODO &quot;${DESTDIR}&quot;
++echo &quot;.&quot;
+\ No newline at end of file
+
+
+Property changes on: trunk/netpanzer/support/scripts/copy_docfiles.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/netpanzer/support/scripts/netpanzer-update-datadir.pl
+===================================================================
+--- trunk/netpanzer/support/scripts/netpanzer-update-datadir.pl	2009-06-28 06:33:36 UTC (rev 1132)
++++ trunk/netpanzer/support/scripts/netpanzer-update-datadir.pl	2009-06-28 13:52:25 UTC (rev 1133)
+@@ -0,0 +1,38 @@
++#! /usr/bin/env perl
++
++if ( $#ARGV &lt; 0 )
++{
++	print &quot;Error: needs file parameter\n&quot;;
++	exit(1);
++}
++
++open NPFILE, &quot;+&lt;&quot;, $ARGV[0] or die $!; 
++binmode NPFILE;
++seek NPFILE, -256, 2;
++
++my $datadir;
++read NPFILE, $datadir, 256;
++
++if ($datadir =~ /^datadir=/)
++{
++	$datadir =~ s/\s+$//;
++	print &quot;Found datadir: $datadir\n&quot;;
++	seek NPFILE, -256, 2;
++}
++else
++{
++	print &quot;datadir NOT FOUND\n&quot;;
++}
++
++if ( $#ARGV &gt; 0 )
++{
++	print &quot;Setting datadir to $ARGV[1]\n&quot;;
++	printf NPFILE &quot;datadir=%-248s&quot;, $ARGV[1];
++}
++else
++{
++	print &quot;no change done\n&quot;;
++}
++
++close NPFILE;
++
+
+
+Property changes on: trunk/netpanzer/support/scripts/netpanzer-update-datadir.pl
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000161.html">[Netpanzer-cvs] r1132 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000163.html">[Netpanzer-cvs] r1134 - trunk/netpanzer/src/NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#162">[ date ]</a>
+              <a href="thread.html#162">[ thread ]</a>
+              <a href="subject.html#162">[ subject ]</a>
+              <a href="author.html#162">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

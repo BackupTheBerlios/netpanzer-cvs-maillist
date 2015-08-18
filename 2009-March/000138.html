@@ -1,0 +1,376 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1109 - in trunk/netpanzer: . nbproject
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-March/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1109%20-%20in%20trunk/netpanzer%3A%20.%20nbproject&In-Reply-To=%3C200903221613.n2MGDnIl026055%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000137.html">
+   <LINK REL="Next"  HREF="000139.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1109 - in trunk/netpanzer: . nbproject</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1109%20-%20in%20trunk/netpanzer%3A%20.%20nbproject&In-Reply-To=%3C200903221613.n2MGDnIl026055%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1109 - in trunk/netpanzer: . nbproject">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sun Mar 22 17:13:49 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000137.html">[Netpanzer-cvs] r1108 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000139.html">[Netpanzer-cvs] r1110 - in trunk/netpanzer: . nbproject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#138">[ date ]</a>
+              <a href="thread.html#138">[ thread ]</a>
+              <a href="subject.html#138">[ subject ]</a>
+              <a href="author.html#138">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-03-22 17:13:39 +0100 (Sun, 22 Mar 2009)
+New Revision: 1109
+
+Added:
+   trunk/netpanzer/SConstruct
+Modified:
+   trunk/netpanzer/
+   trunk/netpanzer/nbproject/configurations.xml
+Log:
+- Added basic scons script to build netpanzer, only builds for mac, jam is still available
+- NetBeans project modify to use scons
+
+
+
+Property changes on: trunk/netpanzer
+___________________________________________________________________
+Name: svn:ignore
+   - netpanzerbrowser
+SDL.dll
+smpeg.dll
+libvorbisfile-3.dll
+packets_*.txt
+config.h.in
+build
+libvorbis-0.dll
+SDL_mixer.dll
+netpanzer
+netpanzer-debug.exe
+config.log
+log.txt
+config.h
+configure
+stderr.txt
+autom4te.cache
+.emacs
+NetworkStats.log
+config.status
+stamp-h1
+Jamconfig
+SDLMain.h
+aclocal.m4
+libogg-0.dll
+SDLMain.m
+stdout.txt
+stamp-h.in
+stuff
+Makefile.in
+netpanzeredit
+release
+netpanzer-debug
+out
+dist
+.dep.inc
+
+   + netpanzerbrowser
+SDL.dll
+smpeg.dll
+libvorbisfile-3.dll
+packets_*.txt
+config.h.in
+build
+libvorbis-0.dll
+SDL_mixer.dll
+netpanzer
+netpanzer-debug.exe
+config.log
+log.txt
+config.h
+configure
+stderr.txt
+autom4te.cache
+.emacs
+NetworkStats.log
+config.status
+stamp-h1
+Jamconfig
+SDLMain.h
+aclocal.m4
+libogg-0.dll
+SDLMain.m
+stdout.txt
+stamp-h.in
+stuff
+Makefile.in
+netpanzeredit
+release
+netpanzer-debug
+out
+dist
+.dep.inc
+.sconsign.dblite
+
+
+Added: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2009-03-22 03:58:11 UTC (rev 1108)
++++ trunk/netpanzer/SConstruct	2009-03-22 16:13:39 UTC (rev 1109)
+@@ -0,0 +1,108 @@
++import os
++import glob
++
++opts = Options()
++opts.AddOptions(
++    ('mode','set compile mode to debug or release','release'),
++    BoolOption('crossmingw', 'Set to 1 for cross-compilation with mingw', 0)
++)
++
++env = Environment(options = opts)
++Help(opts.GenerateHelpText(env))
++
++if not (env['mode'] in ['debug', 'release']):
++    print &quot;Error: mode can only be 'debug' or 'release', found: &quot; + env['mode']
++    Exit(1)
++
++if env['crossmingw']:
++    finalplatform = 'mingw'
++else:
++    finalplatform = env['PLATFORM']
++
++finalbuildir = 'build/' + finalplatform + '/' + env['mode'] + '/'
++finallibsdir = finalbuildir + 'libs/'
++finalbindir = finalbuildir + 'bin/'
++
++def GlobBuildFiles(builddir, pattern):
++    sources = map(lambda x: builddir + '/' + x, glob.glob(pattern))
++    return sources
++
++env.VariantDir(finalbuildir,'.',duplicate=0)
++
++env['CPPPATH'] = [ '.', 'src/Lib', 'src/NetPanzer' ]
++env.Append(CPPPATH = ['src/Lib/physfs'])
++env.Append(CPPPATH = ['/usr/local/include/SDL'])
++
++# BUILDS 2D
++env.StaticLibrary(finallibsdir + 'np2d',GlobBuildFiles(finalbuildir, 'src/Lib/2D/*.cpp'))
++
++# BUILDS NETWORK
++env.StaticLibrary(finallibsdir + 'npnetwork',GlobBuildFiles(finalbuildir, 'src/Lib/Network/*.cpp'))
++
++# BUILDS LUA
++env.StaticLibrary(finallibsdir + 'nplua',GlobBuildFiles(finalbuildir, 'src/Lib/lua/*.c'))
++
++# BUILDS REST OF LIBRARIES
++env.StaticLibrary(finallibsdir + 'nplibs',
++                    GlobBuildFiles(finalbuildir, 'src/Lib/ArrayUtil/*.cpp')
++                    + GlobBuildFiles(finalbuildir, 'src/Lib/INIParser/*.cpp')
++                    + GlobBuildFiles(finalbuildir, 'src/Lib/Types/*.cpp')
++                    + GlobBuildFiles(finalbuildir, 'src/Lib/Util/*.cpp')
++                    + GlobBuildFiles(finalbuildir, 'src/Lib/optionmm/*.cpp')
++                )
++
++# BUILDS PHYSFS
++physfsenv = env.Clone()
++physfsenv['CFLAGS'] = '-DPHYSFS_SUPPORTS_ZIP=1 -DZ_PREFIX=1'
++physfsenv.StaticLibrary(finallibsdir + 'npphysfs',
++                    GlobBuildFiles(finalbuildir, 'src/Lib/physfs/*.c')
++                    + GlobBuildFiles(finalbuildir, 'src/Lib/physfs/platform/*.c')
++                    + GlobBuildFiles(finalbuildir, 'src/Lib/physfs/archivers/*.c')
++                    + GlobBuildFiles(finalbuildir, 'src/Lib/physfs/zlib123/*.c')
++                )
++
++npdirs = &quot;&quot;&quot;
++    Bot
++    Classes
++    Classes/AI
++    Classes/Network
++    Core
++    Interfaces
++    Network
++    Objectives
++    Particles
++    PowerUps
++    Resources
++    Scripts
++    System
++    Units
++    Weapons
++    Views
++    Views/Components
++    Views/Game
++    Views/MainMenu
++    Views/MainMenu/Multi
++    Views/MainMenu/Multi/MasterServer
++    Views/MainMenu/Options
++&quot;&quot;&quot;
++
++# Modified copy from BosWars
++def globSources(sourcePrefix, sourceDirs, builddir, pattern):
++    sources = []
++    sourceDirs = Split(sourceDirs)
++    for d in sourceDirs:
++        sources.append(glob.glob( sourcePrefix + '/' + d + '/' + pattern))
++    sources = Flatten(sources)
++    targetsources = []
++    for s in sources:
++        targetsources.append(builddir + s)
++
++    return targetsources
++
++netpsources = globSources('src/NetPanzer', npdirs, finalbuildir, &quot;*.cpp&quot;)
++env.AppendUnique(FRAMEWORKS=Split('SDL SDL_mixer Cocoa IOKit'))
++env.Program(    finalbindir + 'netpanzer',
++                netpsources,
++                LIBS=['nplua','npphysfs','np2d','npnetwork','nplibs', 'SDLmain'],
++                LIBPATH=finallibsdir
++            )
+\ No newline at end of file
+
+Modified: trunk/netpanzer/nbproject/configurations.xml
+===================================================================
+--- trunk/netpanzer/nbproject/configurations.xml	2009-03-22 03:58:11 UTC (rev 1108)
++++ trunk/netpanzer/nbproject/configurations.xml	2009-03-22 16:13:39 UTC (rev 1109)
+@@ -628,56 +628,59 @@
+                    displayName=&quot;Important Files&quot;
+                    projectFiles=&quot;false&quot;&gt;
+       &lt;itemPath&gt;Makefile&lt;/itemPath&gt;
++      &lt;itemPath&gt;SConstruct&lt;/itemPath&gt;
+     &lt;/logicalFolder&gt;
+   &lt;/logicalFolder&gt;
+   &lt;projectmakefile&gt;Makefile&lt;/projectmakefile&gt;
+   &lt;confs&gt;
+-    &lt;conf name=&quot;mac-debug&quot; type=&quot;1&quot;&gt;
++    &lt;conf name=&quot;mac-debug&quot; type=&quot;0&quot;&gt;
+       &lt;toolsSet&gt;
+         &lt;developmentServer&gt;localhost&lt;/developmentServer&gt;
+         &lt;compilerSet&gt;GNU|GNU&lt;/compilerSet&gt;
+         &lt;platform&gt;4&lt;/platform&gt;
+       &lt;/toolsSet&gt;
+-      &lt;compileType&gt;
+-        &lt;cCompilerTool&gt;
+-          &lt;includeDirectories&gt;
+-            &lt;directoryPath&gt;.&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/Lib&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/NetPanzer&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/Lib/physfs&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/Lib/physfs/zlib123&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;/Library/Frameworks/SDL.framework/Versions/A/Headers&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers&lt;/directoryPath&gt;
+-          &lt;/includeDirectories&gt;
+-          &lt;preprocessorList&gt;
+-            &lt;Elem&gt;PHYSFS_SUPPORTS_ZIP=1&lt;/Elem&gt;
+-            &lt;Elem&gt;Z_PREFIX=1&lt;/Elem&gt;
+-          &lt;/preprocessorList&gt;
+-          &lt;warningLevel&gt;2&lt;/warningLevel&gt;
+-        &lt;/cCompilerTool&gt;
+-        &lt;ccCompilerTool&gt;
+-          &lt;includeDirectories&gt;
+-            &lt;directoryPath&gt;.&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/Lib&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/NetPanzer&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/Lib/physfs&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;src/Lib/physfs/zlib123&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;/Library/Frameworks/SDL.framework/Versions/A/Headers&lt;/directoryPath&gt;
+-            &lt;directoryPath&gt;/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers&lt;/directoryPath&gt;
+-          &lt;/includeDirectories&gt;
+-          &lt;preprocessorList&gt;
+-            &lt;Elem&gt;PHYSFS_SUPPORTS_ZIP=1&lt;/Elem&gt;
+-            &lt;Elem&gt;Z_PREFIX=1&lt;/Elem&gt;
+-          &lt;/preprocessorList&gt;
+-          &lt;warningLevel&gt;2&lt;/warningLevel&gt;
+-        &lt;/ccCompilerTool&gt;
+-        &lt;linkerTool&gt;
+-          &lt;output&gt;./netpanzer-debug&lt;/output&gt;
+-          &lt;linkerLibItems&gt;
+-          &lt;/linkerLibItems&gt;
+-          &lt;commandLine&gt;-lSDLmain -framework SDL -framework SDL_mixer -framework IOKit -framework Cocoa&lt;/commandLine&gt;
+-        &lt;/linkerTool&gt;
+-      &lt;/compileType&gt;
++      &lt;makefileType&gt;
++        &lt;makeTool&gt;
++          &lt;buildCommandWorkingDir&gt;.&lt;/buildCommandWorkingDir&gt;
++          &lt;buildCommand&gt;scons&lt;/buildCommand&gt;
++          &lt;cleanCommand&gt;scons -c&lt;/cleanCommand&gt;
++          &lt;executablePath&gt;&lt;/executablePath&gt;
++          &lt;cCompilerTool&gt;
++            &lt;includeDirectories&gt;
++              &lt;directoryPath&gt;.&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/Lib&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/NetPanzer&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/Lib/physfs&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/Lib/physfs/zlib123&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;/Library/Frameworks/SDL.framework/Versions/A/Headers&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers&lt;/directoryPath&gt;
++            &lt;/includeDirectories&gt;
++            &lt;preprocessorList&gt;
++              &lt;Elem&gt;PHYSFS_SUPPORTS_ZIP=1&lt;/Elem&gt;
++              &lt;Elem&gt;Z_PREFIX=1&lt;/Elem&gt;
++            &lt;/preprocessorList&gt;
++            &lt;warningLevel&gt;2&lt;/warningLevel&gt;
++          &lt;/cCompilerTool&gt;
++          &lt;ccCompilerTool&gt;
++            &lt;includeDirectories&gt;
++              &lt;directoryPath&gt;.&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/Lib&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/NetPanzer&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/Lib/physfs&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;src/Lib/physfs/zlib123&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;/Library/Frameworks/SDL.framework/Versions/A/Headers&lt;/directoryPath&gt;
++              &lt;directoryPath&gt;/Library/Frameworks/SDL_mixer.framework/Versions/A/Headers&lt;/directoryPath&gt;
++            &lt;/includeDirectories&gt;
++            &lt;preprocessorList&gt;
++              &lt;Elem&gt;PHYSFS_SUPPORTS_ZIP=1&lt;/Elem&gt;
++              &lt;Elem&gt;Z_PREFIX=1&lt;/Elem&gt;
++            &lt;/preprocessorList&gt;
++            &lt;warningLevel&gt;2&lt;/warningLevel&gt;
++          &lt;/ccCompilerTool&gt;
++        &lt;/makeTool&gt;
++        &lt;requiredProjects&gt;
++        &lt;/requiredProjects&gt;
++      &lt;/makefileType&gt;
+       &lt;item path=&quot;src/Lib/2D/BuiltinFont.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000137.html">[Netpanzer-cvs] r1108 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000139.html">[Netpanzer-cvs] r1110 - in trunk/netpanzer: . nbproject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#138">[ date ]</a>
+              <a href="thread.html#138">[ thread ]</a>
+              <a href="subject.html#138">[ subject ]</a>
+              <a href="author.html#138">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

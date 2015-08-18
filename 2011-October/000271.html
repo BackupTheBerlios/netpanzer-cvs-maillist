@@ -1,0 +1,701 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1245 - in trunk/netpanzer: src/NetPanzer/Classes	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1245%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Classes%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20units/profiles&In-Reply-To=%3C20111007012902.6E61E481348%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000270.html">
+   <LINK REL="Next"  HREF="000272.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1245 - in trunk/netpanzer: src/NetPanzer/Classes	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1245%20-%20in%20trunk/netpanzer%3A%20src/NetPanzer/Classes%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/Units%20units/profiles&In-Reply-To=%3C20111007012902.6E61E481348%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1245 - in trunk/netpanzer: src/NetPanzer/Classes	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Units units/profiles">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct  7 03:29:01 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000270.html">[Netpanzer-cvs] r1244 - trunk/netpanzer/src/NetPanzer/Scripts
+</A></li>
+        <LI>Next message: <A HREF="000272.html">[Netpanzer-cvs] r1246 - trunk/netpanzer/units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#271">[ date ]</a>
+              <a href="thread.html#271">[ thread ]</a>
+              <a href="subject.html#271">[ subject ]</a>
+              <a href="author.html#271">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-07 03:29:01 +0200 (Fri, 07 Oct 2011)
+New Revision: 1245
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp
+   trunk/netpanzer/units/profiles/Archer.pfl
+   trunk/netpanzer/units/profiles/Bear.pfl
+   trunk/netpanzer/units/profiles/Bobcat.pfl
+   trunk/netpanzer/units/profiles/Drake.pfl
+   trunk/netpanzer/units/profiles/Manta.pfl
+   trunk/netpanzer/units/profiles/Panther1.pfl
+   trunk/netpanzer/units/profiles/SPanzer.pfl
+   trunk/netpanzer/units/profiles/Stinger.pfl
+   trunk/netpanzer/units/profiles/Titan.pfl
+   trunk/netpanzer/units/profiles/Wolf.pfl
+Log:
+Modify unit profiles to use number of tiles for ranges and removed unused variables from the profiles
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1136,6 +1136,33 @@
+         WorldViewInterface::worldXYtoClientXY(world_win, output_pos_press,&amp;pos);
+         screen-&gt;drawLine(pos, mouse_pos, Color::blue);
+     }
++
++//    WorldViewInterface::getViewWindow(&amp;world_win);
++
++//    iXY mpos = MouseInterface::getMousePosition();
++//    iXY wpos;
++//    iXY mappos;
++
++//    WorldViewInterface::clientXYtoWorldXY(world_win, mpos, &amp;wpos);
++//    MapInterface::pointXYtoMapXY( wpos, &amp;mappos );
++
++//    iXY mappos2(mappos.x+1, mappos.y+1);
++
++//    iXY wp1, wp2;
++//    iXY r1, r2;
++
++//    MapInterface::mapXYtoPointXY(mappos,  &amp;wp1);
++//    MapInterface::mapXYtoPointXY(mappos2, &amp;wp2);
++
++//    wp1.x -= 16;
++//    wp1.y -= 16;
++//    wp2.x -= 16;
++//    wp2.y -= 16;
++
++//    WorldViewInterface::worldXYtoClientXY(world_win, wp1, &amp;r1);
++//    WorldViewInterface::worldXYtoClientXY(world_win, wp2, &amp;r2);
++
++//    screen-&gt;drawRect(iRect(r1, r2), Color::white);
+ }
+ 
+ void
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -676,20 +676,10 @@
+       short attack_factor;
+       long  attack_range;
+       long  defend_range;
+-      char  reaction_time;
+       char  speed_factor;
+       char  speed_rate;
+-      char  tracking_rate;
+-      short fuel_capacity;
+       char  reload_time;
+-      char  repath_time; 
+       short regen_time;
+-      char  jammable;
+-      char  jamming_time;
+-      // ** for fuel truck only
+-      long  fueling_range;
+-      // ** for ecm truck only ** 
+-      long  jamming_range; 
+     */
+ 
+     ExplosionSystem e;
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -18,6 +18,8 @@
+  * Created on October 9, 2008, 12:33 AM
+  */
+ 
++#include &lt;sstream&gt;
++
+ #include &lt;cstring&gt;
+ #include &quot;ScriptManager.hpp&quot;
+ #include &quot;ScriptHelper.hpp&quot;
+@@ -74,9 +76,8 @@
+   */
+ static void PrepareTableIndex(lua_State *luavm, const NPString&amp; table, NPString&amp; finalName)
+ {
+-//    DumpStack(&quot; PrepareBegin&quot;, luavm);
+     lua_pushvalue(luavm, LUA_GLOBALSINDEX);
+-//    DumpStack(&quot;  push global&quot;, luavm);
++
+     NPString::size_type start = 0;
+     NPString::size_type end = table.find_first_of(&quot;.&quot;);
+     while ( end != NPString::npos )
+@@ -84,25 +85,18 @@
+         lua_getfield(luavm, -1, table.substr(start,end).c_str());
+         if ( lua_isnil(luavm, -1) )
+         {
+-//            DumpStack(&quot;  not-exits&quot;, luavm);
+             lua_pop(luavm, 1);
+-//            DumpStack(&quot;   pop&quot;, luavm);
+             lua_newtable(luavm);
+-//            DumpStack(&quot;   new table&quot;, luavm);
+             lua_pushvalue(luavm, -1); // dup table
+-//            DumpStack(&quot;   dup table&quot;, luavm);
+             lua_setfield(luavm, -3, table.substr(start,end).c_str());
+-//            DumpStack(&quot;   set field&quot;, luavm);
+         }
+         lua_replace(luavm, -2); // table is at top
+-//        DumpStack(&quot;  replace top&quot;, luavm);
++
+         start = end+1;
+         end = table.find_first_of(&quot;.&quot;, start);
+     }
+ 
+     finalName.assign(table.substr(start));
+-
+-//    DumpStack(&quot; PrepareEnd&quot;, luavm);
+ }
+ 
+ void
+@@ -113,19 +107,17 @@
+         luavm = luaL_newstate();
+         if ( luavm )
+         {
+-            DumpStack(&quot;Real Init&quot;, luavm);
+             luaL_openlibs(luavm);
+         }
+-        DumpStack(&quot;Init&quot;,luavm);
++
+         Color::registerScript(&quot;Color&quot;);
+ //        ParticleInterface::registerScript(&quot;particles&quot;);
+-        DumpStack(&quot;Color&quot;, luavm);
++
+         GameConfig::registerScript(&quot;config&quot;);
+-        DumpStack(&quot;Config&quot;, luavm);
++
+         int to_pop = npmodule_load(luavm);
+         lua_pop(luavm, to_pop);
+ 
+-        DumpStack(&quot;Module&quot;,luavm);
+     }
+ }
+     
+@@ -142,10 +134,8 @@
+ void
+ ScriptManager::registerLib(const NPString&amp; libname, const luaL_Reg * functions)
+ {
+-    DumpStack(&quot;RegisterLib sta:&quot; + libname,luavm);
+     luaL_register(luavm, libname.c_str(), functions);
+     lua_pop(luavm, -1);
+-    DumpStack(&quot;RegisterLib end:&quot; + libname, luavm);
+ }
+     
+ void
+@@ -259,20 +249,18 @@
+             
+             if ( lua_pcall(luavm, 2, 0, 0) != 0 )
+             {
+-                char errormsg[512];
+-                snprintf(errormsg,sizeof(errormsg),
+-                        &quot;Error running server command '%s': %s&quot;,
+-                        str.c_str(), lua_tostring(luavm, -1));
+-                errormsg[sizeof(errormsg)-1] = 0;
+-                ChatInterface::serversayTo(runPlayer, errormsg);
++                std::stringstream errormsg;
++                errormsg &lt;&lt; &quot;Error running server command '&quot;
++                         &lt;&lt; str &lt;&lt; &quot;': &quot;
++                         &lt;&lt; lua_tostring(luavm, -1);
++                ChatInterface::serversayTo(runPlayer, errormsg.str());
+             }
+         }
+         else
+         {
+-            char errormsg[512];
+-            snprintf(errormsg,sizeof(errormsg), &quot;Server command '%s' not found&quot;, str.c_str());
+-            errormsg[sizeof(errormsg)-1] = 0;
+-            ChatInterface::serversayTo(runPlayer, errormsg);
++            std::stringstream errormsg;
++            errormsg &lt;&lt; &quot;Server command '&quot; &lt;&lt; str &lt;&lt; &quot;' not found&quot;;
++            ChatInterface::serversayTo(runPlayer, errormsg.str());
+         }
+     }
+     else
+@@ -425,10 +413,9 @@
+                                    const NPString&amp; metaName,
+                                    ScriptVarBindRecord * getters,
+                                    ScriptVarBindRecord * setters)
+-{                                                               // stack change
+-    DumpStack(&quot;bindStaticVariables &quot;+ objectName +&quot; start&quot;,luavm);
++{
+     NPString finalName;
+-    PrepareTableIndex(luavm, objectName, finalName); // -1 table
++    PrepareTableIndex(luavm, objectName, finalName);
+ 
+     lua_getfield(luavm, -1, finalName.c_str());
+     if ( lua_isnil(luavm, -1) )
+@@ -440,17 +427,9 @@
+     }
+ 
+     lua_replace(luavm, -2);
+-
+-    DumpStack(&quot;PrepareTable, should have only one&quot;, luavm);
+-
+     PrepareMetaTable( metaName, getters, setters);
+-    DumpStack(&quot;PrepareMeta, should have two&quot;, luavm);
+-
+-    lua_setmetatable(luavm,-2);                                 // -1
+-    DumpStack(&quot;SetMetatable, should be 1 remaining&quot;, luavm);
+-
++    lua_setmetatable(luavm,-2);
+     lua_pop(luavm, 1);
+-    DumpStack(&quot;bindStaticVariables end&quot;, luavm);
+ }
+ 
+ /**
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.cpp	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -38,9 +38,8 @@
+ char field_headers[28][64] =
+ { 
+     &quot;[TURRET_PLACEMENT]&quot;, &quot;[MOVE_OFFSET]&quot;, &quot;HITPOINTS&quot;,
+-    &quot;ATTACK_FACTOR&quot;, &quot;RELOAD_TIME&quot;, &quot;REACTION_TIME&quot;, &quot;RANGE_MAX&quot;, &quot;REGEN_TIME&quot;,
+-    &quot;DEFEND_RANGE&quot;, &quot;SPEED_RATE&quot;, &quot;SPEED_FACTOR&quot;, &quot;REPATH_TIME&quot;, &quot;FUEL_CAPACITY&quot;,
+-    &quot;TRACKING_RATE&quot;, &quot;JAMM_ABLE&quot;, &quot;JAMMING_TIME&quot;, &quot;JAMMING_RANGE&quot;, &quot;FUELING_RANGE&quot;,
++    &quot;ATTACK_FACTOR&quot;, &quot;RELOAD_TIME&quot;, &quot;RANGE_MAX&quot;, &quot;REGEN_TIME&quot;,
++    &quot;DEFEND_RANGE&quot;, &quot;SPEED_RATE&quot;, &quot;SPEED_FACTOR&quot;,
+     &quot;IMAGE&quot;,&quot;BODYSPRITE&quot;, &quot;BODYSHADOW&quot;, &quot;TURRETSPRITE&quot;, &quot;TURRETSHADOW&quot;, &quot;SOUNDSELECTED&quot;,
+     &quot;FIRESOUND&quot;, &quot;WEAPON&quot;, &quot;BOUNDBOX&quot;, 
+     &quot;END&quot;
+@@ -49,8 +48,7 @@
+ enum
+ { 
+     _turret_place, _move_offset, _hit_points, _attack_x, _reload_time,
+-    _react_time, _range_max, _regen_time, _defend_range, _speed_rate, _speed_factor, _repath_time, _fuel_capacity,
+-    _tracking_rate, _jamm_able, _jamming_time, _jamming_range, _fueling_range,
++    _range_max, _regen_time, _defend_range, _speed_rate, _speed_factor,
+     _image, _bodysprite, _bodyshadow, _turretsprite, _turretshadow, _soundselected,
+     _firesound, _weapontype, _boundbox,
+     _end
+@@ -206,16 +204,11 @@
+ 		    }
+ 		    break;
+ 
+-		case _react_time :
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;reaction_time = (char) temp_int;
+-		    }
+-		    break;
+-
+ 		case _range_max : 
+ 		    {
+ 			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
++                        temp_int *= 32;         // adjust new values
++                        temp_int *= temp_int;
+ 			profile-&gt;attack_range = (long) temp_int;
+ 		    }
+ 		    break;
+@@ -230,7 +223,9 @@
+ 		case _defend_range: 
+ 		    {
+ 			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;defend_range = (long) temp_int;
++                        temp_int *= 32;         // adjust new values
++                        temp_int *= temp_int;
++                        profile-&gt;defend_range = (long) temp_int;
+ 		    }
+ 		    break;
+ 
+@@ -248,55 +243,6 @@
+ 		    }
+ 		    break;
+ 
+-		case _repath_time: 
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;repath_time = (char) temp_int;
+-		    }
+-		    break;
+-
+-		case _fuel_capacity:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;fuel_capacity = (short ) temp_int;
+-		    }
+-		    break;
+-
+-		case _tracking_rate:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;tracking_rate = (char) temp_int;
+-		    }
+-		    break;
+-
+-		case _jamm_able:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;jammable = (char) temp_int;
+-		    }
+-		    break;
+-
+-		case _jamming_time:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;jamming_time = (char) temp_int;
+-		    }
+-		    break;
+-
+-		case _jamming_range:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;jamming_range = (long) temp_int;
+-		    }
+-		    break;
+-
+-		case _fueling_range:
+-		    {
+-			sscanf( param_list.params[1], &quot;%d&quot;, &amp;temp_int );
+-			profile-&gt;fueling_range = (long) temp_int;
+-		    }
+-		    break;
+-        
+         case _image:
+             profile-&gt;imagefile = param_list.params[1];
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitProfileInterface.hpp	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -37,20 +37,10 @@
+     short attack_factor;
+     long  attack_range;
+     long  defend_range;
+-    char  reaction_time;
+     char  speed_factor;
+     char  speed_rate;
+-    char  tracking_rate;
+-    short fuel_capacity;
+     char  reload_time;
+-    char  repath_time;
+     short regen_time;
+-    char  jammable;
+-    char  jamming_time;
+-    // ** for fuel truck only
+-    long  fueling_range;
+-    // ** for ecm truck only **
+-    long  jamming_range;
+     std::string imagefile;
+     PackedSurface bodySprite;
+     PackedSurface bodyShadow;
+
+Modified: trunk/netpanzer/units/profiles/Archer.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Archer.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Archer.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1,15 +1,12 @@
+-HITPOINTS      120;
+-DAMAGE_FACTOR    0;
+-ATTACK_FACTOR  350;
++HITPOINTS       120;
++DAMAGE_FACTOR     0;
++ATTACK_FACTOR   350;
+ RELOAD_TIME     110;
+-REACTION_TIME    8;
+-RANGE_MAX     2400000;
+-REGEN_TIME    90;
+-DEFEND_RANGE   14400000;
++RANGE_MAX        48;
++REGEN_TIME       90;
++DEFEND_RANGE    119;
+ SPEED_RATE       16;
+ SPEED_FACTOR      2;
+-REPATH_TIME      10;
+-FUEL_CAPACITY  2000;
+ IMAGE &quot;pics/menus/vehicleSelectionView/archer.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/ArchHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/ArchHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Bear.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Bear.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Bear.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -2,14 +2,11 @@
+ DAMAGE_FACTOR    0;
+ ATTACK_FACTOR   80;
+ RELOAD_TIME     40;
+-REACTION_TIME    8;
+-RANGE_MAX     400000;
+-REGEN_TIME     35;
+-DEFEND_RANGE  240000;
+-SPEED_RATE       14;
+-SPEED_FACTOR      2;
+-REPATH_TIME      2;
+-FUEL_CAPACITY  2000;
++RANGE_MAX       20;
++REGEN_TIME      35;
++DEFEND_RANGE    15;
++SPEED_RATE      14;
++SPEED_FACTOR     2;
+ IMAGE &quot;pics/menus/vehicleSelectionView/bear.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/BearHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/BearHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Bobcat.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Bobcat.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Bobcat.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -2,14 +2,11 @@
+ DAMAGE_FACTOR    0;
+ ATTACK_FACTOR   30;
+ RELOAD_TIME     20;
+-REACTION_TIME    8;
+-RANGE_MAX     122500;
+-REGEN_TIME     20;
+-DEFEND_RANGE  73500;
+-SPEED_RATE       20;
+-SPEED_FACTOR      4;
+-REPATH_TIME      20;
+-FUEL_CAPACITY  2000;
++RANGE_MAX       11;
++REGEN_TIME      20;
++DEFEND_RANGE     8;
++SPEED_RATE      20;
++SPEED_FACTOR     4;
+ IMAGE &quot;pics/menus/vehicleSelectionView/bobcat.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/BobcHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/BobcHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Drake.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Drake.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Drake.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1,15 +1,12 @@
+-HITPOINTS     300;
+-DAMAGE_FACTOR   0;
+-ATTACK_FACTOR  180;
+-RELOAD_TIME    50;
+-REACTION_TIME   8;
+-RANGE_MAX     1000000;
+-REGEN_TIME    55;
+-DEFEND_RANGE  600000;
++HITPOINTS       300;
++DAMAGE_FACTOR     0;
++ATTACK_FACTOR   180;
++RELOAD_TIME      50;
++RANGE_MAX        31;
++REGEN_TIME       55;
++DEFEND_RANGE     24;
+ SPEED_RATE       16;
+ SPEED_FACTOR      2;
+-REPATH_TIME      20;
+-FUEL_CAPACITY  2000;
+ IMAGE &quot;pics/menus/vehicleSelectionView/drake.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/DrakHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/DrakHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Manta.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Manta.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Manta.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1,15 +1,12 @@
+-HITPOINTS      350;
+-DAMAGE_FACTOR    0;
+-ATTACK_FACTOR   50;
+-RELOAD_TIME     35;
+-REACTION_TIME    8;
+-RANGE_MAX     230400;
+-REGEN_TIME     30;
+-DEFEND_RANGE  138000;
++HITPOINTS       350;
++DAMAGE_FACTOR     0;
++ATTACK_FACTOR    50;
++RELOAD_TIME      35;
++RANGE_MAX        15;
++REGEN_TIME       30;
++DEFEND_RANGE     12;
+ SPEED_RATE       20;
+ SPEED_FACTOR      4;
+-REPATH_TIME      2;
+-FUEL_CAPACITY  2000;
+ IMAGE &quot;pics/menus/vehicleSelectionView/manta.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/MantHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/MantHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Panther1.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Panther1.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Panther1.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1,15 +1,12 @@
+-HITPOINTS     525;
+-DAMAGE_FACTOR   0;
+-ATTACK_FACTOR  80;
+-RELOAD_TIME    50;
+-REACTION_TIME   8;
+-RANGE_MAX     409600;
+-REGEN_TIME    45;
+-DEFEND_RANGE  245760;
++HITPOINTS       525;
++DAMAGE_FACTOR     0;
++ATTACK_FACTOR    80;
++RELOAD_TIME      50;
++RANGE_MAX        20;
++REGEN_TIME       45;
++DEFEND_RANGE     15;
+ SPEED_RATE       18;
+ SPEED_FACTOR      2;
+-REPATH_TIME      20;
+-FUEL_CAPACITY  2000;
+ IMAGE &quot;pics/menus/vehicleSelectionView/panther1.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/PantHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/PantHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/SPanzer.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/SPanzer.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/SPanzer.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1,15 +1,12 @@
+ HITPOINTS         60;
+ DAMAGE_FACTOR      0;
+-ATTACK_FACTOR      15;
++ATTACK_FACTOR     15;
+ RELOAD_TIME       20;
+-REACTION_TIME      8;
+-RANGE_MAX     100000;
+-REGEN_TIME      20;
+-DEFEND_RANGE   60000;
++RANGE_MAX         10;
++REGEN_TIME        20;
++DEFEND_RANGE       8;
+ SPEED_RATE        22;
+ SPEED_FACTOR       4;
+-REPATH_TIME       20;
+-FUEL_CAPACITY  10000;
+ IMAGE &quot;pics/menus/vehicleSelectionView/scout.bmp&quot;;
+ BODYSPRITE &quot;units/pics/pak/SpahHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/SpahHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Stinger.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Stinger.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Stinger.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1,15 +1,12 @@
+-HITPOINTS      100;
+-DAMAGE_FACTOR    0;
+-ATTACK_FACTOR  200;
++HITPOINTS       100;
++DAMAGE_FACTOR     0;
++ATTACK_FACTOR   200;
+ RELOAD_TIME     100;
+-REACTION_TIME    8;
+-RANGE_MAX     1600000;
+-REGEN_TIME    80;
+-DEFEND_RANGE   9600000;
++RANGE_MAX        40;
++REGEN_TIME       80;
++DEFEND_RANGE     97;
+ SPEED_RATE       18;
+ SPEED_FACTOR      2;
+-REPATH_TIME      10;
+-FUEL_CAPACITY  2000;
+ IMAGE &quot;pics/menus/vehicleSelectionView/stinger.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/StinHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/StinHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Titan.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Titan.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Titan.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -1,15 +1,12 @@
+-HITPOINTS     1300;
+-DAMAGE_FACTOR   0;
+-ATTACK_FACTOR  140;
+-RELOAD_TIME    60;
+-REACTION_TIME   8;
+-RANGE_MAX     1000000;
+-REGEN_TIME    60;
+-DEFEND_RANGE  800000;
++HITPOINTS      1300;
++DAMAGE_FACTOR     0;
++ATTACK_FACTOR   140;
++RELOAD_TIME      60;
++RANGE_MAX        31;
++REGEN_TIME       60;
++DEFEND_RANGE     28;
+ SPEED_RATE       16;
+ SPEED_FACTOR      2;
+-REPATH_TIME      20;
+-FUEL_CAPACITY  2000; 
+ IMAGE &quot;pics/menus/vehicleSelectionView/titan.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/TitaHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/TitaHSSD.pak&quot;
+
+Modified: trunk/netpanzer/units/profiles/Wolf.pfl
+===================================================================
+--- trunk/netpanzer/units/profiles/Wolf.pfl	2011-10-06 14:20:34 UTC (rev 1244)
++++ trunk/netpanzer/units/profiles/Wolf.pfl	2011-10-07 01:29:01 UTC (rev 1245)
+@@ -2,14 +2,11 @@
+ DAMAGE_FACTOR    0;
+ ATTACK_FACTOR   60;
+ RELOAD_TIME     40;
+-REACTION_TIME    8;
+-RANGE_MAX    1000000;
+-REGEN_TIME     50;
+-DEFEND_RANGE  600000;
+-SPEED_RATE       20;
+-SPEED_FACTOR      4;
+-REPATH_TIME      2;
+-FUEL_CAPACITY  2000;
++RANGE_MAX       31;
++REGEN_TIME      50;
++DEFEND_RANGE    24;
++SPEED_RATE      20;
++SPEED_FACTOR     4;
+ IMAGE &quot;pics/menus/vehicleSelectionView/wolf.bmp&quot;
+ BODYSPRITE &quot;units/pics/pak/WolfHNSD.pak&quot;
+ BODYSHADOW &quot;units/pics/pak/WolfHSSD.pak&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000270.html">[Netpanzer-cvs] r1244 - trunk/netpanzer/src/NetPanzer/Scripts
+</A></li>
+	<LI>Next message: <A HREF="000272.html">[Netpanzer-cvs] r1246 - trunk/netpanzer/units/profiles
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#271">[ date ]</a>
+              <a href="thread.html#271">[ thread ]</a>
+              <a href="subject.html#271">[ subject ]</a>
+              <a href="author.html#271">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

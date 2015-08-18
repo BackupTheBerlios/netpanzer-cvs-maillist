@@ -1,0 +1,489 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1354 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-April/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1354%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120425182146.0DCFC55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000377.html">
+   <LINK REL="Next"  HREF="000379.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1354 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1354%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Interfaces%20Views/Game&In-Reply-To=%3C20120425182146.0DCFC55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1354 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Wed Apr 25 20:21:45 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000377.html">[Netpanzer-cvs] r1353 - in trunk/netpanzer: pics/default	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000379.html">[Netpanzer-cvs] r1355 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#378">[ date ]</a>
+              <a href="thread.html#378">[ thread ]</a>
+              <a href="subject.html#378">[ subject ]</a>
+              <a href="author.html#378">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-04-25 20:21:45 +0200 (Wed, 25 Apr 2012)
+New Revision: 1354
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+Log:
+TeamMode:
+- Add check for frag limite
+- Add frag Total in team view
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-04-25 16:24:47 UTC (rev 1353)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2012-04-25 18:21:45 UTC (rev 1354)
+@@ -395,6 +395,7 @@
+ void GameControlRulesDaemon::checkGameRules()
+ {
+     PlayerState *player_state;
++
+  
+     if ( (GameControlRulesDaemon::game_state == _game_state_in_progress) &amp;&amp;
+             (NetworkState::status == _network_state_server)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-04-25 16:24:47 UTC (rev 1353)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-04-25 18:21:45 UTC (rev 1354)
+@@ -123,11 +123,12 @@
+     
+     for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+     {
+-        if (PlayerInterface::getPlayer(player_id)-&gt;isActive())
++        PlayerState* state = PlayerInterface::getPlayer(player_id);
++        if (state-&gt;isActive())
+         {
+-            if (PlayerInterface::getPlayer(player_id)-&gt;getTeamID() == teamID) 
++            if (state-&gt;getTeamID() == teamID) 
+             {
+-                teamScore = PlayerInterface::getPlayer(player_id)-&gt;getKills();
++                teamScore += state-&gt;getKills();
+             }
+         }
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-04-25 16:24:47 UTC (rev 1353)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-04-25 18:21:45 UTC (rev 1354)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+- 
++
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+@@ -26,30 +26,30 @@
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+ #include &quot;Classes/Network/NetworkServer.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+- 
++
+ Team       * TeamManager::Teams_lists = 0;
+ Uint8        TeamManager::max_Teams = 0;
+- 
++
+ void TeamManager::initialize(const Uint8 _max_teams)
+ {
+- 
++
+     max_Teams = _max_teams;
+     int team_id;
+- 
++
+     delete[] Teams_lists;
+     Teams_lists = new Team[max_Teams];
+- 
++
+     for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
+     {
+         Teams_lists[ team_id ].initialize(team_id);
+     }
+ }
+- 
++
+ void TeamManager::addPlayer(PlayerID player_id)
+ {
+     int team_id;
+     int lowTeam = 0, countPlayers = Teams_lists[ 0 ].countPlayers();
+- 
++
+     for ( team_id = 0; team_id &lt; max_Teams; ++team_id )
+     {
+         //LOGGER.warning(&quot;number of players %d in team %d&quot;, Teams_lists[ team_id ].countPlayers(), team_id);
+@@ -61,12 +61,12 @@
+     }
+     Teams_lists[ lowTeam ].addPlayer(player_id);
+ }
+- 
++
+ void TeamManager::addPlayerinTeam(PlayerID player_id, Uint8 team_id)
+ {
+     Teams_lists[ team_id ].addPlayer(player_id);
+ }
+- 
++
+ void TeamManager::removePlayer(PlayerID player_id, Uint8 team_id)
+ {
+     Teams_lists[ team_id ].removePlayer(player_id);
+@@ -83,7 +83,7 @@
+     Teams_lists = 0;
+     max_Teams = 0;
+ }
+- 
++
+ void TeamManager::spawnTeams()
+ {
+     iXY spawn_point = MapInterface::getMinSpawnPoint();
+@@ -91,7 +91,7 @@
+     spawn_point = MapInterface::getMaxSpawnPoint();
+     Teams_lists[ 1 ].spawnTeam(spawn_point);
+ }
+- 
++
+ void TeamManager::spawnPlayer(PlayerID player_id)
+ {
+     Uint8 Team_id = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
+@@ -109,11 +109,11 @@
+     }
+     Teams_lists[ Team_id ].spawnPlayer(player_id, spawn_point);
+ }
+- 
++
+ iXY TeamManager::getPlayerSpawnPoint(PlayerID player_id)
+ {
+     Uint8 Team_id = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
+- 
++
+     iXY spawn_point;
+     switch (Team_id)
+     {
+@@ -128,7 +128,12 @@
+     }
+     return spawn_point;
+ }
+- 
++
++long TeamManager::GetTeamScore(  Uint8 team_id )
++{
++    return Teams_lists[team_id].getTeamScore();
++}
++
+ bool TeamManager::testRuleScoreLimit( long score_limit )
+ {
+     for (Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
+@@ -145,18 +150,18 @@
+     Changeteam_request.set(player_id, newteam, change_team_request);
+     CLIENT-&gt;sendMessage( &amp;Changeteam_request, sizeof(PlayerTeamRequest));
+ }
+-
++ 
+ void TeamManager::serverrequestchangeTeam(PlayerID player_id, Uint8 newteam)
+ {
+     Uint8 current_team = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
+-    
++ 
+     if ( (Teams_lists[newteam].countPlayers() &lt; Teams_lists[current_team].countPlayers())
+-          &amp;&amp; (Teams_lists[newteam].countPlayers() &gt; 0))
++            &amp;&amp; (Teams_lists[newteam].countPlayers() &gt; 0))
+     {
+         Teams_lists[current_team].removePlayer(player_id);
+         Teams_lists[newteam].addPlayer(player_id);
+         PlayerTeamRequest Changeteam_request;
+-        
++ 
+         Changeteam_request.set(player_id, newteam, change_team_Accepted);
+         SERVER-&gt;broadcastMessage( &amp;Changeteam_request, sizeof(PlayerTeamRequest));
+     }
+@@ -164,15 +169,15 @@
+  
+ void TeamManager::PlayerchangeTeam(PlayerID player_id, Uint8 team_idx)
+ {
+-    LOGGER.warning(&quot;change Team %d %d&quot;, player_id, team_idx);
+     Uint8 current_team = PlayerInterface::getPlayer(player_id)-&gt;getTeamID();
+     Teams_lists[current_team].removePlayer(player_id);
+     Teams_lists[team_idx].addPlayer(player_id);
+-    ConsoleInterface::postMessage(Color::yellow, false, 0, 
+-                                  &quot;%s has changed to team %d.&quot;, 
++    ConsoleInterface::postMessage(Color::yellow, false, 0,
++                                  &quot;%s has changed to team %d.&quot;,
+                                   PlayerInterface::getPlayer(player_id)-&gt;getName().c_str(), team_idx);
+ }
+-
+-
+-
++ 
++ 
++ 
++ 
+  
+\ No newline at end of file
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-04-25 16:24:47 UTC (rev 1353)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-04-25 18:21:45 UTC (rev 1354)
+@@ -41,6 +41,7 @@
+     static iXY getPlayerSpawnPoint(PlayerID player_id);
+     static void removePlayer(PlayerID player_id, Uint8 team_id);
+ 
++    static long GetTeamScore(  Uint8 team_id );
+     static bool testRuleScoreLimit( long score_limit );
+     static void PlayerrequestchangeTeam(PlayerID player_id, Uint8 newteam);
+     static void serverrequestchangeTeam(PlayerID player_id, Uint8 team_idx);
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-04-25 16:24:47 UTC (rev 1353)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GTeamView.cpp	2012-04-25 18:21:45 UTC (rev 1354)
+@@ -15,7 +15,7 @@
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+-
++ 
+ #include &quot;GTeamView.hpp&quot;
+ #include &quot;Classes/ScreenSurface.hpp&quot;
+ #include &quot;Classes/WorldInputCmdProcessor.hpp&quot;
+@@ -24,66 +24,66 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/TeamManager.hpp&quot;
+ #include &quot;Views/Components/cButton.hpp&quot;
+-
+-
++ 
++ 
+ static const char * stats_format = &quot;%-20s%6i%7i&quot;;
+ static Uint8 newteam = 0;
+-
++ 
+ static void bChangeTeam()
+ {
+     TeamManager::PlayerrequestchangeTeam(PlayerInterface::getLocalPlayerIndex(), newteam);
+ }
+-
++ 
+ GTeamView::GTeamView() : GameTemplateView()
+ {
+     setSearchName(&quot;GTeamView&quot;);
+     setTitle(&quot;Team View&quot;);
+     setSubTitle(&quot;&quot;);
+-
++ 
+     setAllowResize(false);
+     setAllowMove(false);
+     setVisible(false);
+     setBordered(false);
+-
++ 
+     loaded = false;
+     TeamOneImage.loadBMP(&quot;pics/default/team-one.bmp&quot;);
+     TeamTwoImage.loadBMP(&quot;pics/default/team-two.bmp&quot;);
+-
++ 
+ }
+-
++ 
+ void GTeamView::init()
+ {
+     removeComponents();
+     removeAllButtons();
+     iRect viewrect = getClientRect();
+-
+-
++ 
++ 
+     firstrect.min.x = (viewrect.getSizeX()/2) - 350;
+     firstrect.min.y = (viewrect.getSizeY()/2) - 250;
+     firstrect.max.x = firstrect.min.x + 350;
+     firstrect.max.y = firstrect.min.y + 500;
+-
++ 
+     secondrect.min.x = firstrect.max.x+30;
+     secondrect.min.y = firstrect.min.y;
+     secondrect.max.x = secondrect.min.x + 350;
+     secondrect.max.y = secondrect.min.y + 500;
+-    
++ 
+     addButtonCenterText( iXY(firstrect.max.x+2, firstrect.min.y+18), 28, &quot;&lt;-&gt;&quot;, &quot;&quot;, bChangeTeam);
+     loaded = true;
+ }
+-
++ 
+ void GTeamView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
+     clientArea.BltRoundRect(firstrect, 14, Palette::darkGray256.getColorArray());
+     clientArea.RoundRect(firstrect,14, Color::gray);
+-
++ 
+     clientArea.BltRoundRect(secondrect, 14, Palette::darkGray256.getColorArray());
+     clientArea.RoundRect(secondrect,14, Color::gray);
+-
++ 
+     drawTeams(clientArea, 20);
+     View::doDraw(viewArea, clientArea);
+ }
+-
++ 
+ class StatesSortByTeam
+     : public std::binary_function&lt;const PlayerState*, const PlayerState*, bool&gt;
+ {
+@@ -93,11 +93,11 @@
+         return state1-&gt;getTeamID() &lt; state2-&gt;getTeamID();
+     }
+ };
+-
++ 
+ void GTeamView::drawTeams(Surface &amp;dest, unsigned int flagHeight)
+ {
+     char statBuf[256];
+-
++ 
+     states.clear();
+     PlayerID i;
+     for( i = 0; i &lt; PlayerInterface::getMaxPlayers(); ++i)
+@@ -109,24 +109,26 @@
+         }
+     }
+     std::sort(states.begin(), states.end(), StatesSortByTeam());
+-
++ 
+     int cur_line_pos = firstrect.min.y +20;
+-    dest.bltStringShadowed(firstrect.min.x+10, cur_line_pos, &quot;Team :&quot;,Color::lightGreen, Color::gray64);
++    snprintf(statBuf, sizeof(statBuf), &quot;Team :                %6i&quot;, TeamManager::GetTeamScore(0));
++    dest.bltStringShadowed(firstrect.min.x+10, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
+     TeamOneImage.bltTrans(dest, firstrect.min.x+60, cur_line_pos-5 );
+-    dest.bltStringShadowed(secondrect.min.x+10, cur_line_pos, &quot;Team :&quot;,Color::lightGreen, Color::gray64);
++    snprintf(statBuf, sizeof(statBuf), &quot;Team :                %6i&quot;, TeamManager::GetTeamScore(1));
++    dest.bltStringShadowed(secondrect.min.x+10, cur_line_pos, statBuf,Color::lightGreen, Color::gray64);
+     TeamTwoImage.bltTrans(dest, secondrect.min.x+60, cur_line_pos-5 );
+     cur_line_pos += 25;
+     dest.drawLine(firstrect.min.x+10, cur_line_pos-10, firstrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+     dest.drawLine(secondrect.min.x+10, cur_line_pos-10, secondrect.max.x-10, cur_line_pos-10, Color::lightGreen);
+-
++ 
+     int Start_x = firstrect.min.x+10;
+     int current_Team = 0;
+-
++ 
+     for(std::vector&lt;const PlayerState*&gt;::iterator i = states.begin();
+             i != states.end(); ++i)
+     {
+         const PlayerState* state = *i;
+-
++ 
+         if (current_Team != state-&gt;getTeamID())
+         {
+             cur_line_pos = firstrect.min.y +45;
+@@ -135,20 +137,26 @@
+         }
+         if ( state-&gt;getID() == PlayerInterface::getLocalPlayerIndex() )
+         {
+-            removeComponents();
++            snprintf(statBuf, sizeof(statBuf),
++                     stats_format, state-&gt;getName().substr(0,20).c_str(),
++                     state-&gt;getKills(), state-&gt;getLosses());
++            dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::lightYellow, Color::gray64);
+             if (current_Team &gt; 0)
+             {
+-                 newteam=0;
++                newteam=0;
+             }
+             else
+             {
+-                 newteam=1;
++                newteam=1;
+             }
+         }
+-        snprintf(statBuf, sizeof(statBuf),
+-                 stats_format, state-&gt;getName().substr(0,20).c_str(),
+-                 state-&gt;getKills(), state-&gt;getLosses());
+-        dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::gray224, Color::gray64);
++        else
++        {
++            snprintf(statBuf, sizeof(statBuf),
++                     stats_format, state-&gt;getName().substr(0,20).c_str(),
++                     state-&gt;getKills(), state-&gt;getLosses());
++            dest.bltStringShadowed(Start_x, cur_line_pos, statBuf,Color::gray224, Color::gray64);
++        }
+         cur_line_pos += 20;
+     }
+ }
+@@ -160,7 +168,7 @@
+     }
+     Desktop::setActiveView(this);
+ }
+-
++ 
+ void GTeamView::doDeactivate()
+ {
+     if ( ! getVisible() )
+@@ -170,14 +178,15 @@
+         loaded = false;
+     }
+ }
+-
++ 
+ void GTeamView::checkResolution(iXY oldResolution, iXY newResolution)
+ {
+     resize(iXY(newResolution.x, newResolution.y));
+     moveTo(iXY(0,0));
+ }
+-
++ 
+ void GTeamView::processEvents()
+ {
+     COMMAND_PROCESSOR.process(false);
+ }
++ 
+\ No newline at end of file
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000377.html">[Netpanzer-cvs] r1353 - in trunk/netpanzer: pics/default	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000379.html">[Netpanzer-cvs] r1355 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#378">[ date ]</a>
+              <a href="thread.html#378">[ thread ]</a>
+              <a href="subject.html#378">[ subject ]</a>
+              <a href="author.html#378">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,648 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1403 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units Weapons
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1403%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units%20Weapons&In-Reply-To=%3C20120911084328.C00BD55B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000426.html">
+   <LINK REL="Next"  HREF="000428.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1403 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units Weapons</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1403%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Classes/Network%20Units%20Weapons&In-Reply-To=%3C20120911084328.C00BD55B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1403 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units Weapons">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Tue Sep 11 10:43:28 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000426.html">[Netpanzer-cvs] r1402 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Units
+</A></li>
+        <LI>Next message: <A HREF="000428.html">[Netpanzer-cvs] r1404 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#427">[ date ]</a>
+              <a href="thread.html#427">[ thread ]</a>
+              <a href="subject.html#427">[ subject ]</a>
+              <a href="author.html#427">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-09-11 10:43:28 +0200 (Tue, 11 Sep 2012)
+New Revision: 1403
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/UnitMessageTypes.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.hpp
+   trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+Log:
+Remove some unused code and refactor some internal messages out.
+
+Deleted: trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ChatNetMessage.hpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -1,130 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-#ifndef _CHATNETMESSAGE_HPP
+-#define _CHATNETMESSAGE_HPP
+-
+-#include &lt;string.h&gt;
+-#include &lt;assert.h&gt;
+-#include &quot;NetMessage.hpp&quot;
+-
+-enum { _net_message_id_chat_mesg_req,
+-       _net_message_id_chat_mesg
+-};
+-
+-enum { _chat_mesg_scope_player_set,
+-       _chat_mesg_scope_alliance,
+-       _chat_mesg_scope_enemies,
+-       _chat_mesg_scope_all,
+-       _chat_mesg_scope_server
+-};
+-
+-class ChatMesgRequest : public NetMessage
+-{
+-public:
+-    Uint8 message_scope;
+-    char player_set[32];
+-
+-private:
+-    Uint16 source_player_index;
+-public:
+-    char message_text[150];
+-
+-    ChatMesgRequest()
+-    {
+-        reset();
+-    }
+-    
+-    void reset()
+-    {
+-        message_class = _net_message_class_chat;
+-        message_id = _net_message_id_chat_mesg_req;
+-        memset(player_set, 0, sizeof(player_set));
+-        message_scope = _chat_mesg_scope_all;
+-    }
+-
+-    void setPlayerSet(Uint16 player_index)
+-    {
+-        assert(player_index &lt; sizeof(player_set));
+-        
+-        unsigned long index;
+-        unsigned char shift;
+-        unsigned char mask = 1;
+-
+-        index = player_index;
+-        shift = (unsigned char) ( 7 - (index &amp; (unsigned long) 7 ) ); // 7 - (index % 8)
+-        index = index &gt;&gt; 3;
+-        // index / 8
+-        mask = mask &lt;&lt; shift;
+-            
+-        player_set[index] = player_set[index] | mask;
+-    }
+-    
+-    void clearPlayerSet(Uint16 player_index)
+-    {
+-        assert(player_index &lt; sizeof(player_set));
+-        
+-        unsigned long index;
+-        unsigned char shift;
+-        unsigned char mask = 1;
+-
+-        index = (player_index);
+-        shift = (unsigned char) ( 7 - (index &amp; (unsigned long) 7 ) );
+-        index = index &gt;&gt; 3;
+-        mask = ~(mask &lt;&lt; shift);
+-        
+-        player_set[ index ] = player_set[index] &amp; mask;
+-    }
+-    Uint16 getSourcePlayerIndex() const
+-    {
+-        return ltoh16(source_player_index);
+-    }
+-    void setSourcePlayerIndex(Uint16 playerIndex)
+-    {
+-        source_player_index = htol16(playerIndex);
+-    }
+-} __attribute__((packed));
+-
+-
+-class ChatMesg: public NetMessage
+-{
+-public:
+-    unsigned char  message_scope;
+-private:
+-    Uint16 source_player_index;
+-public:
+-    char message_text[150];
+-
+-    ChatMesg()
+-    {
+-        message_class = _net_message_class_chat;
+-        message_id = _net_message_id_chat_mesg;
+-        memset(message_text, 0, sizeof(message_text));
+-    }
+-
+-    Uint16 getSourcePlayerIndex() const
+-    {
+-        return ltoh16(source_player_index);
+-    }
+-    void setSourcePlayerIndex(Uint16 playerIndex)
+-    {
+-        source_player_index = htol16(playerIndex);
+-    }
+-} __attribute__((packed));
+-
+-#endif
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/UnitMessageTypes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/UnitMessageTypes.hpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Classes/UnitMessageTypes.hpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -126,46 +126,6 @@
+ }
+ __attribute__((packed));
+ 
+-class UMesgWeaponHit : public UnitMessage
+-{
+-private:
+-    Uint16 owner_id;
+-    Sint32  hit_location_x;
+-    Sint32  hit_location_y;
+-    Uint16 damage_factor;
+-        
+-public:
+-    void setOwnerUnitID(UnitID id)
+-    {
+-        owner_id = htol16(id);
+-    }
+-
+-    UnitID getOwnerUnitID() const
+-    {
+-        return ltoh16(owner_id);
+-    }
+-
+-    void setHitLocation(const iXY&amp; point)
+-    {
+-        hit_location_x = htol32(point.x);
+-        hit_location_y = htol32(point.y);
+-    }
+-
+-    iXY getHitLocation() const
+-    {
+-        return iXY(ltoh32(hit_location_x), ltoh32(hit_location_y));
+-    }
+-
+-    void setDamageFactor(Uint16 damage_factor)
+-    {
+-        this-&gt;damage_factor = htol16(damage_factor);
+-    }
+-    Uint16 getDamageFactor() const
+-    {
+-        return ltoh16(damage_factor);
+-    }
+-} __attribute__((packed));
+-
+ class UMesgEndLifeCycleUpdate : public UnitMessage
+ {
+ private:
+@@ -197,41 +157,6 @@
+ }
+ __attribute__((packed));
+ 
+-enum { _select_box_allie_visibility,
+-       _select_box_flag_visiblity,
+-       _select_box_is_allied
+-     };
+-
+-class UMesgUpdateSelectBoxInfo : public UnitMessage
+-{
+-public:
+-    Uint8 request_type;
+-    Uint8 allie_flag_visiblity;
+-    Uint8 flag_visiblity;
+-    Uint8 allied_state;
+-
+-    void set(unsigned char request, bool state_value)
+-    {
+-        message_id = _umesg_update_select_box_info;
+-        request_type = request;
+-        switch( request ) {
+-        case _select_box_allie_visibility :
+-            allie_flag_visiblity = state_value;
+-            break;
+-
+-        case _select_box_flag_visiblity :
+-            flag_visiblity = state_value;
+-            break;
+-
+-        case _select_box_is_allied :
+-            allied_state = state_value;
+-            break;
+-
+-        } // ** switch
+-    }
+-}
+-__attribute__((packed));
+-
+ class UMesgSelfDestruct : public UnitMessage
+ {
+ public:
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -46,6 +46,8 @@
+     virtual void syncUnit() = 0;
+     virtual void offloadGraphics(SpriteSorter&amp; ) = 0;
+     virtual void soundSelected() = 0;
++    
++    virtual void weaponHit(const UnitID from_unit, const Uint16 damage_factor) = 0;
+ 
+     bool isWeaponInRange(const iXY&amp; loc) const
+     {
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -848,3 +848,17 @@
+     }
+ }
+ 
++void UnitInterface::weaponHit(  const UnitID from_unit,
++                                const iXY&amp; location,
++                                const Uint16 damage_factor)
++{
++    for(Units::iterator i = units.begin(); i != units.end(); ++i)
++    {
++        UnitBase* unit = i-&gt;second;
++        if ( unit-&gt;unit_state.bounds(location) )
++        {
++            unit-&gt;weaponHit( from_unit, damage_factor);
++        }
++    }
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -102,6 +102,8 @@
+ 
+     static UnitBase* getUnit(UnitID unit_id);
+ 
++    static void weaponHit(const UnitID from_unit, const iXY&amp; location, const Uint16 damage_factor);
++    
+     static void processNetPacket(const NetPacket* packet);
+     static void sendMessage(const UnitMessage* message,
+             const PlayerState* player = 0);
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitState.hpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -20,9 +20,9 @@
+ 
+ #include &lt;string.h&gt;
+ 
++#include &quot;Types/iXY.hpp&quot;
+ #include &quot;ArrayUtil/BoundBox.hpp&quot;
+ #include &quot;Types/Angle.hpp&quot;
+-
+ #include &quot;UnitLifecycles.hpp&quot;
+ 
+ enum { _threat_level_all_clear,
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -1929,14 +1929,9 @@
+ }
+ 
+ 
+-void Vehicle::messageWeaponHit(const UnitMessage *message)
++void Vehicle::weaponHit(const UnitID from_unit, const Uint16 damage_factor)
+ {
+-    const UMesgWeaponHit *weapon_hit = (const UMesgWeaponHit *) message;
+-
+-    if (!unit_state.bounds(weapon_hit-&gt;getHitLocation()))
+-        return;
+-
+-    unit_state.hit_points -= weapon_hit-&gt;getDamageFactor();
++    unit_state.hit_points -= damage_factor;
+     unit_state.threat_level = _threat_level_under_attack;
+     threat_level_under_attack_timer.changePeriod(
+             GameConfig::interface_attacknotificationtime);
+@@ -1953,8 +1948,7 @@
+         external_ai_event = _external_event_pending_unit_destruct;
+ 
+         UMesgEndLifeCycleUpdate lifecycle_update;
+-        lifecycle_update.set(id, weapon_hit-&gt;getOwnerUnitID(),
+-                unit_state.unit_type);
++        lifecycle_update.set(id, from_unit, unit_state.unit_type);
+         UnitInterface::sendMessage(&amp;lifecycle_update);
+ 
+         // ** Note: Temp
+@@ -1964,34 +1958,6 @@
+     }
+ }
+ 
+-void Vehicle::messageSelectBoxUpdate(const UnitMessage* message)
+-{
+-    const UMesgUpdateSelectBoxInfo *select_box_update
+-        = (const UMesgUpdateSelectBoxInfo *) message;
+-
+-    switch (select_box_update-&gt;request_type)
+-    {
+-        case _select_box_allie_visibility:
+-        {
+-            select_info_box.setAllieIcon(select_box_update-&gt;allie_flag_visiblity );
+-            break;
+-        }
+-        break;
+-
+-        case _select_box_flag_visiblity:
+-        {
+-            select_info_box.setFlagIcon( select_box_update-&gt;flag_visiblity );
+-            break;
+-        }
+-
+-        case _select_box_is_allied:
+-        {
+-            select_info_box.setAllieState( select_box_update-&gt;allied_state );
+-            break;
+-        }
+-    }
+-}
+-
+ void Vehicle::messageSelfDestruct(const UnitMessage* )
+ {
+     unit_state.lifecycle_state = _UNIT_LIFECYCLE_PENDING_DESTRUCT;
+@@ -2014,14 +1980,6 @@
+             messageAICommand(message);
+             break;
+ 
+-        case _umesg_weapon_hit:
+-            messageWeaponHit(message);
+-            break;
+-
+-        case _umesg_update_select_box_info:
+-            messageSelectBoxUpdate(message);
+-            break;
+-
+         case _umesg_self_destruct:
+             messageSelfDestruct(message);
+             break;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.hpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.hpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -234,8 +234,7 @@
+     void setCommandManualFire(const UMesgAICommand* message);
+ 
+     void messageAICommand(const UnitMessage* message);
+-    void messageWeaponHit(const UnitMessage* message);
+-    void messageSelectBoxUpdate(const UnitMessage* message);
++    void weaponHit(const UnitID from_unit, const Uint16 damage_factor);
+     void messageSelfDestruct(const UnitMessage* message);
+     
+     void setUnitProperties( unsigned char utype );
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Weapons/BulletWeapon.cpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -57,14 +57,9 @@
+                 break;
+ 
+             case _fsmFlight_on_target:
+-                if (NetworkState::status == _network_state_server) {
+-                    UMesgWeaponHit weapon_hit;
+-                    weapon_hit.setHeader(0, _umesg_flag_broadcast);
+-                    weapon_hit.message_id = _umesg_weapon_hit;
+-                    weapon_hit.setOwnerUnitID(owner_id);
+-                    weapon_hit.setHitLocation(location);
+-                    weapon_hit.setDamageFactor(damage_factor);
+-                    UnitInterface::sendMessage( &amp;weapon_hit );
++                if (NetworkState::status == _network_state_server)
++                {
++                    UnitInterface::weaponHit(owner_id, location, damage_factor);
+                 }
+ 
+                 fsmFlight_state = _fsmFlight_idle;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -106,29 +106,22 @@
+             }
+             break;
+ 
+-        case _fsmFlight_on_target : {
+-                UMesgWeaponHit weapon_hit;
++        case _fsmFlight_on_target:
++            if ( NetworkState::status == _network_state_server )
++            {
++                UnitInterface::weaponHit(owner_id, location, damage_factor);
++            }
+ 
+-                if ( NetworkState::status == _network_state_server ) {
+-                    weapon_hit.setHeader(0, _umesg_flag_broadcast);
+-                    weapon_hit.message_id = _umesg_weapon_hit;
+-                    weapon_hit.setOwnerUnitID(owner_id);
+-                    weapon_hit.setHitLocation(location);
+-                    weapon_hit.setDamageFactor(damage_factor);
+-                    UnitInterface::sendMessage( &amp;weapon_hit );
+-                }
++            fsmFlight_state = _fsmFlight_idle;
++            lifecycle_status = _lifecycle_weapon_in_active;
+ 
+-                fsmFlight_state = _fsmFlight_idle;
+-                lifecycle_status = _lifecycle_weapon_in_active;
++            //SFX
++            sound-&gt;playAmbientSound(&quot;hit&quot;,
++                                    WorldViewInterface::getCameraDistance( location ) );
+ 
+-                //SFX
+-                sound-&gt;playAmbientSound(&quot;hit&quot;,
+-                                        WorldViewInterface::getCameraDistance( location ) );
+-
+-                // **  Particle Shit
+-                ParticleInterface::addMiss(location, Weapon::owner_type_id);
+-                end_cycle = true;
+-            }
++            // **  Particle Shit
++            ParticleInterface::addMiss(location, Weapon::owner_type_id);
++            end_cycle = true;
+             break;
+ 
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -81,30 +81,22 @@
+             }
+             break;
+ 
+-        case _fsmFlight_on_target : {
+-                UMesgWeaponHit weapon_hit;
++        case _fsmFlight_on_target:
++            if ( NetworkState::status == _network_state_server )
++            {
++                UnitInterface::weaponHit(owner_id, location, damage_factor);
++            }
+ 
+-                if ( NetworkState::status == _network_state_server ) {
+-                    weapon_hit.setHeader(0, _umesg_flag_broadcast);
+-                    weapon_hit.message_id = _umesg_weapon_hit;
+-                    weapon_hit.setOwnerUnitID(owner_id);
+-                    weapon_hit.setHitLocation(location);
+-                    weapon_hit.setDamageFactor(damage_factor);
+-                    UnitInterface::sendMessage( &amp;weapon_hit );
+-                }
++            fsmFlight_state = _fsmFlight_idle;
++            lifecycle_status = _lifecycle_weapon_in_active;
+ 
+-                fsmFlight_state = _fsmFlight_idle;
+-                lifecycle_status = _lifecycle_weapon_in_active;
++            //SFX
++            sound-&gt;playAmbientSound(&quot;hit&quot;,
++                                    WorldViewInterface::getCameraDistance( location ) );
+ 
+-                //SFX
+-                sound-&gt;playAmbientSound(&quot;hit&quot;,
+-                                        WorldViewInterface::getCameraDistance( location ) );
+-
+-                // **  Particle Shit
+-                iXY loc = iXY( location.x, location.y );
+-                ParticleInterface::addMiss(loc, Weapon::owner_type_id);
+-                end_cycle = true;
+-            }
++            // **  Particle Shit
++            ParticleInterface::addMiss(location, Weapon::owner_type_id);
++            end_cycle = true;
+             break;
+ 
+         }
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2012-09-10 15:18:47 UTC (rev 1402)
++++ trunk/netpanzer/src/NetPanzer/Weapons/Weapon.cpp	2012-09-11 08:43:28 UTC (rev 1403)
+@@ -75,8 +75,10 @@
+ {
+     bool end_cycle = false;
+ 
+-    do {
+-        switch( fsmFlight_state ) {
++    do
++    {
++        switch( fsmFlight_state )
++        {
+             case _fsmFlight_idle:
+                 end_cycle = true;
+                 break;
+@@ -88,16 +90,10 @@
+                 end_cycle = true;
+                 break;
+ 
+-            case _fsmFlight_on_target: {
+-                UMesgWeaponHit weapon_hit;
+-
+-                if (NetworkState::status == _network_state_server) {
+-                    weapon_hit.setHeader(0, _umesg_flag_broadcast);
+-                    weapon_hit.message_id = _umesg_weapon_hit;
+-                    weapon_hit.setOwnerUnitID(owner_id);
+-                    weapon_hit.setHitLocation(location);
+-                    weapon_hit.setDamageFactor(damage_factor);
+-                    UnitInterface::sendMessage( &amp;weapon_hit );
++            case _fsmFlight_on_target:
++                if (NetworkState::status == _network_state_server)
++                {
++                    UnitInterface::weaponHit(owner_id, location, damage_factor);
+                 }
+ 
+                 fsmFlight_state = _fsmFlight_idle;
+@@ -107,11 +103,9 @@
+                 sound-&gt;playSound(&quot;hit_target&quot;);
+ 
+                 // **  Particle Shit
+-                iXY loc = iXY( location.x, location.y );
+-                ParticleInterface::addMiss(loc, Weapon::owner_type_id);
++                ParticleInterface::addMiss(location, Weapon::owner_type_id);
+                 end_cycle = true;
+                 break;
+-            }
+         }
+     } while ( end_cycle == false );
+ }
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000426.html">[Netpanzer-cvs] r1402 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Units
+</A></li>
+	<LI>Next message: <A HREF="000428.html">[Netpanzer-cvs] r1404 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Interfaces Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#427">[ date ]</a>
+              <a href="thread.html#427">[ thread ]</a>
+              <a href="subject.html#427">[ subject ]</a>
+              <a href="author.html#427">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

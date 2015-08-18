@@ -1,0 +1,538 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1370 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-May/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1370%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Units%20Views/Game&In-Reply-To=%3C20120524121941.78B5ABF401%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000393.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1370 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game</H1>
+    <B>wile64 at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1370%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%0A%09Classes/Network%20Interfaces%20Units%20Views/Game&In-Reply-To=%3C20120524121941.78B5ABF401%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1370 - in trunk/netpanzer/src/NetPanzer:	Classes/Network Interfaces Units Views/Game">wile64 at scm.berlios.de
+       </A><BR>
+    <I>Thu May 24 14:19:41 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000393.html">[Netpanzer-cvs] r1369 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#394">[ date ]</a>
+              <a href="thread.html#394">[ thread ]</a>
+              <a href="subject.html#394">[ subject ]</a>
+              <a href="author.html#394">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2012-05-24 14:19:40 +0200 (Thu, 24 May 2012)
+New Revision: 1370
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+Log:
+TeamMode : 
+ - Add counter kill/lose for team and sync
+ - remove outpost on change team
+ - killing same team don't change kill/lose counter
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/PlayerNetMessage.hpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -30,7 +30,8 @@
+        _net_message_id_player_alliance_update,
+        _net_message_id_player_flagtimer_update,
+        _net_message_id_player_changeteam_request,
+-       _net_message_id_player_ready_request
++       _net_message_id_player_ready_request,
++       _net_message_id_player_team_score_sync
+      };
+ 
+ #ifdef MSVC
+@@ -292,7 +293,48 @@
+ }
+ __attribute__((packed));
+ 
++class TeamScoreSync : public NetMessage
++{
++private:
++    short TeamKills;
++    short TeamLosses;
++public:
++    Uint8 TeamID;
+ 
++    TeamScoreSync()
++    {
++        message_class = _net_message_class_player;
++        message_id = _net_message_id_player_team_score_sync;
++    }
++
++    void set(Uint8 Team_ID, short kills, short Losses)
++    {
++        TeamKills = kills;
++        TeamLosses =  Losses;
++        TeamID = Team_ID;
++    }
++
++    void setKills(short kills)
++    {
++        TeamKills = kills;
++    }
++    short getKills() const
++    {
++        return TeamKills;
++    }
++
++    void setLosses(short Losses)
++    {
++        TeamKills = Losses;
++    }
++    short getLosses() const
++    {
++        return TeamLosses;
++    }
++}
++__attribute__((packed));
++
++
+ #ifdef MSVC
+ #pragma pack()
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -90,6 +90,7 @@
+     if (GameConfig::game_teammode)
+     {
+         TeamManager::addPlayer(player_state-&gt;getID());
++        TeamManager::sendScores();
+         ConsoleInterface::postMessage(Color::cyan, true, player_state-&gt;getFlag(),
+                                   &quot;'%s' [%s] has joined the game int team %s.&quot;,
+                                   player_state-&gt;getName().c_str(),
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -255,6 +255,11 @@
+     SDL_mutexP(mutex);
+     by_player-&gt;incKills( unit_type );
+     on_player-&gt;incLosses( unit_type );
++    if (GameConfig::game_teammode)
++    {
++        TeamManager::incKills(by_player-&gt;getTeamID());
++        TeamManager::incLosses(on_player-&gt;getTeamID());
++    }
+     SDL_mutexV(mutex);
+ }
+  
+@@ -267,6 +272,7 @@
+     {
+         player_lists[ player_id ].lockStats();
+     } // ** for
++    if (GameConfig::game_teammode) TeamManager::lockTeamStats();
+     SDL_mutexV(mutex);
+ }
+  
+@@ -279,6 +285,7 @@
+     {
+         player_lists[ player_id ].unlockStats();
+     } // ** for
++    if (GameConfig::game_teammode) TeamManager::unlockTeamStats();
+     SDL_mutexV(mutex);
+ }
+  
+@@ -291,6 +298,7 @@
+     {
+         player_lists[ player_id ].resetStats(keepAdmin);
+     } // ** for
++    if (GameConfig::game_teammode) TeamManager::resetTeamStats();
+     SDL_mutexV(mutex);
+ }
+  
+@@ -650,7 +658,11 @@
+     case _net_message_id_player_ready_request :
+         TeamManager::netMessageReadyRequest(message);
+         break;
+- 
++    
++    case _net_message_id_player_team_score_sync :
++        TeamManager::receiveScores(message);
++        break;
++
+     case _net_message_id_player_flagtimer_update :
+         const PlayerFlagTimerUpdate* pftu = (const PlayerFlagTimerUpdate*)message;
+         gameconfig-&gt;game_changeflagtime = pftu-&gt;getflagtimer();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.cpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -134,45 +134,17 @@
+ 
+ short Team::getKills() const
+ {
+-    short TeamKills = 0;
+-    PlayerID player_id;
+-    
+-    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-    {
+-        PlayerState* state = PlayerInterface::getPlayer(player_id);
+-        if (state-&gt;isActive())
+-        {
+-            if (state-&gt;getTeamID() == teamID) 
+-            {
+-                TeamKills += state-&gt;getKills();
+-            }
+-        }
+-    }
+-    return TeamKills;
++    return kills;
+ }
+ 
+ short Team::getLosses() const
+ {
+-    long TeamLosses = 0;
+-    PlayerID player_id;
+-    
+-    for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-    {
+-        PlayerState* state = PlayerInterface::getPlayer(player_id);
+-        if (state-&gt;isActive())
+-        {
+-            if (state-&gt;getTeamID() == teamID) 
+-            {
+-                TeamLosses += state-&gt;getLosses();
+-            }
+-        }
+-    }
+-    return TeamLosses;
++    return losses;
+ }
+ 
+-int Team::getTeamObjective() const
++short Team::getTeamObjective() const
+ {
+-    long TeamObjective = 0;
++    short TeamObjective = 0;
+     PlayerID player_id;
+     
+     for ( player_id = 0; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+@@ -188,4 +160,40 @@
+     }
+     return TeamObjective;
+ }
++void Team::incKills()
++{
++    if ( stats_locked == true )
++        return;
++    kills++;
++}
+ 
++void Team::incLosses()
++{
++    if ( stats_locked == true )
++        return;
++    losses++;
++}
++
++void Team::lockStats()
++{
++    stats_locked = true;
++}
++
++void Team::unlockStats()
++{
++    stats_locked = false;
++}
++
++void Team::resetStats()
++{
++    kills  = 0;
++    losses = 0;
++    stats_locked = false;
++}
++
++void Team::syncScore(short newKills, short newLosses)
++{
++    kills = newKills;
++    losses = newLosses;
++}
++
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/Team.hpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -28,6 +28,11 @@
+     std::string name;
+     Surface Flag;
+     Uint8 teamColor;
++    
++    short kills;
++    short losses;
++    short total;
++    bool stats_locked;
+ 
+ public:
+     void initialize(const Uint8 id);
+@@ -44,10 +49,16 @@
+     PlayerID getrandomplayer() const;
+     void loadFlag(const char *fileName);
+     void drawFlag(Surface &amp;dest, int x, int y) const;
++
+     short getKills() const;
+     short getLosses() const;
+-    int getTeamObjective() const;
+-
++    short getTeamObjective() const;
++    void incKills();
++    void incLosses();
++    void lockStats();
++    void unlockStats();
++    void resetStats();
++    void syncScore(short newKills, short newLosses);
+ };
+ 
+ #endif // ** _TEAM_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.cpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -81,8 +81,8 @@
+     std::vector&lt;NPString&gt; plist;
+     NPString pl = *GameConfig::game_team_names;
+     string_to_params(pl, plist);
++    reset();
+ 
+-
+     for ( int team_id = 0; team_id &lt; max_Teams; ++team_id )
+     {
+         Teams_lists[ team_id ].initialize(team_id);
+@@ -140,23 +140,8 @@
+ 
+ void TeamManager::reset()
+ {
+-//    for ( PlayerID player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers()-1; ++player_index )
+-//    {
+-//        for ( PlayerID player_id = 1; player_id &lt; PlayerInterface::getMaxPlayers(); ++player_id )
+-//        {
+-//            PlayerState* state_id = PlayerInterface::getPlayer(player_id);
+-//            PlayerState* state_index = PlayerInterface::getPlayer(player_index);
+-//            if (state_id-&gt;isActive() &amp;&amp; state_index-&gt;isActive())
+-//            {
+-//                if (state_id-&gt;getTeamID() == state_index-&gt;getTeamID()
+-//                        &amp;&amp; (player_id != player_index))
+-//                {
+-//                    PlayerInterface::allyplayers( player_id, player_index);
+-//                }
+-//            }
+-//        }
+-//    }
+     resetPlayerReady();
++    resetTeamStats();
+ }
+ 
+ void TeamManager::addPlayerinTeam(PlayerID player_id, Uint8 team_id)
+@@ -200,6 +185,30 @@
+     return spawn_point;
+ }
+ 
++void TeamManager::lockTeamStats()
++{
++    for ( Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        Teams_lists[ team_id ].lockStats();
++    }
++}
++
++void TeamManager::unlockTeamStats()
++{
++    for ( Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        Teams_lists[ team_id ].unlockStats();
++    }
++}
++
++void TeamManager::resetTeamStats()
++{
++    for ( Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        Teams_lists[ team_id ].resetStats();
++    }
++}
++
+ short TeamManager::getKills(  Uint8 team_id )
+ {
+     return Teams_lists[team_id].getKills();
+@@ -210,6 +219,16 @@
+     return Teams_lists[team_id].getLosses();
+ }
+ 
++void TeamManager::incKills( Uint8 team_id )
++{
++    Teams_lists[team_id].incKills();
++}
++
++void TeamManager::incLosses( Uint8 team_id )
++{
++    Teams_lists[team_id].incLosses();
++}
++
+ short TeamManager::getObjectivesHeld( Uint8 team_id )
+ {
+     return Teams_lists[team_id].getTeamObjective();
+@@ -314,7 +333,7 @@
+             PlayerTeamRequest Changeteam_request;
+             Changeteam_request.set(player_id, newteam, change_team_Accepted);
+             SERVER-&gt;broadcastMessage( &amp;Changeteam_request, sizeof(PlayerTeamRequest));
+-
++            ObjectiveInterface::disownPlayerObjectives(player_id);
+             UnitInterface::destroyPlayerUnits(player_id);
+             GameManager::spawnPlayer( player_id );
+         }
+@@ -380,6 +399,25 @@
+     }
+ }
+ 
++void TeamManager::sendScores()
++{
++    TeamScoreSync score_Sync;
++    for (Uint8 team_id = 0; team_id &lt; max_Teams; ++team_id )
++    {
++        score_Sync.set( getKills(team_id), getLosses(team_id), team_id);
++        SERVER-&gt;broadcastMessage(&amp;score_Sync, sizeof(TeamScoreSync));
++    }
++}
++
++void TeamManager::receiveScores(const NetMessage* message)
++{
++    const TeamScoreSync* score_Sync
++    = (const TeamScoreSync *) message;
++    
++    if (score_Sync-&gt;TeamID &lt; max_Teams)
++        Teams_lists[score_Sync-&gt;TeamID].syncScore(score_Sync-&gt;getKills(), score_Sync-&gt;getLosses());
++}
++
+ void TeamManager::netMessageChangeTeamRequest(const NetMessage* message)
+ {
+     const PlayerTeamRequest* changeTeamRequest
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/TeamManager.hpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -48,6 +48,14 @@
+     static short getKills( Uint8 team_id );
+     static short getLosses( Uint8 team_id );
+     static short getObjectivesHeld( Uint8 team_id );
++    static void incKills( Uint8 team_id );
++    static void incLosses( Uint8 team_id );
++    static void lockTeamStats();
++    static void unlockTeamStats();
++    static void resetTeamStats();
++    static void sendScores();
++    static void receiveScores(const NetMessage* message);
++    
+     static Uint8 getTeamWin();
+     static const std::string&amp; getTeamName( Uint8 team_id );
+     static bool testRuleScoreLimit( long score_limit );
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -25,6 +25,7 @@
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ #include &quot;Units/Vehicle.hpp&quot;
+ 
+@@ -717,8 +718,11 @@
+             &lt;&lt; &quot;' with his '&quot; &lt;&lt; unitname1 &lt;&lt; &quot;'.&quot; &lt;&lt; std::endl;
+     }
+ 
++    // killing team own units doesn't give score
++    if (GameConfig::game_teammode &amp;&amp; (player1-&gt;getTeamID() == player2-&gt;getTeamID())) return;
+     // killing own units doesn't give score
+-    if(player1 != player2) {
++    if( (player1 != player2) ) 
++    {
+         PlayerInterface::setKill(unit1-&gt;player, unit2-&gt;player,
+                 (UnitType) lifecycle_update-&gt;unit_type);
+         
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-05-23 13:49:20 UTC (rev 1369)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/EndRoundView.cpp	2012-05-24 12:19:40 UTC (rev 1370)
+@@ -240,7 +240,7 @@
+     dest.bltString(x, y, statBuf, ctTexteNormal);
+     x += 120;
+     y = rect.min.y+20;
+-    snprintf(statBuf, sizeof(statBuf), &quot; Objectives: %5i&quot;, state-&gt;getObjectivesHeld());
++    snprintf(statBuf, sizeof(statBuf), &quot;Objectives: %5i&quot;, state-&gt;getObjectivesHeld());
+     dest.bltString(x, y, statBuf, ctTexteNormal);
+ }
+ 
+@@ -270,6 +270,13 @@
+              &quot;Winner is Team %s&quot;, TeamManager::getTeamName(TeamWin).substr(0,20).c_str());
+     dest.bltStringCenteredInRect(RectWinner,statBuf, Color::yellow);
+ 
++    snprintf(statBuf, sizeof(statBuf),
++             &quot;frags: %5i  deaths: %5i  Objectives: %5i&quot;, 
++             TeamManager::getKills(TeamWin),
++             TeamManager::getLosses(TeamWin),
++             TeamManager::getObjectivesHeld(TeamWin));
++    dest.bltString(RectWinner.min.x+50, RectWinner.max.y-15,statBuf, ctTexteNormal);
++
+     int cur_line_pos = TABLE_START + ((ENTRY_HEIGHT - Surface::getFontHeight())/2);
+     int flag_pos = TABLE_START + (int(ENTRY_HEIGHT - flagHeight))/2;
+     Surface * flag = 0;
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000393.html">[Netpanzer-cvs] r1369 - in trunk/netpanzer/src/NetPanzer:	Interfaces Views Views/Components Views/Game
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#394">[ date ]</a>
+              <a href="thread.html#394">[ thread ]</a>
+              <a href="subject.html#394">[ subject ]</a>
+              <a href="author.html#394">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

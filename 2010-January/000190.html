@@ -1,0 +1,702 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1162 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Particles	NetPanzer/PowerUps NetPanzer/System NetPanzer/Views/MainMenu/Options
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1162%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes%20NetPanzer/Interfaces%20NetPanzer/Particles%0A%09NetPanzer/PowerUps%20NetPanzer/System%20NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C201001071611.o07GB1pZ018771%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000189.html">
+   <LINK REL="Next"  HREF="000191.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1162 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Particles	NetPanzer/PowerUps NetPanzer/System NetPanzer/Views/MainMenu/Options</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1162%20-%20in%20trunk/netpanzer/src%3A%20Lib/2D%0A%09NetPanzer/Classes%20NetPanzer/Interfaces%20NetPanzer/Particles%0A%09NetPanzer/PowerUps%20NetPanzer/System%20NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C201001071611.o07GB1pZ018771%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1162 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes NetPanzer/Interfaces NetPanzer/Particles	NetPanzer/PowerUps NetPanzer/System NetPanzer/Views/MainMenu/Options">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Jan  7 17:11:01 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000189.html">[Netpanzer-cvs] r1161 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Interfaces NetPanzer/Objectives NetPanzer/PowerUps	NetPanzer/Units
+</A></li>
+        <LI>Next message: <A HREF="000191.html">[Netpanzer-cvs] r1163 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg	src/NetPanzer/System src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-07 17:10:37 +0100 (Thu, 07 Jan 2010)
+New Revision: 1162
+
+Modified:
+   trunk/netpanzer/src/Lib/2D/Surface.cpp
+   trunk/netpanzer/src/Lib/2D/Surface.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+Log:
+- Added selection of all the available screen resolutions, currently the value is not saved and always starts in 800x600.
+- When playing in windowed mode, the window can be resize to any size. It should limit the minimum to 640x480, to be done.
+- Fix a crash in fullscreen if the mouse gets near the borders (it tryed to scroll the map).
+- Cleanup of some #includes
+
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/Lib/2D/Surface.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -1125,11 +1125,11 @@
+ }
+ 
+ void
+-Surface::setAlpha()
++Surface::setAlpha(unsigned int alpha)
+ {
+     for ( unsigned int n = 0; n &lt; frames.size(); ++n )
+     {
+-        SDL_SetAlpha(frames[n], SDL_SRCALPHA, 128);
++        SDL_SetAlpha(frames[n], SDL_SRCALPHA, alpha);
+     }
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Surface.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/Lib/2D/Surface.hpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -187,7 +187,7 @@
+ 
+     void brigthenFrames();
+     void setColorkey();
+-    void setAlpha();
++    void setAlpha(unsigned int alpha = 128);
+     void optimize();
+ 
+ private:
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Classes/TileSet.hpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -18,14 +18,15 @@
+ #ifndef _TILESET_HPP
+ #define _TILESET_HPP
+ 
++#include &lt;string&gt;
+ #include &lt;vector&gt;
+-#include &quot;2D/Surface.hpp&quot;
+-#include &quot;Types/iXY.hpp&quot;
+ #include &quot;SDL.h&quot;
+-#include &quot;Util/FileStream.hpp&quot;
+ 
+ namespace filesystem { class ReadFile; }
+ 
++class Surface;
++class IFileStream;
++
+ typedef struct TileSetHeader_s
+ {
+     unsigned int version;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -945,6 +945,7 @@
+     evaluateKeyboardEvents();
+     if ( handleMouse )
+     {
++        updateScrollStatus( MouseInterface::getMousePosition() );
+         evaluateMouseEvents();
+     }
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -16,7 +16,6 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-
+ #include &quot;Bot/BotManager.hpp&quot;
+ #include &quot;DedicatedGameManager.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -32,7 +32,8 @@
+ 
+ GameConfig::GameConfig(const std::string&amp; configfile, bool usePhysFS)
+     // VariableName(&quot;Name&quot;, value [, minimum, maximum])
+-    : hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
++    : windowWidth(800), windowHeight(600),
++      hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
+       quickConnect(&quot;quickconnect&quot;, false),
+       serverConnect(&quot;serverconnect&quot;, &quot;&quot;),
+     
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -108,6 +108,9 @@
+     void loadConfig();
+     void saveConfig();
+ 
++    unsigned int windowWidth;
++    unsigned int windowHeight;
++
+     // game Settings (there are not saved to disk)
+     ConfigInt       hostorjoin;         // 1=host, 2=join
+     ConfigBool      quickConnect;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -136,28 +136,37 @@
+     flags |= gameconfig-&gt;hardwareSurface ? SDL_HWSURFACE : 0;
+     flags |= gameconfig-&gt;hardwareDoubleBuffer ? SDL_DOUBLEBUF : 0;
+ 
+-    int bpp = 32;
+-    int mode;
+-    for(mode=gameconfig-&gt;screenresolution; mode&gt;=0; mode--) {
+-        switch(mode) {
+-            case 0: mode_res = iXY(640,480); break;
+-            case 1: mode_res = iXY(800,600); break;
+-            case 2: mode_res = iXY(1024,768); break;
+-            case 3: mode_res = iXY(1280,1024); break;
+-        }
+-
+-        if(Screen-&gt;isDisplayModeAvailable(mode_res.x, mode_res.y, bpp, flags))
+-        {
+-            gameconfig-&gt;screenresolution = mode;
+-            break;
+-        }
++    if ( ! gameconfig-&gt;fullscreen )
++    {
++        flags |= SDL_RESIZABLE;
+     }
+ 
+-    if(mode&lt;0)
+-        throw Exception(&quot;couldn't find a usable video mode&quot;);
++    mode_res.x = gameconfig-&gt;windowWidth;
++    mode_res.y = gameconfig-&gt;windowHeight;
++//    for(mode=gameconfig-&gt;screenresolution; mode&gt;=0; mode--) {
++//        switch(mode) {
++//            case 0: mode_res = iXY(640,480); break;
++//            case 1: mode_res = iXY(800,600); break;
++//            case 2: mode_res = iXY(1024,768); break;
++//            case 3: mode_res = iXY(1280,1024); break;
++//        }
++//
++//        if(Screen-&gt;isDisplayModeAvailable(mode_res.x, mode_res.y, flags))
++//        {
++//            gameconfig-&gt;screenresolution = mode;
++//            break;
++//        }
++//    }
++//
++//    if(mode&lt;0)
++//        throw Exception(&quot;couldn't find a usable video mode&quot;);
+ 
+-    Screen-&gt;setVideoMode(mode_res.x, mode_res.y, bpp, flags);
++    Screen-&gt;setVideoMode(mode_res.x, mode_res.y, flags);
+ 
++    SDL_Surface *v = Screen-&gt;getSurface();
++    mode_res.x = v-&gt;w;
++    mode_res.y = v-&gt;h;
++
+     WorldViewInterface::setCameraSize( mode_res.x, mode_res.y);
+     delete screen;
+     screen = new ScreenSurface(Screen, mode_res.x, mode_res.y);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -16,13 +16,14 @@
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
++#include &lt;cstdlib&gt;
++#include &lt;cstring&gt;
++#include &lt;cstdio&gt;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Core/GlobalGameState.hpp&quot;
+ #include &quot;Classes/SpawnList.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+-#include &lt;cstdlib&gt;
+-#include &lt;cstring&gt;
+-#include &lt;cstdio&gt;
++#include &quot;Util/FileSystem.hpp&quot;
+ 
+ MapInterface::MapListenerList MapInterface::listenerList;
+ int* MapInterface::map_data = 0;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -20,7 +20,6 @@
+ 
+ #include &lt;list&gt;
+ 
+-//#include &quot;Classes/WorldMap.hpp&quot;
+ #include &quot;Classes/TileSet.hpp&quot;
+ #include &quot;Classes/SpawnList.hpp&quot;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -214,8 +214,6 @@
+     MouseInterface::manageClickTimer();
+     Desktop::manage(MouseInterface::getMouseX(),
+                MouseInterface::getMouseY(), MouseInterface::getButtonMask());
+-
+-    COMMAND_PROCESSOR.updateScrollStatus( MouseInterface::getMousePosition() );
+ }
+ //-----------------------------------------------------------------
+ void PlayerGameManager::graphicsLoop()
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -67,9 +67,9 @@
+     packedSurfaceShadow.setData(*staticCloudShadow);
+     packedSurfaceShadow.setFrame(randFrame);
+ 
+-    packedSurfaceShadow.setDrawModeBlend(32);
++//    packedSurfaceShadow.setDrawModeBlend(32);
+ 
+-    packedSurface.setDrawModeBlend(128);
++//    packedSurface.setDrawModeBlend(128);
+ 
+ } // end CloudParticle2D::setRandomSurface
+ 
+@@ -114,6 +114,10 @@
+     staticCloudShadow = new Surface();
+     staticCloudShadow-&gt;createShadow(*staticPackedCloud);
+ 
++    s-&gt;setAlpha(128);
++
++    staticCloudShadow-&gt;setAlpha(32);
++
+     lua_settop(L, luatop);
+ } // end CloudParticle2D::init
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Particles/ParticleInterface.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -37,6 +37,7 @@
+ #include &quot;Util/Exception.hpp&quot;
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
++#include &quot;Util/FileSystem.hpp&quot;
+ #include &quot;2D/Color.hpp&quot;
+ 
+ #include &quot;lua/lua.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -41,5 +41,4 @@
+ 
+     sprite_shadow.setData( POWERUP_ANIM_SHADOW );
+     sprite_shadow.setAttrib( world_loc, iXY(0,0), 4 );
+-    sprite_shadow.setDrawModeBlend(64); // dark a lot
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUpInterface.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -178,6 +178,7 @@
+     t.loadPNGSheet(&quot;powerups/BoltS.png&quot;, 127, 127, 36);
+     PowerUp::POWERUP_ANIM_SHADOW.createShadow(t);
+     PowerUp::POWERUP_ANIM_SHADOW.setOffsetCenter();
++    PowerUp::POWERUP_ANIM_SHADOW.setAlpha();
+ }
+ 
+ void PowerUpInterface::resetLogic( void )
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -24,6 +24,7 @@
+ #include &quot;SDLVideo.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
+ 
+ bool handleSDLEvents()
+ {
+@@ -72,6 +73,12 @@
+                 KeyboardInterface::keyReleased(event.key.keysym.sym);
+                 break;
+ 
++            case SDL_VIDEORESIZE:
++                gameconfig-&gt;windowWidth = event.resize.w;
++                gameconfig-&gt;windowHeight = event.resize.h;
++                GameManager::setVideoMode();
++                break;
++
+         }
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -25,11 +25,12 @@
+   #include &quot;Interfaces/GameConfig.hpp&quot;
+ #endif
+ 
+-#define ADD_STANDARD_SDL_FLAGS(flags) flags |= SDL_ANYFORMAT
+ #define flaginfo(f,xxflag) if ( f &amp; xxflag ) LOGGER.warning(&quot;\t&quot; #xxflag)
+ 
+ SDLVideo* Screen; // get rid of this later...
+ 
++static int best_bpp = 0;
++
+ static void
+ logVideoInfo()
+ {
+@@ -50,6 +51,27 @@
+ }
+ 
+ static void
++logAvailableModes(Uint32 flags)
++{
++    SDL_Rect ** modes = SDL_ListModes(NULL, flags | SDL_FULLSCREEN);
++    if ( modes == (SDL_Rect**) 0 )
++    {
++        LOGGER.warning(&quot;No modes available&quot;);
++    }
++    else if ( modes == (SDL_Rect**)-1 )
++    {
++        LOGGER.warning(&quot;All modes available&quot;);
++    }
++    else
++    {
++        for ( int n = 0; modes[n]; ++n )
++        {
++            LOGGER.warning(&quot;Mode: %d x %d&quot;, modes[n]-&gt;w, modes[n]-&gt;h);
++        }
++    }
++}
++
++static void
+ logFlags(Uint32 f)
+ {
+     flaginfo(f,SDL_SWSURFACE);
+@@ -85,6 +107,15 @@
+                         );
+     }
+ 
++    if ( ! best_bpp )
++    {
++        const SDL_VideoInfo *v = SDL_GetVideoInfo();
++        if ( v )
++        {
++            best_bpp = v-&gt;vfmt-&gt;BitsPerPixel;
++        }
++    }
++
+     logVideoInfo();
+ 
+     // XXX unfortunately SDL initializes the keyboard again :-/
+@@ -101,8 +132,44 @@
+     SDL_QuitSubSystem(SDL_INIT_VIDEO);
+ }
+ 
+-void SDLVideo::setVideoMode(int width, int height, int bpp, Uint32 flags)
++static bool getNearestFullScreenMode(int flags, int* width, int* height)
+ {
++    SDL_Rect** modes = SDL_ListModes(0, flags);
++    if ( modes == 0 )
++    {
++        return false;
++    }
++    else if ( modes == (SDL_Rect**)-1 )
++    {
++        return true;
++    }
++    else
++    {
++        unsigned int mode_size = (*width) * (*height);
++        LOGGER.warning(&quot;mode_size=%u&quot;,mode_size);
++        unsigned int mindif = -1;
++        unsigned int nearest = 0;
++        for ( int n = 0; modes[n]; ++n )
++        {
++            unsigned int new_size = modes[n]-&gt;w * modes[n]-&gt;h;
++            unsigned int new_dif = abs(mode_size-new_size);
++            LOGGER.warning(&quot;new_size=%u , new_dif=%u&quot;, new_size, new_dif);
++
++            if ( new_dif &lt; mindif )
++            {
++                nearest = n;
++                mindif = new_dif;
++                LOGGER.warning(&quot;nearest is %d&quot;, nearest);
++            }
++        }
++        LOGGER.warning(&quot;final nearest is %d&quot;, nearest);
++        *width = modes[nearest]-&gt;w;
++        *height = modes[nearest]-&gt;h;
++    }
++}
++
++void SDLVideo::setVideoMode(int width, int height, Uint32 flags)
++{
+     // eventually delete old backbuffer
+     if (    frontBuffer
+          &amp;&amp; !(frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF)
+@@ -111,25 +178,46 @@
+     {
+         SDL_FreeSurface(backBuffer);
+     }
+-    
+-    ADD_STANDARD_SDL_FLAGS(flags);
+ 
++    int bpp = best_bpp;
++    int new_width = width;
++    int new_height = height;
++    if ( ! (flags&amp;SDL_FULLSCREEN) )
++    {
++        bpp = 0;
++        flags |= SDL_ANYFORMAT;
++    }
++    else
++    {
++        getNearestFullScreenMode(flags, &amp;new_width, &amp;new_height);
++        LOGGER.warning(&quot;Setting fullscreen mode %d x %d (original %d x %d)&quot;,
++                            new_width, new_height, width, height);
++    }
++
+     LOGGER.warning(&quot;Flags before setting mode&quot;);
+     logFlags(flags);
+ 
+-    frontBuffer = SDL_SetVideoMode(width, height, bpp, flags);
++    logAvailableModes(flags);
+ 
++    frontBuffer = SDL_SetVideoMode(new_width, new_height, bpp, flags);
++
+     if ( !frontBuffer )
+     {
+-        throw Exception(&quot;Couldn't set display mode (%dx%d, %X): %s&quot;,
+-                        width, height, flags, SDL_GetError());
++        throw Exception(&quot;Couldn't set display mode, original %d x %d, modified %d x %d (%X): %s&quot;,
++                        width, height, new_width, new_height, flags, SDL_GetError());
+     }
+ 
+     if ( !(frontBuffer-&gt;flags &amp; SDL_DOUBLEBUF) )
+     {
+         LOGGER.warning(&quot;---&gt;Doing custom buffer&lt;---&quot;);
+-        backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
+-                                          bpp, 0, 0, 0, 0
++        backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE,
++                                          frontBuffer-&gt;w,
++                                          frontBuffer-&gt;h,
++                                          frontBuffer-&gt;format-&gt;BitsPerPixel,
++                                          frontBuffer-&gt;format-&gt;Rmask,
++                                          frontBuffer-&gt;format-&gt;Gmask,
++                                          frontBuffer-&gt;format-&gt;Bmask,
++                                          frontBuffer-&gt;format-&gt;Amask
+                                           );
+ 
+         if ( !backBuffer )
+@@ -157,28 +245,34 @@
+         SDL_FreeSurface(Surface::blackScreen);
+     }
+ 
+-    SDL_Surface *s = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
+-                                          backBuffer-&gt;format-&gt;BitsPerPixel,
+-                                          backBuffer-&gt;format-&gt;Rmask,
+-                                          backBuffer-&gt;format-&gt;Gmask,
+-                                          backBuffer-&gt;format-&gt;Bmask,
+-                                          backBuffer-&gt;format-&gt;Amask
++    SDL_Surface *s = SDL_CreateRGBSurface(SDL_SWSURFACE,
++                                          frontBuffer-&gt;w,
++                                          frontBuffer-&gt;h,
++                                          frontBuffer-&gt;format-&gt;BitsPerPixel,
++                                          frontBuffer-&gt;format-&gt;Rmask,
++                                          frontBuffer-&gt;format-&gt;Gmask,
++                                          frontBuffer-&gt;format-&gt;Bmask,
++                                          frontBuffer-&gt;format-&gt;Amask
+                                           );
+ 
+     SDL_SetAlpha(s, SDL_SRCALPHA, 128);
+     Surface::blackScreen = s;
+ 
+-    logVideoInfo();
++//    logVideoInfo();
+ 
+     SDL_ShowCursor(SDL_DISABLE);
+ 
+     SDL_WM_SetCaption(&quot;netPanzer &quot; PACKAGE_VERSION, 0);
+ }
+ 
+-bool SDLVideo::isDisplayModeAvailable(int width, int height, int bpp,
+-                                     Uint32 flags)
++bool SDLVideo::isDisplayModeAvailable(int width, int height, Uint32 flags)
+ {
+-    ADD_STANDARD_SDL_FLAGS(flags);
++    int bpp = best_bpp;
++    if ( ! (flags&amp;SDL_FULLSCREEN) )
++    {
++        bpp = 0;
++        flags |= SDL_ANYFORMAT;
++    }
+ 
+     int res = SDL_VideoModeOK(width, height, bpp, flags);
+ 
+@@ -223,5 +317,3 @@
+ {
+     return backBuffer;
+ }
+-
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.hpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -30,8 +30,8 @@
+     SDLVideo();
+     virtual ~SDLVideo();
+ 
+-    void setVideoMode(int width, int height, int bpp, Uint32 flags);
+-    bool isDisplayModeAvailable(int width, int height, int bpp, Uint32 flags);
++    void setVideoMode(int width, int height, Uint32 flags);
++    bool isDisplayModeAvailable(int width, int height, Uint32 flags);
+     void lockDoubleBuffer();
+     void unlockDoubleBuffer();
+     void copyDoubleBufferandFlip();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-06 15:42:39 UTC (rev 1161)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-07 16:10:37 UTC (rev 1162)
+@@ -55,13 +55,24 @@
+     
+     x = xTextStart + 10;
+     y = 100;
+-    
++
++    char res_str[20];
+     choiceResolution = new Choice();
+     choiceResolution-&gt;setName(&quot;Resolution&quot;);
+-    choiceResolution-&gt;addItem(&quot;640x480&quot;);
+-    choiceResolution-&gt;addItem(&quot;800x600&quot;);
+-    choiceResolution-&gt;addItem(&quot;1024x768&quot;);
+-    choiceResolution-&gt;addItem(&quot;1280x1024&quot;);
++
++    SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
++    int cur_mode = 0;
++    if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
++    {
++        while ( modes[cur_mode] )
++        {
++            snprintf(res_str,sizeof(res_str),&quot;%dx%d&quot;, modes[cur_mode]-&gt;w, modes[cur_mode]-&gt;h);
++            res_str[sizeof(res_str)-1] = 0;
++            choiceResolution-&gt;addItem(res_str);
++            ++cur_mode;
++        }
++    }
++    
+     choiceResolution-&gt;setLocation(x, y);
+     choiceResolution-&gt;select(gameconfig-&gt;screenresolution);
+     choiceResolution-&gt;setMinWidth(minWidth);
+@@ -203,7 +214,28 @@
+     }
+     else if ( source == choiceResolution )
+     {
+-        gameconfig-&gt;screenresolution = choiceResolution-&gt;getSelectedIndex();
++        SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
++        SDL_Rect* mode = 0;
++        if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
++        {
++            mode = modes[choiceResolution-&gt;getSelectedIndex()];
++        }
++
++        if ( mode )
++        {
++            gameconfig-&gt;windowWidth = mode-&gt;w;
++            gameconfig-&gt;windowHeight = mode-&gt;h;
++        }
++
++        if ( choiceResolution-&gt;getSelectedIndex() == 0 &amp;&amp; ! gameconfig-&gt;fullscreen )
++        {
++            // on Mac crash if we are in window and we select the biggest
++            // resolution (the first one in theory), we make it smaller so it
++            // wont crash, it is a SDL error.
++            gameconfig-&gt;windowHeight -= 50;
++            gameconfig-&gt;windowWidth -= 4;
++        }
++
+         GameManager::setVideoMode();
+     }
+     else if ( source == choiceMiniMapUnitSize )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000189.html">[Netpanzer-cvs] r1161 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Interfaces NetPanzer/Objectives NetPanzer/PowerUps	NetPanzer/Units
+</A></li>
+	<LI>Next message: <A HREF="000191.html">[Netpanzer-cvs] r1163 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/Scripts/bindings src/NetPanzer/Scripts/toluapkg	src/NetPanzer/System src/NetPanzer/Views/MainMenu/Options
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

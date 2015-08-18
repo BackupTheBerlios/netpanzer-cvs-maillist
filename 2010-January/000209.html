@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1183 - in trunk/netpanzer/src/NetPanzer: Classes	Core Interfaces Particles System Views/MainMenu
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1183%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Core%20Interfaces%20Particles%20System%20Views/MainMenu&In-Reply-To=%3C201001201056.o0KAuT2A016184%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000208.html">
+   <LINK REL="Next"  HREF="000210.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1183 - in trunk/netpanzer/src/NetPanzer: Classes	Core Interfaces Particles System Views/MainMenu</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1183%20-%20in%20trunk/netpanzer/src/NetPanzer%3A%20Classes%0A%09Core%20Interfaces%20Particles%20System%20Views/MainMenu&In-Reply-To=%3C201001201056.o0KAuT2A016184%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1183 - in trunk/netpanzer/src/NetPanzer: Classes	Core Interfaces Particles System Views/MainMenu">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Jan 20 11:56:29 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000208.html">[Netpanzer-cvs] r1182 - in trunk/netpanzer: . cache	cache/colorfilters cache/colorfilters/netp	cache/colorfilters/netpmenu scripts src/Lib/2D	src/Lib/ArrayUtil src/Lib/INIParser src/Lib/Network	src/Lib/Types src/Lib/Util src/Lib/optionmm src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/AI	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Particles	src/NetPanzer/PowerUps src/NetPanzer/System	src/NetPanzer/Units src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons wads
+</A></li>
+        <LI>Next message: <A HREF="000210.html">[Netpanzer-cvs] r1184 - in trunk/netpanzer: scripts src/Lib/2D	src/Lib/Util src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#209">[ date ]</a>
+              <a href="thread.html#209">[ thread ]</a>
+              <a href="subject.html#209">[ subject ]</a>
+              <a href="author.html#209">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-20 11:56:11 +0100 (Wed, 20 Jan 2010)
+New Revision: 1183
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+Log:
+- Re-apply svn 1141 fix for explosions on 64 bit systems
+- Re-apply svn 1134 fix for ctrl+click when there are no units selected
+- allow compiling without RELEASE_VERSION (becomes testing)
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-19 16:08:17 UTC (rev 1182)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-20 10:56:11 UTC (rev 1183)
+@@ -179,7 +179,7 @@
+     if (selection_box_active)
+         return _cursor_regular;
+ 
+-    if( (manual_control_state == true) || (manual_fire_state == true) )
++    if( ((manual_control_state == true) || (manual_fire_state == true)) &amp;&amp; working_list.isSelected() )
+     {
+         return  _cursor_enemy_unit;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2010-01-19 16:08:17 UTC (rev 1182)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2010-01-20 10:56:11 UTC (rev 1183)
+@@ -52,6 +52,10 @@
+ #include &quot;Scripts/ScriptManager.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ 
++#ifndef PACKAGE_VERSION
++	#define PACKAGE_VERSION &quot;testing&quot;
++#endif
++
+ //---------------------------------------------------------------------------
+ 
+ static std::string pidfile;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-19 16:08:17 UTC (rev 1182)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-20 10:56:11 UTC (rev 1183)
+@@ -46,6 +46,10 @@
+ 
+ #include &quot;Util/Log.hpp&quot;
+ 
++#ifndef PACKAGE_VERSION
++	#define PACKAGE_VERSION &quot;testing&quot;
++#endif
++
+ DedicatedGameManager::DedicatedGameManager()
+     : commandqueue_mutex(0), console(0), heartbeat(0), infosocket(0)
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2010-01-19 16:08:17 UTC (rev 1182)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/InfoSocket.cpp	2010-01-20 10:56:11 UTC (rev 1183)
+@@ -30,6 +30,10 @@
+ #include &lt;string&gt;
+ #include &lt;sstream&gt;
+ 
++#ifndef PACKAGE_VERSION
++	#define PACKAGE_VERSION &quot;testing&quot;
++#endif
++
+ using namespace std;
+ 
+ InfoSocket::InfoSocket(int p) : socket(0)
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2010-01-19 16:08:17 UTC (rev 1182)
++++ trunk/netpanzer/src/NetPanzer/Particles/Particle2D.cpp	2010-01-20 10:56:11 UTC (rev 1183)
+@@ -36,7 +36,7 @@
+ int   Particle2D::drawParticles       = 1;
+ 
+ // Pre-allocation variables.
+-const  size_t MAX_PARTICLE_CLASS_SIZE = 340;
++const  size_t MAX_PARTICLE_CLASS_SIZE = 512;
+ const  int    MAX_PARTICLES           = 3000;
+ //static size_t biggestParticle         = 0;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-19 16:08:17 UTC (rev 1182)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-20 10:56:11 UTC (rev 1183)
+@@ -27,6 +27,10 @@
+   #include &quot;Interfaces/GameConfig.hpp&quot;
+ #endif
+ 
++#ifndef PACKAGE_VERSION
++	#define PACKAGE_VERSION &quot;testing&quot;
++#endif
++
+ SDLVideo* Screen; // get rid of this later...
+ 
+ SDLVideo::SDLVideo()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2010-01-19 16:08:17 UTC (rev 1182)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MainMenuView.cpp	2010-01-20 10:56:11 UTC (rev 1183)
+@@ -26,6 +26,10 @@
+ #include &quot;Views/MainMenu/Multi/GetSessionView.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
++#ifndef PACKAGE_VERSION
++	#define PACKAGE_VERSION &quot;testing&quot;
++#endif
++
+ // MainMenuView
+ //---------------------------------------------------------------------------
+ MainMenuView::MainMenuView() : MenuTemplateView()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000208.html">[Netpanzer-cvs] r1182 - in trunk/netpanzer: . cache	cache/colorfilters cache/colorfilters/netp	cache/colorfilters/netpmenu scripts src/Lib/2D	src/Lib/ArrayUtil src/Lib/INIParser src/Lib/Network	src/Lib/Types src/Lib/Util src/Lib/optionmm src/NetPanzer/Bot	src/NetPanzer/Classes src/NetPanzer/Classes/AI	src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/Particles	src/NetPanzer/PowerUps src/NetPanzer/System	src/NetPanzer/Units src/NetPanzer/Views	src/NetPanzer/Views/Components src/NetPanzer/Views/Game	src/NetPanzer/Views/MainMenu src/NetPanzer/Views/MainMenu/Multi	src/NetPanzer/Views/MainMenu/Multi/MasterServer	src/NetPanzer/Views/MainMenu/Options src/NetPanzer/Weapons wads
+</A></li>
+	<LI>Next message: <A HREF="000210.html">[Netpanzer-cvs] r1184 - in trunk/netpanzer: scripts src/Lib/2D	src/Lib/Util src/NetPanzer/Classes/Network src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Scripts
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#209">[ date ]</a>
+              <a href="thread.html#209">[ thread ]</a>
+              <a href="subject.html#209">[ subject ]</a>
+              <a href="author.html#209">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,1090 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1241 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Scripts src/NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1241%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Scripts%20src/NetPanzer/Views/Game&In-Reply-To=%3C20111004143739.D6A9C4811C4%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000266.html">
+   <LINK REL="Next"  HREF="000268.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1241 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Scripts src/NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1241%20-%20in%20trunk/netpanzer%3A%20scripts%20src/Lib/2D%0A%09src/NetPanzer/Core%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Scripts%20src/NetPanzer/Views/Game&In-Reply-To=%3C20111004143739.D6A9C4811C4%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1241 - in trunk/netpanzer: scripts src/Lib/2D	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Scripts src/NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct  4 16:37:39 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000266.html">[Netpanzer-cvs] r1240 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000268.html">[Netpanzer-cvs] r1242 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#267">[ date ]</a>
+              <a href="thread.html#267">[ thread ]</a>
+              <a href="subject.html#267">[ subject ]</a>
+              <a href="author.html#267">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-04 16:37:39 +0200 (Tue, 04 Oct 2011)
+New Revision: 1241
+
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/scripts/usercommands.lua
+   trunk/netpanzer/src/Lib/2D/Color.cpp
+   trunk/netpanzer/src/Lib/2D/Color.hpp
+   trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+   trunk/netpanzer/src/NetPanzer/Core/main.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+Log:
+Added more scripting support, scripts can have some tasks that will be run each cycle of the main loop.
+- Added new NPString, it should be used for all the strings of the game in the future, currently it is a typedef for std::string.
+- Fixed little leaks in lua handling code
+- Added game.* in scripting, game.frametime is the timeslice of the frame (actually previous frame, but game works that way), this can be used for keeping time and do timely functions in scripts.
+
+To test, say: &quot;/countdown 10 some text here...&quot; it will count down from 10.
+
+Without any more changes in the C code it could be possible to add some other things in lua only, like &quot;periodic messages&quot; for example the motd.
+
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/scripts/initialize.lua	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -9,6 +9,11 @@
+     return iter, t, nil
+ end
+ 
++game = { tasks = {} };
++game.addTask = function(task)
++    table.insert(game.tasks, task);
++end;
++
+ function dump_table(result, t, extra)
+     local lin = extra or &quot;&quot;
+ 
+@@ -57,5 +62,13 @@
+     return gconcat(result,&quot;\n&quot;);
+ end
+ 
++count_time = 0;
++
++function scriptLoop()
++    for i, func in ipairs(game.tasks) do
++        if func() then table.remove(game.tasks,i) end
++    end
++end
++
+ --LOGGER:log(&quot;Dumping conf:\n&quot; .. config.dump(config))
+ 
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -81,5 +81,28 @@
+             config.game.autokicktime = param;
+             netpanzer.serversayto( player, &quot;autokick time was set to &quot; .. config.game.autokicktime);
+         end
++    end,
++
++    countdown_help = &quot;Do a countdown, use 'countdown &lt;time&gt; &lt;message&gt;'&quot;,
++    countdown = function(param, player)
++        local counttime, message = string.match(param, &quot;(%d+) *(.*)&quot;);
++        counttime = counttime or 5;
++        message = message or &quot;Countdown...&quot;;
++        local count = 0;
++        netpanzer.serversay(message .. &quot; &quot; .. counttime);
++
++        game.addTask(function()
++                count = count + game.frametime;
++                if count &gt; 1.0 then
++                    count = count - 1.0;
++                    counttime = counttime - 1;
++                    if counttime == 0 then
++                        netpanzer.serversay(message .. &quot; FIGHT!!!!&quot;);
++                    else
++                        netpanzer.serversay(message .. &quot; &quot; .. counttime);
++                    end
++                end
++                return counttime == 0;
++            end);
+     end
+ };
+
+Modified: trunk/netpanzer/scripts/usercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/usercommands.lua	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/scripts/usercommands.lua	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -67,7 +67,16 @@
+         if (numOb == 0) then ConsoleInterface:post( Color.cyan, false, 0, &quot;You have'nt bases&quot;)
+         elseif (numOb == 1) then ConsoleInterface:post( Color.cyan, false, 0, &quot;You have 1 base&quot;)
+     	else ConsoleInterface:post( Color.cyan, false, 0, &quot;You have &quot; .. numOb .. &quot; bases&quot;) end
++    end,
++
++    test = function(param)
++        netpanzer.scriptmessage(&quot;The value of the thing is: &quot; .. game.frametime);
++    end,
++    
++    countdown_help = &quot;Do a countdown.&quot;,
++    countdown = function(param)
++        netpanzer.say(&quot;/countdown &quot; .. param);
+     end
+-    
++
+ };
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Color.cpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Color.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/Lib/2D/Color.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -130,10 +130,10 @@
+ };
+ 
+ void
+-Color::registerScript(const char *table_name)
++Color::registerScript(const NPString&amp; table_name)
+ {
+     ScriptManager::registerLib( table_name, color_methods);
+-    ScriptManager::bindStaticVariables(table_name, 0, &quot;ColorMetaTable&quot;,
++    ScriptManager::bindStaticVariables(table_name, &quot;ColorMetaTable&quot;,
+                                        color_getters, color_setters);
+ }
+ 
+
+Modified: trunk/netpanzer/src/Lib/2D/Color.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/2D/Color.hpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/Lib/2D/Color.hpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -19,6 +19,7 @@
+ #define __Color_hpp__
+ 
+ #include &quot;SDL.h&quot;
++#include &quot;Core/CoreTypes.hpp&quot;
+ 
+ //---------------------------------------------------------------------------
+ class Color
+@@ -100,7 +101,7 @@
+ 
+ private:
+     friend class ScriptManager;
+-    static void registerScript(const char *table_name);
++    static void registerScript(const NPString&amp; table_name);
+ }
+ ; // end Color
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Core/CoreTypes.hpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -24,10 +24,12 @@
+ // SDL.h included for the basic types [U|S]int[8|16|32]
+ #include &quot;SDL.h&quot;
+ #include &quot;Util/Endian.hpp&quot;
++#include &lt;string&gt;
+ 
++typedef std::string NPString;
++
+ //#define __TEST_PLAYERID__
+ 
+-
+ typedef Sint32 PowerUpID;
+ #define PowerUpID_toPortable(a) htol32(a)
+ #define PowerUpID_fromPortable(a) ltoh32(a)
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/main.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/main.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Core/main.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -303,8 +303,8 @@
+ {
+     ScriptManager::initialize();
+     
+-    ScriptManager::runStr(&quot;LuaInitialize&quot;,&quot;print('Lua is working just fine');&quot;);
+-        
++    //ScriptManager::runStr(&quot;LuaInitialize&quot;,&quot;print('Lua is working just fine');&quot;);
++
+     BaseGameManager *manager = initialise(argc, argv);
+ 
+     ScriptManager::runFile(&quot;unused&quot;,&quot;scripts/initialize.lua&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/BaseGameManager.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -60,6 +60,8 @@
+ 
+ #include &quot;Network/SocketManager.hpp&quot;
+ 
++#include &quot;Scripts/ScriptManager.hpp&quot;
++
+ BaseGameManager* gamemanager = 0;
+ 
+ //------------------------------------------------------------------
+@@ -256,6 +258,9 @@
+     ParticleSystem2D::simAll();
+     Particle2D::simAll();
+ 
++    ScriptManager::setDoubleValue(&quot;game.frametime&quot;, TimerInterface::getTimeSlice());
++    ScriptManager::runFunction(&quot;scriptLoop&quot;);
++
+     GameControlRulesDaemon::updateGameControlFlow();
+     if ( SERVER )
+         SERVER-&gt;sendRemaining();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -115,18 +115,16 @@
+ 
+     bool post_on_server = false;
+     ChatMesg chat_mesg;
+-    char text[MAX_CHAT_MSG_LEN+1];
+     int text_len = chat_request-&gt;getTextLen(packet-&gt;size);
++    const NPString text(chat_request-&gt;message_text, 0, text_len);
+ 
+     chat_mesg.setSourcePlayerIndex(packet-&gt;fromPlayer);
+     chat_mesg.message_scope = chat_request-&gt;message_scope;
+-    memcpy(chat_mesg.message_text, chat_request-&gt;message_text, text_len);
+-    memcpy(text, chat_request-&gt;message_text, text_len);
+-    text[text_len] = 0;
++    text.copy(chat_mesg.message_text, text_len);
+ 
+     if ( chat_request-&gt;message_scope == _chat_mesg_scope_all )
+     {
+-        if ( text[0] != '/' || ! ScriptManager::runServerCommand(&amp;text[1], packet-&gt;fromPlayer) )
++        if ( text[0] != '/' || ! ScriptManager::runServerCommand(text.substr(1), packet-&gt;fromPlayer) )
+         {
+             SERVER-&gt;broadcastMessage(&amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
+             post_on_server = true;
+@@ -175,7 +173,7 @@
+     else if ( chat_request-&gt;message_scope == _chat_mesg_scope_server )
+     {
+         SERVER-&gt;broadcastMessage(&amp;chat_mesg, CHATMESG_HEADER_LEN + text_len);
+-        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;, text);
++        ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;, text.c_str());
+         return;
+     }
+ 
+@@ -205,7 +203,7 @@
+ 
+         // TODO add unitcolor
+         ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(),
+-                        &quot;%s: %s&quot;, player_state-&gt;getName().c_str(), text);
++                        &quot;%s: %s&quot;, player_state-&gt;getName().c_str(), text.c_str());
+     }
+ }
+ 
+@@ -217,6 +215,7 @@
+                        message-&gt;message_id);
+         return;
+     }
++
+     const ChatMesg *chat_mesg = (const ChatMesg*) message;
+ 
+     if ( chat_mesg-&gt;message_scope != _chat_mesg_scope_server
+@@ -228,15 +227,13 @@
+             return;
+     }
+ 
+-    unsigned char text[MAX_CHAT_MSG_LEN+1];
+     int text_len = chat_mesg-&gt;getTextLen(size);
+-    memcpy(text, chat_mesg-&gt;message_text, text_len);
+-    text[text_len] = 0;
++    const NPString text(chat_mesg-&gt;message_text, text_len);
+ 
+     if ( chat_mesg-&gt;message_scope == _chat_mesg_scope_server )
+     {
+         ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+-                                      text);
++                                      text.c_str());
+         return;
+     }
+ 
+@@ -262,7 +259,7 @@
+     } // ** switch
+ 
+     ConsoleInterface::postMessage(color, true, player_state-&gt;getFlag(), &quot;%s: %s&quot;,
+-                                  player_state-&gt;getName().c_str(), text);
++                                  player_state-&gt;getName().c_str(), text.c_str());
+ }
+ 
+ void ChatInterface::processChatMessages(const NetPacket* packet)
+@@ -280,17 +277,12 @@
+     }
+ }
+ 
+-static void sendScopedMessage(const char *message, Uint8 scope)
++static void sendScopedMessage(const NPString&amp; message, Uint8 scope)
+ {
+-    unsigned int text_len = strlen(message);
++    unsigned int text_len = std::min(message.length(), MAX_CHAT_MSG_LEN);
+     ChatMesgRequest cmsg;
+ 
+-    if ( text_len &gt;= sizeof(cmsg.message_text) )
+-    {
+-        text_len = sizeof(cmsg.message_text);
+-    }
+-
+-    memcpy(cmsg.message_text, message, text_len);
++    message.copy(cmsg.message_text, text_len);
+     cmsg.message_scope = scope;
+ 
+     if (NetworkState::status == _network_state_client)
+@@ -304,22 +296,22 @@
+     }
+ }
+ 
+-void ChatInterface::say(const char *message)
++void ChatInterface::say(const NPString&amp; message)
+ {
+     sendScopedMessage(message, _chat_mesg_scope_all);
+ }
+ 
+-void ChatInterface::teamsay(const char* message)
++void ChatInterface::teamsay(const NPString&amp; message)
+ {
+     sendScopedMessage(message, _chat_mesg_scope_alliance);
+ }
+ 
+-void ChatInterface::serversay(const char* message)
++void ChatInterface::serversay(const NPString&amp; message)
+ {
+     sendScopedMessage(message, _chat_mesg_scope_server);
+ }
+ 
+-void ChatInterface::serversayTo(const PlayerID player, const char* message)
++void ChatInterface::serversayTo(const PlayerID player, const NPString&amp; message)
+ {
+     if ( player &gt;= PlayerInterface::getMaxPlayers() || player == INVALID_PLAYER_ID )
+     {
+@@ -336,20 +328,15 @@
+     if (player == PlayerInterface::getLocalPlayerIndex())
+     {
+         ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;Server: %s&quot;,
+-                                      message);
++                                      message.c_str());
+     }
+     else
+     {
+-        unsigned int text_len = strlen(message);
++        unsigned int text_len = std::min(message.length(), MAX_CHAT_MSG_LEN);
+         ChatMesg cmsg;
+ 
++        message.copy(cmsg.message_text, 0, text_len);
+         cmsg.setSourcePlayerIndex(PlayerInterface::getLocalPlayerIndex());
+-
+-        if ( text_len &gt;= sizeof(cmsg.message_text) )
+-        {
+-                text_len = sizeof(cmsg.message_text);
+-        }
+-        memcpy(cmsg.message_text, message, text_len);
+         cmsg.message_scope = _chat_mesg_scope_server;
+ 
+         SERVER-&gt;sendMessage(player, &amp;cmsg, CHATMESG_HEADER_LEN + text_len);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -29,10 +29,10 @@
+     static void processChatMessages(const NetPacket* packet);
+     static void clientHandleChatMessage(const NetMessage* message, size_t size);
+ 
+-    static void say(const char * message);
+-    static void teamsay(const char * message);
+-    static void serversay(const char * message);
+-    static void serversayTo(const PlayerID player, const char * message);
++    static void say(const NPString&amp; message);
++    static void teamsay(const NPString&amp; message);
++    static void serversay(const NPString&amp; message);
++    static void serversayTo(const PlayerID player, const NPString&amp; message);
+ };
+ 
+ #endif // ** _CHATINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -122,18 +122,18 @@
+     {0,0}
+ };
+ 
+-void GameConfig::registerScript(const char * table_name)
++void GameConfig::registerScript(const NPString&amp; table_name)
+ {
+ //    ScriptManager::registerLib( table_name, video_methods);
+-    ScriptManager::bindStaticVariables(table_name, &quot;video&quot;,
++    ScriptManager::bindStaticVariables(table_name + &quot;.video&quot;,
+                                        &quot;ConfigVideoMetaTable&quot;,
+                                        video_getters, video_setters);
+ 
+-    ScriptManager::bindStaticVariables(table_name, &quot;interface&quot;,
++    ScriptManager::bindStaticVariables(table_name + &quot;.interface&quot;,
+                                        &quot;ConfigInterfaceMetaTable&quot;,
+                                        interface_getters, interface_setters);
+ 
+-    ScriptManager::bindStaticVariables(table_name, &quot;game&quot;,
++    ScriptManager::bindStaticVariables(table_name + &quot;.game&quot;,
+                                        &quot;ConfigGameMetaTable&quot;,
+                                        game_getters, game_setters);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -318,7 +318,7 @@
+ 
+ private:
+     friend class ScriptManager;
+-    static void registerScript(const char * table_name);
++    static void registerScript(const NPString&amp; table_name);
+ 
+     std::string configfile;
+     bool usePhysFS;
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Scripts/NetPanzerModule.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -83,10 +83,5 @@
+ int npmodule_load (lua_State *L)
+ {
+   luaL_register(L, &quot;netpanzer&quot;, npmodule);
+-//  lua_pushliteral(L, &quot;config&quot;); // +1
+-//  lua_getglobal(L, &quot;config&quot;); // +1
+-//  lua_settable(L, -3); // -2
+-
+-
+   return 1;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -34,6 +34,77 @@
+ 
+ int npmodule_load (lua_State *L);
+ 
++static void DumpStack (const NPString&amp; text, lua_State *L)
++{
++    int i;
++    int top = lua_gettop(L);
++    printf(&quot;%s[%d]: &quot;, text.c_str(), top);
++    for (i = 1; i &lt;= top; i++) {  /* repeat for each level */
++      int t = lua_type(L, i);
++      switch (t) {
++
++        case LUA_TSTRING:  /* strings */
++          printf(&quot;'%s'&quot;, lua_tostring(L, i));
++          break;
++
++        case LUA_TBOOLEAN:  /* booleans */
++          printf(lua_toboolean(L, i) ? &quot;true&quot; : &quot;false&quot;);
++          break;
++
++        case LUA_TNUMBER:  /* numbers */
++          printf(&quot;%g&quot;, lua_tonumber(L, i));
++          break;
++
++        default:  /* other values */
++          printf(&quot;%s&quot;, lua_typename(L, t));
++          break;
++
++      }
++      printf(&quot;,&quot;);  /* put a separator */
++    }
++    printf(&quot;\n&quot;);  /* end the listing */
++}
++/**
++  * Prepares the lua stack to be able to do an indexing operationg:
++  *     table[key]
++  * The table name might contain dots as &quot;table1.table2.key&quot;
++  * table1 and table 2 will be created in that case.
++  * Returns: the stack position of the table, key is at the top of the
++  * stack
++  */
++static void PrepareTableIndex(lua_State *luavm, const NPString&amp; table, NPString&amp; finalName)
++{
++//    DumpStack(&quot; PrepareBegin&quot;, luavm);
++    lua_pushvalue(luavm, LUA_GLOBALSINDEX);
++//    DumpStack(&quot;  push global&quot;, luavm);
++    NPString::size_type start = 0;
++    NPString::size_type end = table.find_first_of(&quot;.&quot;);
++    while ( end != NPString::npos )
++    {
++        lua_getfield(luavm, -1, table.substr(start,end).c_str());
++        if ( lua_isnil(luavm, -1) )
++        {
++//            DumpStack(&quot;  not-exits&quot;, luavm);
++            lua_pop(luavm, 1);
++//            DumpStack(&quot;   pop&quot;, luavm);
++            lua_newtable(luavm);
++//            DumpStack(&quot;   new table&quot;, luavm);
++            lua_pushvalue(luavm, -1); // dup table
++//            DumpStack(&quot;   dup table&quot;, luavm);
++            lua_setfield(luavm, -3, table.substr(start,end).c_str());
++//            DumpStack(&quot;   set field&quot;, luavm);
++        }
++        lua_replace(luavm, -2); // table is at top
++//        DumpStack(&quot;  replace top&quot;, luavm);
++        start = end+1;
++        end = table.find_first_of(&quot;.&quot;, start);
++    }
++
++    finalName.assign(table.substr(start));
++
++//    DumpStack(&quot; PrepareEnd&quot;, luavm);
++}
++
+ void
+ ScriptManager::initialize()
+ {
+@@ -42,12 +113,19 @@
+         luavm = luaL_newstate();
+         if ( luavm )
+         {
++            DumpStack(&quot;Real Init&quot;, luavm);
+             luaL_openlibs(luavm);
+         }
++        DumpStack(&quot;Init&quot;,luavm);
+         Color::registerScript(&quot;Color&quot;);
+ //        ParticleInterface::registerScript(&quot;particles&quot;);
++        DumpStack(&quot;Color&quot;, luavm);
+         GameConfig::registerScript(&quot;config&quot;);
+-        npmodule_load(luavm);
++        DumpStack(&quot;Config&quot;, luavm);
++        int to_pop = npmodule_load(luavm);
++        lua_pop(luavm, to_pop);
++
++        DumpStack(&quot;Module&quot;,luavm);
+     }
+ }
+     
+@@ -62,15 +140,18 @@
+ }
+     
+ void
+-ScriptManager::registerLib(const char * libname, const luaL_Reg * functions)
++ScriptManager::registerLib(const NPString&amp; libname, const luaL_Reg * functions)
+ {
+-    luaL_register(luavm, libname, functions);
++    DumpStack(&quot;RegisterLib sta:&quot; + libname,luavm);
++    luaL_register(luavm, libname.c_str(), functions);
++    lua_pop(luavm, -1);
++    DumpStack(&quot;RegisterLib end:&quot; + libname, luavm);
+ }
+     
+ void
+-ScriptManager::runStr(const char * runname, const char * str)
++ScriptManager::runStr(const NPString&amp; runname, const NPString&amp; str)
+ {
+-    luaL_loadbuffer(luavm,str,strlen(str), runname);
++    luaL_loadbuffer(luavm, str.c_str(), str.length(), runname.c_str());
+     int error=lua_pcall(luavm,0,0,0);
+     if (error)
+     {
+@@ -79,56 +160,64 @@
+     }
+ }
+ 
++void
++ScriptManager::runFunction(const NPString&amp; func_name)
++{
++    NPString fname;
++    PrepareTableIndex(luavm, func_name, fname);
++    lua_getfield(luavm, -1, fname.c_str());
++    lua_call(luavm, 0, 0);
++    lua_pop(luavm, 1);
++}
++
++static void SplitCommandAndParams(const NPString&amp; str, NPString&amp; cmd, NPString&amp; params)
++{
++    NPString::size_type start = str.find_first_not_of(&quot; \t&quot;);
++    if ( start != NPString::npos )
++    {
++        NPString::size_type end = str.find_first_of(&quot; \t&quot;, start);
++
++        cmd.assign(str, start, end);
++        if ( end != NPString::npos )
++        {
++            NPString::size_type param_start = str.find_first_not_of(&quot; \t&quot;, end);
++            params.assign(str, param_start, -1);
++        }
++    }
++}
++
+ bool
+-ScriptManager::runUserCommand(const char* str)
++ScriptManager::runUserCommand(const NPString&amp; str)
+ {
+     int luatop = lua_gettop(luavm);
+ 
+     lua_getglobal(luavm, &quot;UserCommands&quot;);
+     if ( lua_istable(luavm, -1) )
+     {
+-        char cmd[128];
+-        unsigned int cmdpos = 0;
+-        unsigned int strpos = 0;
++        NPString command;
++        NPString params;
+ 
+-        while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
+-        {
+-            cmd[cmdpos++] = str[strpos++];
+-        }
++        SplitCommandAndParams(str,command,params);
+ 
+-        if ( cmdpos == 0 )
++        if ( command.empty() )
+         {
+             lua_settop(luavm, luatop);
+             return false;
+         }
+ 
+-        if ( cmdpos == sizeof(cmd) )
+-        {
+-            cmd[sizeof(cmd)-1] = 0;
+-        }
+-        else
+-        {
+-            cmd[cmdpos] = 0;
+-        }
+-
+-        lua_getfield(luavm, -1, cmd);
++        lua_getfield(luavm, -1, command.c_str());
+         if ( lua_isfunction(luavm, -1) )
+         {
+-            while ( str[strpos] &amp;&amp; isspace(str[strpos]) )
+-            {
+-                strpos++;
+-            }
++            lua_pushstring(luavm, params.c_str());
+ 
+-            lua_pushstring(luavm, &amp;str[strpos]);
+-            
+             if ( lua_pcall(luavm, 1, 0, 0) != 0 )
+             {
+-                ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;Error running user command '%s': %s&quot;, str, lua_tostring(luavm, -1));
++                ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;Error running user command '%s': %s&quot;, str.c_str(), lua_tostring(luavm, -1));
+             }
+         }
+         else
+         {
+-            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;User command '%s' not found&quot;, str);
++            ConsoleInterface::postMessage(Color::cyan, false, 0, &quot;User command '%s' not found&quot;, str.c_str());
+         }
+     }
+     else
+@@ -141,46 +230,28 @@
+ }
+ 
+ bool
+-ScriptManager::runServerCommand(const char* str, PlayerID runPlayer)
++ScriptManager::runServerCommand(const NPString&amp; str, PlayerID runPlayer)
+ {
+     int luatop = lua_gettop(luavm);
+ 
+     lua_getglobal(luavm, &quot;ServerCommands&quot;);
+     if ( lua_istable(luavm, -1) )
+     {
+-        char cmd[128];
+-        unsigned int cmdpos = 0;
+-        unsigned int strpos = 0;
++        NPString command;
++        NPString params;
+ 
+-        while ( cmdpos &lt; sizeof(cmd) &amp;&amp; str[strpos] &amp;&amp; !isspace(str[strpos]) )
+-        {
+-            cmd[cmdpos++] = str[strpos++];
+-        }
++        SplitCommandAndParams(str,command,params);
+ 
+-        if ( cmdpos == 0 )
++        if ( command.empty() )
+         {
+             lua_settop(luavm, luatop);
+             return false;
+         }
+ 
+-        if ( cmdpos == sizeof(cmd) )
+-        {
+-            cmd[sizeof(cmd)-1] = 0;
+-        }
+-        else
+-        {
+-            cmd[cmdpos] = 0;
+-        }
+-
+-        lua_getfield(luavm, -1, cmd);
++        lua_getfield(luavm, -1, command.c_str());
+         if ( lua_isfunction(luavm, -1) )
+         {
+-            while ( str[strpos] &amp;&amp; isspace(str[strpos]) )
+-            {
+-                strpos++;
+-            }
+-
+-            lua_pushstring(luavm, &amp;str[strpos]);
++            lua_pushstring(luavm, params.c_str());
+             lua_pushnumber(luavm, runPlayer);
+             
+             if ( lua_pcall(luavm, 2, 0, 0) != 0 )
+@@ -188,7 +259,7 @@
+                 char errormsg[512];
+                 snprintf(errormsg,sizeof(errormsg),
+                         &quot;Error running server command '%s': %s&quot;,
+-                        str, lua_tostring(luavm, -1));
++                        str.c_str(), lua_tostring(luavm, -1));
+                 errormsg[sizeof(errormsg)-1] = 0;
+                 ChatInterface::serversayTo(runPlayer, errormsg);
+             }
+@@ -196,7 +267,7 @@
+         else
+         {
+             char errormsg[512];
+-            snprintf(errormsg,sizeof(errormsg), &quot;Server command '%s' not found&quot;, str);
++            snprintf(errormsg,sizeof(errormsg), &quot;Server command '%s' not found&quot;, str.c_str());
+             errormsg[sizeof(errormsg)-1] = 0;
+             ChatInterface::serversayTo(runPlayer, errormsg);
+         }
+@@ -211,9 +282,9 @@
+ }
+ 
+ void
+-ScriptManager::runFile(const char * runname, const char * filename)
++ScriptManager::runFile(const NPString&amp; runname, const NPString&amp; filename)
+ {
+-    int error = luaL_dofile(luavm, filesystem::getRealName(filename).c_str());
++    int error = luaL_dofile(luavm, filesystem::getRealName(filename.c_str()).c_str());
+     if (error)
+     {
+         printf(&quot;error is: %s\n&quot;,lua_tostring(luavm,-1));
+@@ -222,9 +293,9 @@
+ }
+ 
+ void
+-ScriptManager::runFileInTable(const char * filename, const char * table)
++ScriptManager::runFileInTable(const NPString&amp; filename, const NPString&amp; table)
+ {
+-    int r = luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
++    int r = luaL_loadfile(luavm, filesystem::getRealName(filename.c_str()).c_str());
+     if ( r )
+     {
+         LOGGER.warning(&quot;Error in runFileInTable: %s\n&quot;,lua_tostring(luavm,-1));
+@@ -232,13 +303,13 @@
+         return;
+     }
+ 
+-    lua_getglobal(luavm, table);
++    lua_getglobal(luavm, table.c_str());
+     if ( ! lua_istable(luavm, -1) )
+     {
+         lua_pop(luavm,1);
+         lua_createtable(luavm, 6, 0);
+         lua_pushvalue(luavm, -1);
+-        lua_setglobal(luavm, table);
++        lua_setglobal(luavm, table.c_str());
+     }
+ 
+     if ( ! lua_setfenv(luavm, -2) )
+@@ -256,9 +327,9 @@
+ }
+ 
+ void
+-ScriptManager::loadConfigFile(const char * filename, const char * table)
++ScriptManager::loadConfigFile(const NPString&amp; filename, const NPString&amp; table)
+ {
+-    int r = luaL_loadfile(luavm, filesystem::getRealName(filename).c_str());
++    int r = luaL_loadfile(luavm, filesystem::getRealName(filename.c_str()).c_str());
+     if ( r )
+     {
+         LOGGER.warning(&quot;Error in loadConfigFile: %s\n&quot;,lua_tostring(luavm,-1));
+@@ -266,13 +337,13 @@
+         return;
+     }
+ 
+-    lua_getglobal(luavm, table);
++    lua_getglobal(luavm, table.c_str());
+     if ( ! lua_istable(luavm, -1) )
+     {
+         lua_pop(luavm,1);
+         lua_createtable(luavm, 6, 0);
+         lua_pushvalue(luavm, -1);
+-        lua_setglobal(luavm, table);
++        lua_setglobal(luavm, table.c_str());
+     }
+ 
+     // stack: file, table
+@@ -311,69 +382,77 @@
+ }
+ 
+ void
+-ScriptManager::bindStaticVariables(const char * objectName,
+-                                   const char * fieldName,
+-                                   const char * metaName,
+-                                   ScriptVarBindRecord * getters,
+-                                   ScriptVarBindRecord * setters)
+-{                                                               // stack change
+-    luaL_newmetatable(luavm, metaName);                         // +1
++ScriptManager::PrepareMetaTable(const NPString&amp; metaName,
++                            ScriptVarBindRecord * getters,
++                            ScriptVarBindRecord * setters)
++{
++    luaL_getmetatable(luavm, metaName.c_str());
+     int metatable = lua_gettop(luavm);
++    if ( lua_isnil(luavm, -1) )
++    {
++        lua_pop(luavm, 1);
++        luaL_newmetatable(luavm, metaName.c_str());                 // +1 = 1
+ 
+-    lua_pushliteral(luavm, &quot;__index&quot;);                          // +1
+-    lua_pushvalue(luavm, metatable);                            // +1
+-    bindStaticVars(getters);                                    // 0
+-    lua_pushcclosure(luavm, ScriptHelper::index_handler, 1);    // 0 = -1 +1
+-    /* metatable.__index = index_handler */
+-    lua_rawset(luavm, metatable);                               // -2
++        lua_pushliteral(luavm, &quot;__index&quot;);                          // +1 = 2
++        lua_pushvalue(luavm, metatable);                            // +1 = 3
++        bindStaticVars(getters);                                    // 0  = 3
+ 
+-    // metatable still in stack (1)
++        lua_pushcclosure(luavm, ScriptHelper::index_handler, 1);    // 0 = -1 +1
++        /* metatable.__index = index_handler */
++        lua_rawset(luavm, metatable);                               // -2 = 1
+ 
+-    lua_pushliteral(luavm, &quot;__newindex&quot;);                       // +1
+-    lua_newtable(luavm);   /* table for members you can set */  // +1
+-    bindStaticVars(setters);     /* fill with setters */        // 0
+-    lua_pushcclosure(luavm, ScriptHelper::newindex_handler, 1); // 0 = -1 +1
+-    /* metatable.__newindex = newindex_handler */
+-    lua_rawset(luavm, metatable);                               // -2
++        lua_pushliteral(luavm, &quot;__newindex&quot;);                       // +1 = 2
++        lua_newtable(luavm);   /* table for members you can set */  // +1 = 3
++        bindStaticVars(setters);     /* fill with setters */        // 0  = 3
+ 
+-    lua_pushliteral(luavm, &quot;__next&quot;);                           // +1
+-    lua_pushlightuserdata(luavm, (void*)getters);                      // +1
+-    lua_pushcclosure(luavm, ScriptHelper::next_handler, 1);     // 0 = -1 +1
+-    /* metatable.__next = next_handler */
+-    lua_rawset(luavm, metatable);                               // -2 (clean)
++        lua_pushcclosure(luavm, ScriptHelper::newindex_handler, 1); // 0 = -1 +1 = 3
++        /* metatable.__newindex = newindex_handler */
++        lua_rawset(luavm, metatable);                               // -2 = 1
+ 
+-//    lua_pop(luavm, 1);                /* drop metatable */      // -1 (clean)
++        lua_pushliteral(luavm, &quot;__next&quot;);                           // +1 = 2
++        lua_pushlightuserdata(luavm, (void*)getters);               // +1 = 3
++        lua_pushcclosure(luavm, ScriptHelper::next_handler, 1);     // 0 = -1 +1 = 3
++        /* metatable.__next = next_handler */
++        lua_rawset(luavm, metatable);                               // -2 = 1
++    }
++}
+ 
+-    lua_getglobal(luavm, objectName);                           // +1
+-    
+-    bool isRegistered = !lua_isnil(luavm, -1);                  // 0
+-    if ( ! isRegistered )
++void
++ScriptManager::bindStaticVariables(const NPString&amp; objectName,
++                                   const NPString&amp; metaName,
++                                   ScriptVarBindRecord * getters,
++                                   ScriptVarBindRecord * setters)
++{                                                               // stack change
++    DumpStack(&quot;bindStaticVariables &quot;+ objectName +&quot; start&quot;,luavm);
++    NPString finalName;
++    PrepareTableIndex(luavm, objectName, finalName); // -1 table
++
++    lua_getfield(luavm, -1, finalName.c_str());
++    if ( lua_isnil(luavm, -1) )
+     {
+-        // pop nil
+-        lua_pop(luavm,1);                                       // -1 (clean)
+-        lua_createtable(luavm, 0, 0);                           // +1
+-        lua_pushvalue(luavm, -1);                               // +1
+-        lua_setglobal(luavm, objectName);                       // -1
++        lua_pop(luavm, 1);
++        lua_newtable(luavm);
++        lua_pushvalue(luavm, -1);
++        lua_setfield(luavm, -3, finalName.c_str());
+     }
+ 
+-    // we have the global object on stack
++    lua_replace(luavm, -2);
+ 
+-    int fields_to_pop = 1;
++    DumpStack(&quot;PrepareTable, should have only one&quot;, luavm);
+ 
+-    if ( fieldName )
+-    {
+-        ++fields_to_pop;
+-        lua_createtable(luavm, 0, 0);                           // +1
+-        lua_pushvalue(luavm, -1);                               // +1
+-        lua_setfield(luavm, -3, fieldName);                     // -1
+-    }
++    PrepareMetaTable( metaName, getters, setters);
++    DumpStack(&quot;PrepareMeta, should have two&quot;, luavm);
+ 
+-    luaL_getmetatable(luavm, metaName);                         // +1
+     lua_setmetatable(luavm,-2);                                 // -1
++    DumpStack(&quot;SetMetatable, should be 1 remaining&quot;, luavm);
+ 
+-    lua_pop(luavm, fields_to_pop);
++    lua_pop(luavm, 1);
++    DumpStack(&quot;bindStaticVariables end&quot;, luavm);
+ }
+ 
++/**
++ * The stack top should have the table to bind to.
++ */
+ void
+ ScriptManager::bindStaticVars (ScriptVarBindRecord * recordlist)
+ {
+@@ -384,3 +463,25 @@
+         lua_settable(luavm, -3);                            // -2
+     }
+ }
++
++void
++ScriptManager::setIntValue(const NPString&amp; variable, int value)
++{
++    NPString finalName;
++    PrepareTableIndex(luavm, variable, finalName);
++    lua_pushinteger(luavm, value);
++    lua_setfield(luavm, -2, finalName.c_str());
++
++    lua_pop(luavm,1);
++}
++
++void
++ScriptManager::setDoubleValue(const NPString&amp; variable, double value)
++{
++    NPString finalName;
++    PrepareTableIndex(luavm, variable, finalName);
++    lua_pushnumber(luavm, value);
++    lua_setfield(luavm, -2, finalName.c_str());
++
++    lua_pop(luavm,1);
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.hpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -33,28 +33,34 @@
+     static void initialize();
+     static void close();
+     
+-    static void registerLib(const char * libname, const luaL_Reg * functions);
++    static void registerLib(const NPString&amp; libname, const luaL_Reg * functions);
+         
+-    static void runStr(const char * runname, const char * str);
+-    static bool runUserCommand(const char * str);
+-    static bool runServerCommand(const char * str, PlayerID runPlayer);
++    static void runStr(const NPString&amp; runname, const NPString&amp; str);
++    static void runFunction(const NPString&amp; func_name);
++    static bool runUserCommand(const NPString&amp; str);
++    static bool runServerCommand(const NPString&amp; str, PlayerID runPlayer);
+     
+     // NOTE: runFile has to run after FileSystem has been initialized.
+-    static void runFile(const char * runname, const char * filename);
++    static void runFile(const NPString&amp; runname, const NPString&amp; filename);
+ 
+-    static void runFileInTable(const char * filename, const char * table);
+-    static void loadConfigFile(const char * filename, const char * table);
++    static void runFileInTable(const NPString&amp; filename, const NPString&amp; table);
++    static void loadConfigFile(const NPString&amp; filename, const NPString&amp; table);
+ 
+     static lua_State* getLuavm() { return luavm; }
+ 
+-    static void bindStaticVariables(const char * objectName,
+-                                    const char * fieldName,
+-                                    const char * metaName,
++    static void PrepareMetaTable(const NPString&amp; metaName,
++                                 ScriptVarBindRecord * getters,
++                                 ScriptVarBindRecord * setters);
++
++    static void bindStaticVariables(const NPString&amp; objectName,
++                                    const NPString&amp; metaName,
+                                     ScriptVarBindRecord * getters,
+                                     ScriptVarBindRecord * setters);
+ 
+     static void bindStaticVars(ScriptVarBindRecord * recordlist);
+-    
++
++    static void setIntValue(const NPString&amp; variable, int n);
++    static void setDoubleValue(const NPString&amp; variable, double n);
+ private:        
+     static lua_State *luavm;
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-10-04 14:01:21 UTC (rev 1240)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/VehicleSelectionView.cpp	2011-10-04 14:37:39 UTC (rev 1241)
+@@ -512,11 +512,13 @@
+ //---------------------------------------------------------------------------
+ void VehicleSelectionView::drawMiniProductionStatus(Surface &amp;dest)
+ {
++
+     char strBuf[256];
+     char outpostNameBuf[256];
+     char outpostUserNameBuf[256];
+     char productionUnitBuf[256];
+     char timeLeftBuf[256];
++
+     iRect         objectiveBounds;
+     iRect         gameViewRect;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000266.html">[Netpanzer-cvs] r1240 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000268.html">[Netpanzer-cvs] r1242 - trunk/netpanzer/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#267">[ date ]</a>
+              <a href="thread.html#267">[ thread ]</a>
+              <a href="subject.html#267">[ subject ]</a>
+              <a href="author.html#267">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

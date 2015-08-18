@@ -1,0 +1,980 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1318 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/AI	NetPanzer/Classes/Network NetPanzer/Interfaces	NetPanzer/Objectives NetPanzer/PowerUps NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1318%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/Bot%20NetPanzer/Classes%20NetPanzer/Classes/AI%0A%09NetPanzer/Classes/Network%20NetPanzer/Interfaces%0A%09NetPanzer/Objectives%20NetPanzer/PowerUps%20NetPanzer/Units%0A%09NetPanzer/Views/Components%20NetPanzer/Views/Game&In-Reply-To=%3C20111224031406.CB4FB48061D%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000343.html">
+   <LINK REL="Next"  HREF="000345.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1318 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/AI	NetPanzer/Classes/Network NetPanzer/Interfaces	NetPanzer/Objectives NetPanzer/PowerUps NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1318%20-%20in%20trunk/netpanzer/src%3A%20Lib/Util%0A%09NetPanzer/Bot%20NetPanzer/Classes%20NetPanzer/Classes/AI%0A%09NetPanzer/Classes/Network%20NetPanzer/Interfaces%0A%09NetPanzer/Objectives%20NetPanzer/PowerUps%20NetPanzer/Units%0A%09NetPanzer/Views/Components%20NetPanzer/Views/Game&In-Reply-To=%3C20111224031406.CB4FB48061D%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1318 - in trunk/netpanzer/src: Lib/Util	NetPanzer/Bot NetPanzer/Classes NetPanzer/Classes/AI	NetPanzer/Classes/Network NetPanzer/Interfaces	NetPanzer/Objectives NetPanzer/PowerUps NetPanzer/Units	NetPanzer/Views/Components NetPanzer/Views/Game">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec 24 04:14:06 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000343.html">[Netpanzer-cvs] r1317 - trunk/netpanzer
+</A></li>
+        <LI>Next message: <A HREF="000345.html">[Netpanzer-cvs] r1319 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#344">[ date ]</a>
+              <a href="thread.html#344">[ thread ]</a>
+              <a href="subject.html#344">[ subject ]</a>
+              <a href="author.html#344">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-12-24 04:14:06 +0100 (Sat, 24 Dec 2011)
+New Revision: 1318
+
+Modified:
+   trunk/netpanzer/src/Lib/Util/NTimer.hpp
+   trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+   trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+Log:
+Merged some changes to basic classes from newpath. The merge mostly to avoid too much differences between newpath and normal versions
+
+Modified: trunk/netpanzer/src/Lib/Util/NTimer.hpp
+===================================================================
+--- trunk/netpanzer/src/Lib/Util/NTimer.hpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/Lib/Util/NTimer.hpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -36,9 +36,9 @@
+ 
+     inline Uint32 getTimeOut()       { return timeout; }
+     
+-    inline bool isTimeOut() { return (SDL_GetTicks()-starttime)&gt;timeout; }
+-    inline bool isTimeOut(Uint32 t) { return (t-starttime)&gt;timeout; }
+-    inline bool checkWithTimeOut(Uint32 tout) { return (SDL_GetTicks()-starttime)&gt;tout; }
++    inline bool isTimeOut() { return (starttime+timeout)&lt;SDL_GetTicks(); }
++    inline bool isTimeOut(Uint32 t) { return (starttime+timeout)&lt;t; }
++    inline bool checkWithTimeOut(Uint32 tout) { return (starttime+tout)&lt;SDL_GetTicks(); }
+     
+ private:
+     Uint32 starttime;
+
+Modified: trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Bot/BotPlayer.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -32,7 +32,6 @@
+ #include &quot;Units/UnitBase.hpp&quot;
+ #include &quot;Objectives/ObjectiveInterface.hpp&quot;
+ #include &quot;Objectives/Objective.hpp&quot;
+-#include &quot;Units/Vehicle.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+ //-----------------------------------------------------------------
+@@ -222,7 +221,7 @@
+         iXY map_loc;
+         MapInterface::pointXYtoMapXY(
+                 outpost-&gt;location + occupation_pad_offset,
+-                &amp;map_loc);
++                map_loc);
+         moveUnit(unit, map_loc);
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Classes/AI/Astar.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -161,7 +161,7 @@
+        )
+         return 0xFFFFFFFF;
+ 
+-    abs = MapInterface::mapXYtoOffset(map_loc.x, map_loc.y);
++    abs = MapInterface::mapXYtoOffset(map_loc);
+ 
+     return abs;
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Classes/Network/ServerConnectDaemon.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -595,7 +595,7 @@
+             }
+ 
+             unit = i-&gt;second;
+-            MapInterface::pointXYtoMapXY(unit-&gt;unit_state.location, &amp;unit_map_loc);
++            MapInterface::pointXYtoMapXY(unit-&gt;unit_state.location, unit_map_loc);
+             UnitRemoteCreate urc(unit-&gt;player-&gt;getID(),
+                                  unit-&gt;id,
+                                  unit_map_loc.x,
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -86,13 +86,13 @@
+ 
+ void ViewCamera::getViewStart(unsigned long view_size_x,
+ 			      unsigned long view_size_y,
+-                              unsigned long *view_start_x,
+-			      unsigned long *view_start_y)
++                              int *view_start_x,
++                              int *view_start_y)
+ {
+     iXY map_size;
+     unsigned long view_offset_x;
+     unsigned long view_offset_y;
+-    long start_x, start_y;
++    int start_x, start_y;
+ 
+     view_offset_x = view_size_x &gt;&gt; 1;
+     view_offset_y = view_size_y &gt;&gt; 1;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Classes/ViewCamera.hpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -46,11 +46,11 @@
+     }
+ 
+     void getViewStart( unsigned long view_size_x, unsigned long view_size_y,
+-                       unsigned long *view_start_x, unsigned long *view_start_y );
++                       int *view_start_x, int *view_start_y );
+ 
+     inline void getViewWindow( iRect *view_win )
+     {
+-        unsigned long view_start_x, view_start_y;
++        int view_start_x, view_start_y;
+         getViewStart( view_size.x, view_size.y, &amp;view_start_x, &amp;view_start_y );
+         view_win-&gt;min.x = view_start_x;
+         view_win-&gt;min.y = view_start_y;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -195,21 +195,15 @@
+         unsigned long id_list_index;
+         size_t id_list_size;
+         UnitBase *unit_ptr;
+-        iXY range_vector;
+ 
+         id_list_size = working_list.unit_list.size();
+         for( id_list_index = 0; id_list_index &lt; id_list_size; id_list_index++ )
+         {
+             unit_ptr = UnitInterface::getUnit(working_list.unit_list[ id_list_index ]);
+-            if ( unit_ptr != 0 )
++            if ( unit_ptr &amp;&amp; unit_ptr-&gt;isWeaponInRange(loc) )
+             {
+-                range_vector = loc - unit_ptr-&gt;unit_state.location;
+-                if ( range_vector.mag2() &lt; unit_ptr-&gt;unit_state.weapon_range )
+-                {
+-                    fielddraws = true;
+-                    return  _cursor_enemy_unit;
+-                    break;
+-                }
++                fielddraws = true;
++                return  _cursor_enemy_unit;
+             }
+         }
+     }
+@@ -218,7 +212,7 @@
+     {
+         return _cursor_blocked_target;
+     }
+-    MapInterface::pointXYtoMapXY( loc, &amp;map_loc );
++    MapInterface::pointXYtoMapXY( loc, map_loc );
+ 
+     if (MapInterface::getMovementValue(map_loc) &gt;= 0xFF)
+     {
+@@ -889,7 +883,7 @@
+     if ( id_list_size == 0 )
+         return;
+ 
+-    MapInterface::pointXYtoMapXY( world_pos, &amp;map_pos );
++    MapInterface::pointXYtoMapXY( world_pos, map_pos );
+     matrix.reset( map_pos );
+ 
+     NetMessageEncoder encoder;
+@@ -1226,15 +1220,15 @@
+ //    iXY mappos;
+ 
+ //    WorldViewInterface::clientXYtoWorldXY(world_win, mpos, &amp;wpos);
+-//    MapInterface::pointXYtoMapXY( wpos, &amp;mappos );
++//    MapInterface::pointXYtoMapXY( wpos, mappos );
+ 
+ //    iXY mappos2(mappos.x+1, mappos.y+1);
+ 
+ //    iXY wp1, wp2;
+ //    iXY r1, r2;
+ 
+-//    MapInterface::mapXYtoPointXY(mappos,  &amp;wp1);
+-//    MapInterface::mapXYtoPointXY(mappos2, &amp;wp2);
++//    MapInterface::mapXYtoPointXY(mappos,  wp1);
++//    MapInterface::mapXYtoPointXY(mappos2, wp2);
+ 
+ //    wp1.x -= 16;
+ //    wp1.y -= 16;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -59,7 +59,6 @@
+ #include &quot;Classes/Network/NetworkClient.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Classes/Network/ConnectNetMessage.hpp&quot;
+-#include &quot;Units/Vehicle.hpp&quot;
+ #include &quot;Units/UnitGlobals.hpp&quot;
+ 
+ #include &quot;2D/Palette.hpp&quot;
+@@ -322,7 +321,7 @@
+ 
+     //** Change the location of the view camera to the spawn point **
+     iXY world_loc;
+-    MapInterface::mapXYtoPointXY( spawn_point, &amp;world_loc );
++    MapInterface::mapXYtoPointXY( spawn_point, world_loc );
+     if ( PlayerInterface::getLocalPlayerIndex() == player )
+     {
+         WorldViewInterface::setCameraPosition( world_loc );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -157,7 +157,7 @@
+ 
+ }
+ 
+-unsigned char MapInterface::getMovementValue( iXY map_loc )
++unsigned char MapInterface::getMovementValue( const iXY&amp; map_loc )
+ {
+     unsigned short tile_val;
+     char move_val;
+@@ -195,16 +195,8 @@
+ 
+ }
+ 
+-unsigned char MapInterface::getAverageColorPointXY( iXY &amp;point_loc )
++unsigned char MapInterface::getAverageColorMapXY( const iXY&amp; map_loc )
+ {
+-    WorldMap::MapElementType map_value =
+-        main_map.getValue(point_loc.x/32, point_loc.y/32);
+-
+-    return( tile_set.getAverageTileColor( map_value ) );
+-}
+-
+-unsigned char MapInterface::getAverageColorMapXY( iXY &amp;map_loc )
+-{
+     unsigned short map_value;
+ 
+     map_value = main_map.getValue( map_loc.x, map_loc.y );
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MapInterface.hpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -95,106 +95,41 @@
+         return main_map.getValue(offset);
+     }
+ 
+-    static void offsetToPointXY(size_t offset, size_t* point_x, size_t *point_y )
++    static size_t mapXYtoOffset(const iXY&amp; map_loc)
+     {
+-        *point_y = ( offset  /  main_map.getWidth() );
+-
+-        *point_x = ( offset - ( (*point_y) * main_map.getWidth() ) ) * TILE_WIDTH
+-                   + (TILE_WIDTH / 2);
+-
+-        *point_y = (*point_y) * TILE_HEIGHT + (TILE_HEIGHT / 2);
++        return map_loc.y * main_map.getWidth() + map_loc.x;
+     }
+ 
+-    static void offsetToMapXY(size_t offset, size_t&amp; x, size_t&amp; y)
++    static void offsetToMapXY(size_t offset, iXY&amp; map_loc)
+     {
+-        y = offset / main_map.getWidth();
+-        x = offset - y * main_map.getWidth();
++        map_loc.y = offset/main_map.getWidth();
++        map_loc.x = offset%main_map.getWidth();
+     }
+ 
+-    static void offsetToMapXY(size_t offset, iXY *map_loc)
+-    {
+-        size_t map_x, map_y;
+-        offsetToMapXY(offset, map_x, map_y);
+-        map_loc-&gt;x = map_x;
+-        map_loc-&gt;y = map_y;
+-    }
++    static int mapXtoPointX(const int x) { return (x*TILE_WIDTH) + (TILE_WIDTH/2); }
++    static int mapYtoPointY(const int y) { return (y*TILE_HEIGHT)+ (TILE_HEIGHT/2); }
+ 
+-    static void mapXYtoPointXY(unsigned short map_x, unsigned short map_y,
+-                               size_t *point_x, size_t *point_y )
++    static void mapXYtoPointXY(const iXY&amp; map_loc, iXY&amp; loc)
+     {
+-        iXY loc = mapXYtoPointXY(iXY(map_x, map_y));
+-        *point_x = loc.x;
+-        *point_y = loc.y;
++        loc.x = mapXtoPointX(map_loc.x);
++        loc.y = mapXtoPointX(map_loc.y);
+     }
+ 
+-    static void mapXYtoPointXY(iXY map_loc, iXY *loc)
++    static void mapXYtoTopPointXY(const iXY &amp;map_loc, iXY&amp; loc)
+     {
+-        *loc = mapXYtoPointXY(map_loc);
++        loc.x = map_loc.x * TILE_WIDTH;
++        loc.y = map_loc.y * TILE_HEIGHT;
+     }
+ 
+-    static iXY mapXYtoPointXY(iXY map_loc)
+-    {
+-#ifdef DEBUG
+-        assert(inside(map_loc));
+-#endif
+-        return iXY((map_loc.x * TILE_WIDTH) + (TILE_WIDTH / 2),
+-                (map_loc.y * TILE_HEIGHT) + (TILE_HEIGHT / 2));
+-    }
+-
+-    static void pointXYtoMapXY(size_t point_x, size_t point_y,
+-            unsigned short *map_x, unsigned short *map_y )
+-    {
+-        iXY mapxy = pointXYtoMapXY(iXY(point_x, point_y));
+-        *map_x = mapxy.x;
+-        *map_y = mapxy.y;
+-    }
+-
+-    static void pointXYtoMapXY(const iXY&amp; point, iXY *map_loc)
+-    {
+-        *map_loc = pointXYtoMapXY(point);
+-    }
+-
+-    static iXY pointXYtoMapXY(const iXY&amp; point)
+-    {
+-#ifdef DEBUG
+-        assert(point.x &gt;= 0 &amp;&amp; point.x &gt;= 0 
+-                &amp;&amp; point.x &lt; (int) (getWidth() * TILE_WIDTH)
+-                &amp;&amp; point.y &lt; (int) (getHeight() * TILE_HEIGHT));
+-#endif
+-        return iXY(point.x / TILE_WIDTH, point.y / TILE_HEIGHT);
+-    }
+-
+     static int pointXtoMapX(const int x) { return x/TILE_WIDTH; }
+     static int pointYtoMapY(const int y) { return y/TILE_HEIGHT; }
+ 
+-    static size_t mapXYtoOffset(size_t map_x, size_t map_y)
++    static void pointXYtoMapXY(const iXY&amp; point, iXY&amp; map_loc)
+     {
+-        return mapXYtoOffset(iXY(map_x, map_y));
++        map_loc.x = pointXtoMapX(point.x);
++        map_loc.y = pointYtoMapY(point.y);
+     }
+ 
+-    static size_t mapXYtoOffset(const iXY&amp; map_loc)
+-    {
+-        return map_loc.y * main_map.getWidth() + map_loc.x;
+-    }
+-
+-    static void markLocHack(const iXY&amp; loc)
+-    {
+-        main_map.setMapValue(loc.x, loc.y, 27);
+-    }
+-
+-    static void unmarkLocHack(const iXY&amp; loc)
+-    {
+-        main_map.setMapValue(loc.x, loc.y, 28);
+-    }
+-
+-    static void normalizePointXY(size_t point_x, size_t point_y, size_t *norm_x, size_t *norm_y)
+-    {
+-        unsigned short map_x, map_y;
+-
+-        pointXYtoMapXY( point_x, point_y, &amp;map_x, &amp;map_y );
+-        mapXYtoPointXY( map_x, map_y, norm_x, norm_y );
+-    }
+-
+     static WorldMap* getMap()
+     {
+         return( &amp;main_map );
+@@ -222,12 +157,10 @@
+         return( main_map.isMapLoaded() );
+     }
+ 
+-    static unsigned char getMovementValue( iXY map_loc );
++    static unsigned char getMovementValue( const iXY&amp; map_loc );
+ 
+-    static unsigned char getAverageColorPointXY( iXY &amp;point_loc );
++    static unsigned char getAverageColorMapXY( const iXY&amp; map_loc );
+ 
+-    static unsigned char getAverageColorMapXY( iXY &amp;map_loc );
+-
+     static iXY getFreeSpawnPoint()
+     {
+         return spawn_list.getFreeSpawnPoint();
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PathScheduler.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -210,7 +210,7 @@
+                         path_request.path-&gt;popFirst( &amp;abs_new_goal );
+                     }
+ 
+-                    MapInterface::offsetToMapXY( abs_new_goal, &amp;new_goal);
++                    MapInterface::offsetToMapXY( abs_new_goal, new_goal);
+                     path_request.goal = new_goal;
+                 }
+ 
+@@ -260,7 +260,7 @@
+                     path_request.path-&gt;popFirst( &amp;abs_new_goal );
+                 }
+ 
+-                MapInterface::offsetToMapXY( abs_new_goal, &amp;new_goal);
++                MapInterface::offsetToMapXY( abs_new_goal, new_goal);
+                 path_request.goal = new_goal;
+ 
+                 pathing_fsm_state = _pathing_fsm_state_generate_path_part_a;
+@@ -290,7 +290,7 @@
+                     path_request.path-&gt;popLast( &amp;abs_new_goal );
+                 }
+ 
+-                MapInterface::offsetToMapXY( abs_new_goal, &amp;new_goal);
++                MapInterface::offsetToMapXY( abs_new_goal, new_goal);
+                 path_request.goal = new_goal;
+                 path_request.start = working_goal;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -53,7 +53,6 @@
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/SystemNetMessage.hpp&quot;
+ #include &quot;Classes/Network/ConnectNetMessage.hpp&quot;
+-#include &quot;Units/Vehicle.hpp&quot;
+ #include &quot;Units/UnitGlobals.hpp&quot;
+ 
+ #include &quot;2D/Palette.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -42,7 +42,7 @@
+     capture_area = area;
+     occupying_player = 0;
+ 
+-    MapInterface::pointXYtoMapXY( location, &amp;outpost_map_loc );
++    MapInterface::pointXYtoMapXY( location, outpost_map_loc );
+     selection_box.max = location + iXY( 64, 32 );
+     selection_box.min = location + iXY( -224, -128 );
+     this-&gt;area.min = iXY( -400, -144 );
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Objectives/ObjectiveInterface.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -148,8 +148,8 @@
+             num_objectives = 0;
+         }
+ 
+-        size_t loc_x, loc_y;
+-        size_t world_x, world_y;
++        iXY loc;
++        iXY world;
+         std::string name;
+ 
+         for (ObjectiveID objective_index = 0; objective_index &lt; objective_count; objective_index++ )
+@@ -159,11 +159,11 @@
+             name = readToken(in, &quot;Name:&quot;);
+             std::string location = readToken(in, &quot;Location:&quot;);
+             std::stringstream ss(location);
+-            ss &gt;&gt; loc_x &gt;&gt; loc_y;
++            ss &gt;&gt; loc.x &gt;&gt; loc.y;
+             
+-            MapInterface::mapXYtoPointXY( loc_x, loc_y, &amp;world_x, &amp;world_y );
++            MapInterface::mapXYtoPointXY( loc, world );
+ 
+-            objective_obj = new Objective(objective_index, iXY(world_x, world_y),
++            objective_obj = new Objective(objective_index, world,
+                     BoundBox( -48, -32, 48, 32 )
+                     );
+             
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/BonusUnitPowerUp.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -43,17 +43,14 @@
+ void BonusUnitPowerUp::onHit( UnitID unit_id )
+ {
+     PlacementMatrix placement_matrix;
+-    iXY map_pos;
+ 
+     sound-&gt;playPowerUpSound();
+ 
+-    UnitBase* unit = UnitInterface::getUnit(unit_id);
++    PlayerID own_player = UnitInterface::getUnit(unit_id)-&gt;player-&gt;getID();
+ 
+-    MapInterface::pointXYtoMapXY( unit-&gt;unit_state.location, &amp;map_pos );
++    placement_matrix.reset( map_loc );
+ 
+-    placement_matrix.reset( map_pos );
+ 
+-
+     for( int i = 0; i &lt; 9; i++ )
+     {
+         UnitBase *new_unit;
+@@ -63,7 +60,7 @@
+ 
+         new_unit = UnitInterface::createUnit(bonus_unit_type,
+                                              spawn_loc,
+-                                             unit-&gt;player-&gt;getID() );
++                                             own_player );
+ 
+         if ( new_unit != 0 )
+         {
+@@ -75,12 +72,12 @@
+     }
+ 
+     PowerUpHitMesg hit_mesg;
+-    hit_mesg.set( ID, unit-&gt;player-&gt;getID() );
++    hit_mesg.set( ID, own_player );
+     SERVER-&gt;broadcastMessage( &amp;hit_mesg, sizeof( PowerUpHitMesg ));
+ 
+     life_cycle_state = _power_up_lifecycle_state_inactive;
+ 
+-    if(unit-&gt;player == PlayerInterface::getLocalPlayer())
++    if( PlayerInterface::isLocalPlayer(own_player) )
+     {
+         ConsoleInterface::postMessage(Color::unitAqua, false, 0, &quot;YOU GOT A BONUS UNITS POWERUP&quot; );
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/PowerUps/PowerUp.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -37,7 +37,7 @@
+     this-&gt;ID = ID;
+     this-&gt;type = type;
+ 
+-    MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
++    MapInterface::mapXYtoPointXY( map_loc, this-&gt;world_loc );
+     
+     this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
+     
+@@ -55,7 +55,7 @@
+     this-&gt;ID = -1;
+     this-&gt;type = type;
+ 
+-    MapInterface::mapXYtoPointXY( map_loc, &amp;(this-&gt;world_loc) );
++    MapInterface::mapXYtoPointXY( map_loc, this-&gt;world_loc );
+     
+     this-&gt;life_cycle_state = _power_up_lifecycle_state_active;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBase.hpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -47,6 +47,13 @@
+     virtual void offloadGraphics(SpriteSorter&amp; ) = 0;
+     virtual void soundSelected() = 0;
+ 
++    bool isWeaponInRange(const iXY&amp; loc) const
++    {
++        int x = loc.x - unit_state.location.x;
++        int y = loc.y - unit_state.location.y;
++        return (x*x + y*y) &lt; unit_state.weapon_range;
++    }
++
+ private:
+     friend class UnitInterface;
+     void setID(UnitID id)
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBlackBoard.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -38,15 +38,5 @@
+ 
+ void UnitBlackBoard::updateUnitLocs( void )
+ {
+-    unsigned long i,k,x_limit,y_limit;
+ 
+-    x_limit = unit_loc_map.x_size;
+-    y_limit = unit_loc_map.y_size;
+-
+-    for( i = 0; i &lt; y_limit; i++ )
+-        for ( k = 0; k &lt; x_limit; k++ ) {
+-            if ( unit_loc_map.getBit( k, i ) == true )
+-                MapInterface::markLocHack( iXY( k, i ) );
+-        }
+-
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -658,7 +658,7 @@
+         UnitBase* unit = i-&gt;second;
+         UnitState* unit_state = &amp; unit-&gt;unit_state;
+             
+-        MapInterface::pointXYtoMapXY( unit_state-&gt;location, &amp;unit_map_loc );
++        MapInterface::pointXYtoMapXY( unit_state-&gt;location, unit_map_loc );
+         if( map_loc == unit_map_loc ) {
+             *queary_unit_id = unit-&gt;id;
+             return true;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Units/Vehicle.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -81,7 +81,8 @@
+     if(!MapInterface::inside(initial_loc))
+         throw std::runtime_error(&quot;Invalid position&quot;);
+ 
+-    iXY loc = MapInterface::mapXYtoPointXY(initial_loc);
++    iXY loc;
++    MapInterface::mapXYtoPointXY(initial_loc, loc);
+     unit_state.location = loc;
+     UnitBlackBoard::markUnitLoc( initial_loc );
+     fsm_timer.changeRate( 10 );
+@@ -256,8 +257,8 @@
+ {
+     iXY current_loc, next_loc;
+ 
+-    MapInterface::pointXYtoMapXY( unit_state.location, &amp;current_loc );
+-    MapInterface::offsetToMapXY( square, &amp;next_loc );
++    MapInterface::pointXYtoMapXY( unit_state.location, current_loc );
++    MapInterface::offsetToMapXY( square, next_loc );
+ 
+     // so many magic numbers
+     if ( (next_loc.x &gt; current_loc.x)  &amp;&amp;  (next_loc.y == current_loc.y) )
+@@ -344,8 +345,8 @@
+     iXY square_map_loc;
+     iXY unit_map_loc;
+ 
+-    MapInterface::offsetToMapXY( square, &amp;square_map_loc );
+-    MapInterface::pointXYtoMapXY( unit_state.location, &amp;unit_map_loc );
++    MapInterface::offsetToMapXY( square, square_map_loc );
++    MapInterface::pointXYtoMapXY( unit_state.location, unit_map_loc );
+ 
+     offset = unit_map_loc - square_map_loc ;
+ }
+@@ -831,7 +832,7 @@
+ bool Vehicle::ruleMoveToLoc_GoalReached()
+ {
+     iXY map_loc;
+-    MapInterface::pointXYtoMapXY( unit_state.location, &amp;map_loc );
++    MapInterface::pointXYtoMapXY( unit_state.location, map_loc );
+     if ( map_loc == aiFsmMoveToLoc_goal )
+         return true;
+ 
+@@ -862,7 +863,7 @@
+                     aiFsmMoveToLoc_OnExitCleanUp();
+ 
+                     iXY current_map_loc;
+-                    MapInterface::pointXYtoMapXY( unit_state.location, &amp;current_map_loc );
++                    MapInterface::pointXYtoMapXY( unit_state.location, current_map_loc );
+                     UnitBlackBoard::unmarkUnitLoc( current_map_loc );
+ 
+                     external_ai_event = _external_event_null;
+@@ -903,7 +904,7 @@
+                     // Rule GoalReached : is true
+                     // Action : Exit fsm
+                     aiFsmMoveToLoc_prev_loc = unit_state.location;
+-                    MapInterface::pointXYtoMapXY( aiFsmMoveToLoc_prev_loc, &amp;aiFsmMoveToLoc_prev_loc );
++                    MapInterface::pointXYtoMapXY( aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_prev_loc );
+                     UnitBlackBoard::markUnitLoc( aiFsmMoveToLoc_prev_loc );
+ 
+                     aiFsmMoveToLoc_OnExitCleanUp();
+@@ -922,7 +923,7 @@
+                         PathRequest path_request;
+ 
+                         //LOG( (&quot;Incomplete Path -- Regenerating Path&quot;) );
+-                        MapInterface::pointXYtoMapXY( unit_state.location, &amp;start );
++                        MapInterface::pointXYtoMapXY( unit_state.location, start );
+                         path_request.set(id, start, aiFsmMoveToLoc_goal, 0,  &amp;path, _path_request_full );
+                         PathScheduler::requestPath( path_request );
+                         aiFsmMoveToLoc_path_not_finished = true;
+@@ -944,7 +945,7 @@
+             {
+                 // CurrentPathComplete: is Unit at the end of the current path
+                 aiFsmMoveToLoc_path_not_finished = path.popFirst( &amp;aiFsmMoveToLoc_next_square );
+-                MapInterface::offsetToMapXY( aiFsmMoveToLoc_next_square, &amp;aiFsmMoveToLoc_next_loc );
++                MapInterface::offsetToMapXY( aiFsmMoveToLoc_next_square, aiFsmMoveToLoc_next_loc );
+ 
+                 if ( !aiFsmMoveToLoc_path_not_finished )
+                 {
+@@ -957,7 +958,7 @@
+                     // Rule: CurrentPathComplete is false
+                     // Action: Check if next location is empty
+                     aiFsmMoveToLoc_prev_loc = unit_state.location;
+-                    MapInterface::pointXYtoMapXY( aiFsmMoveToLoc_prev_loc, &amp;aiFsmMoveToLoc_prev_loc );
++                    MapInterface::pointXYtoMapXY( aiFsmMoveToLoc_prev_loc, aiFsmMoveToLoc_prev_loc );
+                     UnitBlackBoard::markUnitLoc( aiFsmMoveToLoc_prev_loc );
+ 
+                     //aiFsmMoveToLoc_wait_timer.changePeriod( MOVEWAIT_TIME );
+@@ -1163,7 +1164,7 @@
+                     aiFsmAttackUnit_OnExitCleanUp();
+ 
+                     iXY current_map_loc;
+-                    MapInterface::pointXYtoMapXY( unit_state.location, &amp;current_map_loc );
++                    MapInterface::pointXYtoMapXY( unit_state.location, current_map_loc );
+                     UnitBlackBoard::unmarkUnitLoc( current_map_loc );
+ 
+                     external_ai_event = _external_event_null;
+@@ -1205,7 +1206,7 @@
+                     // Rule: RangeVector &lt; WeaponRange, unit is in range
+                     // Action: Remain in position
+                     aiFsmAttackUnit_prev_loc = unit_state.location;
+-                    MapInterface::pointXYtoMapXY( aiFsmAttackUnit_prev_loc, &amp;aiFsmAttackUnit_prev_loc );
++                    MapInterface::pointXYtoMapXY( aiFsmAttackUnit_prev_loc, aiFsmAttackUnit_prev_loc );
+                     UnitBlackBoard::markUnitLoc( aiFsmAttackUnit_prev_loc );
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_idle;
+                     end_cycle = true;
+@@ -1216,7 +1217,7 @@
+                     if ( aiFsmAttackUnit_path_not_finished == false )
+                     {
+                         iXY start;
+-                        MapInterface::pointXYtoMapXY( unit_state.location, &amp;start );
++                        MapInterface::pointXYtoMapXY( unit_state.location, start );
+ 
+                         PathRequest path_request;
+                         path_request.set(id, start, aiFsmAttackUnit_target_goal_loc, 0, &amp;path, _path_request_full );
+@@ -1282,7 +1283,7 @@
+             {
+                 // CurrentPathComplete: is Unit at the end of the current path
+                 aiFsmAttackUnit_path_not_finished = path.popFirst( &amp;aiFsmAttackUnit_next_square );
+-                MapInterface::offsetToMapXY( aiFsmAttackUnit_next_square, &amp;aiFsmAttackUnit_next_loc );
++                MapInterface::offsetToMapXY( aiFsmAttackUnit_next_square, aiFsmAttackUnit_next_loc );
+ 
+                 if ( !aiFsmAttackUnit_path_not_finished )
+                 {
+@@ -1295,7 +1296,7 @@
+                     // Rule: CurrentPathComplete is false
+                     // Action: Check if next location is empty
+                     aiFsmAttackUnit_prev_loc = unit_state.location;
+-                    MapInterface::pointXYtoMapXY( aiFsmAttackUnit_prev_loc, &amp;aiFsmAttackUnit_prev_loc );
++                    MapInterface::pointXYtoMapXY( aiFsmAttackUnit_prev_loc, aiFsmAttackUnit_prev_loc );
+                     UnitBlackBoard::markUnitLoc( aiFsmAttackUnit_prev_loc );
+                     aiFsmAttackUnit_wait_timer.changePeriod( 0.8f );
+                     aiFsmAttackUnit_state = _aiFsmAttackUnit_wait_clear_loc;
+@@ -1419,12 +1420,12 @@
+                 iXY deviation_vector;
+                 iXY goal_point_loc;
+ 
+-                MapInterface::mapXYtoPointXY( aiFsmAttackUnit_target_goal_loc, &amp;goal_point_loc );
++                MapInterface::mapXYtoPointXY( aiFsmAttackUnit_target_goal_loc, goal_point_loc );
+                 deviation_vector = target_unit_state-&gt;location - goal_point_loc;
+ 
+                 if ( deviation_vector.mag2() &gt; unit_state.weapon_range )
+                 {
+-                    MapInterface::pointXYtoMapXY( target_unit_state-&gt;location, &amp;aiFsmAttackUnit_target_goal_loc );
++                    MapInterface::pointXYtoMapXY( target_unit_state-&gt;location, aiFsmAttackUnit_target_goal_loc );
+ 
+                     PathRequest path_request;
+                     path_request.set( id, aiFsmAttackUnit_next_loc, aiFsmAttackUnit_target_goal_loc, 0, &amp;path, _path_request_full );
+@@ -1839,7 +1840,7 @@
+     move_opcode_sent = false;
+     //move_opcode_sent = true;
+ 
+-    MapInterface::pointXYtoMapXY( unit_state.location, &amp;start );
++    MapInterface::pointXYtoMapXY( unit_state.location, start );
+ 
+     //LOG( (&quot;UnitID %d, %d : Start %d, %d : Goal %d, %d&quot;, id.getPlayer(), id.getIndex(),
+     //                                                    start.x, start.y,
+@@ -1850,7 +1851,7 @@
+     PathScheduler::requestPath( path_request );
+ 
+     iXY target;
+-    MapInterface::mapXYtoPointXY( aiFsmMoveToLoc_goal, &amp;target);
++    MapInterface::mapXYtoPointXY( aiFsmMoveToLoc_goal, target);
+     setFsmTurretTrackPoint( target );
+ }
+ 
+@@ -1874,8 +1875,8 @@
+     aiFsmAttackUnit_path_not_finished = true;
+     aiFsmAttackUnit_target_destroyed = false;
+ 
+-    MapInterface::pointXYtoMapXY( unit_state.location, &amp;start );
+-    MapInterface::pointXYtoMapXY( target_unit_state-&gt;location, &amp;aiFsmAttackUnit_target_goal_loc );
++    MapInterface::pointXYtoMapXY( unit_state.location, start );
++    MapInterface::pointXYtoMapXY( target_unit_state-&gt;location, aiFsmAttackUnit_target_goal_loc );
+ 
+     PathRequest path_request;
+     path_request.set( id, start, aiFsmAttackUnit_target_goal_loc, 0, &amp;path, _path_request_full );
+@@ -1893,7 +1894,7 @@
+     if ( message-&gt;command == _command_start_manual_move )
+     {
+         aiFsmManualMove_move_orientation = message-&gt;manual_move_orientation;
+-        MapInterface::pointXYtoMapXY( unit_state.location, &amp;aiFsmManualMove_next_loc );
++        MapInterface::pointXYtoMapXY( unit_state.location, aiFsmManualMove_next_loc );
+         aiFsmManualMove_state = _aiFsmManualMove_next_move;
+         ai_command_state = _ai_command_manual_move;
+     }
+@@ -1957,7 +1958,7 @@
+ 
+         // ** Note: Temp
+         iXY current_map_loc;
+-        MapInterface::pointXYtoMapXY(unit_state.location, &amp;current_map_loc);
++        MapInterface::pointXYtoMapXY(unit_state.location, current_map_loc);
+         UnitBlackBoard::unmarkUnitLoc(current_map_loc);
+     }
+ }
+@@ -1997,7 +1998,7 @@
+ 
+     // ** Note: Temp
+     iXY current_map_loc;
+-    MapInterface::pointXYtoMapXY( unit_state.location, &amp;current_map_loc );
++    MapInterface::pointXYtoMapXY( unit_state.location, current_map_loc );
+     UnitBlackBoard::unmarkUnitLoc( current_map_loc );
+ }
+ 
+@@ -2043,15 +2044,15 @@
+     iXY sync_loc;
+     iXY current_loc;
+ 
+-    MapInterface::offsetToMapXY(move_opcode-&gt;getSquare(), &amp;sync_loc );
++    MapInterface::offsetToMapXY(move_opcode-&gt;getSquare(), sync_loc );
+     sync_loc.x = sync_loc.x + move_opcode-&gt;loc_x_offset;
+     sync_loc.y = sync_loc.y + move_opcode-&gt;loc_y_offset;
+ 
+-    MapInterface::pointXYtoMapXY( unit_state.location, &amp;current_loc );
++    MapInterface::pointXYtoMapXY( unit_state.location, current_loc );
+ 
+     if ( current_loc != sync_loc )
+     {
+-        MapInterface::mapXYtoPointXY( sync_loc, &amp;(unit_state.location) );
++        MapInterface::mapXYtoPointXY( sync_loc, unit_state.location );
+     }
+ 
+     setFsmMoveMapSquare(move_opcode-&gt;getSquare());
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/MiniMap.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -207,7 +207,7 @@
+         {
+             //Only draw our unit collection location
+             iXY objdest, src;
+-            MapInterface::mapXYtoPointXY(obj-&gt;unit_collection_loc, &amp;objdest);
++            MapInterface::mapXYtoPointXY(obj-&gt;unit_collection_loc, objdest);
+             objdest.x = int(float(objdest.x/32) / xratio)+position.x;
+             objdest.y = int(float(objdest.y/32) / yratio)+position.y;
+             
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2011-12-24 02:50:37 UTC (rev 1317)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2011-12-24 03:14:06 UTC (rev 1318)
+@@ -216,25 +216,23 @@
+ GameView::drawMap(Surface &amp;window)
+ {
+     TileSet * ts = TileInterface::getTileSet();
+-    unsigned long world_x;
+-    unsigned long world_y;
+-    unsigned short map_x;
+-    unsigned short map_y;
++    iXY world;
++    iXY map;
+     
+     WorldViewInterface::getMainCamera()-&gt;getViewStart(window.getWidth(), window.getHeight(),
+-                              &amp;world_x, &amp;world_y);
+-    MapInterface::pointXYtoMapXY( world_x, world_y, &amp;map_x, &amp;map_y );
++                              &amp;world.x, &amp;world.y);
++    MapInterface::pointXYtoMapXY( world, map );
+         
+     unsigned short tile_size = ts-&gt;getTileXsize();
+     
+-    long partial_y = world_y % tile_size;
++    long partial_y = world.y % tile_size;
+     int y = 0;
+     if ( partial_y )
+     {
+         y -= partial_y;
+     }
+     
+-    long partial_x = world_x % tile_size;
++    long partial_x = world.x % tile_size;
+     int start_x = 0;
+     if ( partial_x )
+     {
+@@ -243,18 +241,18 @@
+     
+     unsigned int tile = 0;
+     
+-    WorldMap * map = MapInterface::getMap();
++    WorldMap * worldmap = MapInterface::getMap();
+     
+     unsigned short tmx;
+     
+     for ( ; y &lt; (int)window.getHeight(); y += tile_size )
+     {
+-        tmx = map_x;
++        tmx = map.x;
+         for ( int x = start_x; x &lt; (int)window.getWidth(); x += tile_size )
+         {
+-            tile = map-&gt;getValue(tmx++, map_y);
++            tile = worldmap-&gt;getValue(tmx++, map.y);
+             blitTile(window, tile, x, y);
+         }
+-        map_y ++;
++        map.y ++;
+     }
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000343.html">[Netpanzer-cvs] r1317 - trunk/netpanzer
+</A></li>
+	<LI>Next message: <A HREF="000345.html">[Netpanzer-cvs] r1319 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#344">[ date ]</a>
+              <a href="thread.html#344">[ thread ]</a>
+              <a href="subject.html#344">[ subject ]</a>
+              <a href="author.html#344">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

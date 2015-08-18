@@ -1,0 +1,1294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1094 - trunk/netpanzer/src/NetPanzer/Units
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1094%20-%20trunk/netpanzer/src/NetPanzer/Units&In-Reply-To=%3C200902211016.n1LAGXTQ006731%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000125.html">
+   <LINK REL="Next"  HREF="000127.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1094 - trunk/netpanzer/src/NetPanzer/Units</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1094%20-%20trunk/netpanzer/src/NetPanzer/Units&In-Reply-To=%3C200902211016.n1LAGXTQ006731%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1094 - trunk/netpanzer/src/NetPanzer/Units">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb 21 11:16:33 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000125.html">[Netpanzer-cvs] r1093 - in trunk/netpanzer: nbproject	src/Lib/ArrayUtil src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/AI src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Units src/NetPanzer/Views/Components
+</A></li>
+        <LI>Next message: <A HREF="000127.html">[Netpanzer-cvs] r1095 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-02-21 11:16:23 +0100 (Sat, 21 Feb 2009)
+New Revision: 1094
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+   trunk/netpanzer/src/NetPanzer/Units/Unit.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+Log:
+- Full review of UnitBucketArray
+- Small review of UnitInterface, uses UnitBucketArray more.
+- Move private enums from Unit.hpp to Unit.cpp
+
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-02-21 02:34:05 UTC (rev 1093)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.cpp	2009-02-21 10:16:23 UTC (rev 1094)
+@@ -42,8 +42,79 @@
+ 
+ #define MOVEWAIT_TIME 0.8f
+ 
+-enum{ _rotate_and_move, _rotate_stop_move };
++enum
++{
++    _control_idle,
++    _control_move,
++    _control_move_map_square,
++    _control_turret_track_point,
++    _control_turret_track_target,
++    _control_gunnery_location,
++    _control_gunnery_target
++};
+ 
++enum
++{
++    _ai_command_idle,
++    _ai_command_move_to_loc,
++    _ai_command_attack_unit,
++    _ai_command_manual_move,
++    _ai_command_defend_hold
++};
++
++enum
++{
++    _aiFsmMoveToLoc_path_generate,
++    _aiFsmMoveToLoc_check_goal,
++    _aiFsmMoveToLoc_next_move,
++    _aiFsmMoveToLoc_move_wait,
++    _aiFsmMoveToLoc_wait_clear_loc,
++    _aiFsmMoveToLoc_check_fsm_transition
++};
++
++enum
++{
++    _aiFsmAttackUnit_path_generate,
++    _aiFsmAttackUnit_range_check,
++    _aiFsmAttackUnit_idle,
++    _aiFsmAttackUnit_next_move,
++    _aiFsmAttackUnit_move_wait,
++    _aiFsmAttackUnit_wait_clear_loc,
++    _aiFsmAttackUnit_check_fsm_transition,
++    _aiFsmAttackUnit_check_path_deviation
++};
++
++enum
++{
++    _aiFsmDefendHold_search_for_enemy,
++    _aiFsmDefendHold_attack_enemy
++};
++
++enum
++{
++    _aiFsmManualMove_next_move,
++    _aiFsmManualMove_move_wait,
++    _aiFsmManualMove_check_fsm_transition
++};
++
++enum
++{
++    _external_event_null,
++    _external_event_pending_unit_destruct
++};
++
++enum
++{
++    _rotate_pos,
++    _rotate_neg
++};
++
++enum
++{
++    _rotate_and_move,
++    _rotate_stop_move
++};
++
+ Unit::Unit(PlayerState* ownplayer, unsigned char utype, UnitID uid, iXY initial_loc)
+     : player(ownplayer), id(uid)
+ {
+@@ -2196,38 +2267,3 @@
+         }
+     }
+ }
+-
+-
+-void Unit::offloadGraphics( SpriteSorter &amp;sorter )
+-{
+-    body_anim_shadow.setWorldPos( unit_state.location);
+-
+-    if ( sorter.cullSprite( body_anim_shadow ) == false )
+-    {
+-        // Body
+-        body_anim.setWorldPos( unit_state.location );
+-        body_anim.setFrame( unit_state.body_angle.angle_int );
+-
+-        // Turret
+-        turret_anim.setWorldPos( unit_state.location );
+-        turret_anim.setFrame( unit_state.turret_angle.angle_int );
+-
+-        // Body Shadow
+-        body_anim_shadow.setFrame( unit_state.body_angle.angle_int );
+-
+-        // Turret Shadow
+-        turret_anim_shadow.setWorldPos( unit_state.location );
+-        turret_anim_shadow.setFrame( unit_state.turret_angle.angle_int );
+-
+-        select_info_box.setBoxState( unit_state.select );
+-
+-        //Added layer selection to the selection box info.
+-        select_info_box.setAttrib( unit_state.location,
+-                gameconfig-&gt;unitinfodrawlayer );
+-        select_info_box.setHitPoints( unit_state.hit_points );
+-
+-        sorter.forceAddSprite( &amp;body_anim_shadow );
+-    }
+-
+-    //sorter.addSprite( &amp;body_anim_shadow );
+-}
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/Unit.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/Unit.hpp	2009-02-21 02:34:05 UTC (rev 1093)
++++ trunk/netpanzer/src/NetPanzer/Units/Unit.hpp	2009-02-21 10:16:23 UTC (rev 1094)
+@@ -18,6 +18,7 @@
+ #ifndef _VEHICLE_HPP
+ #define _VEHICLE_HPP
+ #include &lt;string&gt;
++#include &lt;vector&gt;
+ 
+ #include &quot;UnitState.hpp&quot;
+ #include &quot;Util/Timer.hpp&quot;
+@@ -29,63 +30,31 @@
+ #include &quot;Classes/SelectionBoxSprite.hpp&quot;
+ #include &quot;Classes/SpriteSorter.hpp&quot;
+ 
+-enum { _control_idle,
+-       _control_move,
+-       _control_move_map_square,
+-       _control_turret_track_point,
+-       _control_turret_track_target,
+-       _control_gunnery_location,
+-       _control_gunnery_target    };
+-
+-enum { _ai_command_idle,
+-       _ai_command_move_to_loc,
+-       _ai_command_attack_unit,
+-       _ai_command_manual_move,
+-       _ai_command_defend_hold };
+-
+-enum { _aiFsmMoveToLoc_path_generate,
+-       _aiFsmMoveToLoc_check_goal,
+-       _aiFsmMoveToLoc_next_move,
+-       _aiFsmMoveToLoc_move_wait,
+-       _aiFsmMoveToLoc_wait_clear_loc,
+-       _aiFsmMoveToLoc_check_fsm_transition };
+-
+-enum { _aiFsmAttackUnit_path_generate,
+-       _aiFsmAttackUnit_range_check,
+-       _aiFsmAttackUnit_idle,
+-       _aiFsmAttackUnit_next_move,
+-       _aiFsmAttackUnit_move_wait,
+-       _aiFsmAttackUnit_wait_clear_loc,
+-       _aiFsmAttackUnit_check_fsm_transition,
+-       _aiFsmAttackUnit_check_path_deviation };
+-
+-enum { _aiFsmDefendHold_search_for_enemy,
+-       _aiFsmDefendHold_attack_enemy };
+-
+-enum { _aiFsmManualMove_next_move,
+-       _aiFsmManualMove_move_wait,
+-       _aiFsmManualMove_check_fsm_transition };
+-
+-enum { _external_event_null,
+-       _external_event_pending_unit_destruct };
+-
+-enum { _rotate_pos, _rotate_neg };
+-
+-
+ class PlayerState;
+ 
+ class Unit
+ {
+-    friend class UnitInterface;
+ public:
+     PlayerState* player;
+     UnitID       id;
+     UnitState    unit_state;
+     bool         in_sync_flag;
+ 
++    Unit(PlayerState* ownplayer, unsigned char utype, UnitID uid, iXY initial_loc);
++
+     void soundSelected();
+ 
++    void updateState();
+ 
++    void processMessage(const UnitMessage* message);
++
++    void evalCommandOpcode(const UnitOpcode* opcode);
++
++    void syncUnit();
++
++    float smolderWait;
++    float smolderWaitMin;
++
+ protected:
+     SpritePacked body_anim;
+     SpritePacked turret_anim;
+@@ -253,23 +222,9 @@
+     
+     void setUnitProperties( unsigned char utype );
+ 
+-public:
+-    Unit(PlayerState* ownplayer, unsigned char utype, UnitID uid, iXY initial_loc);
+-
+-    void updateState();
+-
+-    void processMessage(const UnitMessage* message);
+-
+-    void evalCommandOpcode(const UnitOpcode* opcode);
+-
+-    void syncUnit();
+-
+-    void offloadGraphics( SpriteSorter &amp;sorter );
+-
+-    float smolderWait;
+-    float smolderWaitMin;
+-
+ private:
++    friend class UnitInterface;
++
+     void setID(UnitID id)
+     {
+         this-&gt;id = id;
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2009-02-21 02:34:05 UTC (rev 1093)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.cpp	2009-02-21 10:16:23 UTC (rev 1094)
+@@ -24,25 +24,8 @@
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Units/UnitBucketArray.hpp&quot;
+ 
+-UnitBucketArray::UnitBucketArray( )
+-//        : UnitBucketArrayTemplate( )
+-{
+-    map_x_sample_factor = 0;
+-    map_y_sample_factor = 0;
+-}
+-
+-UnitBucketArray::~UnitBucketArray( )
+-{
+-}
+-
+ void
+-UnitBucketArray::initialize( iXY map_size, iXY tile_size )
+-{
+-    initialize( map_size, tile_size, 10, 10 );
+-}
+-
+-void
+-UnitBucketArray::initialize( iXY map_size, iXY tile_size,
++UnitBucketArray::initialize( const iXY &amp; map_size, const iXY &amp; tile_size,
+         long x_super_sample, long y_super_sample )
+ {
+     cleanUp();
+@@ -52,19 +35,16 @@
+     assert( x_super_sample &gt;= 1 );
+     assert( y_super_sample &gt;= 1 );
+ 
+-    UnitBucketArray::tile_size = tile_size;
+-    UnitBucketArray::map_size = map_size;
+-    UnitBucketArray::map_size_x = map_size.x;
+-    UnitBucketArray::map_size_y = map_size.y;
+-
+     map_x_sample_factor = x_super_sample;
+     map_y_sample_factor = y_super_sample;
+ 
+-    while( (map_size.x % map_x_sample_factor) &gt; 0 ) {
++    while( (map_size.x % map_x_sample_factor) &gt; 0 )
++    {
+         map_x_sample_factor++;
+     }
+ 
+-    while( (map_size.y % map_y_sample_factor) &gt; 0 ) {
++    while( (map_size.y % map_y_sample_factor) &gt; 0 )
++    {
+         map_y_sample_factor++;
+     }
+ 
+@@ -76,206 +56,33 @@
+ 
+     row_size = rows;
+     column_size = columns;
+-    size = rows*columns;
+-    buckets.resize(size);
+-    //UnitBucketArrayTemplate::initialize( rows, columns );
++    buckets.resize(rows*columns);
+ }
+ 
+ void
+-UnitBucketArray::cleanUp()
++UnitBucketArray::sort()
+ {
+-    buckets.clear();
+-}
++    unsigned int index;
++    unsigned int real_index;
++    UnitList::iterator iter;
+ 
+-iRect
+-UnitBucketArray::getWorldRectBucketUnits( iRect &amp;world_rect )
+-{
+-    long bucket_min_x = world_rect.min.x / pixel_x_sample_factor;
+-    long bucket_min_y = world_rect.min.y / pixel_y_sample_factor;
+-    long bucket_max_x = world_rect.max.x / pixel_x_sample_factor;
+-    long bucket_max_y = world_rect.max.y / pixel_y_sample_factor;
+-
+-    if ( bucket_max_x &gt;= (long) column_size )
++    for( index = 0; index &lt; getSize(); ++index )
+     {
+-        bucket_max_x = column_size - 1;
+-    }
++        UnitList &amp; uli = getBucket(index);
+ 
+-    if ( bucket_max_y &gt;= (long) row_size )
+-    {
+-        bucket_max_y = row_size  - 1;
+-    }
+-
+-    return( iRect( bucket_min_x,
+-                   bucket_min_y,
+-                   bucket_max_x,
+-                   bucket_max_y
+-                 )
+-          );
+-}
+-
+-UnitBucketList*
+-UnitBucketArray::getBucketAssocWorldLoc( iXY world_loc )
+-{
+-    long bucket_index;
+-
+-    bucket_index = ((world_loc.y / pixel_y_sample_factor) * column_size) +
+-                   (world_loc.x / pixel_x_sample_factor);
+-
+-    assert( bucket_index &lt; (long) size );
+-
+-    return( &amp;(buckets[ bucket_index ]) );
+-}
+-
+-UnitBucketList*
+-UnitBucketArray::getBucketAssocMapLoc( iXY map_loc )
+-{
+-    long bucket_index;
+-
+-    bucket_index = ((map_loc.y / map_y_sample_factor) * column_size) +
+-                   (map_loc.x / map_x_sample_factor);
+-
+-    assert( bucket_index &lt; (long) size );
+-
+-    return( &amp;(buckets[ bucket_index ]) );
+-}
+-
+-void
+-UnitBucketArray::addUnit( Unit *unit )
+-{
+-    long bucket_index;
+-
+-    bucket_index = ((unit-&gt;unit_state.location.y / pixel_y_sample_factor) * column_size) +
+-                   (unit-&gt;unit_state.location.x / pixel_x_sample_factor);
+-
+-    assert( bucket_index &lt; (long) size );
+-
+-    buckets[ bucket_index ].push_front( unit );
+-}
+-
+-struct
+-FindUnit
+-{
+-    UnitID toFind;
+-    FindUnit(UnitID u) : toFind(u) {}
+-    bool operator()(Unit* ub)
+-    {
+-        return ub-&gt;id == toFind;
+-    }
+-};
+-
+-long
+-UnitBucketArray::getUnitBucketIndex(UnitID unit_id)
+-{
+-    UnitBucketList::iterator iter;
+-    for( unsigned long bucket_index = 0; bucket_index &lt; size; bucket_index++ )
+-    {
+-        iter = std::find_if( buckets[bucket_index].begin(),
+-                             buckets[bucket_index].end(), FindUnit(unit_id));
+-
+-        if ( iter != buckets[bucket_index].end() )
++        for (iter = uli.begin(); iter != uli.end(); /* nothing */)
+         {
+-            return (long) bucket_index;
+-        }
+-    }
++            real_index = worldLocToBucketIndex( (*iter)-&gt;unit_state.location );
+ 
+-    return -1;
+-}
+-
+-Unit*
+-UnitBucketArray::getUnit(UnitID unit_id, unsigned long bucket_index)
+-{
+-    UnitBucketList::iterator iter;
+-
+-    iter = std::find_if( buckets[bucket_index].begin(),
+-                         buckets[bucket_index].end(), FindUnit(unit_id));
+-
+-    if ( iter != buckets[bucket_index].end() )
+-    {
+-        return *iter;
+-    }
+-
+-    return 0;
+-}
+-
+-Unit* UnitBucketArray::getUnitAtWorldLoc(UnitID unit_id, iXY world_loc)
+-{
+-    long bucket_index;
+-
+-    bucket_index = ((world_loc.y / pixel_y_sample_factor) * column_size) +
+-                   (world_loc.x / pixel_x_sample_factor);
+-
+-    assert( bucket_index &lt; (long) size );
+-
+-    UnitBucketList::iterator iter;
+-    iter = std::find_if( buckets[bucket_index].begin(),
+-                         buckets[bucket_index].end(), FindUnit(unit_id));
+-
+-    if ( iter != buckets[bucket_index].end() )
+-    {
+-        return *iter;
+-    }
+-
+-    return 0;
+-}
+-
+-Unit*
+-UnitBucketArray::getUnitAtMapLoc(UnitID unit_id, iXY map_loc)
+-{
+-    long bucket_index;
+-
+-    bucket_index = ((map_loc.y / map_y_sample_factor) * column_size) +
+-                   (map_loc.x / map_x_sample_factor);
+-
+-    assert( bucket_index &lt; (long) size );
+-    UnitBucketList::iterator iter;
+-    iter = std::find_if( buckets[bucket_index].begin(),
+-                         buckets[bucket_index].end(), FindUnit(unit_id));
+-
+-    if ( iter != buckets[bucket_index].end() )
+-    {
+-        return *iter;
+-    }
+-
+-    return 0;
+-}
+-
+-bool
+-UnitBucketArray::moveUnit(UnitID unit_id, unsigned long from_bucket_index,
+-			       unsigned long to_bucket_index )
+-{
+-    assert(from_bucket_index &lt; size);
+-    assert(to_bucket_index &lt; size);
+-
+-    UnitBucketList::iterator iter = std::find_if( buckets[from_bucket_index].begin(),
+-                                                  buckets[from_bucket_index].end(),
+-                                                  FindUnit(unit_id));
+-
+-    if ( iter != buckets[from_bucket_index].end() )
+-    {
+-        buckets[ to_bucket_index ].push_front( *iter );
+-        buckets[ from_bucket_index ].erase( iter );
+-    }
+-    else
+-    {
+-        long from_bucket_index = getUnitBucketIndex( unit_id );
+-        if(from_bucket_index != -1)
+-        {
+-            return( moveUnit( unit_id, from_bucket_index, to_bucket_index ) );
++            if( real_index != index )
++            {
++                getBucket(real_index).push_back(*iter);
++                iter = uli.erase(iter);
++            }
++            else
++            {
++                ++iter;
++            }
+         }
+-        else
+-        {
+-            return false;
+-        }
+     }
+-
+-    return true;
+ }
+-
+-void
+-UnitBucketArray::removeUnit( Unit *unit )
+-{
+-    long bucket_index;
+-
+-    bucket_index = worldLocToBucketIndex( unit-&gt;unit_state.location );
+-    buckets[bucket_index].remove(unit);
+-}
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-02-21 02:34:05 UTC (rev 1093)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitBucketArray.hpp	2009-02-21 10:16:23 UTC (rev 1094)
+@@ -22,132 +22,145 @@
+ #include &lt;list&gt;
+ #include &quot;Units/Unit.hpp&quot;
+ 
+-typedef std::list&lt;Unit *&gt; UnitBucketList;
++typedef std::vector&lt;Unit *&gt; UnitList;
++typedef std::vector&lt;UnitList&gt; BucketList;
+ 
+ class UnitBucketArray // : public UnitBucketArrayTemplate
+ {
+ protected:
+-    std::vector&lt;UnitBucketList&gt; buckets;
++    BucketList buckets;
+     long map_x_sample_factor;
+     long map_y_sample_factor;
+     long pixel_x_sample_factor;
+     long pixel_y_sample_factor;
+-    iXY map_size;
+-    long map_size_x;
+-    long map_size_y;
+-    iXY tile_size;
+-    size_t size;
+     size_t row_size;
+     size_t column_size;
+ 
+-
+ public:
+ 
+-    UnitBucketArray( );
+-    ~UnitBucketArray( );
++    UnitBucketArray( ) {};
++    ~UnitBucketArray( ) {};
+ 
+-    size_t getSize() const
++    void sort();
++
++    void initialize( const iXY &amp; map_size, const iXY &amp; tile_size, long x_super_sample, long y_super_sample );
++    void initialize( const iXY &amp; map_size, const iXY &amp; tile_size)
+     {
+-        return size;
++        initialize( map_size, tile_size, 10, 10 );
+     }
++    
++    void moveUnit( Unit * unit, unsigned int from_bucket_index, unsigned int to_bucket_index )
++    {
++        UnitList &amp; uli = getBucket(from_bucket_index);
++        uli.erase(std::remove(uli.begin(), uli.end(), unit), uli.end());
++        getBucket(to_bucket_index).push_back(unit);
++    }
+ 
+-    UnitBucketList * getBucket(size_t bucket_index)
++    void cleanUp()
+     {
+-        assert( bucket_index &lt; size );
+-        return( &amp;(buckets[ bucket_index ]) );
++        buckets.clear();
+     }
+ 
+-    UnitBucketList * getBucket( size_t row, size_t column )
++    Unit * getUnitAtWorldLoc( const UnitID unit_id, const iXY &amp; world_loc)
+     {
+-        size_t bucket_index = (row * column_size) + column;
++        UnitList &amp; uli = getBucketAssocWorldLoc(world_loc);
++        UnitList::iterator iter;
++        iter = std::find_if( uli.begin(), uli.end(), FindUnit(unit_id));
++        return (iter != uli.end())?*iter:0;
++    }
+ 
+-        assert( bucket_index &lt; size );
+-        return( &amp;(buckets[ bucket_index ]) );
++    Unit * getUnitAtMapLoc( const UnitID unit_id, const iXY &amp; map_loc )
++    {
++        UnitList &amp; uli = getBucketAssocMapLoc(map_loc);
++        UnitList::iterator iter;
++        iter = std::find_if( uli.begin(), uli.end(), FindUnit(unit_id));
++        return (iter != uli.end())?*iter:0;
+     }
+ 
+-    void initialize( iXY map_size, iXY tile_size);
+-    void initialize( iXY map_size, iXY tile_size, long x_super_sample, long y_super_sample );
+-    void cleanUp();
++    void addUnit( Unit *unit )
++    {
++        getBucketAssocWorldLoc(unit-&gt;unit_state.location).push_back(unit);
++    }
+ 
+-    inline long getXSample( void )
++    void removeUnit( Unit *unit )
+     {
+-        return( map_x_sample_factor );
++        UnitList &amp; uli = getBucketAssocWorldLoc(unit-&gt;unit_state.location);
++        uli.erase(std::remove(uli.begin(), uli.end(), unit), uli.end());
+     }
+ 
+-    inline long getYSample( void )
++    unsigned int getSize() const
+     {
+-        return( map_y_sample_factor );
++        return buckets.size();
+     }
+ 
+-    inline iXY getSample( void )
++    UnitList &amp; getBucket(unsigned int bucket_index)
+     {
+-        return( iXY( map_x_sample_factor, map_y_sample_factor) );
++        assert( bucket_index &lt; getSize() );
++        return( buckets[ bucket_index ] );
+     }
+ 
+-    inline unsigned long mapLocToBucketIndex( iXY map_loc )
++    UnitList &amp; getBucket( unsigned int row, unsigned int column )
+     {
+-        long bucket_index;
++        return ( getBucket((row * column_size) + column) );
++    }
+ 
+-        bucket_index = ((map_loc.y / map_y_sample_factor) * column_size) +
+-                       (map_loc.x / map_x_sample_factor);
++    unsigned int mapLocToBucketIndex( const iXY &amp; map_loc )
++    {
++        return ((map_loc.y / map_y_sample_factor) * column_size)
++                + (map_loc.x / map_x_sample_factor);
++    }
+ 
+-        return( bucket_index );
++    unsigned int worldLocToBucketIndex( const iXY &amp; world_loc )
++    {
++        return ((world_loc.y / pixel_y_sample_factor) * column_size)
++                + (world_loc.x / pixel_x_sample_factor);
+     }
+ 
+-    inline unsigned long worldLocToBucketIndex( iXY world_loc )
++    void worldLocToBucketLoc( const iXY &amp; world_loc, iXY &amp; bucket_loc )
+     {
+-        long bucket_index;
++        bucket_loc.x = (world_loc.x-1) / pixel_x_sample_factor;
++        bucket_loc.y = (world_loc.y-1) / pixel_y_sample_factor;
++    }
+ 
+-        bucket_index = ((world_loc.y / pixel_y_sample_factor) * column_size) +
+-                       (world_loc.x / pixel_x_sample_factor);
+-
+-        return( bucket_index );
++    void worldRectToBucketRect( const iRect &amp; world_rect, iRect &amp;bucket_rect )
++    {
++        worldLocToBucketLoc(world_rect.min, bucket_rect.min);
++        worldLocToBucketLoc(world_rect.max, bucket_rect.max);
+     }
+ 
+-    inline iXY mapLocToBucketLoc( iXY map_loc )
++    void mapLocToBucketLoc( const iXY &amp; map_loc, iXY &amp; bucket_loc)
+     {
+-        return( iXY( (map_loc.x / map_x_sample_factor), (map_loc.y / map_y_sample_factor) ) );
++        bucket_loc.x = map_loc.x / map_x_sample_factor;
++        bucket_loc.y = map_loc.y / map_y_sample_factor;
+     }
+ 
+-    inline iXY worldLocToBucketLoc( iXY world_loc )
++    void mapRectToBucketRect( const iRect &amp; map_rect, iRect &amp;bucket_rect )
+     {
+-        return( iXY(  (world_loc.x / pixel_x_sample_factor) , (world_loc.y / pixel_y_sample_factor) ) );
++        mapLocToBucketLoc(map_rect.min, bucket_rect.min);
++        mapLocToBucketLoc(map_rect.max, bucket_rect.max);
+     }
+ 
+-    inline iRect worldRectToBucketRect( iRect &amp;world_rect )
++    UnitList &amp; getBucketAssocWorldLoc( const iXY &amp; world_loc )
+     {
+-        return( iRect( world_rect.min.x / pixel_x_sample_factor,
+-                       world_rect.min.y / pixel_y_sample_factor,
+-                       world_rect.max.x / pixel_x_sample_factor,
+-                       world_rect.max.y / pixel_y_sample_factor  )
+-              );
++        return getBucket(worldLocToBucketIndex(world_loc));
+     }
+ 
+-    iRect getWorldRectBucketUnits( iRect &amp;world_rect );
+-
+-    inline iRect mapRectToBucketRect( iRect &amp;map_rect )
++    UnitList &amp; getBucketAssocMapLoc( const iXY &amp; map_loc )
+     {
+-        return( iRect( map_rect.min.x / map_x_sample_factor,
+-                       map_rect.min.y / map_y_sample_factor,
+-                       map_rect.max.x / map_x_sample_factor,
+-                       map_rect.max.y / map_y_sample_factor  )
+-              );
++        return getBucket(mapLocToBucketIndex(map_loc));
+     }
++    
++private:
++    struct FindUnit
++    {
++        const UnitID toFind;
++        FindUnit(const UnitID u) : toFind(u) {}
++        bool operator()(Unit* ub) const
++        {
++            return ub-&gt;id == toFind;
++        }
++    };
+ 
+-    UnitBucketList * getBucketAssocWorldLoc( iXY world_loc );
+-    UnitBucketList * getBucketAssocMapLoc( iXY map_loc );
+-
+-    void addUnit( Unit *unit );
+-    void removeUnit( Unit *unit );
+-
+-    long getUnitBucketIndex( UnitID unit_id );
+-
+-    Unit * getUnit( UnitID unit_id, unsigned long bucket_index );
+-    Unit * getUnitAtWorldLoc( UnitID unit_id, iXY world_loc );
+-    Unit * getUnitAtMapLoc( UnitID unit_id, iXY map_loc );
+-
+-    bool moveUnit( UnitID unit_id, unsigned long from_bucket_index, unsigned long to_bucket_index );
+-
+ };
+ 
+ #endif // ** _UNIT_BUCKET_ARRAY_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-02-21 02:34:05 UTC (rev 1093)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.cpp	2009-02-21 10:16:23 UTC (rev 1094)
+@@ -20,8 +20,12 @@
+ #include &lt;iostream&gt;
+ #include &lt;algorithm&gt;
+ 
+-#include &quot;Units/UnitInterface.hpp&quot;
+-#include &quot;Units/UnitProfileInterface.hpp&quot;
++#include &quot;UnitInterface.hpp&quot;
++#include &quot;UnitProfileInterface.hpp&quot;
++#include &quot;UnitBucketArray.hpp&quot;
++#include &quot;UnitOpcodeDecoder.hpp&quot;
++#include &quot;UnitBlackBoard.hpp&quot;
++
+ #include &quot;Interfaces/PlayerInterface.hpp&quot;
+ #include &quot;Interfaces/MapInterface.hpp&quot;
+ #include &quot;Interfaces/WorldViewInterface.hpp&quot;
+@@ -34,7 +38,6 @@
+ #include &quot;Classes/Network/NetworkState.hpp&quot;
+ #include &quot;Classes/Network/NetMessageEncoder.hpp&quot;
+ #include &quot;Interfaces/Console.hpp&quot;
+-#include &quot;Units/UnitOpcodeDecoder.hpp&quot;
+ 
+ #include &quot;Classes/UnitMessageTypes.hpp&quot;
+ #include &quot;Classes/Network/PlayerNetMessage.hpp&quot;
+@@ -44,13 +47,12 @@
+ #include &quot;System/Sound.hpp&quot;
+ #include &quot;Particles/ParticleInterface.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+-#include &quot;UnitBlackBoard.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ 
+ //UnitList * UnitInterface::unit_lists;
+ UnitInterface::Units UnitInterface::units;
+-UnitInterface::PlayerUnitList* UnitInterface::playerUnitLists = 0;
++UnitInterface::PlayerUnitList UnitInterface::playerUnitLists;
+ UnitBucketArray UnitInterface::unit_bucket_array;
+ 
+ unsigned short UnitInterface::max_players;
+@@ -80,7 +82,7 @@
+     max_players = PlayerInterface::getMaxPlayers();
+ 
+     //unit_lists = new UnitList [ max_players ];
+-    playerUnitLists = new PlayerUnitList[max_players];
++    playerUnitLists.resize(max_players);
+ 
+     unit_bucket_array.initialize(MapInterface::getSize(), TileInterface::getTileSize() );
+ 
+@@ -97,25 +99,27 @@
+ {
+     unit_bucket_array.cleanUp();
+ 
+-    delete[] playerUnitLists;
+-    playerUnitLists = 0;
++    playerUnitLists.clear();
+ 
+     for(Units::iterator i = units.begin(); i != units.end(); ++i)
++    {
+         delete i-&gt;second;
++    }
+     units.clear();
+ }
+ 
+ void
+ UnitInterface::reset()
+ {
+-    for(size_t i = 0; i &lt; max_players; i++ ) {
+-        playerUnitLists[i].clear();
+-    }
++    playerUnitLists.clear();
++    playerUnitLists.resize(PlayerInterface::getMaxPlayers());
+ 
+     unit_bucket_array.initialize( MapInterface::getSize(), TileInterface::getTileSize() );
+ 
+-    for(Units::iterator i = units.begin(); i != units.end(); ++i)
++    for( Units::iterator i = units.begin();i != units.end(); ++i )
++    {
+         delete i-&gt;second;
++    }
+     units.clear();
+ }
+ 
+@@ -141,11 +145,16 @@
+ void
+ UnitInterface::sendMessage(const UnitMessage* message,const PlayerState* player)
+ {
+-    if (message-&gt;isFlagged(_umesg_flag_unique)) {
++    if (message-&gt;isFlagged(_umesg_flag_unique))
++    {
+         Unit* unit = getUnit(message-&gt;getUnitID());
+         if(unit == 0)
++        {
+             return;
+-        if(player &amp;&amp; unit-&gt;player != player) {
++        }
++        
++        if(player &amp;&amp; unit-&gt;player != player)
++        {
+             LOGGER.warning(
+                 &quot;Terminal request for unit (%u) not owned by player (%u).\n&quot;,
+                 unit-&gt;id, player-&gt;getID());
+@@ -153,21 +162,29 @@
+         }
+                     
+         unit-&gt;processMessage(message);
+-    } else if (message-&gt;isFlagged( _umesg_flag_broadcast) ) {
+-        if(message-&gt;message_id != _umesg_weapon_hit) {
++    }
++    else if (message-&gt;isFlagged( _umesg_flag_broadcast) )
++    {
++        if(message-&gt;message_id != _umesg_weapon_hit)
++        {
+             LOGGER.warning(&quot;Broadcast flag only allowed for weapon hit.&quot;);
+-            if(player) {
++            if(player)
++            {
+                 LOGGER.warning(&quot;from player %u.\n&quot;, player-&gt;getID());
+             }
+             return;
+         }
+             
+-        for(Units::iterator i = units.begin(); i != units.end(); ++i) {
++        for(Units::iterator i = units.begin(); i != units.end(); ++i)
++        {
+             Unit* unit = i-&gt;second;
+             unit-&gt;processMessage(message);
+         }
+-    } else if (message-&gt;isFlagged( _umesg_flag_manager_request) ) {
+-        if(player) {
++    }
++    else if (message-&gt;isFlagged( _umesg_flag_manager_request) )
++    {
++        if(player)
++        {
+             LOGGER.warning(
+                     &quot;UnitManagerMessage sent out by player %u not allowed.&quot;,
+                     player-&gt;getID());
+@@ -194,15 +211,10 @@
+     // delete the unit
+     unit_bucket_array.removeUnit(unit);
+ 
+-    PlayerUnitList&amp; plist =
+-        playerUnitLists[unit-&gt;player-&gt;getID()];
++    UnitList&amp; plist = playerUnitLists[unit-&gt;player-&gt;getID()];
+     
+-    PlayerUnitList::iterator pi
+-        = std::find(plist.begin(), plist.end(), unit);
+-    assert(pi != plist.end());
+-    if(pi != plist.end())
+-        plist.erase(pi);
+-
++    plist.erase(std::remove(plist.begin(), plist.end(), unit), plist.end());
++    
+     units.erase(i);
+     delete unit;
+ }
+@@ -211,10 +223,12 @@
+ 
+ void UnitInterface::updateUnitStatus()
+ {
+-    for(Units::iterator i = units.begin(); i != units.end(); /*nothing*/ ) {
++    for(Units::iterator i = units.begin(); i != units.end(); /*nothing*/ )
++    {
+         Unit* unit = i-&gt;second;
+ 	    
+-        if (unit-&gt;unit_state.lifecycle_state == _UNIT_LIFECYCLE_INACTIVE) {
++        if (unit-&gt;unit_state.lifecycle_state == _UNIT_LIFECYCLE_INACTIVE)
++        {
+             Units::iterator next = i;
+             ++next;
+             removeUnit(i);
+@@ -228,21 +242,25 @@
+         pre_update_bucket_index 
+             = unit_bucket_array.worldLocToBucketIndex(
+                     unit-&gt;unit_state.location );
++
+         unit-&gt;updateState();
+ 
+         post_update_bucket_index 
+             = unit_bucket_array.worldLocToBucketIndex(
+                     unit-&gt;unit_state.location );
+ 
+-        if ( post_update_bucket_index != pre_update_bucket_index ) {
+-            unit_bucket_array.moveUnit(unit-&gt;id,
++        if ( post_update_bucket_index != pre_update_bucket_index )
++        {
++            unit_bucket_array.moveUnit(unit,
+                     pre_update_bucket_index, post_update_bucket_index );
+         }
+         ++i;
+     }
+ 
+-    if ( NetworkState::status == _network_state_server ) {
+-        if (message_timer.count()) {
++    if ( NetworkState::status == _network_state_server )
++    {
++        if (message_timer.count())
++        {
+             opcode_encoder.send();
+         }
+     }
+@@ -252,12 +270,11 @@
+ {
+     iRect world_window_rect;
+     iRect bucket_rect;
+-    UnitBucketList *bucket_list;
+-    UnitBucketList::iterator bucket_iter;
++    UnitList::iterator bucket_iter;
+     Unit * unit = 0;
+ 
+     world_window_rect = sorter.getWorldWindow();
+-    bucket_rect = unit_bucket_array.getWorldRectBucketUnits(world_window_rect);
++    unit_bucket_array.worldRectToBucketRect(world_window_rect, bucket_rect);
+ 
+     for(long row_index = bucket_rect.min.y;
+             row_index &lt;= bucket_rect.max.y; row_index++ )
+@@ -265,10 +282,10 @@
+         for(long column_index = bucket_rect.min.x;
+                 column_index &lt;= bucket_rect.max.x; column_index++ )
+         {
+-            bucket_list = unit_bucket_array.getBucket(row_index, column_index);
++            UnitList &amp; bucket_list = unit_bucket_array.getBucket(row_index, column_index);
+ 
+-            for(bucket_iter = bucket_list-&gt;begin();
+-                    bucket_iter != bucket_list-&gt;end(); ++bucket_iter)
++            for(bucket_iter = bucket_list.begin();
++                    bucket_iter != bucket_list.end(); ++bucket_iter)
+             {
+                 unit = *bucket_iter;
+ 
+@@ -301,12 +318,6 @@
+ 
+                     sorter.forceAddSprite( &amp;(unit-&gt;body_anim_shadow) );
+                 }
+-
+-
+-
+-
+-
+-//                (*bucket_iter)-&gt;offloadGraphics(sorter);
+             }
+         }
+     }
+@@ -361,49 +372,19 @@
+ {
+     units.insert(std::make_pair(unit-&gt;id, unit));
+    
+-    Uint16 player_index = unit-&gt;player-&gt;getID();
+-    playerUnitLists[player_index].push_back(unit);
++    playerUnitLists[unit-&gt;player-&gt;getID()].push_back(unit);
+ 
+     unit_bucket_array.addUnit(unit);
+ }
+ 
+ // ******************************************************************
+ 
+-void UnitInterface::sortBucketArray()
+-{
+-    unsigned long bucket_count;
+-    unsigned long bucket_index;
+-    UnitBucketList *bucket_list;
+-    UnitBucketList::iterator bucket_iter;
+-
+-
+-    bucket_count = unit_bucket_array.getSize();
+-
+-    for( bucket_index = 0; bucket_index &lt; bucket_count; bucket_index++ ) {
+-        bucket_list = unit_bucket_array.getBucket( bucket_index );
+-
+-        for (bucket_iter = bucket_list-&gt;begin(); bucket_iter != bucket_list-&gt;end();
+-                    ++bucket_iter)
+-        {
+-            unsigned long unit_bucket_index;
+-
+-            unit_bucket_index = unit_bucket_array.worldLocToBucketIndex( (*bucket_iter)-&gt;unit_state.location );
+-
+-            if( unit_bucket_index != bucket_index ) {
+-                unit_bucket_array.moveUnit( (*bucket_iter)-&gt;id,
+-                        bucket_index, unit_bucket_index );
+-            }
+-        }
+-    }
+-}
+-
+-// ******************************************************************
+-
+ Unit*
+ UnitInterface::getUnit(UnitID id)
+ {
+     Units::iterator i = units.find(id);
+-    if(i == units.end()) {
++    if(i == units.end())
++    {
+         return 0;
+     }
+ 
+@@ -416,7 +397,9 @@
+                                       Uint16 player_id)
+ {
+     if (playerUnitLists[player_id].size() &gt;= units_per_player)
+-	return 0;
++    {
++        return 0;
++    }
+ 
+     Unit* unit = newUnit(unit_type, location, player_id, newUnitID());
+     addNewUnit(unit);
+@@ -440,10 +423,12 @@
+ 
+     unit_placement_matrix.reset( location );
+ 
+-    for ( unit_type_index = 0; unit_type_index &lt; UnitProfileInterface::getNumUnitTypes(); unit_type_index++ ) {
++    for ( unit_type_index = 0; unit_type_index &lt; UnitProfileInterface::getNumUnitTypes(); unit_type_index++ )
++    {
+ 
+         unit_spawn_count = unit_config.getSpawnUnitCount( unit_type_index );
+-        for ( unit_spawn_index = 0; unit_spawn_index &lt; unit_spawn_count; unit_spawn_index++ ) {
++        for ( unit_spawn_index = 0; unit_spawn_index &lt; unit_spawn_count; unit_spawn_index++ )
++        {
+             unit_placement_matrix.getNextEmptyLoc( &amp;next_loc );
+             unit = createUnit(unit_type_index, next_loc, player_id);
+ 
+@@ -463,8 +448,10 @@
+ UnitInterface::queryUnitsAt(std::vector&lt;UnitID&gt;&amp; working_list,
+         const iXY&amp; point, Uint16 player_id, unsigned char search_flags)
+ {
+-    for(Units::iterator i = units.begin(); i != units.end(); ++i) {
+-        Unit* unit = i-&gt;second;
++    UnitList &amp; ubl = unit_bucket_array.getBucketAssocWorldLoc(point);
++    for(UnitList::iterator i = ubl.begin(); i != ubl.end(); ++i)
++    {
++        Unit* unit = *i;
+         if(!unit-&gt;unit_state.bounds(point))
+             continue;
+ 
+@@ -552,30 +539,35 @@
+     Unit *closest_unit = 0;
+     long closest_magnitude = 0;
+     iRect bucket_rect;
+-    UnitBucketList *bucket_list;
+-    UnitBucketList::iterator bucket_iter;
++    UnitList::iterator bucket_iter;
+ 
+-    bucket_rect = unit_bucket_array.worldRectToBucketRect( bounding_rect );
++    unit_bucket_array.worldRectToBucketRect( bounding_rect, bucket_rect );
+ 
+-    for( long row_index = bucket_rect.min.y; row_index &lt;= bucket_rect.max.y; row_index++ ) {
+-        for( long column_index = bucket_rect.min.x; column_index &lt;= bucket_rect.max.x; column_index++ ) {
+-            bucket_list = unit_bucket_array.getBucket( row_index, column_index );
++    for( long row_index = bucket_rect.min.y; row_index &lt;= bucket_rect.max.y; row_index++ )
++    {
++        for( long column_index = bucket_rect.min.x; column_index &lt;= bucket_rect.max.x; column_index++ )
++        {
++            UnitList &amp;bucket_list = unit_bucket_array.getBucket( row_index, column_index );
+ 
+-            for ( bucket_iter = bucket_list-&gt;begin();
+-                    bucket_iter != bucket_list-&gt;end(); ++bucket_iter)
++            for ( bucket_iter = bucket_list.begin();
++                    bucket_iter != bucket_list.end(); ++bucket_iter)
+             {
+                 iXY delta;
+                 long temp_mag;
+ 
+-                if ( closest_unit == 0 ) {
++                if ( closest_unit == 0 )
++                {
+                     closest_unit = *bucket_iter;
+                     delta  = loc - (*bucket_iter)-&gt;unit_state.location;
+                     closest_magnitude = long(delta.mag2());
+-                } else {
++                }
++                else
++                {
+                     delta  = loc - (*bucket_iter)-&gt;unit_state.location;
+                     temp_mag = long(delta.mag2());
+ 
+-                    if ( closest_magnitude &gt; temp_mag ) {
++                    if ( closest_magnitude &gt; temp_mag )
++                    {
+                         closest_unit = *bucket_iter;
+                         closest_magnitude = temp_mag;
+                     }
+@@ -584,7 +576,8 @@
+         }
+     }
+ 
+-    if( closest_unit != 0 ) {
++    if( closest_unit != 0 )
++    {
+         *closest_unit_ptr = closest_unit;
+         return true;
+     }
+@@ -687,7 +680,8 @@
+ 
+ void UnitInterface::processManagerMessage(const UnitMessage* message)
+ {
+-    switch(message-&gt;message_id) {
++    switch(message-&gt;message_id)
++    {
+         case _umesg_end_lifecycle:
+             unitManagerMesgEndLifecycle(message);
+             break;
+@@ -833,13 +827,14 @@
+ 
+ void UnitInterface::unitSyncIntegrityCheckMessage(const NetMessage* )
+ {
+-    sortBucketArray();
++    unit_bucket_array.sort();
+ }
+ 
+ // ******************************************************************
+ void UnitInterface::processNetMessage(const NetMessage* net_message)
+ {
+-    switch(net_message-&gt;message_id)  {
++    switch(net_message-&gt;message_id)
++    {
+         case _net_message_id_ini_sync_mesg:
+             unitSyncMessage(net_message);
+             break;
+@@ -877,9 +872,9 @@
+     UMesgSelfDestruct self_destruct;
+     self_destruct.setHeader(0, _umesg_flag_unique);
+ 
+-    PlayerUnitList&amp; unitlist = playerUnitLists[player_id];
+-    for(PlayerUnitList::iterator i = unitlist.begin();
+-            i != unitlist.end(); ++i) {
++    UnitList&amp; unitlist = playerUnitLists[player_id];
++    for(UnitList::iterator i = unitlist.begin(); i != unitlist.end(); ++i)
++    {
+         Unit* unit = *i;
+         unit-&gt;processMessage(&amp;self_destruct);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2009-02-21 02:34:05 UTC (rev 1093)
++++ trunk/netpanzer/src/NetPanzer/Units/UnitInterface.hpp	2009-02-21 10:16:23 UTC (rev 1094)
+@@ -42,11 +42,11 @@
+ {
+ public:
+     typedef std::map&lt;UnitID, Unit*&gt; Units;
+-    typedef std::vector&lt;Unit*&gt; PlayerUnitList;
++    typedef std::vector&lt;UnitList&gt; PlayerUnitList;
+     
+ private:
+     static Units units;
+-    static PlayerUnitList* playerUnitLists;
++    static PlayerUnitList playerUnitLists;
+         
+     static UnitBucketArray unit_bucket_array;
+     static unsigned short max_players;
+@@ -63,8 +63,6 @@
+     static void addNewUnit(Unit *unit);
+     static void removeUnit(Units::iterator i);
+ 
+-    static void sortBucketArray();
+-
+ public:
+     static void initialize( unsigned long max_units );
+     static void cleanUp();
+@@ -75,7 +73,7 @@
+         return units;
+     }
+ 
+-    static const PlayerUnitList&amp; getPlayerUnits(Uint16 player_id)
++    static const UnitList&amp; getPlayerUnits(Uint16 player_id)
+     {
+         assert(player_id &lt; max_players);
+         return playerUnitLists[player_id];
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000125.html">[Netpanzer-cvs] r1093 - in trunk/netpanzer: nbproject	src/Lib/ArrayUtil src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/AI src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Units src/NetPanzer/Views/Components
+</A></li>
+	<LI>Next message: <A HREF="000127.html">[Netpanzer-cvs] r1095 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Units
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

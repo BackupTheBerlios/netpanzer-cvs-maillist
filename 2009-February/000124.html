@@ -1,0 +1,649 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1092 - in trunk/netpanzer: nbproject	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Options
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2009-February/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1092%20-%20in%20trunk/netpanzer%3A%20nbproject%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Particles%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200902171544.n1HFimgJ015154%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000123.html">
+   <LINK REL="Next"  HREF="000125.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1092 - in trunk/netpanzer: nbproject	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Options</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1092%20-%20in%20trunk/netpanzer%3A%20nbproject%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Particles%20src/NetPanzer/Views/Components%0A%09src/NetPanzer/Views/Game%20src/NetPanzer/Views/MainMenu%0A%09src/NetPanzer/Views/MainMenu/Options&In-Reply-To=%3C200902171544.n1HFimgJ015154%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1092 - in trunk/netpanzer: nbproject	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Views/Components	src/NetPanzer/Views/Game src/NetPanzer/Views/MainMenu	src/NetPanzer/Views/MainMenu/Options">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Tue Feb 17 16:44:48 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000123.html">[Netpanzer-cvs] r1091 -	trunk/netpanzer/pics/backgrounds/menus/buttons/default
+</A></li>
+        <LI>Next message: <A HREF="000125.html">[Netpanzer-cvs] r1093 - in trunk/netpanzer: nbproject	src/Lib/ArrayUtil src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/AI src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Units src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#124">[ date ]</a>
+              <a href="thread.html#124">[ thread ]</a>
+              <a href="subject.html#124">[ subject ]</a>
+              <a href="author.html#124">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2009-02-17 16:44:20 +0100 (Tue, 17 Feb 2009)
+New Revision: 1092
+
+Removed:
+   trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp
+Modified:
+   trunk/netpanzer/nbproject/configurations.xml
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+Log:
+- Removed some unused code.
+- Added mouse move event and modifed mouse handling functions.
+Note: These are some changes I had some time ago and needed to commit.
+
+
+Modified: trunk/netpanzer/nbproject/configurations.xml
+===================================================================
+--- trunk/netpanzer/nbproject/configurations.xml	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/nbproject/configurations.xml	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -385,7 +385,6 @@
+           &lt;itemPath&gt;src/NetPanzer/Particles/CraterParticle2D.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Particles/DirtKickParticle2D.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Particles/DirtKickParticle2D.hpp&lt;/itemPath&gt;
+-          &lt;itemPath&gt;src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Particles/FireParticle2D.cpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Particles/FireParticle2D.hpp&lt;/itemPath&gt;
+           &lt;itemPath&gt;src/NetPanzer/Particles/FireParticleSystem2D.cpp&lt;/itemPath&gt;
+@@ -1695,9 +1694,6 @@
+       &lt;item path=&quot;src/NetPanzer/Particles/DirtKickParticle2D.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Particles/FireParticle2D.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -3398,9 +3394,6 @@
+       &lt;item path=&quot;src/NetPanzer/Particles/DirtKickParticle2D.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Particles/FireParticle2D.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -5101,9 +5094,6 @@
+       &lt;item path=&quot;src/NetPanzer/Particles/DirtKickParticle2D.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Particles/FireParticle2D.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+@@ -6804,9 +6794,6 @@
+       &lt;item path=&quot;src/NetPanzer/Particles/DirtKickParticle2D.hpp&quot;&gt;
+         &lt;itemTool&gt;3&lt;/itemTool&gt;
+       &lt;/item&gt;
+-      &lt;item path=&quot;src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp&quot;&gt;
+-        &lt;itemTool&gt;3&lt;/itemTool&gt;
+-      &lt;/item&gt;
+       &lt;item path=&quot;src/NetPanzer/Particles/FireParticle2D.cpp&quot;&gt;
+         &lt;itemTool&gt;1&lt;/itemTool&gt;
+       &lt;/item&gt;
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionList.cpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -264,4 +264,3 @@
+ 
+     unit_list.clear();
+ }
+-
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Classes/SelectionList.hpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -29,16 +29,11 @@
+ public:
+     std::vector&lt;UnitID&gt; unit_list;
+ 
+-    SelectionList( )
+-        : unit_cycle_index(0)
+-    { }
++    SelectionList( ) : unit_cycle_index(0) {}
+ 
+     bool selectUnit( iXY point );
+-
+     bool addUnit( iXY point );
+-
+     bool selectTarget( iXY point );
+-
+     bool selectBounded(iRect bounds, bool addunits);
+     bool selectSameTypeVisible(iXY point, bool addunits);
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -77,17 +77,9 @@
+     outpost_goal_selection = OBJECTIVE_NONE;
+     manual_fire_state = false;
+ 
+-    right_mouse_scroll = false;
+     right_mouse_scroll_moved = false;
+ }
+ 
+-void
+-WorldInputCmdProcessor::switchSelectionList(unsigned long new_list_index)
+-{
+-    working_list.copyList( selection_group_lists[ new_list_index ] );
+-    working_list.select();
+-}
+-
+ void WorldInputCmdProcessor::setSelectionList(unsigned long new_list_index)
+ {
+     selection_group_lists[new_list_index].copyList(working_list);
+@@ -117,33 +109,6 @@
+ 
+     scroll_increment = (long) (scroll_rate * time_slice);
+ 
+-    if(right_mouse_scroll)
+-    {
+-        int x,y;
+-        int buttons=SDL_GetMouseState(&amp;x,&amp;y);
+-        if(!(buttons&amp;SDL_BUTTON(SDL_BUTTON_RIGHT)))
+-        {
+-            // sometimes the winning page or something comes up
+-            //  as you're holding down the right mouse button
+-            //  and the UP message doesn't come through
+-            right_mouse_scroll=false;
+-        }
+-        else if(mouse_pos.x!=right_mouse_scroll_pos.x || mouse_pos.y!=right_mouse_scroll_pos.y)
+-        {
+-            // we're holding down the right mouse button, and mouse has moved
+-            int x_move=mouse_pos.x-right_mouse_scroll_pos.x;
+-            int y_move=mouse_pos.y-right_mouse_scroll_pos.y;
+-            SDL_WarpMouse(right_mouse_scroll_pos.x,right_mouse_scroll_pos.y);
+-
+-            WorldViewInterface::scroll_right(x_move*4);
+-            WorldViewInterface::scroll_down(y_move*4);
+-            right_mouse_scrolled_pos.x+=x_move;
+-            right_mouse_scrolled_pos.y+=y_move;
+-            right_mouse_scroll_moved = true;
+-        }
+-        return;
+-    }
+-
+     if(((bool)gameconfig-&gt;fullscreen)!=true) {
+         // don't do border scrolling on windowed mode because
+         //  the window isn't always on the edge of the screen.
+@@ -559,27 +524,52 @@
+     WorldViewInterface::clientXYtoWorldXY( world_win, mouse_pos, &amp;world_pos );
+     setMouseCursor(getCursorStatus(world_pos));
+ 
+-    if(selection_box_active) {
+-        box_release = world_pos;
+-        if(abs(box_release.x - box_press.x) &gt; 3
+-                    &amp;&amp; abs(box_release.y - box_press.y) &gt; 3) {
+-            selectBoundBoxUnits();
+-        }
+-    }
+-
+-    while( !MouseInterface::event_queue.empty() ) {
++    while( !MouseInterface::event_queue.empty() )
++    {
+         MouseEvent event = MouseInterface::event_queue.front();
+         MouseInterface::event_queue.pop_front();
+ 
+-        if( event.button == MouseInterface::left_button )
+-            evalLeftMButtonEvents(event);
+ 
+-        if( event.button == MouseInterface::right_button )
++        if ( event.event == MouseEvent::EVENT_MOVE )
++        {
++            evalMouseMoveEvents(event);
++        }
++        else if( event.button == MouseInterface::left_button )
++        {
++            evalLeftMButtonEvents(event);
++        }
++        else if( event.button == MouseInterface::right_button )
++        {
+             evalRightMButtonEvents(event);
++        }
+     }
+ }
+ 
+ void
++WorldInputCmdProcessor::evalMouseMoveEvents(const MouseEvent&amp; event)
++{
++    iXY wpos;
++    WorldViewInterface::clientXYtoWorldXY( world_win, event.pos, &amp;wpos );
++
++    if ( selection_box_active )
++    {
++        box_release = wpos;
++        if(abs(box_release.x - box_press.x) &gt; 3
++                &amp;&amp; abs(box_release.y - box_press.y) &gt; 3)
++        {
++            selectBoundBoxUnits();
++        }
++    }
++
++    if ( event.button &amp; MouseInterface::right_button_mask )
++    {
++        WorldViewInterface::scroll_right(event.relpos.x*4);
++        WorldViewInterface::scroll_down(event.relpos.y*4);
++        right_mouse_scroll_moved = true;
++    }
++}
++
++void
+ WorldInputCmdProcessor::evalLeftMButtonEvents(const MouseEvent &amp;event)
+ {
+     iXY world_pos;
+@@ -587,22 +577,19 @@
+ 
+     WorldViewInterface::clientXYtoWorldXY(world_win, event.pos, &amp;world_pos);
+ 
+-    if ( (!selection_box_active)
+-         &amp;&amp; ( manual_fire_state == true
+-              || KeyboardInterface::getKeyState( SDLK_LCTRL )
+-              || KeyboardInterface::getKeyState( SDLK_RCTRL )
+-            )
+-       )
++    if (event.event == MouseEvent::EVENT_DOWN)
+     {
+-
+-        if (event.event == MouseEvent::EVENT_DOWN )
++        if ( (!selection_box_active)
++             &amp;&amp; ( manual_fire_state == true
++                 || KeyboardInterface::getKeyState( SDLK_LCTRL )
++                 || KeyboardInterface::getKeyState( SDLK_RCTRL )
++                )
++           )
+         {
+             sendManualFireCommand( world_pos );
++            return;
+         }
+ 
+-    }
+-    else if (event.event == MouseEvent::EVENT_DOWN)
+-    {
+         Objective *objective = 0;
+         click_status = ObjectiveInterface::quearyObjectiveLocationStatus(
+             world_pos, PlayerInterface::getLocalPlayerIndex(), &amp;objective);
+@@ -726,7 +713,13 @@
+                 break;
+ 
+             case _cursor_enemy_unit:
+-                sendAttackCommand(world_pos);
++                 if ( manual_fire_state != true
++                        &amp;&amp; !KeyboardInterface::getKeyState( SDLK_LCTRL )
++                        &amp;&amp; !KeyboardInterface::getKeyState( SDLK_RCTRL )
++                     )
++                 {
++                     sendAttackCommand(world_pos);
++                 }
+                 break;
+ 
+             case _cursor_make_allie:
+@@ -746,22 +739,17 @@
+     static NTimer mtimer(150);
+     if (event.event == MouseEvent::EVENT_DOWN )
+     {
+-        right_mouse_scroll=true;
+         right_mouse_scroll_moved = false;
+-        right_mouse_scroll_pos=event.pos;
+-        right_mouse_scrolled_pos.x=right_mouse_scrolled_pos.y=0;
+         mtimer.reset();
+     }
+     
+-    if (right_mouse_scroll &amp;&amp; event.event == MouseEvent::EVENT_UP )
++    if (event.event == MouseEvent::EVENT_UP )
+     {
+-        right_mouse_scroll=false;
+         if ( ! right_mouse_scroll_moved &amp;&amp; mtimer.isTimeOut() )
+         {
+             // simple right click on the same position after timeout
+             working_list.unGroup();
+         }
+-        return;
+     }
+ }
+ 
+@@ -822,6 +810,7 @@
+ 
+     if ( working_list.isSelected() == true ) {
+         target_list.selectTarget( world_pos );
++        LOGGER.warning(&quot;num units in list=%d&quot;, target_list.unit_list.size());
+ 
+         target_ptr = UnitInterface::getUnit( target_list.unit_list[0] );
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -35,9 +35,6 @@
+     ObjectiveID outpost_goal_selection; //number of the outpost, -1 if none
+     iXY output_pos_press;
+ 
+-    iXY right_mouse_scroll_pos;
+-    iXY right_mouse_scrolled_pos;
+-    bool right_mouse_scroll;
+     bool right_mouse_scroll_moved;
+     bool selectBoundBoxUnits();
+ 
+@@ -52,7 +49,6 @@
+     unsigned int current_selection_list_bits;
+     SelectionList target_list;
+ 
+-    void switchSelectionList(unsigned long new_list_index);
+     void setSelectionList(unsigned long new_list_index);
+     void cycleSelectedUnits(unsigned long new_list_index);
+ 
+@@ -70,6 +66,7 @@
+ 
+     void evalLeftMButtonEvents(const MouseEvent &amp;event);
+     void evalRightMButtonEvents(const MouseEvent &amp;event);
++    void evalMouseMoveEvents(const MouseEvent &amp;event);
+ 
+     void evaluateMouseEvents();
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.cpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -111,6 +111,22 @@
+     event_queue.push_back(event);
+ }
+ 
++void
++MouseInterface::onMouseMoved(SDL_MouseMotionEvent* e)
++{
++    mouse_pos.x = e-&gt;x;
++    mouse_pos.y = e-&gt;y;
++
++    MouseEvent event;
++    event.event = MouseEvent::EVENT_MOVE;
++    event.button = e-&gt;state;
++    event.pos.x = e-&gt;x;
++    event.pos.y = e-&gt;y;
++    event.relpos.x = e-&gt;xrel;
++    event.relpos.y = e-&gt;yrel;
++    event_queue.push_back(event);
++}
++
+ void MouseInterface::setCursor(const char* cursorname)
+ {
+     cursors_t::iterator i = cursors.find(cursorname);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/MouseInterface.hpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -31,11 +31,13 @@
+ public:
+     enum {
+         EVENT_DOWN = SDL_MOUSEBUTTONDOWN,
+-        EVENT_UP = SDL_MOUSEBUTTONUP
++        EVENT_UP = SDL_MOUSEBUTTONUP,
++        EVENT_MOVE = SDL_MOUSEMOTION
+     };
+     unsigned char button;
+     unsigned char event;
+     iXY pos;
++    iXY relpos;
+ };
+ 
+ typedef std::deque&lt;MouseEvent&gt; MouseEventQueue;
+@@ -106,11 +108,7 @@
+     static void manageClickTimer();
+ 
+     static void setCursor(const char* cursorname);
+-    static inline void onMouseMoved(SDL_MouseMotionEvent *e)
+-    {
+-        mouse_pos.x = e-&gt;x;
+-        mouse_pos.y = e-&gt;y;
+-    }
++    static void onMouseMoved(SDL_MouseMotionEvent *e);
+     
+     static inline iXY getMousePosition()   { return mouse_pos; }
+     
+
+Deleted: trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Particles/ExplosionFlashParticle2D.hpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -1,52 +0,0 @@
+-/*
+-Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+- 
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+- 
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+- 
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#ifndef __FlashParticle2D_hpp__
+-#define __FlashParticle2D_hpp__
+-
+-
+-
+-#include &quot;ExplosionFireParticle2D.hpp&quot;
+-
+-
+-// FlashParticle2D
+-//--------------------------------------------------------------------------
+-class FlashParticle2D : public ExplosionFireParticle2D
+-{
+-public:
+-    FlashParticle2D(fXYZ pos, int xSize);
+-
+-    static void init();
+-
+-protected:
+-    int xSize;
+-
+-    Surface static flashSprite;
+-    //Surface static explosionLightSprite1;
+-
+-    //SpriteBltBrightness explosionLightSurface0;
+-    //SpriteBltBrightness explosionLightSurface1;
+-    SpriteBltBlendScale flashSurface;
+-    //SpriteBltBlendScale explosionLightSurface1;
+-
+-    virtual void draw(const Surface &amp;dest, SpriteSorter &amp;sorter);
+-
+-}
+-; // end FlashParticle2D
+-
+-#endif // __FlashParticle2D_hpp__
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Views/Components/Desktop.cpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -322,13 +322,6 @@
+     prevButton   = curButton;
+     prevMousePos = mousePos;
+ 
+-    //mouseView = findViewContaining(mousePos);
+-    unsigned effActions = mouseActions;
+-    if (mouseView != 0 &amp;&amp; effActions == 0)
+-    {
+-        effActions = mouseView-&gt;getMouseActions(mousePos-mouseView-&gt;min);
+-    }
+-
+     if (focus != 0)
+     {
+         focus-&gt;processEvents();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/GameView.cpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -1,9 +1,3 @@
+-
+-#include &quot;2D/Surface.hpp&quot;
+-
+-
+-#include &quot;GameView.hpp&quot;
+-
+ /*
+ Copyright (C) 1998 Pyrosoft Inc. (www.pyrosoftgames.com), Matthew Bogue
+  
+@@ -37,6 +31,7 @@
+ #include &quot;Particles/ParticleSystem2D.hpp&quot;
+ #include &quot;Views/Components/ViewGlobals.hpp&quot;
+ #include &quot;Particles/ParticleInterface.hpp&quot;
++#include &quot;2D/Surface.hpp&quot;
+ #include &quot;2D/PackedSurface.hpp&quot;
+ #include &quot;Views/Game/VehicleSelectionView.hpp&quot;
+ #include &quot;PowerUps/PowerUpInterface.hpp&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.cpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -162,7 +162,6 @@
+ 
+     loadBackgroundSurface();
+     loadTitleSurface();
+-    loadNetPanzerLogo();
+ 
+     SpecialButtonView::doActivate();
+ } // end doActivate
+@@ -208,16 +207,6 @@
+ {
+ } // end doDeactivate
+ 
+-//---------------------------------------------------------------------------
+-void MenuTemplateView::loadNetPanzerLogo()
+-{} // end MenuTemplateView::loadNetPanzerLogo
+-
+-// processEvents
+-//---------------------------------------------------------------------------
+-void MenuTemplateView::processEvents()
+-{
+-} // end MenuTemplateView::processEvents
+-
+ void
+ MenuTemplateView::onComponentClicked(Component* c)
+ {
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/MenuTemplateView.hpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -28,8 +28,6 @@
+ class MenuTemplateView : public SpecialButtonView
+ {
+ protected:
+-    static  void loadNetPanzerLogo();
+-
+     virtual void loadBackgroundSurface();
+     virtual void loadTitleSurface();
+ 
+@@ -48,7 +46,6 @@
+     virtual void doDraw();
+     virtual void doActivate();
+     virtual void doDeactivate();
+-    virtual void processEvents();
+ 
+     void initInGameOptionButtons();
+     void initPreGameOptionButtons();
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -165,13 +165,6 @@
+ 
+ } // end VisualsView::doDraw
+ 
+-// processEvents
+-//---------------------------------------------------------------------------
+-void VisualsView::processEvents()
+-{
+-    OptionsTemplateView::processEvents();
+-} // end VisualsView::processEvents
+-
+ // loadTitleSurface
+ //---------------------------------------------------------------------------
+ void VisualsView::loadTitleSurface()
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2009-02-02 13:02:17 UTC (rev 1091)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2009-02-17 15:44:20 UTC (rev 1092)
+@@ -76,7 +76,6 @@
+     VisualsView();
+ 
+     virtual void doDraw();
+-    virtual void processEvents();
+     virtual void initButtons();
+     virtual void stateChanged(Component* source);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000123.html">[Netpanzer-cvs] r1091 -	trunk/netpanzer/pics/backgrounds/menus/buttons/default
+</A></li>
+	<LI>Next message: <A HREF="000125.html">[Netpanzer-cvs] r1093 - in trunk/netpanzer: nbproject	src/Lib/ArrayUtil src/NetPanzer/Bot src/NetPanzer/Classes	src/NetPanzer/Classes/AI src/NetPanzer/Classes/Network	src/NetPanzer/Interfaces src/NetPanzer/Network	src/NetPanzer/Objectives src/NetPanzer/PowerUps	src/NetPanzer/Units src/NetPanzer/Views/Components
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#124">[ date ]</a>
+              <a href="thread.html#124">[ thread ]</a>
+              <a href="subject.html#124">[ subject ]</a>
+              <a href="author.html#124">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

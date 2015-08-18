@@ -1,0 +1,979 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1376 - in trunk/netpanzer: . src/NetPanzer/Network
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2012-August/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1376%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Network&In-Reply-To=%3C20120830113208.45B3155B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000399.html">
+   <LINK REL="Next"  HREF="000401.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1376 - in trunk/netpanzer: . src/NetPanzer/Network</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1376%20-%20in%20trunk/netpanzer%3A%20.%20src/NetPanzer/Network&In-Reply-To=%3C20120830113208.45B3155B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1376 - in trunk/netpanzer: . src/NetPanzer/Network">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Thu Aug 30 13:32:08 CEST 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000399.html">[Netpanzer-cvs] r1375 - trunk/netpanzer/src/NetPanzer/Network
+</A></li>
+        <LI>Next message: <A HREF="000401.html">[Netpanzer-cvs] r1377 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#400">[ date ]</a>
+              <a href="thread.html#400">[ thread ]</a>
+              <a href="subject.html#400">[ subject ]</a>
+              <a href="author.html#400">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2012-08-30 13:32:07 +0200 (Thu, 30 Aug 2012)
+New Revision: 1376
+
+Modified:
+   trunk/netpanzer/
+   trunk/netpanzer/SConstruct
+   trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp
+   trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp
+Log:
+Fix missing include path when compiling on windows
+
+
+Property changes on: trunk/netpanzer
+___________________________________________________________________
+Modified: svn:ignore
+   - netpanzer
+.sconsign.dblite
+releases
+RELEASE_VERSION
+nb-netpanzer-debug
+nbproject
+build
+.dep.inc
+Makefile
+nb-netpanzer-debug-svn
+
+   + stderr.txt
+LICENSE.mikmod.txt
+LICENSE.smpeg.txt
+SDL.dll
+nb-netpanzer-debug-svn
+smpeg.dll
+.sconsign.dblite
+releases
+libFLAC-8.dll
+libvorbisfile-3.dll
+LICENSE.ogg-vorbis.txt
+LICENSE.FLAC.txt
+nb-netpanzer-debug
+build
+libvorbis-0.dll
+libogg-0.dll
+SDL_mixer.dll
+netpanzer
+netpanzer-debug.exe
+libmikmod-2.dll
+RELEASE_VERSION
+nbproject
+.dep.inc
+Makefile
+
+
+Modified: trunk/netpanzer/SConstruct
+===================================================================
+--- trunk/netpanzer/SConstruct	2012-08-29 22:01:55 UTC (rev 1375)
++++ trunk/netpanzer/SConstruct	2012-08-30 11:32:07 UTC (rev 1376)
+@@ -229,6 +229,7 @@
+     env.Append( LIBS = [ 'ws2_32', 'mingw32', 'SDLMain', 'SDL' ] )
+     env.Append( CCFLAGS = [ '-D_WIN32_WINNT=0x0501' ] )
+     networkenv.Append( CCFLAGS = [ '-D_WIN32_WINNT=0x0501' ] )
++    networkenv.Append( CPPPATH = [ 'C:/mingw/include/SDL' ] )
+     env.Append( _LIBFLAGS = [ '-mwindows' ] )
+     env.Prepend( _LIBFLAGS = [ 'c:/mingw/lib/SDL_mixer.lib' ] )
+     env['WINICON'] = env.RES( 'support/icon/npicon.rc' )
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp	2012-08-29 22:01:55 UTC (rev 1375)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.cpp	2012-08-30 11:32:07 UTC (rev 1376)
+@@ -1,325 +1,325 @@
+-/*
+-Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#include &quot;HTTPClientSocket.hpp&quot;
+-#include &quot;Util/Log.hpp&quot;
+-
+-#include &lt;sstream&gt;
+-
+-HTTPClientSocket::HTTPClientSocket()
+-{
+-    request_method = &quot;GET&quot;;
+-    port = &quot;80&quot;;
+-}
+-
+-HTTPClientSocket::~HTTPClientSocket()
+-{
+-
+-}
+-
+-void HTTPClientSocket::setMethod(const std::string &amp;method)
+-{
+-    this-&gt;request_method.assign(method);
+-}
+-
+-void HTTPClientSocket::setHeader(const std::string &amp;name, const std::string &amp;value)
+-{
+-    request_headers[name] = value;
+-}
+-
+-void HTTPClientSocket::setContent(const std::vector&lt;uint8_t&gt; request_content)
+-{
+-    this-&gt;request_content.assign(request_content.begin(), request_content.end());
+-
+-    std::stringstream ss;
+-    ss &lt;&lt; request_content.size();
+-    request_headers[&quot;content-length&quot;] = ss.str();
+-}
+-
+-void HTTPClientSocket::setHost(const std::string &amp;host)
+-{
+-    this-&gt;host.assign(host);
+-}
+-
+-void HTTPClientSocket::setPort(const std::string &amp;port)
+-{
+-    this-&gt;port.assign(port);
+-}
+-
+-void HTTPClientSocket::setPath(const std::string &amp;path)
+-{
+-    this-&gt;path.assign(path);
+-}
+-
+-void HTTPClientSocket::doRequest()
+-{
+-    try
+-    {
+-        socket = new network::TCPSocket(host, port , this);
+-        state = sRESPONSE_PROTO;
+-    }
+-    catch (...)
+-    {
+-        if ( socket )
+-        {
+-            socket-&gt;destroy();
+-        }
+-        throw;
+-    }
+-}
+-
+-void HTTPClientSocket::onConnected(network::TCPSocket *so)
+-{
+-    LOGGER.debug(&quot;HTTPClientSocket connected&quot;);
+-    std::stringstream ss;
+-
+-    ss &lt;&lt; request_method &lt;&lt; &quot; <A HREF="http://">http://</A>&quot; &lt;&lt; host &lt;&lt; ':' &lt;&lt; port &lt;&lt; path &lt;&lt; &quot; HTTP/1.1\r\n&quot;
+-       &lt;&lt; &quot;Host: &quot; &lt;&lt; host &lt;&lt; ':' &lt;&lt; port &lt;&lt; &quot;\r\n&quot;
+-       &lt;&lt; &quot;Connection: close\r\n&quot;;
+-
+-    for ( headers::iterator i = request_headers.begin(); i != request_headers.end(); i++ )
+-    {
+-        LOGGER.warning(&quot;adding header [%s]:[%s]&quot;, i-&gt;first.c_str(), i-&gt;second.c_str());
+-        ss &lt;&lt; i-&gt;first &lt;&lt; &quot;: &quot; &lt;&lt; i-&gt;second &lt;&lt; &quot;\r\n&quot;;
+-    }
+-
+-    ss &lt;&lt; &quot;\r\n&quot;;
+-
+-    std::string t(ss.str());
+-
+-    LOGGER.warning(&quot;Going to send:\n%s\n[END]&quot;, t.c_str());
+-
+-    socket-&gt;send(t.c_str(), t.length());
+-}
+-
+-void HTTPClientSocket::onDisconected(network::TCPSocket *so)
+-{
+-    LOGGER.debug(&quot;HTTPClientSocket disconnected&quot;);
+-    socket = 0;
+-}
+-
+-void HTTPClientSocket::onSocketError(network::TCPSocket *so)
+-{
+-    LOGGER.debug(&quot;HTTPClientSocket error&quot;);
+-    socket = 0;
+-}
+-
+-void HTTPClientSocket::onDataReceived(network::TCPSocket *so, const char *data, const int len)
+-{
+-    int mlen = len;
+-    do
+-    {
+-        _handleReceivedByte(*data);
+-        data++;
+-    } while ( --mlen );
+-}
+-
+-void HTTPClientSocket::_handleReceivedByte(uint8_t data)
+-{
+-    switch (state)
+-    {
+-        case sERROR:
+-            break;
+-        case sIDLE:
+-            break;
+-        case sRESPONSE_PROTO:
+-            if ( ! isspace(data) )
+-            {
+-                token.append(1, tolower(data));
+-            }
+-            else
+-            {
+-                if ( token.compare(&quot;http/1.1&quot;) )
+-                {
+-                    LOGGER.warning(&quot;Received protocol is not 'HTTP/1.1'&quot;);
+-                }
+-                response_version = token;
+-                token.clear();
+-                content_length = 0;
+-                content.clear();
+-                state = sRESPONSE_CODE;
+-            }
+-            break;
+-        case sRESPONSE_CODE:
+-            if ( token.size() &lt; 3 )
+-            {
+-                if ( isdigit(data) )
+-                {
+-                    token.append(1, data);
+-                }
+-                else
+-                {
+-                    LOGGER.warning(&quot;Wrong response code, is not a digit&quot;);
+-                    state = sERROR;
+-                }
+-            }
+-            else
+-            {
+-                if ( ! isspace(data) )
+-                {
+-                    LOGGER.warning(&quot;Wrong response code, doesn't end in space&quot;);
+-                }
+-
+-                response_code_str = token;
+-                std::stringstream ss(token);
+-                ss &gt;&gt; response_code;
+-
+-                token.clear();
+-                state = sRESPONSE_TEXT;
+-            }
+-            break;
+-        case sRESPONSE_TEXT:
+-            token.append(1, data); // actualy \r\n shouldn't be in the text
+-            if ( data == '\n' )
+-            {
+-                while ( !token.empty() &amp;&amp; isspace(*token.rbegin()) )
+-                {
+-                    token.resize(token.size()-1);
+-                }
+-                response_description = token;
+-                state = sHEADER_BEGIN;
+-                token.clear();
+-            }
+-            break;
+-        case sHEADER_ENDING:
+-            if ( data == 10 )
+-            {
+-                token.clear();
+-                state = _handleHeaders();
+-            }
+-            else
+-            {
+-                state = sERROR;
+-            }
+-            break;
+-        case sHEADER_BEGIN:
+-            if ( data == 13 )
+-            {
+-                state = sHEADER_ENDING;
+-                break;
+-            }
+-            token.clear();
+-            state = sHEADER_NAME;
+-            // fall through, it is begin of name
+-        case sHEADER_NAME:
+-            if ( data == ':' )
+-            {
+-                header_name = token;
+-                token.clear();
+-                state = sHEADER_SKIP_SPACE;
+-            }
+-            else
+-            {
+-                token.append(1, tolower(data));
+-            }
+-            break;
+-        case sHEADER_SKIP_SPACE:
+-            if ( isspace(data) )
+-            {
+-                break;
+-            }
+-            state = sHEADER_VALUE;
+-            // fall through, it is not space
+-
+-        case sHEADER_VALUE:
+-            if ( data == '\n' )
+-            {
+-                while ( !token.empty() &amp;&amp; isspace(*token.rbegin()) )
+-                {
+-                    token.resize(token.size()-1);
+-                }
+-                response_headers[header_name] = token;
+-                // handle header here
+-                state = sHEADER_BEGIN;
+-            }
+-            else
+-            {
+-                token.append(1,data);
+-            }
+-            break;
+-        case sRECEIVING_DATA:
+-            content.append(1,data);
+-            if ( --content_length &lt;= 0 )
+-            {
+-                onContentFinished();
+-                socket-&gt;destroy();
+-                state = sIDLE;
+-            }
+-            break;
+-    }
+-}
+-
+-HTTPClientSocket::STATE HTTPClientSocket::_handleHeaders()
+-{
+-
+-    LOGGER.warning(&quot;Received: [%s] [%s/%d] [%s]&quot;,
+-                   response_version.c_str(),
+-                   response_code_str.c_str(),
+-                   response_code,
+-                   response_description.c_str());
+-
+-    for ( headers::iterator i = response_headers.begin(); i != response_headers.end(); i++ )
+-    {
+-        LOGGER.warning(&quot;received header [%s]:[%s]&quot;, i-&gt;first.c_str(), i-&gt;second.c_str());
+-    }
+-
+-
+-    headers::iterator clength = response_headers.find(&quot;content-length&quot;);
+-    if ( clength != response_headers.end() )
+-    {
+-        std::stringstream ss(clength-&gt;second);
+-        ss &gt;&gt; content_length;
+-    }
+-
+-    if ( response_code &lt; 100 )
+-    {
+-        return sERROR; // this is bad server
+-    }
+-    else if ( response_code &lt; 200 )
+-    {
+-        return sRESPONSE_PROTO;
+-    }
+-    else if ( response_code &lt; 300 )
+-    {
+-        if ( response_code == 204 ) // no content
+-            return sIDLE;
+-
+-        if ( content_length &gt; 0 )
+-            return sRECEIVING_DATA;
+-
+-        return sIDLE;
+-    }
+-    else if ( response_code &lt; 400 )
+-    {
+-        return sIDLE; // this is a redirect
+-    }
+-    else if ( response_code &lt; 500 )
+-    {
+-        return sERROR; // this is client error
+-    }
+-    else if ( response_code &lt; 600 )
+-    {
+-        return sERROR; // this is server error
+-    }
+-    else
+-    {
+-        return sERROR; // this is bad server
+-    }
+-
+-
+-}
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#include &quot;HTTPClientSocket.hpp&quot;
++#include &quot;Util/Log.hpp&quot;
++
++#include &lt;sstream&gt;
++
++HTTPClientSocket::HTTPClientSocket()
++{
++    request_method = &quot;GET&quot;;
++    port = &quot;80&quot;;
++}
++
++HTTPClientSocket::~HTTPClientSocket()
++{
++
++}
++
++void HTTPClientSocket::setMethod(const std::string &amp;method)
++{
++    this-&gt;request_method.assign(method);
++}
++
++void HTTPClientSocket::setHeader(const std::string &amp;name, const std::string &amp;value)
++{
++    request_headers[name] = value;
++}
++
++void HTTPClientSocket::setContent(const std::vector&lt;uint8_t&gt; request_content)
++{
++    this-&gt;request_content.assign(request_content.begin(), request_content.end());
++
++    std::stringstream ss;
++    ss &lt;&lt; request_content.size();
++    request_headers[&quot;content-length&quot;] = ss.str();
++}
++
++void HTTPClientSocket::setHost(const std::string &amp;host)
++{
++    this-&gt;host.assign(host);
++}
++
++void HTTPClientSocket::setPort(const std::string &amp;port)
++{
++    this-&gt;port.assign(port);
++}
++
++void HTTPClientSocket::setPath(const std::string &amp;path)
++{
++    this-&gt;path.assign(path);
++}
++
++void HTTPClientSocket::doRequest()
++{
++    try
++    {
++        socket = new network::TCPSocket(host, port , this);
++        state = sRESPONSE_PROTO;
++    }
++    catch (...)
++    {
++        if ( socket )
++        {
++            socket-&gt;destroy();
++        }
++        throw;
++    }
++}
++
++void HTTPClientSocket::onConnected(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPClientSocket connected&quot;);
++    std::stringstream ss;
++
++    ss &lt;&lt; request_method &lt;&lt; &quot; <A HREF="http://">http://</A>&quot; &lt;&lt; host &lt;&lt; ':' &lt;&lt; port &lt;&lt; path &lt;&lt; &quot; HTTP/1.1\r\n&quot;
++       &lt;&lt; &quot;Host: &quot; &lt;&lt; host &lt;&lt; ':' &lt;&lt; port &lt;&lt; &quot;\r\n&quot;
++       &lt;&lt; &quot;Connection: close\r\n&quot;;
++
++    for ( headers::iterator i = request_headers.begin(); i != request_headers.end(); i++ )
++    {
++        LOGGER.warning(&quot;adding header [%s]:[%s]&quot;, i-&gt;first.c_str(), i-&gt;second.c_str());
++        ss &lt;&lt; i-&gt;first &lt;&lt; &quot;: &quot; &lt;&lt; i-&gt;second &lt;&lt; &quot;\r\n&quot;;
++    }
++
++    ss &lt;&lt; &quot;\r\n&quot;;
++
++    std::string t(ss.str());
++
++    LOGGER.warning(&quot;Going to send:\n%s\n[END]&quot;, t.c_str());
++
++    socket-&gt;send(t.c_str(), t.length());
++}
++
++void HTTPClientSocket::onDisconected(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPClientSocket disconnected&quot;);
++    socket = 0;
++}
++
++void HTTPClientSocket::onSocketError(network::TCPSocket *so)
++{
++    LOGGER.debug(&quot;HTTPClientSocket error&quot;);
++    socket = 0;
++}
++
++void HTTPClientSocket::onDataReceived(network::TCPSocket *so, const char *data, const int len)
++{
++    int mlen = len;
++    do
++    {
++        _handleReceivedByte(*data);
++        data++;
++    } while ( --mlen );
++}
++
++void HTTPClientSocket::_handleReceivedByte(uint8_t data)
++{
++    switch (state)
++    {
++        case sERROR:
++            break;
++        case sIDLE:
++            break;
++        case sRESPONSE_PROTO:
++            if ( ! isspace(data) )
++            {
++                token.append(1, tolower(data));
++            }
++            else
++            {
++                if ( token.compare(&quot;http/1.1&quot;) )
++                {
++                    LOGGER.warning(&quot;Received protocol is not 'HTTP/1.1'&quot;);
++                }
++                response_version = token;
++                token.clear();
++                content_length = 0;
++                content.clear();
++                state = sRESPONSE_CODE;
++            }
++            break;
++        case sRESPONSE_CODE:
++            if ( token.size() &lt; 3 )
++            {
++                if ( isdigit(data) )
++                {
++                    token.append(1, data);
++                }
++                else
++                {
++                    LOGGER.warning(&quot;Wrong response code, is not a digit&quot;);
++                    state = sERROR;
++                }
++            }
++            else
++            {
++                if ( ! isspace(data) )
++                {
++                    LOGGER.warning(&quot;Wrong response code, doesn't end in space&quot;);
++                }
++
++                response_code_str = token;
++                std::stringstream ss(token);
++                ss &gt;&gt; response_code;
++
++                token.clear();
++                state = sRESPONSE_TEXT;
++            }
++            break;
++        case sRESPONSE_TEXT:
++            token.append(1, data); // actualy \r\n shouldn't be in the text
++            if ( data == '\n' )
++            {
++                while ( !token.empty() &amp;&amp; isspace(*token.rbegin()) )
++                {
++                    token.resize(token.size()-1);
++                }
++                response_description = token;
++                state = sHEADER_BEGIN;
++                token.clear();
++            }
++            break;
++        case sHEADER_ENDING:
++            if ( data == 10 )
++            {
++                token.clear();
++                state = _handleHeaders();
++            }
++            else
++            {
++                state = sERROR;
++            }
++            break;
++        case sHEADER_BEGIN:
++            if ( data == 13 )
++            {
++                state = sHEADER_ENDING;
++                break;
++            }
++            token.clear();
++            state = sHEADER_NAME;
++            // fall through, it is begin of name
++        case sHEADER_NAME:
++            if ( data == ':' )
++            {
++                header_name = token;
++                token.clear();
++                state = sHEADER_SKIP_SPACE;
++            }
++            else
++            {
++                token.append(1, tolower(data));
++            }
++            break;
++        case sHEADER_SKIP_SPACE:
++            if ( isspace(data) )
++            {
++                break;
++            }
++            state = sHEADER_VALUE;
++            // fall through, it is not space
++
++        case sHEADER_VALUE:
++            if ( data == '\n' )
++            {
++                while ( !token.empty() &amp;&amp; isspace(*token.rbegin()) )
++                {
++                    token.resize(token.size()-1);
++                }
++                response_headers[header_name] = token;
++                // handle header here
++                state = sHEADER_BEGIN;
++            }
++            else
++            {
++                token.append(1,data);
++            }
++            break;
++        case sRECEIVING_DATA:
++            content.append(1,data);
++            if ( --content_length &lt;= 0 )
++            {
++                onContentFinished();
++                socket-&gt;destroy();
++                state = sIDLE;
++            }
++            break;
++    }
++}
++
++HTTPClientSocket::STATE HTTPClientSocket::_handleHeaders()
++{
++
++    LOGGER.warning(&quot;Received: [%s] [%s/%d] [%s]&quot;,
++                   response_version.c_str(),
++                   response_code_str.c_str(),
++                   response_code,
++                   response_description.c_str());
++
++    for ( headers::iterator i = response_headers.begin(); i != response_headers.end(); i++ )
++    {
++        LOGGER.warning(&quot;received header [%s]:[%s]&quot;, i-&gt;first.c_str(), i-&gt;second.c_str());
++    }
++
++
++    headers::iterator clength = response_headers.find(&quot;content-length&quot;);
++    if ( clength != response_headers.end() )
++    {
++        std::stringstream ss(clength-&gt;second);
++        ss &gt;&gt; content_length;
++    }
++
++    if ( response_code &lt; 100 )
++    {
++        return sERROR; // this is bad server
++    }
++    else if ( response_code &lt; 200 )
++    {
++        return sRESPONSE_PROTO;
++    }
++    else if ( response_code &lt; 300 )
++    {
++        if ( response_code == 204 ) // no content
++            return sIDLE;
++
++        if ( content_length &gt; 0 )
++            return sRECEIVING_DATA;
++
++        return sIDLE;
++    }
++    else if ( response_code &lt; 400 )
++    {
++        return sIDLE; // this is a redirect
++    }
++    else if ( response_code &lt; 500 )
++    {
++        return sERROR; // this is client error
++    }
++    else if ( response_code &lt; 600 )
++    {
++        return sERROR; // this is server error
++    }
++    else
++    {
++        return sERROR; // this is bad server
++    }
++
++
++}
+
+Modified: trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp	2012-08-29 22:01:55 UTC (rev 1375)
++++ trunk/netpanzer/src/NetPanzer/Network/HTTPClientSocket.hpp	2012-08-30 11:32:07 UTC (rev 1376)
+@@ -1,95 +1,95 @@
+-/*
+-Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
+-
+-This program is free software; you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation; either version 2 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program; if not, write to the Free Software
+-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-*/
+-
+-#ifndef HTTPCLIENTSOCKET_HPP
+-#define HTTPCLIENTSOCKET_HPP
+-
+-#include &quot;Network/TCPSocket.hpp&quot;
+-#include &lt;vector&gt;
+-#include &lt;string&gt;
+-#include &lt;map&gt;
+-#include &lt;stdint.h&gt;
+-
+-class HTTPClientSocket : public network::TCPSocketObserver
+-{
+-public:
+-    HTTPClientSocket();
+-    virtual ~HTTPClientSocket();
+-
+-    void setMethod(const std::string&amp; method);
+-    void setHeader(const std::string&amp; name, const std::string&amp; value);
+-    void setContent(const std::vector&lt;uint8_t&gt; request_content);
+-    void setHost(const std::string&amp; host);
+-    void setPort(const std::string&amp; port);
+-    void setPath(const std::string&amp; path);
+-    void doRequest();
+-
+-protected:
+-    void onDataReceived(network::TCPSocket *so, const char *data, const int len);
+-    void onConnected(network::TCPSocket *so);
+-    void onDisconected(network::TCPSocket *so);
+-    void onSocketError(network::TCPSocket *so);
+-
+-    virtual void onContentFinished() {}
+-
+-    std::string content;
+-
+-private:
+-    network::TCPSocket * socket;
+-    std::string host;
+-    std::string port;
+-    std::string path;
+-
+-    enum STATE
+-    {
+-        sERROR,
+-        sIDLE,
+-        sRESPONSE_PROTO,
+-        sRESPONSE_CODE,
+-        sRESPONSE_TEXT,
+-        sHEADER_ENDING,
+-        sHEADER_BEGIN,
+-        sHEADER_NAME,
+-        sHEADER_SKIP_SPACE,
+-        sHEADER_VALUE,
+-        sRECEIVING_DATA
+-    } state;
+-
+-    std::string token;
+-    std::string header_name;
+-
+-    std::string response_version;
+-    std::string response_code_str;
+-    std::string response_description;
+-    int response_code;
+-    int content_length;
+-
+-    typedef std::map&lt;std::string, std::string&gt; headers;
+-
+-    std::string request_method;
+-    headers request_headers;
+-
+-    headers response_headers;
+-
+-    std::vector&lt;uint8_t&gt; request_content;
+-
+-    void _handleReceivedByte(uint8_t data);
+-    STATE _handleHeaders();
+-};
+-
+-#endif // HTTPCLIENTSOCKET_HPP
++/*
++Copyright (C) 2012 by Aaron Perez &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">aaronps at gmail.com</A>&gt;
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef HTTPCLIENTSOCKET_HPP
++#define HTTPCLIENTSOCKET_HPP
++
++#include &quot;Network/TCPSocket.hpp&quot;
++#include &lt;vector&gt;
++#include &lt;string&gt;
++#include &lt;map&gt;
++#include &lt;stdint.h&gt;
++
++class HTTPClientSocket : public network::TCPSocketObserver
++{
++public:
++    HTTPClientSocket();
++    virtual ~HTTPClientSocket();
++
++    void setMethod(const std::string&amp; method);
++    void setHeader(const std::string&amp; name, const std::string&amp; value);
++    void setContent(const std::vector&lt;uint8_t&gt; request_content);
++    void setHost(const std::string&amp; host);
++    void setPort(const std::string&amp; port);
++    void setPath(const std::string&amp; path);
++    void doRequest();
++
++protected:
++    void onDataReceived(network::TCPSocket *so, const char *data, const int len);
++    void onConnected(network::TCPSocket *so);
++    void onDisconected(network::TCPSocket *so);
++    void onSocketError(network::TCPSocket *so);
++
++    virtual void onContentFinished() {}
++
++    std::string content;
++
++private:
++    network::TCPSocket * socket;
++    std::string host;
++    std::string port;
++    std::string path;
++
++    enum STATE
++    {
++        sERROR,
++        sIDLE,
++        sRESPONSE_PROTO,
++        sRESPONSE_CODE,
++        sRESPONSE_TEXT,
++        sHEADER_ENDING,
++        sHEADER_BEGIN,
++        sHEADER_NAME,
++        sHEADER_SKIP_SPACE,
++        sHEADER_VALUE,
++        sRECEIVING_DATA
++    } state;
++
++    std::string token;
++    std::string header_name;
++
++    std::string response_version;
++    std::string response_code_str;
++    std::string response_description;
++    int response_code;
++    int content_length;
++
++    typedef std::map&lt;std::string, std::string&gt; headers;
++
++    std::string request_method;
++    headers request_headers;
++
++    headers response_headers;
++
++    std::vector&lt;uint8_t&gt; request_content;
++
++    void _handleReceivedByte(uint8_t data);
++    STATE _handleHeaders();
++};
++
++#endif // HTTPCLIENTSOCKET_HPP
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000399.html">[Netpanzer-cvs] r1375 - trunk/netpanzer/src/NetPanzer/Network
+</A></li>
+	<LI>Next message: <A HREF="000401.html">[Netpanzer-cvs] r1377 - trunk/netpanzer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#400">[ date ]</a>
+              <a href="thread.html#400">[ thread ]</a>
+              <a href="subject.html#400">[ subject ]</a>
+              <a href="author.html#400">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

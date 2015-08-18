@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1309 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Game support/icon
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-December/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1309%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Game%20support/icon&In-Reply-To=%3C20111221163934.38263481510%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000334.html">
+   <LINK REL="Next"  HREF="000336.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1309 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Game support/icon</H1>
+    <B>wile64 at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1309%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Core%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Views/Game%20support/icon&In-Reply-To=%3C20111221163934.38263481510%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1309 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Core	src/NetPanzer/Interfaces src/NetPanzer/Views/Game support/icon">wile64 at mail.berlios.de
+       </A><BR>
+    <I>Wed Dec 21 17:39:33 CET 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000334.html">[Netpanzer-cvs] r1308 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000336.html">[Netpanzer-cvs] r1310 - in branches: . newpath	newpath/src/Lib/Types newpath/src/Lib/Util	newpath/src/NetPanzer/Bot newpath/src/NetPanzer/Classes	newpath/src/NetPanzer/Classes/AI	newpath/src/NetPanzer/Classes/Network	newpath/src/NetPanzer/Interfaces newpath/src/NetPanzer/Objectives	newpath/src/NetPanzer/PowerUps newpath/src/NetPanzer/Units	newpath/src/NetPanzer/Views/Components	newpath/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#335">[ date ]</a>
+              <a href="thread.html#335">[ thread ]</a>
+              <a href="subject.html#335">[ subject ]</a>
+              <a href="author.html#335">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: wile64
+Date: 2011-12-21 17:39:33 +0100 (Wed, 21 Dec 2011)
+New Revision: 1309
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+   trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+   trunk/netpanzer/support/icon/npicon.rc
+Log:
+Add flagtimer for change timer change flag set to 0 for disable timer
+change protocol version
+change rc file for 0.8.4 release
+add help for flagtimer
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -199,5 +199,15 @@
+                 end
+                 return counttime == 0;
+             end);
++    end,
++
++    flagtimer_help = &quot;sets the time for changing flag&quot;,
++    flagtimer = function(param, player)
++        if ( param == &quot;&quot; ) then
++            netpanzer.serversayto( player, &quot;flagtimer time is &quot; .. config.game.changeflagtime);
++        else
++            config.game.changeflagtime = param;
++            netpanzer.serversayto( player, &quot;flagtimer time was set to &quot; .. config.game.changeflagtime);
++        end
+     end
+ };
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -94,7 +94,7 @@
+ 
+     lastSelectTimer.setTimeOut(400);
+     actionTimer.setTimeOut(100);
+-
++    Flagtimer.reset();
+ }
+ 
+ void
+@@ -332,8 +332,10 @@
+     if (KeyboardInterface::isCharPressed('B') 
+        &amp;&amp; ! PlayerInterface::getLocalPlayer()-&gt;isSelectingFlag() ) 
+     {
+-        static NTimer Flagtimer(150000);
+-        if (Flagtimer.isTimeOut())
++        if (GameConfig::game_changeflagtime == 0)
++            Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
++        else 
++        if (Flagtimer.checkWithTimeOut(GameConfig::game_changeflagtime * 60000)) 
+         {
+             Desktop::toggleVisibility( &quot;GFlagSelectionView&quot; );
+             Flagtimer.reset();
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.hpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -104,6 +104,8 @@
+     static ObjectiveID selected_objective_id;
+ 
+ public:
++    NTimer Flagtimer;
++
+     WorldInputCmdProcessor();
+ 
+     void process();
+
+Modified: trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Core/NetworkGlobals.hpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -19,7 +19,7 @@
+ #define __NETWORK_GLOBALS_HPP__
+ 
+ #define NETPANZER_DEFAULT_PORT_TCP     3030
+-#define NETPANZER_PROTOCOL_VERSION     1104
++#define NETPANZER_PROTOCOL_VERSION     1105
+ #define MASTERSERVER_PORT             28900
+ 
+ #endif
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ConsoleInterface.cpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -27,12 +27,12 @@
+ #include &quot;Console.hpp&quot;
+ #include &quot;Resources/ResourceManager.hpp&quot;
+ 
+-#define CommandMax 12
++#define CommandMax 13
+ 
+ std::string CommandList[CommandMax] = {
+     &quot;/server listcommands&quot;, &quot;/server adminlogin&quot;, &quot;/server unitspawnlist&quot;, &quot;/server unitprofiles&quot;,
+     &quot;/server listprofiles&quot;, &quot;/server kick&quot;, &quot;/server baselimit&quot;, &quot;/server gamepass&quot;,
+-    &quot;/server map &quot;, &quot;/server autokick&quot;, &quot;/server say&quot;, &quot;/server listplayers&quot;}; 
++    &quot;/server map &quot;, &quot;/server autokick&quot;, &quot;/server say&quot;, &quot;/server listplayers&quot;, &quot;/server flagtimer&quot;}; 
+ 
+ bool ConsoleInterface::stdout_pipe;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -57,6 +57,7 @@
+ NPString* GameConfig::game_unit_spawnlist = 0;
+ NPString* GameConfig::game_adminpass = 0;
+ NPString* GameConfig::game_gamepass = 0;
++int       GameConfig::game_changeflagtime = 15; // minutes
+ 
+ Uint8 GameConfig::player_flag_data[FLAG_WIDTH*FLAG_HEIGHT] = {0};
+ 
+@@ -120,6 +121,7 @@
+     { &quot;unit_spawnlist&quot;,    GETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         GETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+     { &quot;gamepass&quot;,          GETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
++    { &quot;changeflagtime&quot;,    GETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime},
+     {0,0}
+ };
+ 
+@@ -134,6 +136,7 @@
+     { &quot;unit_spawnlist&quot;,    SETSVTYPE_STRING,  &amp;GameConfig::game_unit_spawnlist},
+     { &quot;adminpass&quot;,         SETSVTYPE_STRING,  &amp;GameConfig::game_adminpass},
+     { &quot;gamepass&quot;,          SETSVTYPE_STRING,  &amp;GameConfig::game_gamepass},
++    { &quot;changeflagtime&quot;,    SETSVTYPE_INT,     &amp;GameConfig::game_changeflagtime },
+     {0,0}
+ };
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -136,6 +136,7 @@
+     static NPString* game_unit_spawnlist; // &quot;,&quot; or space separated list with the numbers of each unit to spawn with
+     static NPString* game_adminpass;     // the secret password for admins
+     static NPString* game_gamepass;      // the secret password for entering game
++    static int       game_changeflagtime; // in minutes
+ 
+     static Uint8 player_flag_data[FLAG_WIDTH*FLAG_HEIGHT];
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -286,6 +286,7 @@
+         &lt;&lt; &quot;MaxPlayers: &quot; &lt;&lt; gameconfig-&gt;maxplayers &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;MaxUnits: &quot; &lt;&lt; gameconfig-&gt;maxunits &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;AutoKick: &quot; &lt;&lt; GameConfig::game_autokicktime &lt;&lt; &quot;\n&quot;
++        &lt;&lt; &quot;FagTimer: &quot; &lt;&lt; GameConfig::game_changeflagtime &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;Gametype: &quot; &lt;&lt; gameconfig-&gt;getGameTypeString() &lt;&lt; &quot;\n&quot;
+         &lt;&lt; &quot;ObjectivePercentage: &quot; &lt;&lt;
+             gameconfig-&gt;objectiveoccupationpercentage &lt;&lt; &quot;\n&quot;
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/src/NetPanzer/Views/Game/HelpScrollView.cpp	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -131,6 +131,7 @@
+     insert(&quot;  /server help                      Show Help window (same 'F1')&quot;);
+     insert(&quot;  /server map [map name]            Restart game with the given map&quot;);
+     insert(&quot;  /server autokick [timeout]        Show/set autokick for inactive players&quot;);
++    insert(&quot;  /server flagtimer [timeout]       Show/set flag change timer&quot;);
+     insert(&quot;  /server countdown [timeout]       Generate a countdown (same 'c')&quot;);
+     insert(&quot;  /server say [your talk]           Server say something in chat&quot;);
+     insert(&quot;  /server listplayers               List players with the assigned number&quot;);
+
+Modified: trunk/netpanzer/support/icon/npicon.rc
+===================================================================
+--- trunk/netpanzer/support/icon/npicon.rc	2011-12-15 12:58:19 UTC (rev 1308)
++++ trunk/netpanzer/support/icon/npicon.rc	2011-12-21 16:39:33 UTC (rev 1309)
+@@ -8,8 +8,8 @@
+ //
+ 
+ VS_VERSION_INFO VERSIONINFO
+- FILEVERSION 0,8,4,3
+- PRODUCTVERSION 0,8,4,3
++ FILEVERSION 0,8,4
++ PRODUCTVERSION 0,8,4
+  FILEFLAGSMASK 0x3fL
+  FILEFLAGS 0x0L
+  FILEOS 0x40004L
+@@ -22,12 +22,12 @@
+         BEGIN
+             VALUE &quot;CompanyName&quot;, &quot;\0&quot;
+             VALUE &quot;FileDescription&quot;, &quot;Multiplayer tank battle game\0&quot;
+-            VALUE &quot;FileVersion&quot;, &quot;0, 8, 4, 3\0&quot;
++            VALUE &quot;FileVersion&quot;, &quot;0, 8, 4\0&quot;
+             VALUE &quot;InternalName&quot;, &quot;NetPanzer\0&quot;
+             VALUE &quot;LegalCopyright&quot;, &quot;Copyright(c) 1998 Pyrosoft Inc. and nepanzer-devel team\0&quot;
+             VALUE &quot;OriginalFilename&quot;, &quot;NetPanzer.exe\0&quot;
+             VALUE &quot;ProductName&quot;, &quot;NetPanzer\0&quot;
+-            VALUE &quot;ProductVersion&quot;, &quot;0.8.4-RC3\0&quot;
++            VALUE &quot;ProductVersion&quot;, &quot;0.8.4\0&quot;
+         END
+     END
+     BLOCK &quot;VarFileInfo&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000334.html">[Netpanzer-cvs] r1308 - in trunk/netpanzer/src/NetPanzer: Classes	Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000336.html">[Netpanzer-cvs] r1310 - in branches: . newpath	newpath/src/Lib/Types newpath/src/Lib/Util	newpath/src/NetPanzer/Bot newpath/src/NetPanzer/Classes	newpath/src/NetPanzer/Classes/AI	newpath/src/NetPanzer/Classes/Network	newpath/src/NetPanzer/Interfaces newpath/src/NetPanzer/Objectives	newpath/src/NetPanzer/PowerUps newpath/src/NetPanzer/Units	newpath/src/NetPanzer/Views/Components	newpath/src/NetPanzer/Views/Game
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#335">[ date ]</a>
+              <a href="thread.html#335">[ thread ]</a>
+              <a href="subject.html#335">[ subject ]</a>
+              <a href="author.html#335">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

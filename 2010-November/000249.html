@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1223 - trunk/netpanzer/src/NetPanzer/Interfaces
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-November/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1223%20-%20trunk/netpanzer/src/NetPanzer/Interfaces&In-Reply-To=%3C20101110132021.558DE480562%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000248.html">
+   <LINK REL="Next"  HREF="000250.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1223 - trunk/netpanzer/src/NetPanzer/Interfaces</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1223%20-%20trunk/netpanzer/src/NetPanzer/Interfaces&In-Reply-To=%3C20101110132021.558DE480562%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1223 - trunk/netpanzer/src/NetPanzer/Interfaces">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 10 14:20:21 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000248.html">[Netpanzer-cvs] r1222 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+        <LI>Next message: <A HREF="000250.html">[Netpanzer-cvs] r1224 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#249">[ date ]</a>
+              <a href="thread.html#249">[ thread ]</a>
+              <a href="subject.html#249">[ subject ]</a>
+              <a href="author.html#249">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-11-10 14:20:20 +0100 (Wed, 10 Nov 2010)
+New Revision: 1223
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+Log:
+-removed teaming and allying functions
+-connecting process changes
+-send selected flag when connecting to server
+-simplify some connection packets (uses less bytes)
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-11-08 21:07:35 UTC (rev 1222)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerInterface.cpp	2010-11-10 13:20:20 UTC (rev 1223)
+@@ -47,142 +47,17 @@
+ 
+ SDL_mutex* PlayerInterface::mutex = 0;
+ 
+-//static void setAlliance(const int by_player, const int with_player )
+-//{
+-//    *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = true;
+-//}
+-//
+-//static void clearAlliance(const int by_player, const int with_player )
+-//{
+-//    *(alliance_matrix + (by_player * PlayerInterface::getMaxPlayers()) + with_player ) = false;
+-//}
+-//
+-//static void disconnectedPlayerAllianceCleanup(const int index )
+-//{
+-//    for ( int player_index = 0; player_index &lt; PlayerInterface::getMaxPlayers(); ++player_index )
+-//    {
+-//        clearAlliance( index, player_index );
+-//        clearAlliance( player_index, index );
+-//    }
+-//}
+-
+ bool PlayerInterface::isAllied( PlayerID player, PlayerID with_player )
+ {
+     if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
+-        &amp;&amp; player_lists[player].getTeamID() &gt; 0
+-        &amp;&amp; player_lists[player].getTeamID() == player_lists[with_player].getTeamID() )
++        )
+     {
+-        return true;
++        // XXX ALLY
++        //return true;
+     }
+     return false;
+ }
+-//
+-//bool PlayerInterface::isSingleAllied( unsigned short player, unsigned short with_player )
+-//{
+-//    if ( player &lt; max_players &amp;&amp; with_player &lt; max_players
+-//            &amp;&amp; *(alliance_matrix + (player * max_players) + with_player) )
+-//    {
+-//        return true;
+-//    }
+-//    return false;
+-//}
+ 
+-//static void handleAllianceMessage(const int type,
+-//                                  const int by_player,
+-//                                  const int with_player)
+-//{
+-//    const int local_player = PlayerInterface::getLocalPlayerIndex();
+-//    PlayerState *player_state;
+-//    if ( type == _player_make_alliance )
+-//    {
+-//        setAlliance(by_player, with_player);
+-//
+-//        if ( by_player == local_player )
+-//        {
+-//            player_state = PlayerInterface::getPlayer(with_player);
+-//            if ( PlayerInterface::isSingleAllied(player_state-&gt;getID(), local_player) )
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                              &quot;You accepted %s alliance request.&quot;,
+-//                                              player_state-&gt;getName().c_str());
+-//            }
+-//            else
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                              &quot;You request alliance with %s.&quot;,
+-//                                              player_state-&gt;getName().c_str());
+-//            }
+-//        }
+-//        else if ( with_player == local_player )
+-//        {
+-//            player_state = PlayerInterface::getPlayer(by_player);
+-//            if ( PlayerInterface::isSingleAllied( local_player, player_state-&gt;getID()) )
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                           &quot;%s accepted your alliance request.&quot;,
+-//                                           player_state-&gt;getName().c_str());
+-//            }
+-//            else
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                              &quot;%s request to ally with you.&quot;,
+-//                                              player_state-&gt;getName().c_str());
+-//            }
+-//        }
+-//    }
+-//    else
+-//    {
+-//        // break alliance cancels both alliances
+-//        clearAlliance(by_player, with_player);
+-//        if ( by_player == local_player )
+-//        {
+-//            player_state = PlayerInterface::getPlayer(with_player);
+-//            if ( PlayerInterface::isSingleAllied(player_state-&gt;getID(), local_player) )
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                              &quot;You broke the alliance with %s.&quot;,
+-//                                              player_state-&gt;getName().c_str());
+-//            }
+-//            else
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                              &quot;You cancel your alliance request with %s.&quot;,
+-//                                              player_state-&gt;getName().c_str());
+-//            }
+-//        }
+-//        else if ( with_player == local_player )
+-//        {
+-//            player_state = PlayerInterface::getPlayer(by_player);
+-//            if ( PlayerInterface::isSingleAllied( local_player, player_state-&gt;getID()) )
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                              &quot;%s broke the alliance with you.&quot;,
+-//                                              player_state-&gt;getName().c_str());
+-//            }
+-//            else
+-//            {
+-//                ConsoleInterface::postMessage(Color::yellow, false, 0,
+-//                                              &quot;%s cancelled the alliance request with you.&quot;,
+-//                                              player_state-&gt;getName().c_str());
+-//            }
+-//        }
+-//
+-//        clearAlliance(with_player, by_player);
+-//    }
+-//}
+-//
+-//static void resetAllianceMatrix()
+-//{
+-//    int matrix_size;
+-//
+-//    matrix_size = PlayerInterface::getMaxPlayers() * PlayerInterface::getMaxPlayers();
+-//
+-//    for ( int i = 0; i &lt; matrix_size; i++ )
+-//    {
+-//        alliance_matrix[ i ] = false;
+-//    }
+-//}
+-
+ void PlayerInterface::initialize(const unsigned int _max_players)
+ {
+     char temp_str[64];
+@@ -202,11 +77,6 @@
+         player_lists[ player_id ].setName( temp_str );
+     }
+ 
+-    // XXX ALLY
+-//    delete[] alliance_matrix;
+-//    alliance_matrix = new bool [max_players * max_players];
+-//    resetAllianceMatrix();
+-
+     mutex = SDL_CreateMutex();
+     if(!mutex)
+     {
+@@ -224,8 +94,6 @@
+ {
+     delete[] player_lists;
+     player_lists = 0;
+-//    delete[] alliance_matrix; // XXX ALLY
+-//    alliance_matrix = 0;
+     max_players = 0;
+ 
+     SDL_DestroyMutex(mutex);
+@@ -340,8 +208,6 @@
+         {
+             player_lists[ player_id ].setStatus( _player_state_allocated );
+             player_lists[ player_id ].resetStats();
+-            player_lists[ player_id ].setTeamID(NO_TEAM_ID);
+-            player_lists[ player_id ].setTeamName(&quot;&quot;);
+             res = &amp;player_lists[ player_id ];
+         }
+     }
+@@ -515,16 +381,16 @@
+     const PlayerConnectID *connect_mesg
+         = (const PlayerConnectID *) message;
+ 
+-    local_player_index = connect_mesg-&gt;connect_state.getPlayerIndex();
++    local_player_index = connect_mesg-&gt;player_id;
+     if(local_player_index &gt;= max_players) {
+         LOGGER.warning(&quot;Invalide netMessageConnectID Message&quot;);
+         return;
+     }
+ 
+-    SDL_mutexP(mutex);
+-    player_lists[local_player_index].setFromNetworkPlayerState
+-        (&amp;connect_mesg-&gt;connect_state);
+-    SDL_mutexV(mutex);
++//    SDL_mutexP(mutex);
++//    player_lists[local_player_index].setFromNetworkPlayerState
++//        (&amp;connect_mesg-&gt;connect_state);
++//    SDL_mutexV(mutex);
+ }
+ 
+ void PlayerInterface::netMessageSyncState(const NetMessage* message)
+@@ -566,65 +432,6 @@
+     setKill(player1, player2, (UnitType) score_update-&gt;unit_type );
+ }
+ 
+-// XXX ALLY
+-//void PlayerInterface::netMessageAllianceRequest(const NetMessage *message)
+-//{
+-//    if ( gameconfig-&gt;allowallies == false )
+-//    {
+-//        return;
+-//    }
+-//
+-//    const PlayerAllianceRequest *allie_request
+-//        = (const PlayerAllianceRequest *) message;
+-//
+-//    if(allie_request-&gt;getAllieByPlayerIndex() &gt;= max_players
+-//       || allie_request-&gt;getAllieWithPlayerIndex() &gt;= max_players)
+-//    {
+-//        LOGGER.warning(&quot;Invalid alliance request message&quot;);
+-//        return;
+-//    }
+-//
+-//    SDL_mutexP(mutex);
+-//    handleAllianceMessage(allie_request-&gt;alliance_request_type,
+-//                          allie_request-&gt;getAllieByPlayerIndex(),
+-//                          allie_request-&gt;getAllieWithPlayerIndex());
+-//    SDL_mutexV(mutex);
+-//
+-//    PlayerAllianceUpdate allie_update;
+-//    allie_update.set(allie_request-&gt;getAllieByPlayerIndex(),
+-//                     allie_request-&gt;getAllieWithPlayerIndex(),
+-//                     allie_request-&gt;alliance_request_type);
+-////    SERVER-&gt;broadcastMessage(&amp;allie_update, sizeof(PlayerAllianceUpdate));
+-//    if ( allie_request-&gt;getAllieByPlayerIndex() != local_player_index )
+-//    {
+-//        SERVER-&gt;sendMessage(allie_request-&gt;getAllieByPlayerIndex(),
+-//                            &amp;allie_update, sizeof(PlayerAllianceUpdate));
+-//    }
+-//    if ( allie_request-&gt;getAllieWithPlayerIndex() != local_player_index )
+-//    {
+-//        SERVER-&gt;sendMessage(allie_request-&gt;getAllieWithPlayerIndex(),
+-//                            &amp;allie_update, sizeof(PlayerAllianceUpdate));
+-//    }
+-//}
+-//
+-//void PlayerInterface::netMessageAllianceUpdate(const NetMessage* message)
+-//{
+-//    const PlayerAllianceUpdate* allie_update
+-//        = (const PlayerAllianceUpdate *) message;
+-//
+-//    if(allie_update-&gt;getAllieByPlayerIndex() &gt;= max_players
+-//       || allie_update-&gt;getAllieWithPlayerIndex() &gt;= max_players) {
+-//        LOGGER.warning(&quot;Invalid alliance update message&quot;);
+-//        return;
+-//    }
+-//
+-//    SDL_mutexP(mutex);
+-//    handleAllianceMessage(allie_update-&gt;alliance_update_type,
+-//                          allie_update-&gt;getAllieByPlayerIndex(),
+-//                          allie_update-&gt;getAllieWithPlayerIndex());
+-//    SDL_mutexV(mutex);
+-//}
+-
+ void PlayerInterface::processNetMessage(const NetMessage* message)
+ {
+     switch(message-&gt;message_id) {
+@@ -639,14 +446,6 @@
+         case _net_message_id_player_score_update :
+             netMessageScoreUpdate(message);
+             break;
+-        // XXX ALLY
+-//        case _net_message_id_player_alliance_request :
+-//            netMessageAllianceRequest(message);
+-//            break;
+-//
+-//        case _net_message_id_player_alliance_update :
+-//            netMessageAllianceUpdate(message);
+-//            break;
+     }
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000248.html">[Netpanzer-cvs] r1222 - in trunk/netpanzer: . src/Lib/2D	src/NetPanzer/Classes src/NetPanzer/Classes/Network	src/NetPanzer/Core src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Views/MainMenu/Multi
+</A></li>
+	<LI>Next message: <A HREF="000250.html">[Netpanzer-cvs] r1224 - in trunk/netpanzer/src/NetPanzer: Classes	Classes/Network Core
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#249">[ date ]</a>
+              <a href="thread.html#249">[ thread ]</a>
+              <a href="subject.html#249">[ subject ]</a>
+              <a href="author.html#249">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

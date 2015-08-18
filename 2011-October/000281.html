@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1255 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Objectives
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2011-October/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1255%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Objectives&In-Reply-To=%3C20111012164352.DD4284814CB%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000280.html">
+   <LINK REL="Next"  HREF="000282.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1255 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Objectives</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1255%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Interfaces%20src/NetPanzer/Objectives&In-Reply-To=%3C20111012164352.DD4284814CB%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1255 - in trunk/netpanzer: scripts	src/NetPanzer/Interfaces src/NetPanzer/Objectives">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Wed Oct 12 18:43:52 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000280.html">[Netpanzer-cvs] r1254 - trunk/netpanzer/src/NetPanzer/Views/MainMenu
+</A></li>
+        <LI>Next message: <A HREF="000282.html">[Netpanzer-cvs] r1256 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#281">[ date ]</a>
+              <a href="thread.html#281">[ thread ]</a>
+              <a href="subject.html#281">[ subject ]</a>
+              <a href="author.html#281">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2011-10-12 18:43:52 +0200 (Wed, 12 Oct 2011)
+New Revision: 1255
+
+Modified:
+   trunk/netpanzer/scripts/servercommands.lua
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+Log:
+- Max bases per player configurable:
+
+:<i> game.base_limit in config file
+</I>:<i> &quot;/server baselimit&quot; to see &quot;/server baselimit x&quot; to change at runtime
+</I>
+Note that soon we should change the network protocol, it is already not compatible between current svn version.
+
+
+
+
+Modified: trunk/netpanzer/scripts/servercommands.lua
+===================================================================
+--- trunk/netpanzer/scripts/servercommands.lua	2011-10-12 16:20:46 UTC (rev 1254)
++++ trunk/netpanzer/scripts/servercommands.lua	2011-10-12 16:43:52 UTC (rev 1255)
+@@ -87,6 +87,16 @@
+         end
+     end,
+ 
++    baselimit_help = &quot;sets or get the base limit for players&quot;,
++    baselimit = function(param, player)
++        if ( param == &quot;&quot; ) then
++            netpanzer.serversayto( player, &quot;Base limit: &quot; .. config.game.base_limit);
++        else
++            config.game.base_limit = param;
++            netpanzer.serversayto( player, &quot;Base limit set to: &quot; .. config.game.base_limit);
++        end
++    end,
++
+     countdown_help = &quot;Do a countdown, use 'countdown &lt;time&gt; &lt;message&gt;'&quot;,
+     countdown = function(param, player)
+         local counttime, message = string.match(param, &quot;(%d+) *(.*)&quot;);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-12 16:20:46 UTC (rev 1254)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2011-10-12 16:43:52 UTC (rev 1255)
+@@ -50,6 +50,7 @@
+ 
+ bool      GameConfig::game_enable_bases = true;
+ int       GameConfig::game_base_capture_mode = 1; // normal capture;
++int       GameConfig::game_base_limit = 0; // no limit
+ int       GameConfig::game_autokicktime = 20; // minutes;
+ bool      GameConfig::game_allowmultiip = true;
+ NPString* GameConfig::game_unit_profiles = 0;
+@@ -111,6 +112,7 @@
+ {
+     { &quot;enable_bases&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
+     { &quot;base_capture_mode&quot;, GETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
++    { &quot;base_limit&quot;,        GETSVTYPE_INT,     &amp;GameConfig::game_base_limit },
+     { &quot;autokicktime&quot;,      GETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+     { &quot;allowmultiip&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+     { &quot;unit_profiles&quot;,     GETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+@@ -123,6 +125,7 @@
+ {
+     { &quot;enable_bases&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_enable_bases },
+     { &quot;base_capture_mode&quot;, SETSVTYPE_INT,     &amp;GameConfig::game_base_capture_mode },
++    { &quot;base_limit&quot;,        SETSVTYPE_INT,     &amp;GameConfig::game_base_limit },
+     { &quot;autokicktime&quot;,      SETSVTYPE_INT,     &amp;GameConfig::game_autokicktime },
+     { &quot;allowmultiip&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::game_allowmultiip },
+     { &quot;unit_profiles&quot;,     SETSVTYPE_STRING,  &amp;GameConfig::game_unit_profiles},
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-12 16:20:46 UTC (rev 1254)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2011-10-12 16:43:52 UTC (rev 1255)
+@@ -127,6 +127,7 @@
+ 
+     static bool      game_enable_bases;
+     static int       game_base_capture_mode; // 0=no capture, 1=normal, 2=...
++    static int       game_base_limit;  // 0=no limit, other number max bases per player
+     static int       game_autokicktime; // in minutes
+     static bool      game_allowmultiip; // allow multi connect from same ip
+     static NPString* game_unit_profiles; // &quot;,&quot; or space separated list of profiles to load
+
+Modified: trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2011-10-12 16:20:46 UTC (rev 1254)
++++ trunk/netpanzer/src/NetPanzer/Objectives/Objective.cpp	2011-10-12 16:43:52 UTC (rev 1255)
+@@ -136,6 +136,11 @@
+         return;
+     }
+ 
++    if ( GameConfig::game_base_limit &gt; 0 &amp;&amp; player-&gt;getObjectivesHeld() &gt;= GameConfig::game_base_limit )
++    {
++        return; // cannot capture more bases.
++    }
++
+     if ( occupying_player )
+     {
+         occupying_player-&gt;decObjectivesHeld();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000280.html">[Netpanzer-cvs] r1254 - trunk/netpanzer/src/NetPanzer/Views/MainMenu
+</A></li>
+	<LI>Next message: <A HREF="000282.html">[Netpanzer-cvs] r1256 - in trunk/netpanzer/src: Lib/2D	NetPanzer/Classes
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#281">[ date ]</a>
+              <a href="thread.html#281">[ thread ]</a>
+              <a href="subject.html#281">[ subject ]</a>
+              <a href="author.html#281">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

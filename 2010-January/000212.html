@@ -1,0 +1,1015 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1186 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Views/MainMenu/Options	src/NetPanzer/Weapons
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2010-January/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1186%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/System%20src/NetPanzer/Views/MainMenu/Options%0A%09src/NetPanzer/Weapons&In-Reply-To=%3C201001211213.o0LCDrIj016873%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000211.html">
+   <LINK REL="Next"  HREF="000213.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1186 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Views/MainMenu/Options	src/NetPanzer/Weapons</H1>
+    <B>kromxp at mail.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1186%20-%20in%20trunk/netpanzer%3A%20scripts%0A%09src/NetPanzer/Classes%20src/NetPanzer/Interfaces%0A%09src/NetPanzer/Particles%20src/NetPanzer/Scripts%0A%09src/NetPanzer/System%20src/NetPanzer/Views/MainMenu/Options%0A%09src/NetPanzer/Weapons&In-Reply-To=%3C201001211213.o0LCDrIj016873%40sheep.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1186 - in trunk/netpanzer: scripts	src/NetPanzer/Classes src/NetPanzer/Interfaces	src/NetPanzer/Particles src/NetPanzer/Scripts	src/NetPanzer/System src/NetPanzer/Views/MainMenu/Options	src/NetPanzer/Weapons">kromxp at mail.berlios.de
+       </A><BR>
+    <I>Thu Jan 21 13:13:53 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000211.html">[Netpanzer-cvs] r1185 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces
+</A></li>
+        <LI>Next message: <A HREF="000213.html">[Netpanzer-cvs] r1187 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#212">[ date ]</a>
+              <a href="thread.html#212">[ thread ]</a>
+              <a href="subject.html#212">[ subject ]</a>
+              <a href="author.html#212">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2010-01-21 13:13:10 +0100 (Thu, 21 Jan 2010)
+New Revision: 1186
+
+Modified:
+   trunk/netpanzer/scripts/initialize.lua
+   trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp
+   trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+   trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+   trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+   trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+   trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+   trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+Log:
+- re-add hi-res conf-iguration, windowed is resizable, fullscreen uses available modes.
+- video configuration uses a lua config file.
+- cleanup of ChatInterface.
+
+
+
+Modified: trunk/netpanzer/scripts/initialize.lua
+===================================================================
+--- trunk/netpanzer/scripts/initialize.lua	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/scripts/initialize.lua	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -1,7 +1,7 @@
+-LOGGER:log(&quot;Script initialization&quot;);
++--LOGGER:log(&quot;Script initialization&quot;);
+ 
+-LOGGER:log(&quot;Video Config: &quot; .. config.video.width .. &quot; x &quot; .. config.video.height)
+-LOGGER:log(&quot;Fullscreen: &quot; .. tostring(config.video.fullscreen))
++--LOGGER:log(&quot;Video Config: &quot; .. config.video.width .. &quot; x &quot; .. config.video.height)
++--LOGGER:log(&quot;Fullscreen: &quot; .. tostring(config.video.fullscreen))
+ 
+ function pairs(t)
+     local mt = getmetatable(t)
+@@ -13,7 +13,7 @@
+     local lin = extra or &quot;&quot;
+ 
+     if type(t) ~= 'table' then
+-        LOGGER:log(&quot;ERROR dumping table: it is not a table&quot;)
++        --LOGGER:log(&quot;ERROR dumping table: it is not a table&quot;)
+         return
+     end    
+     
+@@ -57,5 +57,5 @@
+     return gconcat(result,&quot;\n&quot;);
+ end
+ 
+-LOGGER:log(&quot;Dumping conf:\n&quot; .. config.dump(config))
++--LOGGER:log(&quot;Dumping conf:\n&quot; .. config.dump(config))
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Classes/ScreenSurface.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -42,6 +42,7 @@
+     assert(doesExist == false);
+     draw-&gt;lockDoubleBuffer( (unsigned char **) &amp;frame0 );
+     mem = frame0;
++    tpitch = draw-&gt;getSurface()-&gt;pitch;
+     doesExist = true;
+ }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Classes/WorldInputCmdProcessor.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -148,7 +148,7 @@
+         return;
+     }
+ 
+-    if(((bool)gameconfig-&gt;fullscreen)!=true) {
++    if ( GameConfig::video_fullscreen != true ) {
+         // don't do border scrolling on windowed mode because
+         //  the window isn't always on the edge of the screen.
+         return;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -27,8 +27,6 @@
+ //#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
+ #include &quot;Util/Log.hpp&quot;
+ 
+-void (* ChatInterface::addChatString)(const char *message_text) = 0;
+-
+ enum { _net_message_id_chat_mesg_req,
+        _net_message_id_chat_mesg
+ };
+@@ -122,9 +120,7 @@
+     }
+ } __attribute__((packed));
+ 
+-static ChatMesgRequest current_chat_mesg;
+-
+-void ChatInterface::chatMessageRequest(const NetMessage* message) {
++static void chatMessageRequest(const NetMessage* message) {
+ 	bool post_on_server = false;
+ 	ChatMesg chat_mesg;
+ 	const ChatMesgRequest* chat_request = (const ChatMesgRequest*) message;
+@@ -188,14 +184,6 @@
+ 		player_state = PlayerInterface::getPlayer(
+ 				chat_mesg.getSourcePlayerIndex());
+ 
+-		if ((addChatString != 0)) {
+-			char mesg_str[256];
+-			sprintf(mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str());
+-
+-			addChatString(mesg_str);
+-			addChatString(chat_mesg.message_text);
+-		}
+-
+ 		PIX color = Color::white;
+ 
+ 		switch (chat_request-&gt;message_scope) {
+@@ -220,7 +208,7 @@
+ 	}
+ }
+ 
+-void ChatInterface::chatMessage(const NetMessage* message) {
++static void chatMessage(const NetMessage* message) {
+ 	unsigned short local_player_index;
+ 	const ChatMesg *chat_mesg = (const ChatMesg*) message;
+ 
+@@ -244,14 +232,6 @@
+ 	player_state
+ 			= PlayerInterface::getPlayer(chat_mesg-&gt;getSourcePlayerIndex());
+ 
+-	if ((addChatString != 0)) {
+-		char mesg_str[144];
+-		sprintf(mesg_str, &quot; ---- %s ----&quot;, player_state-&gt;getName().c_str());
+-
+-		addChatString(mesg_str);
+-		addChatString(chat_mesg-&gt;message_text);
+-	} // ** if
+-
+ 	PIX color = Color::white;
+ 
+ 	switch (chat_mesg-&gt;message_scope) {
+@@ -289,42 +269,6 @@
+ 	}
+ }
+ 
+-void ChatInterface::setNewMessageCallBack(void(* addStringCallBack)(
+-		const char *message_text)) {
+-	addChatString = addStringCallBack;
+-}
+-
+-void ChatInterface::setMessageScopeAll() {
+-	current_chat_mesg.message_scope = _chat_mesg_scope_all;
+-}
+-
+-void ChatInterface::setMessageScopeAllies() {
+-	current_chat_mesg.message_scope = _chat_mesg_scope_alliance;
+-}
+-
+-void ChatInterface::setMessageScopeEnemies() {
+-	current_chat_mesg.message_scope = _chat_mesg_scope_enemies;
+-}
+-
+-void ChatInterface::setMessageScopeServer() {
+-	current_chat_mesg.message_scope = _chat_mesg_scope_server;
+-}
+-
+-void ChatInterface::sendCurrentMessage(const char *message_text) {
+-	current_chat_mesg.setSourcePlayerIndex(
+-			PlayerInterface::getLocalPlayerIndex());
+-	strncpy(current_chat_mesg.message_text, message_text, 149);
+-	current_chat_mesg.message_text[149] = 0;
+-
+-	if (NetworkState::status == _network_state_client) {
+-		CLIENT-&gt;sendMessage(&amp;current_chat_mesg, sizeof(ChatMesgRequest));
+-	} else {
+-		processChatMessages(&amp;current_chat_mesg);
+-	}
+-
+-	current_chat_mesg.reset();
+-}
+-
+ void ChatInterface::say(const char *message)
+ {
+ 	unsigned int text_len = strlen(message);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/ChatInterface.hpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -18,19 +18,10 @@
+ #ifndef _CHATINTERFACE_HPP
+ #define _CHATINTERFACE_HPP
+ 
+-//#include &quot;Classes/Network/ChatNetMessage.hpp&quot;
+-
+ class NetMessage;
+ 
+ class ChatInterface
+ {
+-protected:
+-//    static ChatMesgRequest current_chat_mesg;
+-    static void (* addChatString)( const char *message_text );
+-
+-    static void chatMessageRequest(const NetMessage* message);
+-    static void chatMessage(const NetMessage* message);
+-
+ public:
+     static void processChatMessages(const NetMessage* message);
+ 
+@@ -38,15 +29,6 @@
+     static void teamsay(const char * message);
+     static void serversay(const char * message);
+     static void serversayTo(const int player, const char * message);
+-
+-
+-    // ** ChatView Interface Methods
+-    static void setNewMessageCallBack( void (* addStringCallBack)( const char *message_text ) );
+-    static void setMessageScopeAll();
+-    static void setMessageScopeAllies();
+-    static void setMessageScopeEnemies();
+-    static void setMessageScopeServer();
+-    static void sendCurrentMessage(const char *message_text);
+ };
+ 
+ #endif // ** _CHATINTERFACE_HPP
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/DedicatedGameManager.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -111,8 +111,7 @@
+             }
+             case ServerCommand::CHAT:
+             {
+-                ChatInterface::setMessageScopeServer();
+-                ChatInterface::sendCurrentMessage(command.argument.c_str());
++                ChatInterface::serversay(command.argument.c_str());
+                 break;
+             }
+             case ServerCommand::STATUS:
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -30,9 +30,68 @@
+ #include &quot;Views/Game/MiniMapView.hpp&quot;
+ #include &quot;Views/GameViewGlobals.hpp&quot;
+ 
++#include &quot;Scripts/ScriptManager.hpp&quot;
++#include &quot;Scripts/ScriptHelper.hpp&quot;
++
++unsigned int GameConfig::video_width = 800;
++unsigned int GameConfig::video_height = 600;
++bool         GameConfig::video_fullscreen = false;
++bool         GameConfig::video_hardwaresurface = false;
++bool         GameConfig::video_doublebuffer = false;
++bool         GameConfig::video_shadows = true;
++bool         GameConfig::video_blendsmoke = true;
++#ifdef _WIN32
++bool         GameConfig::video_usedirectx = true;
++#endif
++
++
++#define WRITE_BOOL(v) ((v)?&quot;true&quot;:&quot;false&quot;)
++
++// This generates the tables needed for script binding
++static const ScriptVarBindRecord video_getters[] =
++{
++    { &quot;width&quot;,           GETSVTYPE_INT,     &amp;GameConfig::video_width },
++    { &quot;height&quot;,          GETSVTYPE_INT,     &amp;GameConfig::video_height },
++    { &quot;fullscreen&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::video_fullscreen },
++    { &quot;hardwaresurface&quot;, GETSVTYPE_BOOLEAN, &amp;GameConfig::video_hardwaresurface },
++    { &quot;doublebuffer&quot;,    GETSVTYPE_BOOLEAN, &amp;GameConfig::video_doublebuffer },
++    { &quot;shadows&quot;,         GETSVTYPE_BOOLEAN, &amp;GameConfig::video_shadows },
++    { &quot;blendsmoke&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::video_blendsmoke },
++#ifdef _WIN32
++    { &quot;usedirectx&quot;,      GETSVTYPE_BOOLEAN, &amp;GameConfig::video_usedirectx },
++#endif
++    {0,0}
++};
++
++static const ScriptVarBindRecord video_setters[] =
++{
++    { &quot;width&quot;,           SETSVTYPE_INT,     &amp;GameConfig::video_width },
++    { &quot;height&quot;,          SETSVTYPE_INT,     &amp;GameConfig::video_height },
++    { &quot;fullscreen&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::video_fullscreen },
++    { &quot;hardwaresurface&quot;, SETSVTYPE_BOOLEAN, &amp;GameConfig::video_hardwaresurface },
++    { &quot;doublebuffer&quot;,    SETSVTYPE_BOOLEAN, &amp;GameConfig::video_doublebuffer },
++    { &quot;shadows&quot;,         SETSVTYPE_BOOLEAN, &amp;GameConfig::video_shadows },
++    { &quot;blendsmoke&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::video_blendsmoke },
++#ifdef _WIN32
++    { &quot;usedirectx&quot;,      SETSVTYPE_BOOLEAN, &amp;GameConfig::video_usedirectx },
++#endif
++    {0,0}
++};
++
++void GameConfig::registerScript(const char * table_name)
++{
++//    ScriptManager::registerLib( table_name, video_methods);
++    ScriptManager::bindStaticVariables(table_name, &quot;video&quot;, &quot;ConfigVideoMetaTable&quot;,
++                                       video_getters, video_setters);
++
++}
++
++
++
+ GameConfig::GameConfig(const std::string&amp; configfile, bool usePhysFS)
+     // VariableName(&quot;Name&quot;, value [, minimum, maximum])
+-    : hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
++    :
++      hostorjoin(&quot;hostorjoin&quot;, _game_session_join, 0, _game_session_last-1),
+       quickConnect(&quot;quickconnect&quot;, false),
+       serverConnect(&quot;serverconnect&quot;, &quot;&quot;),
+     
+@@ -62,17 +121,6 @@
+       logging(&quot;logging&quot;, false),
+       publicServer(&quot;public&quot;, true),
+       
+-      screenresolution(&quot;resolution&quot;, 2, 0, 3),
+-      fullscreen(&quot;fullscreen&quot;, true),
+-      hardwareSurface(&quot;hardwareSurface&quot;, true),
+-      hardwareDoubleBuffer(&quot;hardwareDoubleBuffer&quot;, true),
+-      displayshadows(&quot;displayshadows&quot;, true),
+-      blendsmoke(&quot;blendsmoke&quot;, true),
+-      screengamma(&quot;gamma&quot;, 50, 0, 100),
+-#ifdef _WIN32
+-      usedirectx(&quot;usedirectx&quot;, true),
+-#endif
+-
+       enablesound(&quot;enable&quot;, true),
+       enablemusic(&quot;music&quot;, true),
+       musicvolume(&quot;musicvolume&quot;, 80, 0, 100),
+@@ -152,17 +200,6 @@
+     serversettings.push_back(&amp;logging);
+     serversettings.push_back(&amp;publicServer);
+    
+-    visualssettings.push_back(&amp;screenresolution);
+-    visualssettings.push_back(&amp;fullscreen);
+-    visualssettings.push_back(&amp;hardwareSurface);
+-    visualssettings.push_back(&amp;hardwareDoubleBuffer);
+-    visualssettings.push_back(&amp;displayshadows);
+-    visualssettings.push_back(&amp;blendsmoke);
+-    visualssettings.push_back(&amp;screengamma);
+-#ifdef _WIN32
+-    visualssettings.push_back(&amp;usedirectx);
+-#endif
+-
+     soundsettings.push_back(&amp;enablesound);
+     soundsettings.push_back(&amp;enablemusic);
+     soundsettings.push_back(&amp;musicvolume);
+@@ -218,6 +255,8 @@
+ 
+ void GameConfig::loadConfig()
+ {
++    ScriptManager::loadConfigFile(&quot;config/config.cfg&quot;, &quot;config&quot;);
++
+     INI::Store inifile;
+     if(usePhysFS) {
+         IFileStream in(configfile);
+@@ -234,7 +273,6 @@
+         default_player &lt;&lt; &quot;Player&quot; &lt;&lt; (rand()%1000);
+         playername=default_player.str();
+     }
+-    loadSettings(inifile.getSection(&quot;visuals&quot;), visualssettings);
+     loadSettings(inifile.getSection(&quot;sound&quot;), soundsettings);
+     loadSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     loadSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+@@ -322,7 +360,6 @@
+ 
+     saveSettings(inifile.getSection(&quot;game&quot;), gamesettings);
+     saveSettings(inifile.getSection(&quot;player&quot;), playersettings);
+-    saveSettings(inifile.getSection(&quot;visuals&quot;), visualssettings);
+     saveSettings(inifile.getSection(&quot;sound&quot;), soundsettings);
+     saveSettings(inifile.getSection(&quot;interface&quot;), interfacesettings);
+     saveSettings(inifile.getSection(&quot;radar&quot;), radarsettings);
+@@ -336,6 +373,46 @@
+         std::ofstream out(configfile.c_str());
+         inifile.save(out);
+     }
++
++    lua_State *L = ScriptManager::getLuavm();
++
++    lua_getglobal(L,&quot;config&quot;);
++    if ( ! lua_istable(L, -1) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, config doesn't exits.&quot;);
++        return;
++    }
++
++    lua_pushliteral(L, &quot;dump&quot;);
++    lua_rawget(L, -2);
++    if ( ! lua_isfunction(L, -1) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, config.dump function doesn't exits.&quot;);
++        lua_pop(L, 2);
++        return;
++    }
++
++    lua_pushvalue(L, -2);
++    lua_remove(L, -3);
++
++    if ( lua_pcall(L, 1, 1, 0) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, Lua error: '%s'&quot;, lua_tostring(L, -1));
++        lua_pop(L, 1);
++        return;
++    }
++
++    if ( ! lua_isstring(L, -1) )
++    {
++        LOGGER.warning(&quot;ERROR: Can't save configuration, dump result is not a string.&quot;);
++        lua_pop(L, 1);
++        return;
++    }
++
++    OFileStream out(&quot;config/config.cfg&quot;);
++    out &lt;&lt; lua_tostring(L, -1) &lt;&lt; std::endl;
++    lua_pop(L, 1);
++
+ }
+ 
+ void GameConfig::saveSettings(INI::Section&amp; section,
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameConfig.hpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -108,6 +108,17 @@
+     void loadConfig();
+     void saveConfig();
+ 
++    static unsigned int video_width;
++    static unsigned int video_height;
++    static bool         video_fullscreen;
++    static bool         video_hardwaresurface;
++    static bool         video_doublebuffer;
++    static bool         video_shadows;
++    static bool         video_blendsmoke;
++#ifdef _WIN32
++    static bool         video_usedirectx;
++#endif
++
+     // game Settings (there are not saved to disk)
+     ConfigInt       hostorjoin;         // 1=host, 2=join
+     ConfigBool      quickConnect;
+@@ -140,18 +151,6 @@
+     ConfigBool   logging;
+     ConfigBool   publicServer;
+ 
+-    // Visuals Settings
+-    ConfigInt   screenresolution;
+-    ConfigBool  fullscreen;
+-    ConfigBool  hardwareSurface;
+-    ConfigBool  hardwareDoubleBuffer;
+-    ConfigBool  displayshadows;
+-    ConfigBool  blendsmoke;
+-    ConfigInt   screengamma;
+-#ifdef _WIN32
+-    ConfigBool  usedirectx;
+-#endif
+-
+     // sound settings
+     ConfigBool  enablesound;
+     ConfigBool  enablemusic;
+@@ -308,6 +307,9 @@
+     }
+ 
+ private:
++    friend class ScriptManager;
++    static void registerScript(const char * table_name);
++
+     std::string configfile;
+     bool usePhysFS;
+ 
+@@ -345,7 +347,6 @@
+     std::vector&lt;ConfigVariable*&gt; gamesettings;
+     std::vector&lt;ConfigVariable*&gt; playersettings;
+     std::vector&lt;ConfigVariable*&gt; serversettings;
+-    std::vector&lt;ConfigVariable*&gt; visualssettings;
+     std::vector&lt;ConfigVariable*&gt; soundsettings;
+     std::vector&lt;ConfigVariable*&gt; interfacesettings;
+     std::vector&lt;ConfigVariable*&gt; radarsettings;
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameControlRulesDaemon.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -167,8 +167,7 @@
+             break;
+ 
+         case _map_cycle_server_state_display_endgame_views: {
+-                ChatInterface::setMessageScopeServer();
+-                ChatInterface::sendCurrentMessage(&quot;Round is over&quot;);
++                ChatInterface::serversay(&quot;Round is over&quot;);
+                                                                 
+                 SystemViewControl view_control;
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/GameManager.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -153,38 +153,21 @@
+ 
+ void GameManager::setVideoMode()
+ {
+-    // try to find sensible defaults for SDL flags...
+-    if(gameconfig-&gt;hardwareSurface.isDefaultValue()) {
+-        gameconfig-&gt;hardwareSurface = false;
+-    }
+-    if(gameconfig-&gt;hardwareDoubleBuffer.isDefaultValue()) {
+-        gameconfig-&gt;hardwareDoubleBuffer = false;
+-    }
+-
+     // construct flags
+     iXY mode_res;
+     iXY old_res = screen ? iXY(screen-&gt;getWidth(), screen-&gt;getHeight()): iXY(0,0);
+-    Uint32 flags = gameconfig-&gt;fullscreen ? SDL_FULLSCREEN : 0;
+-    flags |= gameconfig-&gt;hardwareSurface ? SDL_HWSURFACE : 0;
+-    flags |= gameconfig-&gt;hardwareDoubleBuffer ? SDL_DOUBLEBUF : 0;
++    Uint32 flags = GameConfig::video_fullscreen ? SDL_FULLSCREEN : 0;
++    flags |= GameConfig::video_hardwaresurface ? SDL_HWSURFACE : 0;
++    flags |= GameConfig::video_doublebuffer ? SDL_DOUBLEBUF : 0;
+ 
+-    int mode;
+-    for(mode=gameconfig-&gt;screenresolution; mode&gt;=0; mode--) {
+-        switch(mode) {
+-            case 0: mode_res = iXY(640,480); break;
+-            case 1: mode_res = iXY(800,600); break;
+-            case 2: mode_res = iXY(1024,768); break;
+-            case 3: mode_res = iXY(1280,1024); break;
+-        }
+-
+-        if(Screen-&gt;isDisplayModeAvailable(mode_res.x, mode_res.y, 8, flags)) {
+-            gameconfig-&gt;screenresolution = mode;
+-            break;
+-        }
++    if ( ! GameConfig::video_fullscreen )
++    {
++        flags |= SDL_RESIZABLE;
+     }
+-    if(mode&lt;0)
+-        throw Exception(&quot;couldn't find a usable video mode&quot;);
+ 
++    mode_res.x = GameConfig::video_width;
++    mode_res.y = GameConfig::video_height;
++
+     Screen-&gt;setVideoMode(mode_res.x, mode_res.y, 8, flags);
+ 
+     WorldViewInterface::setCameraSize( mode_res.x, mode_res.y);
+
+Modified: trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Interfaces/PlayerGameManager.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -468,7 +468,7 @@
+     if (KeyboardInterface::getKeyState( SDLK_LALT ) ||
+             KeyboardInterface::getKeyState( SDLK_RALT )) {
+         if (KeyboardInterface::getKeyPressed(SDLK_RETURN)) {
+-            gameconfig-&gt;fullscreen.toggle();
++            GameConfig::video_fullscreen = !GameConfig::video_fullscreen;
+             GameManager::setVideoMode();
+         }
+     } // ** LFT_ALT or RGT_ALT pressed
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Particles/ChunkTrajectoryParticle2D.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -118,7 +118,7 @@
+     packedSurface.setAttrib(iXY((int) pos.x, (int) (pos.z - arcYPix)), layer);
+     sorter.addSprite(&amp;packedSurface);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         packedSurfaceShadow.setAttrib(iXY((int) (pos.x - arcYPix), (int) pos.z), shadowLayer);
+         sorter.addSprite(&amp;packedSurfaceShadow);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Particles/CloudParticle2D.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -150,7 +150,7 @@
+     packedSurface.setAttrib(iXY(int(pos.x), int(pos.z)), layer);
+     sorter.addSprite(&amp;packedSurface);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         packedSurfaceShadow.setAttrib(iXY(int(pos.x - 300), int(pos.z)), shadowLayer);
+         sorter.addSprite(&amp;packedSurfaceShadow);
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Particles/PuffParticle2D.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -88,7 +88,7 @@
+ 
+     packedSurfaceShadow.setDrawModeBlend(&amp;Palette::colorTableDarkenALittle);
+ 
+-    if (gameconfig-&gt;blendsmoke) {
++    if (GameConfig::video_blendsmoke) {
+         int randColorTable = rand() % 4;
+ 
+         if (randColorTable == 0) {
+@@ -138,7 +138,7 @@
+     packedSurface.setAttrib(iXY((int) pos.x, (int) pos.z), layer);
+     sorter.addSprite(&amp;packedSurface);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         if (!userDefinedShadowPos) {
+             shadowPos.x = pos.x - ((float(index) /
+                         float(staticPackedSmokeLightPuff.size())) * packedSurfaceShadow.getCurFrame() * 10);
+
+Modified: trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Scripts/ScriptManager.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -28,6 +28,7 @@
+ 
+ #include &quot;Interfaces/ChatInterface.hpp&quot;
+ #include &quot;Interfaces/ConsoleInterface.hpp&quot;
++#include &quot;Interfaces/GameConfig.hpp&quot;
+ 
+ lua_State * ScriptManager::luavm = 0;
+ 
+@@ -43,7 +44,7 @@
+         }
+         Color::registerScript(&quot;Color&quot;);
+ //        ParticleInterface::registerScript(&quot;particles&quot;);
+-//        GameConfig::registerScript(&quot;config&quot;);
++        GameConfig::registerScript(&quot;config&quot;);
+ 
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/System/SDLEvents.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -24,6 +24,7 @@
+ #include &quot;SDLVideo.hpp&quot;
+ #include &quot;2D/Palette.hpp&quot;
+ #include &quot;Interfaces/GameConfig.hpp&quot;
++#include &quot;Interfaces/GameManager.hpp&quot;
+ 
+ bool handleSDLEvents()
+ {
+@@ -64,9 +65,14 @@
+         case SDL_ACTIVEEVENT:
+             if ( (event.active.state&amp;SDL_APPACTIVE)
+                  &amp;&amp; (event.active.gain==1)
+-                 &amp;&amp; gameconfig-&gt;fullscreen )
++                 &amp;&amp; GameConfig::video_fullscreen )
+                 Screen-&gt;setPalette(Palette::color);
+              break;
++        case SDL_VIDEORESIZE:
++            GameConfig::video_width = event.resize.w;
++            GameConfig::video_height = event.resize.h;
++            GameManager::setVideoMode();
++            break;
+         }
+     }
+ 
+
+Modified: trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/System/SDLVideo.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -37,7 +37,7 @@
+         : frontBuffer(0), backBuffer(0)
+ {
+ #ifdef _WIN32
+-    if ( gameconfig-&gt;usedirectx ) {
++    if ( GameConfig::video_usedirectx ) {
+         putenv(&quot;SDL_VIDEODRIVER=directx&quot;);
+     }
+ #endif
+@@ -57,6 +57,41 @@
+     SDL_QuitSubSystem(SDL_INIT_VIDEO);
+ }
+ 
++static bool getNearestFullScreenMode(int flags, int* width, int* height)
++{
++    SDL_Rect** modes = SDL_ListModes(0, flags);
++    if ( modes == 0 )
++    {
++        return false;
++    }
++    else if ( modes != (SDL_Rect**)-1 )
++    {
++        unsigned int min_x_dif = -1;
++        unsigned int min_y_dif = -1;
++        unsigned int nearest = 0;
++        for ( int n = 0; modes[n]; ++n )
++        {
++            unsigned int new_x_dif = abs((*width) - modes[n]-&gt;w);
++
++            if ( new_x_dif &lt;= min_x_dif )
++            {
++                unsigned int new_y_dif = abs((*height) - modes[n]-&gt;h);
++                if ( new_y_dif &lt;= min_y_dif )
++                {
++                    nearest = n;
++                    min_x_dif = new_x_dif;
++                    min_y_dif = new_y_dif;
++                }
++            }
++        }
++        *width = modes[nearest]-&gt;w;
++        *height = modes[nearest]-&gt;h;
++    }
++
++    return true;
++}
++
++
+ void SDLVideo::setVideoMode(int width, int height, int bpp, Uint32 flags)
+ {
+     // eventually delete old backbuffer
+@@ -65,7 +100,22 @@
+             SDL_FreeSurface(backBuffer);
+     }
+     
+-    flags |= SDL_HWPALETTE | SDL_ANYFORMAT;
++    int new_width = width;
++    int new_height = height;
++    if ( ! (flags&amp;SDL_FULLSCREEN) )
++    {
++//        bpp = 0;
++        flags |= SDL_ANYFORMAT;
++    }
++    else
++    {
++        getNearestFullScreenMode(flags, &amp;new_width, &amp;new_height);
++        LOGGER.warning(&quot;Setting fullscreen mode %d x %d (original %d x %d)&quot;,
++                             new_width, new_height, width, height);
++    }
++
++//    flags |= SDL_HWPALETTE | SDL_ANYFORMAT;
++
+     frontBuffer = SDL_SetVideoMode(width, height, bpp, flags);
+     if(!frontBuffer)
+         throw Exception(&quot;Couldn't set display mode (%dx%d, %X): %s&quot;,
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -56,21 +56,34 @@
+     x = xTextStart + 10;
+     y = 100;
+     
++    char res_str[20];
+     choiceResolution = new Choice();
+     choiceResolution-&gt;setName(&quot;Resolution&quot;);
+-    choiceResolution-&gt;addItem(&quot;640x480&quot;);
+-    choiceResolution-&gt;addItem(&quot;800x600&quot;);
+-    choiceResolution-&gt;addItem(&quot;1024x768&quot;);
+-    choiceResolution-&gt;addItem(&quot;1280x1024&quot;);
++    choiceResolution-&gt;addItem(&quot;current&quot;);
++    SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
++    int cur_mode = 0;
++    if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
++    {
++        while ( modes[cur_mode] )
++        {
++            snprintf(res_str,sizeof(res_str),&quot;%dx%d&quot;, modes[cur_mode]-&gt;w, modes[cur_mode]-&gt;h);
++            res_str[sizeof(res_str)-1] = 0;
++            choiceResolution-&gt;addItem(res_str);
++            ++cur_mode;
++        }
++    }
++
+     choiceResolution-&gt;setLocation(x, y);
+-    choiceResolution-&gt;select(gameconfig-&gt;screenresolution);
++    choiceResolution-&gt;select(0);
+     choiceResolution-&gt;setMinWidth(minWidth);
+     choiceResolution-&gt;setStateChangedCallback(this);
+     add(choiceResolution);
+     
++    current_width = 0;
++    current_height = 0;
++
+     checkBoxFullscreen = new CheckBox();
+     checkBoxFullscreen-&gt;setLabel(&quot;Fullscreen&quot;);
+-    checkBoxFullscreen-&gt;setState(gameconfig-&gt;fullscreen);    
+     checkBoxFullscreen-&gt;setLocation(x+ 200, y);
+     checkBoxFullscreen-&gt;setStateChangedCallback(this);
+     add(checkBoxFullscreen);
+@@ -96,7 +109,7 @@
+     
+     checkBoxDrawAllShadows = new CheckBox();
+     checkBoxDrawAllShadows-&gt;setLabel(&quot;Draw All Shadows&quot;);
+-    checkBoxDrawAllShadows-&gt;setState(gameconfig-&gt;displayshadows);
++    checkBoxDrawAllShadows-&gt;setState(GameConfig::video_shadows);
+     checkBoxDrawAllShadows-&gt;setLocation(x, y);
+     checkBoxDrawAllShadows-&gt;setStateChangedCallback(this);
+     add(checkBoxDrawAllShadows);
+@@ -104,7 +117,7 @@
+     
+     checkBoxBlendSmoke = new CheckBox();
+     checkBoxBlendSmoke-&gt;setLabel(&quot;Blend Smoke&quot;);
+-    checkBoxBlendSmoke-&gt;setState(gameconfig-&gt;blendsmoke);
++    checkBoxBlendSmoke-&gt;setState(GameConfig::video_blendsmoke);
+     checkBoxBlendSmoke-&gt;setLocation(x, y);
+     checkBoxBlendSmoke-&gt;setStateChangedCallback(this);
+     add(checkBoxBlendSmoke);
+@@ -136,6 +149,10 @@
+ //---------------------------------------------------------------------------
+ void VisualsView::doDraw(Surface &amp;viewArea, Surface &amp;clientArea)
+ {
++    checkBoxFullscreen-&gt;setState(GameConfig::video_fullscreen);
++    checkBoxBlendSmoke-&gt;setState(GameConfig::video_blendsmoke);
++    checkBoxDrawAllShadows-&gt;setState(GameConfig::video_shadows);
++
+     MenuTemplateView::doDraw(viewArea, clientArea);
+ 
+     View::doDraw(viewArea, clientArea);
+@@ -162,18 +179,44 @@
+ {
+     // Check Box Draw All Shadows
+     if (source == checkBoxDrawAllShadows) {
+-        gameconfig-&gt;displayshadows = checkBoxDrawAllShadows-&gt;getState();
++        GameConfig::video_shadows = checkBoxDrawAllShadows-&gt;getState();
+     }
+     // Check Box Blend Smoke
+     else if (source == checkBoxBlendSmoke) {
+-        gameconfig-&gt;blendsmoke = checkBoxBlendSmoke-&gt;getState();
++        GameConfig::video_blendsmoke = checkBoxBlendSmoke-&gt;getState();
+     } else if (source == checkBoxFullscreen) {
+-        gameconfig-&gt;fullscreen = checkBoxFullscreen-&gt;getState();
++        GameConfig::video_fullscreen = checkBoxFullscreen-&gt;getState();
+         GameManager::setVideoMode();
+     }
+     // Choice Resolution
+     else if (source == choiceResolution) {
+-        gameconfig-&gt;screenresolution = choiceResolution-&gt;getSelectedIndex();
++        int sel_index = choiceResolution-&gt;getSelectedIndex()-1;
++        if ( sel_index &lt; 0 )
++        {
++            return;
++        }
++
++        SDL_Rect** modes = SDL_ListModes(0, SDL_FULLSCREEN);
++        SDL_Rect* mode = 0;
++        if ( modes &amp;&amp; modes != (SDL_Rect**)-1 )
++        {
++            mode = modes[sel_index];
++        }
++
++        if ( mode )
++        {
++            GameConfig::video_width = mode-&gt;w;
++            GameConfig::video_height = mode-&gt;h;
++        }
++
++        if ( sel_index == 0 &amp;&amp; ! GameConfig::video_fullscreen )
++        {
++            // on Mac crash if we are in window and we select the biggest
++            // resolution (the first one in theory), we make it smaller so it
++            // wont crash, it is a SDL error.
++            GameConfig::video_height -= 50;
++        }
++
+         GameManager::setVideoMode();
+     }
+     // Choice Mini Map Unit Size
+
+Modified: trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Views/MainMenu/Options/VisualsView.hpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -49,6 +49,9 @@
+ 
+     // Option choices.
+     Choice   * choiceResolution;
++    unsigned int current_width;
++    unsigned int current_height;
++
+     Choice   * choiceGameViewBackgroundColor;
+     Choice   * choiceMiniMapObjectiveDrawMode;
+     Choice   * choiceMiniMapUnitSize;
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Weapons/MissleWeapon.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -152,7 +152,7 @@
+ 
+     groundLight.setWorldPos(location.x + thrustOffset.x, location.y + thrustOffset.y + heightFromGround);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         shellShadow.setWorldPos(location.x - 20, location.y);
+     }
+ }
+@@ -163,7 +163,7 @@
+     sorter.addSprite(&amp;thrust);
+     //sorter.addSprite(&amp;groundLight);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         sorter.addSprite(&amp;shellShadow);
+     }
+ }
+
+Modified: trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-21 10:18:22 UTC (rev 1185)
++++ trunk/netpanzer/src/NetPanzer/Weapons/ShellWeapon.cpp	2010-01-21 12:13:10 UTC (rev 1186)
+@@ -120,7 +120,7 @@
+ 
+     shell.setWorldPos(location);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         shellShadow.setWorldPos(location);
+     }
+ }
+@@ -129,13 +129,13 @@
+ {
+     shell.setWorldPos(location);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         shellShadow.setWorldPos(location.x - 10, location.y);
+     }
+ 
+     sorter.addSprite(&amp;shell);
+ 
+-    if (gameconfig-&gt;displayshadows) {
++    if (GameConfig::video_shadows) {
+         sorter.addSprite(&amp;shellShadow);
+     }
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000211.html">[Netpanzer-cvs] r1185 - in trunk/netpanzer/src: Lib/Network	NetPanzer/Classes NetPanzer/Interfaces
+</A></li>
+	<LI>Next message: <A HREF="000213.html">[Netpanzer-cvs] r1187 - trunk/netpanzer/src/NetPanzer/System
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#212">[ date ]</a>
+              <a href="thread.html#212">[ thread ]</a>
+              <a href="subject.html#212">[ subject ]</a>
+              <a href="author.html#212">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>

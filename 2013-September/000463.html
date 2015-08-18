@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Netpanzer-cvs] r1444 - trunk/netpanzer/src/NetPanzer/Resources
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/netpanzer-cvs/2013-September/index.html" >
+   <LINK REL="made" HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1444%20-%20trunk/netpanzer/src/NetPanzer/Resources&In-Reply-To=%3C20130928181553.4E4C355B0C%40scm.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000462.html">
+   <LINK REL="Next"  HREF="000464.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Netpanzer-cvs] r1444 - trunk/netpanzer/src/NetPanzer/Resources</H1>
+    <B>kromxp at scm.berlios.de</B> 
+    <A HREF="mailto:netpanzer-cvs%40lists.berlios.de?Subject=Re%3A%20%5BNetpanzer-cvs%5D%20r1444%20-%20trunk/netpanzer/src/NetPanzer/Resources&In-Reply-To=%3C20130928181553.4E4C355B0C%40scm.berlios.de%3E"
+       TITLE="[Netpanzer-cvs] r1444 - trunk/netpanzer/src/NetPanzer/Resources">kromxp at scm.berlios.de
+       </A><BR>
+    <I>Sat Sep 28 20:15:53 CEST 2013</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000462.html">[Netpanzer-cvs] r1443 - in trunk/netpanzer: . data pics/buttons	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private	src/Lib/2D/Components src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Scenes	src/NetPanzer/Scenes/Common src/NetPanzer/Views/Game
+</A></li>
+        <LI>Next message: <A HREF="000464.html">[Netpanzer-cvs] r1445 - in trunk/netpanzer: data	projects/netpanzer-svn-windows/nbproject/private	src/NetPanzer/Resources
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#463">[ date ]</a>
+              <a href="thread.html#463">[ thread ]</a>
+              <a href="subject.html#463">[ subject ]</a>
+              <a href="author.html#463">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: kromxp
+Date: 2013-09-28 20:15:52 +0200 (Sat, 28 Sep 2013)
+New Revision: 1444
+
+Modified:
+   trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+   trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp
+Log:
+avoid #include &lt;map&gt; in ResourceManager header
+
+Modified: trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2013-09-28 17:54:55 UTC (rev 1443)
++++ trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.cpp	2013-09-28 18:15:52 UTC (rev 1444)
+@@ -377,7 +377,7 @@
+     return mapfile;
+ }
+ 
+-template&lt;typename T&gt; void ResourceManager::loadJSonResourceArray(const Json::Value&amp; v, std::map&lt;NPString, T*&gt;&amp; m, const char * rname )
++template&lt;typename T, typename M&gt; void ResourceManager::loadJSonResourceArray(const Json::Value&amp; v, M&amp; m, const char * rname )
+ {
+     if ( v.isArray() &amp;&amp; v.size() &gt; 0 )
+     {
+@@ -386,7 +386,7 @@
+             T * c = resourceFromJSon&lt;T&gt;(v[n]);
+             if ( c )
+             {
+-                typename std::map&lt;NPString, T*&gt;::iterator i = m.find(c-&gt;name);
++                typename M::iterator i = m.find(c-&gt;name);
+                 if ( i == m.end() )
+                 {
+                     LOGGER.warning(&quot;Adding %s: '%s'&quot;, rname, c-&gt;name.c_str());
+@@ -414,11 +414,11 @@
+             return false;
+         }
+         
+-        loadJSonResourceArray(root[&quot;mcursors&quot;],     RMan-&gt;mcursors,     &quot;cursor&quot;);
+-        loadJSonResourceArray(root[&quot;images&quot;],       RMan-&gt;images,       &quot;image&quot;);
+-        loadJSonResourceArray(root[&quot;mimages&quot;],      RMan-&gt;mimages,      &quot;mimage&quot;);
+-        loadJSonResourceArray(root[&quot;blendtables&quot;],  RMan-&gt;blendtables,  &quot;blendtable&quot;);
+-        loadJSonResourceArray(root[&quot;imagefilters&quot;], RMan-&gt;imagefilters, &quot;imagefilter&quot;);
++        loadJSonResourceArray&lt;MouseCursor&gt;(root[&quot;mcursors&quot;],     RMan-&gt;mcursors,     &quot;cursor&quot;);
++        loadJSonResourceArray&lt;Image&gt;      (root[&quot;images&quot;],       RMan-&gt;images,       &quot;image&quot;);
++        loadJSonResourceArray&lt;MImage&gt;     (root[&quot;mimages&quot;],      RMan-&gt;mimages,      &quot;mimage&quot;);
++        loadJSonResourceArray&lt;BlendTable&gt; (root[&quot;blendtables&quot;],  RMan-&gt;blendtables,  &quot;blendtable&quot;);
++        loadJSonResourceArray&lt;ImageFilter&gt;(root[&quot;imagefilters&quot;], RMan-&gt;imagefilters, &quot;imagefilter&quot;);
+ 
+         return true;
+     }
+
+Modified: trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp
+===================================================================
+--- trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp	2013-09-28 17:54:55 UTC (rev 1443)
++++ trunk/netpanzer/src/NetPanzer/Resources/ResourceManager.hpp	2013-09-28 18:15:52 UTC (rev 1444)
+@@ -29,7 +29,6 @@
+ #include &quot;BlendTable.hpp&quot;
+ #include &quot;ImageFilter.hpp&quot;
+ #include &lt;vector&gt;
+-#include &lt;map&gt;
+ 
+ #include &quot;json/json-forwards.h&quot;
+ 
+@@ -65,13 +64,13 @@
+     static bool mapExists(const NPString&amp; name);
+     static const MapFile* getMap(const NPString&amp; name, const int flags);
+     
+-    static bool loadResourceDescriptions(const NPString&amp; filename);
+-    
+     template&lt;typename T&gt; static T getResource(const NPString&amp; name);
+ 
+ private:
++    static bool loadResourceDescriptions(const NPString&amp; filename);
++    
+     template&lt;typename T&gt; static T* resourceFromJSon(const Json::Value&amp; node);
+-    template&lt;typename T&gt; static void loadJSonResourceArray(const Json::Value&amp; v, std::map&lt;NPString, T*&gt;&amp; m, const char * rname );
++    template&lt;typename T, typename M&gt; static void loadJSonResourceArray(const Json::Value&amp; v, M&amp; m, const char * rname );
+ };
+ 
+ #endif	/* _RESOURCEMANAGER_HPP */
+
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000462.html">[Netpanzer-cvs] r1443 - in trunk/netpanzer: . data pics/buttons	projects/netpanzer-svn-windows/nbproject	projects/netpanzer-svn-windows/nbproject/private	src/Lib/2D/Components src/NetPanzer/Interfaces	src/NetPanzer/Resources src/NetPanzer/Scenes	src/NetPanzer/Scenes/Common src/NetPanzer/Views/Game
+</A></li>
+	<LI>Next message: <A HREF="000464.html">[Netpanzer-cvs] r1445 - in trunk/netpanzer: data	projects/netpanzer-svn-windows/nbproject/private	src/NetPanzer/Resources
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#463">[ date ]</a>
+              <a href="thread.html#463">[ thread ]</a>
+              <a href="subject.html#463">[ subject ]</a>
+              <a href="author.html#463">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/netpanzer-cvs">More information about the Netpanzer-cvs
+mailing list</a><br>
+</body></html>
